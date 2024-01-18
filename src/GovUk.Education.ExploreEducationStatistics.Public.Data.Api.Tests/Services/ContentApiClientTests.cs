@@ -54,25 +54,26 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
+        public async Task HttpClientFailureStatusCode_ThrowsException(
                 HttpStatusCode responseStatusCode)
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
                 .Respond(responseStatusCode, new StringContent("test message"));
 
-            var action = async () => await _contentApiClient.ListPublications(
-                page: It.IsAny<int>(),
-                pageSize: It.IsAny<int>(),
-                search: It.IsAny<string>(),
-                publicationIds: It.IsAny<IEnumerable<Guid>>());
-
-            await Assert.ThrowsAsync<HttpRequestException>(action);
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+            {
+                await _contentApiClient.ListPublications(
+                    page: It.IsAny<int>(),
+                    pageSize: It.IsAny<int>(),
+                    search: It.IsAny<string>(),
+                    publicationIds: It.IsAny<IEnumerable<Guid>>());
+            });
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
 
         [Fact]
-        public async Task HttpClientRespondsWithSuccess_ReturnsPublications()
+        public async Task HttpClientSuccess_ReturnsPublications()
         {
             var results = new List<PublicationSearchResultViewModel>()
             {

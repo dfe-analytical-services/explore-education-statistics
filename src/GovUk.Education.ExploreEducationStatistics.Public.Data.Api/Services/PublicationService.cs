@@ -15,8 +15,8 @@ internal class PublicationService : IPublicationService
 
     public PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
     {
-        this._publicDataDbContext = publicDataDbContext;
-        this._contentApiClient = contentApiClient;
+        _publicDataDbContext = publicDataDbContext;
+        _contentApiClient = contentApiClient;
     }
 
     public async Task<Either<ActionResult, PaginatedPublicationListViewModel>> ListPublications(
@@ -24,7 +24,7 @@ internal class PublicationService : IPublicationService
         int pageSize, 
         string? search = null)
     {
-        return await GetPublishedDataSetPublicationIds(_publicDataDbContext)
+        return await GetPublishedDataSetPublicationIds()
             .OnSuccess(async (publicationIds) =>
                 await _contentApiClient.ListPublications(page, pageSize, search, publicationIds))
             .OnSuccess((paginatedPublications) =>
@@ -40,10 +40,9 @@ internal class PublicationService : IPublicationService
             });
     }
 
-    private static Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds(
-        PublicDataDbContext publicDataDbContext)
+    private Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds()
     {
-        return publicDataDbContext.DataSets
+        return _publicDataDbContext.DataSets
             .Where(ds => ds.Status == DataSetStatus.Published)
             .Select(ds => ds.PublicationId)
             .ToHashSet();

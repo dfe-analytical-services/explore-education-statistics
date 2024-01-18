@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 [ExcludeFromCodeCoverage]
 public class Startup
 {
-    private readonly IConfiguration configuration;
-    private readonly IHostEnvironment hostEnvironment;
+    private readonly IConfiguration _configuration;
+    private readonly IHostEnvironment _hostEnvironment;
 
     public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        this.configuration=configuration;
-        this.hostEnvironment=hostEnvironment;
+        _configuration = configuration;
+        _hostEnvironment = hostEnvironment;
     }
 
     // This method gets called by the runtime. Use this method to add services to the container.
@@ -72,12 +71,12 @@ public class Startup
 
         services.AddDbContext<PublicDataDbContext>(options =>
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("PublicDataDb"));
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
             dataSourceBuilder.MapEnum<GeographicLevel>();
 
             options
                 .UseNpgsql(dataSourceBuilder.Build())
-                .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
+                .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
         });
 
         // Caching and compression
@@ -97,7 +96,7 @@ public class Startup
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>
         {
-            var contentApiOptions = configuration
+            var contentApiOptions = _configuration
                 .GetRequiredSection(ContentApiOptions.Section)
                 .Get<ContentApiOptions>()!;
 

@@ -53,9 +53,10 @@ internal class ContentApiClient : IContentApiClient
             }
         }
 
-        var deserializedResponse =
+        var publications =
             await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
 
-        return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(deserializedResponse);
+        return publications
+            ?? throw new Exception("Could deserialize publications from content API.");
     }
 }
