@@ -26,6 +26,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
+        [InlineData(1, 2, 2, 0)]
         [InlineData(1, 2, 2, 1)]
         [InlineData(2, 2, 2, 1)]
         [InlineData(1, 2, 2, 10)]
