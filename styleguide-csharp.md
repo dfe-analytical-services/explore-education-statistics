@@ -95,8 +95,11 @@ of agreed coding standards to conform to when writing C# code for this repositor
 
 - Top-level class names will follow the naming convention `{ClassUnderTest}Tests`
 - Create a nested class on a per-public-method being tested basis `{MethodUnderTest}Tests`
-    * Do this from the outset, from he first method being tested. Do not wait until there are mutliple methods being tested to convert to this style
-    * Also use doubly-nested classes on a per-feature basis where appropriate `{FeatureUnderTest}Tests`
+    * Do this from the outset, from the first method being tested. Do not wait until there are multiple methods being tested to convert to this style
+    * Also use doubly-nested classes on a per-scenario basis where appropriate `{ScenarioUnderTest}Tests`. For example: 
+             
+      > Imagine under a nested `{MethodUnderTest}Tests`-type class, named `ListPublicationsTests`, we have methods like `UserIsPublicationOwner_Success`, `UserIsPublicationOwner_SupercededPublicationsExist`, `UserIsPublicationApprover_Success`, `UserIsPublicationApprover_SupercededPublicationsExist` etc... You might deem it sensible to create a 2nd level of nesting under `ListPublicationsTests` so that you then have the classes `UserIsPublicationOwnerTests` and `UserIsPublicationApproverTests`, and underneath them are their respective test methods like `Success`, `SupercededPublicationsExist`.   
+       
 - Generally follow a `Scenario_Result` pattern for test method names
 - Simple happy-path scenario could just be called `Success` for succinctness
 
@@ -110,4 +113,4 @@ of agreed coding standards to conform to when writing C# code for this repositor
 <a id="s3.3.1-synchronous-vs-asynchronous-test-methods"></a>
 #### 3.3.1 Synchronous VS Asynchronous Test Methods
 
-- If a test methods is using async method(s), then the method declaration should be marked as `async Task` or `async Task<T>`. See [here](https://miro.com/app/board/o9J_ly21jhs=/?moveToWidget=3458764574908695514&cot=14).
+- If a test methods is using async method(s), then the method declaration should be marked as `async Task` or `async Task<T>`.
