@@ -100,7 +100,7 @@ public class PublicationService : IPublicationService
         // Retrieve only requested publication IDs if specified
         if (publicationIds is not null)
         {
-            baseQueryable = baseQueryable.Where(p => publicationIds!.Contains(p.Id));
+            baseQueryable = baseQueryable.Where(p => publicationIds.Contains(p.Id));
         }
 
         // Apply release type and theme filters
