@@ -29,11 +29,11 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         return scope.ServiceProvider.GetRequiredService<TDbContext>();
     }
 
-    public async Task AddTestData<TDbContext>(Func<TDbContext, Task> supplier) where TDbContext : DbContext
+    public async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();
 
-        await supplier.Invoke(context);
+        supplier.Invoke(context);
         await context.SaveChangesAsync();
     }
 

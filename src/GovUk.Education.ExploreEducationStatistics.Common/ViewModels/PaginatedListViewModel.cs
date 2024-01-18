@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ public record PaginatedListViewModel<T>
         Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults);
     }
 
-    [System.Text.Json.Serialization.JsonConstructor]
+    [JsonConstructor]
     [Newtonsoft.Json.JsonConstructor]
     public PaginatedListViewModel(List<T> results, PagingViewModel paging)
     {

@@ -2,7 +2,18 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
-public record PublicationListViewModel(Guid Id, string Title, string Slug, string Summary, DateTimeOffset LastPublished);
+public record PublicationListViewModel
+{
+    public required Guid Id { get; init; }
+    
+    public required string Title { get; init; }
+    
+    public required string Slug { get; init; }
+    
+    public required string Summary { get; init; }
+    
+    public required DateTimeOffset LastPublished { get; init; }
+}
 
 public record PaginatedPublicationListViewModel : PaginatedListViewModel<PublicationListViewModel>
 {

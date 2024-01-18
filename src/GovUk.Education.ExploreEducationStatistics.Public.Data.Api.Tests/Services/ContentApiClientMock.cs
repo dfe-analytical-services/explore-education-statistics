@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
@@ -80,10 +79,17 @@ internal class ContentApiClientMock : IContentApiClient
     private PublicationSearchResultViewModel CreatePublication(Guid guid)
     {
         return _dataFixture
-            .Generator<PublicationSearchResultViewModel>()
-            .WithDefaults()
-            .WithPublicationId(guid)
-            .Generate();
+           .Generator<PublicationSearchResultViewModel>()
+           .ForInstance(s => s
+               .SetDefault(p => p.Id)
+               .SetDefault(p => p.Title)
+               .SetDefault(p => p.Slug)
+               .SetDefault(p => p.Summary)
+               .SetDefault(p => p.Theme)
+               .Set(p => p.Published, p => p.Date.Past())
+               .Set(p => p.Type, Content.Model.ReleaseType.OfficialStatistics)
+               .Set(p => p.Id, guid))
+           .Generate();
     }
 
     private static PaginatedListViewModel<PublicationSearchResultViewModel> EmptyResult(int page,

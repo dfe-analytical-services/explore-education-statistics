@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
 using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -44,12 +45,19 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp(new ContentApiClientMock()).CreateClient();
 
-            var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
-            var unpublishedDataSets = GenerateUnpublishedDataSets(numberOfUnpublishedDataSets);
+            var publishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Published)
+                .GenerateList(numberOfPublishedDataSets);
+
+            var unpublishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Unpublished)
+                .GenerateList(numberOfUnpublishedDataSets); 
 
             var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
 
-            await AddTestDataSets(allDataSets);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
 
             var response = await ListPublications(client, page, pageSize);
 
@@ -58,9 +66,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
 
             Assert.NotNull(content);
-            Assert.Equal(page, content!.Paging.Page);
-            Assert.Equal(pageSize, content!.Paging.PageSize);
-            Assert.Equal(numberOfPublishedDataSets, content!.Paging.TotalResults);
+            Assert.Equal(page, content.Paging.Page);
+            Assert.Equal(pageSize, content.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
 
             var expectedPublicationIds = publishedDataSets
                 .Select(ds => ds.PublicationId)
@@ -139,53 +147,6 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
-    }
-
-    private IReadOnlyList<DataSet> GeneratePublishedDataSets(int numberToGenerate)
-    {
-        return Enumerable.Range(0, numberToGenerate)
-            .Select(_ => GeneratePublishedDataSet())
-            .ToList();
-    }
-
-    private DataSet GeneratePublishedDataSet()
-    {
-        return DataFixture
-            .Generator<DataSet>()
-            .WithDefaults()
-            .WithStatus(DataSetStatus.Published)
-            .Generate();
-    }
-
-    private IReadOnlyList<DataSet> GenerateUnpublishedDataSets(int numberToGenerate)
-    {
-        return Enumerable.Range(0, numberToGenerate)
-            .Select(_ => GenerateUnpublishedDataSet())
-            .ToList();
-    }
-
-    private DataSet GenerateUnpublishedDataSet()
-    {
-        return DataFixture
-            .Generator<DataSet>()
-            .WithDefaults()
-            .WithStatus(DataSetStatus.Unpublished)
-            .Generate();
-    }
-
-    private async Task AddTestDataSets(params DataSet[] dataSets)
-    {
-        foreach (var dataSet in dataSets)
-        {
-            await AddTestDataSet(dataSet);
-        }
-    }
-
-    private async Task AddTestDataSet(DataSet dataSet)
-    {
-        async Task supplier(PublicDataDbContext dbContext) => await dbContext.AddAsync(dataSet);
-
-        await TestApp.AddTestData<PublicDataDbContext>(supplier);
     }
 
     private async Task<HttpResponseMessage> ListPublications(
