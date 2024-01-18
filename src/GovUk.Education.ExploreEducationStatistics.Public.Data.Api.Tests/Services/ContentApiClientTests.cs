@@ -47,6 +47,13 @@ public abstract class ContentApiClientTests
 
         [Theory]
         [InlineData(HttpStatusCode.RequestTimeout)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.Conflict)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotAcceptable)]
         public async Task HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
                 HttpStatusCode responseStatusCode)
         {
