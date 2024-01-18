@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
+
 public static class PublicationSearchResultViewModelGeneratorExtensions
 {
     public static Generator<PublicationSearchResultViewModel> DefaultDataSet(this DataFixture fixture)

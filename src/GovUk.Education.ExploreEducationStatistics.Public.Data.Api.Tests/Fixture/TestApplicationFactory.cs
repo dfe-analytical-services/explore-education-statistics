@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;

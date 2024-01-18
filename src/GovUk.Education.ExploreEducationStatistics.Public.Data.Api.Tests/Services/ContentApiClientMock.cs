@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Servi
 
 internal class ContentApiClientMock : IContentApiClient
 {
-    private readonly DataFixture DataFixture = new();
+    private readonly DataFixture _dataFixture = new();
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         int page,
@@ -20,34 +20,42 @@ internal class ContentApiClientMock : IContentApiClient
     {
         if (publicationIds is null)
         {
-            return await AllPublications(page, pageSize);
+            return await Task.FromResult(AllPublications(page: page, pageSize: pageSize));
         }
 
-        if (!publicationIds!.Any())
+        var publicationIdsList = publicationIds.ToList();
+
+        if (!publicationIdsList.Any())
         {
-            return await EmptyResult(page, pageSize);
+            return await Task.FromResult(EmptyResult(page: page, pageSize: pageSize));
         }
 
-        var publicationsToReturn = PaginatePublications(page, pageSize, publicationIds);
+        var publicationsToReturn = PaginatePublications(
+            page: page, 
+            pageSize: pageSize, 
+            allPublicationIds: publicationIdsList);
 
         return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(
-            publicationsToReturn,
-            publicationIds!.Count(), 
-            page, 
-            pageSize));
+            results: publicationsToReturn,
+            totalResults: publicationIdsList.Count, 
+            page: page, 
+            pageSize: pageSize));
     }
 
-    private async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> AllPublications(int page, int pageSize)
+    private PaginatedListViewModel<PublicationSearchResultViewModel> AllPublications(int page, int pageSize)
     {
         var allPublicationIds = GenerateRandomPublicationIds();
 
-        var publicationsToReturn = PaginatePublications(page, pageSize, allPublicationIds);
+        var publicationsToReturn = PaginatePublications(
+            page: page, 
+            pageSize: pageSize, 
+            allPublicationIds: allPublicationIds);
 
-        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(
-            publicationsToReturn,
-            allPublicationIds.Count, 
-            page, 
-            pageSize));
+        return new PaginatedListViewModel<PublicationSearchResultViewModel>(
+            results: publicationsToReturn,
+            totalResults: allPublicationIds.Count,
+            page: page,
+            pageSize: pageSize);
     }
 
     private static IReadOnlyList<Guid> GenerateRandomPublicationIds()
@@ -57,10 +65,12 @@ internal class ContentApiClientMock : IContentApiClient
             .ToList();
     }
 
-    private List<PublicationSearchResultViewModel> PaginatePublications(int page, int pageSize,
+    private List<PublicationSearchResultViewModel> PaginatePublications(
+        int page,
+        int pageSize,
         IEnumerable<Guid> allPublicationIds)
     {
-        return allPublicationIds!
+        return allPublicationIds
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(CreatePublication)
@@ -69,17 +79,16 @@ internal class ContentApiClientMock : IContentApiClient
 
     private PublicationSearchResultViewModel CreatePublication(Guid guid)
     {
-        return DataFixture
+        return _dataFixture
             .Generator<PublicationSearchResultViewModel>()
             .WithDefaults()
             .WithPublicationId(guid)
             .Generate();
     }
 
-    private static async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> EmptyResult(int page,
+    private static PaginatedListViewModel<PublicationSearchResultViewModel> EmptyResult(int page,
         int pageSize)
     {
-        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, page,
-            pageSize));
+        return new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, page, pageSize);
     }
 }

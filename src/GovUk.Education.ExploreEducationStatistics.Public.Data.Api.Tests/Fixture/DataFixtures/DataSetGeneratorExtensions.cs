@@ -2,6 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
+
 public static class DataSetGeneratorExtensions
 {
     public static Generator<DataSet> DefaultDataSet(this DataFixture fixture)
