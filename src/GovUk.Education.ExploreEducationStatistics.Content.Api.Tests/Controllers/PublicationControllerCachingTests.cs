@@ -67,7 +67,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
 
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetPublicationListCacheKey(_getQuery),
+                new ListPublicationsGetCacheKey(_getQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(null);
 
@@ -76,7 +76,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
 
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
-                new GetPublicationListCacheKey(_getQuery),
+                new ListPublicationsGetCacheKey(_getQuery),
                 _publications,
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null));
@@ -107,7 +107,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     {
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetPublicationListCacheKey(_getQuery),
+                new ListPublicationsGetCacheKey(_getQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(_publications);
 
@@ -127,7 +127,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
 
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new PostPublicationListCacheKey(_postQuery),
+                new ListPublicationsPostCacheKey(_postQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(null);
 
@@ -136,7 +136,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
 
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
-                new PostPublicationListCacheKey(_postQuery),
+                new ListPublicationsPostCacheKey(_postQuery),
                 _publications,
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null));
@@ -167,7 +167,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     {
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new PostPublicationListCacheKey(_postQuery),
+                new ListPublicationsPostCacheKey(_postQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(_publications);
 
