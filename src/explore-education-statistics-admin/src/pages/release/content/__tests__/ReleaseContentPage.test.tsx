@@ -434,11 +434,11 @@ describe('ReleaseContentPage', () => {
     });
 
     expect(
-      screen.getByRole('button', { name: 'Set page view' }),
+      screen.getByRole('button', { name: 'Change page view' }),
     ).toBeInTheDocument();
 
     const radios = within(
-      screen.getByRole('group', { name: 'Set page view' }),
+      screen.getByRole('group', { name: 'Change page view' }),
     ).getAllByRole('radio');
     expect(radios).toHaveLength(3);
     expect(radios[0]).toEqual(screen.getByLabelText('Edit content'));
