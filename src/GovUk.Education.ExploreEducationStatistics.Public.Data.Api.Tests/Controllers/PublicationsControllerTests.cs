@@ -34,7 +34,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(2, 2, 9, 1)]
         [InlineData(1, 2, 9, 10)]
         [InlineData(1, 3, 2, 1)]
-        public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublicationsForPublishedDataSets(
+        public async Task MultiplePublishedDataSets_Returns200WithAllPublicationsForPublishedDataSets(
             int page,
             int pageSize,
             int numberOfPublishedDataSets,
@@ -83,7 +83,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task ListPublications_NoPublishedDataSets_Returns200WithEmptyList()
+        public async Task NoPublishedDataSets_Returns200WithEmptyList()
         {
             var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
@@ -103,7 +103,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public async Task ListPublications_RequestedPageIsTooSmall_Returns400(int page)
+        public async Task RequestedPageIsTooSmall_Returns400(int page)
         {
             var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
@@ -116,7 +116,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(0)]
         [InlineData(-1)]
         [InlineData(41)]
-        public async Task ListPublications_RequestedPageSizeIsOutOfAcceptableRange_Returns400(int pageSize)
+        public async Task RequestedPageSizeIsOutOfAcceptableRange_Returns400(int pageSize)
         {
             var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
@@ -128,7 +128,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Theory]
         [InlineData("a")]
         [InlineData("aa")]
-        public async Task ListPublications_RequestedSearchTermIsNotLongEnough_Returns400(string searchTerm)
+        public async Task RequestedSearchTermIsNotLongEnough_Returns400(string searchTerm)
         {
             var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
