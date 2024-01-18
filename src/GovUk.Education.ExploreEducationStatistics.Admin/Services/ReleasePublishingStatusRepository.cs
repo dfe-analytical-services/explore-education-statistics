@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
@@ -53,7 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (releaseIds.IsNullOrEmpty())
             {
-                // If filter is string.Empty, the query returns all table entities
+                // Return early as we want to do nothing in this case - without this,
+                // `filter` will be string.Empty and the query returns all table entities
                 return;
             }
 
@@ -62,14 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 var newFilter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
                     QueryComparisons.Equal, releaseId.ToString());
-                if (filter == string.Empty)
-                {
-                    filter = newFilter;
-                }
-                else
-                {
-                    filter = TableQuery.CombineFilters(filter, TableOperators.Or, newFilter);
-                }
+
+                filter = filter == string.Empty
+                    ? newFilter
+                    : TableQuery.CombineFilters(filter, TableOperators.Or, newFilter);
             }
 
             var cloudTable = _publisherTableStorageService.GetTable(PublisherReleaseStatusTableName);
