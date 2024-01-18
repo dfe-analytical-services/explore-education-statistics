@@ -61,7 +61,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         }), 5, 1, 10);
 
     [Fact]
-    public async Task ListPublicationsAsGetRequest_NoCachedEntryExists()
+    public async Task ListPublications_GetRequest_NoCachedEntryExists_CreatesCache()
     {
         var publicationService = new Mock<IPublicationService>(Strict);
 
@@ -103,7 +103,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public async Task ListPublicationsAsGetRequest_CachedEntryExists()
+    public async Task ListPublications_GetRequest_CachedEntryExists_ReturnsCache()
     {
         MemoryCacheService
             .Setup(s => s.GetItem(
@@ -121,7 +121,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public async Task ListPublicationsAsPostRequest_NoCachedEntryExists()
+    public async Task ListPublications_PostRequest_NoCachedEntryExists_CreatesCache()
     {
         var publicationService = new Mock<IPublicationService>(Strict);
 
@@ -163,7 +163,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public async Task ListPublicationsAsPostRequest_CachedEntryExists()
+    public async Task ListPublications_PostRequest_CachedEntryExists_ReturnsCache()
     {
         MemoryCacheService
             .Setup(s => s.GetItem(
