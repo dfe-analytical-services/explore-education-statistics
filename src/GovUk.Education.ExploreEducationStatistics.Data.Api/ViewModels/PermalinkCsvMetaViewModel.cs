@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 

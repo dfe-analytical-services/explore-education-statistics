@@ -1,10 +1,13 @@
+.idea/
 .next/
 build/
+dist/
 coverage/
 node_modules/
 *.min.css
 *.min.js
 # Artifacts can leak between jobs on self-hosted runners
 wwwroot/
+src/GovUk.Education.ExploreEducationStatistics.*/
 # This file is massive and holds the formatter
 src/explore-education-statistics-common/src/modules/charts/files/ukGeoJson.json

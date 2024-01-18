@@ -37,6 +37,7 @@ const errorMappings = [
       FileTypeInvalid: 'Choose a file of an allowed format',
       FilenameCannotContainSpacesOrSpecialCharacters:
         'Filename cannot contain spaces or special characters',
+      FileSizeLimitExceeded: 'Choose a file that is under 2GB',
     },
   }),
 ];
@@ -74,6 +75,8 @@ export default function AncillaryFileForm({
     },
     errorMappings,
   );
+
+  const MAX_FILE_SIZE = 2147483647; // 2GB
 
   return (
     <Formik<AncillaryFileFormValues>
@@ -113,6 +116,7 @@ export default function AncillaryFileForm({
         summary: Yup.string().required('Enter a summary'),
         file: Yup.file()
           .minSize(0, 'Choose a file that is not empty')
+          .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB')
           .notRequired(),
       }).concat(validationSchema ?? Yup.object().notRequired())}
     >
@@ -134,7 +138,7 @@ export default function AncillaryFileForm({
 
           <FormFieldFileInput<AncillaryFileFormValues>
             disabled={form.isSubmitting}
-            hint={initialValues?.file?.name}
+            hint="Maximum file size 2GB"
             label={fileFieldLabel}
             name="file"
           />

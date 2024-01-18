@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
@@ -104,16 +104,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         // both in order to support legacy URLs in bookmarks and in content, but also to remain consistent with the equivalent
         // endpoint in the Admin API, which does require the Release Id in order to differentiate between different 
         // DataBlockVersions rather than simply picking the latest published one.
-        [ResponseCache(Duration = 300)]
         [HttpGet("tablebuilder/release/{releaseId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
             Guid dataBlockParentId)
         {
-            return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+            var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessDo(dataBlockVersion => this
                     .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
                 .OnSuccess(GetDataBlockTableResult)
                 .HandleFailuresOrOk();
+
+            if (actionResult.Result is not NotFoundResult)
+            {
+                Response.Headers["Cache-Control"] = "public,max-age=300";
+            }
+
+            return actionResult;
         }
 
         [HttpGet("tablebuilder/fast-track/{dataBlockParentId:guid}")]

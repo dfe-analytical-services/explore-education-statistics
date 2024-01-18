@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -100,16 +101,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private TopicService SetupTopicService(
-            ContentDbContext contentContext = null,
-            StatisticsDbContext statisticsContext = null,
-            PersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IMapper mapper = null,
-            IUserService userService = null,
-            IReleaseSubjectRepository releaseSubjectRepository = null,
-            IReleaseDataFileService releaseDataFileService = null,
-            IReleaseFileService releaseFileService = null,
-            IPublishingService publishingService = null,
-            IMethodologyService methodologyService = null)
+            ContentDbContext? contentContext = null,
+            StatisticsDbContext? statisticsContext = null,
+            PersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IMapper? mapper = null,
+            IUserService? userService = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IReleaseFileService? releaseFileService = null,
+            IPublishingService? publishingService = null,
+            IMethodologyService? methodologyService = null,
+            IReleasePublishingStatusRepository? releasePublishingStatusRepository = null)
         {
             return new TopicService(
                 Mock.Of<IConfiguration>(),
@@ -123,7 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(),
                 publishingService ?? Mock.Of<IPublishingService>(),
                 methodologyService ?? Mock.Of<IMethodologyService>(),
-                Mock.Of<IBlobCacheService>()
+                Mock.Of<IBlobCacheService>(),
+                releasePublishingStatusRepository ?? Mock.Of<IReleasePublishingStatusRepository>()
             );
         }
     }

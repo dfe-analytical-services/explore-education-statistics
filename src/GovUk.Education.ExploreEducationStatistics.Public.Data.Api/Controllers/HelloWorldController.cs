@@ -136,12 +136,14 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                                 {
                                     new()
                                     {
-                                        Identifier = "123",
+                                        PublicId = "123",
+                                        PrivateId = 123,
                                         Label = "Primary"
                                     },
                                     new()
                                     {
-                                        Identifier = "345",
+                                        PublicId = "345",
+                                        PrivateId = 345,
                                         Label = "Secondary"
                                     }
                                 },
@@ -173,13 +175,15 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                                 {
                                     new()
                                     {
-                                        Identifier = "1",
+                                        PublicId = "1",
+                                        PrivateId = 1,
                                         Label = "Barnsley",
                                         Code = "E00001"
                                     },
                                     new()
                                     {
-                                        Identifier = "2",
+                                        PublicId = "2",
+                                        PrivateId = 2,
                                         Label = "Sheffield",
                                         Code = "E00002"
                                     }

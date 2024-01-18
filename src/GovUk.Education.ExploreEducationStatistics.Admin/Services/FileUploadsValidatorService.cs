@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
 
         private const int MaxFilenameSize = 150;
+        private const int MaxFileSize = int.MaxValue; // 2GB
 
         public FileUploadsValidatorService(IFileTypeService fileTypeService,
             ContentDbContext context)
@@ -73,6 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (file.Length == 0)
             {
                 return ValidationActionResult(FileCannotBeEmpty);
+            }
+            
+            if (file.Length > MaxFileSize)
+            {
+                return ValidationActionResult(FileSizeLimitExceeded);
             }
 
             if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))

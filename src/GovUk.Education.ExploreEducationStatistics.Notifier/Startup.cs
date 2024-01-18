@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             builder.Services
                 .AddTransient<IEmailService, EmailService>()
                 .AddTransient<IStorageTableService, StorageTableService>()
+                .AddTransient<IConfigurationProvider, ConfigurationProvider>()
+                .AddTransient<INotificationClientProvider, NotificationClientProvider>()
                 .AddTransient<ITokenService, TokenService>();
         }
     }

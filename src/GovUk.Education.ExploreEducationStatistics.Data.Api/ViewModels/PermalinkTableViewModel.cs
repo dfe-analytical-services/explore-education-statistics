@@ -1,7 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {

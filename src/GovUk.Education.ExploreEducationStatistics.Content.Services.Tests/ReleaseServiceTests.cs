@@ -1,9 +1,7 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -13,10 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;

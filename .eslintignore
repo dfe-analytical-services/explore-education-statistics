@@ -1,8 +1,12 @@
+.idea/
 .next/
 build/
+dist/
 coverage/
 node_modules/
 *.min.js
 # Artifacts can leak between jobs on self-hosted runners
 wwwroot/
+# Ignore backend projects
+src/GovUk.Education.ExploreEducationStatistics.*/
 src/explore-education-statistics-ckeditor/sample

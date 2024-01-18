@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
@@ -104,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 storageQueueService.Verify(mock => mock.AddMessages(
                     ReleaseNotificationQueue,
-                    new List<ReleaseNotificationMessage>
+                    ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
                     {
                         new()
                         {
@@ -115,6 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                             ReleaseSlug = release1.Slug,
                             Amendment = false,
                             UpdateNote = "No update note provided.",
+                            SupersededPublications = new List<IdTitleViewModel>(),
                         },
                         new()
                         {
@@ -125,8 +128,85 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                             ReleaseSlug = amendedRelease1.Slug,
                             Amendment = true,
                             UpdateNote = "latest update note",
+                            SupersededPublications = new List<IdTitleViewModel>(),
                         },
-                    }), Times.Once);
+                    })), Times.Once);
+            }
+
+            MockUtils.VerifyAllMocks(storageQueueService);
+        }
+
+        [Fact]
+        public async Task NotifySubscribersIfApplicable_HasSupersededPublication()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Slug = "2000-01",
+                NotifySubscribers = true,
+                Version = 0,
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "pub1 title",
+                    Slug = "pub1-slug",
+                }
+            };
+
+            var supersededPublication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "pub2 title",
+                Slug = "pub2-slug",
+                SupersededBy = release.Publication,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.Publications.AddAsync(supersededPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
+            storageQueueService.Setup(mock => mock.AddMessages(
+                    ReleaseNotificationQueue,
+                    It.IsAny<List<ReleaseNotificationMessage>>()))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var notificationsService = BuildNotificationsService(
+                    contentDbContext, storageQueueService.Object);
+
+                await notificationsService.NotifySubscribersIfApplicable(release.Id);
+
+                storageQueueService.Verify(mock => mock.AddMessages(
+                    ReleaseNotificationQueue,
+                    ItIs.DeepEqualTo(new List<ReleaseNotificationMessage>
+                    {
+                        new()
+                        {
+                            PublicationId = release.Publication.Id,
+                            PublicationName = release.Publication.Title,
+                            PublicationSlug = release.Publication.Slug,
+                            ReleaseName = release.Title,
+                            ReleaseSlug = release.Slug,
+                            Amendment = false,
+                            UpdateNote = "No update note provided.",
+                            SupersededPublications = new List<IdTitleViewModel>
+                            {
+                                new()
+                                {
+                                    Id = supersededPublication.Id,
+                                    Title = supersededPublication.Title,
+                                },
+                            },
+                        },
+                    })), Times.Once);
             }
 
             MockUtils.VerifyAllMocks(storageQueueService);

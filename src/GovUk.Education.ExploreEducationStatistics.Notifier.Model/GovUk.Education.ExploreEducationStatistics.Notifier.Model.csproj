@@ -8,4 +8,8 @@
     <ItemGroup>
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+    </ItemGroup>
 </Project>
