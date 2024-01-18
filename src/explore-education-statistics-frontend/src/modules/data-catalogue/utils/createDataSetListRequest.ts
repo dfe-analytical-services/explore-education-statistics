@@ -7,12 +7,13 @@ import {
   DataSetSortParam,
   dataSetOrderOptions,
   DataSetOrderOption,
+  DataSetListRequest,
 } from '@frontend/services/dataSetService';
 import omitBy from 'lodash/omitBy';
 
 export default function createDataSetListRequest(
   query: DataCataloguePageQuery,
-): DataCataloguePageQuery {
+): DataSetListRequest {
   const {
     latest,
     orderBy: orderByParam,
@@ -22,7 +23,7 @@ export default function createDataSetListRequest(
     themeId,
   } = getParamsFromQuery(query);
 
-  const { orderBy, sort } = getOrderParams(orderByParam as DataSetOrderOption); // TO DO shouldnt need this as
+  const { orderBy, sort } = getOrderParams(orderByParam);
 
   const minSearchCharacters = 3;
   const searchTerm =
@@ -34,12 +35,12 @@ export default function createDataSetListRequest(
       orderBy,
       page: parseNumber(query.page) ?? 1,
       publicationId,
-      // releaseId, // commenting out as the api errors with release id currently
+      // releaseId,  TO DO commented out as the api errors with release id currently
       sort,
       searchTerm,
       themeId,
     },
-    value => typeof value === 'undefined',
+    value => typeof value === 'undefined' || !value,
   );
 }
 
@@ -71,9 +72,7 @@ function getOrderParams(orderBy: DataSetOrderOption): {
   };
 }
 
-export function getParamsFromQuery(
-  query: DataCataloguePageQuery,
-): DataCataloguePageQuery {
+export function getParamsFromQuery(query: DataCataloguePageQuery) {
   return {
     latest: getFirst(query.latest),
     orderBy:

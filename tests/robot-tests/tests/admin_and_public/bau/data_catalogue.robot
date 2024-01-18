@@ -204,6 +204,12 @@ Validate zip contains correct files
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
+Validate sort controls exist
+    [Tags]    Local    Dev
+    user checks radio is checked    Newest
+    user checks page contains radio    Oldest
+    user checks page contains radio    A to Z
+
 Validate theme filter exists
     [Tags]    Local    Dev
     user checks select contains option    id:theme    All themes

@@ -55,9 +55,21 @@ export const dataSetFilters = [
 
 export type DataSetFilter = (typeof dataSetFilters)[number];
 
+export interface DataSetListRequest {
+  latest?: 'true' | 'false';
+  orderBy?: DataSetOrderParam;
+  page?: number;
+  pageSize?: number;
+  publicationId?: string;
+  releaseId?: string;
+  searchTerm?: string;
+  sort?: DataSetSortParam;
+  themeId?: string;
+}
+
 const dataSetService = {
   listDataSets(
-    params: DataCataloguePageQuery,
+    params: DataSetListRequest,
   ): Promise<PaginatedList<DataSetSummary>> {
     return contentApi.get(`/data-sets`, {
       params,

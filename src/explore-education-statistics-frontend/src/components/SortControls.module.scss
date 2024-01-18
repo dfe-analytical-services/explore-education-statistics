@@ -1,8 +1,6 @@
 @import '~govuk-frontend/govuk/base';
 
 .form {
-  border-bottom: 1px solid govuk-colour('mid-grey');
-  border-top: 1px solid govuk-colour('mid-grey');
   padding: govuk-spacing(3) 0;
 
   @include govuk-media-query($from: desktop) {

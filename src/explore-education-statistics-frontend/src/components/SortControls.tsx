@@ -2,38 +2,33 @@ import Button from '@common/components/Button';
 import { FormRadioGroup, FormSelect } from '@common/components/form';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { PublicationSortOption } from '@common/services/publicationService';
-import styles from '@frontend/modules/find-statistics/components/SortControls.module.scss';
+import styles from '@frontend/components/SortControls.module.scss';
+import { DataSetOrderOption } from '@frontend/services/dataSetService';
+import classNames from 'classnames';
 import React from 'react';
 
-interface Option {
+export interface SortOption {
   label: string;
   value: PublicationSortOption;
 }
 
-const defaultOptions: Option[] = [
-  { label: 'Newest', value: 'newest' },
-  { label: 'Oldest', value: 'oldest' },
-  { label: 'A to Z', value: 'title' },
-];
+type OptionType = PublicationSortOption | DataSetOrderOption;
 
 const formId = 'sortControlsForm';
 const fieldId = `${formId}-sortBy`;
 
 interface Props {
-  hasSearch?: boolean;
-  sortBy: PublicationSortOption;
-  onChange: (nextSortBy: PublicationSortOption) => void;
+  className?: string;
+  options: SortOption[];
+  sortBy: OptionType;
+  onChange: (nextSortBy: OptionType) => void;
 }
 
-const SortControls = ({ hasSearch = false, sortBy, onChange }: Props) => {
+const SortControls = ({ className, options, sortBy, onChange }: Props) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const options = hasSearch
-    ? [...defaultOptions, { label: 'Relevance', value: 'relevance' }]
-    : defaultOptions;
-
   return (
-    <form id={formId} className={styles.form}>
+    <form id={formId} className={classNames(styles.form, className)}>
       {isMobileMedia ? (
         <FormSelect
           id={fieldId}
@@ -43,9 +38,7 @@ const SortControls = ({ hasSearch = false, sortBy, onChange }: Props) => {
           options={options}
           order={[]}
           value={sortBy}
-          onChange={event =>
-            onChange(event.target.value as PublicationSortOption)
-          }
+          onChange={event => onChange(event.target.value as OptionType)}
         />
       ) : (
         <FormRadioGroup
@@ -58,9 +51,7 @@ const SortControls = ({ hasSearch = false, sortBy, onChange }: Props) => {
           order={[]}
           small
           value={sortBy}
-          onChange={event =>
-            onChange(event.target.value as PublicationSortOption)
-          }
+          onChange={event => onChange(event.target.value as OptionType)}
         />
       )}
 

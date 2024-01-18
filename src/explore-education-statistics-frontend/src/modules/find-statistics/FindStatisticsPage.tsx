@@ -24,7 +24,7 @@ import Filters from '@frontend/modules/find-statistics/components/Filters';
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import SearchForm from '@frontend/components/SearchForm';
-import SortControls from '@frontend/modules/find-statistics/components/SortControls';
+import SortControls, { SortOption } from '@frontend/components/SortControls';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
@@ -291,7 +291,20 @@ const FindStatisticsPage: NextPage = () => {
 
           {publications.length > 0 && (
             <SortControls
-              hasSearch={!!search}
+              className="dfe-border-bottom dfe-border-top"
+              options={[
+                { label: 'Newest', value: 'newest' },
+                { label: 'Oldest', value: 'oldest' },
+                { label: 'A to Z', value: 'title' },
+                ...(search
+                  ? [
+                      {
+                        label: 'Relevance',
+                        value: 'relevance',
+                      } as SortOption,
+                    ]
+                  : []),
+              ]}
               sortBy={sortBy}
               onChange={handleSortBy}
             />

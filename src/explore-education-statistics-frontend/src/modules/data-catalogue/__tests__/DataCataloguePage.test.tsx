@@ -23,7 +23,7 @@ jest.mock('@common/services/downloadService');
 jest.mock('@common/services/publicationService');
 jest.mock('@common/services/tableBuilderService');
 
-const mockIsMedia = false;
+let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
   useMobileMedia: () => {
     return {
@@ -562,7 +562,7 @@ describe('DataCataloguePage', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('shows the initial filters', async () => {
+    test('renders the initial filters', async () => {
       dataSetService.listDataSets.mockResolvedValueOnce({
         results: testDataSetSummaries,
         paging: testPaging,
@@ -1728,6 +1728,130 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
       });
+    });
+
+    describe('sorting', () => {
+      test('changing sort order', async () => {
+        dataSetService.listDataSets.mockResolvedValue({
+          results: testDataSetSummaries,
+          paging: testPaging,
+        });
+        publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+        render(<DataCataloguePage newDesign />);
+
+        await waitFor(() => {
+          expect(screen.getByText('30 data sets')).toBeInTheDocument();
+        });
+
+        userEvent.click(screen.getByLabelText('A to Z'));
+
+        await waitFor(() => {
+          expect(mockRouter).toMatchObject({
+            pathname: '/data-catalogue',
+            query: { orderBy: 'title' },
+          });
+        });
+      });
+
+      test('sorts by relevance when have a search filter', async () => {
+        dataSetService.listDataSets.mockResolvedValueOnce({
+          results: testDataSetSummaries,
+          paging: testPaging,
+        });
+        dataSetService.listDataSets.mockResolvedValueOnce({
+          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+          paging: { ...testPaging, totalPages: 1, totalResults: 2 },
+        });
+        publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+        render(<DataCataloguePage newDesign />);
+
+        await waitFor(() => {
+          expect(screen.getByText('30 data sets')).toBeInTheDocument();
+        });
+
+        userEvent.type(screen.getByLabelText('Search data sets'), 'Find me');
+        userEvent.click(screen.getByRole('button', { name: 'Search' }));
+
+        await waitFor(() => {
+          expect(screen.getByText('2 data sets')).toBeInTheDocument();
+        });
+
+        expect(mockRouter).toMatchObject({
+          pathname: '/data-catalogue',
+          query: { orderBy: 'relevance' },
+        });
+      });
+
+      test('reverts the sorting to `newest` when the search filter is removed', async () => {
+        mockRouter.setCurrentUrl(
+          '/data-catalogue?searchTerm=Find+me&orderBy=relevance',
+        );
+        dataSetService.listDataSets.mockResolvedValueOnce({
+          results: [testDataSetSummaries[1]],
+          paging: { ...testPaging, totalPages: 1, totalResults: 1 },
+        });
+        dataSetService.listDataSets.mockResolvedValueOnce({
+          results: testDataSetSummaries,
+          paging: testPaging,
+        });
+        publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+        render(<DataCataloguePage newDesign />);
+
+        await waitFor(() => {
+          expect(screen.getByText('1 data set')).toBeInTheDocument();
+        });
+
+        expect(mockRouter).toMatchObject({
+          pathname: '/data-catalogue',
+          query: { orderBy: 'relevance' },
+        });
+
+        userEvent.click(
+          screen.getByRole('button', {
+            name: 'Remove filter: Search Find me',
+          }),
+        );
+
+        await waitFor(() => {
+          expect(screen.getByText('30 data sets')).toBeInTheDocument();
+        });
+
+        expect(mockRouter).toMatchObject({
+          pathname: '/data-catalogue',
+          query: { orderBy: 'newest' },
+        });
+      });
+    });
+
+    test('renders the mobile filters', async () => {
+      mockIsMedia = true;
+      dataSetService.listDataSets.mockResolvedValueOnce({
+        results: testDataSetSummaries,
+        paging: testPaging,
+      });
+      publicationService.getPublicationTree.mockResolvedValue(testThemes);
+
+      render(<DataCataloguePage newDesign />);
+
+      await waitFor(() => {
+        expect(screen.getByText('30 data sets')).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Filter results' }));
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByLabelText('Theme')).toBeInTheDocument();
+      expect(modal.getByLabelText('Publication')).toBeInTheDocument();
+      expect(modal.getByLabelText('Releases')).toBeInTheDocument();
+      expect(
+        modal.getByRole('button', { name: 'Back to results' }),
+      ).toBeInTheDocument();
+
+      mockIsMedia = false;
     });
   });
 });

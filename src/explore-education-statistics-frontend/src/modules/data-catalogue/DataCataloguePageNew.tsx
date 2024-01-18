@@ -33,6 +33,7 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import FilterClearButton from '@frontend/components/FilterClearButton';
 import FiltersMobile from '@frontend/components/FiltersMobile';
 import getUpdatedQueryParams from '@frontend/modules/data-catalogue/utils/getUpdatedQueryParams';
+import SortControls, { SortOption } from '@frontend/components/SortControls';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { ParsedUrlQuery } from 'querystring';
@@ -228,6 +229,19 @@ export default function DataCataloguePageNew() {
     });
   };
 
+  const handleChangeOrderBy = async (nextOrderBy: DataSetOrderOption) => {
+    await updateQueryParams({
+      ...omit(router.query, 'page'),
+      orderBy: nextOrderBy,
+    });
+
+    logEvent({
+      category: 'Data catalogue',
+      action: 'Data sets sorted',
+      label: nextOrderBy,
+    });
+  };
+
   return (
     <Page
       title="Data catalogue"
@@ -295,7 +309,7 @@ export default function DataCataloguePageNew() {
           )}
         </div>
         <div className="govuk-grid-column-two-thirds">
-          <div>
+          <div className="dfe-border-bottom">
             <h2
               aria-live="polite"
               aria-atomic="true"
@@ -320,10 +334,10 @@ export default function DataCataloguePageNew() {
                 {isFiltered && (
                   <VisuallyHidden>{filteredByString}</VisuallyHidden>
                 )}
-                {/*
+
                 <VisuallyHidden>{` Sorted by ${
-                  sortBy === 'title' ? 'A to Z' : sortBy
-                }`}</VisuallyHidden> */}
+                  orderBy === 'title' ? 'A to Z' : orderBy
+                }`}</VisuallyHidden>
               </p>
 
               {isMobileMedia && isFiltered && (
@@ -336,7 +350,7 @@ export default function DataCataloguePageNew() {
             </div>
 
             {isFiltered && (
-              <div className="govuk-!-margin-bottom-5 govuk-!-padding-bottom-2 dfe-border-bottom dfe-flex dfe-flex-wrap">
+              <div className="govuk-!-padding-bottom-2 dfe-flex dfe-flex-wrap ">
                 {searchTerm && (
                   <FilterClearButton
                     filterType="Search"
@@ -395,14 +409,6 @@ export default function DataCataloguePageNew() {
             </LoadingSpinner>
           )}
 
-          {/* {dataSets.length > 0 && (
-            <SortControls
-              hasSearch={!!search}
-              sortBy={sortBy}
-              onChange={handleSortBy}
-            />
-          )} */}
-
           <LoadingSpinner
             loading={isLoading || isFetching}
             className="govuk-!-margin-top-4"
@@ -434,67 +440,92 @@ export default function DataCataloguePageNew() {
                   </div>
                 ) : (
                   <>
-                    {selectedPublication && selectedRelease && (
-                      <div
-                        className="dfe-border-bottom"
-                        data-testid="release-info"
-                      >
-                        <h3>{`${selectedPublication.title} - ${selectedRelease?.title} downloads`}</h3>
-                        {selectedRelease && (
-                          <>
-                            <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap govuk-!-margin-bottom-4">
-                              <TagGroup className="govuk-!-margin-right-2">
-                                <Tag>{releaseTypes[selectedRelease.type]}</Tag>
-                                <Tag
-                                  strong
-                                  colour={
-                                    selectedRelease.latestRelease
-                                      ? undefined
-                                      : 'orange'
-                                  }
-                                >
-                                  {selectedRelease.latestRelease
-                                    ? 'This is the latest data'
-                                    : 'This is not the latest data'}
-                                </Tag>
-                              </TagGroup>
-
-                              <Link
-                                to={`/find-statistics/${selectedPublication.slug}/${selectedRelease.slug}`}
-                              >
-                                View this release
-                              </Link>
-                            </div>
-
-                            <p>
-                              <Button
-                                className="govuk-!-margin-bottom-0"
-                                onClick={handleDownload}
-                              >{`Download ${
-                                dataSets.length === 1
-                                  ? '1 data set'
-                                  : `all ${dataSets.length} data sets`
-                              } (ZIP)`}</Button>
-                            </p>
-
-                            <ToggleAllButton
-                              showAllDetails={showAllDetails}
-                              onToggle={toggleAllDetails}
-                            />
-                          </>
-                        )}
-                      </div>
-                    )}
-                    {!selectedRelease && (
-                      <div className="dfe-border-bottom">
-                        <p>SORT CONTROLS</p>
-
-                        <ToggleAllButton
-                          showAllDetails={showAllDetails}
-                          onToggle={toggleAllDetails}
+                    <div className="dfe-border-bottom">
+                      {!releaseId && (
+                        <SortControls
+                          options={[
+                            { label: 'Newest', value: 'newest' },
+                            { label: 'Oldest', value: 'oldest' },
+                            { label: 'A to Z', value: 'title' },
+                            ...(searchTerm
+                              ? [
+                                  {
+                                    label: 'Relevance',
+                                    value: 'relevance',
+                                  } as SortOption,
+                                ]
+                              : []),
+                          ]}
+                          sortBy={orderBy}
+                          onChange={handleChangeOrderBy}
                         />
-                      </div>
-                    )}
+                      )}
+                      {selectedPublication && selectedRelease && (
+                        <div
+                          className="govuk-!-padding-top-4"
+                          data-testid="release-info"
+                        >
+                          <h3>{`${selectedPublication.title} - ${selectedRelease?.title} downloads`}</h3>
+                          {selectedRelease && (
+                            <>
+                              <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap govuk-!-margin-bottom-6">
+                                <TagGroup className="govuk-!-margin-right-2">
+                                  <Tag>
+                                    {releaseTypes[selectedRelease.type]}
+                                  </Tag>
+                                  <Tag
+                                    strong
+                                    colour={
+                                      selectedRelease.latestRelease
+                                        ? undefined
+                                        : 'orange'
+                                    }
+                                  >
+                                    {selectedRelease.latestRelease
+                                      ? 'This is the latest data'
+                                      : 'This is not the latest data'}
+                                  </Tag>
+                                </TagGroup>
+
+                                <Link
+                                  to={`/find-statistics/${selectedPublication.slug}/${selectedRelease.slug}`}
+                                >
+                                  View this release
+                                </Link>
+                              </div>
+
+                              <p>
+                                <Button
+                                  className="govuk-!-margin-bottom-0"
+                                  onClick={handleDownload}
+                                >{`Download ${
+                                  dataSets.length === 1
+                                    ? '1 data set'
+                                    : `all ${dataSets.length} data sets`
+                                } (ZIP)`}</Button>
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      <AccordionToggleButton
+                        expanded={showAllDetails}
+                        label={
+                          showAllDetails
+                            ? 'Hide all details'
+                            : 'Show all expanded details'
+                        }
+                        onClick={() => {
+                          toggleAllDetails();
+                          logEvent({
+                            category: 'Data catalogue',
+                            action: 'All data set details toggled',
+                          });
+                        }}
+                      />
+                    </div>
+
                     <ul
                       className="govuk-list"
                       id="searchResults"
@@ -560,27 +591,5 @@ function getThemeForPublication({
     theme.topics
       .flatMap(topic => topic.publications)
       .find(pub => pub.id === publicationId),
-  );
-}
-
-function ToggleAllButton({
-  showAllDetails,
-  onToggle,
-}: {
-  showAllDetails: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <AccordionToggleButton
-      expanded={showAllDetails}
-      label={showAllDetails ? 'Hide all details' : 'Show all expanded details'}
-      onClick={() => {
-        onToggle();
-        logEvent({
-          category: 'Data catalogue',
-          action: 'All data set details toggled',
-        });
-      }}
-    />
   );
 }
