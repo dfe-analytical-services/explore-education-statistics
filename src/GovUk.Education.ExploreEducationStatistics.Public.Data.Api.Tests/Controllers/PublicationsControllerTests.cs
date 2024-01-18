@@ -59,19 +59,18 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(pageSize, content!.Paging.PageSize);
             Assert.Equal(numberOfPublishedDataSets, content!.Paging.TotalResults);
 
-            var publishedDataSetPublicationIdsToBeReturned = allDataSets
-                .Where(ds => ds.Status == DataSetStatus.Published)
+            var expectedPublicationIds = publishedDataSets
                 .Select(ds => ds.PublicationId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
 
-            Assert.Equal(publishedDataSetPublicationIdsToBeReturned.Count(), content.Results.Count);
+            Assert.Equal(expectedPublicationIds.Count(), content.Results.Count);
 
             var publicationIdsThatShouldNotHaveBeenReturned = allDataSets
                 .Select(ds => ds.PublicationId)
-                .Except(publishedDataSetPublicationIdsToBeReturned);
+                .Except(expectedPublicationIds);
 
-            foreach (var publicationId in publishedDataSetPublicationIdsToBeReturned)
+            foreach (var publicationId in expectedPublicationIds)
             {
                 Assert.Contains(content.Results, r => r.Id == publicationId);
             }
