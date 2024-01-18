@@ -13,122 +13,129 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public class PublicationsControllerTests : IntegrationTestFixture
+public abstract class PublicationsControllerTests : IntegrationTestFixture
 {
     public PublicationsControllerTests(TestApplicationFactory testApp) : base(testApp)
     {
     }
 
-    [Theory]
-    [InlineData(1, 2, 2, 1)]
-    [InlineData(2, 2, 2, 1)]
-    [InlineData(1, 2, 2, 10)]
-    [InlineData(1, 2, 9, 1)]
-    [InlineData(2, 2, 9, 1)]
-    [InlineData(1, 2, 9, 10)]
-    [InlineData(1, 3, 2, 1)]
-    public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublicationsForPublishedDataSets(
-        int page,
-        int pageSize,
-        int numberOfPublishedDataSets,
-        int numberOfUnpublishedDataSets)
+    public class ListPublicationsTests : PublicationsControllerTests
     {
-        var client = SetupApp(new ContentApiClientMock()).CreateClient();
-
-        var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
-        var unpublishedDataSets = GenerateUnublishedDataSets(numberOfUnpublishedDataSets);
-
-        var allDataSets = publishedDataSets.Concat(unpublishedDataSets);
-
-        await AddTestDataSets(allDataSets.ToArray());
-
-        var response = await ListPublications(client, page, pageSize);
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
-
-        Assert.NotNull(content);
-        Assert.Equal(page, content!.Paging.Page);
-        Assert.Equal(pageSize, content!.Paging.PageSize);
-        Assert.Equal(numberOfPublishedDataSets, content!.Paging.TotalResults);
-
-        var publishedDataSetPublicationIdsToBeReturned = allDataSets
-            .Where(ds => ds.Status == DataSetStatus.Published)
-            .Select(ds => ds.PublicationId)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize);
-
-        Assert.Equal(publishedDataSetPublicationIdsToBeReturned.Count(), content.Results.Count);
-
-        var publicationIdsThatShouldNotHaveBeenReturned = allDataSets
-            .Select(ds => ds.PublicationId)
-            .Except(publishedDataSetPublicationIdsToBeReturned);
-
-        foreach (var publicationId in publishedDataSetPublicationIdsToBeReturned)
+        public ListPublicationsTests(TestApplicationFactory testApp) : base(testApp)
         {
-            Assert.Contains(content.Results, r => r.Id == publicationId);
         }
 
-        foreach (var publicationId in publicationIdsThatShouldNotHaveBeenReturned)
+        [Theory]
+        [InlineData(1, 2, 2, 1)]
+        [InlineData(2, 2, 2, 1)]
+        [InlineData(1, 2, 2, 10)]
+        [InlineData(1, 2, 9, 1)]
+        [InlineData(2, 2, 9, 1)]
+        [InlineData(1, 2, 9, 10)]
+        [InlineData(1, 3, 2, 1)]
+        public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublicationsForPublishedDataSets(
+            int page,
+            int pageSize,
+            int numberOfPublishedDataSets,
+            int numberOfUnpublishedDataSets)
         {
-            Assert.DoesNotContain(content.Results, r => r.Id == publicationId);
+            var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
+            var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
+            var unpublishedDataSets = GenerateUnublishedDataSets(numberOfUnpublishedDataSets);
+
+            var allDataSets = publishedDataSets.Concat(unpublishedDataSets);
+
+            await AddTestDataSets(allDataSets.ToArray());
+
+            var response = await ListPublications(client, page, pageSize);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
+
+            Assert.NotNull(content);
+            Assert.Equal(page, content!.Paging.Page);
+            Assert.Equal(pageSize, content!.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSets, content!.Paging.TotalResults);
+
+            var publishedDataSetPublicationIdsToBeReturned = allDataSets
+                .Where(ds => ds.Status == DataSetStatus.Published)
+                .Select(ds => ds.PublicationId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize);
+
+            Assert.Equal(publishedDataSetPublicationIdsToBeReturned.Count(), content.Results.Count);
+
+            var publicationIdsThatShouldNotHaveBeenReturned = allDataSets
+                .Select(ds => ds.PublicationId)
+                .Except(publishedDataSetPublicationIdsToBeReturned);
+
+            foreach (var publicationId in publishedDataSetPublicationIdsToBeReturned)
+            {
+                Assert.Contains(content.Results, r => r.Id == publicationId);
+            }
+
+            foreach (var publicationId in publicationIdsThatShouldNotHaveBeenReturned)
+            {
+                Assert.DoesNotContain(content.Results, r => r.Id == publicationId);
+            }
         }
-    }
 
-    [Fact]
-    public async Task ListPublications_NoPublishedDataSets_Returns200WithEmptyList()
-    {
-        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+        [Fact]
+        public async Task ListPublications_NoPublishedDataSets_Returns200WithEmptyList()
+        {
+            var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
-        var response = await ListPublications(client, 1, 1);
+            var response = await ListPublications(client, 1, 1);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
+            var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
 
-        Assert.NotNull(content);
-        Assert.Equal(1, content!.Paging.Page);
-        Assert.Equal(1, content!.Paging.PageSize);
-        Assert.Equal(0, content!.Paging.TotalResults);
-        Assert.Empty(content!.Results);
-    }
+            Assert.NotNull(content);
+            Assert.Equal(1, content!.Paging.Page);
+            Assert.Equal(1, content!.Paging.PageSize);
+            Assert.Equal(0, content!.Paging.TotalResults);
+            Assert.Empty(content!.Results);
+        }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public async Task ListPublications_RequestedPageIsTooSmall_Returns400(int page)
-    {
-        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task ListPublications_RequestedPageIsTooSmall_Returns400(int page)
+        {
+            var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
-        var response = await ListPublications(client, page, 1);
+            var response = await ListPublications(client, page, 1);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(41)]
-    public async Task ListPublications_RequestedPageSizeIsOutOfAcceptableRange_Returns400(int pageSize)
-    {
-        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(41)]
+        public async Task ListPublications_RequestedPageSizeIsOutOfAcceptableRange_Returns400(int pageSize)
+        {
+            var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
-        var response = await ListPublications(client, 1, pageSize);
+            var response = await ListPublications(client, 1, pageSize);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
 
-    [Theory]
-    [InlineData("a")]
-    [InlineData("aa")]
-    public async Task ListPublications_RequestedSearchTermIsNotLongEnough_Returns400(string searchTerm)
-    {
-        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+        [Theory]
+        [InlineData("a")]
+        [InlineData("aa")]
+        public async Task ListPublications_RequestedSearchTermIsNotLongEnough_Returns400(string searchTerm)
+        {
+            var client = SetupApp(new ContentApiClientMock()).CreateClient();
 
-        var response = await ListPublications(client, null, null, searchTerm);
+            var response = await ListPublications(client, null, null, searchTerm);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 
     private IReadOnlyList<DataSet> GeneratePublishedDataSets(int numberToGenerate)
