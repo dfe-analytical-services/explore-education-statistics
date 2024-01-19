@@ -1,9 +1,11 @@
-@description('Specifies the Subscription to be used.')
+@description('Subscription Name e.g. s101d01. Used as a prefix for created resources')
 param subscription string
+
+@description('Environment Name Used as a prefix for created resources')
+param environment string 
+
 @description('Specifies the location for all resources.')
 param location string
-@description('Specifies the Environment for all resources.')
-param environment string
 
 //Specific parameters for the resources
 @description('Virtual Network Address Prefix')
@@ -13,29 +15,22 @@ param vnetAddressPrefix string = '10.0.0.0/16'
 param adminSubnetPrefix string = '10.0.0.0/24'
 
 @description('Importer Subnet Address Prefix')
-param ImporterSubnetPrefix string = '10.0.1.0/24'
+param importerSubnetPrefix string = '10.0.1.0/24'
 
 @description('Publisher Subnet Address Prefix')
 param publisherSubnetPrefix string = '10.0.2.0/24'
 
 @description('Content Subnet Address Prefix')
-param contentSubnetPrefix string = '10.0.3.0/24'
+param contentSubnetPrefix string = '10.0.4.0/24'
 
 @description('DataBase Subnet Address Prefix')
-param databaseSubnetPrefix string = '10.0.4.0/24'
+param databaseSubnetPrefix string = '10.0.5.0/24'
+
+@description('Deploy the subnets')
+param deploySubnets bool = true
 
 //Passed in Tags
-param departmentName string = 'Public API'
-param environmentName string = 'Development'
-param solutionName string = 'API'
-param subscriptionName string = 'Unknown'
-param costCentre string = 'Unknown'
-param serviceOwnerName string = 'Unknown'
-param dateProvisioned string = utcNow('u')
-param createdBy string = 'Unknown'
-param deploymentRepo string = 'N/A'
-param deploymentScript string = 'N/A'
-param deploySubnets bool = true
+param tagValues object
 
 // Variables and created data
 var vNetName = '${subscription}-vnet-${environment}'
@@ -45,8 +40,9 @@ var publisherSubnetName = '${subscription}-snet-${environment}-publisher'
 var contentSubnetName = '${subscription}-snet-${environment}-content'
 var databaseSubnetName = '${subscription}-snet-${environment}-database'
 
+
 //Resources 
-resource virtualnetwork 'Microsoft.Network/virtualNetworks@2021-05-01' = if (deploySubnets) {
+resource virtualnetwork 'Microsoft.Network/virtualNetworks@2023-04-01' = if (deploySubnets) {
   name: vNetName
   location: location
   properties: {
@@ -56,22 +52,10 @@ resource virtualnetwork 'Microsoft.Network/virtualNetworks@2021-05-01' = if (dep
       ]
     }
   }
-  tags: {
-    Department: departmentName
-    Solution: solutionName
-    ServiceType: 'Virtual Networking'
-    Environment: environmentName
-    Subscription: subscriptionName
-    CostCentre: costCentre
-    ServiceOwner: serviceOwnerName
-    DateProvisioned: dateProvisioned
-    CreatedBy: createdBy
-    DeploymentRepo: deploymentRepo
-    DeploymentScript: deploymentScript
-  }
+  tags: tagValues
 }
 
-resource adminsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if (deploySubnets) {
+resource adminsubnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = if (deploySubnets) {
   parent: virtualnetwork
   name: adminSubnetName
   properties: {
@@ -84,11 +68,11 @@ resource adminsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if
   }
 }
 
-resource importersubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if (deploySubnets) {
+resource importersubnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = if (deploySubnets) {
   parent: virtualnetwork
   name: importerSubnetName
   properties: {
-    addressPrefix: ImporterSubnetPrefix
+    addressPrefix: importerSubnetPrefix
     serviceEndpoints: [
       {
         service: 'Microsoft.Storage'
@@ -100,7 +84,7 @@ resource importersubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' =
   ]
 }
 
-resource publishersubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if (deploySubnets) {
+resource publishersubnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = if (deploySubnets) {
   parent: virtualnetwork
   name: publisherSubnetName
   properties: {
@@ -116,7 +100,7 @@ resource publishersubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' 
   ]
 }
 
-resource contentsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if (deploySubnets) {
+resource contentsubnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = if (deploySubnets) {
   parent: virtualnetwork
   name: contentSubnetName
   properties: {
@@ -132,7 +116,7 @@ resource contentsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = 
   ]
 }
 
-resource databasesubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = if (deploySubnets) {
+resource databasesubnet 'Microsoft.Network/virtualNetworks/subnets@2023-04-01' = if (deploySubnets) {
   parent: virtualnetwork
   name: databaseSubnetName
   properties: {

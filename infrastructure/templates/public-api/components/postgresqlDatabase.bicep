@@ -1,24 +1,24 @@
-@description('Specifies the Subscription to be used.')
-param subscription string
+@description('Specifies the Resource Prefix')
+param resourcePrefix string
 
 @description('Specifies the location for all resources.')
 param location string
 
 //Specific parameters for the resources
 @description('Server Name for Azure Database for PostgreSQL')
-param serverName string = 'metadata'
+param serverName string
 
 @description('Database administrator login name')
-@minLength(1)
-param administratorLoginName string
+@minLength(0)
+param adminName string
 
 @description('Database administrator password')
 @minLength(8)
 @secure()
-param administratorLoginPassword string
+param adminPassword string
 
 @description('Azure Database for PostgreSQL sku name, typically, tier + family + cores, e.g. Standard_D4s_v3 ')
-param skuName string
+param dbSkuName string
 
 @description('Azure Database for PostgreSQL Storage Size ')
 param storageSizeGB int
@@ -32,7 +32,7 @@ param autoGrowStatus string
   'GeneralPurpose'
   'MemoryOptimized'
 ])
-param skuTier string = 'Burstable'
+param dbSkuTier string = 'Burstable'
 
 @description('PostgreSQL version')
 @allowed([
@@ -51,42 +51,30 @@ param backupRetentionDays int = 7
 param geoRedundantBackup string = 'Disabled'
 
 @description('The name of the Key Vault to store the connection strings')
-param KeyVaultName string
+param keyVaultName string
 
 //Passed in Tags
-param departmentName string = 'Public API'
-param environmentName string = 'Development'
-param solutionName string = 'API'
-param subscriptionName string = 'Unknown'
-param costCentre string = 'Unknown'
-param serviceOwnerName string = 'Unknown'
-param dateProvisioned string = utcNow('u')
-param createdBy string = 'Unknown'
-param deploymentRepo string = 'N/A'
-param deploymentScript string = 'N/A'
+param tagValues object
 
 // Variables and created data
-var metadataDatabaseName = '${subscription}-postgre-${serverName}'
-var pythonDbConnectionString = 'database=<database>, user=${administratorLoginName}@${metadataDatabase.name}, host=${metadataDatabase.name}${environment().suffixes.sqlServerHostname}, password=${administratorLoginPassword}, port=5432'
-var adoNetDbConnectionString = 'Server=${metadataDatabase.name}${environment().suffixes.sqlServerHostname};Database=<database>;Port=5432;User Id=${administratorLoginName}@${metadataDatabase.name};Password=${administratorLoginPassword};'
-
-var pythonSecretName = 'pythonConnectionString'
-var adoNetSecretName = 'adoConnectionString'
+var databaseName = '${resourcePrefix}-psql-${serverName}'
+var connectionStringSecretName = '${resourcePrefix}-sql-${serverName}-connectionString'
+var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
 
 
 //Resources 
-resource metadataDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
-  name: metadataDatabaseName
+resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
+  name: databaseName
   location: location
   sku: {
-    name: skuName
-    tier: skuTier
+    name: dbSkuName
+    tier: dbSkuTier
   }
   properties: {
     createMode: 'Default'
     version: postgresqlVersion
-    administratorLogin: administratorLoginName
-    administratorLoginPassword: administratorLoginPassword
+    administratorLogin: adminName
+    administratorLoginPassword: adminPassword
     storage: {
       storageSizeGB: storageSizeGB
       autoGrow: autoGrowStatus
@@ -99,55 +87,28 @@ resource metadataDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-
       mode: 'Disabled'
     }
   }
-  tags: {
-    Department: departmentName
-    Solution: solutionName
-    ServiceType: 'PostgreSQL Database'
-    Environment: environmentName
-    Subscription: subscriptionName
-    CostCentre: costCentre
-    ServiceOwner: serviceOwnerName
-    DateProvisioned: dateProvisioned
-    CreatedBy: createdBy
-    DeploymentRepo: deploymentRepo
-    DeploymentScript: deploymentScript
-  }
+  tags: tagValues
 }
 
-
-//store connections strings
-module StorePythonConnectionStringToKeyVault './keyVaultSecret.bicep' = {
-  name: 'python-kv-connectionString'
+//store connections string
+module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
+  name: 'connectionString'
   params: {
-    KeyVaultName: KeyVaultName
-    IsEnabled: true
-    SecretValue: pythonDbConnectionString 
-    ContentType: 'text/plain'
-    SecretName: pythonSecretName
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretValue: connectionString 
+    contentType: 'text/plain'
+    secretName: connectionStringSecretName
   }
 }
-
-module StoreADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
-  name: 'ado-kv-connectionString'
-  params: {
-    KeyVaultName: KeyVaultName
-    IsEnabled: true
-    SecretValue: adoNetDbConnectionString 
-    ContentType: 'text/plain'
-    SecretName: adoNetSecretName
-  }
-}
-
 
 
 
 //Outputs
 @description('The fully qualified Azure resource ID of the Database Server.')
-output metadataDatabaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', metadataDatabaseName)
-@description('Connection String Secrets.')
-output pythonConnectionStringSecretName string = pythonSecretName
-output pythonConnectionStringSecretUri string = StorePythonConnectionStringToKeyVault.outputs.SecretUri
+output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseName)
 
-output adoConnectionStringSecretName string = adoNetSecretName
-output adoConnectionStringSecretUri string = StoreADOConnectionStringToKeyVault.outputs.SecretUri
-output adoNetDbConnectionString string = adoNetDbConnectionString
+@description('Connection String Secrets.')
+output connectionStringSecretName string = connectionStringSecretName
+output connectionStringSecretUri string = storeADOConnectionStringToKeyVault.outputs.keyVaultSecretUri
+output dbConnectionString string = connectionString

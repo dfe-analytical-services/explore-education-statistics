@@ -1,5 +1,5 @@
-@description('Specifies the Subscription to be used.')
-param subscription string
+@description('Specifies the Resource Prefix')
+param resourcePrefix string
 
 @description('Specifies the location for all resources.')
 param location string
@@ -9,21 +9,24 @@ param location string
 param acrLoginServer string
 
 @description('Specifies the container image to deploy from the registry.')
-param acrHostedImageName string = 'containerapps-helloworld'
+param acrHostedImageName string
 
 @minLength(2)
 @maxLength(32)
 @description('Specifies the name of the container app.')
-param containerAppName string = uniqueString(resourceGroup().id)
+param containerAppName string
 
 @description('Specifies the name of the container app environment.')
-param containerAppEnvName string = uniqueString(resourceGroup().id)
+param containerAppEnvName string
 
 @description('Specifies the name of the log analytics workspace.')
-param containerAppLogAnalyticsName string = uniqueString(resourceGroup().id)
+param containerAppLogAnalyticsName string
 
 @description('Specifies the container port.')
 param targetPort int = 80
+
+@description('Select if you want to use a public dummy image to start the container app.')
+param useDummyImage bool
 
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
 @allowed([
@@ -60,116 +63,70 @@ param minReplica int = 1
 @maxValue(25)
 param maxReplica int = 3
 
-@minLength(5)
-@maxLength(50)
-@description('Name of the azure container registry (must be globally unique)')
-param containerRegistryName string = 'eesapiacr'
-
-@description('Specifies the base docker container image to deploy.')
-param containerSeedImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld'
-
-@description('Select if you want to seed the ACR with a base image.')
-param seedRegistry bool = true
-
-@description('Database Connection String')
-param databaseConnectionString string
-
-@description('Key Vault URI Connection String reference')
-param serviceBusConnectionString string
+@description('Container environment parameters')
+param envParams array = []
 
 //Passed in Tags
-param departmentName string = 'Public API'
-param environmentName string = 'Development'
-param solutionName string = 'API'
-param subscriptionName string = 'Unknown'
-param costCentre string = 'Unknown'
-param serviceOwnerName string = 'Unknown'
-param dateProvisioned string = utcNow('u')
-param createdBy string = 'Unknown'
-param deploymentRepo string = 'N/A'
-param deploymentScript string = 'N/A'
+param tagValues object
 
 
 //Variables 
-var ContainerEnvName = '${subscription}-env-${containerAppEnvName}'
-var containerImageName = '${acrLoginServer}/${acrHostedImageName}'
-var ContainerAppName = '${subscription}-app-${containerAppName}'
-var UserIdentityName = '${subscription}-id-${containerAppName}'
-var ContainerLogName = '${subscription}-log-${containerAppLogAnalyticsName}'
-var ContainerImportName = '${subscription}importContainerImage'
-
-//var revisionSuffix = uniqueString(containerImage, containerAppName)
-//var sanitizedRevisionSuffix = substring(revisionSuffix, 0, 10)
-
+//var containerImageName = '${acrLoginServer}/${acrHostedImageName}'
+var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${acrHostedImageName}'
+var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvName}'
+var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
+var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
+var containerLogName = '${resourcePrefix}-log-${containerAppLogAnalyticsName}'
+var applicationInsightsName ='${resourcePrefix}-ai-${containerAppName}'
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+
 
 
 //Resources 
 
 //Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: ContainerLogName
+  name: containerLogName
   location: location
   properties: {
     sku: {
       name: 'PerGB2018'
     }
   }
-  tags: {
-    Department: departmentName
-    Solution: solutionName
-    ServiceType: 'Operation Insights'
-    Environment: environmentName
-    Subscription: subscriptionName
-    CostCentre: costCentre
-    ServiceOwner: serviceOwnerName
-    DateProvisioned: dateProvisioned
-    CreatedBy: createdBy
-    DeploymentRepo: deploymentRepo
-    DeploymentScript: deploymentScript
-  }
+  tags: tagValues
 }
 
-//Registry Seeder
-@description('This module seeds the ACR with the public version of the app')
-module acrImportImage 'br/public:deployment-scripts/import-acr:3.0.1' = if (seedRegistry) {
-  name: ContainerImportName
+//Application Insights Deployment
+module applicationInsightsModule '../components/appInsights.bicep' = {
+  name: 'appInsightsDeploy-${containerAppName}'
   params: {
-    useExistingManagedIdentity: true
-    managedIdentityName: uai.name
-    existingManagedIdentityResourceGroupName: resourceGroup().name
-    existingManagedIdentitySubId: az.subscription().subscriptionId
-    acrName: containerRegistryName
     location: location
-    images: array(containerSeedImage)
+    appInsightsName: applicationInsightsName
   }
 }
-
 
 //Managed Identity
-resource uai 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
-  name: UserIdentityName
+resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: userIdentityName
   location: location
 }
 
 @description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource uaiRbac 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, uai.id, acrPullRole)
+resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!useDummyImage) {
+  name: guid(resourceGroup().id, managedIdentity.id, acrPullRole)
   properties: {
     roleDefinitionId: acrPullRole
-    principalId: uai.properties.principalId
+    principalId: managedIdentity.properties.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
 //Container environment
-resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' = {
-  name: ContainerEnvName
+resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
+  name: containerEnvName
   location: location
-  sku: {
-    name: 'Consumption'
-  }
   properties: {
+    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
@@ -178,29 +135,17 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-06-01-preview' 
       }
     }
   }
-  tags: {
-    Department: departmentName
-    Solution: solutionName
-    ServiceType: 'Managed Environment'
-    Environment: environmentName
-    Subscription: subscriptionName
-    CostCentre: costCentre
-    ServiceOwner: serviceOwnerName
-    DateProvisioned: dateProvisioned
-    CreatedBy: createdBy
-    DeploymentRepo: deploymentRepo
-    DeploymentScript: deploymentScript
-  }
+  tags: tagValues
 }
 
 //Container Application
-resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
-  name: ContainerAppName
+resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
+  name: containerApplicationName
   location: location
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${uai.id}': {}
+      '${managedIdentity.id}': {}
     }
   }
   properties: {
@@ -219,29 +164,14 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
           }
         ]
       }
-      registries: [
-        {
-          identity: uai.id
-          server: acrLoginServer
-        }
-      ]
+
     }
     template: {
-//      revisionSuffix: sanitizedRevisionSuffix
       containers: [
         {
           name: containerAppName 
-          image: containerImageName //'${azureContainerRegistry}/testimage:latest'
-          env: [
-            {
-              name: 'adoDBConnectionString'
-              value: databaseConnectionString
-            }
-            {
-              name: 'serviceBusConnectionString'
-              value: serviceBusConnectionString
-            }
-          ]
+          image: containerImageName
+          env: envParams
           resources: {
             cpu: json(cpuCore)
             memory: '${memorySize}Gi'
@@ -264,23 +194,11 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
       }
     }
   }
-  tags: {
-    Department: departmentName
-    Solution: solutionName
-    ServiceType: 'Container App'
-    Environment: environmentName
-    Subscription: subscriptionName
-    CostCentre: costCentre
-    ServiceOwner: serviceOwnerName
-    DateProvisioned: dateProvisioned
-    CreatedBy: createdBy
-    DeploymentRepo: deploymentRepo
-    DeploymentScript: deploymentScript
-  }
+  tags: tagValues
 }
-
 
 
 // Outputs for exported use
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
 output containerImage string = containerImageName
+output managedIdentityName string = managedIdentity.name

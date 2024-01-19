@@ -1,6 +1,6 @@
 
 //Specific parameters for the resources
-@description('Storage : Name of the blob store')
+@description('Name of the blob store')
 param blobStoreName string = 'default'
 
 @description('Amount of days the soft deleted data is stored and available for recovery')
@@ -8,7 +8,7 @@ param blobStoreName string = 'default'
 @maxValue(365)
 param deleteRetentionPolicy int = 7
 
-@description('Storage : Name of the Storage Account')
+@description(' Name of the Storage Account')
 param storageAccountName string
 
 // Variables and created data
@@ -17,14 +17,14 @@ param storageAccountName string
 //Resources
 
 // Existsing Storage Account
-resource StorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
 
 // Blob Services for Storage Account
-resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2019-06-01' = {
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   name: blobStoreName
-  parent: StorageAccount
+  parent: storageAccount
   properties: {
     cors: {
       corsRules: []

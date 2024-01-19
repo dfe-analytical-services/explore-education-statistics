@@ -1,34 +1,34 @@
 @description('The name of the Key Vault to store the secret within')
-param KeyVaultName string
+param keyVaultName string
 
 @description('The name of the secret to store')
-param SecretName string
+param secretName string
 
 @description('The value being stored in the Key Vault secret')
 @secure()
-param SecretValue string
+param secretValue string
 
 @description('Optional: The type of content being stored')
-param ContentType string = 'text/plain'
+param contentType string = 'text/plain'
 
 @description('Optional: Determines whether the secret is enabled')
-param IsEnabled bool = true
+param isEnabled bool = true
 
 resource KeyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
-  name: KeyVaultName
+  name: keyVaultName
 }
 
 resource KeyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
-  name: replace(replace(SecretName, '.', '-'), ' ', '-')
+  name: replace(replace(secretName, '.', '-'), ' ', '-')
   parent: KeyVault
   properties: {
-    contentType: ContentType
+    contentType: contentType
     attributes: {
-      enabled: IsEnabled 
+      enabled: isEnabled 
     }
-    value: SecretValue
+    value: secretValue
   }
 }
 
 //The URI pointing at the created secret
-output SecretUri string = KeyVaultSecret.properties.secretUri
+output keyVaultSecretUri string = KeyVaultSecret.properties.secretUri
