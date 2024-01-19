@@ -1,36 +1,31 @@
 //Environment Params -------------------------------------------------------------------
 @description('Base domain name for Public API')
-param domain string = 'publicapi'
+param domain string
 
-@description('Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources')
-param subscription string = 's101d01'
+@description('Subscription Name e.g. s101d01. Used as a prefix for created resources')
+param subscription string
 
-@description('Data Hub Environment Name e.g. api. Used as a prefix for created resources')
-param environment string = 'api'
+@description('Environment Name Used as a prefix for created resources')
+param environment string 
 
-@description('Specifies the location in which the Azure Storage resources should be deployed.')
+@description('Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
 //Tagging Params ------------------------------------------------------------------------
-@description('Tag Value - Enter the Department name tag value e.g. Data Directorate')
-param departmentName string = 'Public API'
-@description('Tag Value - The name of the phase of the development lifecycle environment that the component will be used in e.g. Development / Test / Integration / Production')
 param environmentName string = 'Development'
-@description('Tag Value - Enter the solution name that the component is a part of e.g. EDAP, LDS, EES, API')
-param solutionName string = 'API'
-@description('Tag Value - Enter the full name of the Azure subscription where this resource is located e.g. s101-datahub-development / s101-datahub-test / s101-datahub-production')
-param subscriptionName string = 'Unknown'
-@description('Tag Value - Enter the cost centre identifying value provided by the Service Owner. Otherwise populate with Unknown.')
-param costCentre string = 'Unknown'
-@description('Tag Value - Enter the name of the Service or Application Owner in the SURNAME, Firstname format e.g. SINCLAIR, Paul / SHELBY, Laura')
-param serviceOwnerName string = 'Unknown'
-@description('Tag Value - Enter the date that the component was created using the YYYYMMDD format e.g. 20190417. Use of the utcNow function will automatically populate this entry at creation time. Note: This only works when forced as a default value.')
-param dateProvisioned string = utcNow('u')
-@description('Tag Value - Enter the name of the user who created these resources in the SURNAME, Firstname format e.g. FISHER, Paul')
-param createdBy string = 'Unknown'
-@description('Tag Value - Enter the name of the repo that the deployment script for the component name be found. If the component is deployed manually, the value should be N/A')
-param deploymentRepo string = 'N/A'
 
+param tagValues object = {
+  departmentName: 'Unknown'
+  environmentName: environmentName
+  solutionName: 'API'
+  subscriptionName: 'Unknown'
+  costCentre: 'Unknown'
+  serviceOwnerName: 'Unknown'
+  dateProvisioned: utcNow('u')
+  createdBy: 'Unknown'
+  deploymentRepo: 'N/A'
+  deploymentScript: 'main.bicep'
+}
 
 //Networking Params --------------------------------------------------------------------------
 @description('Networking : Deploy subnets for networking')
@@ -40,6 +35,9 @@ param deploySubnets bool = true
 param storageFirewallRules array = ['0.0.0.0/0']
 
 //Storage Params ------------------------------------------------------------------------------
+@description('Storage Account Name')
+param storageAccountName string = 'core'
+
 @description('Storage : Name of the root fileshare folder name')
 @minLength(3)
 @maxLength(63)
@@ -49,14 +47,17 @@ param fileShareName string = 'data'
 param fileShareQuota int = 1
 
 //PostgreSQL Database Params -------------------------------------------------------------------
+@description('Database : PostgreSQL server Name')
+param postgreSQLserverName string
+
 @description('Database : administrator login name')
-@minLength(1)
-param dbAdministratorLoginName string = 'PostgreSQLAdmin'
+@minLength(0)
+param dbAdminName string
 
 @description('Database : administrator password')
 @minLength(8)
 @secure()
-param dbAdministratorLoginPassword string //P$&RW6*h2V1CKwTm
+param dbAdminPassword string
 
 @description('Database : Azure Database for PostgreSQL sku name ')
 @allowed([
@@ -64,7 +65,7 @@ param dbAdministratorLoginPassword string //P$&RW6*h2V1CKwTm
   'Standard_D4ads_v5'
   'Standard_E4ads_v5'
 ])
-param skuName string = 'Standard_B1ms'
+param dbSkuName string = 'Standard_B1ms'
 
 @description('Database : Azure Database for PostgreSQL Storage Size in GB')
 param storageSizeGB int = 32
@@ -76,47 +77,58 @@ param autoGrowStatus string = 'Disabled'
 @minLength(5)
 @maxLength(50)
 @description('Registry : Name of the azure container registry (must be globally unique)')
-param containerRegistryName string = 'eesapiacr'
+param containerRegistryName string
 
-//Container App Params
+@description('Deploy the Container Registry if you are not using an existing registry')
+param deployRegistry bool
+
+@description('Container App : Specifies the container image to seed to the ACR.')
+param containerSeedImage string
+
+@description('Select if you want to seed the ACR with a base image.')
+param seedRegistry bool
+
+//Container App Params -------------------------------------------------------------------
+@minLength(2)
+@maxLength(32)
+@description('Specifies the name of the container app.')
+param containerAppName string
+
+@description('Specifies the name of the container app environment.')
+param containerAppEnvName string = 'publicapi'
+
+@description('Specifies the name of the log analytics workspace.')
+param containerAppLogAnalyticsName string = 'publicapi'
+
 @description('Container App : Specifies the container image to deploy from the registry <name>:<tag>.')
-param acrHostedImageName string = 'hello-world'
+param acrHostedImageName string
 
 @description('Specifies the container port.')
 param targetPort int = 80
 
-@description('Container App : Specifies the container image to seed to the ACR.')
-param containerSeedImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld'
+@description('Select if you want to use a public dummy image to start the container app.')
+param useDummyImage bool
 
-@description('Select if you want to seed the ACR with a base image.')
-param seedRegistry bool = true
 
 //ServiceBus Queue Params -------------------------------------------------------------------
 @description('Name of the Service Bus namespace')
-param namespaceName string = 'etlnamespace'
+param namespaceName string = 'processor'
 
 @description('Name of the Queue')
-param queueName string = 'etlfunctionqueue'
+param queueName string = 'Processorqueue'
 
 //ETL Function Paramenters ------------------------------------------------------------------
-@description('Application : Insights name')
-param applicationInsightsName string = 'etlFunctionInsights'
+@description('Specifies the name of the function.')
+param functionAppName string = 'processor'
 
-@description('Function App Plan operating system')
-@allowed([
-  'Windows'
-  'Linux'
-])
-param appServiceplanOS string = 'Linux'
 
-@description('Function App : Runtime Language')
-@allowed([
-  'dotnet'
-  'node'
-  'python'
-  'java'
-])
-param functionAppRuntime string = 'python'
+
+//---------------------------------------------------------------------------------------------------------------
+// Variables and created data
+//---------------------------------------------------------------------------------------------------------------
+var resourcePrefix = '${subscription}-${environment}'
+var redResourcePrefix = '${subscription}-api'
+
 
 //---------------------------------------------------------------------------------------------------------------
 // All resources via modules
@@ -127,20 +139,10 @@ module vnetModule 'components/network.bicep' = {
   name: 'virtualNetworkDeploy'
   params: {
     subscription: subscription
-    location: location
     environment: environment
+    location: location
     deploySubnets: deploySubnets
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'network.bicep'
+    tagValues: tagValues
   }
 }
 
@@ -148,23 +150,12 @@ module vnetModule 'components/network.bicep' = {
 module storageAccountModule 'components/storageAccount.bicep' = {
   name: 'storageAccountDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: redResourcePrefix
     location: location
-    adminSubnetRef: vnetModule.outputs.adminSubnetRef
-    importerSubnetRef: vnetModule.outputs.importerSubnetRef
-    publisherSubnetRef: vnetModule.outputs.publisherSubnetRef
+    storageAccountName: storageAccountName
+    storageSubnetRules: [vnetModule.outputs.adminSubnetRef, vnetModule.outputs.importerSubnetRef, vnetModule.outputs.publisherSubnetRef]
     storageFirewallRules: storageFirewallRules
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'storageaccount.bicep'
+    tagValues: tagValues
   }
   dependsOn: [
     vnetModule
@@ -175,22 +166,10 @@ module storageAccountModule 'components/storageAccount.bicep' = {
 module fileShareModule 'components/fileShares.bicep' = {
   name: 'fileShareDeploy'
   params: {
+    resourcePrefix: resourcePrefix
     fileShareName: fileShareName
     fileShareQuota: fileShareQuota
     storageAccountName: storageAccountModule.outputs.storageAccountName
-    //tags
-  }
-  dependsOn: [
-    storageAccountModule
-  ]
-}
-
-//Deploy Function blob store
-module blobStoreModule 'components/blobStore.bicep' = {
-  name: 'blobStoreDeploy'
-  params: {
-    storageAccountName: storageAccountModule.outputs.storageAccountName
-    //tags
   }
   dependsOn: [
     storageAccountModule
@@ -198,24 +177,13 @@ module blobStoreModule 'components/blobStore.bicep' = {
 }
 
 //Deploy Key Vault
-module keyVaultModule 'components/keyvault.bicep' = {
+module keyVaultModule 'components/keyVault.bicep' = {
   name: 'keyVaultDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: redResourcePrefix
     location: location
-    environment: environment
     tenantId: az.subscription().tenantId
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'keyvault.bicep'
+    tagValues: tagValues
   }
 }
 
@@ -223,25 +191,16 @@ module keyVaultModule 'components/keyvault.bicep' = {
 module databaseModule 'components/postgresqlDatabase.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: resourcePrefix
     location: location
-    administratorLoginName: dbAdministratorLoginName
-    administratorLoginPassword: dbAdministratorLoginPassword
-    skuName: skuName
+    serverName: postgreSQLserverName
+    adminName: dbAdminName
+    adminPassword: dbAdminPassword
+    dbSkuName: dbSkuName
     storageSizeGB: storageSizeGB
     autoGrowStatus: autoGrowStatus
-    KeyVaultName: keyVaultModule.outputs.keyVaultName
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'database.bicep'
+    keyVaultName: keyVaultModule.outputs.keyVaultName
+    tagValues: tagValues
   }
   dependsOn: [
     vnetModule
@@ -253,48 +212,22 @@ module databaseModule 'components/postgresqlDatabase.bicep' = {
 module containerRegistryModule 'components/containerRegistry.bicep' = {
   name: 'acrDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: resourcePrefix
     location: location
     containerRegistryName: containerRegistryName
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'containerRegistry.bicep'
+    deployRegistry: deployRegistry
+    tagValues: tagValues
   }
 }
 
-//Deploy Container Application
-module containerAppModule 'components/containerApp.bicep' = {
-  name: 'appContainerDeploy'
+//Seed Container Registry 
+module seedRegistryModule 'components/acrSeeder.bicep' = if (seedRegistry) {
+  name: 'acrSeeder'
   params: {
-    subscription: subscription
+    resourcePrefix: resourcePrefix
     location: location
-    acrLoginServer: containerRegistryModule.outputs.crLoginServer
-    acrHostedImageName: acrHostedImageName //image name plus tag i.e. 'azuredocs/aci-helloworld:Latest'
-    targetPort: targetPort
-    containerRegistryName: containerRegistryModule.outputs.crName
-    containerSeedImage: containerSeedImage // seeder image name 'mcr.microsoft.com/azuredocs/aci-helloworld'
-    seedRegistry: seedRegistry
-    databaseConnectionString: databaseModule.outputs.adoNetDbConnectionString
-    serviceBusConnectionString: serviceBusFunctionQueueModule.outputs.ServiceBusConnectionString
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'containerApp.bicep'
+    containerRegistryName: containerRegistryModule.outputs.containerRegistryName
+    containerSeedImage: containerSeedImage
   }
   dependsOn: [
     containerRegistryModule
@@ -302,25 +235,42 @@ module containerAppModule 'components/containerApp.bicep' = {
   ]
 }
 
+//Deploy Container Application
+module containerAppModule 'components/containerApp.bicep' = {
+  name: 'appContainerDeploy'
+  params: {
+    resourcePrefix: resourcePrefix
+    location: location
+    containerAppName: containerAppName
+    containerAppEnvName: containerAppEnvName
+    containerAppLogAnalyticsName: containerAppLogAnalyticsName
+    acrLoginServer: containerRegistryModule.outputs.containerRegistryLoginServer
+    acrHostedImageName: acrHostedImageName
+    targetPort: targetPort
+    useDummyImage: useDummyImage
+    envParams: [
+      {
+        name: 'adoDBConnectionString'
+        value: databaseModule.outputs.dbConnectionString
+      }
+      {
+        name: 'serviceBusConnectionString'
+        value: serviceBusFunctionQueueModule.outputs.serviceBusConnectionString
+      }
+    ]
+    tagValues: tagValues
+  }
+}
+
 //Deploy Service Bus
 module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
   name: 'serviceBusQueueDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: resourcePrefix
     location: location
     namespaceName: namespaceName
     queueName:queueName
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'functionQueue.bicep'
+    tagValues: tagValues
   }
 }
 
@@ -328,26 +278,14 @@ module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
 module etlFunctionAppModule 'application/etlFunctionApp.bicep' = {
   name: 'etlFunctionAppDeploy'
   params: {
-    subscription: subscription
+    resourcePrefix: resourcePrefix
     location: location
-    applicationInsightsName: applicationInsightsName
-    appServiceplanOS: appServiceplanOS
-    functionAppRuntime: functionAppRuntime
+    functionAppName: functionAppName
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    databaseConnectionStringURI: databaseModule.outputs.pythonConnectionStringSecretUri
+    databaseConnectionStringURI: databaseModule.outputs.connectionStringSecretUri
     storageAccountConnectionString: storageAccountModule.outputs.storageAccountConnectionString
-    serviceBusConnectionString: serviceBusFunctionQueueModule.outputs.ServiceBusConnectionString
-    //tags
-    departmentName: departmentName
-    environmentName: environmentName
-    solutionName: solutionName
-    subscriptionName: subscriptionName
-    costCentre: costCentre
-    serviceOwnerName: serviceOwnerName
-    dateProvisioned: dateProvisioned
-    createdBy: createdBy
-    deploymentRepo: deploymentRepo
-    deploymentScript: 'etlFunctionApp.bicep'
+    serviceBusConnectionString: serviceBusFunctionQueueModule.outputs.serviceBusConnectionString
+    tagValues: tagValues
   }
   dependsOn: [
     serviceBusFunctionQueueModule
@@ -357,6 +295,7 @@ module etlFunctionAppModule 'application/etlFunctionApp.bicep' = {
 
 
 //outputs
-output crLoginServer string = containerRegistryModule.outputs.crLoginServer
-output crName string = containerRegistryModule.name
-output metadataDatabaseRef string = databaseModule.outputs.metadataDatabaseRef
+output containerRegistryLoginServer string = containerRegistryModule.outputs.containerRegistryLoginServer
+output containerRegistryName string = containerRegistryModule.name
+output metadataDatabaseRef string = databaseModule.outputs.databaseRef
+output managedIdentityName string = containerAppModule.outputs.managedIdentityName
