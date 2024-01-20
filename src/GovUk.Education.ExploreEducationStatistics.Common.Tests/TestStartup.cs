@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -27,6 +28,8 @@ public class TestStartup
 
         services.AddControllers(options =>
             {
+                options.Filters.Add(new ProblemDetailsResultFilter());
+
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
             }

@@ -22,6 +22,23 @@ public class ValidationProblemViewModel : ValidationProblemDetails
     /// </summary>
     public new IReadOnlyList<ErrorViewModel> Errors { get; set; } = new List<ErrorViewModel>();
 
+    public static ValidationProblemViewModel Create(ValidationProblemDetails problemDetails)
+    {
+        var errors = problemDetails.Errors
+            .SelectMany(errorEntry =>
+                errorEntry.Value.Select(
+                    message => new ErrorViewModel
+                    {
+                        Path = errorEntry.Key.IsNullOrEmpty() ? null : errorEntry.Key,
+                        Message = message
+                    }
+                )
+            )
+            .ToList();
+
+        return Create(problemDetails, errors);
+    }
+
     public static ValidationProblemViewModel Create(
         ValidationProblemDetails problemDetails,
         IEnumerable<ErrorViewModel> errors)

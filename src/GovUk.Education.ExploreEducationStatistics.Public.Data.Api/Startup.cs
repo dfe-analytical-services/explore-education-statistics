@@ -58,6 +58,7 @@ public class Startup
         services
             .AddControllers(options =>
             {
+                options.Filters.Add(new ProblemDetailsResultFilter());
                 options.AddCommaSeparatedQueryModelBinderProvider();
                 options.AddTrimStringBinderProvider();
             })
