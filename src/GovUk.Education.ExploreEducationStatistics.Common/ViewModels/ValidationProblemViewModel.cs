@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,10 @@ public class ValidationProblemViewModel : ValidationProblemDetails
     /// Additional errors that are related to the validation problem.
     /// </summary>
     public new IReadOnlyList<ErrorViewModel> Errors { get; set; } = new List<ErrorViewModel>();
+
+    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    public ValidationProblemDetails? OriginalDetails { get; init; }
 
     public static ValidationProblemViewModel Create(ValidationProblemDetails problemDetails)
     {
@@ -50,6 +55,7 @@ public class ValidationProblemViewModel : ValidationProblemDetails
             Detail = problemDetails.Detail,
             Instance = problemDetails.Instance,
             Errors = errors.ToList(),
+            OriginalDetails = problemDetails,
         };
 
         viewModel.Extensions.AddRange(problemDetails.Extensions);

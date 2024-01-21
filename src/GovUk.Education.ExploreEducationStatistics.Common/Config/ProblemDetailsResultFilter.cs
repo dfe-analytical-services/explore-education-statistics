@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Config;
 
@@ -30,9 +31,18 @@ public class ProblemDetailsResultFilter : IResultFilter
             return;
         }
 
-        // Result is already the right view model type, don't need to do anything else.
-        if (problemDetails is ValidationProblemViewModel)
+        if (problemDetails is ValidationProblemViewModel validationProblemViewModel)
         {
+            // If there are no OriginalDetails, this means we did not receive construct the view
+            // model using a ValidationProblemDetails from the framework. Consequently, we need
+            // to apply the defaults to ensure the view model is filled out properly.
+            // This is mostly applicable to any use of our current ValidationUtils methods
+            // which create custom bad request results with the view model already constructed.
+            if (validationProblemViewModel.OriginalDetails is null)
+            {
+                ApplyValidationProblemDefaults(context, validationProblemViewModel);
+            }
+
             return;
         }
 
@@ -41,5 +51,29 @@ public class ProblemDetailsResultFilter : IResultFilter
 
     public void OnResultExecuted(ResultExecutedContext context)
     {
+    }
+
+    private void ApplyValidationProblemDefaults(
+        ResultExecutingContext context,
+        ValidationProblemViewModel validationProblem)
+    {
+        if (context.Controller is not ControllerBase controllerBase)
+        {
+            return;
+        }
+
+        var validationProblemDetails = controllerBase.ProblemDetailsFactory
+                .CreateValidationProblemDetails(context.HttpContext, new ModelStateDictionary());
+
+        validationProblem.Title ??= validationProblemDetails.Title;
+        validationProblem.Type ??= validationProblemDetails.Type;
+        validationProblem.Detail ??= validationProblemDetails.Detail;
+        validationProblem.Instance ??= validationProblemDetails.Instance;
+
+        if (!validationProblem.Extensions.ContainsKey("traceId") &&
+            validationProblemDetails.Extensions.TryGetValue("traceId", out var traceId))
+        {
+            validationProblem.Extensions["traceId"] = traceId;
+        }
     }
 }

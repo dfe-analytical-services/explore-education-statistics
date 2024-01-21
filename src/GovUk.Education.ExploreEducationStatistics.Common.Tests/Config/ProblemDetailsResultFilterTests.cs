@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
@@ -27,6 +28,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, problemDetails.Status);
         Assert.Equal("Bad Request", problemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", problemDetails.Type);
     }
 
     [Fact]
@@ -39,6 +41,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(500, problemDetails.Status);
         Assert.Equal("An error occurred while processing your request.", problemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.6.1", problemDetails.Type);
     }
 
     [Fact]
@@ -51,6 +54,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -74,6 +78,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -93,6 +98,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -135,7 +141,10 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
         [HttpGet(nameof(TestValidationResult))]
         public ActionResult TestValidationResult()
         {
-            return ValidationUtils.ValidationResult("A global error");
+            return ValidationUtils.ValidationResult(new ErrorViewModel
+            {
+                Message = "A global error"
+            });
         }
     }
 
