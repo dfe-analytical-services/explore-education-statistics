@@ -22,7 +22,11 @@ const ReleaseDataFileReplacementCompletePage = ({
 
   // Run the replacement plan against itself so we can just get the
   // data blocks and footnotes in a convenient way.
-  const { value: plan, isLoading } = useAsyncRetry(
+  const {
+    value: plan,
+    isLoading,
+    error,
+  } = useAsyncRetry(
     () => dataReplacementService.getReplacementPlan(releaseId, fileId, fileId),
     [releaseId, fileId],
   );
@@ -35,6 +39,19 @@ const ReleaseDataFileReplacementCompletePage = ({
       fileId,
     },
   );
+
+  if (error) {
+    return (
+      <>
+        <WarningMessage>
+          There was a problem with the data replacement.
+        </WarningMessage>
+        <Link back className="govuk-!-margin-bottom-6" to={dataFilePath}>
+          Back
+        </Link>
+      </>
+    );
+  }
 
   return (
     <>
@@ -103,7 +120,9 @@ const ReleaseDataFileReplacementCompletePage = ({
                           },
                         )}
                       >
-                        {sanitizeHtml(footnote.content, { allowedTags: [] })}
+                        {sanitizeHtml(footnote.content, {
+                          allowedTags: [],
+                        })}
                       </Link>
                     </li>
                   ))}
