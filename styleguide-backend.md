@@ -1,4 +1,4 @@
-# Explore Education Statistics - C# Style Guide
+# Explore Education Statistics - Backend Style Guide
 
 <details markdown="1">
   <summary>Table of Contents</summary>
@@ -9,8 +9,7 @@
         +   [2.1.1 Named Parameters](#s2.1.1)
     *   [2.2 Structure](#s2.2)
         +   [2.2.1 Entity Framework (EF)](#s2.2.1)
-            +   [2.2.1.1 Configuration](#s2.2.1.1)
-                +   [2.2.1.1.1 Annotations VS Fluent API](#s2.2.1.1.1)
+            +   [2.2.1.1 Annotations VS Fluent API](#s2.2.1.1)
             +   [2.2.1.2 Stored Procedures VS Linq VS SQL](#s2.2.1.2)
     *   [2.3 Best Practices](#s2.3)
         +   [2.3.2 Entity Framework (EF)](#s2.3.2)
@@ -51,10 +50,7 @@ of agreed coding standards to conform to when writing C# code for this repositor
 #### 2.2.1 Entity Framework (EF) 
 
 <a id="s2.2.1.1"></a>
-##### 2.2.1.1 Configuration
-
-<a id="s2.2.1.1.1"></a>
-###### 2.2.1.1.1 Annotations VS Fluent API
+###### 2.2.1.1 Annotations VS Fluent API
 
 - Prefer to use Fluent API over annotations where we can
 - Prefer to have one source of truth rather than split rules across different locations
