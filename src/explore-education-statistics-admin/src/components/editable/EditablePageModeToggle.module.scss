@@ -1,27 +1,45 @@
 @import '~govuk-frontend/govuk/base';
+@import '@admin/styles/variables';
 
-.toggle {
+// scroll-padding to ensure the sticky bar doesn't
+// obscure keyboard focus.
+:global(:root) {
+  scroll-padding-top: 180px;
+
+  @include govuk-media-query($from: tablet) {
+    scroll-padding-top: 100px;
+  }
+}
+
+.container {
   background: $govuk-brand-colour;
-  bottom: 0;
-  left: 0;
-  max-width: 390px;
-  padding: 6px;
-  position: fixed;
-  width: 100%;
-  z-index: 10000;
+  margin: -#{govuk-spacing(6)} 0 govuk-spacing(6) -#{govuk-spacing(3)};
+  max-width: $dfe-page-width-wide;
+  padding: govuk-spacing(1) govuk-spacing(4);
+  position: sticky;
+  top: 0;
+  width: calc(100% + #{govuk-spacing(6)});
+  z-index: 999;
 
-  @media print {
-    display: none;
+  @include govuk-media-query($from: tablet) {
+    margin-bottom: govuk-spacing(9);
+    margin-left: 0;
+    width: 100%;
   }
 
-  :global(.govuk-radios) {
-    background: govuk-colour('white');
-    min-height: 100px;
-    padding: 6px 6px 0;
+  :global(.govuk-fieldset) {
+    align-items: center;
+    display: flex;
   }
 
-  &.open {
-    border-top: 0;
+  :global(.govuk-fieldset__legend) {
+    color: govuk-colour('white');
+    float: left;
+    margin: 0 govuk-spacing(4) 1px 0;
+  }
+
+  :global(.govuk-label) {
+    color: govuk-colour('white');
   }
 }
 
@@ -34,7 +52,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: $govuk-font-weight-bold;
   line-height: 1.25;
   margin: 0;
   padding: 0;
@@ -46,20 +64,5 @@
   &:focus-visible {
     border-color: govuk-colour('yellow');
     outline: none;
-  }
-}
-
-.open {
-  .button {
-    margin-bottom: 6px;
-  }
-}
-
-.content {
-  background-color: govuk-colour('white');
-  display: none;
-
-  .open & {
-    display: block;
   }
 }
