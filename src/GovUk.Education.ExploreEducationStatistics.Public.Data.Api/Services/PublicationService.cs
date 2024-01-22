@@ -21,7 +21,7 @@ internal class PublicationService : IPublicationService
 
     public async Task<Either<ActionResult, PaginatedPublicationListViewModel>> ListPublications(
         int page,
-        int pageSize, 
+        int pageSize,
         string? search = null)
     {
         return await GetPublishedDataSetPublicationIds()
@@ -49,11 +49,13 @@ internal class PublicationService : IPublicationService
 
     private static PublicationListViewModel MapPublication(PublicationSearchResultViewModel publication)
     {
-        return new(
-            Id: publication.Id,
-            Title: publication.Title,
-            Slug: publication.Slug,
-            Summary: publication.Summary,
-            LastPublished: publication.Published);
+        return new PublicationListViewModel 
+        {
+            Id = publication.Id,
+            Title = publication.Title,
+            Slug = publication.Slug,
+            Summary = publication.Summary,
+            LastPublished = publication.Published
+        };
     }
 }
