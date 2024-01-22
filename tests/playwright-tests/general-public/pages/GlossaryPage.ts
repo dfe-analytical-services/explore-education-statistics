@@ -1,9 +1,6 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
 
-// Glossary page
-export class GlossaryPage {
+export default class GlossaryPage {
   readonly page: Page;
   readonly pageSearchBox: Locator;
   readonly pageSearchResults: Locator;
@@ -18,7 +15,7 @@ export class GlossaryPage {
   readonly voluntaryRepaymentSectionText: Locator;
   readonly educationStatisticsMethodology: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.pageSearchBox = page.locator('input#pageSearchForm-input');
@@ -40,6 +37,7 @@ export class GlossaryPage {
       '//a[text()="Education statistics: methodology"]',
     );
   }
+
   // standard text
   readonly voluntaryRepaymentSectionParagraphText =
     'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';

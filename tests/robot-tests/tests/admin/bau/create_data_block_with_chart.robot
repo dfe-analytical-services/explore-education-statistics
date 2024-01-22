@@ -275,7 +275,6 @@ Validate data block is in list again
 Embed data block into release content
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user closes Set Page View box
     user creates new content section    1    ${CONTENT_SECTION_NAME}
     user clicks button    Add data block
     user chooses and embeds data block    ${DATABLOCK_NAME}

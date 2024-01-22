@@ -1,6 +1,7 @@
 .idea/
 .next/
 build/
+dist/
 coverage/
 node_modules/
 *.min.css
