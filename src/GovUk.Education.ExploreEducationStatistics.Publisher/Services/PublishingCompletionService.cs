@@ -108,14 +108,11 @@ public class PublishingCompletionService : IPublishingCompletionService
                 }
             });
 
-        var publicationSlugs = prePublishingStagesComplete
-            .Select(status => status.PublicationSlug)
-            .Distinct();
-
         var directlyRelatedPublicationIds = await _contentDbContext
-            .Publications
-            .Where(p => publicationSlugs.Contains(p.Slug))
-            .Select(p => p.Id)
+            .Releases
+            .Where(r => releaseIdsToUpdate.Contains(r.Id))
+            .Select(r => r.PublicationId)
+            .Distinct()
             .ToListAsync();
 
         await directlyRelatedPublicationIds
