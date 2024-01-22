@@ -142,6 +142,9 @@ def initialise() -> argparse.Namespace:
     if args.reseed and args.env == "prod":
         raise Exception(f"Cannot generate seed data against environment {args.env}")
 
+    if includes_data_changing_tests(args) and args.env not in ["local", "dev"]:
+        raise Exception(f"Cannot run tests that change data on environment {args.env}")
+
     load_environment_variables(args)
     store_credential_environment_variables(args)
     return args
@@ -168,6 +171,7 @@ def validate_environment_variables():
         "WAIT_MEDIUM",
         "WAIT_LONG",
         "WAIT_SMALL",
+        "WAIT_DATA_FILE_IMPORT",
         "FAIL_TEST_SUITES_FAST",
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",
@@ -177,6 +181,25 @@ def validate_environment_variables():
 
     for env_var in required_env_vars:
         assert os.getenv(env_var) is not None, f"Environment variable {env_var} is not set"
+
+
+# If running all tests, or admin, admin_and_public, admin_and_public_2 or seed_data suites,
+# these change data on environments and require test themes, test topics and user authentication.
+#
+# We check for both explicit forward slashes AND OS-specific separators here, as in Windows
+# we can expect to get either scenario depending upon how we're running these tests e.g.
+# Git Bash versus Command Prompt versus IDEs.  {os.sep} in Windows always evaluates to
+# `\\` whereas any of these run options above may choose to either supply forward slashes or
+# back slashes.
+def includes_data_changing_tests(arguments: argparse.Namespace):
+    return (
+        arguments.tests == "tests/"
+        or arguments.tests == f"tests{os.sep}"
+        or f"{os.sep}admin" in arguments.tests
+        or "/admin" in arguments.tests
+        or f"{os.sep}seed_data" in arguments.tests
+        or "/seed_data" in arguments.tests
+    )
 
 
 def store_credential_environment_variables(arguments: argparse.Namespace):

@@ -82,7 +82,7 @@ Variables you may want to set in a `.env` file are documented in `.env.example`.
 
 ## Code style
 
-In order to adher to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
+In order to adhere to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
 
 * [Flake8](https://pypi.org/project/flake8/): 
 We use Flake8 to verify pep8, pyflakes & circular complexity rules. 

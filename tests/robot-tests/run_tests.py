@@ -182,26 +182,6 @@ def run():
 
     args = args_and_variables.initialise()
 
-    # If running all tests, or admin, admin_and_public, admin_and_public_2 or seed_data suites,
-    # these change data on environments and require test themes, test topics and user authentication.
-    #
-    # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
-    # we can expect to get either scenario depending upon how we're running these tests e.g.
-    # Git Bash versus Command Prompt versus IDEs.  {os.sep} in Windows always evaluates to
-    # `\\` whereas any of these run options above may choose to either supply forward slashes or
-    # back slashes.
-    data_changing_tests = (
-        args.tests == "tests/"
-        or args.tests == f"tests{os.sep}"
-        or f"{os.sep}admin" in args.tests
-        or "/admin" in args.tests
-        or f"{os.sep}seed_data" in args.tests
-        or "/seed_data" in args.tests
-    )
-
-    if data_changing_tests and args.env not in ["local", "dev"]:
-        raise Exception(f"Cannot run tests that change data on environment {args.env}")
-
     install_chromedriver(args.chromedriver_version)
 
     test_run_index = -1
@@ -232,7 +212,7 @@ def run():
                 os.environ["RUN_IDENTIFIER"] = run_identifier
 
                 # Create a Test Topic under which all of this test run's data will be created.
-                if data_changing_tests:
+                if args_and_variables.includes_data_changing_tests(args):
                     admin_api.create_test_topic(run_identifier)
 
                 # Run the tests.
@@ -247,7 +227,7 @@ def run():
 
             finally:
                 # Tear down any data created by this test run unless we've disabled teardown.
-                if data_changing_tests and not args.disable_teardown:
+                if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
                     logger.info("Tearing down test data...")
                     admin_api.delete_test_topic()
 
