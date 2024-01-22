@@ -38,8 +38,8 @@ of agreed coding standards to conform to when writing C# code for this repositor
 <a id="s2.1.1"></a>
 ### 2.1.1 Named Parameters
 
-- As a rule, if we hit 3 or more parameters for a method call, consider using a named parameters, or break out a class/record to hold the parameters*
-- If we have multiple parameters of the same type, use named parameters to protect against the accidental reordering or parameters*
+- As a rule, if we hit 3 or more parameters for a method call, consider using named parameters, or break out a class/record to hold the parameters*
+- If we have multiple parameters of the same type, use named parameters to protect against the accidental reordering of parameters*
 
 *This includes constructors
 
