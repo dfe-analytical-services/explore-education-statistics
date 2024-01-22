@@ -70,6 +70,7 @@ internal class ContentApiClientMock : IContentApiClient
         IEnumerable<Guid> allPublicationIds)
     {
         return allPublicationIds
+            .Order()
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(CreatePublication)

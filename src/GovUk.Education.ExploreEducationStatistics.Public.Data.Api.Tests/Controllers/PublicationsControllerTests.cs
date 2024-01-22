@@ -68,6 +68,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
 
             var expectedPublicationIds = publishedDataSets
+                .OrderBy(ds => ds.PublicationId)
                 .Select(ds => ds.PublicationId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
