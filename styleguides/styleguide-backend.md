@@ -36,7 +36,7 @@ of agreed coding standards to conform to when writing C# code for this repositor
 ### 2.1 Style 
 
 <a id="s2.1.1"></a>
-### 2.1.1 Named Parameters
+#### 2.1.1 Named Parameters
 
 - As a rule, if we hit 3 or more parameters for a method call, consider using named parameters, or break out a class/record to hold the parameters*
 - If we have multiple parameters of the same type, use named parameters to protect against the accidental reordering of parameters*
@@ -50,7 +50,7 @@ of agreed coding standards to conform to when writing C# code for this repositor
 #### 2.2.1 Entity Framework (EF) 
 
 <a id="s2.2.1.1"></a>
-###### 2.2.1.1 Annotations VS Fluent API
+##### 2.2.1.1 Annotations VS Fluent API
 
 - Prefer to use Fluent API over annotations where we can
 - Prefer to have one source of truth rather than split rules across different locations
