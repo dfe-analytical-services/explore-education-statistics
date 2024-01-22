@@ -27,7 +27,9 @@ public static class HttpResponseMessageTestExtensions
     private static T? Deserialize<T>(this HttpResponseMessage message, bool useSystemJson)
     {
         return useSystemJson
-            ? JsonSerializer.Deserialize<T>(message.Content.ReadAsStream().ReadToEnd())
+            ? JsonSerializer.Deserialize<T>(
+                message.Content.ReadAsStream().ReadToEnd(), 
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
             : message.Content.ReadFromJson<T>();
     }
 
