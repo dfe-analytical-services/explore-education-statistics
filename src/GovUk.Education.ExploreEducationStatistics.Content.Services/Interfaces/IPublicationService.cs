@@ -24,5 +24,6 @@ public interface IPublicationService
         PublicationsSortBy? sort = null,
         SortOrder? order = null,
         int page = 1,
-        int pageSize = 10);
+        int pageSize = 10,
+        IEnumerable<Guid>? publicationIds = null);
 }

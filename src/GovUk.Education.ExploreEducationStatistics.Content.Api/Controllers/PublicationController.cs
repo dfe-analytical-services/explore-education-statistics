@@ -48,10 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [MemoryCache(typeof(GetPublicationListCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+        [MemoryCache(typeof(ListPublicationsGetCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("publications")]
         public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-            [FromQuery] PublicationsListRequest request)
+            [FromQuery] PublicationsListGetRequest request)
         {
             return await _publicationService
                 .ListPublications(
@@ -62,6 +62,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     request.Order,
                     page: request.Page,
                     pageSize: request.PageSize)
+                .HandleFailuresOrOk();
+        }
+
+        [MemoryCache(typeof(ListPublicationsPostCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+        [HttpPost("publications")]
+        public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
+            [FromBody] PublicationsListPostRequest request)
+        {
+            return await _publicationService
+                .ListPublications(
+                    request.ReleaseType,
+                    request.ThemeId,
+                    request.Search,
+                    request.Sort,
+                    request.Order,
+                    page: request.Page,
+                    pageSize: request.PageSize,
+                    publicationIds: request.PublicationIds)
                 .HandleFailuresOrOk();
         }
 
