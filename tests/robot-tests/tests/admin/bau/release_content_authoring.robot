@@ -54,8 +54,6 @@ Navigate to content section as analyst1
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Add first content section
-    user closes Set Page View box
-    user scrolls down    400
     user scrolls to element    xpath://button[text()="Add new section"]
     user waits until button is enabled    Add new section
     user clicks button    Add new section
@@ -78,7 +76,6 @@ Switch to bau1 to view release
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
-    user closes Set Page View box
 
 Check second text block is locked as bau1
     ${block}=    get accordion section block    First content section    2    id:releaseMainContent
@@ -97,8 +94,6 @@ Switch to bau1 to add review comments for first text block
     ${block}=    user starts editing accordion section text block    First content section    1
     ...    id:releaseMainContent
 
-    # ensure 'Set page view' box doesn't intercept button click
-    user scrolls down    150
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 1
 
@@ -124,8 +119,6 @@ Add review comment for second text block as bau1
     ${block}=    user starts editing accordion section text block    First content section    2
     ...    id:releaseMainContent
 
-    # ensure 'Set page view' box doesn't intercept button click
-    user scrolls down    100
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 3
 
@@ -161,9 +154,6 @@ Switch to analyst1 to start resolving comments
     ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element does not contain    ${block}    Analyst1 User1 is editing
 
-    # avoid set page view box getting in the way
-    user scrolls down    600
-
 Switch to bau1 to check first text block is locked
     user switches to bau1 browser
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
@@ -183,10 +173,6 @@ Switch to analyst1 to resolve comment for first text block
     ${comment}=    user gets unresolved comment    Test comment 1    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
     user waits until element contains    ${author}    Bau1 User1
-
-    # avoid clicking the 'set page view' span
-    user scrolls to element    ${comment}
-    user scrolls down    200
 
     # resolve the comment left by bau1
     user clicks button    Resolve    ${comment}
@@ -221,8 +207,6 @@ Switch back to analyst1 to resolve second text block
     ${block}=    get accordion section block    First content section    2    id:releaseMainContent
 
     user clicks button    View comments    ${block}
-    # avoid set page view box getting in the way
-    user scrolls down    600
 
     user checks list has x items    testid:comments-unresolved    1    ${block}
     user checks list item contains    testid:comments-unresolved    1    Test comment 3    ${block}
@@ -287,7 +271,6 @@ Add data block
 Add review comment for data block as bau1
     user switches to bau1 browser
     user reloads page
-    user closes Set Page View box
     user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
     user scrolls down    400
     ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
@@ -299,7 +282,6 @@ Add review comment for data block as bau1
 Resolve comment for data block as analyst1
     user switches to analyst1 browser
     user reloads page
-    user closes Set Page View box
     user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
     user scrolls down    400
     ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]

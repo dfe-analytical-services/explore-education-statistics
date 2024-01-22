@@ -12,7 +12,6 @@ class KeywordListener:
     logger = get_logger(__name__)
 
     def start_keyword(self, name, attributes):
-
         source = attributes["source"]
 
         if (
@@ -38,7 +37,6 @@ class KeywordListener:
             )
 
     def get_args_and_values_string(self, attributes):
-
         args = attributes["args"]
 
         try:

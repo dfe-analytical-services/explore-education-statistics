@@ -808,10 +808,6 @@ user gets resolved comment
     ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
     [Return]    ${result}
 
-user closes Set Page View box
-    user clicks element    id:pageViewToggleButton
-    user waits until element is not visible    id:editingMode    %{WAIT_SMALL}
-
 # This keyword will work for any URL containing the pattern release/<guid>, and will return the guid segment of the URL.
 # For example, in the URL https://localhost/publication/<publication id>/release/<release id>/status, this
 # keyword would return the <release id> segment of the URL.

@@ -28,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             return handler.WriteToken(secToken);
         }
 
-        public string GetEmailFromToken(string authToken, string secretKey)
+        public string? GetEmailFromToken(string authToken, string secretKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = GetValidationParameters(secretKey);
-            string email = null;
+            string? email = null;
 
             try
             {

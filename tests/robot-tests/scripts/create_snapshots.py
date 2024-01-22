@@ -266,29 +266,33 @@ class SnapshotService:
 
 
 if __name__ == "__main__":
+
     def send_alert(message: str) -> None:
-        if args.slack_webhook_url == None or args.slack_webhook_url == "":
+        if args.slack_webhook_url is None or args.slack_webhook_url == "":
             return
 
         snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
-        snapshot_service._send_slack_notification(text="fallback", blocks=[
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": ":x: Snapshot process failed",
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "plain_text",
-                    "text": f"{message}",
-                }
-            },
-        ])
+        snapshot_service._send_slack_notification(
+            text="fallback",
+            blocks=[
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": ":x: Snapshot process failed",
+                    },
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"{message}",
+                    },
+                },
+            ],
+        )
 
-    try:    
+    try:
         from get_webdriver import get_webdriver
 
         ap = argparse.ArgumentParser(
@@ -357,7 +361,7 @@ if __name__ == "__main__":
         )
 
         args = ap.parse_args()
-        
+
         assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
         chrome_options = Options()
@@ -372,7 +376,9 @@ if __name__ == "__main__":
         if args.basic_auth_user and args.basic_auth_password:
             driver.execute_cdp_cmd("Network.enable", {})
             token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_password}".encode())
-            driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}})
+            driver.execute_cdp_cmd(
+                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
+            )
 
         snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
 
@@ -386,13 +392,13 @@ if __name__ == "__main__":
         driver.quit()
     except Exception as ex:
         message = ""
-        
-        if hasattr(ex, 'message'):
+
+        if hasattr(ex, "message"):
             message = ex.message
-        elif hasattr(ex, 'msg'):
+        elif hasattr(ex, "msg"):
             message = ex.msg
         else:
             message = ex
-        
+
         send_alert(message)
         raise
