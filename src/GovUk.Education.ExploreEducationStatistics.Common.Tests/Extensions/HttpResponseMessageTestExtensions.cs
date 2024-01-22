@@ -19,7 +19,7 @@ public static class HttpResponseMessageTestExtensions
     {
         Assert.Equal(OK, message.StatusCode);
 
-        T? body = Deserialize<T>(message, useSystemJson);
+        var body = Deserialize<T>(message, useSystemJson);
 
         return Assert.IsType<T>(body);
     }
@@ -39,17 +39,17 @@ public static class HttpResponseMessageTestExtensions
         return message.AssertBodyEqualTo(expectedBody);
     }
 
-    public static T AssertOk<T>(this HttpResponseMessage message, T expectedBody)
+    public static T AssertOk<T>(this HttpResponseMessage message, T expectedBody, bool useSystemJson = false)
     {
         Assert.Equal(OK, message.StatusCode);
-        return message.AssertBodyEqualTo(expectedBody);
+        return message.AssertBodyEqualTo(expectedBody, useSystemJson);
     }
 
-    public static T AssertCreated<T>(this HttpResponseMessage message, T expectedBody, string expectedLocation)
+    public static T AssertCreated<T>(this HttpResponseMessage message, T expectedBody, string expectedLocation, bool useSystemJson = false)
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
-        return message.AssertBodyEqualTo(expectedBody);
+        return message.AssertBodyEqualTo(expectedBody, useSystemJson);
     }
 
     public static void AssertNoContent(this HttpResponseMessage message)
@@ -87,9 +87,9 @@ public static class HttpResponseMessageTestExtensions
         return actual;
     }
 
-    public static T AssertBodyEqualTo<T>(this HttpResponseMessage message, T expected)
+    public static T AssertBodyEqualTo<T>(this HttpResponseMessage message, T expected, bool useSystemJson = false)
     {
-        var body = message.Content.ReadFromJson<T>();
+        var body = Deserialize<T>(message, useSystemJson: useSystemJson);
 
         body = Assert.IsType<T>(body);
         body.AssertDeepEqualTo(expected);
