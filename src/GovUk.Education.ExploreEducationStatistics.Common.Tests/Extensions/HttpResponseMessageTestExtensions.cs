@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Net.Http;
+using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 using static System.Net.HttpStatusCode;
@@ -14,13 +15,20 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(OK, message.StatusCode);
     }
 
-    public static T AssertOk<T>(this HttpResponseMessage message)
+    public static T AssertOk<T>(this HttpResponseMessage message, bool useSystemJson = false)
     {
         Assert.Equal(OK, message.StatusCode);
 
-        var body = message.Content.ReadFromJson<T>();
+        T? body = Deserialize<T>(message, useSystemJson);
 
         return Assert.IsType<T>(body);
+    }
+
+    private static T? Deserialize<T>(this HttpResponseMessage message, bool useSystemJson)
+    {
+        return useSystemJson
+            ? JsonSerializer.Deserialize<T>(message.Content.ReadAsStream().ReadToEnd())
+            : message.Content.ReadFromJson<T>();
     }
 
     public static string AssertOk(this HttpResponseMessage message, string expectedBody)

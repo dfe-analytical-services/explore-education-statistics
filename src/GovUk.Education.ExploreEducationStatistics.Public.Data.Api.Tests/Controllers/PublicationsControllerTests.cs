@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
-using System.Net.Http.Json;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -61,9 +60,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, page, pageSize);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
+            var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(page, content.Paging.Page);
@@ -100,9 +97,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, 1, 1);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
+            var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(1, content.Paging.Page);
@@ -149,7 +144,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    private async Task<HttpResponseMessage> ListPublications(
+    private static async Task<HttpResponseMessage> ListPublications(
         HttpClient client, 
         int? page = null, 
         int? pageSize = null,
