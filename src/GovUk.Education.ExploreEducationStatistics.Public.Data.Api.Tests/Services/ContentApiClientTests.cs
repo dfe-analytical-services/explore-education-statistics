@@ -31,7 +31,7 @@ public abstract class ContentApiClientTests
         public async Task HttpClientBadRequest_ReturnsBadRequest()
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
-                .Respond(HttpStatusCode.BadRequest, new StringContent("test message"));
+                .Respond(HttpStatusCode.BadRequest, new StringContent("{ \"thing\": \"test message\" }"));
 
             var response = await _contentApiClient.ListPublications(
                 page: It.IsAny<int>(),
@@ -58,7 +58,7 @@ public abstract class ContentApiClientTests
                 HttpStatusCode responseStatusCode)
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
-                .Respond(responseStatusCode, new StringContent("test message"));
+                .Respond(responseStatusCode, new StringContent("{ \"thing\": \"test message\" }"));
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
