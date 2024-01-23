@@ -44,12 +44,14 @@ internal class PublicationService : IPublicationService
     {
         return await CheckPublicationIsPublished(publicationId)
             .OnSuccess(async (publicationIds) => await _contentApiClient.GetPublication(publicationId))
-            .OnSuccess(publication => new PublicationSummaryViewModel(
-                Id: publication.Id,
-                Title: publication.Title,
-                Slug: publication.Slug,
-                Summary: publication.Summary,
-                LastPublished: publication.Published));
+            .OnSuccess(publication => new PublicationSummaryViewModel
+            {
+                Id  = publication.Id,
+                Title = publication.Title,
+                Slug = publication.Slug,
+                Summary = publication.Summary,
+                LastPublished = publication.Published
+            });
     }
 
     private Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds()
