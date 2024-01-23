@@ -33,17 +33,17 @@ Validate page contents
 
     user checks page contains link with text and url
     ...    Pupil attendance in schools
-    ...    %{PUBLIC_URL}/methodology/pupil-attendance-in-schools
+    ...    /methodology/pupil-attendance-in-schools
 
     user checks page contains link with text and url
     ...    Pupil absence statistics: methodology
-    ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
+    ...    /methodology/pupil-absence-in-schools-in-england
 
 Validate Related information section links exist
     user checks page contains link with text and url
     ...    Find statistics and data
-    ...    %{PUBLIC_URL}/find-statistics
+    ...    /find-statistics
 
     user checks page contains link with text and url
     ...    Education statistics: glossary
-    ...    %{PUBLIC_URL}/glossary
+    ...    /glossary
