@@ -155,7 +155,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task GetPublication_PublicationExists_Returns200()
+        public async Task PublicationExists_Returns200()
         {
             var publication = DataFixture
                 .Generator<PublicationCacheViewModel>()
@@ -191,7 +191,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task GetPublication_PublicationDoesNotExist_Returns404()
+        public async Task PublicationDoesNotExist_Returns404()
         {
             var publicationId = Guid.NewGuid();
 
@@ -212,7 +212,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task GetPublication_NotPublished_Returns404()
+        public async Task NotPublished_Returns404()
         {
             var client = BuildApp().CreateClient();
 
@@ -222,7 +222,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task GetPublication_ContentApiThrowsHttpException_Returns500()
+        public async Task ContentApiThrowsException_Returns500()
         {
             var publicationId = Guid.NewGuid();
 

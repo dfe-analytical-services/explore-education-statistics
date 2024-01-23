@@ -106,7 +106,7 @@ public abstract class ContentApiClientTests
     {
 
         [Fact]
-        public async Task GetPublication_HttpClientRespondsWithBadRequest_ReturnsBadRequestObjectResultAndLogsError()
+        public async Task HttpClientBadRequest_ReturnsBadRequest()
         {
             var publicationId = Guid.NewGuid();
 
@@ -122,7 +122,7 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task GetPublication_HttpClientRespondsWithNotFound_ReturnsNotFoundObjectResultAndLogsError()
+        public async Task HttpClientNotFound_ReturnsNotFound()
         {
             var publicationId = Guid.NewGuid();
 
@@ -146,8 +146,7 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task
-            GetPublication_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
+        public async Task HttpClientFailureStatusCode_ThrowsException(
             HttpStatusCode responseStatusCode)
         {
             var publicationId = Guid.NewGuid();
@@ -162,7 +161,7 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task GetPublication_HttpClientRespondsWithSuccess_ReturnsPublication()
+        public async Task HttpClientSuccess_ReturnsPublication()
         {
             var result = new PublicationCacheViewModel
             {
