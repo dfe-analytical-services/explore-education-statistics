@@ -35,7 +35,7 @@ public class PublicationCacheService : IPublicationCacheService
     [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(string publicationSlug)
     {
-        return _publicationService.Get(publicationSlug);
+        return _publicationService.GetBySlug(publicationSlug);
     }
 
     public async Task<Either<ActionResult, IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
@@ -54,7 +54,7 @@ public class PublicationCacheService : IPublicationCacheService
     [BlobCache(typeof(PublicationCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug)
     {
-        return _publicationService.Get(publicationSlug);
+        return _publicationService.GetBySlug(publicationSlug);
     }
 
     public async Task<Either<ActionResult, Unit>> RemovePublication(string publicationSlug)

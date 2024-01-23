@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -80,6 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     page: request.Page,
                     pageSize: request.PageSize,
                     publicationIds: request.PublicationIds)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("publications/{publicationId}")]
+        public async Task<ActionResult<PublicationCacheViewModel>> GetPublication(Guid publicationId)
+        {
+            return await _publicationService
+                .GetById(publicationId)
                 .HandleFailuresOrOk();
         }
 

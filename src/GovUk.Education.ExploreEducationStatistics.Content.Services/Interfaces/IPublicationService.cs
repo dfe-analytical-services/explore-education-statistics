@@ -13,7 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IPublicationService
 {
-    Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug);
+    Task<Either<ActionResult, PublicationCacheViewModel>> GetById(Guid publicationId);
+
+    Task<Either<ActionResult, PublicationCacheViewModel>> GetBySlug(string publicationSlug);
 
     Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree();
 

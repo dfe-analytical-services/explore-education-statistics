@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(publication.Slug);
+                var result = await service.GetBySlug(publication.Slug);
 
                 var publicationViewModel = result.AssertRight();
 
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(publication.Slug);
+                var result = await service.GetBySlug(publication.Slug);
 
                 var publicationViewModel = result.AssertRight();
 
@@ -253,7 +253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Id = releaseId,
                         ReleaseName = "2000",
                         Slug = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = DateTime.UtcNow,
                     }
                 },
                 Topic = new Topic
@@ -286,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(publication.Slug);
+                var result = await service.GetBySlug(publication.Slug);
 
                 var publicationViewModel = result.AssertRight();
 
@@ -325,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(PublicationSlug);
+                var result = await service.GetBySlug(PublicationSlug);
 
                 result.AssertNotFound();
             }
@@ -336,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var service = SetupPublicationService();
 
-            var result = await service.Get("nonexistent-publication");
+            var result = await service.GetBySlug("nonexistent-publication");
 
             result.AssertNotFound();
         }

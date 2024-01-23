@@ -86,7 +86,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationService = new Mock<IPublicationService>(Strict);
 
         publicationService
-            .Setup(s => s.Get(PublicationSlug))
+            .Setup(s => s.GetBySlug(PublicationSlug))
             .ReturnsAsync(_publicationViewModel);
 
         var service = BuildService(publicationService: publicationService.Object);
@@ -128,7 +128,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationService = new Mock<IPublicationService>(Strict);
 
         publicationService
-            .Setup(s => s.Get(PublicationSlug))
+            .Setup(s => s.GetBySlug(PublicationSlug))
             .ReturnsAsync(new NotFoundResult());
 
         var service = BuildService(publicationService: publicationService.Object);
@@ -393,7 +393,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var publicationService = new Mock<IPublicationService>(Strict);
 
         publicationService
-            .Setup(s => s.Get(PublicationSlug))
+            .Setup(s => s.GetBySlug(PublicationSlug))
             .ReturnsAsync(_publicationViewModel);
 
         PublicBlobCacheService
