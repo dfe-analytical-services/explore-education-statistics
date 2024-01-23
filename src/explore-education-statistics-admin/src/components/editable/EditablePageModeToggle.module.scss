@@ -19,10 +19,9 @@
   position: sticky;
   top: 0;
   width: calc(100% + #{govuk-spacing(6)});
-  z-index: 999;
+  z-index: 9999; // z-index has to be higher than ckeditor sticky toolbar.
 
   @include govuk-media-query($from: tablet) {
-    margin-bottom: govuk-spacing(9);
     margin-left: 0;
     width: 100%;
   }
