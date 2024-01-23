@@ -5,11 +5,14 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -145,6 +148,100 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
+    public class GetPublicationTests : PublicationsControllerTests
+    {
+        public GetPublicationTests(TestApplicationFactory testApp) : base(testApp)
+        {
+        }
+
+        [Fact]
+        public async Task GetPublication_PublicationExists_Returns200()
+        {
+            var publication = DataFixture
+                .Generator<PublicationCacheViewModel>()
+                .ForInstance(s => s
+                    .SetDefault(f => f.Id)
+                    .SetDefault(f => f.Title)
+                    .SetDefault(f => f.Slug)
+                    .SetDefault(f => f.Summary)
+                    .Set(f => f.Published, f => f.Date.Past())
+                    .SetDefault(f => f.LatestReleaseId))
+                .Generate();
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(It.IsAny<Guid>()))
+                .ReturnsAsync(publication);
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
+            var publishedDataSet = GeneratePublishedDataSet(publication.Id);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var response = await GetPublication(client, publication.Id);
+
+            var content = response.AssertOk<ViewModels.PublicationSummaryViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(publication.Id, content.Id);
+            Assert.Equal(publication.Title, content.Title);
+            Assert.Equal(publication.Slug, content.Slug);
+            Assert.Equal(publication.Summary, content.Summary);
+            Assert.Equal(publication.Published, content.LastPublished);
+        }
+
+        [Fact]
+        public async Task GetPublication_PublicationDoesNotExist_Returns404()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var publishedDataSet = GeneratePublishedDataSet(publicationId);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(publicationId))
+                .ReturnsAsync(new NotFoundObjectResult("not found content"));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
+            var response = await GetPublication(client, publicationId);
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Equal("not found content", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task GetPublication_NotPublished_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await GetPublication(client, It.IsAny<Guid>());
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetPublication_ContentApiThrowsHttpException_Returns500()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var publishedDataSet = GeneratePublishedDataSet(publicationId);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(publicationId))
+                .ThrowsAsync(new HttpRequestException("something went wrong"));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+            var response = await GetPublication(client, publicationId);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
+        }
+    }
+
     private static async Task<HttpResponseMessage> ListPublications(
         HttpClient client, 
         int? page = null, 
@@ -163,10 +260,26 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         return await client.GetAsync(uri);
     }
 
+    private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
+    {
+        var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
+
+        return await client.GetAsync(uri);
+    }
+
+    private DataSet GeneratePublishedDataSet(Guid publicationId)
+    {
+        return DataFixture
+            .DefaultDataSet()
+            .WithStatus(DataSetStatus.Published)
+            .WithPublicationId(publicationId)
+            .Generate();
+    }
+
     private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
     {
         return TestApp.ConfigureServices(
-            services => { services.ReplaceService(contentApiClient); }
+            services => { services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>()); }
         );
     }
 }

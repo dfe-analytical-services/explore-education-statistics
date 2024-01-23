@@ -11,6 +11,11 @@ internal class ContentApiClientMock : IContentApiClient
 {
     private readonly DataFixture _dataFixture = new();
 
+    public Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(Guid publicationId)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         int page,
         int pageSize,

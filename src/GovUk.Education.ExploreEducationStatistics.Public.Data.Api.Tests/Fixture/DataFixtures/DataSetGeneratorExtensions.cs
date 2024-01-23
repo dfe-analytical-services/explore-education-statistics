@@ -31,4 +31,12 @@ public static class DataSetGeneratorExtensions
         this InstanceSetters<DataSet> instanceSetter,
         DataSetStatus status)
         => instanceSetter.Set(f => f.Status, status);
+
+    public static Generator<DataSet> WithPublicationId(this Generator<DataSet> generator, Guid publicationId)
+    => generator.ForInstance(s => s.SetPublicationId(publicationId));
+
+    public static InstanceSetters<DataSet> SetPublicationId(
+        this InstanceSetters<DataSet> instanceSetter,
+        Guid publicationId)
+        => instanceSetter.Set(f => f.PublicationId, publicationId);
 }

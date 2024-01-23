@@ -101,4 +101,90 @@ public abstract class ContentApiClientTests
             Assert.Equal(results.Single().Id, publication.Id);
         }
     }
+
+    public class GetPublicationTests : ContentApiClientTests
+    {
+
+        [Fact]
+        public async Task GetPublication_HttpClientRespondsWithBadRequest_ReturnsBadRequestObjectResultAndLogsError()
+        {
+            var publicationId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+                .Respond(HttpStatusCode.BadRequest, new StringContent("test message"));
+
+            var response = await _contentApiClient.GetPublication(publicationId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            Assert.IsType<BadRequestObjectResult>(left);
+        }
+
+        [Fact]
+        public async Task GetPublication_HttpClientRespondsWithNotFound_ReturnsNotFoundObjectResultAndLogsError()
+        {
+            var publicationId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+                .Respond(HttpStatusCode.NotFound, new StringContent("test message"));
+
+            var response = await _contentApiClient.GetPublication(publicationId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            Assert.IsType<NotFoundObjectResult>(left);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.RequestTimeout)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        [InlineData(HttpStatusCode.BadGateway)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.Conflict)]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Gone)]
+        [InlineData(HttpStatusCode.NotAcceptable)]
+        public async Task GetPublication_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
+            HttpStatusCode responseStatusCode)
+        {
+            var publicationId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+                .Respond(responseStatusCode, new StringContent("test message"));
+
+            await Assert.ThrowsAsync<HttpRequestException>(async () => await _contentApiClient.GetPublication(publicationId));
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public async Task GetPublication_HttpClientRespondsWithSuccess_ReturnsPublication()
+        {
+            var result = new PublicationCacheViewModel
+            {
+                Id = Guid.NewGuid(),
+                Title = "Test title",
+                Slug = "test-slug",
+                Summary = "Test summary",
+                Published = DateTime.UtcNow,
+            };
+
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}")
+                .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
+
+            var response = await _contentApiClient.GetPublication(result.Id);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var right = response.AssertRight();
+            Assert.NotNull(right);
+            Assert.Equal(result.Id, right.Id);
+            Assert.Equal(result.Title, right.Title);
+            Assert.Equal(result.Slug, right.Slug);
+            Assert.Equal(result.Summary, right.Summary);
+            Assert.Equal(result.Published, right.Published);
+        }
+    }
 }
