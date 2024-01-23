@@ -54,6 +54,14 @@ const ReleaseContentPageLoaded = () => {
               </BrowserWarning>
             )}
 
+            {canPreviewRelease && (
+              <EditablePageModeToggle
+                canUpdateRelease={canUpdateRelease}
+                previewLabel="Preview release page"
+                showTablePreviewOption
+              />
+            )}
+
             {canUpdateRelease && (
               <>
                 {totalUnsavedBlocks > 0 && (
@@ -73,13 +81,6 @@ const ReleaseContentPageLoaded = () => {
               </>
             )}
 
-            {canPreviewRelease && (
-              <EditablePageModeToggle
-                canUpdateRelease={canUpdateRelease}
-                previewLabel="Preview release page"
-                showTablePreviewOption
-              />
-            )}
             <div
               className={classNames({
                 [styles.container]: editingMode === 'edit',
