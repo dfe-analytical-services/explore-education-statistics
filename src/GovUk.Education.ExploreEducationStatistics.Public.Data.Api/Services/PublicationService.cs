@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -39,6 +40,21 @@ internal class PublicationService : IPublicationService
             });
     }
 
+    public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    {
+        return await CheckPublicationIsPublished(publicationId)
+            .OnSuccess(async (publicationIds) => await _contentApiClient.GetPublication(publicationId))
+            .OnSuccess(publication =>
+            {
+                return new PublicationSummaryViewModel(
+                    Id: publication.Id,
+                    Title: publication.Title,
+                    Slug: publication.Slug,
+                    Summary: publication.Summary,
+                    LastPublished: publication.Published);
+            });
+    }
+
     private Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds()
     {
         return _publicDataDbContext.DataSets
@@ -57,5 +73,20 @@ internal class PublicationService : IPublicationService
             Summary = publication.Summary,
             LastPublished = publication.Published
         };
+    }
+
+    private Either<ActionResult, Unit> CheckPublicationIsPublished(Guid publicationId)
+    {
+        var publicationIsPublished = _publicDataDbContext.DataSets
+            .Where(ds => ds.PublicationId == publicationId)
+            .Where(ds => ds.Status == DataSetStatus.Published)
+            .Any();
+
+        if (publicationIsPublished)
+        {
+            return Unit.Instance;
+        }
+
+        return new NotFoundResult();
     }
 }

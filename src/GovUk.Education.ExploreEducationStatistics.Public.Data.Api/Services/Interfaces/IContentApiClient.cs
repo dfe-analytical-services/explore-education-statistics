@@ -12,4 +12,6 @@ public interface IContentApiClient
         int pageSize, 
         string? search = null, 
         IEnumerable<Guid>? publicationIds = null);
+
+    Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(Guid publicationId);
 }

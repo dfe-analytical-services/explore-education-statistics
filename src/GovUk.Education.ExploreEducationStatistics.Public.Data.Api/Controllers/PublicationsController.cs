@@ -40,4 +40,21 @@ public class PublicationsController : ControllerBase
                 search: request.Search)
             .HandleFailuresOrOk();
     }
+
+    /// <summary>
+    /// Get a publication’s details"
+    /// </summary>
+    /// <remarks>
+    /// Gets a specific publication’s details.
+    /// </remarks>
+    [HttpGet("{publicationId}")]
+    [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
+    [SwaggerResponse(400)]
+    // add other responses
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    {
+        return await _publicationService
+            .GetPublication(publicationId)
+            .HandleFailuresOrOk();
+    }
 }

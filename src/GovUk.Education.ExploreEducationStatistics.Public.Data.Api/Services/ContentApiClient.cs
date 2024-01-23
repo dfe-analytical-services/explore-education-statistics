@@ -59,4 +59,34 @@ internal class ContentApiClient : IContentApiClient
         return publications
             ?? throw new Exception("Could deserialize publications from content API.");
     }
+
+    public async Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(Guid publicationId)
+    {
+        var response = await _httpClient.GetAsync($"api/publications/{publicationId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await response.Content.ReadAsStringAsync();
+            _logger.LogError(StringExtensions.TrimIndent(
+                $"""
+                 Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
+                 {message}
+                 """));
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(response.Content);
+                case HttpStatusCode.NotFound:
+                    return new NotFoundObjectResult(response.Content);
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+        }
+
+        var deserializedResponse = await response.Content.ReadFromJsonAsync<PublicationCacheViewModel>();
+
+        return new Either<ActionResult, PublicationCacheViewModel>(deserializedResponse);
+    }
 }
