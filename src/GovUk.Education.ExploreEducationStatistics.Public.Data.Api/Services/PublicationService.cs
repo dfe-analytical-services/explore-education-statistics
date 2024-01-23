@@ -44,15 +44,12 @@ internal class PublicationService : IPublicationService
     {
         return await CheckPublicationIsPublished(publicationId)
             .OnSuccess(async (publicationIds) => await _contentApiClient.GetPublication(publicationId))
-            .OnSuccess(publication =>
-            {
-                return new PublicationSummaryViewModel(
-                    Id: publication.Id,
-                    Title: publication.Title,
-                    Slug: publication.Slug,
-                    Summary: publication.Summary,
-                    LastPublished: publication.Published);
-            });
+            .OnSuccess(publication => new PublicationSummaryViewModel(
+                Id: publication.Id,
+                Title: publication.Title,
+                Slug: publication.Slug,
+                Summary: publication.Summary,
+                LastPublished: publication.Published));
     }
 
     private Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds()
@@ -79,8 +76,7 @@ internal class PublicationService : IPublicationService
     {
         var publicationIsPublished = _publicDataDbContext.DataSets
             .Where(ds => ds.PublicationId == publicationId)
-            .Where(ds => ds.Status == DataSetStatus.Published)
-            .Any();
+            .Any(ds => ds.Status == DataSetStatus.Published);
 
         if (publicationIsPublished)
         {

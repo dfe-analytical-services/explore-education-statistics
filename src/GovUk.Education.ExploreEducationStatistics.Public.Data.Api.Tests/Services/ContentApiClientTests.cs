@@ -146,7 +146,8 @@ public abstract class ContentApiClientTests
         [InlineData(HttpStatusCode.Forbidden)]
         [InlineData(HttpStatusCode.Gone)]
         [InlineData(HttpStatusCode.NotAcceptable)]
-        public async Task GetPublication_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
+        public async Task
+            GetPublication_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
             HttpStatusCode responseStatusCode)
         {
             var publicationId = Guid.NewGuid();
@@ -154,7 +155,8 @@ public abstract class ContentApiClientTests
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
                 .Respond(responseStatusCode, new StringContent("test message"));
 
-            await Assert.ThrowsAsync<HttpRequestException>(async () => await _contentApiClient.GetPublication(publicationId));
+            await Assert.ThrowsAsync<HttpRequestException>(async () =>
+                await _contentApiClient.GetPublication(publicationId));
 
             _mockHttp.VerifyNoOutstandingExpectation();
         }
