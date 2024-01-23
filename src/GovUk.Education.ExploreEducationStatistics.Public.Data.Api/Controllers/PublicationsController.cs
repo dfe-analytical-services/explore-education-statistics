@@ -48,8 +48,10 @@ public class PublicationsController : ControllerBase
     /// Gets a specific publication’s details.
     /// </remarks>
     [HttpGet("{publicationId}")]
+    [Produces("application/json")]
     [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(400)]
+    [SwaggerResponse(404)]
     // add other responses
     public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(Guid publicationId)
     {
