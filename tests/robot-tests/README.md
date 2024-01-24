@@ -106,8 +106,10 @@ being present in the database.
 For that reason, we must firstly ensure that we have appropriate data on our databases. Install the latest data dump file and seed data ZIP file.
 
 1. Download the latest `ees-mssql-data-<version>.zip` file and install it in your local databases.
-2. Download the latest `seed-data-files.zip` file and place in the [tests/robot-tests/tests/files](tests/robot-tests/tests/files). It will be
-   automatically unpacked when running the tests.
+2. Download the latest `seed-data-files-<version>.zip` file and place in the [tests/robot-tests/tests/files](tests/robot-tests/tests/files) folder
+   with the name `seed-data-files.zip` (i.e. without the `-<version>` part). It will be ignored from Git here, and will be automatically unpacked when
+   running the tests to the [tests/robot-tests/tests/files/.unzipped-seed-data-files](tests/robot-tests/tests/files/.unzipped-seed-data-files) folder.
+   1. If the file is showing as an untracked file in Git, check the filename!
 
 ### Run the tests
 
@@ -188,7 +190,8 @@ A common error is for a test suite to intermittently fail when run with other te
 
 After a group discussion, it was decided that tests will, as far as is possible, create their own test data. This means that any tests you write that alter data, you will need to create that data from scratch.
 
-This however isn't the case for some tests. Certain tests rely on other utilities (written in robot) that are responsible for bootstrapping a given environment with test data. Test suites to create the bootstrapped data can be found in `tests/bootstrap_data`.
+This however isn't the case for some tests. Certain tests rely on other tests scripts for bootstrapping a given environment with seed data. Test suites to create the seed data can be found in `tests/seed_data` and instructions on how to recreate the seed data
+can be found in the [Seed Data README](tests/robot-tests/tests/seed_data/README.md).
 
 ## IDE
 
