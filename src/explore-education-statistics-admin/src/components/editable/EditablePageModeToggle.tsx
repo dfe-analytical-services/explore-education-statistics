@@ -66,7 +66,7 @@ export default function EditablePageModeToggle({
       )}
 
       <div
-        aria-labelledby="pageViewToggleButton"
+        aria-labelledby={isMobileMedia ? 'pageViewToggleButton' : undefined}
         className={classNames({
           'dfe-js-hidden': isMobileMedia && !isOpen,
         })}
