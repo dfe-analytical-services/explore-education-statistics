@@ -14,12 +14,12 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select Seed Data Theme 1 publication 2
-    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
-    user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    ${EXCLUSIONS_PUBLICATION_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
 
 Validate "Exclusions by geographic level" subject details
     user clicks radio    Exclusions by geographic level
@@ -158,7 +158,7 @@ User generates a permanent link
 User validates permanent link works correctly
     user clicks link    View share link
     user waits until h1 is visible
-    ...    'Exclusions by geographic level' from '${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}'
+    ...    'Exclusions by geographic level' from '${EXCLUSIONS_PUBLICATION_TITLE}'
 
 User validates permalink contains correct date
     ${date}=    get current datetime    %-d %B %Y

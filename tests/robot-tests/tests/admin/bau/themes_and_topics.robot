@@ -25,18 +25,18 @@ Go to 'Manage themes and topics'
     user waits until h1 is visible    Manage themes and topics
 
 Verify existing theme and topics
-    user waits until page contains accordion section    ${SEED_DATA_THEME_1_TITLE}
-    user opens accordion section    ${SEED_DATA_THEME_1_TITLE}
+    user waits until page contains accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks summary list contains    Summary
     ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
-    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    1
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    2
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    3
-    ...    ${SEED_DATA_THEME_1_TOPIC_3_TITLE}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    4
-    ...    ${SEED_DATA_THEME_1_TOPIC_4_TITLE}
+    user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    1
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
+    user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    2
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
+    user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    3
+    ...    ${SCHOOL_AND_PUPIL_NUMBERS_TOPIC_TITLE}
+    user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    4
+    ...    ${SCHOOL_APPLICATIONS_TOPIC_TITLE}
 
 Create theme
     user clicks link    Create theme

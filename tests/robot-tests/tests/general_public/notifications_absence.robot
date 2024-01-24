@@ -11,19 +11,19 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to Absence publication
-    user navigates to public frontend    %{PUBLIC_URL}${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}    %{WAIT_MEDIUM}
+    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication
     user clicks link    Sign up for email alerts
 
     user waits until page contains title caption    Notify me    %{WAIT_LONG}
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
-    user checks nth breadcrumb contains    3    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks nth breadcrumb contains    3    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks nth breadcrumb contains    4    Notify me
 
 Sign up for email alerts

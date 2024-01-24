@@ -18,4 +18,4 @@ Parse Find Statistics page HTML
 
 Validate Seed Data Theme 1 Publication 1 publication on page
     ${list}=    user_gets_publications_list    ${parsed_page}
-    user_checks_list_contains_publication    ${list}    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user_checks_list_contains_publication    ${list}    ${PUPIL_ABSENCE_PUBLICATION_TITLE}

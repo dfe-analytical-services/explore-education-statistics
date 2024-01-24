@@ -1,5 +1,5 @@
 *** Settings ***
-Resource            ../libs/common.robot
+Resource            ../../libs/common.robot
 
 Force Tags          GeneralPublic    Prod
 

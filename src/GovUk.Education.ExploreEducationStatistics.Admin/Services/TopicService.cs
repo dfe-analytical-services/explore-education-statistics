@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // don't really have a mechanism to clean things up
             // properly across the entire application.
             // TODO: EES-1295 ability to completely delete releases
-            if (!topic.Title.StartsWith("UI test topic"))
+            if (!topic.Title.StartsWith("UI test topic") && !topic.Title.StartsWith("Seed topic"))
             {
                 return new ForbidResult();
             }

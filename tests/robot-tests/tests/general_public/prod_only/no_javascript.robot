@@ -1,6 +1,6 @@
 *** Settings ***
-Resource        ../libs/public-common.robot
-Library         ../libs/no_javascript.py
+Resource        ../../libs/public-common.robot
+Library         ../../libs/no_javascript.py
 
 Test Setup      fail test fast if required
 

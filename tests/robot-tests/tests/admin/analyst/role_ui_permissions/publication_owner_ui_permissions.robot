@@ -13,11 +13,11 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Import permissions test variables
-    Set suite variable    ${PUBLICATION_NAME}    ${SEED_DATA_THEME_2_PUBLICATION_FOR_PUBLICATION_OWNER}
-    Set suite variable    ${THEME_NAME}    ${SEED_DATA_THEME_2_TITLE}
-    Set suite variable    ${TOPIC_NAME}    ${SEED_DATA_THEME_2_TOPIC_1_TITLE}
-    Set suite variable    ${DRAFT_RELEASE_TYPE}    ${SEED_DATA_THEME_2_DRAFT_RELEASE_TYPE}
-    Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${SEED_DATA_THEME_2_PUBLISHED_RELEASE_TYPE}
+    Set suite variable    ${PUBLICATION_NAME}    ${ROLE_PERMISSIONS_PUBLICATION_OWNER_PUBLICATION}
+    Set suite variable    ${THEME_NAME}    ${ROLE_PERMISSIONS_THEME_TITLE}
+    Set suite variable    ${TOPIC_NAME}    ${ROLE_PERMISSIONS_TOPIC_TITLE}
+    Set suite variable    ${DRAFT_RELEASE_TYPE}    ${ROLE_PERMISSIONS_DRAFT_RELEASE_TYPE}
+    Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${ROLE_PERMISSIONS_PUBLISHED_RELEASE_TYPE}
 
 Navigate to Publication where analyst has Publication Owner role
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}

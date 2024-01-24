@@ -12,10 +12,10 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to publication release page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
+    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Click fast track link for 'Pupil absence rates' data block
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user opens accordion section    Pupil absence rates    id:content
     user scrolls to accordion section    Pupil absence rates    id:content
     user scrolls to element    testid:Data block - Generic data block - National
@@ -25,7 +25,7 @@ Click fast track link for 'Pupil absence rates' data block
 Validate Publication selected step option
     user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
     user waits until page contains element    css:table
-    user checks previous table tool step contains    1    Publication    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Validate Subject selected step option
     [Tags]    NotAgainstDev    NotAgainstTest

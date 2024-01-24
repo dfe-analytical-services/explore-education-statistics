@@ -17,18 +17,18 @@ Navigate to /methodology page
 
 Validate accordion sections exist
     user checks url equals    %{PUBLIC_URL}/methodology
-    user waits until page contains accordion section    ${SEED_DATA_THEME_1_TITLE}
+    user waits until page contains accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Validate page contents
-    user opens accordion section    ${SEED_DATA_THEME_1_TITLE}
+    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user checks page contains link with text and url
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_RELATIVE_URL}
+    ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
+    ...    ${EXCLUSIONS_METHODOLOGY_RELATIVE_URL}
 
     user checks page contains link with text and url
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_RELATIVE_URL}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_RELATIVE_URL}
 
 Validate Related information section links exist
     user checks page contains link with text and url

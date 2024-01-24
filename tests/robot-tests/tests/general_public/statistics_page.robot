@@ -35,8 +35,8 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks radio is checked    All themes
-    user checks page contains radio    ${SEED_DATA_THEME_1_TITLE}
-    user checks page contains radio    ${SEED_DATA_THEME_2_TITLE}
+    user checks page contains radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains radio    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate release type filters exist
     user clicks button    Release type
@@ -57,12 +57,12 @@ Validate publications list exists
     user checks page contains element    testid:publicationsList
 
 Filter by theme
-    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
-    user checks page contains button    ${SEED_DATA_THEME_1_TITLE}
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Remove theme filter
-    user clicks button    ${SEED_DATA_THEME_1_TITLE}
-    user checks page does not contain button    ${SEED_DATA_THEME_1_TITLE}
+    user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks radio is checked    All themes
 
 Filter by release type
@@ -76,32 +76,32 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
-    user presses keys    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user presses keys    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    Search
-    user checks page contains button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks radio is checked    Relevance
-    user checks list item contains    testid:publicationsList    1    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks list item contains    testid:publicationsList    1    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Removing search
-    user clicks button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    user checks page does not contain button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks radio is checked    Newest
 
 Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user clicks radio    Official statistics
 
     user checks page contains button    pupil
-    user checks page contains button    ${SEED_DATA_THEME_1_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    Official statistics
 
     user clicks button    Clear all filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    ${SEED_DATA_THEME_1_TITLE}
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Clear all filters
 

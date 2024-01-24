@@ -1,5 +1,5 @@
 *** Settings ***
-Resource            ../libs/public-common.robot
+Resource            ../../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser

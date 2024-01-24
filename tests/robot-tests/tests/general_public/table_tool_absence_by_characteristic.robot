@@ -14,11 +14,11 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select "Seed Data Theme 1 Publication 1" publication
-    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
-    user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Validate "Absence by characteristic" subject details
     user clicks radio    Absence by characteristic
@@ -246,7 +246,7 @@ User generates a permanent link
 User validates permanent link works correctly
     [Documentation]    EES-2892
     user clicks link    View share link
-    user waits until h1 is visible    'Absence by characteristic' from '${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}'
+    user waits until h1 is visible    'Absence by characteristic' from '${PUPIL_ABSENCE_PUBLICATION_TITLE}'
 
 User validates permalink table
     user checks table column heading contains    1    1    Gender male

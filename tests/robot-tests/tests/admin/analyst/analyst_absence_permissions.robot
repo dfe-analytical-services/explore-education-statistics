@@ -12,17 +12,17 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
-    user waits until h3 is visible    ${SEED_DATA_THEME_1_TITLE} / ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE} / ${PUPIL_ABSENCE_TOPIC_TITLE}
     ${ABSENCE_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1_TITLE}-${SEED_DATA_THEME_1_TOPIC_1_TITLE}"]
+    ...    xpath://*[@data-testid="topic-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}-${PUPIL_ABSENCE_TOPIC_TITLE}"]
     user waits until parent contains element    ${ABSENCE_PUBLICATIONS}
-    ...    link:${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    ...    link:${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
-    user waits until h3 is visible    ${SEED_DATA_THEME_1_TITLE} / ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    user waits until h3 is visible    ${PUPILS_AND_SCHOOLS_THEME_TITLE} / ${EXCLUSIONS_TOPIC_TITLE}
     ${EXCLUSION_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1_TITLE}-${SEED_DATA_THEME_1_TOPIC_2_TITLE}"]
+    ...    xpath://*[@data-testid="topic-publications-${PUPILS_AND_SCHOOLS_THEME_TITLE}-${EXCLUSIONS_TOPIC_TITLE}"]
     user waits until parent contains element    ${EXCLUSION_PUBLICATIONS}
-    ...    link:${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
+    ...    link:${EXCLUSIONS_PUBLICATION_TITLE}
 
 Validate Analyst1 can see correct draft, approvals and scheduled releases tabs
     user checks element should contain    id:draft-releases-tab    Draft releases
@@ -33,8 +33,8 @@ Validate Analyst1 cannot create a publication
     user checks page does not contain element    link:Create new publication
 
 Navigate to Seed Data Theme 1 Publication 1 page
-    user clicks link    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user clicks link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Navigate to legacy releases
     user clicks link    Legacy releases
@@ -96,7 +96,7 @@ Navigate to Absence release
     ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases
     user clicks link containing text    View    ${ROW}
 
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until h2 is visible    Release summary
 
 Validate Analyst1 can see Absence release summary
@@ -106,7 +106,7 @@ Validate Analyst1 can see Absence release summary
 Validate Analyst1 can see 'Content' page
     user clicks link    Content
     user waits until page finishes loading
-    user waits until h2 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}    %{WAIT_SMALL}
+    user waits until h2 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_SMALL}
 
 Validate Analyst1 can see 'Content' page key stats
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}

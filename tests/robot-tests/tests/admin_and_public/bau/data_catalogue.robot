@@ -104,7 +104,7 @@ User navigates to /data-catalogue page
 
 User checks search filters publications properly
     user enters text into element    id:publicationForm-publicationIdSearch    Pupil
-    user waits until page contains    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}    %{WAIT_SMALL}
+    user waits until page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_SMALL}
     user clears element text    id:publicationForm-publicationIdSearch
 
 Choose publication

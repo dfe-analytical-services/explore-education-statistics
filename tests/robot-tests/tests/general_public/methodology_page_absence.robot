@@ -12,14 +12,14 @@ Force Tags          GeneralPublic    Local    Dev    PreProd
 *** Test Cases ***
 Navigate to Seed Data Theme 1 methodologies
     user navigates to public methodologies page
-    user opens accordion section    ${SEED_DATA_THEME_1_TITLE}
+    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Go to Seed Data Theme 1 Publication 1 Methodology 1
     user checks page contains link with text and url
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_RELATIVE_URL}
-    user clicks link    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_RELATIVE_URL}
+    user clicks link    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user waits until page contains title caption    Methodology
 
 Validate Published date
@@ -52,8 +52,8 @@ Validate Related information section and links exist
 
     user checks element contains child element    ${related_information}    xpath://h3[text()="Publications"]
     user checks page contains link with text and url
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
     ...    ${related_information}
 
     user checks element contains child element    ${related_information}    xpath://h3[text()="Related pages"]

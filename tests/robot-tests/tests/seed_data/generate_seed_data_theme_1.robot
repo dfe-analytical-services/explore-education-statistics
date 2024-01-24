@@ -26,19 +26,19 @@ Force Tags          SeedDataGeneration    Local    Dev    PreProd
 
 
 *** Variables ***
-${RELEASE_1_NAME}       ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE} ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_NAME}
-${RELEASE_2_NAME}       ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE} ${SEED_DATA_THEME_1_PUBLICATION_2_RELEASE_1_NAME}
+${RELEASE_1_NAME}       ${PUPIL_ABSENCE_PUBLICATION_TITLE} ${PUPIL_ABSENCE_RELEASE_NAME}
+${RELEASE_2_NAME}       ${EXCLUSIONS_PUBLICATION_TITLE} ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}
 
 
 *** Test Cases ***
 Create test theme and topic
     ${THEME_ID}=    user creates theme via api
-    ...    ${SEED_DATA_THEME_1_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
-    ${TOPIC_1_ID}=    user creates topic via api    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}    ${THEME_ID}
-    ${TOPIC_2_ID}=    user creates topic via api    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}    ${THEME_ID}
-    ${TOPIC_3_ID}=    user creates topic via api    ${SEED_DATA_THEME_1_TOPIC_3_TITLE}    ${THEME_ID}
-    ${TOPIC_4_ID}=    user creates topic via api    ${SEED_DATA_THEME_1_TOPIC_4_TITLE}    ${THEME_ID}
+    ${TOPIC_1_ID}=    user creates topic via api    ${PUPIL_ABSENCE_TOPIC_TITLE}    ${THEME_ID}
+    ${TOPIC_2_ID}=    user creates topic via api    ${EXCLUSIONS_TOPIC_TITLE}    ${THEME_ID}
+    ${TOPIC_3_ID}=    user creates topic via api    ${SCHOOL_AND_PUPIL_NUMBERS_TOPIC_TITLE}    ${THEME_ID}
+    ${TOPIC_4_ID}=    user creates topic via api    ${SCHOOL_APPLICATIONS_TOPIC_TITLE}    ${THEME_ID}
     user reloads page
     Set Suite Variable    ${THEME_ID}
     Set Suite Variable    ${TOPIC_1_ID}
@@ -46,19 +46,18 @@ Create test theme and topic
     Set Suite Variable    ${TOPIC_3_ID}
     Set Suite Variable    ${TOPIC_4_ID}
 
-Create publication 1
+Create ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     ...    ${TOPIC_1_ID}
+    Set Suite Variable    ${PUBLICATION_ID}
 
     user navigates to publication page from dashboard
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
-    # Add legacy releases
-    Log to console    \nAdding legacy releases to publication ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-
+Add legacy releases to ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
     user creates legacy release    Academic year 2009/10
@@ -74,22 +73,20 @@ Create publication 1
     user creates legacy release    Academic year 2014/15
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
 
-    Log to console    \nCreating release ${RELEASE_1_NAME}
+Create ${RELEASE_1_NAME} release
     user creates test release via api
     ...    ${PUBLICATION_ID}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_TIME}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_YEAR}
+    ...    ${PUPIL_ABSENCE_RELEASE_TIME}
+    ...    ${PUPIL_ABSENCE_RELEASE_YEAR}
     ...    OfficialStatistics
 
     user navigates to draft release page from dashboard
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_NAME}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_RELEASE_NAME}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
-    # Add data files.
-    Log to console    \nAdding data files to release ${RELEASE_1_NAME}
-
+Add data files to ${RELEASE_1_NAME}
     user uploads subject
     ...    Absence by characteristic
     ...    absence_by_characteristic.csv
@@ -102,8 +99,7 @@ Create publication 1
     ...    absence_in_prus.meta.csv
     ...    ${UNZIPPED_FILES_DIR}
 
-    # Add data guidance.
-    Log to console    \nAdding data guidance to release ${RELEASE_1_NAME}
+Add data guidance to ${RELEASE_1_NAME}
     user clicks link    Data guidance
     user waits until page finishes loading
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
@@ -112,8 +108,7 @@ Create publication 1
     user clicks button    Save guidance
     user waits until page finishes loading
 
-    # Create data blocks.
-    Log to console    \nAdding data blocks to release ${RELEASE_1_NAME}
+Create data block 1 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Authorised absence rate    Unauthorised absence rate    Overall absence rate
     @{filter_items}=    create list
@@ -128,6 +123,7 @@ Create publication 1
     ...    'Absence by characteristic' in England between 2012/13 and 2016/17
     ...    ${EMPTY}
 
+Create data block 2 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Overall absence rate
     @{filter_items}=    create list
@@ -142,6 +138,7 @@ Create publication 1
     ...    Overall absence rate for 'Absence by characteristic' in England for 2016/17
     ...    ${EMPTY}
 
+Create data block 3 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Authorised absence rate
     @{filter_items}=    create list
@@ -156,6 +153,7 @@ Create publication 1
     ...    Authorised absence rate for 'Absence by characteristic' in England for 2016/17
     ...    ${EMPTY}
 
+Create data block 4 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Unauthorised absence rate
     @{filter_items}=    create list
@@ -170,6 +168,7 @@ Create publication 1
     ...    Unauthorised absence rate for 'Absence by characteristic' in England for 2016/17
     ...    ${EMPTY}
 
+Create data block 5 for ${RELEASE_1_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Authorised absence rate    Unauthorised absence rate    Overall absence rate
     @{filter_items}=    create list
@@ -184,6 +183,7 @@ Create publication 1
     ...    'Absence by characteristic' in England between 2012/13 and 2016/17
     ...    ${EMPTY}
 
+Create data block 6 for ${RELEASE_1_NAME}
     # Add another data block, identical to the one above, but this time for the purpose of embedding in release content
     # whereas the one above will be chosen for the secondary statistics table.
     @{locations}=    create list    England
@@ -200,6 +200,7 @@ Create publication 1
     ...    'Absence by characteristic' in England between 2012/13 and 2016/17
     ...    ${EMPTY}
 
+Create data block 7 for ${RELEASE_1_NAME}
     @{locations}=    create list    ALL localAuthorityDistrict
     @{indicators}=    create list    Authorised absence rate    Unauthorised absence rate    Overall absence rate
     @{filter_items}=    create list
@@ -214,8 +215,7 @@ Create publication 1
     ...    Absence rates at Local Authority District level for 2016/17
     ...    ${EMPTY}
 
-    # Configure line chart.
-    Log to console    \nAdding line chart to release ${RELEASE_1_NAME}
+Add line chart to ${RELEASE_1_NAME}
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -229,8 +229,7 @@ Create publication 1
     user chooses select option    id:chartLegendConfigurationForm-items-2-symbol    Circle
     user saves chart configuration
 
-    # Configure map.
-    Log to console    \nAdding map to release ${RELEASE_1_NAME}
+Add map chart to ${RELEASE_1_NAME}
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -245,19 +244,16 @@ Create publication 1
     user chooses select option    name:boundaryLevel    Local Authority Districts (December 2021) UK BUC
     user saves chart configuration
 
-    # Add content.
-    Log to console    \nAdding content to release ${RELEASE_1_NAME}
+Add release content to ${RELEASE_1_NAME}
     user clicks link    Content
     user waits until page finishes loading
 
-    # Add content - release summary.
-    Log to console    \nAdding release summary to release ${RELEASE_1_NAME}
+Add release summary to ${RELEASE_1_NAME}
     user adds summary text block
     user adds content to summary text block
     ...    Read national statistical summaries, view charts and tables and download data files.
 
-    # Add content - key statistics.
-    Log to console    \nAdding key statistics to release ${RELEASE_1_NAME}
+Add key statistics to ${RELEASE_1_NAME}
     user adds key statistic from data block
     ...    Key Stat 1
     ...    Up from 4.6% in 2015/16
@@ -276,18 +272,15 @@ Create publication 1
     ...    What is unauthorized absence rate?
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
-    # Add content - headlines.
-    Log to console    \nAdding release headlines to release ${RELEASE_1_NAME}
+Add headlines to ${RELEASE_1_NAME}
     user adds headlines text block
     user adds content to headlines text block    Pupils missed on average 8.2 school days.
 
-    # Add content - secondary stats.
-    Log to console    \nAdding secondary statistics to release ${RELEASE_1_NAME}
+Add secondary statistics to ${RELEASE_1_NAME}
     user adds secondary stats data block
     ...    Key Stats aggregate table
 
-    # Add content - content sections.
-    Log to console    \nAdding content sections to release ${RELEASE_1_NAME}
+Add content sections to ${RELEASE_1_NAME}
     user adds release content section
     ...    About these statistics
     ...    The statistics and data cover the absence of pupils of compulsory school age during the 2016/17 academic year
@@ -343,8 +336,7 @@ Create publication 1
     ...    LAD map
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    # Add content - release note.
-    Log to console    \nAdding release notes to release ${RELEASE_1_NAME}
+Add release notes to ${RELEASE_1_NAME}
     user adds a release note
     ...    First published.
     ...    22
@@ -357,57 +349,50 @@ Create publication 1
     ...    04
     ...    2018
 
-    # Approve release.
-    Log to console    \nApproving release ${RELEASE_1_NAME}
+Approve ${RELEASE_1_NAME}
     user approves release for immediate publication    original    03    2019
 
-    # Amend release.
-    Log to console    \nAmending release ${RELEASE_1_NAME}
-
+Amend ${RELEASE_1_NAME}
     user creates amendment for release
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_NAME}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_RELEASE_NAME}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
     # Add a release note to the amendment.
     user clicks link    Content
     user waits until page finishes loading
-
     user adds a release note
     ...    Updating LAD map
     ...    22
     ...    08
     ...    2022
 
-    # Approve the release amendment.
-    Log to console    \nApproving release amendment ${RELEASE_1_NAME}
+Approve ${RELEASE_1_NAME} amendment
     user approves release for immediate publication    amendment    03    2019
 
-    # Backdate its Published date.
+Backdate ${RELEASE_1_NAME} published date
     ${release_id}=    get release id from url
     ${published_override}=    Convert Date    2018-04-25 00:00:00    datetime
-    Log to console    \nUpdating published date via API for release ${RELEASE_1_NAME}
     user updates release published date via api    ${release_id}    ${published_override}
 
-    # Create and approve a methodology.
-    Log to console    \nCreating methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+Create methodology ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user creates methodology for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
-    Log to console    \nUpdating summary for methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+Update summary for ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user edits methodology summary for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
     user clicks link    Manage content
 
-    Log to console    \nAdding content sections to methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+Add content sections to ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user creates new content section
     ...    1
     ...    1. Overview of absence statistics
@@ -479,7 +464,7 @@ Create publication 1
     ...    append=True
     ...    style=h4
 
-    Log to console    \nAdding annexes to methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+Add annexes to ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user adds methodology annex section
     ...    Annex A - Calculations
     ...    The following calculations are used to produce pupil absence National Statistics:
@@ -511,42 +496,40 @@ Create publication 1
     ...    6
     ...    dfe-logo.jpg
 
-    Log to console    \nApproving methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+Approve ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
     user approves methodology for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${PUPIL_ABSENCE_TOPIC_TITLE}
 
+Backdate ${PUPIL_ABSENCE_METHODOLOGY_TITLE} published date
     ${methodology_id}=    get methodology id from url
     ${published_override}=    Convert Date    2018-03-22 00:00:00    datetime
-    Log to console
-    ...    \nUpdating published date via API for methodology ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
     user updates methodology published date via api
     ...    ${methodology_id}
     ...    ${published_override}
 
-    # Give access to release to analyst1.
-    Log to console    \nGiving analyst1 Contributor access to release ${RELEASE_1_NAME}
+Give Analyst1 Contributor access to ${RELEASE_1_NAME}
     user gives release access to analyst
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELEASE_1_NAME}
+    ...    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    ...    ${PUPIL_ABSENCE_RELEASE_NAME}
     ...    Contributor
     ...    EES-test.ANALYST1@education.gov.uk
 
-Create publication 2
+Create ${EXCLUSIONS_PUBLICATION_TITLE}
     ${PUBLICATION_ID}=    user creates test publication via api
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
     ...    ${TOPIC_2_ID}
 
+    Set Suite Variable    ${PUBLICATION_ID}
+
     user navigates to publication page from dashboard
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
-    # Add legacy releases
-    Log to console    \nAdding legacy releases to publication ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-
+Add legacy releases to ${EXCLUSIONS_PUBLICATION_TITLE}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
     user creates legacy release    Academic year 2008/09
@@ -566,30 +549,27 @@ Create publication 2
     user creates legacy release    Academic year 2015/16
     ...    https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016
 
-    Log to console    \nCreating release ${RELEASE_2_NAME}
+Create ${RELEASE_2_NAME} release
     user creates test release via api
     ...    ${PUBLICATION_ID}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_RELEASE_1_TIME}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_RELEASE_1_YEAR}
+    ...    ${EXCLUSIONS_PUBLICATION_RELEASE_TIME}
+    ...    ${EXCLUSIONS_PUBLICATION_RELEASE_YEAR}
     ...    OfficialStatistics
 
     user navigates to draft release page from dashboard
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_RELEASE_1_NAME}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
-    # Add data files.
-    Log to console    \nAdding data files to release ${RELEASE_2_NAME}
-
+Add data files to ${RELEASE_2_NAME}
     user uploads subject
     ...    Exclusions by geographic level
     ...    exclusions_by_geographic_level.csv
     ...    exclusions_by_geographic_level.meta.csv
     ...    ${UNZIPPED_FILES_DIR}
 
-    # Add data guidance.
-    Log to console    \nAdding data guidance to release ${RELEASE_2_NAME}
+Add data guidance to ${RELEASE_2_NAME}
     user clicks link    Data guidance
     user waits until page finishes loading
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
@@ -598,9 +578,7 @@ Create publication 2
     user clicks button    Save guidance
     user waits until page finishes loading
 
-    # Create data blocks.
-    Log to console    \nAdding data blocks to release ${RELEASE_2_NAME}
-
+Create data block 1 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Number of pupils    Number of permanent exclusions    Permanent exclusion rate
     @{filter_items}=    create list
@@ -614,6 +592,7 @@ Create publication 2
     ...    Generic data block 1
     ...    Chart showing permanent exclusions in England
 
+Create data block 2 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Number of pupils    Number of fixed period exclusions
     ...    Fixed period exclusion rate
@@ -628,6 +607,7 @@ Create publication 2
     ...    Generic data block 2
     ...    Chart showing fixed-period exclusions in England
 
+Create data block 3 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Permanent exclusion rate
     @{filter_items}=    create list
@@ -640,6 +620,7 @@ Create publication 2
     ...    ${filter_items}
     ...    Key Stat 1
 
+Create data block 4 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Fixed period exclusion rate
     @{filter_items}=    create list
@@ -652,6 +633,7 @@ Create publication 2
     ...    ${filter_items}
     ...    Key Stat 2
 
+Create data block 5 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Number of permanent exclusions
     @{filter_items}=    create list
@@ -664,6 +646,7 @@ Create publication 2
     ...    ${filter_items}
     ...    Key Stat 3
 
+Create data block 6 for ${RELEASE_2_NAME}
     @{locations}=    create list    England
     @{indicators}=    create list    Permanent exclusion rate    Fixed period exclusion rate
     ...    Number of permanent exclusions
@@ -679,9 +662,7 @@ Create publication 2
     ...    'Exclusions by geographic level' in England between 2012/13 and 2016/17
     ...    ${EMPTY}
 
-    # Configure line charts.
-    Log to console    \nAdding line charts to release ${RELEASE_2_NAME}
-
+Add line chart 1 to ${RELEASE_2_NAME}
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -695,6 +676,7 @@ Create publication 2
     user chooses select option    id:chartLegendConfigurationForm-items-2-symbol    Circle
     user saves chart configuration
 
+Add line chart 2 to ${RELEASE_2_NAME}
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -708,6 +690,7 @@ Create publication 2
     user chooses select option    id:chartLegendConfigurationForm-items-2-symbol    Circle
     user saves chart configuration
 
+Add line chart 3 to ${RELEASE_2_NAME}
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
     user waits until table is visible
@@ -721,19 +704,16 @@ Create publication 2
     user chooses select option    id:chartLegendConfigurationForm-items-2-symbol    Circle
     user saves chart configuration
 
-    # Add content.
-    Log to console    \nAdding content to release ${RELEASE_2_NAME}
+Add release content to ${RELEASE_2_NAME}
     user clicks link    Content
     user waits until page finishes loading
 
-    # Add content - release summary.
-    Log to console    \nAdding release summary to release ${RELEASE_2_NAME}
+Add release summary to ${RELEASE_2_NAME}
     user adds summary text block
     user adds content to summary text block
     ...    Read national statistical summaries, view charts and tables and download data files.
 
-    # Add content - key statistics.
-    Log to console    \nAdding key statistics to release ${RELEASE_2_NAME}
+Add key statistics to ${RELEASE_2_NAME}
     user adds key statistic from data block
     ...    Key Stat 1
     ...    Up from 0.08% in 2015/16
@@ -752,19 +732,16 @@ Create publication 2
     ...    What is number of permanent exclusions?
     ...    Total number of permanent exclusions within a school year.
 
-    # Add content - headlines.
-    Log to console    \nAdding release headlines to release ${RELEASE_2_NAME}
+Add headlines to ${RELEASE_2_NAME}
     user adds headlines text block
     user adds content to headlines text block
     ...    The rate of permanent exclusions has increased since last year from 0.08 per cent of pupil enrolments in 2015/16 to 0.10 per cent in 2016/17.
 
-    # Add content - secondary stats.
-    Log to console    \nAdding secondary statistics to release ${RELEASE_2_NAME}
+Add secondary statistics to ${RELEASE_2_NAME}
     user adds secondary stats data block
     ...    Key Stats aggregate table
 
-    # Add content - content sections.
-    Log to console    \nAdding content sections to release ${RELEASE_2_NAME}
+Add content sections to ${RELEASE_2_NAME}
     user adds release content section
     ...    About this release
     ...    The statistics and data cover permanent and fixed period exclusions and school-level exclusions during the 2016/17 academic year in the following state-funded school types as reported in the school census.
@@ -820,8 +797,7 @@ Create publication 2
     ...    There's considerable variation in the permanent exclusion and fixed-period exclusion rate at the LA level.
     ...    9
 
-    # Add content - release note.
-    Log to console    \nAdding release notes to release ${RELEASE_2_NAME}
+Add release notes to ${RELEASE_2_NAME}
     user adds a release note
     ...    First published.
     ...    19
@@ -834,33 +810,31 @@ Create publication 2
     ...    08
     ...    2018
 
-    # Approve release.
-    Log to console    \nApproving release ${RELEASE_2_NAME}
+Approve ${RELEASE_2_NAME}
     user approves release for immediate publication    original    07    2019
 
+Backdate ${RELEASE_2_NAME} published date
     ${release_id}=    get release id from url
     ${published_override}=    Convert Date    2018-07-19 00:00:00    datetime
-    Log to console    \nUpdating published date via API for release ${RELEASE_2_NAME}
     user updates release published date via api    ${release_id}    ${published_override}
 
-    # Create and approve a methodology.
-    Log to console    \nCreating methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
+Create methodology ${EXCLUSIONS_METHODOLOGY_TITLE}
     user creates methodology for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
-    Log to console    \nUpdating summary for methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
+Update summary for ${EXCLUSIONS_METHODOLOGY_TITLE}
     user edits methodology summary for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
     user clicks link    Manage content
 
-    Log to console    \nAdding content sections to methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
+Add content sections to ${EXCLUSIONS_METHODOLOGY_TITLE}
     user adds methodology content section
     ...    1. Overview of exclusion statistics
     ...    The headteacher of a school can exclude a pupil on disciplinary grounds only.
@@ -896,7 +870,7 @@ Create publication 2
     ...    If you have a specific enquiry about absence and exclusion statistics and data, contact:
     ...    7
 
-    Log to console    \nAdding annexes to methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
+Add annexes to ${EXCLUSIONS_METHODOLOGY_TITLE}
     user adds methodology annex section
     ...    Annex A - Calculations
     ...    The following calculations are used to produce pupil absence National Statistics:
@@ -917,26 +891,24 @@ Create publication 2
     ...    Donec tortor lorem, vulputate eu convallis quis, euismod ac justo. Fusce vel cursus arcu. Duis mi metus, lacinia vitae hendrerit eget, vulputate ut ante.
     ...    4
 
-    Log to console    \nApproving methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
+Approve ${EXCLUSIONS_METHODOLOGY_TITLE}
     user approves methodology for publication
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
+    ...    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ...    ${EXCLUSIONS_TOPIC_TITLE}
 
+Backdate ${EXCLUSIONS_METHODOLOGY_TITLE} published date
     ${methodology_id}=    get methodology id from url
     ${published_override}=    Convert Date    2018-08-25 00:00:00    datetime
-    Log to console
-    ...    \nUpdating published date via API for methodology ${SEED_DATA_THEME_1_PUBLICATION_2_METHODOLOGY_1_TITLE}
     user updates methodology published date via api
     ...    ${methodology_id}
     ...    ${published_override}
 
-    # Give access to release to analyst1.
-    Log to console    \nGiving analyst1 Contributor access to release ${RELEASE_2_NAME}
+Give Analyst1 Contributor access to ${RELEASE_2_NAME}
     user gives release access to analyst
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
-    ...    ${SEED_DATA_THEME_1_PUBLICATION_2_RELEASE_1_NAME}
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
+    ...    ${EXCLUSIONS_PUBLICATION_RELEASE_NAME}
     ...    Contributor
     ...    EES-test.ANALYST1@education.gov.uk
 
