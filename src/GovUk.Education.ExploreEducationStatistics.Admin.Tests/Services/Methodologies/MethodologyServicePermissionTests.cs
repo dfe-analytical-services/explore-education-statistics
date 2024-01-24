@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -191,6 +192,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         {
                             Title = "Updated Title"
                         });
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task UpdateMethodologyPublished()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(IsBauUser)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(userService: userService.Object);
+                        return service.UpdateMethodologyPublished(_methodologyVersion.Id,
+                            new MethodologyPublishedUpdateRequest());
                     }
                 );
         }

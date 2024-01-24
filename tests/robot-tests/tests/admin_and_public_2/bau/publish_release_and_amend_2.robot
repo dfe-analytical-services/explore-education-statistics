@@ -424,9 +424,7 @@ Update Seven filters footnote
 
 Add release note for new release amendment
     user clicks link    Content
-    user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note two
-    user clicks button    Save note
+    user adds a release note    Test release note two
     ${date}    get current datetime    %-d %B %Y
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note two

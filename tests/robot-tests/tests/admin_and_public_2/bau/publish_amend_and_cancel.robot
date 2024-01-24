@@ -92,8 +92,7 @@ Create chart for data block
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
     user checks radio is checked    Use table title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
-
-    user clicks button    Save chart options
+    user saves infographic configuration
 
     user waits until page contains    Chart preview
     user checks infographic chart contains alt    id:chartBuilderPreview    Sample alt text
@@ -119,24 +118,21 @@ Add three accordion sections to release
     user changes accordion section title    3    Test embedded dashboard section
 
 Add data block to first accordion section
-    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
-    ...    id:releaseMainContent
-    ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user scrolls to element    ${datablock}
-    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
+    ${datablock}=    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
 Add test text to second accordion section
-    user adds text block to editable accordion section    Test text    id:releaseMainContent
+    user adds text block to editable accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test text    1    Some test text !
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add embedded dashboard to third accordion section
     user chooses to embed a URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${modal}=    user updates embedded URL details in modal
     ...    Test embedded dashboard title
@@ -231,7 +227,7 @@ Upload replacement data
     user waits until page contains element    testid:Replacement Subject title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -301,10 +297,7 @@ Edit data block for amendment
     user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
 
-    user clicks link    Edit block    css:tbody > tr:first-child
-
-    user waits until h2 is visible    ${DATABLOCK_NAME}
-    user waits until h2 is visible    Data block details
+    user clicks edit data block link    ${DATABLOCK_NAME}
 
     user checks page contains element    //*[@data-testid="Data set name-key" and contains(text(), "Data set name")]
     user checks page contains element
@@ -333,7 +326,7 @@ Navigate to 'Content' page for amendment
     user waits until page contains button    Add a summary text block
 
 Verify amended Dates data block table has footnotes
-    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -351,14 +344,14 @@ Verify amended Dates data block table has footnotes
     ...    ${data_block_table}
 
 Update second accordion section text for amendment
-    user opens accordion section    Test text    id:releaseMainContent
+    user opens accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test text    1    Amended test text!
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Update embedded dashboard title
     user chooses to update an embedded URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${modal}=    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
@@ -435,15 +428,17 @@ Verify that release content is unchanged
     user waits until page finishes loading
     user waits until page finishes loading
 
-    user checks there are x accordion sections    3    id:releaseMainContent
-    user checks accordion is in position    Dates data block    1    id:releaseMainContent
-    user checks accordion is in position    Test text    2    id:releaseMainContent
-    user checks accordion is in position    Test embedded dashboard section    3    id:releaseMainContent
+    user checks there are x accordion sections    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Dates data block    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Test text    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Test embedded dashboard section    3
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Verify that the Dates data block accordion is unchanged
-    user scrolls to accordion section    Dates data block    id:releaseMainContent
-    user opens accordion section    Dates data block    id:releaseMainContent
-    ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
+    user scrolls to accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${section}=    user gets accordion section content element    Dates data block
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
@@ -455,10 +450,10 @@ Verify that the Dates data block accordion is unchanged
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    22,900    ${section}
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
-    user closes accordion section    Dates data block    id:releaseMainContent
+    user closes accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Verify that the Dates data block table footnotes are unchanged
-    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -470,15 +465,15 @@ Verify that the Dates data block table footnotes are unchanged
     ...    ${data_block_table}
 
 Verify that the Test text accordion is unchanged
-    user opens accordion section    Test text    id:releaseMainContent
-    ${section}=    user gets accordion section content element    Test text    id:releaseMainContent
+    user opens accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${section}=    user gets accordion section content element    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text !"]
-    user closes accordion section    Test text    id:releaseMainContent
+    user closes accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Verify that the Embedded URL accordion section is unchanged
-    user opens accordion section    Test embedded dashboard section    id:releaseMainContent
+    user opens accordion section    Test embedded dashboard section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${section}=    user gets accordion section content element    Test embedded dashboard section
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]

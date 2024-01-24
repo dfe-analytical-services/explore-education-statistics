@@ -457,8 +457,7 @@ Check footnote was updated on data block
 
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
-    user clicks link    Edit block    css:tbody > tr:first-child
-    user waits until table is visible
+    user clicks edit data block link    UI Test data block name 2
 
     user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
@@ -484,8 +483,7 @@ Check footnotes were reordered on data block
 
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
-    user clicks link    Edit block    css:tbody > tr:first-child
-    user waits until table is visible
+    user clicks edit data block link    UI Test data block name 2
     user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
@@ -500,8 +498,9 @@ Add an accordion section to release content
     user changes accordion section title    1    Test section
 
 Add text block with link to a featured table to accordion section
-    user adds text block to editable accordion section    Test section    id:releaseMainContent
-    ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
+    user adds text block to editable accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${block}=    user starts editing accordion section text block    Test section    1
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${toolbar}=    get editor toolbar    ${block}
     ${insert}=    user gets button element    Insert    ${toolbar}
     user clicks element    ${insert}

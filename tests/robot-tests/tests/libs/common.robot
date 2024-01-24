@@ -14,6 +14,7 @@ Resource    ./table_tool.robot
 ${browser}=                             chrome
 ${headless}=                            1
 ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
+${UNZIPPED_FILES_DIR}=                  ${EXECDIR}${/}tests${/}files${/}.unzipped-seed-data-files${/}
 ${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads${/}
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}

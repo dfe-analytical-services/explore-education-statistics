@@ -3,6 +3,7 @@ Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
+Resource            ../../seed_data/seed_data_theme_1_constants.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -103,7 +104,7 @@ User navigates to /data-catalogue page
 
 User checks search filters publications properly
     user enters text into element    id:publicationForm-publicationIdSearch    Pupil
-    user waits until page contains    Pupil absence in schools in England    %{WAIT_SMALL}
+    user waits until page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_SMALL}
     user clears element text    id:publicationForm-publicationIdSearch
 
 Choose publication

@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -12,13 +13,13 @@ Force Tags          GeneralPublic    Local    Dev
 Go to Table Tool page
     user navigates to data tables page on public frontend
 
-Select Exclusions publication
-    user clicks radio    Pupils and schools
-    user clicks radio    Permanent and fixed-period exclusions in England
+Select Seed Data Theme 1 publication 2
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    ${EXCLUSIONS_PUBLICATION_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication
-    ...    Permanent and fixed-period exclusions in England
+    ...    ${EXCLUSIONS_PUBLICATION_TITLE}
 
 Validate "Exclusions by geographic level" subject details
     user clicks radio    Exclusions by geographic level
@@ -157,7 +158,7 @@ User generates a permanent link
 User validates permanent link works correctly
     user clicks link    View share link
     user waits until h1 is visible
-    ...    'Exclusions by geographic level' from 'Permanent and fixed-period exclusions in England'
+    ...    'Exclusions by geographic level' from '${EXCLUSIONS_PUBLICATION_TITLE}'
 
 User validates permalink contains correct date
     ${date}=    get current datetime    %-d %B %Y

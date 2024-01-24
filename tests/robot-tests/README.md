@@ -82,7 +82,7 @@ Variables you may want to set in a `.env` file are documented in `.env.example`.
 
 ## Code style
 
-In order to adhear to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
+In order to adhere to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
 
 * [Flake8](https://pypi.org/project/flake8/): 
 We use Flake8 to verify pep8, pyflakes & circular complexity rules. 
@@ -97,6 +97,19 @@ We use Isort to organise imports
 We use RobotFramework-tidy to format robotframework test code
 
 ## How do I run the tests?
+
+### Prerequisites
+
+The UI tests are mostly designed to set up their own data where possible, but some rely on pre-existing seed data and ALL rely on pre-existing users
+being present in the database.
+
+For that reason, we must firstly ensure that we have appropriate data on our databases. Install the latest data dump file and seed data ZIP file.
+
+1. Download the latest `ees-mssql-data-<version>.zip` file and install it in your local databases.
+2. Download the latest `seed-data-files.zip` file and place in the [tests/robot-tests/tests/files](tests/robot-tests/tests/files). It will be
+   automatically unpacked when running the tests.
+
+### Run the tests
 
 From the `tests/robot-tests` directory run:
 

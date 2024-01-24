@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -12,18 +13,18 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 Go to Table Tool page
     user navigates to data tables page on public frontend
 
-Select "Pupil absence" publication
-    user clicks radio    Pupils and schools
-    user clicks radio    Pupil absence in schools in England
+Select "Seed Data Theme 1 Publication 1" publication
+    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Validate "Absence by characteristic" subject details
     user clicks radio    Absence by characteristic
     user checks summary list contains    Geographic levels    Local authority; Local authority district; National
     user checks summary list contains    Time period    2012/13 to 2016/17
-    user checks summary list contains    Content    1
+    user checks summary list contains    Content    Absence by characteristic data guidance content
 
 Validate back takes you to step 1
     user goes back
@@ -245,7 +246,7 @@ User generates a permanent link
 User validates permanent link works correctly
     [Documentation]    EES-2892
     user clicks link    View share link
-    user waits until h1 is visible    'Absence by characteristic' from 'Pupil absence in schools in England'
+    user waits until h1 is visible    'Absence by characteristic' from '${PUPIL_ABSENCE_PUBLICATION_TITLE}'
 
 User validates permalink table
     user checks table column heading contains    1    1    Gender male

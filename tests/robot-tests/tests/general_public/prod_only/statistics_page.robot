@@ -1,13 +1,11 @@
 *** Settings ***
-Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_theme_1_constants.robot
-Resource            ../seed_data/seed_data_theme_2_constants.robot
+Resource            ../../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev    PreProd
+Force Tags          GeneralPublic    Prod
 
 
 *** Test Cases ***
@@ -35,8 +33,17 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks radio is checked    All themes
-    user checks page contains radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page contains radio    ${ROLE_PERMISSIONS_THEME_TITLE}
+    user checks page contains radio    Children's social care
+    user checks page contains radio    COVID-19
+    user checks page contains radio    Destination of pupils and students
+    user checks page contains radio    Early years
+    user checks page contains radio    Finance and funding
+    user checks page contains radio    Further education
+    user checks page contains radio    Higher education
+    user checks page contains radio    Pupils and schools
+    user checks page contains radio    School and college outcomes and performance
+    user checks page contains radio    Teachers and school workforce
+    user checks page contains radio    UK education and training statistics
 
 Validate release type filters exist
     user clicks button    Release type
@@ -57,12 +64,12 @@ Validate publications list exists
     user checks page contains element    testid:publicationsList
 
 Filter by theme
-    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    Pupils and schools
+    user checks page contains button    Pupils and schools
 
 Remove theme filter
-    user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks button    Pupils and schools
+    user checks page does not contain button    Pupils and schools
     user checks radio is checked    All themes
 
 Filter by release type
@@ -76,32 +83,32 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
-    user presses keys    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user presses keys    Pupil absence in schools in England
     user clicks button    Search
-    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    Pupil absence in schools in England
     user checks radio is checked    Relevance
-    user checks list item contains    testid:publicationsList    1    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
 
 Removing search
-    user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
-    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    Pupil absence in schools in England
+    user checks page does not contain button    Pupil absence in schools in England
     user checks radio is checked    Newest
 
 Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user clicks radio    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user clicks radio    Pupils and schools
     user clicks radio    Official statistics
 
     user checks page contains button    pupil
-    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    Pupils and schools
     user checks page contains button    Official statistics
 
     user clicks button    Clear all filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    Pupils and schools
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Clear all filters
 

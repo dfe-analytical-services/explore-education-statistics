@@ -44,8 +44,9 @@ Add an accordion section to release content
     user changes accordion section title    1    Test section
 
 Add text block with link to absence glossary entry to accordion section
-    user adds text block to editable accordion section    Test section    id:releaseMainContent
-    ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
+    user adds text block to editable accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    ${block}=    user starts editing accordion section text block    Test section    1
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${toolbar}=    get editor toolbar    ${block}
     ${insert}=    user gets button element    Insert    ${toolbar}
     user clicks element    ${insert}
@@ -62,7 +63,7 @@ Add text block with link to absence glossary entry to accordion section
 
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
-    user opens accordion section    Test section    id:releaseMainContent
+    user opens accordion section    Test section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
