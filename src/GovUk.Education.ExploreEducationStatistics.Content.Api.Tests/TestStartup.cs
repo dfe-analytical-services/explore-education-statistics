@@ -1,10 +1,12 @@
 #nullable enable
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
@@ -44,6 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
                 })
                 .AddApplicationPart(typeof(Startup).Assembly);
 
+            services.AddValidatorsFromAssemblyContaining<Startup>();
+            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
+            services.AddFluentValidationAutoValidation();
+
             services.AddDbContext<StatisticsDbContext>(
                 options =>
                     options.UseInMemoryDatabase("TestStatisticsDb",
@@ -70,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
 
     public static class TestStartupExtensions
     {
-        public static WebApplicationFactory<TestStartup> ResetDbContexts(this WebApplicationFactory<TestStartup> testApp)
+        public static WebApplicationFactory<TestStartup> ResetDbContexts(
+            this WebApplicationFactory<TestStartup> testApp)
         {
             return testApp
                 .ResetContentDbContext()

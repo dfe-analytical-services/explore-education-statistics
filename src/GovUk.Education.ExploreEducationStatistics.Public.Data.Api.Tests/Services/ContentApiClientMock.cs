@@ -96,6 +96,7 @@ internal class ContentApiClientMock : IContentApiClient
     private static PaginatedListViewModel<PublicationSearchResultViewModel> EmptyResult(int page,
         int pageSize)
     {
-        return new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, page, pageSize);
+        return new PaginatedListViewModel<PublicationSearchResultViewModel>(
+            new List<PublicationSearchResultViewModel>(), 0, page, pageSize);
     }
 }
