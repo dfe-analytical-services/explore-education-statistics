@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RichardSzalay.MockHttp;
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
@@ -31,7 +32,12 @@ public abstract class ContentApiClientTests
         public async Task HttpClientBadRequest_ReturnsBadRequest()
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
-                .Respond(HttpStatusCode.BadRequest, new StringContent("{ \"thing\": \"test message\" }"));
+                .Respond(
+                HttpStatusCode.BadRequest,
+                JsonContent.Create(new ValidationProblemDetails(new Dictionary<string, string[]>()
+                {
+                    { string.Empty, [Errors.Error1.ToString()] }
+                })));
 
             var response = await _contentApiClient.ListPublications(
                 page: It.IsAny<int>(),
@@ -42,7 +48,7 @@ public abstract class ContentApiClientTests
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            Assert.IsType<BadRequestObjectResult>(left);
+            left.AssertBadRequest(Errors.Error1);
         }
 
         [Theory]
@@ -58,7 +64,7 @@ public abstract class ContentApiClientTests
                 HttpStatusCode responseStatusCode)
         {
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
-                .Respond(responseStatusCode, new StringContent("{ \"thing\": \"test message\" }"));
+                .Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
             {
@@ -111,14 +117,19 @@ public abstract class ContentApiClientTests
             var publicationId = Guid.NewGuid();
 
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
-                .Respond(HttpStatusCode.BadRequest, new StringContent("test message"));
+                .Respond(
+                HttpStatusCode.BadRequest,
+                JsonContent.Create(new ValidationProblemDetails(new Dictionary<string, string[]>()
+                {
+                    { string.Empty, [Errors.Error1.ToString()] }
+                })));
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            Assert.IsType<BadRequestObjectResult>(left);
+            left.AssertBadRequest(Errors.Error1);
         }
 
         [Fact]
@@ -127,14 +138,16 @@ public abstract class ContentApiClientTests
             var publicationId = Guid.NewGuid();
 
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
-                .Respond(HttpStatusCode.NotFound, new StringContent("test message"));
+                .Respond(
+                HttpStatusCode.NotFound,
+                JsonContent.Create(new ProblemDetails { Detail = "Not found details" }));
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            Assert.IsType<NotFoundObjectResult>(left);
+            left.AssertNotFoundResult(new ProblemDetails { Detail = "Not found details" });
         }
 
         [Theory]
@@ -152,7 +165,7 @@ public abstract class ContentApiClientTests
             var publicationId = Guid.NewGuid();
 
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
-                .Respond(responseStatusCode, new StringContent("test message"));
+                .Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
                 await _contentApiClient.GetPublication(publicationId));
@@ -187,5 +200,10 @@ public abstract class ContentApiClientTests
             Assert.Equal(result.Summary, right.Summary);
             Assert.Equal(result.Published, right.Published);
         }
+    }
+
+    private enum Errors
+    {
+        Error1,
     }
 }

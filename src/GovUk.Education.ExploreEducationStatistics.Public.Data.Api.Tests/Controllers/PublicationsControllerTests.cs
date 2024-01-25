@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -201,14 +203,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
                 .Setup(c => c.GetPublication(publicationId))
-                .ReturnsAsync(new NotFoundObjectResult("not found content"));
-
+                .ReturnsAsync(new NotFoundObjectResult(new ProblemDetails { Detail = "not found deails" }));
+            
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
             var response = await GetPublication(client, publicationId);
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            Assert.Equal("not found content", await response.Content.ReadAsStringAsync());
+            response.AssertNotFound(new ProblemDetails { Detail = "not found deails", Status = (int?)HttpStatusCode.NotFound }, true);
         }
 
         [Fact]
@@ -218,7 +219,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await GetPublication(client, It.IsAny<Guid>());
 
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            response.AssertNotFound();
         }
 
         [Fact]

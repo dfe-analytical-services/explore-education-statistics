@@ -27,6 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 
+        public static void AssertNotFoundResult<T>(this ActionResult result, T expected) where T : class
+        {
+            var notFound = Assert.IsAssignableFrom<NotFoundObjectResult>(result);
+
+            var body = Assert.IsType<T>(notFound.Value);
+            body.AssertDeepEqualTo(expected);
+        }
+
         public static void AssertNoContent(this ActionResult result)
         {
             Assert.IsAssignableFrom<NoContentResult>(result);
