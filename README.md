@@ -696,7 +696,7 @@ whatever you want on your filesystem.
 
 ### Robot Tests
 
-Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in `tests`.
+Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in the [tests/robot-tests](tests/robot-tests) folder.
 
 See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
 
