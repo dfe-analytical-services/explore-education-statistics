@@ -26,9 +26,10 @@ Go to 'Manage themes and topics'
 
 Verify existing theme and topics
     user waits until page contains accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
-    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    ${accordion}=    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks summary list contains    Summary
     ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
+    ...    ${accordion}
     user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    1
     ...    ${EXCLUSIONS_TOPIC_TITLE}
     user checks topic is in correct position    ${PUPILS_AND_SCHOOLS_THEME_TITLE}    2
@@ -57,7 +58,7 @@ Edit theme
     user waits until h1 is visible    Edit theme
 
     # Used in teardown
-    ${theme_id}    get theme id from url
+    ${theme_id}=    get theme id from url
     set suite variable    ${CREATED_THEME_ID}    ${theme_id}
 
     user waits until page contains element    id:themeForm-title
