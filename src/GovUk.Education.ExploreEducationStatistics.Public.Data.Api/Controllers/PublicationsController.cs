@@ -14,10 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 public class PublicationsController : ControllerBase
 {
     private readonly IPublicationService _publicationService;
+    private readonly IDataSetService _dataSetService;
 
-    public PublicationsController(IPublicationService publicationService)
+    public PublicationsController(IPublicationService publicationService, IDataSetService dataSetService)
     {
-        this._publicationService = publicationService;
+        _publicationService = publicationService;
+        _dataSetService = dataSetService;
     }
 
     /// <summary>
@@ -31,13 +33,35 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(200, "The paginated list of publications", type: typeof(PaginatedPublicationListViewModel))]
     [SwaggerResponse(400)]
     public async Task<ActionResult<PaginatedPublicationListViewModel>> ListPublications(
-        [FromQuery] PublicationsListRequest request)
+        [FromQuery] ListPublicationsRequest request)
     {
         return await _publicationService
             .ListPublications(
                 page: request.Page,
                 pageSize: request.PageSize,
                 search: request.Search)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// List a publication’s data sets
+    /// </summary>
+    /// <remarks>
+    /// Lists summary details of all the data sets related to a publication.
+    /// </remarks>
+    [HttpGet("{publicationId}/data-sets")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(PaginatedPublicationListViewModel))]
+    [SwaggerResponse(400)]
+    public async Task<ActionResult<PaginatedDataSetViewModel>> ListDataSets(
+        [FromQuery] ListDataSetsRequest request, 
+        Guid publicationId)
+    {
+        return await _dataSetService
+            .ListDataSets(
+                page: request.Page,
+                pageSize: request.PageSize,
+                publicationId)
             .HandleFailuresOrOk();
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
-public record PublicationsListRequest
+public record ListPublicationsRequest
 {
     /// <summary>
     /// A search term to find matching publications.
@@ -22,7 +22,7 @@ public record PublicationsListRequest
     [DefaultValue(20)]
     public int PageSize { get; init; } = 20;
 
-    public class Validator : AbstractValidator<PublicationsListRequest>
+    public class Validator : AbstractValidator<ListPublicationsRequest>
     {
         public Validator()
         {
