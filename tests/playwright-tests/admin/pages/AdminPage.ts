@@ -35,9 +35,6 @@ export default class AdminPage {
 
   async selectTestThemeAndTestTopic() {
     await this.testThemeDropdown.selectOption({ label: 'Test theme' });
-    // await this.testTopicDropdown.selectOption({ label: 'Test topic' });
-   // await this.createNewPublicationButton.click();
-    await this.page.waitForTimeout(200);
   }
 
   async clickPublication(publicationName: string) {
