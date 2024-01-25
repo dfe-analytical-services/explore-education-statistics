@@ -37,7 +37,9 @@ export default class SingOffPage {
     this.updateStatusButton = page.locator(
       '//button[contains(text(),"Update status")]',
     );
-    this.releaseProcessStatus = page.locator('strong[id="release-process-status-Complete"]');
+    this.releaseProcessStatus = page.locator(
+      'strong[id="release-process-status-Complete"]',
+    );
   }
 
   async publishReleaseImmediately() {
@@ -54,7 +56,7 @@ export default class SingOffPage {
   async waitUntilReleaseStatusToCommplete() {
     const releaseStatus = await this.releaseProcessStatus.innerText();
     await this.page.waitForFunction(async expectedtext => {
-        return expectedtext.toLowerCase() === 'complete';
-      }, releaseStatus);
+      return expectedtext.toLowerCase() === 'complete';
+    }, releaseStatus);
   }
 }

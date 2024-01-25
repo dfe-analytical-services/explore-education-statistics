@@ -38,6 +38,5 @@ export default class ContentPage {
     await this.editBlockButton.click();
     await this.editBlockSectionInputBox.fill('content');
     await this.saveCloseButton.click();
-
   }
 }

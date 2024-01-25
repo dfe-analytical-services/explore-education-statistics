@@ -8,12 +8,10 @@ export default class FindStatisticsPage {
   constructor(page: Page) {
     this.page = page;
     // Locators
-    this.releaseLink = (text: string) =>  page.locator(`//a[text()="${text}"]`);
-    
+    this.releaseLink = (text: string) => page.locator(`//a[text()="${text}"]`);
   }
 
   async navigateToPublicReleasePage(publicationName: string) {
     await this.releaseLink(publicationName).click();
   }
-
 }

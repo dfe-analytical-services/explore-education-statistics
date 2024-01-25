@@ -30,7 +30,10 @@ export default class CreateNewPublicationPage {
     this.savePublicationbutton = page.locator('button[type="submit"]');
   }
 
-  async createNewPublication(publicationName: string, publicationSummary: string) {
+  async createNewPublication(
+    publicationName: string,
+    publicationSummary: string,
+  ) {
     await this.publicationFormTitle.fill(publicationName);
     await this.publicationSummary.fill(publicationSummary);
     await this.teamName.fill('UI test contact name');
