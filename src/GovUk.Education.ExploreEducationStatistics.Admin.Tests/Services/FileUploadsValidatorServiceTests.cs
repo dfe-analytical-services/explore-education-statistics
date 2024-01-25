@@ -2,16 +2,20 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
@@ -22,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class FileUploadsValidatorServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task ValidateFileForUpload_FileCannotBeEmpty()
         {
@@ -125,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFile = CreateFormFileMock("test.csv").Object;
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
-                
+
                 fileTypeService
                     .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
@@ -220,22 +226,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_DuplicateDataFile()
         {
-            var releaseId = Guid.NewGuid();
+            var release = _fixture.DefaultRelease()
+                .Generate();
+
+            var releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFile(_fixture.DefaultFile()
+                    .WithFilename("test.csv"))
+                .Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.Add(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                });
-
+                context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -246,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataFile = CreateFormFileMock("test.csv").Object;
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
-                var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);
+                var result = await service.ValidateDataFilesForUpload(release.Id, dataFile, metaFile);
 
                 result.AssertBadRequest(DataFilenameNotUnique);
             }
@@ -255,22 +259,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfSameName()
         {
-            var releaseId = Guid.NewGuid();
+            var release = _fixture.DefaultRelease()
+                .Generate();
+
+            // The file being replaced here has the same name as the one being uploaded, but that's ok.
+            var fileBeingReplaced = _fixture.DefaultFile()
+                .WithFilename("test.csv");
+
+            var releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFile(fileBeingReplaced)
+                .Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.Add(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                });
-
+                context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -282,12 +287,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataFile = CreateFormFileMock("test.csv").Object;
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
-                // The file being replaced here has the same name as the one being uploaded, but that's ok.
-                var fileBeingReplaced = new File
-                {
-                    Filename = "test.csv"
-                };
-
                 fileTypeService
                     .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
@@ -296,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(
-                    releaseId, dataFile, metaFile, fileBeingReplaced);
+                    release.Id, dataFile, metaFile, fileBeingReplaced);
                 VerifyAllMocks(fileTypeService);
 
                 result.AssertRight();
@@ -306,29 +305,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
         {
-            var releaseId = Guid.NewGuid();
+            var release = _fixture.DefaultRelease()
+                .Generate();
+
+            // Create two release files, one of which is the file being replaced, and the other has the same filename
+            // as the file being uploaded.
+            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile()
+                .ForIndex(0, s => s.SetFilename("test.csv"))
+                .ForIndex(1, s => s.SetFilename("another.csv"))
+                .Generate(2)
+                .ToTuple2();
+
+            var releaseFiles = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFiles(ListOf(fileBeingReplaced, otherFile))
+                .Generate(2);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.AddRange(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                }, new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "another.csv"
-                    }
-                });
+                context.ReleaseFiles.AddRange(releaseFiles);
 
                 await context.SaveChangesAsync();
             }
@@ -343,13 +340,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataFile = CreateFormFileMock("another.csv").Object;
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
-                var fileBeingReplaced = new File
-                {
-                    Filename = "test.csv"
-                };
-
                 var result = await service.ValidateDataFilesForUpload(
-                    releaseId, dataFile, metaFile, fileBeingReplaced);
+                    release.Id, dataFile, metaFile, fileBeingReplaced);
 
                 result.AssertBadRequest(DataFilenameNotUnique);
             }
@@ -469,7 +461,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (service, _) = BuildService();
 
-            var archiveFile = CreateDataArchiveFileMock("LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv", "test.meta.csv").Object;
+            var archiveFile =
+                CreateDataArchiveFileMock(
+                    "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv",
+                    "test.meta.csv").Object;
 
             var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                 archiveFile);
@@ -482,7 +477,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (service, _) = BuildService();
 
-            var archiveFile = CreateDataArchiveFileMock("test.csv", "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv").Object;
+            var archiveFile = CreateDataArchiveFileMock("test.csv",
+                    "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv")
+                .Object;
 
             var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
                 archiveFile);
@@ -525,21 +522,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataArchiveEntriesForUpload_DuplicateDataFile()
         {
-            var releaseId = Guid.NewGuid();
+            var release = _fixture.DefaultRelease()
+                .Generate();
+
+            var releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFile(_fixture.DefaultFile()
+                    .WithFilename("test.csv"))
+                .Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.Add(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                });
+                context.ReleaseFiles.Add(releaseFile);
 
                 await context.SaveChangesAsync();
             }
@@ -550,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
 
-                var result = await service.ValidateDataArchiveEntriesForUpload(releaseId, archiveFile);
+                var result = await service.ValidateDataArchiveEntriesForUpload(release.Id, archiveFile);
 
                 result.AssertBadRequest(DataFilenameNotUnique);
             }
@@ -602,30 +598,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             ValidateDataArchiveEntriesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
         {
-            var releaseId = Guid.NewGuid();
+            var release = _fixture.DefaultRelease()
+                .Generate();
+
+            // Create two release files, one of which is the file being replaced, and the other has the same filename
+            // as the file being uploaded.
+            var (fileBeingReplaced, otherFile) = _fixture.DefaultFile()
+                .ForIndex(0, s => s.SetFilename("test.csv"))
+                .ForIndex(1, s => s.SetFilename("another.csv"))
+                .Generate(2)
+                .ToTuple2();
+
+            var releaseFiles = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFiles(ListOf(fileBeingReplaced, otherFile))
+                .Generate(2);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.AddRange(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                }, new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "another.csv"
-                    }
-                });
-
+                context.ReleaseFiles.AddRange(releaseFiles);
                 await context.SaveChangesAsync();
             }
 
@@ -638,13 +631,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // in this Release after the replacement is complete.
                 var archiveFile = CreateDataArchiveFileMock("another.csv", "test.meta.csv").Object;
 
-                var fileBeingReplaced = new File
-                {
-                    Filename = "test.csv"
-                };
-
                 var result = await service.ValidateDataArchiveEntriesForUpload(
-                    releaseId, archiveFile, fileBeingReplaced);
+                    release.Id, archiveFile, fileBeingReplaced);
 
                 result.AssertBadRequest(DataFilenameNotUnique);
             }
