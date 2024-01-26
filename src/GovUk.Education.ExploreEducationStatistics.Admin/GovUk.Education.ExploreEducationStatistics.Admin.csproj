@@ -40,7 +40,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21" />
     
     <!--  TODO EES-4814 - remove this when Areas have been fully removed -->
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.21" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.21.6" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
@@ -175,6 +174,12 @@
     <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotificationsSent.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotifySubscribers.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Tools\Views\Home\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Shared\Error.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Shared\_Layout.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Shared\_LoginPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Tools\Views\_ViewStart.cshtml" />
   </ItemGroup>
 
     <ItemGroup>

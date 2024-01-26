@@ -1,11 +1,7 @@
 #nullable enable
 using System;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -45,7 +41,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -471,12 +466,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<AuthorizationHandlerService>();
             services.AddScoped<DateTimeProvider>();
 
-            // These services act as delegates through to underlying Identity services that cannot be mocked or are
-            // hard to mock.
-            // TODO EES-4814 - remove the need for these services
-            services.AddTransient<ISignInManagerDelegate, SignInManagerDelegate>();
-            services.AddTransient<IUserManagerDelegate, UserManagerDelegate>();
-
             // This service allows a set of users to be pre-invited to the service on startup.
             if (HostEnvironment.IsDevelopment())
             {
@@ -622,13 +611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // TODO EES-4814 - remove when possible
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader());
 
-            app.UseMvc(routes =>
-            {
-                // TODO EES-4814 - do we need this?
-                // routes.MapRoute(
-                //     name: "default",
-                //     template: "{controller}/{action=Index}/{id?}");
-            });
+            app.UseMvc();
 
             if (!env.IsIntegrationTest())
             {
