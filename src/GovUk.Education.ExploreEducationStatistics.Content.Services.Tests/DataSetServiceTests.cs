@@ -24,9 +24,9 @@ public class DataSetServiceTests
 {
     private readonly DataFixture _fixture = new();
 
-    public class ListPublicationsTests : DataSetServiceTests
+    public class ListDataSetsTests : DataSetServiceTests
     {
-        public class FilterTests : ListPublicationsTests
+        public class FilterTests : ListDataSetsTests
         {
             [Fact]
             public async Task FilterByReleaseId_Success()
@@ -256,7 +256,7 @@ public class DataSetServiceTests
             }
         }
 
-        public class OrderByTests : ListPublicationsTests
+        public class OrderByTests : ListDataSetsTests
         {
             [Fact]
             public async Task OrderByTitleAscending_Success()
@@ -622,7 +622,7 @@ public class DataSetServiceTests
             }
         }
 
-        public class SupersededPublicationTests : ListPublicationsTests
+        public class SupersededPublicationTests : ListDataSetsTests
         {
             [Fact]
             public async Task PublicationIsSuperseded_DataSetsOfSupersededPublicationsAreExcluded()
@@ -711,7 +711,7 @@ public class DataSetServiceTests
             }
         }
 
-        public class MiscellaneousTests : ListPublicationsTests
+        public class MiscellaneousTests : ListDataSetsTests
         {
             [Fact]
             // TODO Remove this once we do further work to remove all HTML from summaries at source

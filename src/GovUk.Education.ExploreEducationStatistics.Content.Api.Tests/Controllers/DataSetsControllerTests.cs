@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -24,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
+using MockQueryable.Moq;
 using Moq;
 using Xunit;
 
@@ -43,180 +44,1042 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         {
         }
 
-        [Fact]
-        public async Task Success()
+        public class FilterTests : ListDataSetsTests
         {
-            var query = new DataSetsListRequest();
-
-            var cacheKey = new ListDataSetsCacheKey(query);
-
-            MemoryCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(PaginatedListViewModel<DataSetListViewModel>)))
-                .Returns((object?) null);
-
-            MemoryCacheService
-                .Setup(s => s.SetItem<object>(
-                    cacheKey,
-                    It.IsAny<PaginatedListViewModel<DataSetListViewModel>>(),
-                    It.IsAny<MemoryCacheConfiguration>(),
-                    null));
-
-            var (releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
-
-            var client = BuildApp()
-                .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
-                .CreateClient();
-
-            var response = await ListDataSets(client, query);
-
-            MockUtils.VerifyAllMocks(MemoryCacheService);
-
-            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
-
-            var expectedReleaseFiles = new List<ReleaseFile>
+            public FilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
-                releaseFilesRelease1[0],
-                releaseFilesRelease1[1],
-                releaseFilesRelease2[0],
-                releaseFilesRelease2[1]
-            };
+            }
 
-            AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
-            AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            [Fact]
+            public async Task FilterByReleaseId_Success()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = release1.Id
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByPublicationId_Success()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    PublicationId = release1.PublicationId
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByThemeId_Success()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ThemeId = release1.Publication.Topic.ThemeId
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByReleaseIdWhereReleaseIsNotPublished_ReturnsEmpty()
+            {
+                var (_, _, unpublishedRelease, _, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = unpublishedRelease.Id
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
+                Assert.Empty(pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByPublicationIdWherePublicationIsNotPublished_ReturnsEmpty()
+            {
+                var (_, _, unpublishedRelease, _, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    PublicationId = unpublishedRelease.PublicationId
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
+                Assert.Empty(pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByThemeIdWhereThemeIsNotPublished_ReturnsEmpty()
+            {
+                var (_, _, unpublishedRelease, _, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ThemeId = unpublishedRelease.Publication.Topic.ThemeId
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
+                Assert.Empty(pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterBySearchTerm_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                var freeTextRanks = new List<FreeTextRank>
+                {
+                    new(releaseFilesRelease2[1].Id, 1),
+                    new(releaseFilesRelease1[1].Id, 2),
+                    new(releaseFilesRelease1[0].Id, 3),
+                    new(releaseFilesRelease2[0].Id, 4)
+                };
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                    .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    SearchTerm = "term"
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterBySearchTermWhereTermIsNotFound_ReturnsEmpty()
+            {
+                var (_, _, _, _, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                    .Returns(new List<FreeTextRank>().AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    SearchTerm = "term"
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
+                Assert.Empty(pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task NoFilter_ReturnsAllResultsOrderedByTitleAscending()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest();
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
         }
 
-        [Fact]
-        public async Task NoPublishedDataSets_ReturnsEmpty()
+        public class OrderByTests : ListDataSetsTests
         {
-            var query = new DataSetsListRequest();
+            public OrderByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+            {
+            }
 
-            var cacheKey = new ListDataSetsCacheKey(query);
+            [Fact]
+            public async Task OrderByTitleAscending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
 
-            MemoryCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(PaginatedListViewModel<DataSetListViewModel>)))
-                .Returns((object?) null);
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
-            MemoryCacheService
-                .Setup(s => s.SetItem<object>(
-                    cacheKey,
-                    It.IsAny<PaginatedListViewModel<DataSetListViewModel>>(),
-                    It.IsAny<MemoryCacheConfiguration>(),
-                    null));
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
 
-            var client = BuildApp().CreateClient();
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Title,
+                    Sort = SortOrder.Asc
+                };
+                var response = await ListDataSets(client, query);
 
-            var response = await ListDataSets(client, query);
+                MockUtils.VerifyAllMocks(MemoryCacheService);
 
-            MockUtils.VerifyAllMocks(MemoryCacheService);
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
 
-            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
 
-            AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
-            Assert.Empty(pagedResult.Results);
+            [Fact]
+            public async Task OrderByTitleDescending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Title,
+                    Sort = SortOrder.Desc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease1[0]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByTitleWithoutSortOrder_DefaultsToAscending()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Title,
+                    Sort = null
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByNaturalAscending_Success()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = release1.Id,
+                    OrderBy = DataSetsListRequestOrderBy.Natural,
+                    Sort = SortOrder.Asc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[1], // Has natural order 0
+                    releaseFilesRelease1[0] // Has natural order 1
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByNaturalDescending_Success()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = release1.Id,
+                    OrderBy = DataSetsListRequestOrderBy.Natural,
+                    Sort = SortOrder.Desc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0], // Has natural order 1
+                    releaseFilesRelease1[1] // Has natural order 0
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByNaturalWithoutSortOrder_DefaultsToAscending()
+            {
+                var (release1, _, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = release1.Id,
+                    OrderBy = DataSetsListRequestOrderBy.Natural,
+                    Sort = null
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[1], // Has natural order 0
+                    releaseFilesRelease1[0] // Has natural order 1
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByPublishedAscending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Published,
+                    Sort = SortOrder.Asc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect data set files belonging to the oldest published release to be returned first
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1],
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByPublishedDescending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Published,
+                    Sort = SortOrder.Desc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect data set files belonging to the newest published release to be returned first
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByPublishedWithoutSortOrder_DefaultsToDescending()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    OrderBy = DataSetsListRequestOrderBy.Published,
+                    Sort = null
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect data set files belonging to the newest published release to be returned first
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceAscending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                var freeTextRanks = new List<FreeTextRank>
+                {
+                    new(releaseFilesRelease2[1].Id, 1),
+                    new(releaseFilesRelease1[1].Id, 2),
+                    new(releaseFilesRelease1[0].Id, 3),
+                    new(releaseFilesRelease2[0].Id, 4)
+                };
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                    .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    SearchTerm = "term",
+                    OrderBy = DataSetsListRequestOrderBy.Relevance,
+                    Sort = SortOrder.Asc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[1],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease2[0]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceDescending_Success()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                var freeTextRanks = new List<FreeTextRank>
+                {
+                    new(releaseFilesRelease2[1].Id, 1),
+                    new(releaseFilesRelease1[1].Id, 2),
+                    new(releaseFilesRelease1[0].Id, 3),
+                    new(releaseFilesRelease2[0].Id, 4)
+                };
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                    .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    SearchTerm = "term",
+                    OrderBy = DataSetsListRequestOrderBy.Relevance,
+                    Sort = SortOrder.Desc
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceWithoutSortOrder_DefaultsToDescending()
+            {
+                var (_, _, _, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
+
+                var freeTextRanks = new List<FreeTextRank>
+                {
+                    new(releaseFilesRelease2[1].Id, 1),
+                    new(releaseFilesRelease1[1].Id, 2),
+                    new(releaseFilesRelease1[0].Id, 3),
+                    new(releaseFilesRelease2[0].Id, 4)
+                };
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                    .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    SearchTerm = "term",
+                    OrderBy = DataSetsListRequestOrderBy.Relevance,
+                    Sort = null
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public async Task PageTooSmall_ReturnsBadRequest(int page)
+        public class SupersededPublicationTests : ListDataSetsTests
         {
-            var query = new DataSetsListRequest(
-                Page: page
-            );
+            public SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+            {
+            }
 
-            var client = BuildApp().CreateClient();
+            [Fact]
+            public async Task PublicationIsSuperseded_DataSetsOfSupersededPublicationsAreExcluded()
+            {
+                var (release1, release2, _, _, releaseFilesRelease2, allReleaseFiles) = GenerateTestData();
 
-            var response = await ListDataSets(client, query);
+                // Set the publication of release 1 to be superseded by the publication of release 2
+                release1.Publication.SupersededById = release2.PublicationId;
 
-            response.AssertBadRequest(expectedErrorKey: "Page",
-                expectedErrorMessage: "'Page' must be greater than or equal to '1'.");
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest();
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect all data set files belonging to release 1 to be excluded as it is superseded
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterBySupersededPublicationId_SupersededStatusIsIgnored()
+            {
+                var (release1, release2, _, releaseFilesRelease1, _, allReleaseFiles) = GenerateTestData();
+
+                // Set the publication of release 1 to be superseded by the publication of release 2
+                release1.Publication.SupersededById = release2.PublicationId;
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    PublicationId = release1.PublicationId
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Filtering by a publication id should ignore the superseded status and return all data set files
+                // belonging to the publication
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task SupersedingPublicationHasNoPublishedReleases_SupersededStatusIsIgnored()
+            {
+                var (release1, _, unpublishedRelease, releaseFilesRelease1, releaseFilesRelease2, allReleaseFiles) =
+                    GenerateTestData();
+
+                // Set the publication of release 1 to be superseded by a publication with no published releases
+                release1.Publication.SupersededById = unpublishedRelease.PublicationId;
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest();
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // The superseded status should be ignored as the superseding publication has no published releases
+                var expectedReleaseFiles = new List<ReleaseFile>
+                {
+                    releaseFilesRelease1[0],
+                    releaseFilesRelease1[1],
+                    releaseFilesRelease2[0],
+                    releaseFilesRelease2[1]
+                };
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(-1)]
-        public async Task PageSizeTooSmall_ReturnsBadRequest(int pageSize)
+        public class ValidationTests : ListDataSetsTests
         {
-            var query = new DataSetsListRequest(
-                PageSize: pageSize
-            );
+            public ValidationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+            {
+            }
 
-            var client = BuildApp().CreateClient();
+            [Theory]
+            [InlineData(0)]
+            [InlineData(-1)]
+            public async Task PageTooSmall_ReturnsBadRequest(int page)
+            {
+                var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(client, query);
+                var query = new DataSetsListRequest(
+                    Page: page
+                );
+                var response = await ListDataSets(client, query);
 
-            response.AssertBadRequest(expectedErrorKey: "PageSize",
-                expectedErrorMessage: "'Page Size' must be greater than or equal to '1'.");
+                response.AssertBadRequest(expectedErrorKey: "Page",
+                    expectedErrorMessage: "'Page' must be greater than or equal to '1'.");
+            }
+
+            [Theory]
+            [InlineData(0)]
+            [InlineData(-1)]
+            public async Task PageSizeTooSmall_ReturnsBadRequest(int pageSize)
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    PageSize: pageSize
+                );
+                var response = await ListDataSets(client, query);
+
+                response.AssertBadRequest(expectedErrorKey: "PageSize",
+                    expectedErrorMessage: "'Page Size' must be greater than or equal to '1'.");
+            }
+
+            [Theory]
+            [InlineData(41)]
+            public async Task PageSizeTooBig_ReturnsBadRequest(int pageSize)
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    PageSize: pageSize
+                );
+                var response = await ListDataSets(client, query);
+
+                response.AssertBadRequest(expectedErrorKey: "PageSize",
+                    expectedErrorMessage: "'Page Size' must be less than or equal to '40'.");
+            }
+
+            [Theory]
+            [InlineData("a")]
+            [InlineData("aa")]
+            public async Task SearchTermTooSmall_ReturnsBadRequest(string searchTerm)
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    SearchTerm: searchTerm
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertBadRequest(expectedErrorKey: "SearchTerm",
+                    expectedErrorMessage:
+                    $"The length of 'Search Term' must be at least 3 characters. You entered {searchTerm.Length} characters.");
+            }
+
+            [Fact]
+            public async Task OrderByNaturalWithoutReleaseId_ReturnsBadRequest()
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    OrderBy: DataSetsListRequestOrderBy.Natural
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertBadRequest(expectedErrorKey: "ReleaseId",
+                    expectedErrorMessage: "'Release Id' must not be empty.");
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceWithoutSearchTerm_ReturnsBadRequest()
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    OrderBy: DataSetsListRequestOrderBy.Relevance
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertBadRequest(expectedErrorKey: "SearchTerm",
+                    expectedErrorMessage: "'Search Term' must not be empty.");
+            }
         }
 
-        [Theory]
-        [InlineData(41)]
-        public async Task PageSizeTooBig_ReturnsBadRequest(int pageSize)
+        public class MiscellaneousTests : ListDataSetsTests
         {
-            var query = new DataSetsListRequest(
-                PageSize: pageSize
-            );
+            public MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+            {
+            }
 
-            var client = BuildApp().CreateClient();
+            [Fact]
+            public async Task NoPublishedDataSets_ReturnsEmpty()
+            {
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
-            var response = await ListDataSets(client, query);
+                var client = BuildApp().CreateClient();
 
-            response.AssertBadRequest(expectedErrorKey: "PageSize",
-                expectedErrorMessage: "'Page Size' must be less than or equal to '40'.");
-        }
+                var query = new DataSetsListRequest();
+                var response = await ListDataSets(client, query);
 
-        [Theory]
-        [InlineData("a")]
-        [InlineData("aa")]
-        public async Task SearchTermTooSmall_ReturnsBadRequest(string searchTerm)
-        {
-            var query = new DataSetsListRequest(
-                SearchTerm: searchTerm
-            );
+                MockUtils.VerifyAllMocks(MemoryCacheService);
 
-            var client = BuildApp().CreateClient();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
 
-            var response = await ListDataSets(client, query);
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0);
+                Assert.Empty(pagedResult.Results);
+            }
 
-            MockUtils.VerifyAllMocks(MemoryCacheService);
+            [Fact]
+            // TODO Remove this once we do further work to remove all HTML from summaries at source
+            public async Task ReleaseFileSummariesContainHtml_HtmlTagsAreStripped()
+            {
+                var (_, _, _, _, _, allReleaseFiles) = GenerateTestData();
 
-            response.AssertBadRequest(expectedErrorKey: "SearchTerm",
-                expectedErrorMessage:
-                $"The length of 'Search Term' must be at least 3 characters. You entered {searchTerm.Length} characters.");
-        }
+                allReleaseFiles.ForEach(releaseFile => { releaseFile.Summary = $"<p>{releaseFile.Summary}</p>"; });
 
-        [Fact]
-        public async Task OrderByNaturalWithoutReleaseId_ReturnsBadRequest()
-        {
-            var query = new DataSetsListRequest(
-                OrderBy: DataSetsListRequestOrderBy.Natural
-            );
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
-            var client = BuildApp().CreateClient();
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.AddRange(allReleaseFiles))
+                    .CreateClient();
 
-            var response = await ListDataSets(client, query);
+                var query = new DataSetsListRequest();
+                var response = await ListDataSets(client, query);
 
-            MockUtils.VerifyAllMocks(MemoryCacheService);
+                MockUtils.VerifyAllMocks(MemoryCacheService);
 
-            response.AssertBadRequest(expectedErrorKey: "ReleaseId",
-                expectedErrorMessage: "'Release Id' must not be empty.");
-        }
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
 
-        [Fact]
-        public async Task OrderByRelevanceWithoutSearchTerm_ReturnsBadRequest()
-        {
-            var query = new DataSetsListRequest(
-                OrderBy: DataSetsListRequestOrderBy.Relevance
-            );
-
-            var client = BuildApp().CreateClient();
-
-            var response = await ListDataSets(client, query);
-
-            MockUtils.VerifyAllMocks(MemoryCacheService);
-
-            response.AssertBadRequest(expectedErrorKey: "SearchTerm",
-                expectedErrorMessage: "'Search Term' must not be empty.");
+                Assert.All(pagedResult.Results, item =>
+                {
+                    var content = item.Content;
+                    Assert.DoesNotContain("<p>", content);
+                    Assert.DoesNotContain("</p>", content);
+                });
+            }
         }
 
         private static async Task<HttpResponseMessage> ListDataSets(HttpClient client,
@@ -285,6 +1148,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         private (
+            Release release1,
+            Release release2,
+            Release unpublishedRelease,
             List<ReleaseFile> releaseFilesRelease1,
             List<ReleaseFile> releaseFilesRelease2,
             List<ReleaseFile> allReleaseFiles
@@ -342,25 +1208,23 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 .Concat(releaseFilesUnpublished)
                 .ToList();
 
-            return (releaseFilesRelease1,
+            return (release1,
+                release2,
+                unpublishedRelease,
+                releaseFilesRelease1,
                 releaseFilesRelease2,
                 allReleaseFiles);
         }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp()
+    private WebApplicationFactory<TestStartup> BuildApp(IDataSetService? dataSetService = null)
     {
         return TestApp
             .ResetDbContexts()
             .ConfigureServices(services =>
             {
-                services.AddTransient<IDataSetService, DataSetService>(
-                    s =>
-                    {
-                        var contentDbContext = s.GetRequiredService<ContentDbContext>();
-                        return new DataSetService(contentDbContext);
-                    }
-                );
+                services.AddTransient(
+                    s => dataSetService ?? new DataSetService(s.GetRequiredService<ContentDbContext>()));
             });
     }
 }
