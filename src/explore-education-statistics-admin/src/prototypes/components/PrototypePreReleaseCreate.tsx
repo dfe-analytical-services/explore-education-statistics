@@ -14,8 +14,8 @@ const PrototypeCreatePreRelease = () => {
   const [editPreRelease, setEditPreRelease] = useState(false);
 
   const formIntro = `
-    <p>Beside Department for Education (DfE) professional and production staff the 
-    following post holders are given pre-release access up to 24 hours before release.</p>
+    <p>Besides Department for Education (DfE) professional and production staff, the 
+    following post holders were given pre-release access up to 24 hours before release.</p>
 
     <ul>
         <li>ADD ROLES HERE</li>
@@ -23,8 +23,8 @@ const PrototypeCreatePreRelease = () => {
 `;
 
   const formText = `
-    <p>Beside Department for Education (DfE) professional and production staff the 
-    following post holders are given pre-release access up to 24 hours before release.</p>
+    <p>Besides Department for Education (DfE) professional and production staff, the 
+    following post holders were given pre-release access up to 24 hours before release.</p>
     <ul>
         <li>
             Secretary of State, DfE
