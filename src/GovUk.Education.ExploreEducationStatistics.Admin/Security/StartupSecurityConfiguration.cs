@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationH
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Web;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
@@ -20,6 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         {
             services.AddAuthorization(options =>
             {
+                options.AddPolicy("Has \"access-admin-api\" scope", policy =>
+                    policy.RequireScope("access-admin-api"));
+
                 /**
                  * General role-based page access
                  */

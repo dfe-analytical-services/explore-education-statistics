@@ -20,24 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Pupil_Absence_Statistics\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Pupil_Exclusion_Statistics\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Secondary_And_Primary_School_Applications_And_Offers\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21" PrivateAssets="all" />
     <!-- TODO remove AutoMapper.Extensions.Microsoft.DependencyInjection with AutoMapper v13 -->
@@ -45,14 +27,19 @@
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.52" />
     <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
-    <PackageReference Include="JWT" Version="10.1.0" />
+<!--    <PackageReference Include="JWT" Version="10.1.0" />-->
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.21" />
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.32" />
+      <!--  TODO EES-4814 -->
+<!--    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.32" />-->
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.21" />
+      <!--  TODO EES-4814 - do we need anymore if not using Identity Framework to automatically do anything for us 
+      anymore? -->
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21" />
+    
+    <!--  TODO EES-4814 - remove this when Areas have been fully removed -->
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.21" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.21.6" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
@@ -64,6 +51,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="4.5.1" />
     <PackageReference Include="Cronos" Version="0.7.1" />
+    <!--  TODO EES-4814 - ensure we have the latest -->
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.15.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -127,6 +116,7 @@
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
+    <!--  TODO EES-4814 - remove these when Areas have been fully removed -->
     <_ContentIncludedByDefault Remove="Views\FileUpload\Upload.cshtml" />
     <_ContentIncludedByDefault Remove="Views\File\List.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
@@ -187,15 +177,15 @@
     <_ContentIncludedByDefault Remove="Areas\Tools\Views\Home\Index.cshtml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model\GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
+    </ItemGroup>
 
-  <PropertyGroup>
-    <NoWarn>NU1605</NoWarn>
-  </PropertyGroup>
-</Project>
+    <PropertyGroup>
+      <NoWarn>NU1605</NoWarn>
+    </PropertyGroup>
+  </Project>

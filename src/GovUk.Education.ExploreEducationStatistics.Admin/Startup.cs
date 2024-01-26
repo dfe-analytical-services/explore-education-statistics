@@ -1,16 +1,13 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -27,7 +24,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -47,19 +43,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using IdentityServer4.Models;
-using IdentityServer4.Services;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -68,14 +58,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Thinktecture;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
@@ -110,14 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
-        private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
+        // private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
 
-        private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021");
+        // private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021");
 
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
-        private readonly List<string> _adminUrlAndAliases;
+        // TODO EES-4814
+        // private readonly List<string> _adminUrlAndAliases;
 
         public Startup(
             IConfiguration configuration,
@@ -126,11 +115,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
 
-            _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
-            if (hostEnvironment.IsDevelopment())
-            {
-                _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
-            }
+            // _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
+            // if (hostEnvironment.IsDevelopment())
+            // {
+            //     _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
+            // }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -168,9 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddMvc(options =>
                 {
+                    // TODO EES-4814
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
+                    options.Filters.Add(new AuthorizeFilter("Has \"access-admin-api\" scope"));
                     options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.Filters.Add(new ProblemDetailsResultFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
@@ -190,6 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Database contexts
              */
 
+            // TODO EES-4814 - can probably simplify these tables
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
@@ -225,120 +216,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
 
             /*
-             * Auth / IdentityServer
+             * Authentication and Authorization
              */
 
-            // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
-
-            services
-                .AddDefaultIdentity<ApplicationUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<UsersAndRolesDbContext>()
-                .AddDefaultTokenProviders();
+            // TODO EES-4814 - do we need the stores anymore, or even the default Identity config?
+            // services
+            //     .AddDefaultIdentity<ApplicationUser>()
+            //     .AddRoles<IdentityRole>()
+            //     .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
             if (!HostEnvironment.IsIntegrationTest())
             {
-                var identityServerConfig = services
-                    .AddIdentityServer(options =>
-                    {
-                        options.Events.RaiseErrorEvents = true;
-                        options.Events.RaiseInformationEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseSuccessEvents = true;
-                    })
-                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
-                    {
-                        var spaClient = options
-                            .Clients
-                            .First(client => client.ClientId == OpenIdConnectSpaClientId);
-
-                        var clientConfig = Configuration.GetSection("OpenIdConnectSpaClient");
-
-                        if (clientConfig == null)
-                        {
-                            return;
-                        }
-
-                        var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
-
-                        if (allowRefreshTokens)
-                        {
-                            // Allow the use of refresh tokens to add persistent access to the service and enable the silent
-                            // login flow.
-                            spaClient.AllowOfflineAccess = true;
-                            spaClient.AllowedScopes = spaClient
-                                .AllowedScopes
-                                .Append(OpenIdConnectScope.OfflineAccess)
-                                .ToList();
-
-                            spaClient.UpdateAccessTokenClaimsOnRefresh = true;
-
-                            var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
-
-                            spaClient.RefreshTokenUsage = tokenUsage != null
-                                ? EnumUtil.GetFromEnumValue<TokenUsage>(tokenUsage)
-                                : TokenUsage.OneTimeOnly;
-
-                            var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
-
-                            spaClient.RefreshTokenExpiration = tokenExpiration != null
-                                ? EnumUtil.GetFromEnumValue<TokenExpiration>(tokenExpiration)
-                                : TokenExpiration.Absolute;
-                        }
-                    })
-                    .AddProfileService<ApplicationUserProfileService>();
-
-                if (HostEnvironment.IsDevelopment())
-                {
-                    identityServerConfig.AddDeveloperSigningCredential();
-                }
-                else
-                {
-                    identityServerConfig.AddSigningCredentials();
-                }
-
-                services.Configure<JwtBearerOptions>(
-                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                    options =>
-                    {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            // When the user returns from logging into the Identity Provider (e.g. Azure AD, Keycloak etc)
-                            // the external login portion of the Open ID Connect flow is completed, and then the Admin
-                            // SPA and Identity Server (the locally running implementation of an Open ID Connect IdP) enter
-                            // into a conversation, effectively swapping the access token issued from Azure or Keycloak
-                            // for a new access token issued from Identity Server itself specifically for the SPA's use.
-                            //
-                            // The "Issuer" of this access token is by default whatever URL that the SPA used to initiate
-                            // the conversation with Identity Server.  So if the external IdP returns the user to
-                            // https://localhost:5021, then the SPA will use https://localhost:5021 as a basis for
-                            // negotiating with Identity Server, and thus Identity Server will issue its access tokens with
-                            // the "Issuer" set to "https://localhost:5021".
-                            //
-                            // However, by default Identity Server will set its "TokenValidationParameters.ValidIssuer"
-                            // property to the "applicationUrl" value in "launchSettings.json" - locally for instance,
-                            // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens
-                            // that it issues would otherwise be immediately invalidated by this setting, regardless of what
-                            // URL the user was hitting the site on.  The answer is to manually let Identity Server know
-                            // which URLs are appropriate for each environment.
-                            //
-                            // As locally it's possible to access the service under an alternative URL like
-                            // "https://ees.local:5021", then we need to ensure that both "https://localhost:5021" and
-                            // "https://ees.local:5021" are *both* valid "Issuer" values on the access token provided by
-                            // Identity Server.
-                            ValidIssuers = _adminUrlAndAliases
-                        };
-                    });
-
                 services
-                    .AddAuthentication()
-                    .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
-                    .AddIdentityServerJwt();
+                        // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
+                        // headers as a way of identifying users.
+                    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        // This adds verification of the incoming JWTs after they have been located in the
+                        // Authorization headers above.
+                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnect"));
 
+                services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+
+                // TODO EES-4814
                 services.Configure<JwtBearerOptions>(
-                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                    JwtBearerDefaults.AuthenticationScheme,
                     options =>
                     {
                         var originalOnMessageReceived = options.Events.OnMessageReceived;
@@ -355,6 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             // Allows requests with `access_token` query parameter to authenticate.
                             // Only really needed for websockets as we unfortunately can't set any
                             // headers in the browser for the initial handshake.
+                            // TODO EES-4814 - do we need to support this in a different way?
                             if (context.Request.Query.ContainsKey("access_token"))
                             {
                                 context.Token = context.Request.Query["access_token"];
@@ -362,24 +264,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         };
                     });
             }
-
-            // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
-            services.Configure<IdentityOptions>(options =>
-            {
-                // This config tells UserManager to expect the logged in user's id to be in a Claim called
-                // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub" (because
-                // this Claim is renamed via the DefaultInboundClaimTypeMap earlier in the login process).
-                //
-                // It doesn't seem to be possible to remove the renaming (via
-                // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("sub")) because some mechanism earlier in the
-                // authentication process requires it to be in the Claim named
-                // "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier" rather than "sub".
-                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
-
-                // Default User settings
-                options.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
-            });
 
             /*
              * SignalR
@@ -578,11 +462,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<AuthorizationHandlerService>();
             services.AddScoped<DateTimeProvider>();
 
-            // This service handles the generation of the JWTs for users after they log in
-            services.AddTransient<IProfileService, ApplicationUserProfileService>();
-
             // These services act as delegates through to underlying Identity services that cannot be mocked or are
             // hard to mock.
+            // TODO EES-4814 - remove the need for these services
             services.AddTransient<ISignInManagerDelegate, SignInManagerDelegate>();
             services.AddTransient<IUserManagerDelegate, UserManagerDelegate>();
 
@@ -722,43 +604,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthentication();
             app.UseAuthorization();
 
-            if (!env.IsIntegrationTest())
-            {
-                app.UseIdentityServer();
-            }
-
-            var rewriteOptions = new RewriteOptions();
-
-            // Deny access to all /Identity routes other than:
-            //
-            // /Identity/Account/Login
-            // /Identity/Account/ExternalLogin
-            // /Identity/Account/InviteExpired
-            //
-            // This Regex is case insensitive.
-            rewriteOptions.AddRewrite(
-                @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))",
-                replacement: "/",
-                skipRemainingRules: true);
-
-            rewriteOptions.Add(new LowercasePathRule());
-            app.UseRewriter(rewriteOptions);
-
             app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
                 }
             );
 
+            // TODO EES-4814 - remove when possible
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader());
+
             app.UseMvc(routes =>
             {
-                routes.MapRoute(
-                    name: "Areas",
-                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action=Index}/{id?}");
+                // TODO EES-4814 - do we need this?
+                // routes.MapRoute(
+                //     name: "default",
+                //     template: "{controller}/{action=Index}/{id?}");
             });
 
             if (!env.IsIntegrationTest())
@@ -821,6 +681,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 migration.Apply();
             }
+        }
+    }
+
+    class ClaimsTransformation : IClaimsTransformation
+    {
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            claimsIdentity.AddClaim(new Claim(SecurityClaimTypes.ApplicationAccessGranted.ToString(), ""));
+            claimsIdentity.AddClaim(new Claim(SecurityClaimTypes.ManageAllTaxonomy.ToString(), ""));
+
+            // Attempt to transfer an unsupported scope Claim into one of the 2 supported scope Claim names that
+            // Microsoft Platform Identity supports - "scp" or "http://schemas.microsoft.com/identity/claims/scope".
+            //
+            // This occurs when using an IdP that does not issue the Scope claim with one of the 2 supported names
+            // above.  An example would be Keycloak, which issues scopes under a claim named "scope".
+            //
+            // This ensures that the Authorization filters further up the request-processing chain are provided with
+            // a compatible scope Claim from which to enforce access to endpoints based upon scopes.
+            var supportedScopeClaim = principal.FindFirst(claim =>
+                claim.Type == ClaimConstants.Scp || claim.Type == ClaimConstants.Scope);
+
+            if (supportedScopeClaim == null)
+            {
+                var unsupportedScopeClaim = principal.FindFirst(claim => claim.Type == "scope");
+                if (unsupportedScopeClaim != null)
+                {
+                    claimsIdentity.AddClaim(new Claim(ClaimConstants.Scp, unsupportedScopeClaim.Value));
+                }
+            }
+
+            principal.AddIdentity(claimsIdentity);
+            return Task.FromResult(principal);
         }
     }
 }
