@@ -1,48 +1,33 @@
 #nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+
+public class ViewReleaseRequirement : IAuthorizationRequirement
 {
-    public class ViewReleaseRequirement : IAuthorizationRequirement
+}
+
+public class ViewReleaseAuthorizationHandler
+    : AuthorizationHandler<ViewReleaseRequirement, Release>
+{
+    private readonly IReleaseRepository _releaseRepository;
+
+    public ViewReleaseAuthorizationHandler(IReleaseRepository releaseRepository)
     {
+        _releaseRepository = releaseRepository;
     }
 
-    public class ViewReleaseAuthorizationHandler
-        : AuthorizationHandler<ViewReleaseRequirement, Release>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext authContext,
+        ViewReleaseRequirement requirement,
+        Release release)
     {
-        private readonly ContentDbContext _context;
-
-        public ViewReleaseAuthorizationHandler(ContentDbContext context)
+        if (await _releaseRepository.IsLatestPublishedReleaseVersion(release.Id))
         {
-            _context = context;
-        }
-
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext authContext,
-            ViewReleaseRequirement requirement,
-            Release release)
-        {
-            if (!_context.TryReloadEntity(release, out var loadedRelease))
-            {
-                return;
-            }
-
-            await _context.Entry(loadedRelease)
-                .Reference(p => p.Publication)
-                .Query()
-                .Include(p => p.Releases)
-                .LoadAsync();
-
-            if (loadedRelease.IsLatestPublishedVersionOfRelease())
-            {
-                authContext.Succeed(requirement);
-            }
+            authContext.Succeed(requirement);
         }
     }
 }

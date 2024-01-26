@@ -1240,7 +1240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var publicationTree = await service.GetPublicationTree();
 
-                Assert.Equal(1, publicationTree.Count);
+                Assert.Single(publicationTree);
                 Assert.Equal("Theme A", publicationTree[0].Title);
 
                 Assert.Single(publicationTree[0].Topics);
@@ -2407,14 +2407,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
-            IPublicationRepository? publicationRepository = null)
+            IPublicationRepository? publicationRepository = null,
+            IReleaseRepository? releaseRepository = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                publicationRepository ?? new PublicationRepository(contentDbContext)
+                publicationRepository ?? new PublicationRepository(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext)
             );
         }
     }

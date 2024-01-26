@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
@@ -39,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
+            IReleaseRepository releaseRepository,
             IUserRoleService userRoleService,
             IUserService userService,
             IUserInviteRepository userInviteRepository,
@@ -49,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
+            _releaseRepository = releaseRepository;
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
@@ -100,12 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(_ =>
+                .OnSuccess(async () =>
                 {
-                    return _contentDbContext.Releases
-                        .Include(r => r.Publication)
-                        .ToList()
-                        .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
+                    var releases = await _releaseRepository.ListLatestReleaseVersions();
+                    return releases
                         .Select(r => new IdTitleViewModel
                         {
                             Id = r.Id,

@@ -2,40 +2,37 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserReleaseRoleServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task ListUserReleaseRolesByPublication()
         {
-            var release1 = new Release
-            {
-                Id = Guid.NewGuid(),
-            };
-            var release2 = new Release
-            {
-                Id = Guid.NewGuid(),
-            };
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Releases = ListOf(release1, release2),
-            };
+            var (release1, release2) = _fixture.DefaultRelease()
+                .Generate(2)
+                .ToTuple2();
 
-            var releaseIgnored1 = new Release // Ignored because different publication
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-            };
+            var publication = _fixture.DefaultPublication()
+                .WithReleases(ListOf(release1, release2))
+                .Generate();
+
+            var releaseIgnored1 = _fixture.DefaultRelease()
+                .WithPublication(_fixture.DefaultPublication())
+                .Generate();
 
             var userReleaseRole1 = new UserReleaseRole
             {
@@ -87,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupUserReleaseRoleService(contentDbContext);
+                var service = BuildService(contentDbContext);
                 var userReleaseRoles = await service.ListUserReleaseRolesByPublication(Contributor,
                     publication.Id);
 
@@ -110,12 +107,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static UserReleaseRoleService SetupUserReleaseRoleService(
+        private static UserReleaseRoleService BuildService(
             ContentDbContext contentDbContext)
         {
             return new(
                 contentDbContext,
-                new PublicationRepository(contentDbContext));
+                new ReleaseRepository(contentDbContext));
         }
     }
 }

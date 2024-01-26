@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
@@ -36,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseInviteService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+            IReleaseRepository releaseRepository,
             IUserRepository userRepository,
             IUserService userService,
             IUserRoleService userRoleService,
@@ -48,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
+            _releaseRepository = releaseRepository;
             _userRepository = userRepository;
             _userService = userService;
             _userRoleService = userRoleService;
@@ -62,11 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<Guid> releaseIds)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query => query
-                    .Include(p => p.Releases))
-                .OnSuccessDo(
-                    publication => _userService.CheckCanUpdateReleaseRole(publication, Contributor))
-                .OnSuccess(publication => ValidateReleaseIds(publication, releaseIds))
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(publication => _userService.CheckCanUpdateReleaseRole(publication, Contributor))
+                .OnSuccessDo(() => ValidateReleaseIds(publicationId, releaseIds))
                 .OnSuccess(async publication =>
                 {
                     var sanitisedEmail = email.Trim();
@@ -178,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
-        private async Task<Either<ActionResult, Publication>> ValidateReleaseIds(Publication publication,
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseIds(Guid publicationId,
             List<Guid> releaseIds)
         {
             var distinctReleaseIds = releaseIds.Distinct().ToList();
@@ -188,22 +190,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     nameof(releaseIds));
             }
 
-            await _contentDbContext
-                .Entry(publication)
-                .Collection(p => p.Releases)
-                .LoadAsync();
-
-            var publicationReleaseIds = publication
-                .ListActiveReleases()
-                .Select(r => r.Id)
-                .ToList();
-
+            var publicationReleaseIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
             if (!releaseIds.All(publicationReleaseIds.Contains))
             {
                 return ValidationActionResult(NotAllReleasesBelongToPublication);
             }
 
-            return publication;
+            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(

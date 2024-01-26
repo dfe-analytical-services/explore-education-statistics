@@ -9,6 +9,4 @@ public interface IPublicationRepository
     Task<bool> IsPublished(Guid publicationId);
 
     Task<bool> IsSuperseded(Guid publicationId);
-
-    Task UpdateLatestPublishedRelease(Guid publicationId);
 }

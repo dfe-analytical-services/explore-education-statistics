@@ -6,10 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -100,8 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    InMemoryApplicationDbContext(),
-                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
                     Mock.Of<IPreReleaseService>(Strict)));
         }
