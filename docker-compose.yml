@@ -39,6 +39,7 @@ services:
       context: ./docker/keycloak
     ports:
       - "5030:8080"
+      - "5031:8443"
 
   public-api-db:
     image: postgres:16.1-alpine
