@@ -298,7 +298,7 @@ The standard accounts used day to day are:
   * analyst - username `analyst` and password `password`
   * analyst2 - username `analyst2` and password `password`
 
-The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password
+The [Keycloak Admin login](https://ees.local:5031/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
 
 ##### Adding additional users to Keycloak manually
@@ -676,7 +676,11 @@ docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.bin
 ```
 
 Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
-realm configuration.
+realm configuration. From the project root, run:
+
+```bash
+docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.json
+```
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 
