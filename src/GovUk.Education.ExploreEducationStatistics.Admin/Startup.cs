@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Acco
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -43,12 +45,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -220,10 +224,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              */
 
             // TODO EES-4814 - do we need the stores anymore, or even the default Identity config?
-            // services
-            //     .AddDefaultIdentity<ApplicationUser>()
-            //     .AddRoles<IdentityRole>()
-            //     .AddEntityFrameworkStores<UsersAndRolesDbContext>();
+            // Currently it is supplying the UserManager in use by some of our services.
+            services
+                .AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
             if (!HostEnvironment.IsIntegrationTest())
             {
@@ -235,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         // Authorization headers above.
                     .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnect"));
 
-                services.AddTransient<IClaimsTransformation, ClaimsTransformation>();
+                services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
                 // TODO EES-4814
                 services.Configure<JwtBearerOptions>(
@@ -306,6 +311,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            // This service is responsible for handling calls immediately following successful login into the Admin SPA.
+            // It will determine if the user is an existing or a new user, and will register them locally if a new user.
+            services.AddTransient<ISignInService, SignInService>();
 
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
             // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
@@ -681,39 +690,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 migration.Apply();
             }
-        }
-    }
-
-    class ClaimsTransformation : IClaimsTransformation
-    {
-        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
-        {
-            var claimsIdentity = new ClaimsIdentity();
-            claimsIdentity.AddClaim(new Claim(SecurityClaimTypes.ApplicationAccessGranted.ToString(), ""));
-            claimsIdentity.AddClaim(new Claim(SecurityClaimTypes.ManageAllTaxonomy.ToString(), ""));
-
-            // Attempt to transfer an unsupported scope Claim into one of the 2 supported scope Claim names that
-            // Microsoft Platform Identity supports - "scp" or "http://schemas.microsoft.com/identity/claims/scope".
-            //
-            // This occurs when using an IdP that does not issue the Scope claim with one of the 2 supported names
-            // above.  An example would be Keycloak, which issues scopes under a claim named "scope".
-            //
-            // This ensures that the Authorization filters further up the request-processing chain are provided with
-            // a compatible scope Claim from which to enforce access to endpoints based upon scopes.
-            var supportedScopeClaim = principal.FindFirst(claim =>
-                claim.Type == ClaimConstants.Scp || claim.Type == ClaimConstants.Scope);
-
-            if (supportedScopeClaim == null)
-            {
-                var unsupportedScopeClaim = principal.FindFirst(claim => claim.Type == "scope");
-                if (unsupportedScopeClaim != null)
-                {
-                    claimsIdentity.AddClaim(new Claim(ClaimConstants.Scp, unsupportedScopeClaim.Value));
-                }
-            }
-
-            principal.AddIdentity(claimsIdentity);
-            return Task.FromResult(principal);
         }
     }
 }

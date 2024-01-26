@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
+// TODO EES-4814 - move to appropriate folder. Stop extending ApiAuthorizationDbContext when registration rewritten.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
@@ -58,9 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 
             // Note that this logic is also present in UserInvite.Expired.
             // It is implemented here as well because EF is not able to translate the "Expired" computed field for
-            // use in this QueryFilter. 
+            // use in this QueryFilter.
             modelBuilder.Entity<UserInvite>()
-                .HasQueryFilter(invite => invite.Accepted || 
+                .HasQueryFilter(invite => invite.Accepted ||
                                           invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays));
 
             modelBuilder.Entity<IdentityRole>()

@@ -11,11 +11,11 @@ export async function callRegister(accessToken) {
   headers.append('Authorization', bearer);
 
   const options = {
-    method: 'GET',
+    method: 'POST',
     headers: headers,
   };
 
-  return fetch(themesAndTopicsConfig.registerEndpoint, options)
-    .then(response => response.json())
-    .catch(error => console.log(error));
+  return fetch(themesAndTopicsConfig.registerEndpoint, options).catch(error =>
+    console.log(error),
+  );
 }

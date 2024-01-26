@@ -6,13 +6,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
 {
     public static class ClaimsPrincipalExtensions
     {
+        public const string EesUserIdClaim = "";
+
         public static Guid GetUserId(this ClaimsPrincipal principal)
         {
-            var userIdClaim = principal
-                .Claims
-                .First(claim => claim.Type == ClaimTypes.NameIdentifier);
-
-            return Guid.Parse(userIdClaim.Value);
+            var userIdClaim = principal.FindFirstValue(EesUserIdClaim);
+            return Guid.Parse(userIdClaim);
         }
     }
 }

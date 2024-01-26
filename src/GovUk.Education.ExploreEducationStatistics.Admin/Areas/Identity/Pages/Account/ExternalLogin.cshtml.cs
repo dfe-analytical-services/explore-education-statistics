@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
+// TODO EES-4814 - remove in favour of standard Login/RegistrationController.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -245,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             {
                 return await HandleExpiredInvite(inviteToSystem, email);
             }
-            
+
             // Mark the invite as accepted.
             inviteToSystem.Accepted = true;
             _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
@@ -310,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 await _contentDbContext.Users.AddAsync(newInternalUser);
 
-                var releaseRolesToCreate = await 
+                var releaseRolesToCreate = await
                     GetUserReleaseInvites(email)
                     .Select(invite => new UserReleaseRole
                     {
@@ -323,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     .ToListAsync();
                 await _contentDbContext.UserReleaseRoles.AddRangeAsync(releaseRolesToCreate);
 
-                var publicationRolesToCreate = await 
+                var publicationRolesToCreate = await
                     GetUserPublicationInvites(email)
                     .Select(invite => new UserPublicationRole
                     {
