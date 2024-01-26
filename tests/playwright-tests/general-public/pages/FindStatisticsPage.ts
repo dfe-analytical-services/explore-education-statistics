@@ -1,5 +1,4 @@
 import { Locator, Page } from '@playwright/test';
-import environment from '../../utils/env';
 
 export default class FindStatisticsPage {
   readonly page: Page;
