@@ -75,5 +75,5 @@ export const adminApiLoginRequest = {
 
 export const themesAndTopicsConfig = {
   themesEndpoint: 'https://localhost:5021/api/themes',
-  registerEndpoint: 'https://localhost:5021/api/register',
+  registerEndpoint: 'https://localhost:5021/api/sign-in',
 };

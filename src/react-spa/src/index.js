@@ -3,14 +3,21 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
-import { PublicClientApplication } from '@azure/msal-browser';
+import { EventType, PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 import { msalConfig } from './authConfig';
 
 // Bootstrap components
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { callRegister } from './register';
 
 const msalInstance = new PublicClientApplication(msalConfig);
+
+msalInstance.addEventCallback(async message => {
+  if (message.eventType === EventType.LOGIN_SUCCESS) {
+    await callRegister(message.payload.accessToken);
+  }
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

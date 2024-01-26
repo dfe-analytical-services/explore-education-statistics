@@ -5,12 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Identity;
 
+// TODO EES-4814 - move to appropriate folder.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models
 {
     public class UserInvite
     {
         public static int InviteExpiryDurationDays = 14;
-        
+
         [Key] public string Email { get; set; } = string.Empty;
 
         public bool Accepted { get; set; }
@@ -28,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.M
         /// <remarks>
         /// Note that this logic is also present in <see cref="UsersAndRolesDbContext.OnModelCreating"/>.
         /// It is implemented there as well as EF is not able to translate this computed field for use in
-        /// a QueryFilter. 
+        /// a QueryFilter.
         /// </remarks>
-        [NotMapped] public bool Expired => !Accepted && 
+        [NotMapped] public bool Expired => !Accepted &&
                                            Created < DateTime.UtcNow.AddDays(-InviteExpiryDurationDays);
     }
 }

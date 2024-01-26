@@ -131,5 +131,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext.RemoveRange(invites);
             await _contentDbContext.SaveChangesAsync();
         }
+
+        public Task<List<UserReleaseInvite>> ListByEmail(string email)
+        {
+            return _contentDbContext
+                .UserReleaseInvites
+                .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
+                .ToListAsync();
+        }
     }
 }

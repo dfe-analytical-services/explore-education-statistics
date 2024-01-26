@@ -34,6 +34,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
             return GetUser().GetUserId();
         }
 
+        public UserProfile GetProfile()
+        {
+            var user = GetUser();
+
+            // TODO EES-4814 - can we just rely on a single set of Claims now?
+            var email = user.FindFirstValue(ClaimTypes.Email) ?? user.FindFirstValue(ClaimTypes.Name);
+
+            // Try to infer the user's name from the explicit "Given Name" and "Surname" Claims
+            // if they are available.
+            // TODO EES-4814 - can we just rely on a single set of Claims now?
+            var givenName = user.FindFirstValue(ClaimTypes.GivenName);
+            var surname = user.FindFirstValue(ClaimTypes.Surname);
+
+            return new UserProfile(Email: email, FirstName: givenName, LastName: surname);
+        }
+
         private ClaimsPrincipal? GetUser()
         {
             return _httpContextAccessor.HttpContext?.User;
