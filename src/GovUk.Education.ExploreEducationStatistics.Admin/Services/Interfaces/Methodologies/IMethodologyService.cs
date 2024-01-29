@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -38,6 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(
             Guid methodologyVersionId,
             MethodologyUpdateRequest request);
+
+        Task<Either<ActionResult, Unit>> UpdateMethodologyPublished(
+            Guid methodologyVersionId,
+            MethodologyPublishedUpdateRequest request);
 
         Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
             MethodologyVersion methodologyVersion);

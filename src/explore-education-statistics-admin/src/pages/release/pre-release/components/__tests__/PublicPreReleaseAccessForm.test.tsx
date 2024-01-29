@@ -56,7 +56,7 @@ describe('PublicPreReleaseAccessForm', () => {
     );
 
     expect(screen.getByLabelText('Public access list')).toHaveTextContent(
-      'Beside Department for Education (DfE) professional and production staff the',
+      'Besides Department for Education (DfE) professional and production staff, the',
     );
   });
 

@@ -251,3 +251,10 @@ def _get_user_invite(user_email: str):
     invites = response.json()
     matching_invites = list(filter(lambda invite: invite["email"] == user_email, invites))
     return next(iter(matching_invites), None)
+
+
+def user_updates_methodology_published_date_via_api(methodology_id: str, published: datetime) -> None:
+    response = admin_client.patch(f"/api/methodology/{methodology_id}/published", {"published": published.isoformat()})
+    assert (
+        response.status_code < 300
+    ), f"Updating methodology published date failed with {response.status_code} and {response.text}"

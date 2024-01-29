@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
@@ -10,7 +10,8 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- Disable build warnings for undocumented methods -->
-        <NoWarn>1591</NoWarn>
+        <!-- Disable code analysis warnings for not using primary constructors -->
+        <NoWarn>1591, IDE0290</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +21,7 @@
         <PackageReference Include="DuckDB.NET.Data.Full" Version="0.9.2" />
         <PackageReference Include="FluentValidation" Version="11.8.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.8.1" />
+        <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.0.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -36,6 +38,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
     </ItemGroup>
 

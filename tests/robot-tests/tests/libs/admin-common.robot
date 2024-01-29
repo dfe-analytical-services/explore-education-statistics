@@ -229,7 +229,12 @@ user navigates to methodology
     ...    ${publication}
     ...    ${methodology_title}
     ...    ${action_button_text}=Edit
-    user navigates to methodologies on publication page    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    user navigates to methodologies on publication page
+    ...    ${publication}
+    ...    ${theme}
+    ...    ${topic}
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
 
@@ -240,10 +245,13 @@ user edits methodology summary for publication
     ...    ${publication}
     ...    ${existing_methodology_title}
     ...    ${new_methodology_title}
-    ...    ${action_button_text}=Edit
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
     user navigates to methodology    ${publication}
     ...    ${existing_methodology_title}
-    ...    ${action_button_text}
+    ...    Edit
+    ...    ${theme}
+    ...    ${topic}
 
     user clicks link    Edit summary
     user waits until h2 is visible    Edit methodology summary    %{WAIT_MEDIUM}
@@ -469,8 +477,13 @@ user enters text into data guidance data file content editor
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC}=%{TEST_TOPIC_NAME}
+
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME}    ${TOPIC}
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="Amend"]    ${ROW}
@@ -533,18 +546,22 @@ user navigates to admin dashboard
     ...    %{WAIT_SMALL}
 
 user uploads subject
-    [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}
+    [Arguments]
+    ...    ${SUBJECT_NAME}
+    ...    ${SUBJECT_FILE}
+    ...    ${META_FILE}
+    ...    ${FOLDER}=${FILES_DIR}
     user clicks link    Data and files
     user waits until page contains element    id:dataFileUploadForm-subjectTitle    %{WAIT_SMALL}
     user enters text into element    id:dataFileUploadForm-subjectTitle    ${SUBJECT_NAME}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}${SUBJECT_FILE}
-    user chooses file    id:dataFileUploadForm-metadataFile    ${FILES_DIR}${META_FILE}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FOLDER}${SUBJECT_FILE}
+    user chooses file    id:dataFileUploadForm-metadataFile    ${FOLDER}${META_FILE}
     user clicks button    Upload data files
-    user waits until h2 is visible    Uploaded data files    %{WAIT_SMALL}
+    user waits until h2 is visible    Uploaded data files    %{WAIT_LONG}
     user waits until page contains accordion section    ${SUBJECT_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${SUBJECT_NAME}
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
-    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
+    user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_DATA_FILE_IMPORT}
 
 user puts release into draft
     [Arguments]
@@ -808,10 +825,6 @@ user gets resolved comment
     ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
     [Return]    ${result}
 
-user closes Set Page View box
-    user clicks element    id:pageViewToggleButton
-    user waits until element is not visible    id:editingMode    %{WAIT_SMALL}
-
 # This keyword will work for any URL containing the pattern release/<guid>, and will return the guid segment of the URL.
 # For example, in the URL https://localhost/publication/<publication id>/release/<release id>/status, this
 # keyword would return the <release id> segment of the URL.
@@ -822,6 +835,17 @@ get release id from url
     ...    release\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
     ${release_id}=    Get From List    ${release_id_match}    0
     [Return]    ${release_id}
+
+# This keyword will work for any URL containing the pattern methodology/<guid>, and will return the guid segment of the URL.
+# For example, in the URL https://localhost/methodology/<methodology id>/summary, this
+# keyword would return the <methodology id> segment of the URL.
+
+get methodology id from url
+    ${current_url}=    Get Location
+    @{methodology_id_match}=    Get Regexp Matches    ${current_url}
+    ...    methodology\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
+    ${methodology_id}=    Get From List    ${methodology_id_match}    0
+    [Return]    ${methodology_id}
 
 user clicks the nth key stats tile button
     [Arguments]
@@ -864,9 +888,85 @@ user updates free text key stat
     user clicks button    Save
     user waits until page does not contain button    Save
 
+user adds key statistic from data block
+    [Arguments]
+    ...    ${data_block_name}
+    ...    ${trend}
+    ...    ${guidance_title}
+    ...    ${guidance_text}
+    ...    ${expected_select_options}=${EMPTY}
+    ...    ${expected_data_block_title}=${EMPTY}
+    ...    ${expected_data_block_stat}=${EMPTY}
+    user clicks button    Add key statistic from data block
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains option    name:selectedDataBlock    Select a data block
+
+    IF    "${expected_select_options}" != "${EMPTY}"
+        ${expected_items_count}=    Get length    ${expected_select_options}
+        ${expected_items_count}=    Set Variable    ${${expected_items_count}+1}
+        user checks select contains x options    name:selectedDataBlock    ${expected_items_count}
+        FOR    ${expected_select_option}    IN    @{expected_select_options}
+            user checks select contains option    name:selectedDataBlock    ${expected_select_option}
+        END
+    END
+
+    user chooses and embeds data block    ${data_block_name}
+    user waits until page contains button    Add key statistic from data block
+
+    IF    "${expected_data_block_title}" != "${EMPTY}"
+        user waits until page contains    ${expected_data_block_title}    %{WAIT_MEDIUM}
+    END
+
+    IF    "${expected_data_block_stat}" != "${EMPTY}"
+        user checks page contains    ${expected_data_block_stat}
+    END
+
+    user clicks element    xpath://*[@data-testid="keyStat"][last()]//button[contains(text(), "Edit")]
+    user enters text into element    xpath://input[@name="trend"]    ${trend}
+    user enters text into element    xpath://input[@name="guidanceTitle"]    ${guidance_title}
+
+    user clears element text    xpath://*[@data-testid="keyStat"][last()]//*[contains(@class, "ck-content")]
+    user presses keys    ${guidance_text}
+
+    user clicks button    Save
+    user waits until page does not contain button    Save
+
 user removes key stat
     [Arguments]    ${tile_num}
     user clicks the nth key stats tile button    ${tile_num}    Remove
 
 user closes admin feedback banner if needed
     user clicks element if exists    //*[@data-testid="admin-survey-banner"]//button[text()="Close"]
+
+user adds data guidance for subject
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${guidance_text}
+
+    user waits until page contains accordion section    ${subject_name}
+    user enters text into data guidance data file content editor    ${subject_name}
+    ...    ${guidance_text}
+
+user clicks edit data block link
+    [Arguments]
+    ...    ${data_block_name}
+    user clicks element    testid:Edit data block ${data_block_name}
+    user waits until page finishes loading
+    user waits until h2 is visible    ${data_block_name}
+    user waits until h2 is visible    Data block details
+
+user creates legacy release
+    [Arguments]
+    ...    ${description}
+    ...    ${url}
+    user clicks button    Create legacy release
+
+    ${modal}=    user waits until modal is visible    Create legacy release
+    user clicks button    OK    ${modal}
+
+    user waits until page contains element    id:legacyReleaseForm-description
+    user enters text into element    id:legacyReleaseForm-description    ${description}
+    user enters text into element    id:legacyReleaseForm-url    ${url}
+    user clicks button    Save legacy release
+    user waits until page finishes loading
+    user waits until page contains button    Create legacy release

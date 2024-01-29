@@ -54,22 +54,20 @@ Navigate to content section as analyst1
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Add first content section
-    user closes Set Page View box
-    user scrolls down    400
     user scrolls to element    xpath://button[text()="Add new section"]
     user waits until button is enabled    Add new section
     user clicks button    Add new section
-    user changes accordion section title    1    ${SECTION_1_TITLE}    id:releaseMainContent
+    user changes accordion section title    1    ${SECTION_1_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add first text block
-    user adds text block to editable accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
+    user adds text block to editable accordion section    ${SECTION_1_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    ${SECTION_1_TITLE}    1
-    ...    ${BLOCK_1_CONTENT}    id:releaseMainContent
+    ...    ${BLOCK_1_CONTENT}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add second text block
-    user adds text block to editable accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
+    user adds text block to editable accordion section    ${SECTION_1_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    ${SECTION_1_TITLE}    2
-    ...    ${BLOCK_2_CONTENT}    id:releaseMainContent    save=False
+    ...    ${BLOCK_2_CONTENT}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}    save=False
 
 Switch to bau1 to view release
     user switches to bau1 browser
@@ -78,27 +76,24 @@ Switch to bau1 to view release
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
-    user closes Set Page View box
 
 Check second text block is locked as bau1
-    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks element contains    ${block}
     ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element contains    ${block}    Analyst1 User1 is editing
 
 Switch to analyst1 to save second text block
     user switches to analyst1 browser
-    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user saves autosaving text block    ${block}
 
 Switch to bau1 to add review comments for first text block
     user switches to bau1 browser
-    user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
+    user opens accordion section    ${SECTION_1_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${block}=    user starts editing accordion section text block    First content section    1
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    # ensure 'Set page view' box doesn't intercept button click
-    user scrolls down    150
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 1
 
@@ -120,12 +115,10 @@ Switch to bau1 to add review comments for first text block
     user saves autosaving text block    ${block}
 
 Add review comment for second text block as bau1
-    user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
+    user opens accordion section    ${SECTION_1_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${block}=    user starts editing accordion section text block    First content section    2
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    # ensure 'Set page view' box doesn't intercept button click
-    user scrolls down    100
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 3
 
@@ -134,7 +127,7 @@ Add review comment for second text block as bau1
 
 Switch to analyst1 to check second text block is locked
     user switches to analyst1 browser
-    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user waits until element contains    ${block}
     ...    Bau1 User1 (ees-test.bau1@education.gov.uk) is currently editing this block
@@ -142,13 +135,13 @@ Switch to analyst1 to check second text block is locked
 
 Switch to bau1 to save second text block
     user switches to bau1 browser
-    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user saves autosaving text block    ${block}
 
 Switch to analyst1 to start resolving comments
     user switches to analyst1 browser
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user checks element does not contain    ${block}
     ...    Bau1 User1 (ees-test.bau1@education.gov.uk) is currently editing this block
@@ -161,12 +154,9 @@ Switch to analyst1 to start resolving comments
     ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element does not contain    ${block}    Analyst1 User1 is editing
 
-    # avoid set page view box getting in the way
-    user scrolls down    600
-
 Switch to bau1 to check first text block is locked
     user switches to bau1 browser
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user waits until element contains    ${block}
     ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
@@ -174,7 +164,7 @@ Switch to bau1 to check first text block is locked
 
 Switch to analyst1 to resolve comment for first text block
     user switches to analyst1 browser
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user checks list has x items    testid:comments-unresolved    2    ${block}
     user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
@@ -183,10 +173,6 @@ Switch to analyst1 to resolve comment for first text block
     ${comment}=    user gets unresolved comment    Test comment 1    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
     user waits until element contains    ${author}    Bau1 User1
-
-    # avoid clicking the 'set page view' span
-    user scrolls to element    ${comment}
-    user scrolls down    200
 
     # resolve the comment left by bau1
     user clicks button    Resolve    ${comment}
@@ -210,7 +196,7 @@ Switch to analyst1 to resolve comment for first text block
 
 Switch to bau1 to check first text block is unlocked
     user switches to bau1 browser
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user checks element does not contain    ${block}
     ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
@@ -218,11 +204,9 @@ Switch to bau1 to check first text block is unlocked
 
 Switch back to analyst1 to resolve second text block
     user switches to analyst1 browser
-    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user clicks button    View comments    ${block}
-    # avoid set page view box getting in the way
-    user scrolls down    600
 
     user checks list has x items    testid:comments-unresolved    1    ${block}
     user checks list item contains    testid:comments-unresolved    1    Test comment 3    ${block}
@@ -252,7 +236,7 @@ Switch back to analyst1 to resolve second text block
 
 Switch back to bau1 to update unresolved comment
     user switches to bau1 browser
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user clicks button    View comments    ${block}
     ${comment}=    user gets unresolved comment    Test comment 2    ${block}
@@ -264,7 +248,7 @@ Switch back to bau1 to update unresolved comment
     user clicks button    Update    ${comment}
 
 Delete unresolved comment as bau1
-    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+    ${block}=    get accordion section block    First content section    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${comment}=    user gets unresolved comment    Test updated comment 2    ${block}
     user clicks button    Delete    ${comment}
     user waits until parent does not contain element    ${block}    testid:comments-unresolved
@@ -276,19 +260,16 @@ Add second content section as analyst1
     user scrolls to element    xpath://button[text()="Add new section"]
     user waits until button is enabled    Add new section
     user clicks button    Add new section
-    user changes accordion section title    2    ${SECTION_2_TITLE}    id:releaseMainContent
+    user changes accordion section title    2    ${SECTION_2_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add data block
     user adds data block to editable accordion section    ${SECTION_2_TITLE}    ${DATABLOCK_NAME}
-    ...    id:releaseMainContent
-    ${block}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until page contains element    ${block}    %{WAIT_SMALL}
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add review comment for data block as bau1
     user switches to bau1 browser
     user reloads page
-    user closes Set Page View box
-    user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
+    user opens accordion section    ${SECTION_2_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user scrolls down    400
     ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
     user adds comment to data block    ${block}    Test data block comment
@@ -299,8 +280,7 @@ Add review comment for data block as bau1
 Resolve comment for data block as analyst1
     user switches to analyst1 browser
     user reloads page
-    user closes Set Page View box
-    user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
+    user opens accordion section    ${SECTION_2_TITLE}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user scrolls down    400
     ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
     ${comment}=    user gets unresolved comment    Test data block comment    ${block}

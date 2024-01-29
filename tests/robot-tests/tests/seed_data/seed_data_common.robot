@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../common.robot
-Resource    ../admin-common.robot
-Library     ../admin_api.py
+Resource    ../libs/common.robot
+Resource    ../libs/admin-common.robot
+Library     ../libs/admin_api.py
 
 
 *** Variables ***
@@ -96,13 +96,13 @@ user creates a fully populated draft release
     user clicks link    Data guidance
     user waits until page finishes loading
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user adds data guidance for subject
+    ...    ${SUBJECT_NAME}
     ...    data guidance content
     user clicks button    Save guidance
+    user waits until page finishes loading
 
     # add footnote
-    user waits until page finishes loading
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user waits until page contains link    Create footnote
@@ -113,6 +113,16 @@ user creates a fully populated draft release
     user enters text into element    id:footnoteForm-content    test footnote
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
+
+    # add a key stat
+    user clicks link    Content
+    user waits until page finishes loading
+    user adds free text key stat
+    ...    Free text key stat title
+    ...    98%
+    ...    Some trend text
+    ...    A guidance title
+    ...    Some guidance text
 
     # add public prerelease access list
     user clicks link    Pre-release access

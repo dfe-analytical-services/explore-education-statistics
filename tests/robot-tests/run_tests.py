@@ -13,6 +13,7 @@ import random
 import shutil
 import string
 from pathlib import Path
+from zipfile import ZipFile
 
 import admin_api as admin_api
 import args_and_variables as args_and_variables
@@ -22,12 +23,14 @@ from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
-from tests.libs.fail_fast import failing_suites_filename
+from tests.libs.fail_fast import failing_suites_filename, get_failing_test_suites
 from tests.libs.logger import get_logger
 from tests.libs.slack import SlackService
 
 pabot_suite_names_filename = ".pabotsuitenames"
 results_foldername = "test-results"
+seed_data_files_filepath = "tests/files/seed-data-files.zip"
+unzipped_seed_data_folderpath = "tests/files/.unzipped-seed-data-files"
 
 logger = get_logger(__name__)
 
@@ -44,6 +47,14 @@ def setup_python_path():
         os.environ["PYTHONPATH"] = str(current_dir)
 
 
+def unzip_data_files():
+    if not os.path.exists(seed_data_files_filepath):
+        logger.warn(f"Unable to find seed data files bundle at {seed_data_files_filepath}")
+    else:
+        with ZipFile(seed_data_files_filepath, "r") as zipfile:
+            zipfile.extractall(unzipped_seed_data_folderpath)
+
+
 def install_chromedriver(chromedriver_version: str):
     # Install chromedriver and add it to PATH
     get_webdriver(chromedriver_version)
@@ -57,8 +68,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         "Failing",
         "--exclude",
         "UnderConstruction",
-        "--exclude",
-        "BootstrapData",
         "--exclude",
         "VisualTesting",
         "--xunit",
@@ -75,16 +84,18 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
+    if arguments.reseed:
+        robot_args += ["--include", "SeedDataGeneration"]
+    else:
+        robot_args += ["--exclude", "SeedDataGeneration"]
     if arguments.env == "local":
-        robot_args += ["--include", "Local"]
-        robot_args += ["--exclude", "NotAgainstLocal"]
+        robot_args += ["--include", "Local", "--exclude", "NotAgainstLocal"]
         # seed Azure storage emulator release files
         generator = ReleaseFilesGenerator()
         generator.create_public_release_files()
         generator.create_private_release_files()
     if arguments.env == "dev":
-        robot_args += ["--include", "Dev"]
-        robot_args += ["--exclude", "NotAgainstDev"]
+        robot_args += ["--include", "Dev", "--exclude", "NotAgainstDev"]
     if arguments.env == "test":
         robot_args += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
     # fmt off
@@ -116,12 +127,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
     robot_args += [arguments.tests]
 
     return robot_args
-
-
-def get_failing_suites() -> []:
-    if Path(failing_suites_filename).exists():
-        return open(failing_suites_filename, "r").readlines()
-    return []
 
 
 def create_run_identifier():
@@ -172,25 +177,10 @@ def execute_tests(arguments: argparse.Namespace, rerunning_failures: bool):
 
 
 def run():
+    # Unzip any data files that may be used in tests.
+    unzip_data_files()
+
     args = args_and_variables.initialise()
-
-    # If running all tests, or admin, admin_and_public or admin_and_public_2 suites, these
-    # change data on environments and require test themes, test topics and user authentication.
-    #
-    # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
-    # we can expect to get either scenario depending upon how we're running these tests e.g.
-    # Git Bash versus Command Prompt versus IDEs.  {os.sep} in Windows always evaluates to
-    # `\\` whereas any of these run options above may choose to either supply forward slashes or
-    # back slashes.
-    data_changing_tests = (
-        args.tests == "tests/"
-        or "/admin" in args.tests
-        or args.tests == f"tests{os.sep}"
-        or f"{os.sep}admin" in args.tests
-    )
-
-    if data_changing_tests and args.env not in ["local", "dev"]:
-        raise Exception(f"Cannot run tests that change data on environment {args.env}")
 
     install_chromedriver(args.chromedriver_version)
 
@@ -222,7 +212,7 @@ def run():
                 os.environ["RUN_IDENTIFIER"] = run_identifier
 
                 # Create a Test Topic under which all of this test run's data will be created.
-                if data_changing_tests:
+                if args_and_variables.includes_data_changing_tests(args):
                     admin_api.create_test_topic(run_identifier)
 
                 # Run the tests.
@@ -237,12 +227,12 @@ def run():
 
             finally:
                 # Tear down any data created by this test run unless we've disabled teardown.
-                if data_changing_tests and not args.disable_teardown:
+                if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
                     logger.info("Tearing down test data...")
                     admin_api.delete_test_topic()
 
             # If all tests passed, return early.
-            if not get_failing_suites():
+            if not get_failing_test_suites():
                 break
 
         logger.info(f"Log available at: file://{os.getcwd()}{os.sep}{results_foldername}{os.sep}log.html")
@@ -250,11 +240,12 @@ def run():
 
         logger.info(f"Number of test runs: {test_run_index + 1}")
 
-        failing_suites = get_failing_suites()
+        failing_suites = get_failing_test_suites()
 
         if failing_suites:
+            logger.info(f"Number of failing suites: {len(failing_suites)}")
             logger.info(f"Failing suites:")
-            [logger.info(r"  * file://" + suite) for suite in failing_suites]
+            [logger.info(r"  * file://" + suite.strip()) for suite in failing_suites]
         else:
             logger.info("\nAll tests passed!")
 

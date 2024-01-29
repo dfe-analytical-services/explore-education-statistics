@@ -18,7 +18,7 @@ ${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
 
 *** Test Cases ***
 Create test publication and release via API
-    ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    AY    2025
 
 Upload a subject
@@ -57,15 +57,12 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
 Add summary content to release
-    user closes Set Page View box
     user adds summary text block
     user adds content to summary text block    Test intro text for ${PUBLICATION_NAME}
 
 Add release note to release
-    user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note one
-    user clicks button    Save note
-    ${date}    get current datetime    %-d %B %Y
+    user adds a release note    Test release note one
+    ${date}=    get current datetime    %-d %B %Y
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
@@ -77,15 +74,11 @@ Add Useful information related page link to release
     user checks page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
 
 Add secondary statistics
-    user clicks button    Add secondary stats
-    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
-    user checks select contains x options    name:selectedDataBlock    5
-    user checks select contains option    name:selectedDataBlock    Select a data block
-    user checks select contains option    name:selectedDataBlock    Data Block 1
-    user checks select contains option    name:selectedDataBlock    Data Block 2
-    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
-    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
-    user chooses and embeds data block    Data Block 1
+    ${expected_select_options}=    create list    Data Block 1    Data Block 2    Key Stats Data Block 1
+    ...    Key Stats Data Block 2
+    user adds secondary stats data block
+    ...    Data Block 1
+    ...    ${expected_select_options}
 
 Check secondary statistics are included correctly
     user waits until element is visible    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
@@ -123,25 +116,15 @@ Remove secondary statistics
     user checks page contains button    Add secondary stats
 
 Add a key statistics data block tile
-    user clicks button    Add key statistic from data block
-    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
-    user checks select contains x options    name:selectedDataBlock    3
-    user checks select contains option    name:selectedDataBlock    Select a data block
-    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
-    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
-    user chooses and embeds data block    Key Stats Data Block 1
-    user waits until page contains    Proportion of settings open    %{WAIT_MEDIUM}
-    user checks page contains    1%
-
-Edit the guidance information for the key statistics tile
-    user clicks the nth key stats tile button    1    Edit
-    user enters text into element    css:input[name="trend"]    Down from last year
-    user enters text into element    label:Guidance title    Learn more about open settings
-    # Tab into the CK Editor guidance text editor
-    user presses keys    TAB
-    user presses keys    Some information about about open settings
-    user clicks the nth key stats tile button    1    Save
-    user waits until page does not contain element    css:input[name="trend"]    %{WAIT_MEDIUM}
+    ${expected_select_options}=    create list    Key Stats Data Block 1    Key Stats Data Block 2
+    user adds key statistic from data block
+    ...    Key Stats Data Block 1
+    ...    Down from last year
+    ...    Learn more about open settings
+    ...    Some information about about open settings
+    ...    ${expected_select_options}
+    ...    Proportion of settings open
+    ...    1%
 
 Check the guidance information for the key statistics tile
     user waits until page contains    Down from last year    %{WAIT_MEDIUM}
@@ -151,14 +134,15 @@ Check the guidance information for the key statistics tile
     user checks page contains    Some information about about open settings
 
 Add another key statistics data block tile
-    user clicks button    Add key statistic from data block
-    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
-    user checks select contains x options    name:selectedDataBlock    2
-    user checks select contains option    name:selectedDataBlock    Select a data block
-    user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
-    user chooses and embeds data block    Key Stats Data Block 2
-    user checks page contains    Number of open settings
-    user checks page contains    22,900
+    ${expected_select_options}=    create list    Key Stats Data Block 2
+    user adds key statistic from data block
+    ...    Key Stats Data Block 2
+    ...    ${EMPTY}
+    ...    ${EMPTY}
+    ...    ${EMPTY}
+    ...    ${expected_select_options}
+    ...    Number of open settings
+    ...    22,900
 
 Remove newly added key statistics data block tile
     user clicks the nth key stats tile button    2    Remove
@@ -205,35 +189,28 @@ Add accordion sections to release
     user creates new content section    3    Test section three
 
 Add content blocks to Test section one
-    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    1    block one test text
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    2    block two test text
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    3    block three test text
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user checks accordion section contains X blocks    Test section one    3    id:releaseMainContent
+    user checks accordion section contains X blocks    Test section one    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Delete second content block
-    user deletes editable accordion section content block    Test section one    2    id:releaseMainContent
+    user deletes editable accordion section content block    Test section one    2
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until page does not contain    block two test text
-    user checks accordion section contains X blocks    Test section one    2    id:releaseMainContent
+    user checks accordion section contains X blocks    Test section one    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Validate two remaining content blocks
     user checks accordion section text block contains    Test section one    1    block one test text
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks accordion section text block contains    Test section one    2    block three test text
-    ...    id:releaseMainContent
-
-
-*** Keywords ***
-user clicks the nth key stats tile button
-    [Arguments]
-    ...    ${tile_number}
-    ...    ${button_text}
-    user clicks button containing text    ${button_text}    xpath://*[@data-testid="keyStat"][${tile_number}]
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}

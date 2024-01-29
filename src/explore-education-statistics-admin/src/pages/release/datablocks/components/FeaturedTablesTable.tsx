@@ -179,7 +179,12 @@ function FeaturedTablesRow({
       <td className="govuk-table__cell--actions govuk-!-width-one-quarter">
         {!isReordering ? (
           <>
-            <Link className="govuk-!-margin-bottom-0" unvisited to={link}>
+            <Link
+              className="govuk-!-margin-bottom-0"
+              unvisited
+              to={link}
+              data-testid={`Edit data block ${dataBlock.name}`}
+            >
               {canUpdateRelease ? 'Edit block' : 'View block'}
             </Link>
             {canUpdateRelease && (

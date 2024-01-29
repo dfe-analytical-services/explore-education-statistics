@@ -149,7 +149,6 @@ Remove a Content Section from the Amendment
     user deletes editable accordion section    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Remove an image from a Content Block
-    user closes Set Page View box
     user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user removes image from accordion section text block    Methodology annex section 2    2
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
@@ -163,6 +162,7 @@ Remove a Content Block from a Content Section
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Add a new Content Block to an existing Content Section and include a new image
+    user scrolls up    400
     user opens accordion section    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}

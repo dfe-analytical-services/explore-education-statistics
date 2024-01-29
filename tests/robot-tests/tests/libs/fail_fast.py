@@ -21,11 +21,8 @@ def _get_current_test_suite() -> str:
 
 def current_test_suite_failing_fast() -> bool:
     test_suite = _get_current_test_suite()
-    if os.path.isfile(failing_suites_filename):
-        file = open(failing_suites_filename, "r")
-        failing_suites = file.readlines()
-        return test_suite in failing_suites
-    return False
+    failing_suites = get_failing_test_suites()
+    return f"{test_suite}{os.linesep}" in failing_suites
 
 
 def record_failing_test_suite():
@@ -33,13 +30,32 @@ def record_failing_test_suite():
     logger.warn(
         f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite"
     )
-    file = open(failing_suites_filename, "w")
-    file.writelines([test_suite])
+    file_write = open(failing_suites_filename, "a")
+    file_write.write(f"{test_suite}{os.linesep}")
+    file_write.close()
 
 
 def fail_test_fast_if_required():
     if current_test_suite_failing_fast():
         _raise_assertion_error(f"Test suite {_get_current_test_suite()} is already failing.  Failing this test fast.")
+
+
+def get_failing_test_suites() -> []:
+    if os.path.isfile(failing_suites_filename):
+        # We wouldn't expect the same test suite to be recorded in this file more than once, as we only trigger the
+        # "record failing test suite" upon the first failing test in an individual suite.
+        #
+        # Strangely though, this does get called multiple times if using Pabot and re-running failed suites. It seems as
+        # though the failure keywords are being merged with the initial run's failure keyword definitions and therefore
+        # causing the failing test suite to be recorded multiple times when its first failing test is hit.
+        #
+        # We therefore explicitly remove any duplicates from the list here.
+
+        file = open(failing_suites_filename, "r")
+        failing_suites = file.readlines()
+        file.close()
+        return list(dict.fromkeys(failing_suites))
+    return []
 
 
 def _raise_assertion_error(err_msg):

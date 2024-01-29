@@ -1,6 +1,8 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Force Tags          GeneralPublic    Prod
+Resource            ../seed_data/seed_data_theme_1_constants.robot
+
+Force Tags          GeneralPublic    Local    Dev    PreProd
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -9,40 +11,30 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to /methodology page
-    [Tags]    Local    Dev    PreProd
     user navigates to public methodologies page
     user waits until page contains
     ...    Browse to find out about the methodology behind specific education statistics and data and how and why they're collected and published.
-    ...    10
-
-Validate page contents
-    [Tags]    Local    NotAgainstProd
-    user waits until page contains accordion section    Pupils and schools
-    user opens accordion section    Pupils and schools
-
-    user checks page contains link with text and url
-    ...    Pupil exclusion statistics: methodology
-    ...    /methodology/permanent-and-fixed-period-exclusions-in-england
-
-    user checks page contains link with text and url
-    ...    Pupil absence statistics: methodology
-    ...    /methodology/pupil-absence-in-schools-in-england
 
 Validate accordion sections exist
-    user checks url contains    methodology
-    user waits until page contains accordion section    Children's social care
-    user waits until page contains accordion section    COVID-19
-    user waits until page contains accordion section    Destination of pupils and students
-    user waits until page contains accordion section    Early years
-    user waits until page contains accordion section    Finance and funding
-    user waits until page contains accordion section    Further education
-    user waits until page contains accordion section    Higher education
-    user waits until page contains accordion section    Pupils and schools
-    user waits until page contains accordion section    School and college outcomes and performance
-    user waits until page contains accordion section    Teachers and school workforce
-    user waits until page contains accordion section    UK education and training statistics
+    user checks url equals    %{PUBLIC_URL}/methodology
+    user waits until page contains accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+
+Validate page contents
+    user opens accordion section    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+
+    user checks page contains link with text and url
+    ...    ${EXCLUSIONS_METHODOLOGY_TITLE}
+    ...    ${EXCLUSIONS_METHODOLOGY_RELATIVE_URL}
+
+    user checks page contains link with text and url
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_RELATIVE_URL}
 
 Validate Related information section links exist
-    [Tags]    Local    Dev    PreProd
-    user checks page contains element    xpath://a[text()="Find statistics and data"]
-    user checks page contains element    xpath://a[text()="Education statistics: glossary"]
+    user checks page contains link with text and url
+    ...    Find statistics and data
+    ...    /find-statistics
+
+    user checks page contains link with text and url
+    ...    Education statistics: glossary
+    ...    /glossary

@@ -1,73 +1,85 @@
 import { EditingMode, useEditingContext } from '@admin/contexts/EditingContext';
+import styles from '@admin/components/editable/EditablePageModeToggle.module.scss';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
+import { useMobileMedia } from '@common/hooks/useMedia';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import classNames from 'classnames';
-import styles from './EditablePageModeToggle.module.scss';
 
 interface Props {
   canUpdateRelease?: boolean;
   previewLabel?: string;
   showTablePreviewOption?: boolean;
 }
-const EditablePageModeToggle = ({
+
+export default function EditablePageModeToggle({
   canUpdateRelease = true,
   previewLabel = 'Preview content',
   showTablePreviewOption = false,
-}: Props) => {
+}: Props) {
   const { editingMode, setEditingMode } = useEditingContext();
   const [isOpen, toggleOpen] = useToggle(true);
+  const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const previewOption = {
-    label: previewLabel,
-    value: 'preview',
-  };
+  const options = [
+    ...(canUpdateRelease
+      ? [
+          {
+            label: 'Edit content',
+            value: 'edit',
+          },
+        ]
+      : []),
+    {
+      label: previewLabel,
+      value: 'preview',
+    },
 
-  const options = [previewOption];
-
-  if (canUpdateRelease) {
-    options.push({
-      label: 'Edit content',
-      value: 'edit',
-    });
-  }
-
-  if (showTablePreviewOption) {
-    options.push({
-      label: 'Preview table tool',
-      value: 'table-preview',
-    });
-  }
+    ...(showTablePreviewOption
+      ? [
+          {
+            label: 'Preview table tool',
+            value: 'table-preview',
+          },
+        ]
+      : []),
+  ];
 
   return (
-    <div
-      className={classNames(styles.toggle, {
-        [styles.open]: isOpen,
-      })}
-    >
-      <button
-        type="button"
-        id="pageViewToggleButton"
-        onClick={toggleOpen}
-        className={styles.button}
-        aria-expanded={isOpen}
+    <div className={styles.container}>
+      {isMobileMedia && (
+        <button
+          type="button"
+          id="pageViewToggleButton"
+          onClick={toggleOpen}
+          className={styles.button}
+          aria-expanded={isOpen}
+        >
+          Change page view
+          <span
+            className={classNames('govuk-accordion-nav__chevron', {
+              'govuk-accordion-nav__chevron--down': isOpen,
+            })}
+            aria-hidden
+          />
+        </button>
+      )}
+
+      <div
+        aria-labelledby={isMobileMedia ? 'pageViewToggleButton' : undefined}
+        className={classNames({
+          'dfe-js-hidden': isMobileMedia && !isOpen,
+        })}
       >
-        Set page view
-        <span
-          className={classNames('govuk-accordion-nav__chevron', {
-            'govuk-accordion-nav__chevron--down': isOpen,
-          })}
-          aria-hidden
-        />
-      </button>
-      <div aria-labelledby="pageViewToggleButton" className={styles.content}>
         <FormRadioGroup
           id="editingMode"
+          inline
           name="editingMode"
           className={styles.fieldset}
           value={editingMode}
-          legend="Set page view"
-          legendHidden
+          legend="Change page view"
+          legendHidden={isMobileMedia}
+          legendSize="s"
           small
           options={options}
           onChange={event => {
@@ -77,6 +89,4 @@ const EditablePageModeToggle = ({
       </div>
     </div>
   );
-};
-
-export default EditablePageModeToggle;
+}

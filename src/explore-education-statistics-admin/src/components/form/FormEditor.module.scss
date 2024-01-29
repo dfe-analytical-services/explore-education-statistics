@@ -26,6 +26,15 @@ $active-colour: lighten(govuk-colour('orange'), 10);
     text-align: left;
     width: 100%;
   }
+
+  // Adjust the sticky toolbar so it isn't obscured by the page mode bar.
+  // stylelint-disable-next-line selector-class-pattern
+  :global(.ck-sticky-panel .ck-sticky-panel__content_sticky) {
+    padding-top: 48px;
+    @include govuk-media-query($from: tablet) {
+      padding-top: 54px;
+    }
+  }
 }
 
 .focused {
