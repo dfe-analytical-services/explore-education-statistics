@@ -529,7 +529,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.ReleaseFiles.Add(releaseFile);
-
                 await context.SaveChangesAsync();
             }
 
@@ -548,22 +547,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataArchiveEntriesForUpload_ReplacingDataFileWithFileOfSameName()
         {
-            var releaseId = Guid.NewGuid();
+            Release release = _fixture.DefaultRelease();
+
+            // The file being replaced here has the same name as the one being uploaded, but that's ok.
+            var fileBeingReplaced = _fixture.DefaultFile()
+                .WithFilename("test.csv");
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(release)
+                .WithFile(fileBeingReplaced);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.ReleaseFiles.Add(new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        Type = FileType.Data,
-                        Filename = "test.csv"
-                    }
-                });
-
+                context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -574,14 +572,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // The replacement file here has the same name as the one it is replacing, so this should be ok.
                 var archiveFile = CreateDataArchiveFileMock("test.csv", "test.meta.csv").Object;
 
-                // The file being replaced here has the same name as the one being uploaded, but that's ok.
-                var fileBeingReplaced = new File
-                {
-                    Filename = "test.csv"
-                };
-
                 var result =
-                    await service.ValidateDataArchiveEntriesForUpload(releaseId, archiveFile, fileBeingReplaced);
+                    await service.ValidateDataArchiveEntriesForUpload(release.Id, archiveFile, fileBeingReplaced);
 
                 result.AssertRight();
             }
