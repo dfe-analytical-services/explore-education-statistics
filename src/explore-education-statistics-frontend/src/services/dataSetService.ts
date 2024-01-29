@@ -1,14 +1,13 @@
 import { PaginatedList } from '@common/services/types/pagination';
 import { contentApi } from '@common/services/api';
-import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 
 export interface DataSetSummary {
+  content: string;
   fileId: string;
   filename: string;
   fileSize: string;
   fileExtension: string;
   title: string;
-  summary: string;
   theme: {
     id: string;
     title: string;

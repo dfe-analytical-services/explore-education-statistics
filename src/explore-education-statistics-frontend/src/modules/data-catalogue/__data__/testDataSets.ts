@@ -20,7 +20,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
       id: 'release-1',
       title: 'Release 1',
     },
-    summary: 'Data set summary 1',
+    content: 'Data set summary 1',
     theme: {
       id: 'theme-1',
       title: 'Theme 1',
@@ -49,7 +49,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
       id: 'release-1',
       title: 'Release 1',
     },
-    summary: 'Data set summary 1',
+    content: 'Data set summary 1',
     theme: {
       id: 'theme-2',
       title: 'Theme 2',
@@ -78,7 +78,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
       id: 'release-1',
       title: 'Release 1',
     },
-    summary: 'Data set summary 1',
+    content: 'Data set summary 1',
     theme: {
       id: 'theme-2',
       title: 'Theme 2',

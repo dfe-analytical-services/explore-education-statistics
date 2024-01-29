@@ -105,10 +105,10 @@ describe('DataSetSummary', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the `read more` button when the summary is long', () => {
+  test('renders the `read more` button when the content is long', () => {
     render(
       <DataSetSummary
-        dataSet={{ ...testDataSetSummaries[0], summary: longSummary }}
+        dataSet={{ ...testDataSetSummaries[0], content: longSummary }}
         expanded
       />,
     );
@@ -118,7 +118,7 @@ describe('DataSetSummary', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not render the `read more` button when the summary is short', () => {
+  test('does not render the `read more` button when the content is short', () => {
     render(<DataSetSummary dataSet={testDataSetSummaries[0]} expanded />);
 
     expect(

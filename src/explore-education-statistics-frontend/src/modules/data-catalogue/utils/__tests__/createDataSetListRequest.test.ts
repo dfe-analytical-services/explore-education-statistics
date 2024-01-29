@@ -21,7 +21,7 @@ describe('createDataSetListRequest', () => {
       orderBy: 'relevance',
       page: 4,
       publicationId: 'publication-id',
-      // releaseId: 'release-id',  TO DO - commented out as the api errors with release id currently
+      releaseId: 'release-id',
       searchTerm: 'find me',
       sort: 'desc',
       themeId: 'theme-id',

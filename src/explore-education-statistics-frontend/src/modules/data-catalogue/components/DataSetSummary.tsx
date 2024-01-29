@@ -34,6 +34,7 @@ export default function DataSetSummary({
   showLatestDataTag = true,
 }: Props) {
   const {
+    content,
     fileId,
     filters = [],
     geographicLevels = [],
@@ -42,7 +43,6 @@ export default function DataSetSummary({
     publication,
     published,
     release,
-    summary,
     theme,
     timePeriods = {},
     title,
@@ -50,7 +50,7 @@ export default function DataSetSummary({
   const [showMoreContent, toggleMoreContent] = useToggle(false);
   const [showDetails, toggleDetails] = useToggle(false);
   const id = `data-set-${fileId}`;
-  const truncateContent = summary.length > maxContentLength;
+  const truncateContent = content.length > maxContentLength;
 
   useEffect(() => {
     toggleDetails(expanded);
@@ -85,7 +85,7 @@ export default function DataSetSummary({
           [styles.content]: truncateContent,
           [styles.expanded]: showMoreContent,
         })}
-        html={summary}
+        html={content}
       />
 
       {truncateContent && (
@@ -119,7 +119,7 @@ export default function DataSetSummary({
           {publication.title}
         </SummaryListItem>
         <SummaryListItem term="Release">{release.title}</SummaryListItem>
-        {geographicLevels.length > 0 && (
+        {geographicLevels && geographicLevels.length > 0 && (
           <SummaryListItem
             className={classNames({
               'dfe-js-hidden': !showDetails,
@@ -129,7 +129,7 @@ export default function DataSetSummary({
             {orderBy(geographicLevels).join(', ')}
           </SummaryListItem>
         )}
-        {indicators.length > 0 && (
+        {indicators && indicators.length > 0 && (
           <SummaryListItem
             className={classNames({
               'dfe-js-hidden': !showDetails,
@@ -152,7 +152,7 @@ export default function DataSetSummary({
             </CollapsibleList>
           </SummaryListItem>
         )}
-        {filters.length > 0 && (
+        {filters && filters.length > 0 && (
           <SummaryListItem
             className={classNames({
               'dfe-js-hidden': !showDetails,

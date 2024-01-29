@@ -35,7 +35,7 @@ export default function createDataSetListRequest(
       orderBy,
       page: parseNumber(query.page) ?? 1,
       publicationId,
-      // releaseId,  TO DO commented out as the api errors with release id currently
+      releaseId,
       sort,
       searchTerm,
       themeId,
