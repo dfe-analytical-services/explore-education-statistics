@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240201091238_EES4666_AddReleaseParent")]
+    partial class EES4666_AddReleaseParent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -947,7 +949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("ReleaseName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ReleaseParentId")
+                    b.Property<Guid?>("ReleaseParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Slug")
@@ -1899,9 +1901,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseParent", "ReleaseParent")
                         .WithMany("Releases")
-                        .HasForeignKey("ReleaseParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReleaseParentId");
 
                     b.Navigation("CreatedBy");
 

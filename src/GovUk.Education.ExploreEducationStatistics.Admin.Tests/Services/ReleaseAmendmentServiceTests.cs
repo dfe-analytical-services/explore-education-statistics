@@ -51,16 +51,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithVersion(0)
-                    .Generate())
+                    .WithVersion(0))
                 .GenerateList(3);
 
             var dataBlock1Parent = dataBlockParents[0];
             var dataBlock2Parent = dataBlockParents[1];
             var dataBlock3Parent = dataBlockParents[2];
 
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
+                .WithPublication(_fixture
+                    .DefaultPublication())
+                .WithReleaseParent(_fixture
+                    .DefaultReleaseParent())
                 .WithCreated(
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
@@ -71,9 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithPreviousVersionId(Guid.NewGuid())
                 .WithYear(2035)
                 .WithType(ReleaseType.OfficialStatistics)
-                .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
                 .WithReleaseStatuses(ListOf(
                     new ReleaseStatus
                     {
@@ -139,8 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Id = Guid.NewGuid(),
                                         Content = "Comment 2 Text"
                                     }
-                                })
-                            .Generate(),
+                                }),
                             dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
                             new EmbedBlockLink
                             {
@@ -230,8 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         DataBlockParentId = dataBlock2Parent.Id,
                         Created = new DateTime(2023, 01, 01),
                         Updated = new DateTime(2023, 01, 02),
-                    }))
-                .Generate();
+                    }));
 
             var approverReleaseRole = new UserReleaseRole
             {
@@ -315,9 +313,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var subject = _fixture
-                .DefaultSubject()
-                .Generate();
+            Subject subject = _fixture
+                .DefaultSubject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -349,10 +346,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(originalRelease);
-                await contentDbContext.AddRangeAsync(originalCreatedBy, amendmentCreator);
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.Releases.Add(originalRelease);
+                contentDbContext.Users.AddRange(originalCreatedBy, amendmentCreator);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -369,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var amendmentId = Guid.Empty;
+            Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
@@ -388,13 +385,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var amendment = RetrieveAmendment(contentDbContext, amendmentId);
+                var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
                 // Check the values that we expect to have been copied over successfully from the original Release.
                 amendment.AssertDeepEqualTo(originalRelease, Except<Release>(
                     r => r.Id,
                     r => r.Amendment,
                     r => r.Publication,
+                    r => r.ReleaseParent,
                     r => r.PreviousVersion!,
                     r => r.PreviousVersionId!,
                     r => r.Version,
@@ -426,7 +424,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Release.
                 Assert.NotEqual(Guid.Empty, amendment.Id);
                 Assert.True(amendment.Amendment);
-                Assert.Equal(originalRelease.PublicationId, amendment.PublicationId);
                 Assert.Equal(originalRelease.Id, amendment.PreviousVersion?.Id);
                 Assert.Equal(originalRelease.Id, amendment.PreviousVersionId);
                 Assert.Equal(originalRelease.Version + 1, amendment.Version);
@@ -555,9 +552,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check EmbedBlocks have been copied over OK.
                 var amendmentEmbedBlockLink = await contentDbContext
                     .ContentBlocks
-                    .Where(block => block.ReleaseId == amendment.Id)
                     .OfType<EmbedBlockLink>()
-                    .SingleAsync();
+                    .SingleAsync(block => block.ReleaseId == amendment.Id);
 
                 var originalEmbedBlockLink = Assert.IsType<EmbedBlockLink>(originalRelease.Content[0].Content[2]);
                 Assert.NotEqual(originalEmbedBlockLink.Id, amendmentEmbedBlockLink.Id);
@@ -682,6 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Releases
                 .Include(release => release.PreviousVersion)
                 .Include(release => release.Publication)
+                .Include(release => release.ReleaseParent)
                 .Include(release => release.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(section => section.Comments)
@@ -761,11 +758,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         
                     </p>".TrimIndent();
 
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
+                .WithReleaseParent(_fixture
+                    .DefaultReleaseParent())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -780,8 +778,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .WithBody(htmlBlock3Body)
                         .Generate(1)))
                     .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
-                    .GenerateList())
-                .Generate();
+                    .GenerateList());
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -795,7 +792,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var amendmentId = Guid.Empty;
+            Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var releaseAmendmentService = BuildService(
@@ -812,7 +809,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var amendment = RetrieveAmendment(contentDbContext, amendmentId);
+                var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
                 Assert.Equal(3, amendment.Content.Count);
                 Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
@@ -836,11 +833,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task NullHtmlBlockBody()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
+                .WithReleaseParent(_fixture
+                    .DefaultReleaseParent())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -848,8 +846,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultHtmlBlock()
                         .WithBody(null!)
                         .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
+                    .GenerateList(1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -863,7 +860,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var amendmentId = Guid.Empty;
+            Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var releaseAmendmentService = BuildService(
@@ -881,7 +878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var amendment = RetrieveAmendment(contentDbContext, amendmentId);
+                var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
                 Assert.NotNull(amendment);
             }
         }
@@ -889,13 +886,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreatesRelatedDashboardsSectionIfNotOnOriginal()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
-                .WithCreated(createdById: _userId)
-                .Generate();
+                    .DefaultPublication())
+                .WithReleaseParent(_fixture
+                    .DefaultReleaseParent())
+                .WithCreated(createdById: _userId);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -909,7 +906,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var amendmentId = Guid.Empty;
+            Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var releaseAmendmentService = BuildService(
@@ -926,7 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var amendment = RetrieveAmendment(contentDbContext, amendmentId);
+                var amendment = RetrieveAmendment(contentDbContext, amendmentId.Value);
 
                 var relatedDashboardsSection = Assert.Single(amendment.Content);
                 Assert.Equal(ContentSectionType.RelatedDashboards, relatedDashboardsSection.Type);
@@ -936,11 +933,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CopyFootnotes()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
+                .WithReleaseParent(_fixture
+                    .DefaultReleaseParent())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -948,15 +946,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultHtmlBlock()
                         .WithBody(null!)
                         .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
+                    .GenerateList(1));
 
-            var originalStatsRelease = _fixture
+            Data.Model.Release originalStatsRelease = _fixture
                 .DefaultStatsRelease()
-                .WithId(originalRelease.Id)
-                .Generate();
+                .WithId(originalRelease.Id);
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(originalStatsRelease)
                 .WithSubject(_fixture
@@ -964,8 +960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
                     .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
                         .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate();
+                        .Generate(1)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()
@@ -1003,7 +998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var amendmentId = Guid.Empty;
+            Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
