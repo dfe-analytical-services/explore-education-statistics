@@ -28,9 +28,9 @@
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
-    "publication_title": "Apprenticeships and traineeships",
-    "published": "30 Nov 2023",
+    "publication_summary": "Apprenticeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
+    "publication_title": "Apprenticeships",
+    "published": "25 Jan 2024",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -147,6 +147,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "Number of practitioners and settings that have registered to take part in strands of the early years education recovery (EYER) programme in England.",
+    "publication_title": "Early years education recovery",
+    "published": "25 Jan 2024",
+    "release_type": "Management information",
+    "theme": "Early years"
+  },
+  {
     "publication_summary": "Annual statistics on early years foundation stage profile assessments in England relating to the 7 areas of learning and the 17 early learning goals.",
     "publication_title": "Early years foundation stage profile results",
     "published": "30 Nov 2023",
@@ -226,7 +233,7 @@
   {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "30 Nov 2023",
+    "published": "25 Jan 2024",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -317,7 +324,7 @@
   {
     "publication_summary": "Local authority and school spending on education, children's services and social care across financial years. Also includes income of LA maintained schools.",
     "publication_title": "LA and school expenditure",
-    "published": "8 Dec 2022",
+    "published": "25 Jan 2024",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -492,7 +499,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "11 Jan 2024",
+    "published": "25 Jan 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -520,7 +527,7 @@
   {
     "publication_summary": "School funding data for England, including trends in funding over time since 2010-11 and funding allocations of individual primary and secondary schools.",
     "publication_title": "School funding statistics",
-    "published": "26 Jan 2023",
+    "published": "25 Jan 2024",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
