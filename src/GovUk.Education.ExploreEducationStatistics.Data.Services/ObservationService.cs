@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     INSERT INTO #{nameof(MatchedObservation)} 
                     SELECT o.id FROM Observation o " +
                     (locationIdsTempTableName != null
-                        ? $"RIGHT JOIN {locationIdsTempTableName} ON {locationIdsTempTableName}.Id = o.LocationId "
+                        ? $"JOIN {locationIdsTempTableName} ON {locationIdsTempTableName}.Id = o.LocationId "
                         : "") +
                     "WHERE o.SubjectId = @subjectId " +
                     (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +

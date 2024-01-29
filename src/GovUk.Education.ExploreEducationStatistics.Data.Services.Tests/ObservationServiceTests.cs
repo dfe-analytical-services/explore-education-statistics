@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             const string expectedSql = @"
                   INSERT INTO #MatchedObservation 
                   SELECT o.id FROM Observation o
-                  RIGHT JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
+                  JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
                   WHERE o.SubjectId = @subjectId
                   ORDER BY o.Id;";
             
@@ -539,7 +539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 const string expectedSql = @"
                       INSERT INTO #MatchedObservation 
                       SELECT o.id FROM Observation o
-                      RIGHT JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
+                      JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
                       WHERE o.SubjectId = @subjectId 
                       AND (
                         (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR 
