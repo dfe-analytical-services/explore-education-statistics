@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 await GetEnumValues<PreReleaseAccess>()
-                    .Where(value => value != PreReleaseAccess.Within)
+                    .Where(value => value != PreReleaseAccess.Within && value != PreReleaseAccess.WithinPublishDayLenience)
                     .ToList()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async access =>
