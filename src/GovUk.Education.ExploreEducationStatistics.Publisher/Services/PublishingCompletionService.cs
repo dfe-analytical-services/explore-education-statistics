@@ -116,8 +116,7 @@ public class PublishingCompletionService : IPublishingCompletionService
 
         await directlyRelatedPublicationIds
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(async publicationId => 
-                await UpdateLatestPublishedRelease(publicationId));
+            .ForEachAwaitAsync(UpdateLatestPublishedRelease);
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
