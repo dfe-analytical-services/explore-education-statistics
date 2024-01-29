@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
@@ -47,9 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
                 })
                 .AddApplicationPart(typeof(Startup).Assembly);
 
-            services.AddValidatorsFromAssemblyContaining<Startup>();
+            services.AddFluentValidation();
             services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
-            services.AddFluentValidationAutoValidation();
 
             services.AddDbContext<StatisticsDbContext>(
                 options =>

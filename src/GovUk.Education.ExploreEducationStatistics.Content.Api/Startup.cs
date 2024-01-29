@@ -38,7 +38,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
@@ -85,9 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 options.AddTrimStringBinderProvider();
             });
 
-            services.AddValidatorsFromAssemblyContaining<Startup>();
+            services.AddFluentValidation();
             services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
-            services.AddFluentValidationAutoValidation();
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options

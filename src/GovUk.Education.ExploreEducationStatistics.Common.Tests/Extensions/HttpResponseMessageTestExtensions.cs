@@ -75,20 +75,6 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(NotModified, message.StatusCode);
     }
 
-    public static void AssertBadRequest(this HttpResponseMessage message,
-        string expectedErrorKey,
-        string expectedErrorMessage,
-        bool useSystemJson = false)
-    {
-        Assert.Equal(BadRequest, message.StatusCode);
-        var body = Deserialize<ValidationProblemDetails>(message, useSystemJson);
-        Assert.NotNull(body);
-        Assert.True(body.Errors.ContainsKey(expectedErrorKey));
-        var error = body.Errors[expectedErrorKey];
-        var errorMessage = Assert.Single(error);
-        Assert.Equal(expectedErrorMessage, errorMessage);
-    }
-
     public static ProblemDetails AssertBadRequest(this HttpResponseMessage message)
     {
         Assert.Equal(BadRequest, message.StatusCode);

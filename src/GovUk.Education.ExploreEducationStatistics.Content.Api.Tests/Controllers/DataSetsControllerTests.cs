@@ -243,7 +243,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = new Mock<ContentDbContext>();
                 contentDbContext.Setup(context => context.ReleaseFiles)
                     .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
-                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
                     .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
                 var client = BuildApp(
@@ -252,7 +252,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    SearchTerm = "term"
+                    SearchTerm = "aaa"
                 };
                 var response = await ListDataSets(client, query);
 
@@ -283,7 +283,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = new Mock<ContentDbContext>();
                 contentDbContext.Setup(context => context.ReleaseFiles)
                     .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
-                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
                     .Returns(new List<FreeTextRank>().AsQueryable().BuildMockDbSet().Object);
 
                 var client = BuildApp(
@@ -292,7 +292,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    SearchTerm = "term"
+                    SearchTerm = "aaa"
                 };
                 var response = await ListDataSets(client, query);
 
@@ -676,7 +676,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = new Mock<ContentDbContext>();
                 contentDbContext.Setup(context => context.ReleaseFiles)
                     .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
-                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
                     .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
                 var client = BuildApp(
@@ -685,7 +685,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    SearchTerm = "term",
+                    SearchTerm = "aaa",
                     OrderBy = DataSetsListRequestOrderBy.Relevance,
                     Sort = SortOrder.Asc
                 };
@@ -726,7 +726,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = new Mock<ContentDbContext>();
                 contentDbContext.Setup(context => context.ReleaseFiles)
                     .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
-                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
                     .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
                 var client = BuildApp(
@@ -735,7 +735,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    SearchTerm = "term",
+                    SearchTerm = "aaa",
                     OrderBy = DataSetsListRequestOrderBy.Relevance,
                     Sort = SortOrder.Desc
                 };
@@ -776,7 +776,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = new Mock<ContentDbContext>();
                 contentDbContext.Setup(context => context.ReleaseFiles)
                     .Returns(allReleaseFiles.AsQueryable().BuildMockDbSet().Object);
-                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("term"))
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
                     .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
 
                 var client = BuildApp(
@@ -785,7 +785,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    SearchTerm = "term",
+                    SearchTerm = "aaa",
                     OrderBy = DataSetsListRequestOrderBy.Relevance,
                     Sort = null
                 };
@@ -939,8 +939,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 );
                 var response = await ListDataSets(client, query);
 
-                response.AssertBadRequest(expectedErrorKey: "Page",
-                    expectedErrorMessage: "'Page' must be greater than or equal to '1'.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasGreaterThanOrEqualError("page");
             }
 
             [Theory]
@@ -955,8 +958,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 );
                 var response = await ListDataSets(client, query);
 
-                response.AssertBadRequest(expectedErrorKey: "PageSize",
-                    expectedErrorMessage: "'Page Size' must be greater than or equal to '1'.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasGreaterThanOrEqualError("pageSize");
             }
 
             [Theory]
@@ -970,8 +976,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 );
                 var response = await ListDataSets(client, query);
 
-                response.AssertBadRequest(expectedErrorKey: "PageSize",
-                    expectedErrorMessage: "'Page Size' must be less than or equal to '40'.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasLessThanOrEqualError("pageSize");
             }
 
             [Theory]
@@ -988,9 +997,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertBadRequest(expectedErrorKey: "SearchTerm",
-                    expectedErrorMessage:
-                    $"The length of 'Search Term' must be at least 3 characters. You entered {searchTerm.Length} characters.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasMinimumLengthError("searchTerm");
             }
 
             [Fact]
@@ -1005,8 +1016,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertBadRequest(expectedErrorKey: "ReleaseId",
-                    expectedErrorMessage: "'Release Id' must not be empty.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasNotEmptyError("releaseId");
             }
 
             [Fact]
@@ -1021,8 +1035,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertBadRequest(expectedErrorKey: "SearchTerm",
-                    expectedErrorMessage: "'Search Term' must not be empty.");
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasNotEmptyError("searchTerm");
             }
         }
 
