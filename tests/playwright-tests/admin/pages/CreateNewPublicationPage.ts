@@ -8,7 +8,7 @@ export default class CreateNewPublicationPage {
   readonly teamEmailAddress: Locator;
   readonly contactName: Locator;
   readonly contactTelephone: Locator;
-  readonly savePublicationbutton: Locator;
+  readonly savePublicationButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -27,7 +27,7 @@ export default class CreateNewPublicationPage {
     this.contactTelephone = page.locator(
       'input[id="publicationForm-contactTelNo"]',
     );
-    this.savePublicationbutton = page.locator('button[type="submit"]');
+    this.savePublicationButton = page.locator('button[type="submit"]');
   }
 
   async createNewPublication(
@@ -40,6 +40,6 @@ export default class CreateNewPublicationPage {
     await this.teamEmailAddress.fill('ui_test@test.com');
     await this.contactName.fill('UI test team name');
     await this.contactTelephone.fill('0123 4567');
-    await this.savePublicationbutton.click();
+    await this.savePublicationButton.click();
   }
 }

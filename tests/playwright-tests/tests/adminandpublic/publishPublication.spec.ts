@@ -1,15 +1,15 @@
 import { test } from '@playwright/test';
-import environment from '../utils/env';
-import AzureLoginPage from '../admin/azpage/AzureLoginPage';
-import AdminPage from '../admin/pages/AdminPage';
-import CreateNewPublicationPage from '../admin/pages/CreateNewPublicationPage';
-import uiTestString from '../utils/uiTestString';
-import ContentPage from '../admin/pages/ContentPage';
-import ManagePublicationReleasePage from '../admin/pages/ManagePublicationReleasePage';
-import HomePage from '../general-public/pages/HomePage';
-import FindStatisticsPage from '../general-public/pages/FindStatisticsPage';
-import CreateNewReleasePage from '../admin/pages/CreateNewReleasePage';
-import SingOffPage from '../admin/pages/SignOffPage';
+import environment from '../../utils/env';
+import AzureLoginPage from '../../admin/azpage/AzureLoginPage';
+import AdminPage from '../../admin/pages/AdminPage';
+import CreateNewPublicationPage from '../../admin/pages/CreateNewPublicationPage';
+import uiTestString from '../../utils/uiTestString';
+import ContentPage from '../../admin/pages/ContentPage';
+import ManagePublicationReleasePage from '../../admin/pages/ManagePublicationReleasePage';
+import HomePage from '../../general-public/pages/HomePage';
+import FindStatisticsPage from '../../general-public/pages/FindStatisticsPage';
+import CreateNewReleasePage from '../../admin/pages/CreateNewReleasePage';
+import SingOffPage from '../../admin/pages/SignOffPage';
 
 test.describe.configure({ mode: 'serial' });
 
