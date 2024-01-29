@@ -105,9 +105,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
-                var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
-                    ? await GetLocationsClause(context, locationIds!, cancellationToken)
-                    : default;
+                var (locationIdsTempTableName, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
+                    ? await GetLocationsTempTable(context, locationIds!, cancellationToken)
+                    : (null, null);
 
                 var (filterItemIdsClause, filterItemIdTempTables) = !filterItemIds.IsNullOrEmpty()
                     ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
@@ -115,26 +115,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 var sql = @$"
                     INSERT INTO #{nameof(MatchedObservation)} 
-                    SELECT o.id FROM Observation o
-                    WHERE o.SubjectId = @subjectId " +
+                    SELECT o.id FROM Observation o " +
+                    (locationIdsTempTableName != null
+                        ? $"JOIN {locationIdsTempTableName} ON {locationIdsTempTableName}.Id = o.LocationId "
+                        : "") +
+                    "WHERE o.SubjectId = @subjectId " +
                     (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
-                    (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
                     (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
                     "ORDER BY o.Id;";
 
                 var parameters = ListOf(new SqlParameter("subjectId", subjectId));
                 
                 var tableReferences = new List<IAsyncDisposable>();
-                
+
                 if (locationIdsTempTable != null) {
                     tableReferences.Add(locationIdsTempTable);
                 }
-                
+
                 if (!filterItemIdTempTables.IsNullOrEmpty())
                 {
                     tableReferences.AddRange(filterItemIdTempTables);
                 }
-                
+
                 return (sql, parameters, tableReferences);
             }
             
@@ -222,15 +224,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         });
             }
 
-            private async Task<(string, ITempTableQuery<IdTempTable>)> GetLocationsClause(
+            private async Task<(string?, ITempTableQuery<IdTempTable>?)> GetLocationsTempTable(
                 StatisticsDbContext context, 
                 IList<Guid> locationIds,
                 CancellationToken cancellationToken)
             {
-                var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
-                    context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
-                
-                return ($"o.LocationId IN (SELECT Id FROM {SanitizeTempTableName(locationsTempTable.Name)})", locationsTempTable);
+                var locationIdsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
+                    context, locationIds!.Select(id => new IdTempTable(id)), cancellationToken);
+
+                var locationTempTableName = SanitizeTempTableName(locationIdsTempTable.Name);
+
+                return (locationTempTableName, locationIdsTempTable);
             }
 
             private string SanitizeTempTableName(string tempTableName)
