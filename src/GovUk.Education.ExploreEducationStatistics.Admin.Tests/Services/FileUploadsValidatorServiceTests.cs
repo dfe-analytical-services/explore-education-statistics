@@ -226,14 +226,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_DuplicateDataFile()
         {
-            var release = _fixture.DefaultRelease()
-                .Generate();
+            Release release = _fixture.DefaultRelease();
 
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithRelease(release)
                 .WithFile(_fixture.DefaultFile()
-                    .WithFilename("test.csv"))
-                .Generate();
+                    .WithFilename("test.csv"));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -259,8 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfSameName()
         {
-            var release = _fixture.DefaultRelease()
-                .Generate();
+            Release release = _fixture.DefaultRelease();
 
             // The file being replaced here has the same name as the one being uploaded, but that's ok.
             var fileBeingReplaced = _fixture.DefaultFile()
@@ -268,8 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithRelease(release)
-                .WithFile(fileBeingReplaced)
-                .Generate();
+                .WithFile(fileBeingReplaced);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -305,8 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataFilesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
         {
-            var release = _fixture.DefaultRelease()
-                .Generate();
+            Release release = _fixture.DefaultRelease();
 
             // Create two release files, one of which is the file being replaced, and the other has the same filename
             // as the file being uploaded.
@@ -522,14 +517,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ValidateDataArchiveEntriesForUpload_DuplicateDataFile()
         {
-            var release = _fixture.DefaultRelease()
-                .Generate();
+            Release release = _fixture.DefaultRelease();
 
             var releaseFile = _fixture.DefaultReleaseFile()
                 .WithRelease(release)
                 .WithFile(_fixture.DefaultFile()
-                    .WithFilename("test.csv"))
-                .Generate();
+                    .WithFilename("test.csv"));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -598,8 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             ValidateDataArchiveEntriesForUpload_ReplacingDataFileWithFileOfDifferentNameButClashesWithAnother()
         {
-            var release = _fixture.DefaultRelease()
-                .Generate();
+            Release release = _fixture.DefaultRelease();
 
             // Create two release files, one of which is the file being replaced, and the other has the same filename
             // as the file being uploaded.
