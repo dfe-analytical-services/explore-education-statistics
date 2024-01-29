@@ -65,11 +65,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Requests", "GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj", "{0F0F94FF-AD31-4F0E-BE7B-4D9C26FF1E82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F75569A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
+Project("{00000000-0000-0000-0000-000000000000}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.ViewModels", "GovUk.Education.ExploreEducationStatistics.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Data.ViewModels.csproj", "{CEA32610-A401-4A66-9874-45838C497DE7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Notifier.Tests", "GovUk.Education.ExploreEducationStatistics.Notifier.Tests\GovUk.Education.ExploreEducationStatistics.Notifier.Tests.csproj", "{630EDEC2-DB6C-4D9E-86C5-586C2B42A351}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor", "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj", "{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -489,6 +491,18 @@ Global
 		{630EDEC2-DB6C-4D9E-86C5-586C2B42A351}.Release|x64.Build.0 = Release|Any CPU
 		{630EDEC2-DB6C-4D9E-86C5-586C2B42A351}.Release|x86.ActiveCfg = Release|Any CPU
 		{630EDEC2-DB6C-4D9E-86C5-586C2B42A351}.Release|x86.Build.0 = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|x64.Build.0 = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Debug|x86.Build.0 = Debug|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|x64.ActiveCfg = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|x64.Build.0 = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|x86.ActiveCfg = Release|Any CPU
+		{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
