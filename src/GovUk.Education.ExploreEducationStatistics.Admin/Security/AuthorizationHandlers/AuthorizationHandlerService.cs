@@ -172,7 +172,7 @@ public class AuthorizationHandlerService
                     ReleaseRole.PrereleaseViewer))
         {
             var windowStatus = _preReleaseService.GetPreReleaseWindowStatus(release, DateTime.UtcNow);
-            if (windowStatus.Access == PreReleaseAccess.Within)
+            if (windowStatus.Access is PreReleaseAccess.Within or PreReleaseAccess.WithinPublishDayLenience)
             {
                 return true;
             }
