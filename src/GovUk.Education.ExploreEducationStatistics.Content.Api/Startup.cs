@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
                     options.EnableEndpointRouting = false;
                 })
                 .AddNewtonsoftJson(options =>

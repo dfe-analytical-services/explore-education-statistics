@@ -7,9 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -116,7 +114,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, page, 1);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page");
         }
 
         [Theory]
@@ -129,7 +131,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, 1, pageSize);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize");
         }
 
         [Theory]
@@ -141,7 +147,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, null, null, searchTerm);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasMinimumLengthError("search");
         }
     }
 

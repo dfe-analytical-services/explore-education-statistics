@@ -681,7 +681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteUser(inviteRequest);
 
                 var actionResult = result.AssertLeft();
-                actionResult.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
+                actionResult.AssertValidationProblem(ValidationErrorMessages.UserAlreadyExists);
             }
         }
         
@@ -884,7 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var result = await service.InviteUser(inviteRequest);
 
             var actionResult = result.AssertLeft();
-            actionResult.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
+            actionResult.AssertValidationProblem(ValidationErrorMessages.InvalidUserRole);
         }
 
         [Fact]
@@ -1013,7 +1013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserManagementService();
                 var result = await service.CancelInvite("test@test.com");
                 var actionResult = result.AssertLeft();
-                actionResult.AssertBadRequest(ValidationErrorMessages.InviteNotFound);
+                actionResult.AssertValidationProblem(ValidationErrorMessages.InviteNotFound);
         }
 
         private static UserManagementService SetupUserManagementService(

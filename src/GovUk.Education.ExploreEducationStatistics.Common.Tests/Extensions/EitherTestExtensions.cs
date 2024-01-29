@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             params Enum[] expectedValidationErrors)
         {
             var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
-            badRequest.AssertBadRequest(expectedValidationErrors);
+            badRequest.AssertValidationProblem(expectedValidationErrors);
             return either.Left;
         }
 

@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 VerifyAllMocks(methodologyVersionRepository);
 
-                actionResult.AssertBadRequest(MethodologySlugNotUnique);
+                actionResult.AssertValidationProblem(MethodologySlugNotUnique);
             }
         }
 

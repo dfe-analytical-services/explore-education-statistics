@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             VerifyAllMocks(releaseDataFileService);
 
-            result.AssertBadRequest(CannotOverwriteFile);
+            result.AssertValidationProblem(CannotOverwriteFile);
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
             VerifyAllMocks(releaseService);
 
-            result.AssertBadRequest(UnableToFindMetadataFileToDelete);
+            result.AssertValidationProblem(UnableToFindMetadataFileToDelete);
         }
 
         [Fact]
