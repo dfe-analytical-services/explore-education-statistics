@@ -39,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_SubjectNotLinkedToRelease_ReturnsValidationResult()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -58,16 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -87,16 +83,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterNotLinkedToRelease_ReturnsValidationResult()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -114,20 +107,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Filter filter = _fixture
-                .DefaultFilter()
-                .Generate();
+                .DefaultFilter();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -147,20 +136,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterGroupNotLinkedToRelease_ReturnsValidationResult()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Filter filter = _fixture
-                .DefaultFilter()
-                .Generate();
+                .DefaultFilter();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -178,24 +163,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterGroup filterGroup = _fixture
-                .DefaultFilterGroup()
-                .Generate();
+                .DefaultFilterGroup();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -215,24 +195,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterItemNotLinkedToRelease_ReturnsValidationResult()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterGroup filterGroup = _fixture
-                .DefaultFilterGroup()
-                .Generate();
+                .DefaultFilterGroup();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -250,28 +225,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -291,16 +260,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_IndicatorNotLinkedToRelease_ReturnsValidationResult()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -318,24 +284,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -356,44 +317,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             CreateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject1 = _fixture
                 .DefaultSubject()
                 .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             Subject subject2 = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject1 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject1)
-                .Generate();
+                .WithSubject(subject1);
             ReleaseSubject releaseSubject2 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject2)
-                .Generate();
+                .WithSubject(subject2);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -442,44 +393,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             bool subjectMissing)
         {
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject1 = _fixture
                 .DefaultSubject()
                 .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             Subject subject2 = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject1 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject1)
-                .Generate();
+                .WithSubject(subject1);
             ReleaseSubject releaseSubject2 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject2)
-                .Generate();
+                .WithSubject(subject2);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -505,11 +446,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_SubjectNotLinkedToRelease_ReturnsValidationResult()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -528,19 +467,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -566,19 +501,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterNotLinkedToRelease_ReturnsValidationResult()
         {
             Footnote footnote = _fixture.
-                DefaultFootnote()
-                .Generate();
+                DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -602,23 +533,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Filter filter = _fixture
-                .DefaultFilter()
-                .Generate();
+                .DefaultFilter();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -644,23 +570,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterGroupNotLinkedToRelease_ReturnsValidationResult()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Filter filter = _fixture
-                .DefaultFilter()
-                .Generate();
+                .DefaultFilter();
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -684,27 +605,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterGroup filterGroup = _fixture
-                .DefaultFilterGroup()
-                .Generate();
+                .DefaultFilterGroup();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -730,27 +645,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterItemNotLinkedToRelease_ReturnsValidationResult()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterGroup filterGroup = _fixture
-                .DefaultFilterGroup()
-                .Generate();
+                .DefaultFilterGroup();
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -774,31 +683,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithFilters(new List<Filter>() { filter })
-                .Generate();
+                .WithFilters(new List<Filter>() { filter });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -824,19 +726,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_IndicatorNotLinkedToRelease_ReturnsValidationResult()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Subject subject = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -860,27 +758,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject = _fixture
                 .DefaultSubject()
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject)
-                .Generate();
+                .WithSubject(subject);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -907,47 +799,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             UpdateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject1 = _fixture
                 .DefaultSubject()
                 .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             Subject subject2 = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject1 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject1)
-                .Generate();
+                .WithSubject(subject1);
             ReleaseSubject releaseSubject2 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject2)
-                .Generate();
+                .WithSubject(subject2);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -996,47 +877,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             bool subjectMissing)
         {
             Footnote footnote = _fixture
-                .DefaultFootnote()
-                .Generate();
+                .DefaultFootnote();
             Release release = _fixture
-                .DefaultStatsRelease()
-                .Generate();
+                .DefaultStatsRelease();
             FilterItem filterItem = _fixture
-                .DefaultFilterItem()
-                .Generate();
+                .DefaultFilterItem();
             FilterGroup filterGroup = _fixture
                 .DefaultFilterGroup()
-                .WithFilterItems(new List<FilterItem>() { filterItem })
-                .Generate();
+                .WithFilterItems(new List<FilterItem>() { filterItem });
             Filter filter = _fixture
                 .DefaultFilter()
-                .WithFilterGroups(new List<FilterGroup>() { filterGroup })
-                .Generate();
+                .WithFilterGroups(new List<FilterGroup>() { filterGroup });
             Indicator indicator = _fixture
-                .DefaultIndicator()
-                .Generate();
+                .DefaultIndicator();
             IndicatorGroup indicatorGroup = _fixture
                 .DefaultIndicatorGroup()
-                .WithIndicators(new List<Indicator>() { indicator })
-                .Generate();
+                .WithIndicators(new List<Indicator>() { indicator });
             Subject subject1 = _fixture
                 .DefaultSubject()
                 .WithFilters(new List<Filter>() { filter })
-                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup })
-                .Generate();
+                .WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup });
             Subject subject2 = _fixture
-                .DefaultSubject()
-                .Generate();
+                .DefaultSubject();
             ReleaseSubject releaseSubject1 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject1)
-                .Generate();
+                .WithSubject(subject1);
             ReleaseSubject releaseSubject2 = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(subject2)
-                .Generate();
+                .WithSubject(subject2);
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1063,13 +933,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateFootnote_MultipleFootnotesHaveExpectedOrder()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubject(_fixture.DefaultSubject())
-                .Generate();
+                .WithSubject(_fixture.DefaultSubject());
 
             // Create a release which already has some existing footnotes
             var releaseFootnotes = _fixture
@@ -1148,9 +1017,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetFootnote()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
@@ -1160,10 +1029,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .Generate(1))
                     .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
                         .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate();
+                        .Generate(1)));
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
                 .WithFootnote(_fixture
@@ -1172,8 +1040,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithFilters(releaseSubject.Subject.Filters)
                     .WithFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
                     .WithFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
-                    .WithIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators))
-                .Generate();
+                    .WithIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1231,13 +1098,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetFootnote_ReleaseNotFound()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
-                .WithFootnote(_fixture.DefaultFootnote())
-                .Generate();
+                .WithFootnote(_fixture.DefaultFootnote());
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1266,11 +1132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (release, otherRelease) = _fixture.DefaultStatsRelease().GenerateList(2).ToTuple2();
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
-                .WithFootnote(_fixture.DefaultFootnote())
-                .Generate();
+                .WithFootnote(_fixture.DefaultFootnote());
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1304,7 +1169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteFootnote()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
             var releaseSubjects = _fixture
                 .DefaultReleaseSubject()
@@ -1321,7 +1186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var (subject1, subject2) = releaseSubjects.Select(rs => rs.Subject).ToTuple2();
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
                 .WithFootnote(_fixture
@@ -1330,8 +1195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithFilters(subject2.Filters)
                     .WithFilterGroups(subject2.Filters[0].FilterGroups)
                     .WithFilterItems(subject2.Filters[0].FilterGroups[0].FilterItems)
-                    .WithIndicators(subject2.IndicatorGroups[0].Indicators))
-                .Generate();
+                    .WithIndicators(subject2.IndicatorGroups[0].Indicators));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1389,15 +1253,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteFootnote_MultipleFootnotesHaveExpectedOrder()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
                     .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)))
-                .Generate();
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()
@@ -1465,9 +1328,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_AddCriteria()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
@@ -1475,16 +1338,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
                     .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
                         .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate();
+                        .Generate(1)));
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
                 .WithFootnote(_fixture
                     .DefaultFootnote()
-                    .WithOrder(1))
-                .Generate();
+                    .WithOrder(1));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1567,7 +1428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_RemoveCriteria()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
             var releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1578,16 +1439,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithIndicatorGroups(_fixture
                         .DefaultIndicatorGroup()
                         .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate();
+                        .Generate(1)));
 
-            var releaseFootnote = _fixture
+            ReleaseFootnote releaseFootnote = _fixture
                 .DefaultReleaseFootnote()
                 .WithRelease(release)
                 .WithFootnote(_fixture
                     .DefaultFootnote()
-                    .WithOrder(1))
-                .Generate();
+                    .WithOrder(1));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1656,15 +1515,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnotes()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
                     .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)))
-                .Generate();
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()
@@ -1744,15 +1602,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnotes_ReleaseNotFound()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
                     .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)))
-                .Generate();
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()
@@ -1818,15 +1675,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnotes_FootnoteMissing()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
                     .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)))
-                .Generate();
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()
@@ -1891,15 +1747,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnotes_FootnoteNotForRelease()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
                 .WithSubject(_fixture
                     .DefaultSubject()
-                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)))
-                .Generate();
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()

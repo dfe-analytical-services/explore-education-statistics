@@ -43,10 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -57,9 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test chart",
                         Height = 400,
                         Width = 500,
-                    }))
-                    .Generate())
-                .Generate();
+                    })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -86,7 +83,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, dataBlockVersion, featuredTable);
+                context.Releases.Add(release);
+                context.ReleaseFiles.Add(releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
+                context.FeaturedTables.Add(featuredTable);
                 await context.SaveChangesAsync();
             }
 
@@ -120,17 +120,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithRelease(release)
-                    .WithSubjectId(subjectId)
-                    .Generate())
-                .Generate();
+                    .WithSubjectId(subjectId));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -149,7 +146,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, dataBlockVersion);
+                context.Releases.Add(release);
+                context.ReleaseFiles.Add(releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -173,19 +172,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     // Set the name to null
                     .WithName(null)
                     .WithRelease(release)
-                    .WithSubjectId(subjectId)
-                    .Generate())
-                .Generate();
+                    .WithSubjectId(subjectId));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -204,8 +200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-
-                await context.AddRangeAsync(dataBlockVersion, releaseFile);
+                context.ReleaseFiles.Add(releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -229,10 +225,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -243,9 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         // No title
                         Height = 400,
                         Width = 500,
-                    }))
-                    .Generate())
-                .Generate();
+                    })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -265,7 +258,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlockVersion, releaseFile);
+                context.ReleaseFiles.Add(releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -290,17 +284,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithRelease(release)
-                    .WithSubjectId(subjectId)
-                    .Generate())
-                .Generate();
+                    .WithSubjectId(subjectId));
 
             var releaseFile = new ReleaseFile
             {
@@ -322,7 +313,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlockVersion, releaseFile);
+                context.ReleaseFiles.Add(releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
                 await context.SaveChangesAsync();
             }
             await using (var context = InMemoryContentDbContext(contextId))
@@ -647,11 +639,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var fileId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -662,9 +653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         FileId = fileId.ToString(),
                         Height = 400,
                         Width = 500,
-                    }))
-                    .Generate())
-                .Generate();
+                    })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -717,17 +706,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeletePlan_DependentDataBlockIsKeyStatistic()
         {
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
-                    .Generate())
-                .Generate();
+                    .WithRelease(release));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -767,17 +753,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
         {
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
-                    .Generate())
-                .Generate();
+                    .WithRelease(release));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -893,11 +876,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var fileId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -909,9 +891,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Height = 400,
                             Width = 500,
                         }))
-                    .WithRelease(release)
-                    .Generate())
-                .Generate();
+                    .WithRelease(release));
 
             var dataBlockVersion = dataBlockParent.LatestDraftVersion!;
 
@@ -1005,11 +985,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var fileId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -1021,14 +1000,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Height = 400,
                             Width = 500,
                         }))
-                    .WithRelease(release)
-                    .Generate())
+                    .WithRelease(release))
                 // In this test, the DataBlockParent also has an already-published DataBlockVersion which cannot be
                 // deleted, and thus the parent will also not be deleted.
                 .WithLatestPublishedVersion(_fixture
-                    .DefaultDataBlockVersion()
-                    .Generate())
-                .Generate();
+                    .DefaultDataBlockVersion());
 
             var draftDataBlockVersion = dataBlockParent.LatestDraftVersion!;
             var publishedDataBlockVersion = dataBlockParent.LatestPublishedVersion!;
@@ -1438,11 +1414,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -1454,9 +1429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Title = "Old chart",
                             Height = 400,
                             Width = 500,
-                        }))
-                    .Generate())
-                .Generate();
+                        })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -1477,7 +1450,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlockVersion, releaseFile);
+                context.DataBlockVersions.Add(dataBlockVersion);
+                context.ReleaseFiles.Add(releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1561,11 +1535,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -1577,9 +1550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             // No title
                             Height = 400,
                             Width = 500,
-                        }))
-                    .Generate())
-                .Generate();
+                        })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -1686,11 +1657,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var subjectId = Guid.NewGuid();
             var fileId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
@@ -1703,9 +1673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             FileId = fileId.ToString(),
                             Height = 400,
                             Width = 500,
-                        }))
-                    .Generate())
-                .Generate();
+                        })));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -1793,16 +1761,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetUnattachedDataBlocks()
         {
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
             var dataBlockParents = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
-                    .Generate())
+                    .WithRelease(release))
                 .GenerateList(4);
 
             var unattachedDataBlockVersion1 = dataBlockParents[0].LatestPublishedVersion!;

@@ -47,7 +47,7 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectNotFound()
     {
-        var subject = _fixture.DefaultSubject().Generate();
+        var subject = _fixture.DefaultSubject();
 
         var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)
@@ -167,7 +167,7 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectNotFound_LocationsExist()
     {
-        var subject = _fixture.DefaultSubject().Generate();
+        var subject = _fixture.DefaultSubject();
 
         var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)
@@ -260,7 +260,7 @@ public class PermalinkCsvMetaServiceTests
     [Fact]
     public async Task GetCsvMeta_SubjectNotFound_LocationsMissing()
     {
-        var subject = _fixture.DefaultSubject().Generate();
+        var subject = _fixture.DefaultSubject();
 
         var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
             .WithSubject(subject)

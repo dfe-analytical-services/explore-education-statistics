@@ -34,7 +34,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using StatsRelease = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_ReplacementFileNotFound()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_OriginalFileNotFound()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var replacementReleaseFile = new ReleaseFile
             {
@@ -223,11 +224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_OriginalFileIsNotUsedByAnyDependentData()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -316,11 +316,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_NoReplacementDataPresent_ReplacementInvalid()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -756,11 +755,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_SelectedFilterItemsNoLongerExistButSomeDo_ReplacementInvalidButFixable()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -984,11 +982,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_AllOriginalFilterItemsNoLongerExist_ReplacementInvalidAndNotFixable()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -1204,11 +1201,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_NewFiltersIntroduced_ReplacementInvalidAndNotFixable()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -1450,11 +1446,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_ReplacementHasDifferentLocation_LocationMatchedByCode_ReplacementValid()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -1697,11 +1692,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetReplacementPlan_AllReplacementDataPresent_ReplacementValid()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -2273,11 +2267,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_ReplacementPlanInvalid()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -2413,11 +2406,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_OriginalFileIsNotAssociatedWithReplacementFile()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -2503,11 +2495,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_ReplacementFileIsNotAssociatedWithOriginalFile()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -2595,11 +2586,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
-            var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+            StatsRelease statsRelease = _fixture.DefaultStatsRelease()
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -3193,11 +3183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_MapChart_ReplacesChartDataSetConfigs()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -3549,11 +3538,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_MapChart_ReplacesChartDataSetConfigsWithNullLocation()
         {
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
             var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -3840,11 +3828,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceFilterSequence for a more comprehensive test of the actual replacement.
 
-            var release = _fixture.DefaultRelease().Generate();
+            Release release = _fixture.DefaultRelease();
 
-            var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(release.Id)
-                .Generate();
+            StatsRelease statsRelease = _fixture.DefaultStatsRelease()
+                .WithId(release.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -4054,11 +4041,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceIndicatorSequence for a more comprehensive test of the actual replacement.
 
-            var contentRelease = _fixture.DefaultRelease().Generate();
+            Release contentRelease = _fixture.DefaultRelease();
 
-            var statsRelease = _fixture.DefaultStatsRelease()
-                .WithId(contentRelease.Id)
-                .Generate();
+            StatsRelease statsRelease = _fixture.DefaultStatsRelease()
+                .WithId(contentRelease.Id);
 
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
@@ -4238,7 +4224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static Footnote CreateFootnote(Release release,
+        private static Footnote CreateFootnote(StatsRelease release,
             string content,
             List<FilterFootnote>? filterFootnotes = null,
             List<FilterGroupFootnote>? filterGroupFootnotes = null,

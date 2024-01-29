@@ -30,17 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var release = _fixture
-                .DefaultRelease()
-                .Generate();
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithRelease(release)
-                    .WithSubjectId(subjectId)
-                    .Generate())
-                .Generate();
+                    .WithSubjectId(subjectId));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 

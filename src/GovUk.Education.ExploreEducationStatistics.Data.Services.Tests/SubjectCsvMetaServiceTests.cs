@@ -931,8 +931,7 @@ public class SubjectCsvMetaServiceTests
 
         var location = _fixture.DefaultLocation()
             .WithPresetRegionAndLocalAuthority()
-            .WithGeographicLevel(GeographicLevel.LocalAuthority)
-            .Generate();
+            .WithGeographicLevel(GeographicLevel.LocalAuthority);
 
         var observations = _fixture.DefaultObservation()
             .WithMeasures(indicators)

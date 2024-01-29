@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task CreatePermalink_WithoutReleaseId()
         {
-            var subject = _fixture
+            Subject subject = _fixture
                 .DefaultSubject()
                 .WithFilters(_fixture.DefaultFilter()
                     .ForIndex(0, s =>
@@ -128,8 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .GenerateList())
                 .WithIndicatorGroups(_fixture
                     .DefaultIndicatorGroup(indicatorCount: 1)
-                    .Generate(3))
-                .Generate();
+                    .Generate(3));
 
             var indicators = subject
                 .IndicatorGroups
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task CreatePermalink_WithReleaseId()
         {
-            var subject = _fixture
+            Subject subject = _fixture
                 .DefaultSubject()
                 .WithFilters(_fixture.DefaultFilter()
                     .ForIndex(0, s =>
@@ -461,8 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .GenerateList())
                 .WithIndicatorGroups(_fixture
                     .DefaultIndicatorGroup(indicatorCount: 1)
-                    .Generate(3))
-                .Generate();
+                    .Generate(3));
 
             var indicators = subject
                 .IndicatorGroups

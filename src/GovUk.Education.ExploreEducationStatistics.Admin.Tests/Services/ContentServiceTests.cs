@@ -615,17 +615,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AttachDataBlock()
         {
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithOrder(1)
-                    .WithRelease(release))
-                .Generate();
+                    .WithRelease(release));
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 

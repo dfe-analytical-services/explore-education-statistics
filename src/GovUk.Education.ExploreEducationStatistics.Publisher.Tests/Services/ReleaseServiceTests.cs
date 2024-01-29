@@ -216,16 +216,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CompletePublishing_FirstVersion()
         {
-            var release = _fixture
-                .DefaultRelease()
-                .Generate();
+            Release release = _fixture
+                .DefaultRelease();
 
             var originalDataBlockParents = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
-                    .Generate())
+                    .WithRelease(release))
                 .GenerateList(2);
 
             var actualPublishedDate = DateTime.UtcNow;
@@ -304,12 +302,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(previousRelease)
-                    .Generate())
+                    .WithRelease(previousRelease))
                 .WithLatestDraftVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
-                    .Generate())
+                    .WithRelease(release))
                 .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -389,8 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(previousRelease)
-                    .Generate())
+                    .WithRelease(previousRelease))
                 // This time Data Blocks have been removed from the latest Release amendment, and so they now have no
                 // "latest" version.
                 .WithLatestDraftVersion((DataBlockVersion) null!)

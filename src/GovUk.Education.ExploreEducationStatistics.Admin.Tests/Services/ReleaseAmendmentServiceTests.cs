@@ -25,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using StatsRelease = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using ReleaseSubject = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -51,15 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
-                    .WithVersion(0)
-                    .Generate())
+                    .WithVersion(0))
                 .GenerateList(3);
 
             var dataBlock1Parent = dataBlockParents[0];
             var dataBlock2Parent = dataBlockParents[1];
             var dataBlock3Parent = dataBlockParents[2];
 
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithCreated(
                     created: DateTime.UtcNow.AddDays(-2),
@@ -72,8 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithYear(2035)
                 .WithType(ReleaseType.OfficialStatistics)
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
                 .WithReleaseStatuses(ListOf(
                     new ReleaseStatus
                     {
@@ -139,8 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Id = Guid.NewGuid(),
                                         Content = "Comment 2 Text"
                                     }
-                                })
-                            .Generate(),
+                                }),
                             dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
                             new EmbedBlockLink
                             {
@@ -230,8 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         DataBlockParentId = dataBlock2Parent.Id,
                         Created = new DateTime(2023, 01, 01),
                         Updated = new DateTime(2023, 01, 02),
-                    }))
-                .Generate();
+                    }));
 
             var approverReleaseRole = new UserReleaseRole
             {
@@ -315,9 +312,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var subject = _fixture
-                .DefaultSubject()
-                .Generate();
+            Subject subject = _fixture
+                .DefaultSubject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -761,11 +757,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         
                     </p>".TrimIndent();
 
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -780,8 +775,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .WithBody(htmlBlock3Body)
                         .Generate(1)))
                     .ForIndex(2, s => s.SetType(ContentSectionType.RelatedDashboards))
-                    .GenerateList())
-                .Generate();
+                    .GenerateList());
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -836,11 +830,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task NullHtmlBlockBody()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -848,8 +841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultHtmlBlock()
                         .WithBody(null!)
                         .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
+                    .GenerateList(1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -889,13 +881,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreatesRelatedDashboardsSectionIfNotOnOriginal()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
-                .WithCreated(createdById: _userId)
-                .Generate();
+                    .DefaultPublication())
+                .WithCreated(createdById: _userId);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -936,11 +926,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CopyFootnotes()
         {
-            var originalRelease = _fixture
+            Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
-                    .DefaultPublication()
-                    .Generate())
+                    .DefaultPublication())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -948,15 +937,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .DefaultHtmlBlock()
                         .WithBody(null!)
                         .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
+                    .GenerateList(1));
 
-            var originalStatsRelease = _fixture
+            StatsRelease originalStatsRelease = _fixture
                 .DefaultStatsRelease()
-                .WithId(originalRelease.Id)
-                .Generate();
+                .WithId(originalRelease.Id);
 
-            var releaseSubject = _fixture
+            ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(originalStatsRelease)
                 .WithSubject(_fixture
@@ -964,8 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
                     .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
                         .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate();
+                        .Generate(1)));
 
             var releaseFootnotes = _fixture
                 .DefaultReleaseFootnote()

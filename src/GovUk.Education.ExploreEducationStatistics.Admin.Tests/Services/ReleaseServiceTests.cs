@@ -1762,15 +1762,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithRole(PublicationRole.Owner)
-                    .WithPublication(publications[0])
-                    .Generate();
+                    .WithPublication(publications[0]);
 
                 var approverPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithRole(PublicationRole.Approver)
-                    .WithPublication(publications[1])
-                    .Generate();
+                    .WithPublication(publications[1]);
 
                 var ownerPublicationRolesForOtherUser = _fixture
                     .DefaultUserPublicationRole()
@@ -1821,13 +1819,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var contextId = Guid.NewGuid().ToString();
 
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
@@ -1840,8 +1837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithRole(PublicationRole.Approver)
-                    .WithPublication(publication)
-                    .Generate();
+                    .WithPublication(publication);
 
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {

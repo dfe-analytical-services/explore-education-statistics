@@ -29,28 +29,24 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get()
     {
-        var dataBlockVersion = _fixture
-            .DefaultDataBlockVersion()
-            .Generate();
+        DataBlockVersion dataBlockVersion = _fixture
+            .DefaultDataBlockVersion();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestDraftVersion(dataBlockVersion)
-            .Generate();
+            .WithLatestDraftVersion(dataBlockVersion);
 
-        var release = _fixture
+        Release release = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
-            .Generate();
+            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!));
 
-        var featuredTable = _fixture
+        FeaturedTable featuredTable = _fixture
             .DefaultFeaturedTable()
             .WithDataBlock(dataBlockVersion.ContentBlock)
             .WithDataBlockParent(dataBlockParent)
             .WithRelease(release)
             .WithCreated(DateTime.Now.AddDays(-3), createdById: Guid.NewGuid())
-            .WithUpdated(DateTime.Now.AddDays(-2), updatedById: Guid.NewGuid())
-            .Generate();
+            .WithUpdated(DateTime.Now.AddDays(-2), updatedById: Guid.NewGuid());
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -82,9 +78,8 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get_NoFeaturedTable()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -124,9 +119,8 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Get_ReleaseAndFeaturedTableNotAssociated()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
         var featuredTable = new FeaturedTable
         {
@@ -162,41 +156,34 @@ public class FeaturedTableServiceTests
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+                .DefaultDataBlockVersion())
             .GenerateList(2);
 
-        var release = _fixture
+        Release release = _fixture
             .DefaultRelease()
             .WithDataBlockVersions(dataBlockParents
-                .Select(p => p.LatestPublishedVersion!))
-            .Generate();
+                .Select(p => p.LatestPublishedVersion!));
 
-        var featuredTable1 = _fixture
+        FeaturedTable featuredTable1 = _fixture
             .DefaultFeaturedTable()
             .WithDataBlock(dataBlockParents[0].LatestPublishedVersion!.ContentBlock)
             .WithDataBlockParent(dataBlockParents[0])
-            .WithRelease(release)
-            .Generate();
+            .WithRelease(release);
 
-        var featuredTable2 = _fixture
+        FeaturedTable featuredTable2 = _fixture
             .DefaultFeaturedTable()
             .WithDataBlock(dataBlockParents[1].LatestPublishedVersion!.ContentBlock)
             .WithDataBlockParent(dataBlockParents[1])
-            .WithRelease(release)
-            .Generate();
+            .WithRelease(release);
 
-        var unassociatedDataBlockParent = _fixture
+        DataBlockParent unassociatedDataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
-                .DefaultDataBlockVersion()
-                .Generate())
-            .Generate();
+                .DefaultDataBlockVersion());
 
-        var unassociatedRelease = _fixture
+        Release unassociatedRelease = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestDraftVersion!))
-            .Generate();
+            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestDraftVersion!));
 
         var unassociatedFeaturedTable = new FeaturedTable
         {
@@ -316,17 +303,14 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Create()
     {
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestDraftVersion(_fixture
-                .DefaultDataBlockVersion()
-                .Generate())
-            .Generate();
+                .DefaultDataBlockVersion());
 
-        var release = _fixture
+        Release release = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
-            .Generate();
+            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -478,25 +462,21 @@ public class FeaturedTableServiceTests
     [Fact]
     public async Task Update()
     {
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
-            .Generate();
+                .DefaultDataBlockVersion());
 
-        var release = _fixture
+        Release release = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(dataBlockParent.LatestPublishedVersion!))
-            .Generate();
+            .WithDataBlockVersions(ListOf(dataBlockParent.LatestPublishedVersion!));
 
-        var featuredTable = _fixture
+        FeaturedTable featuredTable = _fixture
             .DefaultFeaturedTable()
             .WithDataBlock(dataBlockParent.LatestPublishedVersion!.ContentBlock)
             .WithDataBlockParent(dataBlockParent)
             .WithRelease(release)
-            .WithOrder(65)
-            .Generate();
+            .WithOrder(65);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -778,15 +758,13 @@ public class FeaturedTableServiceTests
         var dataBlockParents = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
+                .DefaultDataBlockVersion())
             .GenerateList(3);
 
-        var release = _fixture
+        Release release = _fixture
             .DefaultRelease()
             .WithDataBlockVersions(dataBlockParents
-                .Select(p => p.LatestPublishedVersion!))
-            .Generate();
+                .Select(p => p.LatestPublishedVersion!));
 
         var featuredTables = _fixture
             .DefaultFeaturedTable()
@@ -805,23 +783,19 @@ public class FeaturedTableServiceTests
                 .SetOrder(2))
             .GenerateList(3);
 
-        var unassociatedDataBlockParent = _fixture
+        DataBlockParent unassociatedDataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(() => _fixture
-                .DefaultDataBlockVersion()
-                .Generate())
-            .Generate();
+                .DefaultDataBlockVersion());
 
-        var unassociatedRelease = _fixture
+        Release unassociatedRelease = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestPublishedVersion!))
-            .Generate();
+            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestPublishedVersion!));
 
-        var unassociatedFeaturedTable = _fixture
+        FeaturedTable unassociatedFeaturedTable = _fixture
             .DefaultFeaturedTable()
             .WithRelease(unassociatedRelease)
-            .WithOrder(4)
-            .Generate();
+            .WithOrder(4);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))

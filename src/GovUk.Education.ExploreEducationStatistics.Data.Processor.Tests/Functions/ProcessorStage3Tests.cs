@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -94,8 +95,7 @@ public class ProcessorStage3Tests : IDisposable
                     .ForIndex(0, s => s.SetLabel("Indicator one"))
                     .ForIndex(1, s => s.SetLabel("Indicator two"))
                     .GenerateList())
-                .Generate(1))
-            .Generate();
+                .Generate(1));
     }
 
     public void Dispose()
@@ -106,7 +106,7 @@ public class ProcessorStage3Tests : IDisposable
     [Fact]
     public async Task ProcessStage3()
     {
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -114,8 +114,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
-            )
-            .Generate();
+            );
     
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -293,7 +292,7 @@ public class ProcessorStage3Tests : IDisposable
     [Fact]
     public async Task ProcessStage3_FailsImportIfRowCountsDontMatch()
     {
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -301,13 +300,11 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
-            )
-            .Generate();
+            );
         
-        var unexpectedImportedObservation = _fixture
+        Observation unexpectedImportedObservation = _fixture
             .DefaultObservation()
-            .WithSubject(_subject)
-            .Generate();
+            .WithSubject(_subject);
     
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -422,7 +419,7 @@ public class ProcessorStage3Tests : IDisposable
     public async Task ProcessStage3_PartiallyImportedAlready()
     {
         // This import has already imported 4 rows and is now being restarted.
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -432,8 +429,7 @@ public class ProcessorStage3Tests : IDisposable
                 expectedImportedRows: 16,
                 importedRows: 4,
                 lastProcessedRowIndex: 3
-            )
-            .Generate();
+            );
 
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
@@ -574,7 +570,7 @@ public class ProcessorStage3Tests : IDisposable
         // imported. Of the 4th batch of 3 rows, the first row has been imported
         // already, so of the 4th batch, only the 2nd and 3rd rows should be imported.
         // The remaining 2 batches of 3 and 1 rows respectively should be imported fully. 
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -584,8 +580,7 @@ public class ProcessorStage3Tests : IDisposable
                 expectedImportedRows: 16,
                 importedRows: 10,
                 lastProcessedRowIndex: 9
-            )
-            .Generate();
+            );
 
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
@@ -719,7 +714,7 @@ public class ProcessorStage3Tests : IDisposable
     public async Task ProcessStage3_IgnoredRows()
     {
         // This import expects only 8 out of 16 rows to be imported, as 8 of them are ignored.
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("ignored-school-rows")
@@ -727,8 +722,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 8
-            )
-            .Generate();
+            );
     
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -866,7 +860,7 @@ public class ProcessorStage3Tests : IDisposable
         // This import expects only 8 out of 16 rows to be imported, as 8 of them are ignored.
         // This import was interrupted and is restarting. So far, 7 rows have been processed, and of those 7,
         // 4 are LA-level data that has been imported, and 3 are School-level data that has been ignored.
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("ignored-school-rows")
@@ -876,8 +870,7 @@ public class ProcessorStage3Tests : IDisposable
                 expectedImportedRows: 8,
                 importedRows: 4,
                 lastProcessedRowIndex: 6
-            )
-            .Generate();
+            );
         
         // Generate already-imported Observations with alternating CsvRow numbers
         // e.g. 2, 4, 6, 8
@@ -885,8 +878,7 @@ public class ProcessorStage3Tests : IDisposable
             .DefaultObservation()
             .WithLocation(_fixture
                 .DefaultLocation()
-                .WithGeographicLevel(GeographicLevel.LocalAuthority)
-                .Generate())
+                .WithGeographicLevel(GeographicLevel.LocalAuthority))
             .WithSubject(_subject)
             .ForInstance(s => s.Set(o => o.CsvRow, 
                 (_, _, context) => (context.Index * 2) + 2))
@@ -1026,7 +1018,7 @@ public class ProcessorStage3Tests : IDisposable
     {
         Environment.SetEnvironmentVariable("RowsPerBatch", "3");
         
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -1034,8 +1026,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
-            )
-            .Generate();
+            );
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1169,7 +1160,7 @@ public class ProcessorStage3Tests : IDisposable
     {
         Environment.SetEnvironmentVariable("RowsPerBatch", "3");
         
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("small-csv")
@@ -1177,8 +1168,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
-            )
-            .Generate();
+            );
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1283,7 +1273,7 @@ public class ProcessorStage3Tests : IDisposable
     [Fact]
     public async Task ProcessStage3_AdditionalFiltersAndIndicators()
     {
-        var additionalFilter = _fixture
+        Filter additionalFilter = _fixture
             .DefaultFilter()
             .WithSubject(_subject)
             .WithLabel("Additional filter")
@@ -1293,17 +1283,15 @@ public class ProcessorStage3Tests : IDisposable
                     .DefaultFilterItem()
                     .ForIndex(1, s => s.SetLabel("Not specified"))
                     .Generate(3))
-                .Generate(1))
-            .Generate();
+                .Generate(1));
 
         // Add an additional Indicator to the existing Indicator Group
-        var additionalIndicator = _fixture
+        Indicator additionalIndicator = _fixture
             .DefaultIndicator()
             .WithIndicatorGroup(_subject.IndicatorGroups[0])
-            .WithLabel("Additional indicator")
-            .Generate();
+            .WithLabel("Additional indicator");
         
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
             .WithFiles("additional-filters-and-indicators")
@@ -1311,8 +1299,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
-            )
-            .Generate();
+            );
     
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1443,7 +1430,7 @@ public class ProcessorStage3Tests : IDisposable
     [Fact]
     public async Task ProcessStage3_SpecialFilterItemAndIndicatorValues()
     {
-        var subject = _fixture
+        Subject subject = _fixture
             .DefaultSubject()
             .WithFilters(_fixture
                 .DefaultFilter()
@@ -1470,10 +1457,9 @@ public class ProcessorStage3Tests : IDisposable
                     .DefaultIndicator()
                     .WithLabel("Indicator one")
                     .GenerateList(1))
-                .Generate(1))
-            .Generate();
+                .Generate(1));
         
-        var import = _fixture
+        DataImport import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
             .WithFiles("small-csv-with-special-data")
@@ -1481,8 +1467,7 @@ public class ProcessorStage3Tests : IDisposable
             .WithRowCounts(
                 totalRows: 5,
                 expectedImportedRows: 5
-            )
-            .Generate();
+            );
     
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))

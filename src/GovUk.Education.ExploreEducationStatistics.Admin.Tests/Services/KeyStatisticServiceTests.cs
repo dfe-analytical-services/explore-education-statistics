@@ -35,17 +35,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -121,17 +118,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_Order()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -219,17 +213,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_NoRelease()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -258,17 +249,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_NoDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -297,17 +285,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_DataBlockAttachedToContent()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -494,17 +479,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -983,17 +965,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -1048,9 +1027,8 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticText()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
         var keyStatisticText = new KeyStatisticText
         {
@@ -1097,17 +1075,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_NoRelease()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
@@ -1146,17 +1121,14 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_NoKeyStatistic()
     {
-        var release = _fixture
-            .DefaultRelease()
-            .Generate();
+        Release release = _fixture
+            .DefaultRelease();
 
-        var dataBlockParent = _fixture
+        DataBlockParent dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
-                .Generate())
-            .Generate();
+                .WithRelease(release));
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 

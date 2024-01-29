@@ -2997,26 +2997,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublication_Included()
             {
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
-                var methodology = _fixture
+                Methodology methodology = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate();
+                    .WithRole(PublicationRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3047,8 +3044,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 // Generate 2 Methodologies that are not in Higher Review.
                 var methodologies = _fixture
@@ -3068,8 +3064,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate();
+                    .WithRole(PublicationRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3093,8 +3088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 // Create a Methodology that has only been adopted by the User's Publication.
                 var methodology = _fixture
@@ -3103,15 +3097,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate();
+                    .WithRole(PublicationRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3135,8 +3127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3144,16 +3135,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 // Set up the User as an Owner on the Methodology's Publication rather than an Approver.
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Owner)
-                    .Generate();
+                    .WithRole(PublicationRole.Owner);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3179,8 +3168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3188,15 +3176,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(otherUser)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate();
+                    .WithRole(PublicationRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3222,29 +3208,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_Included()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
-                var publication = _fixture
+                Publication publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(ListOf(release))
-                    .Generate();
+                    .WithReleases(ListOf(release));
 
-                var methodology = _fixture
+                Methodology methodology = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate();
+                    .WithRole(ReleaseRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3282,24 +3265,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(releases)
-                    .Generate();
+                    .WithReleases(releases);
 
-                var methodology = _fixture
+                Methodology methodology = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var releaseRoleForUserOnOldRelease = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(releases[0])
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate();
+                    .WithRole(ReleaseRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3328,12 +3308,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 // Generate 2 Methodologies that are not in Higher Review.
                 var methodologies = _fixture
@@ -3353,8 +3332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate();
+                    .WithRole(ReleaseRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3375,12 +3353,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsReleaseApproverOnAdoptingPublication_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 // Create a Methodology that has only been adopted by the User's Publication.
                 var methodology = _fixture
@@ -3389,15 +3366,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate();
+                    .WithRole(ReleaseRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3419,11 +3394,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsOnlyContributorOnOwningPublicationRelease_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
                 var publication = _fixture
-                    .DefaultPublication()
-                    .Generate();
+                    .DefaultPublication();
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3431,16 +3405,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 // Set up the User as a Contributor on the Methodology's Publication's Release rather than an Approver.
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Contributor)
-                    .Generate();
+                    .WithRole(ReleaseRole.Contributor);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3464,12 +3436,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Set up a different User as the Approver for the owning Publication.
                 var otherUser = new User();
 
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
                 var publication = _fixture
                     .DefaultPublication()
-                    .WithContact(MockContact)
-                    .Generate();
+                    .WithContact(MockContact);
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3477,15 +3448,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .Generate(1))
-                    .Generate();
+                        .Generate(1));
 
                 var releaseRoleForOtherUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(otherUser)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Contributor)
-                    .Generate();
+                    .WithRole(ReleaseRole.Contributor);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3506,13 +3475,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                Release release = _fixture.DefaultRelease();
 
                 var publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(ListOf(release))
-                    .Generate();
+                    .WithReleases(ListOf(release));
 
                 var methodology = _fixture
                     .DefaultMethodology()
@@ -3520,22 +3488,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
                         .WithApprovalStatus(HigherLevelReview)
-                        .GenerateList(1))
-                    .Generate();
+                        .GenerateList(1));
 
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithPublication(publication)
-                    .WithRole(PublicationRole.Approver)
-                    .Generate();
+                    .WithRole(PublicationRole.Approver);
 
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRelease(release)
-                    .WithRole(ReleaseRole.Approver)
-                    .Generate();
+                    .WithRole(ReleaseRole.Approver);
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))

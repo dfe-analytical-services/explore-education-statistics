@@ -43,9 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static readonly Release Release = Fixture
             .DefaultRelease()
-            .WithPublication(Fixture.DefaultPublication().Generate())
-            .WithPublished(DateTime.UtcNow.AddDays(-1))
-            .Generate();
+            .WithPublication(Fixture.DefaultPublication())
+            .WithPublished(DateTime.UtcNow.AddDays(-1));
 
         private static readonly DataBlockParent DataBlockParent = Fixture
             .DefaultDataBlockParent()
@@ -82,17 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     Title = "Test chart",
                     Height = 400,
                     Width = 500,
-                }))
-                .Generate())
-            .Generate();
+                })));
 
         private static readonly DataBlockParent DataBlockParentWithNoPublishedVersion = Fixture
             .DefaultDataBlockParent()
             .WithLatestDraftVersion(Fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(Release)
-                .Generate())
-            .Generate();
+                .WithRelease(Release));
 
         private static readonly Guid PublicationId = Release.PublicationId;
 

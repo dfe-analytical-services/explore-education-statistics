@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteReleaseSubject()
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            Subject subject = _fixture.DefaultSubject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteReleaseSubject_NonOrphanedSubject()
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            Subject subject = _fixture.DefaultSubject();
 
             var releaseSubject1 = new ReleaseSubject
             {
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteReleaseSubject_NotFound()
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            Subject subject = _fixture.DefaultSubject();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteAllReleaseSubjects()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
             var releaseSubject1 = new ReleaseSubject
             {
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteAllReleaseSubjects_SoftDeleteFalse()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            Release release = _fixture.DefaultStatsRelease();
 
             var releaseSubject1 = new ReleaseSubject
             {

@@ -346,35 +346,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test topic to delete"
             };
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(releaseId)
-                    .Generate())
+                    .WithReleaseId(releaseId))
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(releaseId)
-                    .Generate())
-                .Generate();
+                    .WithReleaseId(releaseId));
 
-            var release = _fixture
+            ContentRelease release = _fixture
                 .DefaultRelease()
                 .WithId(releaseId)
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
-                        .WithTopic(topic)
-                        .Generate())
+                        .WithTopic(topic))
                 .WithDataBlockVersions(ListOf(
                     dataBlockParent.LatestDraftVersion!,
-                    dataBlockParent.LatestPublishedVersion!))
-                .Generate();
+                    dataBlockParent.LatestPublishedVersion!));
 
-            var methodology = _fixture
+            Methodology methodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(release.Publication)
-                .Generate();
+                .WithOwningPublication(release.Publication);
 
             var statsRelease = new Release
             {
@@ -777,35 +771,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test topic to delete"
             };
 
-            var dataBlockParent = _fixture
+            DataBlockParent dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(releaseId)
-                    .Generate())
+                    .WithReleaseId(releaseId))
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(releaseId)
-                    .Generate())
-                .Generate();
+                    .WithReleaseId(releaseId));
 
-            var release = _fixture
+            ContentRelease release = _fixture
                 .DefaultRelease()
                 .WithId(releaseId)
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
-                        .WithTopic(topic)
-                        .Generate())
+                        .WithTopic(topic))
                 .WithDataBlockVersions(ListOf(
                     dataBlockParent.LatestDraftVersion!,
-                    dataBlockParent.LatestPublishedVersion!))
-                .Generate();
+                    dataBlockParent.LatestPublishedVersion!));
 
-            var methodology = _fixture
+            Methodology methodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(release.Publication)
-                .Generate();
+                .WithOwningPublication(release.Publication);
 
             var statsRelease = new Release
             {
@@ -821,35 +809,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "UI test topic to retain"
             };
 
-            var otherDataBlockParent = _fixture
+            DataBlockParent otherDataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(otherReleaseId)
-                    .Generate())
+                    .WithReleaseId(otherReleaseId))
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(otherReleaseId)
-                    .Generate())
-                .Generate();
+                    .WithReleaseId(otherReleaseId));
 
-            var otherRelease = _fixture
+            ContentRelease otherRelease = _fixture
                 .DefaultRelease()
                 .WithId(otherReleaseId)
                 .WithPublication(
                     _fixture
                         .DefaultPublication()
-                        .WithTopic(otherTopic)
-                        .Generate())
+                        .WithTopic(otherTopic))
                 .WithDataBlockVersions(ListOf(
                     otherDataBlockParent.LatestDraftVersion!,
-                    otherDataBlockParent.LatestPublishedVersion!))
-                .Generate();
+                    otherDataBlockParent.LatestPublishedVersion!));
 
             var otherMethodology = _fixture
                 .DefaultMethodology()
-                .WithOwningPublication(otherRelease.Publication)
-                .Generate();
+                .WithOwningPublication(otherRelease.Publication);
 
             var otherStatsRelease = new Release
             {
