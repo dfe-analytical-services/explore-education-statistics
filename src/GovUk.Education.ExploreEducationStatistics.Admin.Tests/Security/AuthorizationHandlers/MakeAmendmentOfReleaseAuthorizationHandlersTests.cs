@@ -500,12 +500,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(
             ContentDbContext contentDbContext)
         {
-            return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+            return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
                     new ReleaseRepository(contentDbContext),
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
+                    Mock.Of<IPreReleaseService>(Strict)),
+                new ReleaseRepository(contentDbContext));
         }
     }
 }
