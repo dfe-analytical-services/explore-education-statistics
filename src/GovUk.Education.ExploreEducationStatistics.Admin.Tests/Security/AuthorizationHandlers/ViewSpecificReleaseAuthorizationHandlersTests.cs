@@ -207,6 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             {
                                 MinutesBeforeReleaseTimeEnd = 100,
                                 MinutesBeforeReleaseTimeStart = 200,
+                                MinutesIntoPublishDayByWhichPublishingHasOccurred = 50, // TODO: Ensure this value occurs in a test or two
                             }
                         }
                     }))));

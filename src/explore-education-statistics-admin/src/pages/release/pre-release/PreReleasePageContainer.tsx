@@ -132,7 +132,7 @@ const PreReleasePageContainer = ({
       );
     }
 
-    if (access === 'Within') {
+    if (access === 'Within' || access === 'WithinPublishDayLenience') {
       return (
         <>
           <NotificationBanner

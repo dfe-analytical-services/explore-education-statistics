@@ -37,6 +37,7 @@ describe('PreReleasePageContainer', () => {
       access: 'After',
       start: new Date('2018-12-12T09:00:00Z'),
       end: new Date('2018-12-13T00:00:00Z'),
+      publishDayLenienceDeadline: new Date('2018-12-14T09:30:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -64,6 +65,7 @@ describe('PreReleasePageContainer', () => {
       access: 'Before',
       start: new Date('3000-12-12T09:00:00Z'),
       end: new Date('3000-12-13T00:00:00Z'),
+      publishDayLenienceDeadline: new Date('2018-12-14T09:30:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -98,6 +100,7 @@ describe('PreReleasePageContainer', () => {
       access: 'Within',
       start: subHours(now, 6),
       end: addHours(now, 18),
+      publishDayLenienceDeadline: addHours(now, 27.5),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -121,6 +124,48 @@ describe('PreReleasePageContainer', () => {
 
       expect(
         screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', {
+          name: 'Pre-release access is not yet available',
+        }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test('renders correctly when within release day lenience window', async () => {
+    const now = new Date(); // 2am on Publish Day
+
+    permissionService.getPreReleaseWindowStatus.mockResolvedValue({
+      access: 'WithinPublishDayLenience',
+      start: subHours(now, 26),
+      end: subHours(now, 2),
+      publishDayLenienceDeadline: addHours(now, 7.5),
+    });
+
+    preReleaseService.getPreReleaseSummary.mockResolvedValue(
+      testPreReleaseSummary,
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      const banner = within(screen.getByRole('region', { name: 'Contact' }));
+      expect(
+        banner.getByText('If you have an enquiry about this release contact:'),
+      ).toBeInTheDocument();
+
+      expect(banner.getByText('Test team:')).toBeInTheDocument();
+      expect(
+        banner.getByRole('link', { name: 'test@test.com' }),
+      ).toBeInTheDocument();
+
+      expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('heading', {
+          name: 'Pre-release access has ended',
+        }),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('heading', {
