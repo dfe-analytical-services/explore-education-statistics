@@ -131,6 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureKeyStatisticsText(modelBuilder);
             ConfigureDataBlockParent(modelBuilder);
             ConfigureDataBlockVersion(modelBuilder);
+
+            // Apply model configuration for types which implement IEntityTypeConfiguration
+
+            new FreeTextRank.Config().Configure(modelBuilder.Entity<FreeTextRank>());
         }
 
         private static void ConfigureComment(ModelBuilder modelBuilder)
