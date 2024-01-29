@@ -1,7 +1,7 @@
 import styles from '@admin/components/DroppableArea.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { DroppableProvided, DroppableStateSnapshot } from 'react-beautiful-dnd';
+import { DroppableProvided, DroppableStateSnapshot } from '@hello-pangea/dnd';
 
 interface Props {
   children: ReactNode;

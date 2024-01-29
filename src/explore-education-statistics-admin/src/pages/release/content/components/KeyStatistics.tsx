@@ -10,7 +10,7 @@ import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.mo
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
-import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, DropResult } from '@hello-pangea/dnd';
 import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStatistics';
 
 export interface KeyStatisticsProps {

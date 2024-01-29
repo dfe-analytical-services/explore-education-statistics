@@ -143,6 +143,9 @@ importers:
       '@ckeditor/ckeditor5-upload':
         specifier: ^40.1.0
         version: 40.1.0
+      '@hello-pangea/dnd':
+        specifier: ^16.5.0
+        version: 16.5.0(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2)
       '@lukemorales/query-key-factory':
         specifier: ^1.3.2
         version: 1.3.2(@tanstack/query-core@4.32.0)(@tanstack/react-query@4.32.0)
@@ -299,9 +302,6 @@ importers:
       react-app-polyfill:
         specifier: ^3.0.0
         version: 3.0.0
-      react-beautiful-dnd:
-        specifier: ^13.1.1
-        version: 13.1.1(react-dom@17.0.2)(react@17.0.2)
       react-dev-utils:
         specifier: ^12.0.1
         version: 12.0.1(eslint@8.43.0)(typescript@5.1.6)(webpack@5.88.1)
@@ -438,9 +438,6 @@ importers:
       '@types/react':
         specifier: 17.0.27
         version: 17.0.27
-      '@types/react-beautiful-dnd':
-        specifier: ^13.1.4
-        version: 13.1.4
       '@types/react-dom':
         specifier: 17.0.9
         version: 17.0.9
@@ -624,6 +621,9 @@ importers:
       '@hello-pangea/color-picker':
         specifier: ^3.2.2
         version: 3.2.2(react@17.0.2)
+      '@hello-pangea/dnd':
+        specifier: ^16.5.0
+        version: 16.5.0(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2)
       '@hookform/resolvers':
         specifier: ^3.1.1
         version: 3.1.1(react-hook-form@7.43.9)
@@ -711,9 +711,6 @@ importers:
       react:
         specifier: 17.0.2
         version: 17.0.2
-      react-beautiful-dnd:
-        specifier: ^13.0.0
-        version: 13.1.1(react-dom@17.0.2)(react@17.0.2)
       react-dom:
         specifier: 17.0.2
         version: 17.0.2(react@17.0.2)
@@ -802,9 +799,6 @@ importers:
       '@types/react':
         specifier: 17.0.27
         version: 17.0.27
-      '@types/react-beautiful-dnd':
-        specifier: ^13.0.0
-        version: 13.1.3
       '@types/react-dom':
         specifier: 17.0.9
         version: 17.0.9
@@ -883,6 +877,9 @@ importers:
 
   src/explore-education-statistics-frontend:
     dependencies:
+      '@hello-pangea/dnd':
+        specifier: ^16.5.0
+        version: 16.5.0(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2)
       '@next/env':
         specifier: ^12.3.4
         version: 12.3.4
@@ -952,9 +949,6 @@ importers:
       react:
         specifier: 17.0.2
         version: 17.0.2
-      react-beautiful-dnd:
-        specifier: ^13.1.1
-        version: 13.1.1(react-dom@17.0.2)(react@17.0.2)
       react-dom:
         specifier: 17.0.2
         version: 17.0.2(react@17.0.2)
@@ -1034,9 +1028,6 @@ importers:
       '@types/react':
         specifier: 17.0.27
         version: 17.0.27
-      '@types/react-beautiful-dnd':
-        specifier: ^13.1.4
-        version: 13.1.4
       '@types/react-dom':
         specifier: 17.0.9
         version: 17.0.9
@@ -4588,6 +4579,13 @@ packages:
     dependencies:
       regenerator-runtime: 0.13.11
 
+  /@babel/runtime@7.23.9:
+    resolution: {integrity: sha512-0CX6F+BI2s9dkUqr08KFrAIZgNFj75rdBU/DjCyYLIaV/quFjkk6T+EJ2LkZHyZTbEV4L5p97mNkUsHl2wLFAw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      regenerator-runtime: 0.14.1
+    dev: false
+
   /@babel/runtime@7.9.0:
     resolution: {integrity: sha512-cTIudHnzuWLS56ik4DnRnqqNf8MkdUzV4iFFI1h7Jo9xvrpQROYaAnaSd2mHLQAzzZAPfATynX5ord6YlNYNMA==}
     dependencies:
@@ -5249,6 +5247,27 @@ packages:
       lodash: 4.17.21
       react: 17.0.2
       tinycolor2: 1.6.0
+    dev: false
+
+  /@hello-pangea/dnd@16.5.0(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-n+am6O32jo/CFXciCysz83lPM3I3F58FJw4uS44TceieymcyxQSfzK5OhzPAKrVBZktmuOI6Zim9WABTMtXv4A==}
+    peerDependencies:
+      react: ^16.8.5 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.23.9
+      css-box-model: 1.2.1
+      memoize-one: 6.0.0
+      raf-schd: 4.0.3
+      react: 17.0.2
+      react-dom: 17.0.2(react@17.0.2)
+      react-redux: 8.1.3(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1)
+      redux: 4.2.1
+      use-memo-one: 1.1.3(react@17.0.2)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+      - react-native
     dev: false
 
   /@hookform/resolvers@3.1.1(react-hook-form@7.43.9):
@@ -7127,18 +7146,6 @@ packages:
   /@types/range-parser@1.2.4:
     resolution: {integrity: sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==}
 
-  /@types/react-beautiful-dnd@13.1.3:
-    resolution: {integrity: sha512-BNdmvONKtsrZq3AGrujECQrIn8cDT+fZsxBLXuX3YWY/nHfZinUFx4W88eS0rkcXzuLbXpKOsu/1WCMPMLEpPg==}
-    dependencies:
-      '@types/react': 17.0.27
-    dev: true
-
-  /@types/react-beautiful-dnd@13.1.4:
-    resolution: {integrity: sha512-4bIBdzOr0aavN+88q3C7Pgz+xkb7tz3whORYrmSj77wfVEMfiWiooIwVWFR7KM2e+uGTe5BVrXqSfb0aHeflJA==}
-    dependencies:
-      '@types/react': 17.0.27
-    dev: true
-
   /@types/react-dom@17.0.9:
     resolution: {integrity: sha512-wIvGxLfgpVDSAMH5utdL9Ngm5Owu0VsGmldro3ORLXV8CShrL8awVj06NuEXFQ5xyaYfdca7Sgbk/50Ri1GdPg==}
     dependencies:
@@ -7174,15 +7181,6 @@ packages:
     dependencies:
       '@types/react': 17.0.27
     dev: true
-
-  /@types/react-redux@7.1.25:
-    resolution: {integrity: sha512-bAGh4e+w5D8dajd6InASVIyCo4pZLJ66oLb80F9OBLO1gKESbZcRCJpTT6uLXX+HAB57zw1WTdwJdAsewuTweg==}
-    dependencies:
-      '@types/hoist-non-react-statics': 3.3.1
-      '@types/react': 17.0.27
-      hoist-non-react-statics: 3.3.2
-      redux: 4.2.1
-    dev: false
 
   /@types/react-router-dom@5.3.3:
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
@@ -7301,6 +7299,10 @@ packages:
 
   /@types/unist@2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
+    dev: false
+
+  /@types/use-sync-external-store@0.0.3:
+    resolution: {integrity: sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==}
     dev: false
 
   /@types/uuid@8.3.4:
@@ -13770,8 +13772,8 @@ packages:
     resolution: {integrity: sha512-QmpUu4KqDmX0plH4u+tf0riMc1KHE1+lw95cMrLlXQAFOx/xnBtwhZ52XJxd9X2O6kwKBqX32kmhbhlobD0cuw==}
     dev: false
 
-  /memoize-one@5.2.1:
-    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
+  /memoize-one@6.0.0:
+    resolution: {integrity: sha512-rkpe71W0N0c0Xz6QD0eJETuWAJGnJ9afsl1srmwPrI+yBCkge5EycXXbYRyvL29zZVUWQCY7InPRCv3GDXuZNw==}
     dev: false
 
   /memoizee@0.4.15:
@@ -16080,25 +16082,6 @@ packages:
       whatwg-fetch: 3.6.2
     dev: false
 
-  /react-beautiful-dnd@13.1.1(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-0Lvs4tq2VcrEjEgDXHjT98r+63drkKEgqyxdA7qD3mvKwga6a5SscbdLPO2IExotU1jW8L0Ksdl0Cj2AF67nPQ==}
-    peerDependencies:
-      react: ^16.8.5 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.5 || ^17.0.0 || ^18.0.0
-    dependencies:
-      '@babel/runtime': 7.22.6
-      css-box-model: 1.2.1
-      memoize-one: 5.2.1
-      raf-schd: 4.0.3
-      react: 17.0.2
-      react-dom: 17.0.2(react@17.0.2)
-      react-redux: 7.2.9(react-dom@17.0.2)(react@17.0.2)
-      redux: 4.2.1
-      use-memo-one: 1.1.3(react@17.0.2)
-    transitivePeerDependencies:
-      - react-native
-    dev: false
-
   /react-dev-utils@12.0.1(eslint@8.43.0)(typescript@5.1.6)(webpack@5.88.1):
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
     engines: {node: '>=14'}
@@ -16274,26 +16257,38 @@ packages:
     resolution: {integrity: sha512-kzmNjIgU32mO4mmH5+iUyrqlpFQhF8K2k7eZ4fdLSOPFrD1XgEuSBv9LDEgxRXTMBqMd8ppT0x6TIzqE5pdGdw==}
     dev: false
 
-  /react-redux@7.2.9(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-Gx4L3uM182jEEayZfRbI/G11ZpYdNAnBs70lFVMNdHJI76XYtR+7m0MN+eAs7UHBPhWXcnFPaS+9owSCJQHNpQ==}
+  /react-redux@8.1.3(@types/react-dom@17.0.9)(@types/react@17.0.27)(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1):
+    resolution: {integrity: sha512-n0ZrutD7DaX/j9VscF+uTALI3oUPa/pO4Z3soOBIjuRn/FzVu6aehhysxZCLi6y7duMf52WNZGMl7CtuK5EnRw==}
     peerDependencies:
-      react: ^16.8.3 || ^17 || ^18
-      react-dom: '*'
-      react-native: '*'
+      '@types/react': ^16.8 || ^17.0 || ^18.0
+      '@types/react-dom': ^16.8 || ^17.0 || ^18.0
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+      react-native: '>=0.59'
+      redux: ^4 || ^5.0.0-beta.0
     peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
       react-dom:
         optional: true
       react-native:
         optional: true
+      redux:
+        optional: true
     dependencies:
-      '@babel/runtime': 7.22.6
-      '@types/react-redux': 7.1.25
+      '@babel/runtime': 7.23.9
+      '@types/hoist-non-react-statics': 3.3.1
+      '@types/react': 17.0.27
+      '@types/react-dom': 17.0.9
+      '@types/use-sync-external-store': 0.0.3
       hoist-non-react-statics: 3.3.2
-      loose-envify: 1.4.0
-      prop-types: 15.8.1
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
-      react-is: 17.0.2
+      react-is: 18.2.0
+      redux: 4.2.1
+      use-sync-external-store: 1.2.0(react@17.0.2)
     dev: false
 
   /react-refresh@0.14.0:
@@ -16603,7 +16598,7 @@ packages:
   /redux@4.2.1:
     resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
     dependencies:
-      '@babel/runtime': 7.22.6
+      '@babel/runtime': 7.23.9
     dev: false
 
   /referrer-policy@1.2.0:
@@ -16625,6 +16620,10 @@ packages:
 
   /regenerator-runtime@0.13.9:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
+
+  /regenerator-runtime@0.14.1:
+    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
+    dev: false
 
   /regenerator-transform@0.15.1:
     resolution: {integrity: sha512-knzmNAcuyxV+gQCufkYcvOqX/qIIfHLv0u5x79kRxuGojfYVky1f15TzZEu2Avte8QGepvUNTnLskf8E6X6Vyg==}

@@ -4,7 +4,7 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
 import reorder from '@common/utils/reorder';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import React, { ReactNode, useCallback } from 'react';
 
 export interface EditableSectionBlockProps<

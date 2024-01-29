@@ -5,7 +5,7 @@ import ButtonText from '@common/components/ButtonText';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
 export interface FormattedOption {
   id: string;
