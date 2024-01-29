@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 
 public static class DataSetGeneratorExtensions
 {
@@ -27,14 +26,13 @@ public static class DataSetGeneratorExtensions
     public static Generator<DataSet> WithStatus(this Generator<DataSet> generator, DataSetStatus status)
         => generator.ForInstance(s => s.SetStatus(status));
 
+    public static Generator<DataSet> WithPublicationId(this Generator<DataSet> generator, Guid publicationId)
+        => generator.ForInstance(s => s.SetPublicationId(publicationId));
+
     public static InstanceSetters<DataSet> SetStatus(
         this InstanceSetters<DataSet> instanceSetter,
         DataSetStatus status)
         => instanceSetter.Set(f => f.Status, status);
-
-    public static Generator<DataSet> WithPublicationId(this Generator<DataSet> generator, Guid publicationId)
-    => generator.ForInstance(s => s.SetPublicationId(publicationId));
-
     public static InstanceSetters<DataSet> SetPublicationId(
         this InstanceSetters<DataSet> instanceSetter,
         Guid publicationId)

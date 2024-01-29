@@ -1,17 +1,18 @@
+using System.Net;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -258,7 +259,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await GetPublication(client, publication.Id);
 
-            var content = response.AssertOk<ViewModels.PublicationSummaryViewModel>(useSystemJson: true);
+            var content = response.AssertOk<PublicationSummaryViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(publication.Id, content.Id);
