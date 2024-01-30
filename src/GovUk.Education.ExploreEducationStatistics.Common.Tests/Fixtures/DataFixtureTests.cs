@@ -42,6 +42,26 @@ public class DataFixtureTests
     }
 
     [Fact]
+    public void Generator_Single_GenerateRandomIsDeterministic()
+    {
+        var fixture = new DataFixture();
+
+        var generator = fixture.Generator<Person>();
+        var items = generator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(7, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person", item.FirstName));
+
+        items = generator.GenerateRandomList(10);
+
+        Assert.Equal(8, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person", item.FirstName));
+    }
+
+    [Fact]
     public void Generator_Single_SetSeed()
     {
         var fixture = new DataFixture();
@@ -144,7 +164,31 @@ public class DataFixtureTests
     }
 
     [Fact]
-    public void Generator_RandomIsDeterministicButDifferentPerType()
+    public void Generator_Multiple_GenerateRandomIsDeterministic()
+    {
+        var fixture = new DataFixture();
+
+        var items = fixture
+            .Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person 1"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(7, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person 1", item.FirstName));
+
+        items = fixture
+            .Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person 2"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(8, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person 2", item.FirstName));
+    }
+
+    [Fact]
+    public void Generator_Multiple_RandomIsDeterministicButDifferentPerType()
     {
         var fixture = new DataFixture();
 
