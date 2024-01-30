@@ -9,6 +9,7 @@ Library     ../admin-utilities.py
 # accordion section itself e.g. the "Add new section" button.    These are necessary to use to differentiate
 # between different "Add new section" buttons (as an example) when more than one set of content accordions appears
 # on the page, for instance with Methodologies where Content and Annex areas are available.
+${RELEASE_CONTENT_EDITABLE_ACCORDION}=          id:releaseMainContent
 ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodologyAccordion-content"]]]
 ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodologyAccordion-annexes"]]]
 ${METHODOLOGY_CONTENT_READONLY_ACCORDION}=      id:methodologyAccordion-content
@@ -38,10 +39,30 @@ user adds basic release content
     user waits until button is enabled    Add new section
     user clicks button    Add new section
 
-    user changes accordion section title    1    Test section one    id:releaseMainContent
-    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user changes accordion section title    1    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    1
-    ...    Test content block for ${publication}    id:releaseMainContent
+    ...    Test content block for ${publication}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+user adds a release note
+    [Arguments]
+    ...    ${body}
+    ...    ${display_date_day}=${EMPTY}
+    ...    ${display_date_month}=${EMPTY}
+    ...    ${display_date_year}=${EMPTY}
+    user clicks button    Add note
+    user enters text into element    id:createReleaseNoteForm-reason    ${body}
+    user clicks button    Save note
+    user waits until page contains button    Add note
+
+    IF    "${display_date_day}" != "${EMPTY}"
+        user clicks button    Edit note    xpath://p[text()="${body}"]/ancestor::li
+        user enters text into element    label:Day    ${display_date_day}
+        user enters text into element    label:Month    ${display_date_month}
+        user enters text into element    label:Year    ${display_date_year}
+        user clicks button    Update note
+        user waits until page does not contain button    Update note
+    END
 
 user creates new content section
     [Arguments]
@@ -105,6 +126,8 @@ user creates data block for dates csv
 
     user waits until h2 is visible    Edit data block
     user waits until page contains button    Delete this data block
+
+# TODO DW - this could make use of new table_tool.robot "user creates data block" keyword.
 
 user creates key stats data block for dates csv
     [Arguments]
@@ -188,7 +211,7 @@ user changes accordion section title
     [Arguments]
     ...    ${section_num}
     ...    ${title}
-    ...    ${parent}=id:releaseMainContent
+    ...    ${parent}=${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user opens nth editable accordion section    ${section_num}    ${parent}
     ${section}=    get child element    ${parent}
@@ -238,10 +261,13 @@ user adds data block to editable accordion section
     user waits until page finishes loading
     user clicks button    Add data block    ${section}
     ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
-    user chooses select option    ${block_list}    Dates data block name
+    user chooses select option    ${block_list}    ${block_name}
     user waits until parent contains element    ${section}    css:table
     user clicks button    Embed    ${section}
     user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
+    ${block}=    set variable    xpath://*[@data-testid="Data block - ${block_name}"]
+    user waits until page contains element    ${block}    %{WAIT_SMALL}
+    [Return]    ${block}
 
 user chooses to embed a URL in editable accordion section
     [Arguments]
@@ -313,6 +339,24 @@ user adds content to headlines text block
     [Arguments]    ${content}
     user adds content to autosaving text block    id:releaseHeadlines    ${content}
 
+user adds secondary stats data block
+    [Arguments]
+    ...    ${data_block_name}
+    ...    ${expected_select_options}=${EMPTY}
+    user clicks button    Add secondary stats
+    user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
+    user checks select contains option    name:selectedDataBlock    Select a data block
+
+    IF    "${expected_select_options}" != "${EMPTY}"
+        ${expected_items_count}=    Get length    ${expected_select_options}
+        ${expected_items_count}=    Set Variable    ${${expected_items_count}+1}
+        user checks select contains x options    name:selectedDataBlock    ${expected_items_count}
+        FOR    ${expected_select_option}    IN    @{expected_select_options}
+            user checks select contains option    name:selectedDataBlock    ${expected_select_option}
+        END
+    END
+    user chooses and embeds data block    ${data_block_name}
+
 user adds content to related dashboards text block
     [Arguments]    ${content}
     user adds content to autosaving text block    id:related-dashboards-content    ${content}
@@ -323,11 +367,33 @@ user adds content to accordion section text block
     ...    ${block_num}
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
+    ...    ${append}=${False}
+    ...    ${style}=${EMPTY}
 
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
-    user presses keys    CTRL+a
-    user presses keys    BACKSPACE
+
+    IF    "${append}" == "${FALSE}"
+        user presses keys    CTRL+a
+        user presses keys    BACKSPACE
+    ELSE
+        user presses keys    END
+        user presses keys    ENTER
+    END
+
     user presses keys    ${content}
+
+    IF    "${style}" != "${EMPTY}"
+        user presses keys    SHIFT+HOME
+        user clicks element    xpath://button[@data-cke-tooltip-text="Heading"]
+        IF    "${style}" == "h3"
+            user clicks element    css:.ck-heading_heading3
+        ELSE IF    "${style}" == "h4"
+            user clicks element    css:.ck-heading_heading4
+        ELSE IF    "${style}" == "h5"
+            user clicks element    css:.ck-heading_heading5
+        END
+    END
+
     user clicks button    Save    ${block}
     user waits until element contains    ${block}    ${content}    %{WAIT_SMALL}
 
@@ -357,7 +423,7 @@ user adds image to accordion section text block
     user presses keys    ARROW_UP
 
     choose file
-    ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
+    ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
@@ -382,6 +448,7 @@ user adds image without alt text to accordion section text block
     ...    ${block_num}
     ...    ${filename}=test-infographic.png
     ...    ${parent}=[data-testid="accordion"]
+    ...    ${save_button}=Save & close
 
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
@@ -390,7 +457,7 @@ user adds image without alt text to accordion section text block
     user presses keys    ARROW_UP
 
     choose file
-    ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
+    ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
     user clicks element    xpath://div[@title="Insert paragraph after block"]
 
@@ -398,7 +465,7 @@ user adds image without alt text to accordion section text block
     user waits until parent contains element    ${block}
     ...    xpath://img[starts-with(@src, "/api/")]
 
-    user clicks button    Save    ${block}
+    user clicks button    ${save_button}    ${block}
     user waits until page finishes loading
 
 user removes image from accordion section text block
@@ -423,6 +490,24 @@ user removes image from accordion section text block
     user presses keys    DELETE
     user clicks button    ${save_button}    ${block}
     user waits until page finishes loading
+
+user adds link to accordion section text block
+    [Arguments]
+    ...    ${section_name}
+    ...    ${block_num}
+    ...    ${url}=https://gov.uk
+    ...    ${parent}=[data-testid="accordion"]
+
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
+    # Move the cursor to make sure previous content isn't selected.
+    user presses keys    ${\n}
+    user presses keys    ARROW_DOWN
+
+    ${toolbar}=    get editor toolbar    ${block}
+    ${button}=    user gets button element    Link    ${toolbar}
+    user clicks element    ${button}
+    user enters text into element    label:Link URL    ${url}
+    user presses keys    ENTER
 
 user saves autosaving text block
     [Arguments]    ${parent}

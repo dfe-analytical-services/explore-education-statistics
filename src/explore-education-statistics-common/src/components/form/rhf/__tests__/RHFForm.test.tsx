@@ -408,9 +408,9 @@ describe('Form', () => {
         <RHFForm
           id="test-form"
           onSubmit={() => {
-            throw createServerValidationErrorMock([], {
-              firstName: ['Invalid first name'],
-            });
+            throw createServerValidationErrorMock([
+              { path: 'firstName', message: 'Invalid first name' },
+            ]);
           }}
         >
           The form
@@ -428,9 +428,9 @@ describe('Form', () => {
 
   test('removes mapped server validation errors when form can be submitted successfully', async () => {
     const onSubmit = jest.fn(() => {
-      throw createServerValidationErrorMock([], {
-        firstName: ['Invalid first name'],
-      });
+      throw createServerValidationErrorMock([
+        { path: 'firstName', message: 'Invalid first name' },
+      ]);
     });
 
     render(
@@ -479,9 +479,9 @@ describe('Form', () => {
           <RHFForm
             id="test-form"
             onSubmit={() => {
-              throw createServerValidationErrorMock([], {
-                firstName: ['Invalid first name'],
-              });
+              throw createServerValidationErrorMock([
+                { path: 'firstName', message: 'Invalid first name' },
+              ]);
             }}
           >
             The form
@@ -526,9 +526,9 @@ describe('Form', () => {
           <RHFForm
             id="test-form"
             onSubmit={() => {
-              throw createServerValidationErrorMock([], {
-                firstName: ['Invalid first name'],
-              });
+              throw createServerValidationErrorMock([
+                { path: 'firstName', message: 'Invalid first name' },
+              ]);
             }}
           >
             The form
@@ -572,10 +572,12 @@ describe('Form', () => {
           <RHFForm
             id="test-form"
             onSubmit={() => {
-              throw createServerValidationErrorMock(['Global error'], {
-                field1: ['Invalid field 1'],
-                'nested.field2': ['Invalid field 2'],
-              });
+              throw createServerValidationErrorMock([
+                { message: 'Global error' },
+                { code: 'UnmappedCode', message: '' },
+                { path: 'field1', message: 'Invalid field 1' },
+                { path: 'nested.field2', message: 'Invalid field 2' },
+              ]);
             }}
           >
             {formState.isSubmitted ? 'The form is submitted' : 'The form'}
@@ -590,7 +592,13 @@ describe('Form', () => {
     await waitFor(() => {
       expect(screen.getByText('The form is submitted')).toBeInTheDocument();
 
+      expect(
+        screen.getByText(
+          'The form submission is invalid and could not be processed',
+        ),
+      ).toBeInTheDocument();
       expect(screen.queryByText('Global error')).not.toBeInTheDocument();
+      expect(screen.queryByText('UnmappedCode')).not.toBeInTheDocument();
       expect(screen.queryByText('Invalid field 1')).not.toBeInTheDocument();
       expect(screen.queryByText('Invalid field 2')).not.toBeInTheDocument();
     });

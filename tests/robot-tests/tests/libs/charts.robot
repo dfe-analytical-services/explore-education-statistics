@@ -183,7 +183,13 @@ user checks infographic chart contains alt
     user waits until parent contains element    ${locator}    css:img[alt="${text}"]
 
 user configures basic chart
-    [Arguments]    ${CHART_TYPE}    ${CHART_HEIGHT}    ${CHART_WIDTH}
+    [Arguments]
+    ...    ${CHART_TYPE}
+    ...    ${CHART_HEIGHT}
+    ...    ${CHART_WIDTH}
+    ...    ${CHART_ALT_TEXT}=${EMPTY}
+    ...    ${CHART_SUBTITLE}=${EMPTY}
+    user clicks link    Chart
     user waits until page finishes loading
     ${CHART_TYPE_LIST}=    create list    Line    Horizontal bar    Vertical bar    Geographic
     should contain    ${CHART_TYPE_LIST}    ${CHART_TYPE}
@@ -201,6 +207,39 @@ user configures basic chart
         user chooses select option at index    name:boundaryLevel    1
     END
 
+    IF    "${CHART_ALT_TEXT}" != "${EMPTY}"
+        user enters text into element    label:Alt text    ${CHART_ALT_TEXT}
+    END
+
+    IF    "${CHART_SUBTITLE}" != "${EMPTY}"
+        user enters text into element    label:Subtitle    ${CHART_SUBTITLE}
+    END
+
     # Prevent intermittent failure when trying to switch to other chart tab
     # after running this keyword
     user clicks link    Chart configuration
+
+user selects all data sets for chart
+    user clicks link    Data sets
+    user waits until h3 is visible    Data sets
+    user clicks button    Add data set
+
+user saves infographic configuration
+    user saves chart configuration    ${True}
+
+user saves chart configuration
+    [Arguments]
+    ...    ${infographic}=${False}
+    # There are several "Save chart options" buttons to choose from (one per chart configuration tab).
+    # We want to ensure that we click one that is visible, so we target the one on the "Chart configuration"
+    # tab.
+    #
+    # This is true of all chart types other than "Infographic", which does not have any additional tabs.
+    IF    "${infographic}" == "${False}"
+        user clicks link    Chart configuration
+        user waits until h3 is visible    Chart configuration
+    END
+
+    user clicks button    Save chart options
+    user waits until button is enabled    Save chart options
+    user waits until page contains    Chart preview

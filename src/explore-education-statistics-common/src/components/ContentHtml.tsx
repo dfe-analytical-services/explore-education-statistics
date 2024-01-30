@@ -1,7 +1,12 @@
 import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
+import styles from '@common/components/ContentHtml.module.scss';
+import formatContentLink from '@common/utils/url/formatContentLink';
 import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
-import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
+import sanitizeHtml, {
+  SanitizeHtmlOptions,
+  defaultSanitizeOptions,
+} from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import { Element } from 'domhandler/lib/node';
 import parseHtmlString, {
@@ -10,10 +15,10 @@ import parseHtmlString, {
   attributesToProps,
 } from 'html-react-parser';
 import React, { ReactElement, useMemo } from 'react';
-import styles from './ContentHtml.module.scss';
 
 export interface ContentHtmlProps {
   className?: string;
+  formatLinks?: boolean;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
   sanitizeOptions?: SanitizeHtmlOptions;
@@ -24,9 +29,10 @@ export interface ContentHtmlProps {
 
 export default function ContentHtml({
   className,
+  formatLinks = true,
   getGlossaryEntry,
   html,
-  sanitizeOptions,
+  sanitizeOptions = defaultSanitizeOptions,
   testId,
   trackGlossaryLinks,
   transformFeaturedTableLinks,
@@ -34,8 +40,26 @@ export default function ContentHtml({
   const { isMounted } = useMounted();
 
   const cleanHtml = useMemo(() => {
-    return sanitizeHtml(html, sanitizeOptions);
-  }, [html, sanitizeOptions]);
+    const opts: SanitizeHtmlOptions = {
+      ...sanitizeOptions,
+      transformTags: {
+        ...sanitizeOptions?.transformTags,
+        ...(formatLinks && {
+          a: (tagName, attribs) => {
+            return {
+              tagName,
+              attribs: {
+                ...attribs,
+                href: formatContentLink(attribs.href),
+              },
+            };
+          },
+        }),
+      },
+    };
+
+    return sanitizeHtml(html, opts);
+  }, [formatLinks, html, sanitizeOptions]);
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {

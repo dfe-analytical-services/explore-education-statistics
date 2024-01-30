@@ -1,6 +1,7 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
 Resource            ../libs/charts.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -20,28 +21,28 @@ Navigate to Absence publication
     ...    %{WAIT_MEDIUM}
 
     user clicks radio    Oldest
-    user waits until page contains link    Pupil absence in schools in England
-    user clicks link    Pupil absence in schools in England
-    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
+    user waits until page contains link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks link    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Validate title
-    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic year 2016/17
 
 Validate URL
-    user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
+    user checks url contains    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Validate Published date
-    [Tags]    NotAgainstPreProd    Failing
-    user checks summary list contains    Published date    25 April 2018
+    [Tags]    NotAgainstPreProd
+    user checks summary list contains    Published    25 April 2018
 
 Validate Next update date
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Next update    22 March 2019
+    user checks summary list contains    Next update    March 2019
 
 Validate Email alerts link
     user checks page contains link with text and url    Sign up for email alerts
-    ...    /subscriptions?slug=pupil-absence-in-schools-in-england
+    ...    /subscriptions?slug=${PUPIL_ABSENCE_PUBLICATION_SLUG}
 
 Validate "About these statistics" -- Number of other releases
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
@@ -75,8 +76,8 @@ Check quick links navigation contains links
     user checks element contains link    testid:quick-links    Download all data (zip)
 
 Check supporting information contains methodology link
-    user checks page contains link with text and url    Pupil absence statistics: methodology
-    ...    /methodology/pupil-absence-in-schools-in-england
+    user checks page contains link with text and url    ${PUPIL_ABSENCE_METHODOLOGY_TITLE}
+    ...    ${PUPIL_ABSENCE_METHODOLOGY_RELATIVE_URL}
 
 Validate subject files file type and file unit style
     [Documentation]    DFE-958    DFE-562
@@ -256,7 +257,7 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
-    ...    'Absence by characteristic' from 'Pupil absence in schools in England' in    %{WAIT_MEDIUM}
+    ...    'Absence by characteristic' from '${PUPIL_ABSENCE_PUBLICATION_TITLE}' in    %{WAIT_MEDIUM}
 
     user checks table column heading contains    1    1    2016/17    css:#content_9_datablock-tables table
 
@@ -389,4 +390,4 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     user waits until page finishes loading
 
     user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}

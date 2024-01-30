@@ -21,6 +21,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using IReleaseRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -32,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IUserService _userService;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
@@ -43,11 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
             IUserService userService,
+            IReleaseRepository releaseRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             UserManager<ApplicationUser> identityUserManager
-            )
+        )
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -55,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
             _userService = userService;
+            _releaseRepository = releaseRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
@@ -69,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId)
-                        .OnSuccessCombineWith(_ =>_usersAndRolesPersistenceHelper
+                        .OnSuccessCombineWith(_ => _usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
                         .OnSuccessVoid(async tuple =>
                         {
@@ -394,13 +399,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(userReleaseRole => userReleaseRole.UserId == userId)
                         .ToListAsync();
 
-                    var latestReleaseRoles = allReleaseRoles
-                        .Where(userReleaseRole => userReleaseRole.Release.Publication.IsLatestVersionOfRelease(
-                            userReleaseRole.Release.Id))
+                    var latestReleaseRoles = await allReleaseRoles
+                        .ToAsyncEnumerable()
+                        .WhereAwait(async userReleaseRole =>
+                            await _releaseRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseId))
                         .OrderBy(userReleaseRole => userReleaseRole.Release.Publication.Title)
                         .ThenBy(userReleaseRole => userReleaseRole.Release.Year)
                         .ThenBy(userReleaseRole => userReleaseRole.Release.TimePeriodCoverage)
-                        .ToList();
+                        .ToListAsync();
 
                     return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
                         {

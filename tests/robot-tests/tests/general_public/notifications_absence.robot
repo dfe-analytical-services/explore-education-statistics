@@ -1,7 +1,8 @@
 *** Settings ***
 Resource            ../libs/common.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
-Force Tags          GeneralPublic    Dev    Test    Preprod    Prod
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -10,26 +11,24 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to Absence publication
-    [Tags]    Local
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
-    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
+    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}    %{WAIT_MEDIUM}
 
 Go to Notify me page for Absence publication
-    [Tags]    Local
     user clicks link    Sign up for email alerts
 
     user waits until page contains title caption    Notify me    %{WAIT_LONG}
-    user waits until h1 is visible    Pupil absence in schools in England
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
-    user checks nth breadcrumb contains    3    Pupil absence in schools in England
+    user checks nth breadcrumb contains    3    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks nth breadcrumb contains    4    Notify me
 
 Sign up for email alerts
     [Documentation]    EES-716    EES-1265
-    [Tags]    NotAgainstPreProd
+    [Tags]    NotAgainstPreProd    NotAgainstLocal
     user clicks element    id:subscriptionForm-email
     press keys    id:subscriptionForm-email    mark@hiveit.co.uk
     user clicks button    Subscribe

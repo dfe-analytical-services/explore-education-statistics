@@ -11,7 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
+using ExternalMethodologyViewModel =
+    GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
@@ -46,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
             return await _publicationService
-                         .ListPublicationSummaries()
-                         .HandleFailuresOrOk();
+                .ListPublicationSummaries()
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("api/publications/{publicationId:guid}")]
@@ -99,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId:guid}/releases")]
-        public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
+        public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
@@ -107,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery] bool includePermissions = false)
         {
             return await _publicationService
-                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions)
+                .ListLatestReleaseVersionsPaginated(publicationId, page, pageSize, live, includePermissions)
                 .HandleFailuresOrOk();
         }
 

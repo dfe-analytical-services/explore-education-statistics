@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
@@ -11,10 +12,10 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to publication release page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
+    user navigates to public frontend    %{PUBLIC_URL}${PUPIL_ABSENCE_PUBLICATION_RELATIVE_URL}
 
 Click fast track link for 'Pupil absence rates' data block
-    user waits until h1 is visible    Pupil absence in schools in England
+    user waits until h1 is visible    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user opens accordion section    Pupil absence rates    id:content
     user scrolls to accordion section    Pupil absence rates    id:content
     user scrolls to element    testid:Data block - Generic data block - National
@@ -24,7 +25,7 @@ Click fast track link for 'Pupil absence rates' data block
 Validate Publication selected step option
     user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
     user waits until page contains element    css:table
-    user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
+    user checks previous table tool step contains    1    Publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Validate Subject selected step option
     [Tags]    NotAgainstDev    NotAgainstTest
@@ -46,10 +47,9 @@ Validate table data
     user checks table column heading contains    1    4    2015/16
     user checks table column heading contains    1    5    2016/17
 
-    user checks table row heading contains    1    1    England
-    user checks table row heading contains    1    2    Authorised absence rate
-    user checks table row heading contains    2    1    Unauthorised absence rate
-    user checks table row heading contains    3    1    Overall absence rate
+    user checks table row heading contains    1    1    Authorised absence rate
+    user checks table row heading contains    2    1    Overall absence rate
+    user checks table row heading contains    3    1    Unauthorised absence rate
 
     # Authorised absence rate
     user checks table cell contains    1    1    4.2%
@@ -58,16 +58,16 @@ Validate table data
     user checks table cell contains    1    4    3.4%
     user checks table cell contains    1    5    3.4%
 
-    # Unauthorised absence rate
-    user checks table cell contains    2    1    1.1%
-    user checks table cell contains    2    2    1.1%
-    user checks table cell contains    2    3    1.1%
-    user checks table cell contains    2    4    1.1%
-    user checks table cell contains    2    5    1.3%
-
     # Overall absence rate
-    user checks table cell contains    3    1    5.3%
-    user checks table cell contains    3    2    4.5%
-    user checks table cell contains    3    3    4.6%
-    user checks table cell contains    3    4    4.6%
-    user checks table cell contains    3    5    4.7%
+    user checks table cell contains    2    1    5.3%
+    user checks table cell contains    2    2    4.5%
+    user checks table cell contains    2    3    4.6%
+    user checks table cell contains    2    4    4.6%
+    user checks table cell contains    2    5    4.7%
+
+    # Unauthorised absence rate
+    user checks table cell contains    3    1    1.1%
+    user checks table cell contains    3    2    1.1%
+    user checks table cell contains    3    3    1.1%
+    user checks table cell contains    3    4    1.1%
+    user checks table cell contains    3    5    1.3%

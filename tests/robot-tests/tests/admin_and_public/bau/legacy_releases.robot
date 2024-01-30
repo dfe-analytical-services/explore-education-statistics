@@ -26,15 +26,7 @@ Create legacy release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
-    user clicks button    Create legacy release
-
-    ${modal}=    user waits until modal is visible    Create legacy release
-    user clicks button    OK    ${modal}
-
-    user waits until page contains element    id:legacyReleaseForm-description
-    user enters text into element    id:legacyReleaseForm-description    ${DESCRIPTION}
-    user enters text into element    id:legacyReleaseForm-url    http://test.com
-    user clicks button    Save legacy release
+    user creates legacy release    ${DESCRIPTION}    http://test.com
 
 Validate created legacy release
     user waits until h2 is visible    Legacy releases

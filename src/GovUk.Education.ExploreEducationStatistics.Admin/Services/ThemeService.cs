@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Theme>(id, q => 
+                .CheckEntityExists<Theme>(id, q =>
                     q.Include(t => t.Topics))
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // don't really have a mechanism to clean things up
             // properly across the entire application.
             // TODO: EES-1295 ability to completely delete releases
-            if (!theme.Title.StartsWith("UI test theme"))
+            if (!theme.Title.StartsWith("UI test theme") && !theme.Title.StartsWith("Seed theme"))
             {
                 return new ForbidResult();
             }
@@ -185,14 +185,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var topics = await _context
                 .UserReleaseRoles
                 .AsQueryable()
-                .Where(userReleaseRole => 
+                .Where(userReleaseRole =>
                     userReleaseRole.UserId == userId &&
                     userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
                 .Select(userReleaseRole => userReleaseRole.Release.Publication)
                 .Concat(_context
                     .UserPublicationRoles
                     .AsQueryable()
-                    .Where(userPublicationRole => 
+                    .Where(userPublicationRole =>
                         userPublicationRole.UserId == userId &&
                         ListOf(Owner, Approver).Contains(userPublicationRole.Role))
                     .Select(userPublicationRole => userPublicationRole.Publication))

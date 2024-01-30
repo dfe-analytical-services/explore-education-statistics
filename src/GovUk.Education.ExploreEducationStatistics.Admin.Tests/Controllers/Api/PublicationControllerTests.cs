@@ -79,7 +79,7 @@ public class PublicationControllerTests
             TopicId = topicId
         });
 
-        result.Result!.AssertBadRequest(SlugNotUnique);
+        result.Result!.AssertValidationProblem(SlugNotUnique);
     }
     
     [Fact]

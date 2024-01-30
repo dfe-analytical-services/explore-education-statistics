@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
-using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -15,7 +14,6 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
@@ -57,11 +55,18 @@ public class Startup
             options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
 
-        services.AddControllers(options =>
-        {
-            options.AddCommaSeparatedQueryModelBinderProvider();
-            options.AddTrimStringBinderProvider();
-        });
+        services
+            .AddControllers(options =>
+            {
+                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            })
+            .ConfigureApiBehaviorOptions(options =>
+            {
+                // Disables default model validation. Use FluentValidation instead.
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
         services.AddProblemDetails();
         services.AddApiVersioning().AddMvc().AddApiExplorer();
@@ -89,9 +94,7 @@ public class Startup
 
         // Services
 
-        services.AddValidatorsFromAssemblyContaining<Startup>();
-        services.AddFluentValidationAutoValidation();
-
+        services.AddFluentValidation();
         services.AddFluentValidationRulesToSwagger();
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>

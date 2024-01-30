@@ -46,7 +46,7 @@ public record ReleaseSummaryViewModel
         Publication = new PublicationSummaryViewModel(publication);
     }
 
-    public ReleaseSummaryViewModel(Release release)
+    public ReleaseSummaryViewModel(Release release, bool latestPublishedRelease)
     {
         Id = release.Id;
         Title = release.Title;
@@ -57,6 +57,6 @@ public record ReleaseSummaryViewModel
         ReleaseName = release.ReleaseName;
         NextReleaseDate = release.NextReleaseDate;
         Type = release.Type;
-        LatestRelease = Id == release.Publication.LatestPublishedReleaseId;
+        LatestRelease = latestPublishedRelease;
     }
 }

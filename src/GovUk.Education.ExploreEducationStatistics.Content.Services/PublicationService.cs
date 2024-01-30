@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -25,15 +24,18 @@ public class PublicationService : IPublicationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPublicationRepository _publicationRepository;
+    private readonly IReleaseRepository _releaseRepository;
 
     public PublicationService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IPublicationRepository publicationRepository)
+        IPublicationRepository publicationRepository,
+        IReleaseRepository releaseRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _publicationRepository = publicationRepository;
+        _releaseRepository = releaseRepository;
     }
 
     public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
@@ -79,17 +81,14 @@ public class PublicationService : IPublicationService
                 }
 
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-                return BuildPublicationViewModel(publication, isSuperseded);
+                var publishedReleases = await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
             });
     }
 
     public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
     {
         var themes = await _contentDbContext.Themes
-            .Include(theme => theme.Topics)
-            .ThenInclude(topic => topic.Publications)
-            .ThenInclude(publication => publication.Releases)
-        
             .Include(theme => theme.Topics)
             .ThenInclude(topic => topic.Publications)
             .ThenInclude(publication => publication.SupersededBy)
@@ -192,6 +191,7 @@ public class PublicationService : IPublicationService
 
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
+        List<Release> releases,
         bool isSuperseded)
     {
         var topic = new TopicViewModel(new ThemeViewModel(
@@ -225,22 +225,15 @@ public class PublicationService : IPublicationService
                     Title = publication.SupersededBy.Title
                 }
                 : null,
-            Releases = ListPublishedReleases(publication)
+            Releases = releases
+                .Select(release => new ReleaseTitleViewModel
+                {
+                    Id = release.Id,
+                    Slug = release.Slug,
+                    Title = release.Title
+                })
+                .ToList()
         };
-    }
-
-    private static List<ReleaseTitleViewModel> ListPublishedReleases(Publication publication)
-    {
-        return publication.GetPublishedReleases()
-            .OrderByDescending(release => release.Year)
-            .ThenByDescending(release => release.TimePeriodCoverage)
-            .Select(release => new ReleaseTitleViewModel
-            {
-                Id = release.Id,
-                Slug = release.Slug,
-                Title = release.Title
-            })
-            .ToList();
     }
 
     private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
@@ -281,9 +274,17 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
-        var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
         var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-        
+
+        var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
+        var latestReleaseHasData =
+            latestPublishedReleaseId.HasValue && await HasAnyDataFiles(latestPublishedReleaseId.Value);
+
+        var publishedReleaseIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
+        var anyLiveReleaseHasData = await publishedReleaseIds
+            .ToAsyncEnumerable()
+            .AnyAwaitAsync(async id => await HasAnyDataFiles(id));
+
         return new PublicationTreePublicationViewModel
         {
             Id = publication.Id,
@@ -298,12 +299,8 @@ public class PublicationService : IPublicationService
                     Title = publication.SupersededBy.Title
                 }
                 : null,
-            LatestReleaseHasData = latestPublishedReleaseId != null &&
-                                   await HasAnyDataFiles(latestPublishedReleaseId.Value),
-            AnyLiveReleaseHasData = await publication.Releases
-                .ToAsyncEnumerable()
-                .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
-                                          && await HasAnyDataFiles(r.Id))
+            LatestReleaseHasData = latestReleaseHasData,
+            AnyLiveReleaseHasData = anyLiveReleaseHasData
         };
     }
 

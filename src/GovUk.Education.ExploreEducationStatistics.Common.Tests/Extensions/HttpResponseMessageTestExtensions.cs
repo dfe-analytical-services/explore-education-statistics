@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static System.Net.HttpStatusCode;
@@ -25,15 +26,6 @@ public static class HttpResponseMessageTestExtensions
         return Assert.IsType<T>(body);
     }
 
-    private static T? Deserialize<T>(this HttpResponseMessage message, bool useSystemJson)
-    {
-        return useSystemJson
-            ? JsonSerializer.Deserialize<T>(
-                message.Content.ReadAsStream().ReadToEnd(), 
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-            : message.Content.ReadFromJson<T>();
-    }
-
     public static string AssertOk(this HttpResponseMessage message, string expectedBody)
     {
         Assert.Equal(OK, message.StatusCode);
@@ -46,7 +38,11 @@ public static class HttpResponseMessageTestExtensions
         return message.AssertBodyEqualTo(expectedBody, useSystemJson);
     }
 
-    public static T AssertCreated<T>(this HttpResponseMessage message, T expectedBody, string expectedLocation, bool useSystemJson = false)
+    public static T AssertCreated<T>(
+        this HttpResponseMessage message,
+        T expectedBody,
+        string expectedLocation,
+        bool useSystemJson = false)
     {
         Assert.Equal(Created, message.StatusCode);
         Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
@@ -85,6 +81,45 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(NotModified, message.StatusCode);
     }
 
+    public static ProblemDetails AssertBadRequest(this HttpResponseMessage message)
+    {
+        Assert.Equal(BadRequest, message.StatusCode);
+
+        return message.AssertBodyIsProblemDetails();
+    }
+
+    public static ValidationProblemViewModel AssertValidationProblem(this HttpResponseMessage message)
+    {
+        Assert.Equal(BadRequest, message.StatusCode);
+
+        return message.AssertBodyIsValidationProblem();
+    }
+
+    public static ProblemDetails AssertInternalServerError(this HttpResponseMessage message)
+    {
+        Assert.Equal(InternalServerError, message.StatusCode);
+
+        return message.AssertBodyIsProblemDetails();
+    }
+
+    public static ProblemDetails AssertBodyIsProblemDetails(this HttpResponseMessage message)
+    {
+        var details = Deserialize<ProblemDetails>(message, useSystemJson: true);
+
+        Assert.NotNull(details);
+
+        return details;
+    }
+
+    public static ValidationProblemViewModel AssertBodyIsValidationProblem(this HttpResponseMessage message)
+    {
+        var details = Deserialize<ValidationProblemViewModel>(message, useSystemJson: true);
+
+        Assert.NotNull(details);
+
+        return details;
+    }
+
     public static string AssertBodyEqualTo(this HttpResponseMessage message, string expected)
     {
         var actual = message.Content.ReadAsStream().ReadToEnd();
@@ -107,5 +142,14 @@ public static class HttpResponseMessageTestExtensions
     public static void AssertPathAndQueryEqualTo(this HttpResponseMessage response, string expected)
     {
         Assert.Equal(expected, response.RequestMessage?.RequestUri?.PathAndQuery);
+    }
+
+    private static T? Deserialize<T>(this HttpResponseMessage message, bool useSystemJson)
+    {
+        return useSystemJson
+            ? JsonSerializer.Deserialize<T>(
+                message.Content.ReadAsStream().ReadToEnd(),
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+            : message.Content.ReadFromJson<T>();
     }
 }

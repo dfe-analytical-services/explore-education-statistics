@@ -168,7 +168,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, page, 1);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page");
         }
 
         [Theory]
@@ -181,7 +185,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, 1, pageSize);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize");
         }
 
         [Theory]
@@ -193,7 +201,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, null, null, searchTerm);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasMinimumLengthError("search");
         }
 
         private static async Task<HttpResponseMessage> ListPublications(
