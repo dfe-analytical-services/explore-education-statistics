@@ -46,7 +46,7 @@ internal class ContentApiClient : IContentApiClient
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemDetails>());
+                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 default:
                     response.EnsureSuccessStatusCode();
                     break;
@@ -76,7 +76,7 @@ internal class ContentApiClient : IContentApiClient
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemDetails>());
+                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 case HttpStatusCode.NotFound:
                     return new NotFoundObjectResult(await response.Content.ReadFromJsonAsync<ProblemDetails>());
                 default:

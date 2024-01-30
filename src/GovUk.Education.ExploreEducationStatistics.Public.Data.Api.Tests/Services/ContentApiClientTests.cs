@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
@@ -34,10 +35,15 @@ public abstract class ContentApiClientTests
             _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
                 .Respond(
                 HttpStatusCode.BadRequest,
-                JsonContent.Create(new ValidationProblemDetails(new Dictionary<string, string[]>()
+                JsonContent.Create(new ValidationProblemViewModel
                 {
-                    { string.Empty, [Errors.Error1.ToString()] }
-                })));
+                    Errors = new ErrorViewModel[]
+                    {
+                        new() {
+                           Code = Errors.Error1.ToString()
+                        }
+                    }
+                }));
 
             var response = await _contentApiClient.ListPublications(
                 page: It.IsAny<int>(),
@@ -48,7 +54,7 @@ public abstract class ContentApiClientTests
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            left.AssertBadRequest(Errors.Error1);
+            left.AssertValidationProblem(Errors.Error1);
         }
 
         [Theory]
@@ -119,17 +125,22 @@ public abstract class ContentApiClientTests
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
                 .Respond(
                 HttpStatusCode.BadRequest,
-                JsonContent.Create(new ValidationProblemDetails(new Dictionary<string, string[]>()
+                JsonContent.Create(new ValidationProblemViewModel
                 {
-                    { string.Empty, [Errors.Error1.ToString()] }
-                })));
+                    Errors = new ErrorViewModel[]
+                    {
+                        new() {
+                           Code = Errors.Error1.ToString()
+                        }
+                    }
+                }));
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            left.AssertBadRequest(Errors.Error1);
+            left.AssertValidationProblem(Errors.Error1);
         }
 
         [Fact]
