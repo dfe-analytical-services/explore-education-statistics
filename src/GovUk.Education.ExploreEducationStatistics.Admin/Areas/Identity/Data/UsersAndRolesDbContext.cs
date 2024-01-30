@@ -5,24 +5,21 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using IdentityServer4.EntityFramework.Options;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
-// TODO EES-4814 - move to appropriate folder. Stop extending ApiAuthorizationDbContext when registration rewritten.
+// TODO EES-4814 - move to appropriate folder.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
-    public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
+    public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public DbSet<UserInvite> UserInvites { get; set; } = null!;
 
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions,
-            bool updateTimestamps = true) : base(options, operationalStoreOptions)
+            bool updateTimestamps = true) : base(options)
         {
             Configure(updateTimestamps);
         }

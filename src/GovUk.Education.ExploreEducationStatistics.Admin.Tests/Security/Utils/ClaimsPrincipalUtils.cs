@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using IdentityModel;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles.RoleNames;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -17,22 +16,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         public static ClaimsPrincipal AuthenticatedUser()
         {
             return CreateClaimsPrincipal(
-                Guid.NewGuid(), 
+                Guid.NewGuid(),
                 SecurityClaim(ApplicationAccessGranted));
         }
-        
+
         public static ClaimsPrincipal BauUser()
         {
             // Give the BAU User the "BAU User" role, plus every Claim from the SecurityClaimTypes enum.
-            var claims = 
+            var claims =
                 ListOf(RoleClaim(RoleNames.BauUser))
                 .Concat(EnumUtil.GetEnumValues<SecurityClaimTypes>().Select(SecurityClaim));
-                
+
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
                 claims.ToArray());
         }
-        
+
         public static ClaimsPrincipal AnalystUser()
         {
             return CreateClaimsPrincipal(
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 SecurityClaim(PrereleasePagesAccessGranted),
                 SecurityClaim(CanViewPrereleaseContacts));
         }
-        
+
         public static ClaimsPrincipal PreReleaseUser()
         {
             return CreateClaimsPrincipal(
@@ -53,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 SecurityClaim(PrereleasePagesAccessGranted));
 
         }
-        
+
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)
         {
             return CreateClaimsPrincipal(userId, new Claim[] { });
@@ -62,11 +61,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
         {
             var identity = new ClaimsIdentity(
-                claims: new List<Claim>(), 
-                authenticationType: "TestAuthenticationType", 
-                nameType: JwtClaimTypes.Name, 
-                roleType: JwtClaimTypes.Role);
-            
+                claims: new List<Claim>(),
+                authenticationType: "TestAuthenticationType",
+                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Name
+                "name",
+                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Role
+                "role");
+
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
             identity.AddClaims(additionalClaims);
             var user = new ClaimsPrincipal(identity);
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             return CreateClaimsPrincipal(userId,
                 additionalClaims.Select(c => new Claim(c.ToString(), "")).ToArray());
         }
-        
+
         /// <summary>
         /// Create a Claim representing a SecurityClaimTypes enum value.
         /// </summary>
@@ -86,13 +87,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         {
             return new Claim(type.ToString(), "");
         }
-        
+
         /// <summary>
         /// Create a Claim representing a Global Role (i.e. an AspNetUserRoles assignment).
         /// </summary>
         private static Claim RoleClaim(string roleName)
         {
-            return new Claim(JwtClaimTypes.Role, roleName);
+            return new Claim(
+                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Role
+                "role", roleName);
         }
     }
 }
