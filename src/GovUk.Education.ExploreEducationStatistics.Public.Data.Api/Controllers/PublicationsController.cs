@@ -21,7 +21,7 @@ public class PublicationsController : ControllerBase
     }
 
     /// <summary>
-    /// List Publications
+    /// List publications
     /// </summary>
     /// <remarks>
     /// Lists details about publications with data available for querying.
@@ -42,12 +42,12 @@ public class PublicationsController : ControllerBase
     }
 
     /// <summary>
-    /// Get a publication’s details"
+    /// Get a publication’s details
     /// </summary>
     /// <remarks>
-    /// Gets a specific publication’s details.
+    /// Get a specific publication's summary details.
     /// </remarks>
-    [HttpGet("{publicationId}")]
+    [HttpGet("{publicationId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(400)]

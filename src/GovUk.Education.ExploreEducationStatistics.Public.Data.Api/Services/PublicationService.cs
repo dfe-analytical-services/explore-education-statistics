@@ -62,9 +62,9 @@ internal class PublicationService : IPublicationService
             .ToHashSet();
     }
 
-    private static PublicationListViewModel MapPublication(PublicationSearchResultViewModel publication)
+    private static PublicationSummaryViewModel MapPublication(PublicationSearchResultViewModel publication)
     {
-        return new PublicationListViewModel 
+        return new PublicationSummaryViewModel
         {
             Id = publication.Id,
             Title = publication.Title,

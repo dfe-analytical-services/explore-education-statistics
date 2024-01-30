@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -37,18 +36,31 @@ public class PublicationService : IPublicationService
         _publicationRepository = publicationRepository;
     }
 
-    public async Task<Either<ActionResult, PublicationCacheViewModel>> GetById(Guid publicationId)
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
     {
-        return await Get(p => p.Id == publicationId);
+        return await _contentPersistenceHelper
+            .CheckEntityExists<Publication>(query => query
+                .Include(p => p.LatestPublishedRelease)
+                .Where(p => p.Id == publicationId))
+            .OnSuccess(publication =>
+            {
+                if (publication.LatestPublishedReleaseId == null)
+                {
+                    return new Either<ActionResult, PublishedPublicationSummaryViewModel>(new NotFoundResult());
+                }
+
+                return new PublishedPublicationSummaryViewModel
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    Published = publication.LatestPublishedRelease!.Published!.Value,
+                };
+            });
     }
 
-    public async Task<Either<ActionResult, PublicationCacheViewModel>> GetBySlug(string publicationSlug)
-    {
-        return await Get(p => p.Slug == publicationSlug);
-    }
-
-    private async Task<Either<ActionResult, PublicationCacheViewModel>> Get(
-        Expression<Func<Publication, bool>> predicate)
+    public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
             .CheckEntityExists<Publication>(query => query
@@ -58,7 +70,7 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Include(p => p.SupersededBy)
-                .Where(predicate))
+                .Where(p => p.Slug == publicationSlug))
             .OnSuccess(async publication =>
             {
                 if (publication.LatestPublishedReleaseId == null)
@@ -194,8 +206,6 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            Summary = publication.Summary,
-            Published = publication.LatestPublishedRelease!.Published!.Value,
             LegacyReleases = publication.LegacyReleases
                 .OrderByDescending(legacyRelease => legacyRelease.Order)
                 .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))

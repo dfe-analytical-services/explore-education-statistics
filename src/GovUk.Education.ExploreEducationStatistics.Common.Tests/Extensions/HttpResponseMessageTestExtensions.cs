@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static System.Net.HttpStatusCode;
 
@@ -63,10 +64,10 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(NotFound, message.StatusCode);
     }
 
-    public static T AssertNotFound<T>(this HttpResponseMessage message, T expectedBody, bool useSystemJson = false)
+    public static ProblemDetails AssertNotFound(this HttpResponseMessage message, ProblemDetails expectedBody)
     {
         Assert.Equal(NotFound, message.StatusCode);
-        return message.AssertBodyEqualTo(expectedBody, useSystemJson);
+        return message.AssertBodyEqualTo(expectedBody, useSystemJson: true);
     }
 
     public static void AssertForbidden(this HttpResponseMessage message)

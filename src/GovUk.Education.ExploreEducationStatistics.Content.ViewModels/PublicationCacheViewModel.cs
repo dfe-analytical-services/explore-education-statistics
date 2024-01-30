@@ -10,10 +10,6 @@ public record PublicationCacheViewModel
 
     public string Slug { get; init; } = string.Empty;
 
-    public string Summary { get; init; } = string.Empty;
-
-    public DateTime Published { get; init; }
-
     public Guid LatestReleaseId { get; init; }
 
     public bool IsSuperseded { get; init; }

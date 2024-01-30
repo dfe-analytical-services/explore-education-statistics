@@ -6,6 +6,9 @@ public abstract record PaginatedListViewModel<T>
 {
     public List<T> Results { get; }
 
+    /// <summary>
+    /// Provides metadata for use in pagination.
+    /// </summary>
     public PagingViewModel Paging { get; }
 
     public PaginatedListViewModel(List<T> results, int totalResults, int page, int pageSize)
@@ -24,12 +27,24 @@ public abstract record PaginatedListViewModel<T>
 
 public record PagingViewModel
 {
+    /// <summary>
+    /// The current page number.
+    /// </summary>
     public int Page { get; }
 
+    /// <summary>
+    /// The maximum number of results per page.
+    /// </summary>
     public int PageSize { get; }
 
+    /// <summary>
+    /// The total number of results across all pages.
+    /// </summary>
     public int TotalResults { get; }
 
+    /// <summary>
+    /// The total number of pages.
+    /// </summary>
     public int TotalPages => ((TotalResults - 1) / PageSize) + 1;
 
     public PagingViewModel(int page, int pageSize, int totalResults)

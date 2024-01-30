@@ -57,10 +57,10 @@ internal class ContentApiClient : IContentApiClient
             await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
 
         return publications
-            ?? throw new Exception("Could deserialize publications from content API.");
+            ?? throw new Exception("Could not deserialize publications from content API.");
     }
 
-    public async Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(Guid publicationId)
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId)
     {
         var response = await _httpClient.GetAsync($"api/publications/{publicationId}");
 
@@ -85,8 +85,9 @@ internal class ContentApiClient : IContentApiClient
             }
         }
 
-        var deserializedResponse = await response.Content.ReadFromJsonAsync<PublicationCacheViewModel>();
+        var publications = await response.Content.ReadFromJsonAsync<PublishedPublicationSummaryViewModel>();
 
-        return new Either<ActionResult, PublicationCacheViewModel>(deserializedResponse);
+        return publications
+            ?? throw new Exception("Could not deserialize publication from content API.");
     }
 }

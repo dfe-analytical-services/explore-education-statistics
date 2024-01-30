@@ -84,11 +84,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("publications/{publicationId}")]
-        public async Task<ActionResult<PublicationCacheViewModel>> GetPublication(Guid publicationId)
+        [HttpGet("publications/{publicationId:guid}/summary")]
+        public async Task<ActionResult<PublishedPublicationSummaryViewModel>> GetPublicationSummary(Guid publicationId)
         {
             return await _publicationService
-                .GetById(publicationId)
+                .GetSummary(publicationId)
                 .HandleFailuresOrOk();
         }
 

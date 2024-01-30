@@ -13,8 +13,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -148,6 +147,24 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        private static async Task<HttpResponseMessage> ListPublications(
+            HttpClient client,
+            int? page = null,
+            int? pageSize = null,
+            string? search = null)
+        {
+            var query = new Dictionary<string, string?>
+            {
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() },
+                { "search", search },
+            };
+
+            var uri = QueryHelpers.AddQueryString(BaseUrl, query);
+
+            return await client.GetAsync(uri);
+        }
     }
 
     public class GetPublicationTests : PublicationsControllerTests
@@ -160,19 +177,18 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         public async Task PublicationExists_Returns200()
         {
             var publication = DataFixture
-                .Generator<PublicationCacheViewModel>()
+                .Generator<PublishedPublicationSummaryViewModel>()
                 .ForInstance(s => s
                     .SetDefault(f => f.Id)
                     .SetDefault(f => f.Title)
                     .SetDefault(f => f.Slug)
                     .SetDefault(f => f.Summary)
-                    .Set(f => f.Published, f => f.Date.Past())
-                    .SetDefault(f => f.LatestReleaseId))
+                    .Set(f => f.Published, f => f.Date.Past()))
                 .Generate();
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(It.IsAny<Guid>()))
+                .Setup(c => c.GetPublication(publication.Id))
                 .ReturnsAsync(publication);
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -209,15 +225,39 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await GetPublication(client, publicationId);
 
-            response.AssertNotFound(new ProblemDetails { Detail = "not found deails", Status = (int?)HttpStatusCode.NotFound }, true);
+            response.AssertNotFound(new ProblemDetails
+            {
+                Detail = "not found deails",
+                Status = StatusCodes.Status404NotFound,
+            });
         }
 
         [Fact]
-        public async Task NotPublished_Returns404()
+        public async Task NotDataSets_Returns404()
         {
             var client = BuildApp().CreateClient();
 
             var response = await GetPublication(client, It.IsAny<Guid>());
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task UnpublishedDataSets_Returns404()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var unpublishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Unpublished)
+                .WithPublicationId(publicationId)
+                .GenerateList(3);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(unpublishedDataSets));
+
+            var client = BuildApp().CreateClient();
+
+            var response = await GetPublication(client, publicationId);
 
             response.AssertNotFound();
         }
@@ -241,40 +281,22 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
             Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
         }
-    }
 
-    private static async Task<HttpResponseMessage> ListPublications(
-        HttpClient client, 
-        int? page = null, 
-        int? pageSize = null,
-        string? search = null)
-    {
-        var query = new Dictionary<string, string?>
+        private DataSet GeneratePublishedDataSet(Guid publicationId)
         {
-            { "page", page?.ToString() },
-            { "pageSize", pageSize?.ToString() },
-            { "search", search },
-        };
+            return DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Published)
+                .WithPublicationId(publicationId)
+                .Generate();
+        }
 
-        var uri = QueryHelpers.AddQueryString(BaseUrl, query);
+        private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
+        {
+            var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
 
-        return await client.GetAsync(uri);
-    }
-
-    private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
-    {
-        var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
-
-        return await client.GetAsync(uri);
-    }
-
-    private DataSet GeneratePublishedDataSet(Guid publicationId)
-    {
-        return DataFixture
-            .DefaultDataSet()
-            .WithStatus(DataSetStatus.Published)
-            .WithPublicationId(publicationId)
-            .Generate();
+            return await client.GetAsync(uri);
+        }
     }
 
     private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)

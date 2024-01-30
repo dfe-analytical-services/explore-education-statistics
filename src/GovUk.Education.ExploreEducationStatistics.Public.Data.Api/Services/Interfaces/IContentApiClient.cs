@@ -13,5 +13,5 @@ public interface IContentApiClient
         string? search = null, 
         IEnumerable<Guid>? publicationIds = null);
 
-    Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(Guid publicationId);
+    Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId);
 }

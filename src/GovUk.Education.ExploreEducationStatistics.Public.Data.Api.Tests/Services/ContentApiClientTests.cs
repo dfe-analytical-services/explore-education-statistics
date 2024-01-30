@@ -147,7 +147,7 @@ public abstract class ContentApiClientTests
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            left.AssertNotFoundResult(new ProblemDetails { Detail = "Not found details" });
+            left.AssertNotFoundObjectResult(new ProblemDetails { Detail = "Not found details" });
         }
 
         [Theory]
@@ -176,7 +176,7 @@ public abstract class ContentApiClientTests
         [Fact]
         public async Task HttpClientSuccess_ReturnsPublication()
         {
-            var result = new PublicationCacheViewModel
+            var result = new PublishedPublicationSummaryViewModel
             {
                 Id = Guid.NewGuid(),
                 Title = "Test title",
