@@ -62,7 +62,7 @@ internal class ContentApiClient : IContentApiClient
 
     public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId)
     {
-        var response = await _httpClient.GetAsync($"api/publications/{publicationId}");
+        var response = await _httpClient.GetAsync($"api/publications/{publicationId}/summary");
 
         if (!response.IsSuccessStatusCode)
         {
@@ -78,7 +78,10 @@ internal class ContentApiClient : IContentApiClient
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 case HttpStatusCode.NotFound:
-                    return new NotFoundObjectResult(await response.Content.ReadFromJsonAsync<ProblemDetails>());
+                    bool hasContent = response.Content.Headers.ContentLength > 0;
+                    return hasContent
+                        ? new NotFoundObjectResult(await response.Content.ReadFromJsonAsync<ProblemDetails>())
+                        : new NotFoundResult();
                 default:
                     response.EnsureSuccessStatusCode();
                     break;
