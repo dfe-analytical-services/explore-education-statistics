@@ -129,8 +129,10 @@ user mouses over chart bar
 
 user mouses over selected map feature
     [Arguments]    ${locator}
-    user waits until parent contains element    ${locator}    testid:mapBlock-selectedFeature
-    ${element}=    get child element    ${locator}    testid:mapBlock-selectedFeature
+    # We can identify the selected geojson feature by the stroke (border) width.
+    # Unselected features have stroke width 1, when selected it changes to 3.
+    user waits until parent contains element    ${locator}    css:path.leaflet-interactive[stroke-width="3"]
+    ${element}=    get child element    ${locator}    css:path.leaflet-interactive[stroke-width="3"]
     user waits until element is visible    ${element}
     user mouses over element    ${element}
 
