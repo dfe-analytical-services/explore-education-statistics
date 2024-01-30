@@ -122,7 +122,7 @@ public abstract class ContentApiClientTests
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(
                 HttpStatusCode.BadRequest,
                 JsonContent.Create(new ValidationProblemViewModel
@@ -148,7 +148,24 @@ public abstract class ContentApiClientTests
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
+                .Respond(
+                HttpStatusCode.NotFound);
+
+            var response = await _contentApiClient.GetPublication(publicationId);
+
+            _mockHttp.VerifyNoOutstandingExpectation();
+
+            var left = response.AssertLeft();
+            left.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task HttpClientNotFoundObjectResult_ReturnsNotFoundObjectResult()
+        {
+            var publicationId = Guid.NewGuid();
+
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(
                 HttpStatusCode.NotFound,
                 JsonContent.Create(new ProblemDetails { Detail = "Not found details" }));
@@ -175,7 +192,7 @@ public abstract class ContentApiClientTests
         {
             var publicationId = Guid.NewGuid();
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}")
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
                 .Respond(responseStatusCode);
 
             await Assert.ThrowsAsync<HttpRequestException>(async () =>
@@ -196,7 +213,7 @@ public abstract class ContentApiClientTests
                 Published = DateTime.UtcNow,
             };
 
-            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}")
+            _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{result.Id}/summary")
                 .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(result));
 
             var response = await _contentApiClient.GetPublication(result.Id);
