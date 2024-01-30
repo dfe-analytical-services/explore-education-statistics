@@ -7,7 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
+using ExternalMethodologyViewModel =
+    GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
@@ -39,16 +40,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact);
+        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
+            ContactSaveRequest updatedContact);
 
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
+        Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
             Guid publicationId,
             int page,
             int pageSize,
             bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false);

@@ -397,14 +397,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
-            ListActiveReleasesPaginated(
+            ListLatestReleaseVersionsPaginated(
                 Guid publicationId,
                 int page = 1,
                 int pageSize = 5,
                 bool? live = null,
                 bool includePermissions = false)
         {
-            return await ListActiveReleases(publicationId, live, includePermissions)
+            return await ListLatestReleaseVersions(publicationId, live, includePermissions)
                 .OnSuccess(
                     releases =>
                         // This is not ideal - we should paginate results in the database, however,
@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false)

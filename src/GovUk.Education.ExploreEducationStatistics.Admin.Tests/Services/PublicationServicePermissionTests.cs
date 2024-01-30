@@ -22,7 +22,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IPublicationRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -433,7 +434,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+                .SetupResourceCheckToFail(publication,
+                    SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();
@@ -443,7 +445,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.UpdateExternalMethodology(publication.Id, new ExternalMethodologySaveRequest());
+                    return await service.UpdateExternalMethodology(publication.Id,
+                        new ExternalMethodologySaveRequest());
                 });
         }
 
@@ -460,7 +463,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+                .SetupResourceCheckToFail(publication,
+                    SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();
@@ -533,14 +537,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void ListActiveReleases()
+        public void ListLatestReleaseVersions()
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.ListActiveReleases(_publication.Id),
+                async service => await service.ListLatestReleaseVersions(_publication.Id),
                 _publication,
                 userService,
                 publicationService,
@@ -555,7 +559,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.PartialUpdateLegacyReleases(_publication.Id, new List<LegacyReleasePartialUpdateViewModel>()),
+                async service =>
+                    await service.PartialUpdateLegacyReleases(_publication.Id,
+                        new List<LegacyReleasePartialUpdateViewModel>()),
                 _publication,
                 userService,
                 publicationService,
