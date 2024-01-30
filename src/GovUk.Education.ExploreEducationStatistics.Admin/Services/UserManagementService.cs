@@ -107,13 +107,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var releases = await _releaseRepository.ListLatestReleaseVersions();
-                    return releases
-                        .Select(r => new IdTitleViewModel
+                    return await releases
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async release =>
                         {
-                            Id = r.Id,
-                            Title = $"{r.Publication.Title} - {r.Title}"
+                            var publicationTitle = await _contentDbContext.Publications
+                                .Where(p => p.Id == release.PublicationId)
+                                .Select(p => p.Title)
+                                .FirstAsync();
+
+                            return new IdTitleViewModel
+                            {
+                                Id = release.Id,
+                                Title = $"{publicationTitle} - {release.Title}"
+                            };
                         })
-                        .ToList();
+                        .ToListAsync();
                 });
         }
 
