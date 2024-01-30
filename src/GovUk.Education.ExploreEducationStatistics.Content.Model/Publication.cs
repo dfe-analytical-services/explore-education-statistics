@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -45,51 +44,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? LatestPublishedReleaseId { get; set; }
 
         public Release? LatestPublishedRelease { get; set; }
-
-        public Release? LatestRelease()
-        {
-            return Releases
-                .Where(r => IsLatestVersionOfRelease(r.Id))
-                .OrderBy(r => r.Year)
-                .ThenBy(r => r.TimePeriodCoverage)
-                .LastOrDefault();
-        }
-
-        public bool IsLatestVersionOfRelease(Guid releaseId)
-        {
-            return !Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
-        }
-
-        public List<Release> ListActiveReleases()
-        {
-            return Releases
-                .Where(r => IsLatestVersionOfRelease(r.Id))
-                .ToList();
-        }
-
-        public List<Release> GetPublishedReleases()
-        {
-            return Releases
-                .Where(IsLatestPublishedVersionOfRelease)
-                .ToList();
-        }
-
-        public bool IsLatestPublishedVersionOfRelease(Release release)
-        {
-            if (Releases == null || !Releases.Any())
-            {
-                throw new ArgumentException(
-                    "Releases must be hydrated to test the latest published version");
-            }
-
-            return
-                // Release itself must be live
-                release.Live
-                // It must also be the latest version unless the later version is a draft
-                && !Releases.Any(r =>
-                    r.Live
-                    && r.PreviousVersionId == release.Id
-                    && r.Id != release.Id);
-        }
     }
 }

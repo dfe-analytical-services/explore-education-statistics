@@ -127,7 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessCombineWith(GetDataBlockTableResult)
-                .OnSuccessCombineWith(tuple => _releaseRepository.GetLatestPublishedRelease(tuple.Item1.Release.PublicationId))
+                .OnSuccessCombineWith(tuple =>
+                    _releaseRepository.GetLatestPublishedReleaseVersion(tuple.Item1.Release.PublicationId)
+                        .OrNotFound())
                 .OnSuccess(tuple =>
                 {
                     var (dataBlockVersion, tableResult, latestRelease) = tuple;

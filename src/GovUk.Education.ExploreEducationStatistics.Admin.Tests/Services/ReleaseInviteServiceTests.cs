@@ -24,6 +24,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
+using IReleaseRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -408,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     email: "test@test.com",
                     publicationId: publication.Id,
                     releaseIds: ListOf(release1.Id, release2.Id));
-                
+
                 result.AssertBadRequest(UserAlreadyHasReleaseRoles);
             }
 
@@ -650,7 +653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     email: "test@test.com",
                     publicationId: publication1.Id,
                     releaseIds: ListOf(release1.Id, release2.Id));
-                
+
                 result.AssertBadRequest(NotAllReleasesBelongToPublication);
             }
 
@@ -878,6 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IReleaseRepository? releaseRepository = null,
             IUserRepository? userRepository = null,
             IUserService? userService = null,
             IUserRoleService? userRoleService = null,
@@ -893,6 +897,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseInviteService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userRepository ?? new UserRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService(CreatedById).Object,
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),

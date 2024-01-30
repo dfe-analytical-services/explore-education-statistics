@@ -1,33 +1,26 @@
 #nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers
 {
     public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : AuthorizationHandler<
         ViewSubjectDataRequirement, ReleaseSubject>
     {
-        private readonly ContentDbContext _context;
+        private readonly IReleaseRepository _releaseRepository;
 
-        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(ContentDbContext context)
+        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(IReleaseRepository releaseRepository)
         {
-            _context = context;
+            _releaseRepository = releaseRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
             ViewSubjectDataRequirement requirement,
             ReleaseSubject releaseSubject)
         {
-            var release = await _context.Releases
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.Releases)
-                .SingleAsync(r => r.Id == releaseSubject.ReleaseId);
-
-            if (release.IsLatestPublishedVersionOfRelease())
+            if (await _releaseRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseId))
             {
                 authContext.Succeed(requirement);
             }

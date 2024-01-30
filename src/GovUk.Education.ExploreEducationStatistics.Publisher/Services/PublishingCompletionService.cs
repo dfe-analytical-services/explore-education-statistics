@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IMethodologyService _methodologyService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-    private readonly IPublicationRepository _publicationRepository;
+    private readonly IReleaseRepository _releaseRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
     private readonly IRedirectsCacheService _redirectsCacheService;
@@ -30,8 +29,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         IMethodologyService methodologyService,
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService,
-        IPublicationRepository publicationRepository,
         IPublicationCacheService publicationCacheService,
+        IReleaseRepository releaseRepository,
         IReleaseService releaseService,
         IRedirectsCacheService redirectsCacheService)
     {
@@ -41,8 +40,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         _notificationsService = notificationsService;
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
+        _releaseRepository = releaseRepository;
         _releaseService = releaseService;
-        _publicationRepository = publicationRepository;
         _redirectsCacheService = redirectsCacheService;
     }
 
@@ -117,7 +116,7 @@ public class PublishingCompletionService : IPublishingCompletionService
 
         await directlyRelatedPublicationIds
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
+            .ForEachAwaitAsync(UpdateLatestPublishedRelease);
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
@@ -150,5 +149,16 @@ public class PublishingCompletionService : IPublishingCompletionService
                     status.ReleaseId,
                     status.Id,
                     ReleasePublishingStatusPublishingStage.Complete));
+    }
+
+    private async Task UpdateLatestPublishedRelease(Guid publicationId)
+    {
+        var publication = await _contentDbContext.Publications
+            .SingleAsync(p => p.Id == publicationId);
+
+        var publishedReleasesIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds(publicationId);
+        publication.LatestPublishedReleaseId = publishedReleasesIds.First();
+        _contentDbContext.Update(publication);
+        await _contentDbContext.SaveChangesAsync();
     }
 }

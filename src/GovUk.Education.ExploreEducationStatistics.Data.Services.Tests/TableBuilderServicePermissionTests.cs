@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
                         releaseRepository
-                            .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                            .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
                             .ReturnsAsync(new Release
                             {
                                 Id = ReleaseId

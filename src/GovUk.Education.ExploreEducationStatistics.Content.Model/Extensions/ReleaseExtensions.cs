@@ -26,15 +26,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             return $"{release.Publication.Slug}_{release.Slug}.zip";
         }
-
-        /// <summary>
-        /// Determines whether a Release is the latest published version of a Release within its Publication, i.e. no newer published amendments of that Release exist.
-        /// </summary>
-        /// <param name="release">The Release to test</param>
-        /// <returns>True if the Release is the latest published version of a Release</returns>
-        public static bool IsLatestPublishedVersionOfRelease(this Release release)
-        {
-            return release.Publication.IsLatestPublishedVersionOfRelease(release);
-        }
     }
 }
