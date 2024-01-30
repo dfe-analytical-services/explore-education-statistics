@@ -79,7 +79,7 @@ public class InstanceSetters<T> where T : class
             {
                 var index = GetDisplayIndex(context, faker);
 
-                return $"{PropertyName.For(property)} of {typeof(T).Name} {index}";
+                return $"{typeof(T).Name} {index} :: {PropertyName.For(property)}";
             }
         );
     }

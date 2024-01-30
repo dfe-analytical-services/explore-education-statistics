@@ -35,8 +35,8 @@ public class GeneratorTests
                 .SetDefault(t => t.LastName))
             .Generate();
 
-        Assert.Equal("FirstName of Test 0", item.FirstName);
-        Assert.Equal("LastName of Test 0", item.LastName);
+        Assert.Equal("Test 0 :: FirstName", item.FirstName);
+        Assert.Equal("Test 0 :: LastName", item.LastName);
     }
 
     [Fact]
@@ -163,12 +163,12 @@ public class GeneratorTests
                 .SetDefault(t => t.LastName))
             .GenerateList(3);
 
-        Assert.Equal("FirstName of Test 0", items[0].FirstName);
-        Assert.Equal("LastName of Test 0", items[0].LastName);
-        Assert.Equal("FirstName of Test 1", items[1].FirstName);
-        Assert.Equal("LastName of Test 1", items[1].LastName);
-        Assert.Equal("FirstName of Test 2", items[2].FirstName);
-        Assert.Equal("LastName of Test 2", items[2].LastName);
+        Assert.Equal("Test 0 :: FirstName", items[0].FirstName);
+        Assert.Equal("Test 0 :: LastName", items[0].LastName);
+        Assert.Equal("Test 1 :: FirstName", items[1].FirstName);
+        Assert.Equal("Test 1 :: LastName", items[1].LastName);
+        Assert.Equal("Test 2 :: FirstName", items[2].FirstName);
+        Assert.Equal("Test 2 :: LastName", items[2].LastName);
     }
 
     [Fact]

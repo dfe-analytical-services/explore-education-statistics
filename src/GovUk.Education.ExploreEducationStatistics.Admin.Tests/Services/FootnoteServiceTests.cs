@@ -1136,9 +1136,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(3, retrievedFootnotes.Count);
 
-                Assert.Equal("Content of Footnote 0", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
                 Assert.Equal("New Footnote", retrievedFootnotes[2].Content);
                 Assert.Equal(2, retrievedFootnotes[2].Order);
@@ -1202,7 +1202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var retrievedFootnote = result.AssertRight();
 
                 Assert.Equal(releaseFootnote.FootnoteId, retrievedFootnote.Id);
-                Assert.Equal("Content of Footnote 0", retrievedFootnote.Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnote.Content);
 
                 Assert.Single(retrievedFootnote.Releases);
                 Assert.Equal(release.Id, retrievedFootnote.Releases.First().ReleaseId);
@@ -1455,9 +1455,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, retrievedFootnotes.Count);
 
                 // Expect that the remaining footnotes have been reordered
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 2", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 2 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
             }
         }
@@ -1732,11 +1732,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, retrievedFootnotes.Count);
 
                 // Check the footnotes have been reordered
-                Assert.Equal("Content of Footnote 2", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 2 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 0", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[2].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[2].Content);
                 Assert.Equal(2, retrievedFootnotes[2].Order);
             }
         }
@@ -1808,9 +1808,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Verify that the footnotes remain untouched
                 Assert.Equal(2, retrievedFootnotes.Count);
-                Assert.Equal("Content of Footnote 0", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
             }
         }
@@ -1881,9 +1881,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Verify that the footnotes remain untouched
                 Assert.Equal(2, retrievedFootnotes.Count);
-                Assert.Equal("Content of Footnote 0", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
             }
         }
@@ -1958,9 +1958,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Verify that the footnotes remain untouched
                 Assert.Equal(2, retrievedFootnotes.Count);
-                Assert.Equal("Content of Footnote 0", retrievedFootnotes[0].Content);
+                Assert.Equal("Footnote 0 :: Content", retrievedFootnotes[0].Content);
                 Assert.Equal(0, retrievedFootnotes[0].Order);
-                Assert.Equal("Content of Footnote 1", retrievedFootnotes[1].Content);
+                Assert.Equal("Footnote 1 :: Content", retrievedFootnotes[1].Content);
                 Assert.Equal(1, retrievedFootnotes[1].Order);
             }
         }
