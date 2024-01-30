@@ -144,6 +144,7 @@ const useCKEditorConfig = ({
             },
           },
         },
+        defaultProtocol: 'https://',
       },
       extraPlugins:
         hasImageUpload && onImageUpload

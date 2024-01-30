@@ -14,47 +14,67 @@ const cacheTime = getCacheTime();
 
 let cachedRedirects: CachedRedirects | undefined;
 
-// The middleware only runs on paths defined in the config
-// in middleware.ts, that will also need to be
-// updated if any other paths are added here.
 const redirectPaths = {
   methodologies: '/methodology',
   publications: '/find-statistics',
 };
 
 export default async function redirectPages(request: NextRequest) {
-  const shouldRefetch =
-    !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
+  const { nextUrl } = request;
 
-  if (shouldRefetch) {
-    cachedRedirects = {
-      redirects: await redirectService.list(),
-      fetchedAt: Date.now(),
-    };
+  // Check for redirects for release and methodology pages
+  if (
+    Object.values(redirectPaths).find(path =>
+      nextUrl.pathname.toLowerCase().startsWith(path),
+    ) &&
+    nextUrl.pathname.split('/').length > 2
+  ) {
+    const shouldRefetch =
+      !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
+
+    if (shouldRefetch) {
+      cachedRedirects = {
+        redirects: await redirectService.list(),
+        fetchedAt: Date.now(),
+      };
+    }
+
+    const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
+      const redirectType = key as RedirectType;
+      if (
+        nextUrl.pathname.toLowerCase().startsWith(redirectPaths[redirectType])
+      ) {
+        const pathSegments = nextUrl.pathname.split('/');
+
+        const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
+          ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
+        );
+
+        if (rewriteRule) {
+          return pathSegments
+            .map(segment =>
+              segment.toLowerCase() === rewriteRule?.fromSlug
+                ? rewriteRule?.toSlug
+                : segment.toLowerCase(),
+            )
+            .join('/');
+        }
+      }
+      return acc;
+    }, '');
+
+    if (redirectPath) {
+      const redirectUrl = nextUrl.clone();
+      redirectUrl.pathname = redirectPath;
+      return NextResponse.redirect(redirectUrl);
+    }
   }
 
-  const redirectUrl = Object.keys(redirectPaths).reduce((acc, key) => {
-    const redirectType = key as RedirectType;
-    if (request.nextUrl.pathname.startsWith(redirectPaths[redirectType])) {
-      const pathSegments = request.nextUrl.pathname.split('/');
-
-      const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
-        ({ fromSlug }) => pathSegments[2] === fromSlug,
-      );
-
-      if (rewriteRule) {
-        return pathSegments
-          .map(segment =>
-            segment === rewriteRule?.fromSlug ? rewriteRule?.toSlug : segment,
-          )
-          .join('/');
-      }
-    }
-    return acc;
-  }, '');
-
-  if (redirectUrl) {
-    return NextResponse.redirect(new URL(redirectUrl, request.url));
+  // Redirect any URLs with uppercase characters to lowercase.
+  if (nextUrl.pathname !== nextUrl.pathname.toLowerCase()) {
+    const url = nextUrl.clone();
+    url.pathname = url.pathname.toLowerCase();
+    return NextResponse.redirect(url);
   }
 
   return NextResponse.next();
