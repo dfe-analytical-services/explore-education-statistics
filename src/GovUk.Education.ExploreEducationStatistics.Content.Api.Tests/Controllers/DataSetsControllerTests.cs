@@ -364,7 +364,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
-                
+
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
                     releaseFilesRelease1[0],
@@ -930,7 +930,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             [Theory]
             [InlineData(0)]
             [InlineData(-1)]
-            public async Task PageTooSmall_ReturnsBadRequest(int page)
+            [InlineData(10000)]
+            public async Task PageOutsideAllowedRange_ReturnsValidationError(int page)
             {
                 var client = BuildApp().CreateClient();
 
@@ -943,13 +944,37 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 Assert.Single(validationProblem.Errors);
 
-                validationProblem.AssertHasGreaterThanOrEqualError("page");
+                validationProblem.AssertHasInclusiveBetweenError("page");
             }
 
             [Theory]
-            [InlineData(0)]
+            [InlineData(1)]
+            [InlineData(9999)]
+            public async Task PageInAllowedRange_Success(int page)
+            {
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .CreateClient();
+
+                var query = new DataSetsListRequest(
+                    Page: page
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0, expectedPage: page);
+            }
+
+            [Theory]
             [InlineData(-1)]
-            public async Task PageSizeTooSmall_ReturnsBadRequest(int pageSize)
+            [InlineData(0)]
+            [InlineData(41)]
+            public async Task PageSizeOutsideAllowedRange_ReturnsValidationError(int pageSize)
             {
                 var client = BuildApp().CreateClient();
 
@@ -962,31 +987,36 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 Assert.Single(validationProblem.Errors);
 
-                validationProblem.AssertHasGreaterThanOrEqualError("pageSize");
+                validationProblem.AssertHasInclusiveBetweenError("pageSize");
             }
 
             [Theory]
-            [InlineData(41)]
-            public async Task PageSizeTooBig_ReturnsBadRequest(int pageSize)
+            [InlineData(1)]
+            [InlineData(40)]
+            public async Task PageSizeInAllowedRange_Success(int pageSize)
             {
-                var client = BuildApp().CreateClient();
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .CreateClient();
 
                 var query = new DataSetsListRequest(
                     PageSize: pageSize
                 );
                 var response = await ListDataSets(client, query);
 
-                var validationProblem = response.AssertValidationProblem();
+                MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                Assert.Single(validationProblem.Errors);
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
 
-                validationProblem.AssertHasLessThanOrEqualError("pageSize");
+                AssertPaginatedViewModel(pagedResult, expectedTotalResults: 0, expectedPageSize: pageSize);
             }
 
             [Theory]
             [InlineData("a")]
             [InlineData("aa")]
-            public async Task SearchTermTooSmall_ReturnsBadRequest(string searchTerm)
+            public async Task SearchTermBelowMinimumLength_ReturnsValidationError(string searchTerm)
             {
                 var client = BuildApp().CreateClient();
 
@@ -995,8 +1025,6 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 );
                 var response = await ListDataSets(client, query);
 
-                MockUtils.VerifyAllMocks(MemoryCacheService);
-
                 var validationProblem = response.AssertValidationProblem();
 
                 Assert.Single(validationProblem.Errors);
@@ -1004,17 +1032,44 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 validationProblem.AssertHasMinimumLengthError("searchTerm");
             }
 
-            [Fact]
-            public async Task OrderByNaturalWithoutReleaseId_ReturnsBadRequest()
+            [Theory]
+            [InlineData("aaa")]
+            [InlineData("aaaa")]
+            public async Task SearchTermAboveMinimumLength_Success(string searchTerm)
             {
-                var client = BuildApp().CreateClient();
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(new List<ReleaseFile>().AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(searchTerm))
+                    .Returns(new List<FreeTextRank>().AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
 
                 var query = new DataSetsListRequest(
-                    OrderBy: DataSetsListRequestOrderBy.Natural
+                    SearchTerm: searchTerm
                 );
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+            }
+
+            [Fact]
+            public async Task OrderByNaturalWithoutReleaseId_ReturnsValidationError()
+            {
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    ReleaseId: null,
+                    OrderBy: DataSetsListRequestOrderBy.Natural
+                );
+                var response = await ListDataSets(client, query);
 
                 var validationProblem = response.AssertValidationProblem();
 
@@ -1024,11 +1079,31 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByRelevanceWithoutSearchTerm_ReturnsBadRequest()
+            public async Task OrderByNaturalWithReleaseId_Success()
+            {
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp().CreateClient();
+
+                var query = new DataSetsListRequest(
+                    ReleaseId: Guid.NewGuid(),
+                    OrderBy: DataSetsListRequestOrderBy.Natural
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceWithoutSearchTerm_ReturnsValidationError()
             {
                 var client = BuildApp().CreateClient();
 
                 var query = new DataSetsListRequest(
+                    SearchTerm: null,
                     OrderBy: DataSetsListRequestOrderBy.Relevance
                 );
                 var response = await ListDataSets(client, query);
@@ -1040,6 +1115,33 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Assert.Single(validationProblem.Errors);
 
                 validationProblem.AssertHasNotEmptyError("searchTerm");
+            }
+
+            [Fact]
+            public async Task OrderByRelevanceWithSearchTerm_Success()
+            {
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var contentDbContext = new Mock<ContentDbContext>();
+                contentDbContext.Setup(context => context.ReleaseFiles)
+                    .Returns(new List<ReleaseFile>().AsQueryable().BuildMockDbSet().Object);
+                contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable("aaa"))
+                    .Returns(new List<FreeTextRank>().AsQueryable().BuildMockDbSet().Object);
+
+                var client = BuildApp(
+                        dataSetService: new DataSetService(contentDbContext.Object))
+                    .CreateClient();
+
+                var query = new DataSetsListRequest(
+                    SearchTerm: "aaa",
+                    OrderBy: DataSetsListRequestOrderBy.Relevance
+                );
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
             }
         }
 

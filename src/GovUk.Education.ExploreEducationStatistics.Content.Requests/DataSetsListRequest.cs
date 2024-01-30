@@ -25,10 +25,9 @@ public record DataSetsListRequest(
             RuleFor(request => request.SearchTerm).NotEmpty()
                 .When(request => request.OrderBy == DataSetsListRequestOrderBy.Relevance);
             RuleFor(request => request.Page)
-                .GreaterThanOrEqualTo(1);
+                .InclusiveBetween(1, 9999);
             RuleFor(request => request.PageSize)
-                .GreaterThanOrEqualTo(1)
-                .LessThanOrEqualTo(40);
+                .InclusiveBetween(1, 40);
         }
     }
 }
