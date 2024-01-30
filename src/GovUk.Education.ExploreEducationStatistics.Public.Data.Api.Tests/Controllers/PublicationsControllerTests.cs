@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
@@ -14,6 +13,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Microsoft.AspNetCore.Http;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -46,8 +46,6 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             int numberOfPublishedDataSets,
             int numberOfUnpublishedDataSets)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
-
             var publishedDataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Published)
@@ -62,6 +60,51 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
 
+            var publications = new List<PublicationSearchResultViewModel>();
+
+            var publishedDataSetPublicationIds = publishedDataSets.Select(p => p.PublicationId);
+
+            var numberOfPublicationsToReturn = Math.Min(pageSize, numberOfPublishedDataSets);
+
+            var publicationIdsToReturn = publishedDataSetPublicationIds
+                .Take(numberOfPublicationsToReturn)
+                .ToList();
+
+            foreach (var publicationId in publicationIdsToReturn)
+            {
+                var publication = DataFixture
+                    .Generator<PublicationSearchResultViewModel>()
+                    .ForInstance(s => s
+                        .SetDefault(p => p.Title)
+                        .SetDefault(p => p.Slug)
+                        .SetDefault(p => p.Summary)
+                        .SetDefault(p => p.Theme)
+                        .Set(p => p.Published, p => p.Date.Past())
+                        .Set(p => p.Type, ReleaseType.OfficialStatistics)
+                        .Set(p => p.Id, publicationId))
+                    .Generate();
+
+                publications.Add(publication);
+            }
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.ListPublications(
+                    page,
+                    pageSize,
+                    null,
+                    It.Is<IEnumerable<Guid>>(ids => 
+                        Enumerable.SequenceEqual(
+                            ids.Order(),
+                            publishedDataSetPublicationIds.Order()))))
+                .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                    results: publications,
+                    totalResults: numberOfPublishedDataSets,
+                    page: page,
+                    pageSize: pageSize));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
             var response = await ListPublications(client, page, pageSize);
 
             var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
@@ -70,21 +113,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(page, content.Paging.Page);
             Assert.Equal(pageSize, content.Paging.PageSize);
             Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
-
-            var expectedPublicationIds = publishedDataSets
-                .OrderBy(ds => ds.PublicationId)
-                .Select(ds => ds.PublicationId)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            Assert.Equal(expectedPublicationIds.Count, content.Results.Count);
+            Assert.Equal(publicationIdsToReturn.Count, content.Results.Count);
 
             var unexpectedPublicationIds = allDataSets
                 .Select(ds => ds.PublicationId)
-                .Except(expectedPublicationIds);
+                .Except(publicationIdsToReturn);
 
-            foreach (var publicationId in expectedPublicationIds)
+            foreach (var publicationId in publicationIdsToReturn)
             {
                 Assert.Contains(content.Results, r => r.Id == publicationId);
             }
@@ -98,7 +133,20 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Fact]
         public async Task NoPublishedDataSets_Returns200_EmptyList()
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.ListPublications(
+                    1,
+                    1,
+                    null,
+                    Enumerable.Empty<Guid>()))
+                .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                    results: Enumerable.Empty<PublicationSearchResultViewModel>().ToList(),
+                    totalResults: 0,
+                    page: 1,
+                    pageSize: 1));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
 
             var response = await ListPublications(client, 1, 1);
 
@@ -116,7 +164,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(-1)]
         public async Task PageTooSmall_Returns400(int page)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, page, 1);
 
@@ -129,7 +177,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(41)]
         public async Task PageSizeOutOfBounds_Returns400(int pageSize)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, 1, pageSize);
 
@@ -141,7 +189,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData("aa")]
         public async Task SearchTermTooSmall_Returns400(string searchTerm)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, null, null, searchTerm);
 
