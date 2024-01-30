@@ -48,6 +48,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -218,11 +219,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Authentication and Authorization
              */
 
-            // TODO EES-4814 - do we need the stores anymore, or even the default Identity config?
-            // Currently it is supplying the UserManager in use by some of our services.
+            //
+            // This configuration sets up out-of-the-box Services to support the Identity Framework's Users, Roles and
+            // Claims. It sets up the UserManager and RoleManager in DI, and links them to the database via the
+            // UsersAndRolesDbContext.
+            //
+            // TODO EES-4814 - are these services supplying any benefit anymore, or should we rewrite and ditch
+            // "AddIdentity"?  Can SignInUserAsync be used for anything useful, like supplying extra information about
+            // the users in the AspNet cookie?
             services
-                .AddDefaultIdentity<ApplicationUser>()
-                .AddRoles<IdentityRole>()
+                .AddIdentity<ApplicationUser, IdentityRole>()
+                .AddUserManager<UserManager<ApplicationUser>>()
+                .AddRoleManager<RoleManager<IdentityRole>>()
+                .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
+                .AddRoleStore<RoleStore<IdentityRole, UsersAndRolesDbContext>>()
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
             if (!HostEnvironment.IsIntegrationTest())
@@ -230,9 +240,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services
                         // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
                         // headers as a way of identifying users.
-                    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                        // This adds verification of the incoming JWTs after they have been located in the
-                        // Authorization headers above.
+                    .AddAuthentication(options =>
+                    {
+                        // This line tells Identity Framework to use the JWT mechanism for logging in users, rather
+                        // than Identity's default cookie-based one.  Without this line, the defaults set up in
+                        // services.AddIdentity(...) above would take precedence.
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    // This adds verification of the incoming JWTs after they have been located in the
+                    // Authorization headers above.
                     .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnect"));
 
                 services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();

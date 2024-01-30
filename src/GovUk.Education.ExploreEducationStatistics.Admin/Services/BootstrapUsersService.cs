@@ -1,8 +1,10 @@
+#nullable enable
 using System;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
@@ -12,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IConfiguration _configuration;
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
-        private readonly UsersAndRolesDbContext _contentDbContext;
+        private readonly ContentDbContext _contentDbContext;
 
         public BootstrapUsersService(
             IConfiguration configuration,
             UsersAndRolesDbContext usersAndRolesDbContext,
-            UsersAndRolesDbContext contentDbContext)
+            ContentDbContext contentDbContext)
         {
             _configuration = configuration;
             _usersAndRolesDbContext = usersAndRolesDbContext;
@@ -51,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(u => u.Email.ToLower())
                 .ToList();
 
-            var newInvitesToCreate = bauBootstrapUserEmailAddresses
+            var newInvitesToCreate = bauBootstrapUserEmailAddresses!
                 .Where(email =>
                     !existingEmailInvites.Contains(email.ToLower()) &&
                     !existingUserEmails.Contains(email.ToLower()))
@@ -62,7 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         RoleId = Role.BauUser.GetEnumValue(),
                         Accepted = false,
                         Created = DateTime.UtcNow,
-                    });
+                    })
+                .ToList();
 
             if (newInvitesToCreate.IsNullOrEmpty())
             {
