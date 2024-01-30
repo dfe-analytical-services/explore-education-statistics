@@ -23,7 +23,7 @@ test('Handling tear down topics via API', async ({ request }) => {
 test('API DELETE Rrequest #4', async ({ request }) => {
   // console.log("TOKEN-2", USER.token);
   const res = await request.delete(
-    'https://admin.dev.explore-education-statistics.service.gov.uk/api/topics/c03612cc-26a3-494b-b09f-08dc175e4381',
+    '/api/topics/c03612cc-26a3-494b-b09f-08dc175e4381',
     {
       headers: {
         Authorization:
@@ -33,5 +33,5 @@ test('API DELETE Rrequest #4', async ({ request }) => {
   );
   expect(res.status()).toBe(200);
   const tests = await res.json();
-  console.log('TESTS #4', tests);
+  console.log('TESTS #5', tests);
 });

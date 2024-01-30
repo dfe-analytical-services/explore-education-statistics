@@ -25,12 +25,10 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: ' ',
-
+    baseURL: 'https://admin.dev.explore-education-statistics.service.gov.uk',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
   },
-
   /* Configure projects for major browsers */
   projects: [
     {
