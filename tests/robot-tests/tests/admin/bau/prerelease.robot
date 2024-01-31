@@ -145,7 +145,7 @@ Validate prerelease has not started
     ${month}=    get current datetime    %m    1
     ${year}=    get current datetime    %Y    1
     ${time_start}=    format uk to local datetime    ${year}-${month}-${day}T00:00:00    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${year}-${month}-${day}    %-d %B %Y
+    ${time_end}=    format uk to local datetime    ${year}-${month}-${day}T00:00:00    %-d %B %Y
     user checks page contains
     ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
@@ -252,7 +252,7 @@ Validate prerelease has not started for Analyst user
     ${month}=    get current datetime    %m    1
     ${year}=    get current datetime    %Y    1
     ${time_start}=    format uk to local datetime    ${year}-${month}-${day}T00:00:00    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${year}-${month}-${day}    %-d %B %Y
+    ${time_end}=    format uk to local datetime    ${year}-${month}-${day}T00:00:00    %-d %B %Y
     user checks page contains
     ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
