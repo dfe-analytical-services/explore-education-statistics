@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -113,7 +114,7 @@ public class PublicationService : IPublicationService
         IEnumerable<Guid>? publicationIds = null)
     {
         sort ??= search == null ? Title : Relevance;
-        order ??= order ?? (sort == Title ? Asc : Desc);
+        order ??= sort == Title ? Asc : Desc;
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
@@ -138,52 +139,46 @@ public class PublicationService : IPublicationService
         }
 
         // Apply a free-text search filter
-        var queryable = search == null
-            ? baseQueryable.Select(publication => new { Publication = publication, Rank = 0 })
-            : baseQueryable.Join(_contentDbContext.PublicationsFreeTextTable(search),
-                publication => publication.Id,
-                freeTextRank => freeTextRank.Id,
-                (publication, freeTextRank) => new { Publication = publication, freeTextRank.Rank });
+        var queryable = baseQueryable.JoinFreeText(_contentDbContext.PublicationsFreeTextTable, p => p.Id, search);
 
         // Apply sorting
         var orderedQueryable = sort switch
         {
             Published =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.LatestPublishedRelease!.Published)
-                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedRelease!.Published),
+                    ? queryable.OrderBy(result => result.Value.LatestPublishedRelease!.Published)
+                    : queryable.OrderByDescending(result => result.Value.LatestPublishedRelease!.Published),
             Relevance =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Rank)
-                    : queryable.OrderByDescending(p => p.Rank),
+                    ? queryable.OrderBy(result => result.Rank)
+                    : queryable.OrderByDescending(result => result.Rank),
             Title =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.Title)
-                    : queryable.OrderByDescending(p => p.Publication.Title),
+                    ? queryable.OrderBy(result => result.Value.Title)
+                    : queryable.OrderByDescending(result => result.Value.Title),
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)
         };
 
         // Then sort by publication id to provide a stable sort order
-        orderedQueryable = orderedQueryable.ThenBy(p => p.Publication.Id);
+        orderedQueryable = orderedQueryable.ThenBy(result => result.Value.Id);
 
         // Get the total results count for the paginated response
         var totalResults = await orderedQueryable.CountAsync();
 
         // Apply offset pagination and execute the query
         var results = await orderedQueryable
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(tuple =>
+            .Paginate(page, pageSize)
+            .Select(result =>
                 new PublicationSearchResultViewModel
                 {
-                    Id = tuple.Publication.Id,
-                    Slug = tuple.Publication.Slug,
-                    Summary = tuple.Publication.Summary,
-                    Title = tuple.Publication.Title,
-                    Theme = tuple.Publication.Topic.Theme.Title,
-                    Published = tuple.Publication.LatestPublishedRelease!.Published!.Value,
-                    Type = tuple.Publication.LatestPublishedRelease!.Type,
-                    Rank = tuple.Rank
+                    Id = result.Value.Id,
+                    Slug = result.Value.Slug,
+                    Summary = result.Value.Summary,
+                    Title = result.Value.Title,
+                    Theme = result.Value.Topic.Theme.Title,
+                    Published = result.Value.LatestPublishedRelease!.Published!.Value,
+                    Type = result.Value.LatestPublishedRelease!.Type,
+                    Rank = result.Rank
                 }).ToListAsync();
 
         return new PaginatedListViewModel<PublicationSearchResultViewModel>(results, totalResults, page, pageSize);

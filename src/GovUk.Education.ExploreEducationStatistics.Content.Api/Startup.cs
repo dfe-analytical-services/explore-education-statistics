@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -82,6 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 options.AddTrimStringBinderProvider();
             });
 
+            services.AddFluentValidation();
+            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
+
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
@@ -141,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+            services.AddTransient<IDataSetService, DataSetService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IPublicationService, PublicationService>();

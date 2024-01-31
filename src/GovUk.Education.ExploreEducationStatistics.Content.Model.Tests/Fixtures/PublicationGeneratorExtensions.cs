@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -36,7 +37,7 @@ public static class PublicationGeneratorExtensions
         this Generator<Publication> generator,
         Func<SetterContext, IEnumerable<Release>> releases)
         => generator.ForInstance(s => s.SetReleases(releases.Invoke));
-    
+
     public static Generator<Publication> WithContact(
         this Generator<Publication> generator,
         Contact contact)
@@ -57,6 +58,15 @@ public static class PublicationGeneratorExtensions
         Release release)
         => setters.Set(p => p.LatestPublishedRelease, release);
 
+    public static Generator<Publication> WithTopics(this Generator<Publication> generator,
+        IEnumerable<Topic> topics)
+    {
+        topics.ForEach((topic, index) =>
+            generator.ForIndex(index, s => s.SetTopic(topic)));
+
+        return generator;
+    }
+
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
         IEnumerable<Release> releases)
@@ -76,10 +86,10 @@ public static class PublicationGeneratorExtensions
                 return list;
             }
         );
-    
+
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
-        Contact contact) 
+        Contact contact)
         => setters.Set(m => m.Contact, contact);
 
     private static InstanceSetters<Publication> SetTopicId(
@@ -90,5 +100,6 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetTopic(
         this InstanceSetters<Publication> setters,
         Topic topic)
-        => setters.Set(p => p.Topic, topic);
+        => setters.Set(p => p.Topic, topic)
+            .SetTopicId(topic.Id);
 }
