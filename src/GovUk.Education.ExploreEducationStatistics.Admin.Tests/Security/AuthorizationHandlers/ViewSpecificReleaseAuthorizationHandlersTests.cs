@@ -137,47 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task PreReleaseUser_WithinPreReleaseAccessLenienceWindow()
-            {
-                var userId = Guid.NewGuid();
-
-                var successScenario = new ReleaseHandlerTestScenario
-                {
-                    Entity = Release,
-                    User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
-                    UserReleaseRoles = new List<UserReleaseRole>
-                    {
-                        new()
-                        {
-                            ReleaseId = Release.Id,
-                            UserId = userId,
-                            Role = ReleaseRole.PrereleaseViewer
-                        }
-                    },
-                    ExpectedToPass = true,
-                    UnexpectedFailMessage =
-                        "Expected the test to succeed because the Pre Release window is currently within publish day lenience"
-                };
-
-                var preReleaseService = new Mock<IPreReleaseService>(Strict);
-
-                preReleaseService
-                    .Setup(s => s.GetPreReleaseWindowStatus(Release, It.IsAny<DateTime>()))
-                    .Returns(new PreReleaseWindowStatus
-                    {
-                        Access = PreReleaseAccess.WithinPublishDayLenience
-                    });
-
-                // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
-                // if the Pre Release window is currently in the leniency period.
-                await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
-                    contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
-                    successScenario);
-
-                VerifyAllMocks(preReleaseService);
-            }
-
-            [Fact]
             public async Task PreReleaseUser_OutsidePreReleaseAccessWindow()
             {
                 var userId = Guid.NewGuid();
@@ -202,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 await GetEnumValues<PreReleaseAccess>()
-                    .Where(value => value != PreReleaseAccess.Within && value != PreReleaseAccess.WithinPublishDayLenience)
+                    .Where(value => value != PreReleaseAccess.Within)
                     .ToList()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async access =>
@@ -246,9 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             AccessWindow = new AccessWindowOptions
                             {
-                                MinutesBeforeReleaseTimeEnd = 100,
                                 MinutesBeforeReleaseTimeStart = 200,
-                                MinutesIntoPublishDayByWhichPublishingHasOccurred = 50,
                             }
                         }
                     }))));

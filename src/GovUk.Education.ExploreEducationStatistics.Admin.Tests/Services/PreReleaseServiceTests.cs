@@ -25,9 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 AccessWindow = new AccessWindowOptions
                 {
-                    MinutesBeforeReleaseTimeEnd = 1,
                     MinutesBeforeReleaseTimeStart = 1440,
-                    MinutesIntoPublishDayByWhichPublishingHasOccurred = 570,
                 }
             }
         }));
@@ -35,27 +33,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Release _testRelease = new()
         {
             PublishScheduled = DefaultScheduledPublishDate,
-            Published = DefaultActuallyPublishedDate,
+            Published = null,
             ApprovalStatus = ReleaseApprovalStatus.Approved
         };
 
 
         [Theory]
-        [InlineData("2003-11-10T00:00:00.00Z", PreReleaseAccess.Before)]
-        [InlineData("2003-11-13T23:59:00.00Z", PreReleaseAccess.Before)]
-        [InlineData("2003-11-14T00:00:00.00Z", PreReleaseAccess.Within)]
-        [InlineData("2003-11-14T10:24:00.00Z", PreReleaseAccess.Within)]
-        [InlineData("2003-11-14T23:58:00.00Z", PreReleaseAccess.Within)]
-        [InlineData("2003-11-14T23:59:00.00Z", PreReleaseAccess.WithinPublishDayLenience)]
-        [InlineData("2003-11-15T00:00:00.00Z", PreReleaseAccess.WithinPublishDayLenience)]
-        [InlineData("2003-11-15T02:30:00.00Z", PreReleaseAccess.WithinPublishDayLenience)]
-        [InlineData("2003-11-15T08:45:00.00Z", PreReleaseAccess.WithinPublishDayLenience)]
-        [InlineData("2003-11-15T09:32:00.00Z", PreReleaseAccess.After)]
-        public void CalculatesAccessRangeAsExpected(string referenceTimeString, PreReleaseAccess expectedAccess)
+        [InlineData("2003-11-10T00:00:00.00Z", false, PreReleaseAccess.Before)]
+        [InlineData("2003-11-13T23:59:00.00Z", false,PreReleaseAccess.Before)]
+        [InlineData("2003-11-14T00:00:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-14T10:24:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-14T23:58:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-14T23:59:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-15T00:00:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-15T02:30:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-15T02:30:00.00Z", true,PreReleaseAccess.After)]
+        [InlineData("2003-11-15T08:45:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-15T09:32:00.00Z", false,PreReleaseAccess.Within)]
+        [InlineData("2003-11-15T09:32:00.00Z", true,PreReleaseAccess.After)]
+        public void CalculatesAccessRangeAsExpected(string referenceTimeString, bool releaseHasBeenPublished, PreReleaseAccess expectedAccess)
         {
+            var release  = new Release()
+            {
+                PublishScheduled = DefaultScheduledPublishDate,
+                Published = releaseHasBeenPublished ? DefaultActuallyPublishedDate : null,
+                ApprovalStatus = ReleaseApprovalStatus.Approved
+            };
+
             var referenceTime = DateTime.Parse(referenceTimeString, styles: DateTimeStyles.AdjustToUniversal);
 
-            var result = _sut.GetPreReleaseWindowStatus(_testRelease, referenceTime);
+            var result = _sut.GetPreReleaseWindowStatus(release, referenceTime);
 
             Assert.Equal(expectedAccess, result.Access);
         }
@@ -67,57 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Assert.Equal(PreReleaseAccess.Within, result.Access);
             Assert.Equal(DateTime.Parse("2003-11-14T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.Start);
-            Assert.Equal(DateTime.Parse("2003-11-14T23:59:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.End);
-            Assert.Equal(DateTime.Parse("2003-11-15T09:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.PublishDayLenienceDeadline);
-        }
-
-        [Fact]
-        public void CalculatesLeniencePeriodWhenDateIsBST()
-        {
-            var testReleaseWithBSTTimes = new Release()
-            {
-                PublishScheduled = DateTime.Parse("2003-07-15T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                Published = DateTime.Parse("2003-07-15T09:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                ApprovalStatus = ReleaseApprovalStatus.Approved
-            };
-
-            var result = _sut.GetPreReleaseWindowStatus(testReleaseWithBSTTimes, DateTime.Parse("2003-07-14T10:24:00.00Z", styles: DateTimeStyles.AdjustToUniversal));
-
-            Assert.Equal(PreReleaseAccess.Within, result.Access);
-            Assert.Equal(DateTime.Parse("2003-07-14T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.Start);
-            Assert.Equal(DateTime.Parse("2003-07-14T23:59:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.End);
-            Assert.Equal(DateTime.Parse("2003-07-15T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.PublishDayLenienceDeadline);
-        }
-
-        [Fact]
-        public void DoesNotMoveIntoNegativeTimeIfLenienceOffsetIsBelow60Minutes()
-        {
-            var sut = new PreReleaseService(Options.Create(new PreReleaseOptions
-            {
-                PreReleaseAccess = new PreReleaseAccessOptions
-                {
-                    AccessWindow = new AccessWindowOptions
-                    {
-                        MinutesBeforeReleaseTimeEnd = 1,
-                        MinutesBeforeReleaseTimeStart = 1440,
-                        MinutesIntoPublishDayByWhichPublishingHasOccurred = 30,
-                    }
-                }
-            }));
-
-            var testReleaseWithBSTTimes = new Release()
-            {
-                PublishScheduled = DateTime.Parse("2003-07-15T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                Published = DateTime.Parse("2003-07-15T09:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                ApprovalStatus = ReleaseApprovalStatus.Approved
-            };
-
-            var result = sut.GetPreReleaseWindowStatus(testReleaseWithBSTTimes, DateTime.Parse("2003-07-14T10:24:00.00Z", styles: DateTimeStyles.AdjustToUniversal));
-
-            Assert.Equal(PreReleaseAccess.Within, result.Access);
-            Assert.Equal(DateTime.Parse("2003-07-14T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.Start);
-            Assert.Equal(DateTime.Parse("2003-07-14T23:59:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.End);
-            Assert.Equal(DateTime.Parse("2003-07-15T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.PublishDayLenienceDeadline);
+            Assert.Equal(DefaultScheduledPublishDate, result.ScheduledPublishDate);
         }
 
         [Fact]
@@ -126,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseWithNoInformation = new Release()
             {
                 PublishScheduled = DefaultScheduledPublishDate,
-                Published = DefaultActuallyPublishedDate,
+                Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
             };
 
@@ -140,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseWithNoInformation = new Release()
             {
                 PublishScheduled = DefaultScheduledPublishDate,
-                Published = DefaultActuallyPublishedDate,
+                Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 

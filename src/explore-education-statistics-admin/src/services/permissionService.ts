@@ -28,18 +28,12 @@ export interface DataFilePermissions {
   canCancelImport: boolean;
 }
 
-export type PreReleaseAccess =
-  | 'Before'
-  | 'After'
-  | 'Within'
-  | 'NoneSet'
-  | 'WithinPublishDayLenience';
+export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
 
 export interface PreReleaseWindowStatus {
   access: PreReleaseAccess;
   start: Date;
-  end: Date;
-  publishDayLenienceDeadline: Date;
+  scheduledPublishDate: Date;
 }
 
 const permissionService = {
@@ -78,14 +72,12 @@ const permissionService = {
       .get<{
         access: PreReleaseAccess;
         start: string;
-        end: string;
-        publishDayLenienceDeadline: string;
+        scheduledPublishDate: string;
       }>(`/permissions/release/${releaseId}/prerelease/status`)
       .then(status => ({
         access: status.access,
         start: parseISO(status.start),
-        end: parseISO(status.end),
-        publishDayLenienceDeadline: parseISO(status.publishDayLenienceDeadline),
+        scheduledPublishDate: parseISO(status.scheduledPublishDate),
       }));
   },
   getDataFilePermissions(

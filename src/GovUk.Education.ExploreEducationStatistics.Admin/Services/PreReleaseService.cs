@@ -28,31 +28,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new PreReleaseWindow
             {
                 Start = GetStartTime(publishScheduled),
-                End = GetEndTime(publishScheduled)
+                ScheduledPublishDate = publishScheduled
             };
         }
 
         public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
         {
+            if (release.Live)
+            {
+                return new PreReleaseWindowStatus
+                {
+                    Access = PreReleaseAccess.After
+                };
+            }
+
             if (!release.PublishScheduled.HasValue)
             {
                 return new PreReleaseWindowStatus
                 {
-                    Access = release.Live ? PreReleaseAccess.After : PreReleaseAccess.NoneSet
+                    Access = PreReleaseAccess.NoneSet
                 };
             }
 
             var publishScheduled = release.PublishScheduled.Value;
             var startTime = GetStartTime(publishScheduled);
-            var endTime = GetEndTime(publishScheduled);
-            var publishDayEndTime = GetPublishDayLenienceDeadline(publishScheduled);
 
             return new PreReleaseWindowStatus
             {
-                Start = startTime,
-                End = endTime,
-                PublishDayLenienceDeadline = publishDayEndTime,
-                Access = GetAccess(release, startTime, endTime, publishDayEndTime, referenceTime)
+                Start = GetStartTime(publishScheduled),
+                ScheduledPublishDate = publishScheduled,
+                Access = GetAccess(release, startTime, referenceTime)
             };
         }
 
@@ -61,34 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
         }
 
-        private DateTime GetEndTime(DateTime publishScheduled)
-        {
-            return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
-        }
-
-        private DateTime GetPublishDayLenienceDeadline(DateTime publishScheduled)
-        {
-            var ukTimeZone = DateTimeExtensions.GetUkTimeZone();
-
-            // The Azure Functions which publish releases will do so at 9:30 in the current timezone (BST in summer, GMT otherwise)
-            //      (^ for reasons explained in the CheckPublishDateCanBeScheduled method in the ReleaseApprovalService).
-            // This means that during winter, these jobs will actually run at 8:30 UTC.
-            // These date calculations are done in UTC, so in summer we only want to add 510 minutes onto midnight rather than 570.
-            //      (^ Assuming the default publishing time of 09:30am)
-            if (ukTimeZone.IsDaylightSavingTime(publishScheduled))
-            {
-                var adjustedMinutes = Math.Max(_preReleaseOptions.MinutesIntoPublishDayByWhichPublishingHasOccurred - 60, 0);
-                return publishScheduled.AddMinutes(adjustedMinutes);
-            }
-
-            return publishScheduled.AddMinutes(_preReleaseOptions.MinutesIntoPublishDayByWhichPublishingHasOccurred);
-        }
-
         private static PreReleaseAccess GetAccess(
             Release release,
             DateTime startTime,
-            DateTime endTime,
-            DateTime publishDayLenienceDeadline,
             DateTime referenceTime)
         {
             if (!release.PublishScheduled.HasValue || release.ApprovalStatus != ReleaseApprovalStatus.Approved)
@@ -101,17 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return PreReleaseAccess.Before;
             }
 
-            if (referenceTime.IsBefore(endTime))
-            {
-                return PreReleaseAccess.Within;
-            }
-
-            if (referenceTime.IsAfterInclusive(endTime) && referenceTime.IsBefore(publishDayLenienceDeadline))
-            {
-                return PreReleaseAccess.WithinPublishDayLenience;
-            }
-
-            return PreReleaseAccess.After;
+            return release.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
         }
     }
 
@@ -123,10 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class AccessWindowOptions
     {
         public int MinutesBeforeReleaseTimeStart { get; set; }
-
-        public int MinutesBeforeReleaseTimeEnd { get; set; }
-
-        public int MinutesIntoPublishDayByWhichPublishingHasOccurred { get; set; }
     }
 
     public class PreReleaseAccessOptions

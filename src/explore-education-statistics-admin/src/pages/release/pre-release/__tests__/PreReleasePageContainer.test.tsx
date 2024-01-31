@@ -36,8 +36,7 @@ describe('PreReleasePageContainer', () => {
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'After',
       start: new Date('2018-12-12T09:00:00Z'),
-      end: new Date('2018-12-13T00:00:00Z'),
-      publishDayLenienceDeadline: new Date('2018-12-14T09:30:00Z'),
+      scheduledPublishDate: new Date('2018-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -64,8 +63,7 @@ describe('PreReleasePageContainer', () => {
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'Before',
       start: new Date('3000-12-12T09:00:00Z'),
-      end: new Date('3000-12-13T00:00:00Z'),
-      publishDayLenienceDeadline: new Date('2018-12-14T09:30:00Z'),
+      scheduledPublishDate: new Date('3000-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -83,7 +81,7 @@ describe('PreReleasePageContainer', () => {
 
       expect(
         screen.getByText(
-          'Pre-release access will be available from 12 December 3000 at 09:00 until 13 December 3000 at 00:00.',
+          'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000',
         ),
       ).toBeInTheDocument();
 
@@ -94,13 +92,12 @@ describe('PreReleasePageContainer', () => {
   });
 
   test('renders correctly when within pre-release window', async () => {
-    const now = new Date();
+    const now = new Date('2018-12-12T14:32:00Z');
 
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'Within',
       start: subHours(now, 6),
-      end: addHours(now, 18),
-      publishDayLenienceDeadline: addHours(now, 27.5),
+      scheduledPublishDate: new Date('2018-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
@@ -133,14 +130,13 @@ describe('PreReleasePageContainer', () => {
     });
   });
 
-  test('renders correctly when within release day lenience window', async () => {
+  test('renders correctly when on release day but release is yet to be published', async () => {
     const now = new Date(); // 2am on Publish Day
 
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
-      access: 'WithinPublishDayLenience',
+      access: 'Within',
       start: subHours(now, 26),
-      end: subHours(now, 2),
-      publishDayLenienceDeadline: addHours(now, 7.5),
+      scheduledPublishDate: subHours(now, 2),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
