@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -17,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -28,7 +26,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -1649,10 +1646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseRepository = new ReleaseRepository(contentDbContext,
-                    Mock.Of<StatisticsDbContext>(),
-                    Mock.Of<IMapper>());
-                var releaseService = BuildService(contentDbContext, releaseRepository: releaseRepository);
+                var releaseService = BuildService(contentDbContext);
                 var result = await releaseService.GetReleaseStatuses(release.Id);
 
                 var resultStatuses = result.AssertRight();
@@ -1768,10 +1762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var releaseRepository = new ReleaseRepository(contentDbContext,
-                    Mock.Of<StatisticsDbContext>(),
-                    Mock.Of<IMapper>());
-                var releaseService = BuildService(contentDbContext, releaseRepository: releaseRepository);
+                var releaseService = BuildService(contentDbContext);
                 var result = await releaseService.GetReleaseStatuses(amendedRelease.Id);
 
                 var resultStatuses = result.AssertRight();
@@ -1820,12 +1811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var releaseRepository = new ReleaseRepository(
-                    context,
-                    Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
-                    Mock.Of<IMapper>(MockBehavior.Strict));
-                var releaseService = BuildService(context,
-                    releaseRepository: releaseRepository);
+                var releaseService = BuildService(context);
                 var result = await releaseService.GetReleaseStatuses(release.Id);
 
                 var resultStatuses = result.AssertRight();

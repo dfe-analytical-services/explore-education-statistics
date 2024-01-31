@@ -1,23 +1,29 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseRepositoryTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task ListReleasesForUser_ReleaseRole_Approved()
         {
@@ -64,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext);
                 var result =
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
@@ -119,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext);
                 var result =
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
@@ -175,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext);
                 var result =
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
@@ -217,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext);
                 var result =
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
@@ -273,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext);
                 var result =
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
@@ -283,154 +289,108 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task ReleaseHierarchyCreated()
+        public class CreateStatisticsDbReleaseAndSubjectHierarchy : ReleaseRepositoryTests
         {
-            var release = new Release
+            [Fact]
+            public async Task StatsReleaseDoesNotExist_CreatesStatsReleaseAndReleaseSubject()
             {
-                Published = DateTime.Now,
-                PreviousVersionId = Guid.NewGuid(),
-                Publication = new Publication
+                Release release = _fixture
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication());
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    Title = "Test publication",
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme"
-                        }
-                    }
+                    contentDbContext.Releases.Add(release);
+                    await contentDbContext.SaveChangesAsync();
                 }
-            };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
-                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
-                Assert.NotNull(statsRelease);
-                Assert.Equal(release.Id, statsRelease!.Id);
-                Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
-            }
-        }
-
-        [Fact]
-        public async Task ReleaseHierarchyUpdated()
-        {
-            var release = new Release
-            {
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.Week5,
-                Publication = new Publication
+                Guid? createdSubjectId;
+                var statisticsDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    Title = "Test publication",
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme"
-                        }
-                    }
+                    var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
+                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(release.Id);
                 }
-            };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new Data.Model.Release
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    Id = release.Id,
-                    PublicationId = release.Publication.Id
-                });
-                await statisticsDbContext.SaveChangesAsync();
-            }
+                    var statsRelease = await statisticsDbContext.Release
+                        .FirstAsync(r => r.Id == release.Id);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
-                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id);
-            }
+                    Assert.Equal(release.Id, statsRelease.Id);
+                    Assert.Equal(release.PublicationId, statsRelease.PublicationId);
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
-                Assert.NotNull(statsRelease);
-                Assert.Equal(release.Id, statsRelease!.Id);
-                Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
-            }
-        }
+                    var releaseSubject = Assert.Single(statisticsDbContext.ReleaseSubject);
 
-        [Fact]
-        public async Task SubjectHierarchyCreated()
-        {
-            var release = new Release
-            {
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.April,
-                Publication = new Publication
-                {
-                    Title = "Test publication",
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme"
-                        }
-                    }
+                    Assert.Equal(release.Id, releaseSubject.ReleaseId);
+                    Assert.Equal(createdSubjectId, releaseSubject.SubjectId);
                 }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
             }
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            [Fact]
+            public async Task StatsReleaseExists_UpdatesStatsReleaseAndCreatesReleaseSubject()
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext, statisticsDbContext);
-                await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(
-                    release.Id);
-            }
+                Release release = _fixture
+                    .DefaultRelease()
+                    .WithPublication(_fixture
+                        .DefaultPublication());
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var subjects = statisticsDbContext.Subject.ToList();
-                Assert.Single(subjects);
+                // Create a stats release with a different publication Id to the content release
+                Data.Model.Release existingStatsRelease = _fixture
+                    .DefaultStatsRelease()
+                    .WithId(release.Id)
+                    .WithPublicationId(Guid.NewGuid());
 
-                var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
-                Assert.Single(releaseSubjects);
-                Assert.Equal(subjects[0].Id, releaseSubjects[0].SubjectId);
-                Assert.Equal(release.Id, releaseSubjects[0].ReleaseId);
+                ReleaseSubject existingReleaseSubject = _fixture
+                    .DefaultReleaseSubject()
+                    .WithRelease(existingStatsRelease)
+                    .WithSubject(_fixture
+                        .DefaultSubject());
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    contentDbContext.Releases.Add(release);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                Guid? createdSubjectId;
+                var statisticsDbContextId = Guid.NewGuid().ToString();
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+                {
+                    statisticsDbContext.Release.Add(existingStatsRelease);
+                    statisticsDbContext.ReleaseSubject.Add(existingReleaseSubject);
+                    await statisticsDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+                {
+                    var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
+                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(release.Id);
+                }
+
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+                {
+                    var statsRelease = await statisticsDbContext.Release
+                        .FirstAsync(r => r.Id == release.Id);
+
+                    Assert.Equal(release.Id, statsRelease.Id);
+                    Assert.Equal(release.PublicationId, statsRelease.PublicationId);
+
+                    Assert.Equal(2, await statisticsDbContext.ReleaseSubject.CountAsync());
+
+                    Assert.True(await statisticsDbContext.ReleaseSubject
+                        .AnyAsync(rs => rs.ReleaseId == release.Id
+                                        && rs.SubjectId == existingReleaseSubject.SubjectId));
+
+                    Assert.True(await statisticsDbContext.ReleaseSubject
+                        .AnyAsync(rs => rs.ReleaseId == release.Id
+                                        && rs.SubjectId == createdSubjectId));
+                }
             }
         }
 
@@ -461,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext: contentDbContext);
                 var result = await releaseRepository.GetAllReleaseVersionIds(amendedRelease2);
                 Assert.Equal(3, result.Count);
 
@@ -485,7 +445,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var releaseRepository = BuildRepository(contentDbContext: contentDbContext);
                 var result = await releaseRepository.GetAllReleaseVersionIds(originalRelease);
                 Assert.Single(result);
 
@@ -493,15 +453,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private ReleaseRepository BuildReleaseRepository(
+        private static ReleaseRepository BuildRepository(
             ContentDbContext? contentDbContext = null,
             StatisticsDbContext? statisticsDbContext = null
         )
         {
             return new ReleaseRepository(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
-                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
-                AdminMapper());
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
         }
     }
 }

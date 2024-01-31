@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -18,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IMapper _mapper;
 
         public ReleaseRepository(
             ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
-            IMapper mapper)
+            StatisticsDbContext statisticsDbContext)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
-            _mapper = mapper;
         }
 
         public async Task<List<Content.Model.Release>> ListReleases(
@@ -55,14 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => r.UserId == userId)
                 .Select(r => r.PublicationId)
                 .ToListAsync();
-            
+
             var userPublicationRoleReleaseIds = await _contentDbContext
                 .Releases
                 .AsQueryable()
                 .Where(r => userPublicationIds.Contains(r.PublicationId))
                 .Select(r => r.Id)
                 .ToListAsync();
-            
+
             userReleaseIds.AddRange(userPublicationRoleReleaseIds);
             userReleaseIds = userReleaseIds.Distinct().ToList();
 
@@ -75,30 +71,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId)
         {
             var release = await _contentDbContext.Releases
-                .Include(r => r.Publication)
+                .FirstAsync(r => r.Id == releaseId);
+
+            var existingStatsRelease = await _statisticsDbContext.Release
                 .FirstOrDefaultAsync(r => r.Id == releaseId);
 
-            var existingRelease =
-                await _statisticsDbContext.Release.FindAsync(release.Id);
-            if (existingRelease == null)
+            if (existingStatsRelease == null)
             {
-                var statsRelease = _mapper.Map(release, new Data.Model.Release());
-                await _statisticsDbContext.Release.AddAsync(statsRelease);
+                _statisticsDbContext.Release.Add(new Data.Model.Release
+                {
+                    Id = releaseId,
+                    PublicationId = release.PublicationId
+                });
             }
             else
             {
-                _mapper.Map(release, existingRelease);
-                _statisticsDbContext.Release.Update(existingRelease);
+                existingStatsRelease.PublicationId = release.PublicationId;
+                _statisticsDbContext.Release.Update(existingStatsRelease);
             }
 
-            var releaseSubject = (await _statisticsDbContext.ReleaseSubject.AddAsync(new ReleaseSubject
+            var releaseSubject = new ReleaseSubject
             {
                 ReleaseId = release.Id,
                 Subject = new Subject()
-            })).Entity;
+            };
 
+            _statisticsDbContext.ReleaseSubject.Add(releaseSubject);
             await _statisticsDbContext.SaveChangesAsync();
-            return releaseSubject.Subject.Id;
+
+            return releaseSubject.SubjectId;
         }
 
         public async Task<List<Guid>> GetAllReleaseVersionIds(Content.Model.Release release)
