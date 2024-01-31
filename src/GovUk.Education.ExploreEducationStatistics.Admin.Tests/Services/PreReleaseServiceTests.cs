@@ -30,13 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }));
 
-        private readonly Release _testRelease = new()
-        {
-            PublishScheduled = DefaultScheduledPublishDate,
-            Published = null,
-            ApprovalStatus = ReleaseApprovalStatus.Approved
-        };
-
 
         [Theory]
         [InlineData("2003-11-10T00:00:00.00Z", false, PreReleaseAccess.Before)]
@@ -68,9 +61,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void CalculatesAllAccessRangeFieldsAsExpected()
+        public void CalculatesStartAndScheduledPublishDatesAsExpected()
         {
-            var result = _sut.GetPreReleaseWindowStatus(_testRelease, DateTime.Parse("2003-11-14T10:24:00.00Z", styles: DateTimeStyles.AdjustToUniversal));
+            var testRelease = new Release()
+            {
+                PublishScheduled = DefaultScheduledPublishDate,
+                Published = null,
+                ApprovalStatus = ReleaseApprovalStatus.Approved
+            };
+
+            var result = _sut.GetPreReleaseWindowStatus(testRelease, DateTime.Parse("2003-11-14T10:24:00.00Z", styles: DateTimeStyles.AdjustToUniversal));
 
             Assert.Equal(PreReleaseAccess.Within, result.Access);
             Assert.Equal(DateTime.Parse("2003-11-14T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal), result.Start);
@@ -80,28 +80,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AccessIsNoneSetIfPublishedScheduleIsStillInReview()
         {
-            var releaseWithNoInformation = new Release()
+            var testReleaseInReview = new Release()
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
             };
 
-            var preReleaseWindowStatus = _sut.GetPreReleaseWindowStatus(releaseWithNoInformation, DateWithinPreReleaseAccessWindow);
+            var preReleaseWindowStatus = _sut.GetPreReleaseWindowStatus(testReleaseInReview, DateWithinPreReleaseAccessWindow);
             Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
         }
 
         [Fact]
         public void AccessIsNoneSetIfPublishedScheduleIsStillInDraft()
         {
-            var releaseWithNoInformation = new Release()
+            var testReleaseInDraft = new Release()
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
-            var preReleaseWindowStatus = _sut.GetPreReleaseWindowStatus(releaseWithNoInformation, DateWithinPreReleaseAccessWindow);
+            var preReleaseWindowStatus = _sut.GetPreReleaseWindowStatus(testReleaseInDraft, DateWithinPreReleaseAccessWindow);
             Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
         }
 
