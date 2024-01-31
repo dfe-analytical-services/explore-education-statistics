@@ -36,8 +36,7 @@ public static class LocationMetaGeneratorExtensions
                 m => m.Level,
                 (_, _, context) =>
                     GeographicLevelUtils.Levels[context.Index % GeographicLevelUtils.Levels.Length]
-            )
-            .Set(m => m.Options, []);
+            );
 
     public static InstanceSetters<LocationMeta> SetLevel(
         this InstanceSetters<LocationMeta> setters,

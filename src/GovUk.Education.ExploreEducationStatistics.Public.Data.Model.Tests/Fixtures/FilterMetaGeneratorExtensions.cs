@@ -38,8 +38,7 @@ public static class FilterMetaGeneratorExtensions
         => setters
             .SetDefault(m => m.Identifier)
             .SetDefault(m => m.Label)
-            .SetDefault(m => m.Hint)
-            .Set(m => m.Options, []);
+            .SetDefault(m => m.Hint);
 
     public static InstanceSetters<FilterMeta> SetIdentifier(this InstanceSetters<FilterMeta> setters, string identifier)
         => setters.Set(m => m.Identifier, identifier);

@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 
 public static class TimePeriodMetaGeneratorExtensions
 {
-    private const int DefaultStartYear = 2015;
+    private const int DefaultStartYear = 2000;
     private const TimeIdentifier DefaultCode = TimeIdentifier.AcademicYear;
 
     public static Generator<TimePeriodMeta> DefaultTimePeriodMeta(this DataFixture fixture)
