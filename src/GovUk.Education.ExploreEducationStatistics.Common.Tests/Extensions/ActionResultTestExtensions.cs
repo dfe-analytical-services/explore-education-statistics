@@ -29,6 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.IsAssignableFrom<NotFoundResult>(result.Result);
         }
 
+        public static void AssertNotFoundResult(this ActionResult result)
+        {
+            Assert.IsAssignableFrom<NotFoundResult>(result);
+        }
+
         public static void AssertNoContent(this ActionResult result)
         {
             Assert.IsAssignableFrom<NoContentResult>(result);

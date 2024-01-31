@@ -115,7 +115,7 @@ public class Startup
     {
         UpdateDatabase(app);
 
-        if (env.IsDevelopment())
+        if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
         }

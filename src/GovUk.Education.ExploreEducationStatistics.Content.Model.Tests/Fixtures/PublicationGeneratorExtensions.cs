@@ -23,6 +23,11 @@ public static class PublicationGeneratorExtensions
             .SetDefault(p => p.Summary)
             .SetDefault(p => p.Title);
 
+    public static Generator<Publication> WithLatestPublishedRelease(
+        this Generator<Publication> generator,
+        Release release)
+        => generator.ForInstance(s => s.SetLatestPublishedRelease(release));
+
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
         IEnumerable<Release> releases)
@@ -47,6 +52,11 @@ public static class PublicationGeneratorExtensions
         this Generator<Publication> generator,
         Topic topic)
         => generator.ForInstance(s => s.SetTopic(topic));
+
+    public static InstanceSetters<Publication> SetLatestPublishedRelease(
+        this InstanceSetters<Publication> setters,
+        Release release)
+        => setters.Set(p => p.LatestPublishedRelease, release);
 
     public static Generator<Publication> WithTopics(this Generator<Publication> generator,
         IEnumerable<Topic> topics)

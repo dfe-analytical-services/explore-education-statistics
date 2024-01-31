@@ -39,6 +39,30 @@ public class PublicationService : IPublicationService
         _releaseRepository = releaseRepository;
     }
 
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
+    {
+        return await _contentPersistenceHelper
+            .CheckEntityExists<Publication>(query => query
+                .Include(p => p.LatestPublishedRelease)
+                .Where(p => p.Id == publicationId))
+            .OnSuccess(publication =>
+            {
+                if (publication.LatestPublishedReleaseId == null)
+                {
+                    return new Either<ActionResult, PublishedPublicationSummaryViewModel>(new NotFoundResult());
+                }
+
+                return new PublishedPublicationSummaryViewModel
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    Published = publication.LatestPublishedRelease!.Published!.Value,
+                };
+            });
+    }
+
     public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
