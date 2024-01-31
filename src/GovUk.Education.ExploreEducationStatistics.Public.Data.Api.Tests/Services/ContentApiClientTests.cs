@@ -1,9 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RichardSzalay.MockHttp;
@@ -149,8 +147,7 @@ public abstract class ContentApiClientTests
             var publicationId = Guid.NewGuid();
 
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
-                .Respond(
-                HttpStatusCode.NotFound);
+                .Respond(HttpStatusCode.NotFound);
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
@@ -161,21 +158,19 @@ public abstract class ContentApiClientTests
         }
 
         [Fact]
-        public async Task HttpClientNotFoundObjectResult_ReturnsNotFoundObjectResult()
+        public async Task HttpClientNotFoundObjectResult_ReturnsNotFoundResult()
         {
             var publicationId = Guid.NewGuid();
 
             _mockHttp.Expect(HttpMethod.Get, $"http://localhost/api/publications/{publicationId}/summary")
-                .Respond(
-                HttpStatusCode.NotFound,
-                JsonContent.Create(new ProblemDetails { Detail = "Not found details" }));
+                .Respond(HttpStatusCode.NotFound);
 
             var response = await _contentApiClient.GetPublication(publicationId);
 
             _mockHttp.VerifyNoOutstandingExpectation();
 
             var left = response.AssertLeft();
-            left.AssertNotFoundObjectResult(new ProblemDetails { Detail = "Not found details" });
+            left.AssertNotFoundResult();
         }
 
         [Theory]
