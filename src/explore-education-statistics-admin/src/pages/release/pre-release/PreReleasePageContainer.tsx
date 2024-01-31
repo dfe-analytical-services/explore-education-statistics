@@ -120,7 +120,7 @@ const PreReleasePageContainer = ({
             )} at ${format(start, 'HH:mm')} until it is published on ${format(
               scheduledPublishDate,
               'd MMMM yyyy',
-            )}`}
+            )}.`}
           </p>
 
           <p>

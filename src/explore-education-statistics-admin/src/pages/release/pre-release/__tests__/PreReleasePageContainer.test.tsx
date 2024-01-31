@@ -81,7 +81,7 @@ describe('PreReleasePageContainer', () => {
 
       expect(
         screen.getByText(
-          'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000',
+          'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000.',
         ),
       ).toBeInTheDocument();
 
