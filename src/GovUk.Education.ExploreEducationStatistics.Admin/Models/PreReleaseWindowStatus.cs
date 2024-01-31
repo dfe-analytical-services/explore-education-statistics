@@ -19,6 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         NoneSet,
         Before,
         Within,
-        After,
+        After
     }
 }
