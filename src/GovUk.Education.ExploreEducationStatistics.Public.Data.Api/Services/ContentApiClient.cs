@@ -21,9 +21,9 @@ internal class ContentApiClient : IContentApiClient
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        int page, 
-        int pageSize, 
-        string? search = null, 
+        int page,
+        int pageSize,
+        string? search = null,
         IEnumerable<Guid>? publicationIds = null)
     {
         var request = new PublicationsListPostRequest(
@@ -36,18 +36,17 @@ internal class ContentApiClient : IContentApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            var message = await response.Content.ReadAsStringAsync();
-            _logger.LogError(StringExtensions.TrimIndent(
-                $"""
-                 Failed to retrieve publications with status code: {response.StatusCode}. Message:
-                 {message}
-                 """));
-
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 default:
+                    var message = await response.Content.ReadAsStringAsync();
+                    _logger.LogError(StringExtensions.TrimIndent(
+                        $"""
+                         Failed to retrieve publications with status code: {response.StatusCode}. Message:
+                         {message}
+                         """));
                     response.EnsureSuccessStatusCode();
                     break;
             }
@@ -66,23 +65,19 @@ internal class ContentApiClient : IContentApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            var message = await response.Content.ReadAsStringAsync();
-            _logger.LogError(StringExtensions.TrimIndent(
-                $"""
-                 Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
-                 {message}
-                 """));
-
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 case HttpStatusCode.NotFound:
-                    bool hasContent = response.Content.Headers.ContentLength > 0;
-                    return hasContent
-                        ? new NotFoundObjectResult(await response.Content.ReadFromJsonAsync<ProblemDetails>())
-                        : new NotFoundResult();
+                    return new NotFoundResult();
                 default:
+                    var message = await response.Content.ReadAsStringAsync();
+                    _logger.LogError(StringExtensions.TrimIndent(
+                        $"""
+                         Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
+                         {message}
+                         """));
                     response.EnsureSuccessStatusCode();
                     break;
             }

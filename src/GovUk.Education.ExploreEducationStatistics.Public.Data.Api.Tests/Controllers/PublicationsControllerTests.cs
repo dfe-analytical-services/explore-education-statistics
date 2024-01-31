@@ -6,13 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Microsoft.AspNetCore.Http;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
@@ -62,7 +60,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var publications = new List<PublicationSearchResultViewModel>();
 
-            var publishedDataSetPublicationIds = publishedDataSets.Select(p => p.PublicationId);
+            var publishedDataSetPublicationIds = publishedDataSets
+                .Select(p => p.PublicationId)
+                .ToList();
 
             var numberOfPublicationsToReturn = Math.Min(pageSize, numberOfPublishedDataSets);
 
@@ -141,7 +141,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     null,
                     Enumerable.Empty<Guid>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                    results: Enumerable.Empty<PublicationSearchResultViewModel>().ToList(),
+                    results: [],
                     totalResults: 0,
                     page: 1,
                     pageSize: 1));
@@ -279,17 +279,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
                 .Setup(c => c.GetPublication(publicationId))
-                .ReturnsAsync(new NotFoundObjectResult(new ProblemDetails { Detail = "not found deails" }));
+                .ReturnsAsync(new NotFoundResult());
             
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
             var response = await GetPublication(client, publicationId);
 
-            response.AssertNotFound(new ProblemDetails
-            {
-                Detail = "not found deails",
-                Status = StatusCodes.Status404NotFound,
-            });
+            response.AssertNotFound();
         }
 
         [Fact]

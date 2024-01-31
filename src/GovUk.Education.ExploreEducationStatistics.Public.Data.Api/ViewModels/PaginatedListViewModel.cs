@@ -4,6 +4,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 public abstract record PaginatedListViewModel<T>
 {
+    /// <summary>
+    /// The list of results for this page.
+    /// </summary>
     public List<T> Results { get; }
 
     /// <summary>
