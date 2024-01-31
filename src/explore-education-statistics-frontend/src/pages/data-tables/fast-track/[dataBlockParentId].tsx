@@ -57,9 +57,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
         fastTrack,
         featuredTables,
         selectedPublication: {
-          id: selectedPublication.id,
-          title: selectedPublication.title,
-          slug: selectedPublication.slug,
+          ...selectedPublication,
           selectedRelease: {
             id: fastTrack.releaseId,
             slug: fastTrack.releaseSlug,
