@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -30,7 +31,7 @@ public record DataSetViewModel
 
     public required DataSetLatestVersionViewModel LatestVersion { get; init; }
 
-    public Guid SupersedingDataSetId { get; init; }
+    public Guid? SupersedingDataSetId { get; init; }
 }
 
 public record DataSetLatestVersionViewModel
@@ -39,11 +40,11 @@ public record DataSetLatestVersionViewModel
 
     public required DateTimeOffset Published { get; init; }
 
-    public required int TotalResults { get; init; }
+    public required long TotalResults { get; init; }
 
     public required TimePeriodRangeViewModel TimePeriods { get; init; }
 
-    public required IReadOnlyList<string> GeographicLevels { get; init; }
+    public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     public required IReadOnlyList<string> Filters { get; init; }
     
