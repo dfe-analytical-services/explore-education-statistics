@@ -14,7 +14,6 @@ import publicationService, {
 import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import DownloadStep, {
   DownloadFormSubmitHandler,

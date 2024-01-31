@@ -4,6 +4,7 @@ Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../seed_data/seed_data_theme_1_constants.robot
+Resource            ../../seed_data/seed_data_theme_2_constants.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -213,8 +214,8 @@ Validate sort controls exist
 Validate theme filter exists
     [Tags]    Local    Dev
     user checks select contains option    id:theme    All themes
-    user checks select contains option    id:theme    Pupils and schools
-    user checks select contains option    id:theme    UI tests - Publication and Release UI Permissions Theme
+    user checks select contains option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks select contains option    id:theme    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate publication filter exists
     [Tags]    Local    Dev
@@ -227,70 +228,70 @@ Validate release filter exists
 
 Filter by theme
     [Tags]    Local    Dev
-    user chooses select option    id:theme    Pupils and schools
-    user checks page contains button    Pupils and schools
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
     [Tags]    Local    Dev
-    user chooses select option    id:publication    Pupil absence in schools in England
-    user checks page contains button    Pupil absence in schools in England
-    user checks page contains button    Academic year 2016/17
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Filter by all releases
     [Tags]    Local    Dev
     user chooses select option    id:release    All releases
-    user checks page contains button    Pupil absence in schools in England
-    user checks page does not contain button    Academic year 2016/17
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove theme filter
     [Tags]    Local    Dev
-    user clicks button    Pupils and schools
-    user checks page does not contain button    Pupils and schools
-    user checks page does not contain button    Pupil absence in schools in England
+    user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Remove publication filter
     [Tags]    Local    Dev
-    user chooses select option    id:theme    Pupils and schools
-    user chooses select option    id:publication    Pupil absence in schools in England
-    user clicks button    Pupil absence in schools in England
-    user checks page contains button    Pupils and schools
-    user checks page does not contain button    Pupil absence in schools in England
-    user checks page does not contain button    Academic year 2016/17
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove release filter
     [Tags]    Local    Dev
-    user chooses select option    id:theme    Pupils and schools
-    user chooses select option    id:publication    Pupil absence in schools in England
-    user clicks button    Academic year 2016/17
-    user checks page contains button    Pupils and schools
-    user checks page contains button    Pupil absence in schools in England
-    user checks page does not contain button    Academic year 2016/17
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Clear all filters
     [Tags]    Local    Dev
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user chooses select option    id:theme    Pupils and schools
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user checks page contains button    pupil
-    user checks page contains button    Pupils and schools
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
     user clicks button    Clear filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    Pupils and schools
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    Clear filters
 
 Searching
     [Tags]    Local    Dev
     user clicks element    id:searchForm-search
-    user presses keys    Absence for four year olds
+    user presses keys    Exclusions by geographic level
     user clicks button    Search
-    user checks page contains button    Absence for four year olds
-    user checks list item contains    testid:data-sets-list    1    Absence for four year olds
+    user checks page contains button    Exclusions by geographic level
+    user checks list item contains    testid:data-sets-list    1    Exclusions by geographic level
 
 Removing search
     [Tags]    Local    Dev
-    user clicks button    Absence for four year olds
-    user checks page does not contain button    Absence for four year olds
+    user clicks button    Exclusions by geographic level
+    user checks page does not contain button    Exclusions by geographic level
