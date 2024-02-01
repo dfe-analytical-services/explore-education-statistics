@@ -44,19 +44,22 @@ describe('PreReleasePageContainer', () => {
     );
 
     renderPage();
-
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', { name: 'Pre-release access has ended' }),
+        screen.getByText('Pre-release access has ended'),
       ).toBeInTheDocument();
-
-      expect(
-        screen.getByRole('link', { name: 'View this release' }),
-      ).toHaveAttribute(
-        'href',
-        'http://localhost/find-statistics/test-publication/2018',
-      );
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Pre-release access has ended' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'View this release' }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/test-publication/2018',
+    );
   });
 
   test('renders correctly when pre-release has not started', async () => {
@@ -71,24 +74,27 @@ describe('PreReleasePageContainer', () => {
     );
 
     renderPage();
-
     await waitFor(() => {
       expect(
-        screen.getByRole('heading', {
-          name: 'Pre-release access is not yet available',
-        }),
+        screen.getByText('Pre-release access is not yet available'),
       ).toBeInTheDocument();
-
-      expect(
-        screen.getByText(
-          'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000.',
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
-      ).not.toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000.',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly when within pre-release window', async () => {
@@ -105,29 +111,32 @@ describe('PreReleasePageContainer', () => {
     );
 
     renderPage();
-
     await waitFor(() => {
-      const banner = within(screen.getByRole('region', { name: 'Contact' }));
       expect(
-        banner.getByText('If you have an enquiry about this release contact:'),
+        screen.getByText('If you have an enquiry about this release contact:'),
       ).toBeInTheDocument();
-
-      expect(banner.getByText('Test team:')).toBeInTheDocument();
-      expect(
-        banner.getByRole('link', { name: 'test@test.com' }),
-      ).toBeInTheDocument();
-
-      expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('heading', {
-          name: 'Pre-release access is not yet available',
-        }),
-      ).not.toBeInTheDocument();
     });
+
+    const banner = within(screen.getByRole('region', { name: 'Contact' }));
+    expect(
+      banner.getByText('If you have an enquiry about this release contact:'),
+    ).toBeInTheDocument();
+
+    expect(banner.getByText('Test team:')).toBeInTheDocument();
+    expect(
+      banner.getByRole('link', { name: 'test@test.com' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly when on release day but release is yet to be published', async () => {
@@ -144,35 +153,38 @@ describe('PreReleasePageContainer', () => {
     );
 
     renderPage();
-
     await waitFor(() => {
-      const banner = within(screen.getByRole('region', { name: 'Contact' }));
       expect(
-        banner.getByText('If you have an enquiry about this release contact:'),
+        screen.getByText('If you have an enquiry about this release contact:'),
       ).toBeInTheDocument();
-
-      expect(banner.getByText('Test team:')).toBeInTheDocument();
-      expect(
-        banner.getByRole('link', { name: 'test@test.com' }),
-      ).toBeInTheDocument();
-
-      expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('heading', {
-          name: 'Pre-release access has ended',
-        }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('heading', {
-          name: 'Pre-release access is not yet available',
-        }),
-      ).not.toBeInTheDocument();
     });
+
+    const banner = within(screen.getByRole('region', { name: 'Contact' }));
+    expect(
+      banner.getByText('If you have an enquiry about this release contact:'),
+    ).toBeInTheDocument();
+
+    expect(banner.getByText('Test team:')).toBeInTheDocument();
+    expect(
+      banner.getByRole('link', { name: 'test@test.com' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access has ended',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).not.toBeInTheDocument();
   });
 
   const renderPage = () => {
-    return render(
+    render(
       <TestConfigContextProvider>
         <MemoryRouter
           initialEntries={[
