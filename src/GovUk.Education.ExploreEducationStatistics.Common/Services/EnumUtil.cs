@@ -20,6 +20,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             throw new ArgumentException("The value '" + value + "' is not supported.");
         }
 
+        public static TEnum GetFromLabel<TEnum>(string label) where TEnum : Enum
+        {
+            foreach (var val in Enum.GetValues(typeof(TEnum)).Cast<TEnum>())
+            {
+                if (val.GetEnumLabel().Equals(label))
+                {
+                    return val;
+                }
+            }
+
+            throw new ArgumentException("The label '" + label + "' is not supported.");
+        }
+
         public static List<TEnum> GetEnumValues<TEnum>()
         {
             return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
