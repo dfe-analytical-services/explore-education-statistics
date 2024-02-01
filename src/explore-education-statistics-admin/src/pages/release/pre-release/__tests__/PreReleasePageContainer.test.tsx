@@ -43,12 +43,7 @@ describe('PreReleasePageContainer', () => {
       testPreReleaseSummary,
     );
 
-    renderPage();
-    await waitFor(() => {
-      expect(
-        screen.getByText('Pre-release access has ended'),
-      ).toBeInTheDocument();
-    });
+    await renderPageAndAwaitForText('Pre-release access has ended');
 
     expect(
       screen.getByRole('heading', { name: 'Pre-release access has ended' }),
@@ -73,12 +68,7 @@ describe('PreReleasePageContainer', () => {
       testPreReleaseSummary,
     );
 
-    renderPage();
-    await waitFor(() => {
-      expect(
-        screen.getByText('Pre-release access is not yet available'),
-      ).toBeInTheDocument();
-    });
+    await renderPageAndAwaitForText('Pre-release access is not yet available');
 
     expect(
       screen.getByRole('heading', {
@@ -110,12 +100,9 @@ describe('PreReleasePageContainer', () => {
       testPreReleaseSummary,
     );
 
-    renderPage();
-    await waitFor(() => {
-      expect(
-        screen.getByText('If you have an enquiry about this release contact:'),
-      ).toBeInTheDocument();
-    });
+    await renderPageAndAwaitForText(
+      'If you have an enquiry about this release contact:',
+    );
 
     const banner = within(screen.getByRole('region', { name: 'Contact' }));
     expect(
@@ -152,12 +139,9 @@ describe('PreReleasePageContainer', () => {
       testPreReleaseSummary,
     );
 
-    renderPage();
-    await waitFor(() => {
-      expect(
-        screen.getByText('If you have an enquiry about this release contact:'),
-      ).toBeInTheDocument();
-    });
+    await renderPageAndAwaitForText(
+      'If you have an enquiry about this release contact:',
+    );
 
     const banner = within(screen.getByRole('region', { name: 'Contact' }));
     expect(
@@ -183,7 +167,7 @@ describe('PreReleasePageContainer', () => {
     ).not.toBeInTheDocument();
   });
 
-  const renderPage = () => {
+  const renderPageAndAwaitForText = async (textToWaitFor: string) => {
     render(
       <TestConfigContextProvider>
         <MemoryRouter
@@ -201,5 +185,9 @@ describe('PreReleasePageContainer', () => {
         </MemoryRouter>
       </TestConfigContextProvider>,
     );
+
+    await waitFor(() => {
+      expect(screen.getByText(textToWaitFor)).toBeInTheDocument();
+    });
   };
 });
