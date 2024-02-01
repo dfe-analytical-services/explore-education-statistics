@@ -74,12 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithPreviousVersionId(Guid.NewGuid())
                 .WithYear(2035)
                 .WithType(ReleaseType.OfficialStatistics)
-                .WithReleaseStatuses(ListOf(
-                    new ReleaseStatus
-                    {
-                        InternalReleaseNote = "Release note",
-                        Created = DateTime.UtcNow
-                    }))
+                .WithReleaseStatuses(_fixture
+                    .DefaultReleaseStatus()
+                    .Generate(1))
                 .WithVersion(2)
                 .WithTimePeriodCoverage(TimeIdentifier.March)
                 .WithNotifiedOn(DateTime.UtcNow.AddDays(-4))
