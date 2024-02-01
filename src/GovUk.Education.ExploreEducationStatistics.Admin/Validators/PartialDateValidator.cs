@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ValidationResult = System.ComponentModel.DataAnnotations.ValidationResult;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
@@ -16,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
                 return ValidationResult.Success;
             }
 
-            return ValidationResult(PartialDateNotValid);
+            return new ValidationResult(PartialDateNotValid.ToString());
         }
     }
 }

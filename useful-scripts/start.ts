@@ -76,6 +76,7 @@ const allowedServiceNames = [
   'processor',
   'publicApiDb',
   'publicData',
+  'publicProcessor',
   'publisher',
   'notifier',
   'idp',
@@ -153,6 +154,13 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     type: 'func',
     dockerServices: ['data-storage'],
   },
+  publicProcessor: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor',
+    colour: chalk.blue,
+    port: 7074,
+    type: 'func',
+    dockerServices: ['data-storage'],
+  },
   idp: {
     service: 'idp',
     colour: chalk.gray,
@@ -203,9 +211,12 @@ Start frontend in production mode without build step:
 
 Start content and data APIs:
   $ start data content
+  
+Start public data API:
+  $ start publicData
 
-Start admin, processor and publisher:
-  $ start admin processor publisher
+Start admin and its dependencies:
+  $ start admin processor publisher publicProcessor
 
 Start .NET services without a clean step:
   $ start data content --skip-clean

@@ -33,6 +33,7 @@ The project is primarily composed of two areas:
   - Depends on:
     - Postgres `public_data` database
 
+
 ### Admin (for admins and analysts)
 
 - **UI** - `src/explore-education-statistics-admin`
@@ -47,15 +48,28 @@ The project is primarily composed of two areas:
     - Publisher
     - Notifier
     - Data Processor
+    - Public Data Processor
 
 - **Publisher** - `src/GovUk.Education.ExploreEducationStatistics.Publisher`
   - Azure function for publishing admin content to the public frontend
-
+  - Depends on:
+    - SQLServer `content` database
+    - SQLServer `statistics` database
+  
 - **Notifier** - `src/GovUk.Education.ExploreEducationStatistics.Notifier`
   - Azure function for sending notifications
 
 - **Data Processor** - `src/GovUk.Education.ExploreEducationStatistics.Data.Processor`
-  - Azure function for handling dataset imports into the admin. Also referred to as the 'importer' or just 'processor'.
+  - Azure function for handling data set imports into the admin. 
+  - Also referred to as the 'importer' or just 'processor'.
+  - Depends on:
+    - SQLServer `content` database
+    - SQLServer `statistics` database
+
+- **Public Data Processor** - `src/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor`
+  - Azure function for processing data sets so they can be used in the public API.
+  - Depends on:
+    - Postgres `public_data` database
 
 ## Getting started
 
@@ -396,10 +410,10 @@ Examples:
   pnpm start admin
   ```
 
-- To start other services:
+- To start admin dependency services:
 
   ```bash
-  pnpm start publisher processor
+  pnpm start publisher processor publicProcessor
   ```
 
 - To start the public data API:

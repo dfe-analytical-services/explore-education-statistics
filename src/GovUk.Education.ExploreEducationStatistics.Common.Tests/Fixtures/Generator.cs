@@ -183,6 +183,24 @@ public class Generator<T> where T : class
     public T[] GenerateArray() => GenerateList().ToArray();
 
     /// <summary>
+    /// Generate a random number of instances of <see cref="T"/>.
+    /// </summary>
+    /// <param name="maxCount">The maximum number of instances.</param>
+    public IEnumerable<T> GenerateRandom(int maxCount)
+    {
+        if (_seeder is not null)
+        {
+            _faker.Random = new Randomizer(_seeder());
+        }
+
+        return Generate(_faker.Random.Int(1, maxCount));
+    }
+
+    public List<T> GenerateRandomList(int maxCount) => GenerateRandom(maxCount).ToList();
+
+    public T[] GenerateRandomArray(int maxCount) => GenerateRandom(maxCount).ToArray();
+
+    /// <summary>
     /// Get the maximum index specified by any use of <see cref="ForRange"/> or
     /// <see cref="ForIndex"/>. If no ranges or indices have been specified, throw
     /// an ArgumentException.

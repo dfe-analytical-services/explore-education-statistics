@@ -643,7 +643,7 @@ describe('FiltersForm', () => {
 
   test('shows table size error when the correct error response is returned from the API', async () => {
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
-      'QueryExceedsMaxAllowableTableSize',
+      { code: 'QueryExceedsMaxAllowableTableSize', message: '' },
     ]);
     const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 
@@ -690,7 +690,7 @@ describe('FiltersForm', () => {
 
   test('shows table timeout error when the correct error response is returned from the API', async () => {
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
-      'RequestCancelled',
+      { code: 'RequestCancelled', message: '' },
     ]);
     const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 

@@ -74,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
                     options.RespectBrowserAcceptHeader = true;
                     options.ReturnHttpNotAcceptable = true;
                     options.EnableEndpointRouting = false;

@@ -23,11 +23,11 @@ import {
   barChartDataLabelPositions,
   lineChartDataLabelPositions,
 } from '@common/modules/charts/util/chartUtils';
+import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
 import {
   convertServerFieldErrors,
   mapFieldErrors,
-  ServerValidationErrorResponse,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -63,7 +63,7 @@ interface Props {
   chartOptions: ChartOptions;
   definition: ChartDefinition;
   legendPosition?: LegendPosition;
-  submitError?: ServerValidationErrorResponse;
+  submitError?: ValidationProblemDetails;
   onChange: (chartOptions: ChartOptions) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
@@ -312,7 +312,7 @@ const ChartConfiguration = ({
               <FormFieldTextInput<FormValues>
                 label="Subtitle"
                 name="subtitle"
-                hint="The statistical subtitle should say what the data is, the geography the data relates to and the time period shown. 
+                hint="The statistical subtitle should say what the data is, the geography the data relates to and the time period shown.
                 For example, 'Figure 1: Number of people living in one person households, England, 1991 to 2021'."
                 maxLength={160}
               />

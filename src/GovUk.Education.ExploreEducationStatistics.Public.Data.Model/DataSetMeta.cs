@@ -28,6 +28,21 @@ public class DataSetMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOff
 
     public DateTimeOffset? Updated { get; set; }
 
+    public DataSetVersionMetaSummary ToSummary()
+    {
+        return new DataSetVersionMetaSummary
+        {
+            Filters = Filters.Select(f => f.Label).ToList(),
+            Indicators = Indicators.Select(i => i.Label).ToList(),
+            GeographicLevels = GeographicLevels,
+            TimePeriodRange = new TimePeriodRange
+            {
+                Start = TimePeriods.First(),
+                End = TimePeriods.Last()
+            }
+        };
+    }
+
     internal class Config : IEntityTypeConfiguration<DataSetMeta>
     {
         public void Configure(EntityTypeBuilder<DataSetMeta> builder)

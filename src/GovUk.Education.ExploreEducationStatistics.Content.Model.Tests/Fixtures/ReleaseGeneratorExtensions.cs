@@ -35,7 +35,16 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithPublication(
         this Generator<Release> generator,
         Publication publication)
-        => generator.ForInstance(release => release.SetPublication(publication));
+        => generator.ForInstance(s => s.SetPublication(publication));
+
+    public static Generator<Release> WithPublications(this Generator<Release> generator,
+        IEnumerable<Publication> publications)
+    {
+        publications.ForEach((publication, index) =>
+            generator.ForIndex(index, release => release.SetPublication(publication)));
+
+        return generator;
+    }
 
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
@@ -84,6 +93,7 @@ public static class ReleaseGeneratorExtensions
     {
         return generator.ForInstance(r => r.SetCreated(created, createdById));
     }
+
     public static Generator<Release> WithNextReleaseDate(
         this Generator<Release> generator,
         PartialDate nextReleaseDate)

@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -27,7 +28,12 @@ public class TestStartup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddMvcCore(options => { options.EnableEndpointRouting = false; })
+        services.AddMvcCore(
+                options =>
+                {
+                    options.Filters.Add(new ProblemDetailsResultFilter());
+                    options.EnableEndpointRouting = false;
+                })
             .AddNewtonsoftJson(
                 options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
             );

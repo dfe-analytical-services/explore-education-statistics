@@ -607,7 +607,9 @@ describe('ReleaseStatusForm', () => {
       'shows checklist error message `%s` after failed submit',
       async checklistError => {
         const handleSubmit = jest.fn().mockImplementation(() => {
-          throw createServerValidationErrorMock([checklistError]);
+          throw createServerValidationErrorMock([
+            { code: checklistError, message: '' },
+          ]);
         });
 
         render(
@@ -638,7 +640,9 @@ describe('ReleaseStatusForm', () => {
 
     test('shows generic server validation error message for `approvalStatus` after failed submit', async () => {
       const handleSubmit = jest.fn().mockImplementation(() => {
-        throw createServerValidationErrorMock(['UnexpectedError']);
+        throw createServerValidationErrorMock([
+          { code: 'UnexpectedError', message: '' },
+        ]);
       });
 
       render(
@@ -801,7 +805,9 @@ describe('ReleaseStatusForm', () => {
 
     test('shows error modal when submitted with publish date that could not be scheduled', async () => {
       const handleSubmit = jest.fn().mockImplementation(() => {
-        throw createServerValidationErrorMock(['PublishDateCannotBeScheduled']);
+        throw createServerValidationErrorMock([
+          { code: 'PublishDateCannotBeScheduled', message: '' },
+        ]);
       });
 
       render(

@@ -304,7 +304,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
-                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
+                .OnSuccess(publicationId =>
+                    _releaseRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
                 .OnSuccess(release => release.Id);
         }
 

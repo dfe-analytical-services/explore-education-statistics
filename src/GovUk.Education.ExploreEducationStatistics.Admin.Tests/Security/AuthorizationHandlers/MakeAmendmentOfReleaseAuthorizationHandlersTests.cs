@@ -9,11 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static Moq.MockBehavior;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -494,14 +497,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
 
-        private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(
+            ContentDbContext contentDbContext)
         {
-            return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
+            return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    contentDbContext,
-                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new ReleaseRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPreReleaseService>(Strict)));
+                    Mock.Of<IPreReleaseService>(Strict)),
+                new ReleaseRepository(contentDbContext));
         }
     }
 }

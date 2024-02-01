@@ -1,15 +1,18 @@
+using System.Net;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Net;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using Moq;
+using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -42,8 +45,6 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             int numberOfPublishedDataSets,
             int numberOfUnpublishedDataSets)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
-
             var publishedDataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Published)
@@ -58,6 +59,53 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
 
+            var publications = new List<PublicationSearchResultViewModel>();
+
+            var publishedDataSetPublicationIds = publishedDataSets
+                .Select(p => p.PublicationId)
+                .ToList();
+
+            var numberOfPublicationsToReturn = Math.Min(pageSize, numberOfPublishedDataSets);
+
+            var publicationIdsToReturn = publishedDataSetPublicationIds
+                .Take(numberOfPublicationsToReturn)
+                .ToList();
+
+            foreach (var publicationId in publicationIdsToReturn)
+            {
+                var publication = DataFixture
+                    .Generator<PublicationSearchResultViewModel>()
+                    .ForInstance(s => s
+                        .SetDefault(p => p.Title)
+                        .SetDefault(p => p.Slug)
+                        .SetDefault(p => p.Summary)
+                        .SetDefault(p => p.Theme)
+                        .Set(p => p.Published, p => p.Date.Past())
+                        .Set(p => p.Type, ReleaseType.OfficialStatistics)
+                        .Set(p => p.Id, publicationId))
+                    .Generate();
+
+                publications.Add(publication);
+            }
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.ListPublications(
+                    page,
+                    pageSize,
+                    null,
+                    It.Is<IEnumerable<Guid>>(ids => 
+                        Enumerable.SequenceEqual(
+                            ids.Order(),
+                            publishedDataSetPublicationIds.Order()))))
+                .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                    results: publications,
+                    totalResults: numberOfPublishedDataSets,
+                    page: page,
+                    pageSize: pageSize));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
             var response = await ListPublications(client, page, pageSize);
 
             var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
@@ -66,21 +114,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(page, content.Paging.Page);
             Assert.Equal(pageSize, content.Paging.PageSize);
             Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
-
-            var expectedPublicationIds = publishedDataSets
-                .OrderBy(ds => ds.PublicationId)
-                .Select(ds => ds.PublicationId)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
-            Assert.Equal(expectedPublicationIds.Count, content.Results.Count);
+            Assert.Equal(publicationIdsToReturn.Count, content.Results.Count);
 
             var unexpectedPublicationIds = allDataSets
                 .Select(ds => ds.PublicationId)
-                .Except(expectedPublicationIds);
+                .Except(publicationIdsToReturn);
 
-            foreach (var publicationId in expectedPublicationIds)
+            foreach (var publicationId in publicationIdsToReturn)
             {
                 Assert.Contains(content.Results, r => r.Id == publicationId);
             }
@@ -94,7 +134,20 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Fact]
         public async Task NoPublishedDataSets_Returns200_EmptyList()
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.ListPublications(
+                    1,
+                    1,
+                    null,
+                    Enumerable.Empty<Guid>()))
+                .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                    results: [],
+                    totalResults: 0,
+                    page: 1,
+                    pageSize: 1));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
 
             var response = await ListPublications(client, 1, 1);
 
@@ -112,11 +165,15 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(-1)]
         public async Task PageTooSmall_Returns400(int page)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, page, 1);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page");
         }
 
         [Theory]
@@ -125,11 +182,15 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData(41)]
         public async Task PageSizeOutOfBounds_Returns400(int pageSize)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, 1, pageSize);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize");
         }
 
         [Theory]
@@ -137,36 +198,168 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [InlineData("aa")]
         public async Task SearchTermTooSmall_Returns400(string searchTerm)
         {
-            var client = BuildApp(new ContentApiClientMock()).CreateClient();
+            var client = BuildApp().CreateClient();
 
             var response = await ListPublications(client, null, null, searchTerm);
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasMinimumLengthError("search");
+        }
+
+        private static async Task<HttpResponseMessage> ListPublications(
+            HttpClient client,
+            int? page = null,
+            int? pageSize = null,
+            string? search = null)
+        {
+            var query = new Dictionary<string, string?>
+            {
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() },
+                { "search", search },
+            };
+
+            var uri = QueryHelpers.AddQueryString(BaseUrl, query);
+
+            return await client.GetAsync(uri);
         }
     }
 
-    private static async Task<HttpResponseMessage> ListPublications(
-        HttpClient client, 
-        int? page = null, 
-        int? pageSize = null,
-        string? search = null)
+    public class GetPublicationTests : PublicationsControllerTests
     {
-        var query = new Dictionary<string, string?>
+        public GetPublicationTests(TestApplicationFactory testApp) : base(testApp)
         {
-            { "page", page?.ToString() },
-            { "pageSize", pageSize?.ToString() },
-            { "search", search },
-        };
+        }
 
-        var uri = QueryHelpers.AddQueryString(BaseUrl, query);
+        [Fact]
+        public async Task PublicationExists_Returns200()
+        {
+            var publication = DataFixture
+                .Generator<PublishedPublicationSummaryViewModel>()
+                .ForInstance(s => s
+                    .SetDefault(f => f.Id)
+                    .SetDefault(f => f.Title)
+                    .SetDefault(f => f.Slug)
+                    .SetDefault(f => f.Summary)
+                    .Set(f => f.Published, f => f.Date.Past()))
+                .Generate();
 
-        return await client.GetAsync(uri);
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(publication.Id))
+                .ReturnsAsync(publication);
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
+            var publishedDataSet = GeneratePublishedDataSet(publication.Id);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var response = await GetPublication(client, publication.Id);
+
+            var content = response.AssertOk<PublicationSummaryViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(publication.Id, content.Id);
+            Assert.Equal(publication.Title, content.Title);
+            Assert.Equal(publication.Slug, content.Slug);
+            Assert.Equal(publication.Summary, content.Summary);
+            Assert.Equal(publication.Published, content.LastPublished);
+        }
+
+        [Fact]
+        public async Task PublicationDoesNotExist_Returns404()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var publishedDataSet = GeneratePublishedDataSet(publicationId);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(publicationId))
+                .ReturnsAsync(new NotFoundResult());
+            
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
+            var response = await GetPublication(client, publicationId);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task NotDataSets_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await GetPublication(client, It.IsAny<Guid>());
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task UnpublishedDataSets_Returns404()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var unpublishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Unpublished)
+                .WithPublicationId(publicationId)
+                .GenerateList(3);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(unpublishedDataSets));
+
+            var client = BuildApp().CreateClient();
+
+            var response = await GetPublication(client, publicationId);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ContentApiThrowsException_Returns500()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var publishedDataSet = GeneratePublishedDataSet(publicationId);
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.GetPublication(publicationId))
+                .ThrowsAsync(new HttpRequestException("something went wrong"));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+            var response = await GetPublication(client, publicationId);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Contains("something went wrong", await response.Content.ReadAsStringAsync());
+        }
+
+        private DataSet GeneratePublishedDataSet(Guid publicationId)
+        {
+            return DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Published)
+                .WithPublicationId(publicationId)
+                .Generate();
+        }
+
+        private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
+        {
+            var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
     }
 
     private WebApplicationFactory<Startup> BuildApp(IContentApiClient? contentApiClient = null)
     {
         return TestApp.ConfigureServices(
-            services => { services.ReplaceService(contentApiClient); }
+            services => { services.ReplaceService(contentApiClient ?? Mock.Of<IContentApiClient>()); }
         );
     }
 }

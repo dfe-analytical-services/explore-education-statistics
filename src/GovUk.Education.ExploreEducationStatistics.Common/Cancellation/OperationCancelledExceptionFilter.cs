@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
@@ -14,7 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
             if (context.Exception is OperationCanceledException)
             {
                 context.ExceptionHandled = true;
-                context.Result = ValidationResult("RequestCancelled");
+                context.Result = ValidationResult(new ErrorViewModel
+                {
+                    Code = "RequestCancelled"
+                });
             }
         }
     }

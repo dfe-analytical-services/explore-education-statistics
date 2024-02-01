@@ -18,6 +18,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -97,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IReleaseRepository? releaseRepository = null,
             IUserRepository? userRepository = null,
             IUserService? userService = null,
             IUserRoleService? userRoleService = null,
@@ -112,6 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseInviteService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userRepository ?? new UserRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),

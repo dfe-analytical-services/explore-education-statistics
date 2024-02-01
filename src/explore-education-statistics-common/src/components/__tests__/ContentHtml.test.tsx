@@ -150,4 +150,49 @@ describe('ContentHtml', () => {
       </div>
     `);
   });
+
+  describe('formatting links', () => {
+    const testContentWithLinks = `Test content 
+    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something">
+    EES link with uppercase characters</a> 
+    <a href="  https://gov.uk/TEST something  ">External link with whitespace, space to encode and uppercase characters</a>`;
+
+    test('formats links in content', () => {
+      render(<ContentHtml html={testContentWithLinks} />);
+
+      expect(
+        screen.getByRole('link', {
+          name: 'EES link with uppercase characters',
+        }),
+      ).toHaveAttribute(
+        'href',
+        'https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools?testParam=Something',
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name: 'External link with whitespace, space to encode and uppercase characters',
+        }),
+      ).toHaveAttribute('href', 'https://gov.uk/TEST%20something');
+    });
+
+    test('does not format links in content when `formatLinks` is false', () => {
+      render(<ContentHtml formatLinks={false} html={testContentWithLinks} />);
+
+      expect(
+        screen.getByRole('link', {
+          name: 'EES link with uppercase characters',
+        }),
+      ).toHaveAttribute(
+        'href',
+        'https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something',
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name: 'External link with whitespace, space to encode and uppercase characters',
+        }),
+      ).toHaveAttribute('href', '  https://gov.uk/TEST something  ');
+    });
+  });
 });

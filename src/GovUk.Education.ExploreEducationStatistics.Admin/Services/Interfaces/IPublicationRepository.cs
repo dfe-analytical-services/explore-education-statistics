@@ -12,9 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         IQueryable<Publication> QueryPublicationsForTopic(Guid? topicId = null);
 
         Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? topicId = null);
-
-        Task<List<Release>> ListActiveReleases(Guid publicationId);
-
-        Task<Release?> GetLatestReleaseForPublication(Guid publicationId);
     }
 }

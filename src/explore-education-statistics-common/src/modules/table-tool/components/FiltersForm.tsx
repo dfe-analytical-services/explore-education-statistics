@@ -21,7 +21,7 @@ import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import {
-  getErrorMessage,
+  getErrorCode,
   hasErrorMessage,
   isServerValidationError,
 } from '@common/validation/serverValidations';
@@ -134,7 +134,7 @@ export default function FiltersForm({
         throw error;
       }
 
-      const errorCode = getErrorMessage(error);
+      const errorCode = getErrorCode<TableQueryErrorCode>(error);
 
       if (onTableQueryError) {
         if (errorCode) {

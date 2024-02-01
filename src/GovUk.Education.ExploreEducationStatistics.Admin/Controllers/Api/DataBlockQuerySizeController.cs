@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -16,6 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     /**
+     * TODO EES-336 Remove this
      * Temporary controller for determining the maximum possible size of a table that could be generated
      * by existing datablocks in the service.
      *
@@ -38,24 +40,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IFilterItemRepository _filterItemRepository;
+        private readonly IReleaseRepository _releaseRepository;
 
         public DataBlockQuerySizeController(ContentDbContext contentDbContext,
-            IFilterItemRepository filterItemRepository)
+            IFilterItemRepository filterItemRepository,
+            IReleaseRepository releaseRepository)
         {
             _contentDbContext = contentDbContext;
             _filterItemRepository = filterItemRepository;
+            _releaseRepository = releaseRepository;
         }
 
         [HttpGet("api/data-blocks/query-size-report")]
         [Authorize(Roles = RoleNames.BauUser)]
         public async Task<ActionResult<List<DataBlockQuerySizeReport>>> QuerySizeReport()
         {
-            var publishedReleaseIds = _contentDbContext.Releases
-                .Include(r => r.Publication)
-                .ToList()
-                .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
-                .Select(r => r.Id)
-                .ToList();
+            var publishedReleaseIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds();
 
             var publishedDataBlocks = await _contentDbContext
                 .ContentBlocks

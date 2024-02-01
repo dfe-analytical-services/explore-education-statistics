@@ -423,7 +423,7 @@ user adds image to accordion section text block
     user presses keys    ARROW_UP
 
     choose file
-    ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
+    ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
@@ -448,6 +448,7 @@ user adds image without alt text to accordion section text block
     ...    ${block_num}
     ...    ${filename}=test-infographic.png
     ...    ${parent}=[data-testid="accordion"]
+    ...    ${save_button}=Save & close
 
     ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
@@ -456,7 +457,7 @@ user adds image without alt text to accordion section text block
     user presses keys    ARROW_UP
 
     choose file
-    ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
+    ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
     user clicks element    xpath://div[@title="Insert paragraph after block"]
 
@@ -464,7 +465,7 @@ user adds image without alt text to accordion section text block
     user waits until parent contains element    ${block}
     ...    xpath://img[starts-with(@src, "/api/")]
 
-    user clicks button    Save    ${block}
+    user clicks button    ${save_button}    ${block}
     user waits until page finishes loading
 
 user removes image from accordion section text block
@@ -489,6 +490,24 @@ user removes image from accordion section text block
     user presses keys    DELETE
     user clicks button    ${save_button}    ${block}
     user waits until page finishes loading
+
+user adds link to accordion section text block
+    [Arguments]
+    ...    ${section_name}
+    ...    ${block_num}
+    ...    ${url}=https://gov.uk
+    ...    ${parent}=[data-testid="accordion"]
+
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
+    # Move the cursor to make sure previous content isn't selected.
+    user presses keys    ${\n}
+    user presses keys    ARROW_DOWN
+
+    ${toolbar}=    get editor toolbar    ${block}
+    ${button}=    user gets button element    Link    ${toolbar}
+    user clicks element    ${button}
+    user enters text into element    label:Link URL    ${url}
+    user presses keys    ENTER
 
 user saves autosaving text block
     [Arguments]    ${parent}

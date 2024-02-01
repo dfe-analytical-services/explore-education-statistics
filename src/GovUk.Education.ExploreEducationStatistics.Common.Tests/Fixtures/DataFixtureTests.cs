@@ -42,6 +42,26 @@ public class DataFixtureTests
     }
 
     [Fact]
+    public void Generator_Single_GenerateRandomIsDeterministic()
+    {
+        var fixture = new DataFixture();
+
+        var generator = fixture.Generator<Person>();
+        var items = generator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(7, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person", item.FirstName));
+
+        items = generator.GenerateRandomList(10);
+
+        Assert.Equal(8, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person", item.FirstName));
+    }
+
+    [Fact]
     public void Generator_Single_SetSeed()
     {
         var fixture = new DataFixture();
@@ -144,7 +164,31 @@ public class DataFixtureTests
     }
 
     [Fact]
-    public void Generator_RandomIsDeterministicButDifferentPerType()
+    public void Generator_Multiple_GenerateRandomIsDeterministic()
+    {
+        var fixture = new DataFixture();
+
+        var items = fixture
+            .Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person 1"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(7, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person 1", item.FirstName));
+
+        items = fixture
+            .Generator<Person>()
+            .ForInstance(s => s
+                .Set(p => p.FirstName, "Test person 2"))
+            .GenerateRandomList(10);
+
+        Assert.Equal(8, items.Count);
+        Assert.All(items, item => Assert.Equal("Test person 2", item.FirstName));
+    }
+
+    [Fact]
+    public void Generator_Multiple_RandomIsDeterministicButDifferentPerType()
     {
         var fixture = new DataFixture();
 
@@ -325,13 +369,13 @@ public class DataFixtureTests
                 .SetDefault(p => p.LastName))
             .GenerateList(3);
 
-        Assert.Equal("FirstName of Person 0", items[0].FirstName);
-        Assert.Equal("FirstName of Person 1", items[1].FirstName);
-        Assert.Equal("FirstName of Person 2", items[2].FirstName);
+        Assert.Equal("Person 0 :: FirstName", items[0].FirstName);
+        Assert.Equal("Person 1 :: FirstName", items[1].FirstName);
+        Assert.Equal("Person 2 :: FirstName", items[2].FirstName);
 
-        Assert.Equal("LastName of Person 0", items[0].LastName);
-        Assert.Equal("LastName of Person 1", items[1].LastName);
-        Assert.Equal("LastName of Person 2", items[2].LastName);
+        Assert.Equal("Person 0 :: LastName", items[0].LastName);
+        Assert.Equal("Person 1 :: LastName", items[1].LastName);
+        Assert.Equal("Person 2 :: LastName", items[2].LastName);
 
         items = fixture
             .Generator<Person>()
@@ -342,13 +386,13 @@ public class DataFixtureTests
 
         // The default string increments when generators
         // of the same type generate new instances.
-        Assert.Equal("FirstName of Person 3", items[0].FirstName);
-        Assert.Equal("FirstName of Person 4", items[1].FirstName);
-        Assert.Equal("FirstName of Person 5", items[2].FirstName);
+        Assert.Equal("Person 3 :: FirstName", items[0].FirstName);
+        Assert.Equal("Person 4 :: FirstName", items[1].FirstName);
+        Assert.Equal("Person 5 :: FirstName", items[2].FirstName);
 
-        Assert.Equal("LastName of Person 3", items[0].LastName);
-        Assert.Equal("LastName of Person 4", items[1].LastName);
-        Assert.Equal("LastName of Person 5", items[2].LastName);
+        Assert.Equal("Person 3 :: LastName", items[0].LastName);
+        Assert.Equal("Person 4 :: LastName", items[1].LastName);
+        Assert.Equal("Person 5 :: LastName", items[2].LastName);
     }
 
     [Fact]
@@ -363,13 +407,13 @@ public class DataFixtureTests
                 .SetDefault(p => p.LastName))
             .GenerateList(3);
 
-        Assert.Equal("FirstName of Person 0", items[0].FirstName);
-        Assert.Equal("FirstName of Person 1", items[1].FirstName);
-        Assert.Equal("FirstName of Person 2", items[2].FirstName);
+        Assert.Equal("Person 0 :: FirstName", items[0].FirstName);
+        Assert.Equal("Person 1 :: FirstName", items[1].FirstName);
+        Assert.Equal("Person 2 :: FirstName", items[2].FirstName);
 
-        Assert.Equal("LastName of Person 0", items[0].LastName);
-        Assert.Equal("LastName of Person 1", items[1].LastName);
-        Assert.Equal("LastName of Person 2", items[2].LastName);
+        Assert.Equal("Person 0 :: LastName", items[0].LastName);
+        Assert.Equal("Person 1 :: LastName", items[1].LastName);
+        Assert.Equal("Person 2 :: LastName", items[2].LastName);
 
         items = fixture
             .Generator<Person>()
@@ -380,13 +424,13 @@ public class DataFixtureTests
 
         // The default string increments when generators
         // of the same type generate new instances.
-        Assert.Equal("FirstName of Person 3", items[0].FirstName);
-        Assert.Equal("FirstName of Person 4", items[1].FirstName);
-        Assert.Equal("FirstName of Person 5", items[2].FirstName);
+        Assert.Equal("Person 3 :: FirstName", items[0].FirstName);
+        Assert.Equal("Person 4 :: FirstName", items[1].FirstName);
+        Assert.Equal("Person 5 :: FirstName", items[2].FirstName);
 
-        Assert.Equal("LastName of Person 3", items[0].LastName);
-        Assert.Equal("LastName of Person 4", items[1].LastName);
-        Assert.Equal("LastName of Person 5", items[2].LastName);
+        Assert.Equal("Person 3 :: LastName", items[0].LastName);
+        Assert.Equal("Person 4 :: LastName", items[1].LastName);
+        Assert.Equal("Person 5 :: LastName", items[2].LastName);
     }
 
     [Fact]
@@ -401,13 +445,13 @@ public class DataFixtureTests
                 .SetDefault(p => p.LastName))
             .GenerateList(3);
 
-        Assert.Equal("FirstName of Person 0", persons[0].FirstName);
-        Assert.Equal("FirstName of Person 1", persons[1].FirstName);
-        Assert.Equal("FirstName of Person 2", persons[2].FirstName);
+        Assert.Equal("Person 0 :: FirstName", persons[0].FirstName);
+        Assert.Equal("Person 1 :: FirstName", persons[1].FirstName);
+        Assert.Equal("Person 2 :: FirstName", persons[2].FirstName);
 
-        Assert.Equal("LastName of Person 0", persons[0].LastName);
-        Assert.Equal("LastName of Person 1", persons[1].LastName);
-        Assert.Equal("LastName of Person 2", persons[2].LastName);
+        Assert.Equal("Person 0 :: LastName", persons[0].LastName);
+        Assert.Equal("Person 1 :: LastName", persons[1].LastName);
+        Assert.Equal("Person 2 :: LastName", persons[2].LastName);
 
         var companies = fixture
             .Generator<Company>()
@@ -417,9 +461,9 @@ public class DataFixtureTests
 
         // The default string does not increment when
         // generators of other types generate new instances.
-        Assert.Equal("Name of Company 0", companies[0].Name);
-        Assert.Equal("Name of Company 1", companies[1].Name);
-        Assert.Equal("Name of Company 2", companies[2].Name);
+        Assert.Equal("Company 0 :: Name", companies[0].Name);
+        Assert.Equal("Company 1 :: Name", companies[1].Name);
+        Assert.Equal("Company 2 :: Name", companies[2].Name);
     }
 
 
@@ -435,13 +479,13 @@ public class DataFixtureTests
                 .SetDefault(p => p.LastName))
             .GenerateList(3);
 
-        Assert.Equal("FirstName of Person 0", persons[0].FirstName);
-        Assert.Equal("FirstName of Person 1", persons[1].FirstName);
-        Assert.Equal("FirstName of Person 2", persons[2].FirstName);
+        Assert.Equal("Person 0 :: FirstName", persons[0].FirstName);
+        Assert.Equal("Person 1 :: FirstName", persons[1].FirstName);
+        Assert.Equal("Person 2 :: FirstName", persons[2].FirstName);
 
-        Assert.Equal("LastName of Person 0", persons[0].LastName);
-        Assert.Equal("LastName of Person 1", persons[1].LastName);
-        Assert.Equal("LastName of Person 2", persons[2].LastName);
+        Assert.Equal("Person 0 :: LastName", persons[0].LastName);
+        Assert.Equal("Person 1 :: LastName", persons[1].LastName);
+        Assert.Equal("Person 2 :: LastName", persons[2].LastName);
 
         var companies = fixture
             .Generator<Company>()
@@ -451,8 +495,8 @@ public class DataFixtureTests
 
         // The default string does not increment when
         // generators of other types generate new instances.
-        Assert.Equal("Name of Company 0", companies[0].Name);
-        Assert.Equal("Name of Company 1", companies[1].Name);
-        Assert.Equal("Name of Company 2", companies[2].Name);
+        Assert.Equal("Company 0 :: Name", companies[0].Name);
+        Assert.Equal("Company 1 :: Name", companies[1].Name);
+        Assert.Equal("Company 2 :: Name", companies[2].Name);
     }
 }

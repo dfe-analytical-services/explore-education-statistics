@@ -1,21 +1,21 @@
+#nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+
+public record IdTitleViewModel
 {
-    public record IdTitleViewModel
+    public Guid Id { get; set; }
+
+    public string Title { get; init; } = string.Empty;
+
+    public IdTitleViewModel()
     {
-        public Guid Id { get; set; }
+    }
 
-        public string Title { get; set; }
-
-        public IdTitleViewModel()
-        {
-        }
-
-        public IdTitleViewModel(Guid id, string title)
-        {
-            Id = id;
-            Title = title;
-        }
+    public IdTitleViewModel(Guid id, string title)
+    {
+        Id = id;
+        Title = title;
     }
 }

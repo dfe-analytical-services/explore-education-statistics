@@ -23,6 +23,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -681,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteUser(inviteRequest);
 
                 var actionResult = result.AssertLeft();
-                actionResult.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
+                actionResult.AssertValidationProblem(ValidationErrorMessages.UserAlreadyExists);
             }
         }
         
@@ -884,7 +886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var result = await service.InviteUser(inviteRequest);
 
             var actionResult = result.AssertLeft();
-            actionResult.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
+            actionResult.AssertValidationProblem(ValidationErrorMessages.InvalidUserRole);
         }
 
         [Fact]
@@ -1013,7 +1015,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserManagementService();
                 var result = await service.CancelInvite("test@test.com");
                 var actionResult = result.AssertLeft();
-                actionResult.AssertBadRequest(ValidationErrorMessages.InviteNotFound);
+                actionResult.AssertValidationProblem(ValidationErrorMessages.InviteNotFound);
         }
 
         private static UserManagementService SetupUserManagementService(
@@ -1021,6 +1023,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
+            IReleaseRepository? releaseRepository = null,
             IUserRoleService? userRoleService = null,
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
@@ -1035,6 +1038,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userService ?? AlwaysTrueUserService(CreatedById).Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),

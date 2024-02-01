@@ -15,7 +15,8 @@ SELECT ContentBlock.Id                              AS ContentBlockId,
        JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
        ContentBlock.DataBlock_Query                 AS Query
 FROM ContentBlock
-JOIN Releases ON ContentBlocks.ReleaseId = Releases.Id
+LEFT JOIN DataBlockVersions ON DataBlockVersions.ContentBlockId = ContentBlock.Id
+LEFT JOIN Releases ON DataBlockVersions.ReleaseId = Releases.Id
 LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
 LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'

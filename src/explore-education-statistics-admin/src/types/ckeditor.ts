@@ -228,6 +228,7 @@ export interface Node {
   getAttribute<T>(key: string): T | undefined;
   getAttributeKeys(): Iterable<string>;
   hasAttribute(key: string): boolean;
+  toJSON(): Record<string, unknown>;
 }
 
 export interface Element extends Node {

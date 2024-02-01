@@ -2,6 +2,8 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
@@ -52,7 +54,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
         {
-            var handler = new ViewSubjectDataForPublishedReleasesAuthorizationHandler(contentDbContext);
+            var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
                 new IAuthorizationRequirement[] {Activator.CreateInstance<ViewSubjectDataRequirement>()},
@@ -111,10 +113,10 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
         {
-            var handler = new ViewSubjectDataForPublishedReleasesAuthorizationHandler(contentDbContext);
+            var handler = BuildHandler(contentDbContext);
 
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {Activator.CreateInstance<ViewSubjectDataRequirement>()},
+                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewSubjectDataRequirement>() },
                 null,
                 releaseSubject);
 
@@ -122,5 +124,13 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 
             Assert.True(authContext.HasSucceeded);
         }
+    }
+
+    private static ViewSubjectDataForPublishedReleasesAuthorizationHandler BuildHandler(
+        ContentDbContext contentDbContext)
+    {
+        return new ViewSubjectDataForPublishedReleasesAuthorizationHandler(
+            new ReleaseRepository(contentDbContext)
+        );
     }
 }

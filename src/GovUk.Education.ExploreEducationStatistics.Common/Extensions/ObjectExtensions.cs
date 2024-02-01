@@ -1,0 +1,18 @@
+#nullable enable
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+
+public static class ObjectExtensions
+{
+    public static Dictionary<string, object?> ToDictionary(this object obj)
+    {
+        var properties = obj.GetType().GetProperties();
+
+        return properties.ToDictionary(
+            property => property.Name,
+            property => property.GetValue(obj)
+        );
+    }
+}

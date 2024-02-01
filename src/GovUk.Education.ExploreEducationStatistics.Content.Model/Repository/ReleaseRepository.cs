@@ -1,10 +1,10 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -51,24 +51,150 @@ public class ReleaseRepository : IReleaseRepository
         return release.PreviousVersion.Published.Value;
     }
 
-    public async Task<bool> IsLatestPublishedVersionOfRelease(Guid releaseId)
+    public async Task<Release?> GetLatestPublishedReleaseVersion(Guid publicationId)
+    {
+        var publication = await _contentDbContext.Publications
+            .Include(p => p.LatestPublishedRelease)
+            .SingleOrDefaultAsync(p => p.Id == publicationId);
+        return publication?.LatestPublishedRelease;
+    }
+
+    public async Task<Release?> GetLatestReleaseVersion(Guid publicationId)
+    {
+        var releases = await ListLatestReleaseVersions(publicationId);
+        return releases.FirstOrDefault();
+    }
+
+    public async Task<Release?> GetLatestPublishedReleaseVersion(Guid publicationId, string releaseSlug)
+    {
+        var releases = await _contentDbContext.Releases
+            .Where(release => release.PublicationId == publicationId
+                              && release.Slug == releaseSlug)
+            .ToListAsync();
+
+        return releases.SingleOrDefault(release => release.Live
+                                                   // It must also be the latest version unless the later version is a draft
+                                                   && !releases.Any(r =>
+                                                       r.Live
+                                                       && r.PreviousVersionId == release.Id
+                                                       && r.Id != release.Id));
+    }
+
+    public async Task<bool> IsLatestPublishedReleaseVersion(Guid releaseId)
     {
         var release = await _contentDbContext.Releases
-            .SingleAsync(r => r.Id == releaseId);
+            .SingleOrDefaultAsync(r => r.Id == releaseId);
+
+        if (release == null)
+        {
+            return false;
+        }
 
         var publication = await _contentDbContext.Publications
             .Include(p => p.Releases)
             .SingleAsync(p => p.Id == release.PublicationId);
 
-        return publication.IsLatestPublishedVersionOfRelease(release);
+        return
+            // Release itself must be live
+            release.Live
+            // It must also be the latest version unless the later version is a draft
+            && !publication.Releases.Any(r =>
+                r.Live
+                && r.PreviousVersionId == release.Id
+                && r.Id != release.Id);
     }
 
-    public async Task<Either<ActionResult, Release>> GetLatestPublishedRelease(Guid publicationId)
+    public async Task<bool> IsLatestReleaseVersion(Guid releaseId)
     {
-        var publication = await _contentDbContext.Publications
-            .Include(p => p.LatestPublishedRelease)
-            .SingleOrDefaultAsync(p => p.Id == publicationId);
+        var release = await _contentDbContext.Releases
+            .SingleOrDefaultAsync(r => r.Id == releaseId);
 
-        return publication?.LatestPublishedRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
+        if (release == null)
+        {
+            return false;
+        }
+
+        var publication = await _contentDbContext.Publications
+            .Include(p => p.Releases)
+            .SingleAsync(p => p.Id == release.PublicationId);
+
+        return !publication.Releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+    }
+
+    // TODO EES-4336 Remove this
+    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds()
+    {
+        var releases = await _contentDbContext.Releases
+            .ToListAsync();
+
+        return releases.Where(release => release.Live
+                                         // It must also be the latest version unless the later version is a draft
+                                         && !releases.Any(r =>
+                                             r.Live
+                                             && r.PreviousVersionId == release.Id
+                                             && r.Id != release.Id))
+            .Select(r => r.Id)
+            .ToList();
+    }
+
+    public async Task<List<Release>> ListLatestPublishedReleaseVersions(Guid publicationId)
+    {
+        var releases = await _contentDbContext.Releases
+            .Where(release => release.PublicationId == publicationId)
+            .ToListAsync();
+
+        return releases.Where(release => release.Live
+                                         // It must also be the latest version unless the later version is a draft
+                                         && !releases.Any(r =>
+                                             r.Live
+                                             && r.PreviousVersionId == release.Id
+                                             && r.Id != release.Id))
+            .OrderByDescending(release => release.Year)
+            .ThenByDescending(release => release.TimePeriodCoverage)
+            .ToList();
+    }
+
+    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(Guid publicationId)
+    {
+        var releases = await ListLatestPublishedReleaseVersions(publicationId);
+        return releases
+            .Select(release => release.Id)
+            .ToList();
+    }
+
+    public async Task<List<Guid>> ListLatestReleaseVersionIds(Guid publicationId)
+    {
+        var releases = await _contentDbContext.Releases
+            .Where(release => release.PublicationId == publicationId)
+            .ToListAsync();
+
+        return releases.Where(release => !releases.Any(r => r.PreviousVersionId == release.Id && r.Id != release.Id))
+            .OrderByDescending(release => release.Year)
+            .ThenByDescending(release => release.TimePeriodCoverage)
+            .Select(release => release.Id)
+            .ToList();
+    }
+
+    public async Task<List<Release>> ListLatestReleaseVersions()
+    {
+        var releases = await _contentDbContext.Releases
+            .ToListAsync();
+
+        return releases.Where(release => !releases.Any(r => r.PreviousVersionId == release.Id && r.Id != release.Id))
+            .OrderByDescending(release => release.Year)
+            .ThenByDescending(release => release.TimePeriodCoverage)
+            .ToList();
+    }
+
+    public async Task<List<Release>> ListLatestReleaseVersions(Guid publicationId)
+    {
+        var releases = await _contentDbContext.Releases
+            .Where(release => release.PublicationId == publicationId)
+            .ToListAsync();
+
+        return releases.Where(release => !releases.Any(r => r.PreviousVersionId == release.Id && r.Id != release.Id))
+            .OrderByDescending(release => release.Year)
+            .ThenByDescending(release => release.TimePeriodCoverage)
+            .ToList();
     }
 }

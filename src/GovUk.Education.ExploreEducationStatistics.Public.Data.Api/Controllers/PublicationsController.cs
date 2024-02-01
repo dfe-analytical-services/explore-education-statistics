@@ -21,7 +21,7 @@ public class PublicationsController : ControllerBase
     }
 
     /// <summary>
-    /// List Publications
+    /// List publications
     /// </summary>
     /// <remarks>
     /// Lists details about publications with data available for querying.
@@ -38,6 +38,25 @@ public class PublicationsController : ControllerBase
                 page: request.Page,
                 pageSize: request.PageSize,
                 search: request.Search)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Get a publication’s details
+    /// </summary>
+    /// <remarks>
+    /// Get a specific publication's summary details.
+    /// </remarks>
+    [HttpGet("{publicationId:guid}")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
+    [SwaggerResponse(400)]
+    [SwaggerResponse(404)]
+    // add other responses
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    {
+        return await _publicationService
+            .GetPublication(publicationId)
             .HandleFailuresOrOk();
     }
 }

@@ -214,3 +214,36 @@ Validate two remaining content blocks
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user checks accordion section text block contains    Test section one    2    block three test text
     ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+
+Verify that validation prevents adding an image without alt text
+    user adds image without alt text to accordion section text block    Test section one    1
+    ...    test-infographic.png     ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+    user checks page contains    All images must have alternative text
+
+    user clicks element    xpath://img     ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user clicks button    Change image text alternative
+    user enters text into element    label:Text alternative    Alt text for the uploaded content image
+    user clicks element    css:button.ck-button-save
+
+    user checks accordion section text block contains image with alt text    Test section one    1
+    ...    Alt text for the uploaded content image     ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+
+    user clicks button    Save & close
+
+    user checks page does not contain    All images must have alternative text
+
+Verify that validation prevents adding an invalid link
+    user adds link to accordion section text block    Test section one    1    https://gov     ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks page contains    1 link has an invalid URL.
+
+    user clicks element    xpath://a[text()='https://gov']
+    user clicks button    Edit link
+    user enters text into element    label:Link URL    gov.uk
+    user presses keys    ENTER
+
+    user clicks button    Save & close
+
+    user checks page does not contain    1 link has an invalid URL.
+

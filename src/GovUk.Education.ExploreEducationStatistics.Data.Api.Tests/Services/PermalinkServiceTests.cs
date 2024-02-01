@@ -30,7 +30,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -83,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .ReturnsAsync(new NotFoundResult());
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
+                .ReturnsAsync((Release?) null);
 
             subjectRepository
                 .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId))
@@ -353,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
                 .ReturnsAsync(release);
 
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);

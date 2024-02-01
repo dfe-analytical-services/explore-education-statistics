@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -56,22 +57,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     q.Where(p => p.Slug == publicationSlug))
                 .OnSuccess(async publication =>
                 {
-                    // If no release is requested get the latest published release
+                    // If no release is requested get the latest published release version
                     if (releaseSlug == null)
                     {
-                        return await _releaseRepository.GetLatestPublishedRelease(publication.Id);
+                        return await _releaseRepository.GetLatestPublishedReleaseVersion(publication.Id)
+                            .OrNotFound();
                     }
 
                     // Otherwise get the latest published version of the requested release
-                    await _contentDbContext.Entry(publication)
-                        .Collection(p => p.Releases)
-                        .LoadAsync();
-
-                    var latestPublishedVersionOfRelease = publication.Releases.SingleOrDefault(r =>
-                        r.Slug == releaseSlug && r.IsLatestPublishedVersionOfRelease());
-
-                    return latestPublishedVersionOfRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
-                }).OnSuccess(release => GetRelease(release.Id));
+                    return await _releaseRepository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug)
+                        .OrNotFound();
+                })
+                .OnSuccess(release => GetRelease(release.Id));
         }
 
         public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId,
@@ -112,16 +109,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(
                     q => q
-                        .Include(p => p.Releases)
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => publication.GetPublishedReleases()
-                    .OrderByDescending(r => r.Year)
-                    .ThenByDescending(r => r.TimePeriodCoverage)
-                    .Select(release => new ReleaseSummaryViewModel(release))
-                    .ToList()
-                );
+                .OnSuccess(async publication =>
+                {
+                    var publishedReleases =
+                        await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                    return publishedReleases
+                        .Select(release => new ReleaseSummaryViewModel(release,
+                            latestPublishedRelease: release.Id == publication.LatestPublishedReleaseId))
+                        .ToList();
+                });
         }
 
         private static void FilterContentBlock(IContentBlockViewModel block)

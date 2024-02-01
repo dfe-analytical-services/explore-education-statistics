@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -2543,7 +2545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases()
+        public async Task ListLatestReleaseVersions()
         {
             var release1Original = new Release
             {
@@ -2595,7 +2597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     publication.Id);
 
                 var releases = result.AssertRight();
@@ -2609,7 +2611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_SingleRelease()
+        public async Task ListLatestReleaseVersions_SingleRelease()
         {
             var release = new Release
             {
@@ -2640,7 +2642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     release.Publication.Id);
 
                 var releases = result.AssertRight();
@@ -2666,7 +2668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_Live_True()
+        public async Task ListLatestReleaseVersions_Live_True()
         {
             var release1Original = new Release
             {
@@ -2721,7 +2723,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     publication.Id, live: true);
 
                 var releases = result.AssertRight();
@@ -2732,7 +2734,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_Live_False()
+        public async Task ListLatestReleaseVersions_Live_False()
         {
             var release1Original = new Release
             {
@@ -2787,7 +2789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     publication.Id, live: false);
 
                 var releases = result.AssertRight();
@@ -2798,7 +2800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_IncludePermissions_True()
+        public async Task ListLatestReleaseVersions_IncludePermissions_True()
         {
             var release = new Release
             {
@@ -2823,7 +2825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     release.PublicationId, includePermissions: true);
 
                 var releases = result.AssertRight();
@@ -2839,7 +2841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_IncludePermissions_False()
+        public async Task ListLatestReleaseVersions_IncludePermissions_False()
         {
             var release = new Release
             {
@@ -2864,7 +2866,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleases(
+                var result = await publicationService.ListLatestReleaseVersions(
                     release.PublicationId, includePermissions: false);
 
                 var releases = result.AssertRight();
@@ -2876,7 +2878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleasesPaginated()
+        public async Task ListLatestReleaseVersionsPaginated()
         {
             var release1 = new Release
             {
@@ -2920,7 +2922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = await publicationService.ListActiveReleasesPaginated(
+                var result = await publicationService.ListLatestReleaseVersionsPaginated(
                     publication.Id,
                     page: 1,
                     pageSize: 2
@@ -2945,6 +2947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
+            IReleaseRepository? releaseRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
@@ -2956,6 +2959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
+                releaseRepository ?? new ReleaseRepository(context),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

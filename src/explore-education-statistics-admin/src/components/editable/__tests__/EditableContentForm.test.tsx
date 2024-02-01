@@ -112,6 +112,62 @@ describe('EditableContentForm', () => {
       });
     });
 
+    test('formats links before calling `onSubmit` handler', async () => {
+      const handleSubmit = jest.fn();
+
+      const testContentWithLinks = `Test content 
+        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/Pupil-Attendance-In-Schools?testParam=Something">
+        EES link with uppercase characters</a> 
+        <a href="  https://gov.uk/TEST something  ">External link with whitespace, space to encode and uppercase characters</a>`;
+
+      const formattedContentWithLinks = `Test content 
+        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/pupil-attendance-in-schools?testParam=Something">
+        EES link with uppercase characters</a> 
+        <a href="https://gov.uk/TEST%20something">External link with whitespace, space to encode and uppercase characters</a>`;
+
+      render(
+        <EditableContentForm
+          content={testContentWithLinks}
+          id="block-id"
+          label="Form label"
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(formattedContentWithLinks);
+      });
+    });
+
+    test('does not remove data attributes for glossary and featured table links when formatting links', async () => {
+      const handleSubmit = jest.fn();
+
+      const testContentWithLinks = `Test content 
+        <a data-glossary href="https://explore-education-statistics.service.gov.uk/glossary#absence">
+        Glossary link</a> 
+        <a data-featured-table href="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/c85e82df-75f0-4b35-ad9e-08dc1cd00d3d?featuredTable=true">
+        Featured table link</a>`;
+
+      render(
+        <EditableContentForm
+          content={testContentWithLinks}
+          id="block-id"
+          label="Form label"
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(testContentWithLinks);
+      });
+    });
+
     test('shows error if `onSubmit` throws error when submitting form', async () => {
       const handleSubmit = jest.fn();
       handleSubmit.mockRejectedValue(new Error('Something went wrong'));

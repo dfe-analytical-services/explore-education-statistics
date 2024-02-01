@@ -15,6 +15,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -959,6 +960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
+                new ReleaseRepository(contentDbContext),
                 new UserReleaseRoleRepository(contentDbContext),
                 new UserReleaseInviteRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService(UserId).Object

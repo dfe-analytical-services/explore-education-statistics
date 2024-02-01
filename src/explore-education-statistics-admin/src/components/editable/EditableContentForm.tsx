@@ -2,12 +2,7 @@ import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import {
-  Element,
-  Node,
-  ToolbarGroup,
-  ToolbarOption,
-} from '@admin/types/ckeditor';
+import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -15,15 +10,19 @@ import {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
-import WarningMessage from '@common/components/WarningMessage';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
+import formatContentLink from '@common/utils/url/formatContentLink';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { Formik, FormikHelpers } from 'formik';
 import React, { useCallback, useRef } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+import sanitizeHtml, {
+  SanitizeHtmlOptions,
+  defaultSanitizeOptions,
+} from '@common/utils/sanitizeHtml';
 
 interface FormValues {
   content: string;
@@ -72,7 +71,6 @@ const EditableContentForm = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
-  const [showAltTextMessage, toggleAltTextMessage] = useToggle(false);
 
   useIdleTimer({
     element: containerRef.current ?? document,
@@ -85,25 +83,6 @@ const EditableContentForm = ({
     onIdle,
   });
 
-  const validateElements = useCallback(
-    (elements: Element[]) => {
-      const hasInvalidImage = elements.some(
-        element =>
-          isInvalidImage(element) ||
-          Array.from(element.getChildren()).some(child =>
-            isInvalidImage(child),
-          ),
-      );
-
-      toggleAltTextMessage(hasInvalidImage);
-
-      return hasInvalidImage
-        ? 'All images must have alternative text'
-        : undefined;
-    },
-    [toggleAltTextMessage],
-  );
-
   const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
     useAsyncCallback(
       async (nextContent: string) => {
@@ -115,8 +94,23 @@ const EditableContentForm = ({
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
       try {
+        const sanitizeOptions: SanitizeHtmlOptions = {
+          ...defaultSanitizeOptions,
+          transformTags: {
+            a: (tagName, attribs) => {
+              return {
+                tagName,
+                attribs: {
+                  ...attribs,
+                  href: formatContentLink(attribs.href),
+                },
+              };
+            },
+          },
+        };
+
         await clearPendingDeletions?.();
-        await onSubmit(values.content);
+        await onSubmit(sanitizeHtml(values.content, sanitizeOptions));
       } catch (err) {
         logger.error(err);
         helpers.setFieldError('content', 'Could not save content');
@@ -150,7 +144,6 @@ const EditableContentForm = ({
 
             return (
               <Form id={`${id}-form`} visuallyHiddenErrorSummary>
-                {showAltTextMessage && <AltTextWarningMessage />}
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
                   error={autoSaveError ? 'Could not save content' : undefined}
@@ -159,7 +152,6 @@ const EditableContentForm = ({
                   label={label}
                   name="content"
                   toolbarConfig={toolbarConfig}
-                  validateElements={validateElements}
                   onAutoSave={handleAutoSave}
                   onBlur={onBlur}
                   onCancelComment={toggleCommentAddForm.off}
@@ -195,27 +187,3 @@ const EditableContentForm = ({
   );
 };
 export default EditableContentForm;
-
-function isInvalidImage(element: Node) {
-  return (
-    (element.name === 'imageBlock' || element.name === 'imageInline') &&
-    !element.getAttribute('alt')
-  );
-}
-
-export function AltTextWarningMessage() {
-  return (
-    <WarningMessage>
-      Alternative text must be added for images, for guidance see{' '}
-      <a
-        href="https://www.w3.org/WAI/tutorials/images/tips/"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        W3C tips on writing alternative text
-      </a>
-      . <br />
-      Images without alternative text are outlined in red.
-    </WarningMessage>
-  );
-}

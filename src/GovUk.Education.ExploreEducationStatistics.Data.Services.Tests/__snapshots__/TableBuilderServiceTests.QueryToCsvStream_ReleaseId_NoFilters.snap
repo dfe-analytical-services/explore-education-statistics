@@ -1,4 +1,4 @@
-﻿time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,name_of_indicator_0,name_of_indicator_1
+﻿time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,indicator_0_name,indicator_1_name
 202223,Academic year,Regional,E92000001,England,E13000002,Outer London,-29241,32490
 202223,Academic year,Regional,E92000001,England,E13000002,Outer London,11391,-31271
 202223,Academic year,Regional,E92000001,England,E12000003,Yorkshire and the Humber,-13513,-29497

@@ -1,10 +1,9 @@
-using System.Linq;
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
@@ -17,15 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly AuthorizationHandlerService _authorizationHandlerService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public MakeAmendmentOfSpecificReleaseAuthorizationHandler(
-            ContentDbContext contentDbContext,
-            AuthorizationHandlerService authorizationHandlerService)
+            AuthorizationHandlerService authorizationHandlerService,
+            IReleaseRepository releaseRepository)
         {
-            _contentDbContext = contentDbContext;
             _authorizationHandlerService = authorizationHandlerService;
+            _releaseRepository = releaseRepository;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -33,7 +32,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             MakeAmendmentOfSpecificReleaseRequirement requirement,
             Release release)
         {
-            if (!release.Live || !IsLatestVersionOfRelease(_contentDbContext, release))
+            if (!release.Live)
+            {
+                return;
+            }
+
+            if (!await _releaseRepository.IsLatestReleaseVersion(release.Id))
             {
                 return;
             }
@@ -52,15 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 context.Succeed(requirement);
             }
-        }
-
-        // TODO DW - can this be replaced with publicationRepo.GetLatestReleaseForPublication()? 
-        private static bool IsLatestVersionOfRelease(ContentDbContext context, Release release)
-        {
-            var releases = context.Releases.AsNoTracking()
-                .Where(r => r.PublicationId == release.PublicationId && r.Id != release.Id);
-
-            return !releases.Any(r => r.PreviousVersionId == release.Id);
         }
     }
 }

@@ -1,5 +1,8 @@
+import {
+  ValidationProblemDetails,
+  ValidationProblemError,
+} from '@common/services/types/problemDetails';
 import { Dictionary } from '@common/types';
-import { ServerValidationErrorResponse } from '@common/validation/serverValidations';
 import { AxiosError, AxiosHeaders } from 'axios';
 
 interface CreateAxiosErrorOptions<T> {
@@ -37,19 +40,16 @@ export default function createAxiosErrorMock<T>(
   };
 }
 
-export function createServerValidationErrorMock<T extends string = string>(
-  globalErrors: T[],
-  fieldErrors: Dictionary<T[]> = {},
-): AxiosError<ServerValidationErrorResponse<T>> {
+export function createServerValidationErrorMock<TCode extends string = string>(
+  errors: ValidationProblemError<TCode>[],
+): AxiosError<ValidationProblemDetails<TCode>> {
   return createAxiosErrorMock({
     status: 400,
     data: {
-      errors: {
-        ...fieldErrors,
-        '': globalErrors,
-      },
+      errors,
       status: 400,
       title: 'One or more validation errors occurred.',
+      type: 'https://tools.ietf.org/html/rfc9110#section-15.5.1',
     },
   });
 }

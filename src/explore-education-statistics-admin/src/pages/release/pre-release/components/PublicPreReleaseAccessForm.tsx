@@ -76,6 +76,7 @@ const PublicPreReleaseAccessForm = ({
               name="preReleaseAccessList"
               label="Public access list"
               focusOnInit
+              toolbarConfig={['bulletedList']}
             />
 
             <ButtonGroup>

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -281,7 +280,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
-            var response = await client.GetAsync($"http://localhost/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockParentId}");
+            var response =
+                await client.GetAsync(
+                    $"http://localhost/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockParentId}");
 
             VerifyAllMocks(BlobCacheService, dataBlockService);
 
@@ -293,7 +294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var client = SetupApp().CreateClient();
 
-            var response = await client.GetAsync($"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockParentId}");
+            var response =
+                await client.GetAsync($"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockParentId}");
 
             response.AssertNotFound();
         }
@@ -470,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
                 .ReturnsAsync(latestRelease);
 
             var client = SetupApp(
@@ -511,7 +513,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParentWithNoPublishedVersion))
                 .CreateClient();
 
-            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentWithNoPublishedVersion.Id}");
+            var response =
+                await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentWithNoPublishedVersion.Id}");
 
             VerifyAllMocks(BlobCacheService);
 
@@ -547,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
                 .ReturnsAsync(latestRelease);
 
             var client = SetupApp(

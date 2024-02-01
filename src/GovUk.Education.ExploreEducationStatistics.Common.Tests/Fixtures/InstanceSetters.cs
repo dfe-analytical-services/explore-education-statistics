@@ -1,7 +1,10 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using Bogus;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -22,7 +25,7 @@ public class InstanceSetters<T> where T : class
         Set(property, () => value);
 
     public InstanceSetters<T> Set<TProperty>(Expression<Func<T, TProperty>> property, Func<TProperty> value) =>
-        Set(property, (_, _) => value());
+        Set(property, _ => value());
 
     public InstanceSetters<T> Set<TProperty>(
         Expression<Func<T, TProperty>> property,
@@ -79,10 +82,39 @@ public class InstanceSetters<T> where T : class
             {
                 var index = GetDisplayIndex(context, faker);
 
-                return $"{PropertyName.For(property)} of {typeof(T).Name} {index}";
+                return $"{typeof(T).Name} {index} :: {PropertyName.For(property)}";
             }
         );
     }
+
+    public InstanceSetters<T> SetDefault<TEnum>(Expression<Func<T, TEnum>> property) where TEnum : struct, Enum
+        => Set(property, faker => faker.PickRandom<TEnum>());
+
+    public InstanceSetters<T> SetDefault<TEnum>(Expression<Func<T, TEnum?>> property) where TEnum : struct, Enum
+        => Set(property, faker => faker.PickRandom<TEnum>());
+
+    public InstanceSetters<T> SetDefault(Expression<Func<T, IList<string>>> property)
+    {
+        return Set(
+            property,
+            (faker, _, context) =>
+            {
+                var index = GetDisplayIndex(context, faker);
+
+                return Enumerable.Range(0, faker.Random.Int(2, 5))
+                    .Select(itemIndex =>
+                        $"{typeof(T).Name} {index} :: {PropertyName.For(property)} :: Item {itemIndex}")
+                    .ToList();
+            }
+        );
+    }
+
+    public InstanceSetters<T> SetDefault<TEnum>(Expression<Func<T, IList<TEnum>>> property) where TEnum : Enum
+        => Set(
+            property,
+            faker => EnumUtil.GetEnumValues<TEnum>()
+                .Take(faker.Random.Int(2, 5))
+                .ToList());
 
     public InstanceSetters<T> SetDefault(Expression<Func<T, int?>> property, int? offset = 0)
     {

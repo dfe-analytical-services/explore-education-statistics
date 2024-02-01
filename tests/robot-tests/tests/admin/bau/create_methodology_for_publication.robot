@@ -76,7 +76,7 @@ Update the Methodology Content
 
 Verify that validation prevents adding an image without alt text
     user adds image without alt text to accordion section text block    Methodology content section 1    1
-    ...    test-infographic.png    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    test-infographic.png    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}    Save
 
     user checks page contains    All images must have alternative text
 
@@ -92,6 +92,20 @@ Verify that validation prevents adding an image without alt text
 
     user checks page does not contain    All images must have alternative text
 
+Verify that validation prevents adding an invalid link
+    user adds link to accordion section text block    Methodology content section 1    1    https://gov
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user checks page contains    1 link has an invalid URL.
+
+    user clicks element    xpath://a[text()='https://gov']
+    user clicks button    Edit link
+    user enters text into element    label:Link URL    gov.uk
+    user presses keys    ENTER
+
+    user clicks button    Save
+
+    user checks page does not contain    1 link has an invalid URL.
+
 Add Methodology Annexes
     user creates new content section    1    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology annex section 1
@@ -100,11 +114,10 @@ Add Methodology Annexes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
-
-    user checks accordion section contains x blocks    Methodology annex section 1    1
-    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user checks accordion section text block contains image with alt text    Methodology annex section 1    1
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user checks accordion section contains x blocks    Methodology annex section 1    1
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Approve the Methodology
     approve methodology from methodology view
