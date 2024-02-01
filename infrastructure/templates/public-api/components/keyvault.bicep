@@ -9,13 +9,13 @@ param location string
 param tenantId string
 
 @description('Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.')
-param enabledForDeployment bool = false
+param enabledForDeployment bool = true
 
 @description('Specifies whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys.')
 param enabledForDiskEncryption bool = false
 
 @description('Specifies whether Azure Resource Manager is permitted to retrieve secrets from the key vault.')
-param enabledForTemplateDeployment bool = false
+param enabledForTemplateDeployment bool = true
 
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
 @allowed([
@@ -57,5 +57,4 @@ resource keyvault 'Microsoft.KeyVault/vaults@2022-07-01' = {
 
 //Output
 output keyVaultName string = keyvault.name
-
-
+output keyVaultId string = keyvault.id

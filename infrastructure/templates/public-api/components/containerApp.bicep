@@ -9,7 +9,7 @@ param location string
 param acrLoginServer string
 
 @description('Specifies the container image to deploy from the registry.')
-param acrHostedImageName string
+param containerAppImageName string
 
 @minLength(2)
 @maxLength(32)
@@ -23,35 +23,32 @@ param containerAppEnvName string
 param containerAppLogAnalyticsName string
 
 @description('Specifies the container port.')
-param targetPort int = 80
+param containerAppTargetPort int = 80
 
 @description('Select if you want to use a public dummy image to start the container app.')
 param useDummyImage bool
 
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
 @allowed([
-  '0.25'
-  '0.5'
-  '0.75'
   '1'
-  '1.25'
-  '1.5'
-  '1.75'
   '2'
+  '3'
+  '4'
 ])
-param cpuCore string = '0.5'
+param cpuCore string = '4'
 
 @description('Amount of memory (in gibibytes, GiB) allocated to the container up to 4GiB. Can be with a maximum of two decimals. Ratio with CPU cores must be equal to 2.')
 @allowed([
-  '0.5'
   '1'
-  '1.5'
   '2'
   '3'
-  '3.5'
   '4'
+  '5'
+  '6'
+  '7'
+  '8'
 ])
-param memorySize string = '1'
+param memorySize string = '8'
 
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
@@ -63,8 +60,13 @@ param minReplica int = 1
 @maxValue(25)
 param maxReplica int = 3
 
-@description('Container environment parameters')
-param envParams array = []
+@description('Specifies the database connection string')
+@secure()
+param dbConnectionString string
+
+@description('Specifies the service bus connection string.')
+@secure()
+param serviceBusConnectionString string
 
 //Passed in Tags
 param tagValues object
@@ -72,7 +74,7 @@ param tagValues object
 
 //Variables 
 //var containerImageName = '${acrLoginServer}/${acrHostedImageName}'
-var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${acrHostedImageName}'
+var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${containerAppImageName}'
 var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
@@ -100,6 +102,7 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
 module applicationInsightsModule '../components/appInsights.bicep' = {
   name: 'appInsightsDeploy-${containerAppName}'
   params: {
+    resourcePrefix: resourcePrefix
     location: location
     appInsightsName: applicationInsightsName
   }
@@ -134,6 +137,12 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
         sharedKey: logAnalytics.listKeys().primarySharedKey
       }
     }
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
   }
   tags: tagValues
 }
@@ -155,7 +164,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       activeRevisionsMode: 'Single'
       ingress: {
         external: true
-        targetPort: targetPort
+        targetPort: containerAppTargetPort
         allowInsecure: false
         traffic: [
           {
@@ -171,7 +180,16 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
         {
           name: containerAppName 
           image: containerImageName
-          env: envParams
+          env: [
+            {
+              name: 'dbConnectionString'
+              value: dbConnectionString
+            }
+            {
+              name: 'serviceBusConnectionString'
+              value: serviceBusConnectionString
+            }
+          ]
           resources: {
             cpu: json(cpuCore)
             memory: '${memorySize}Gi'
@@ -193,6 +211,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
         ]
       }
     }
+    workloadProfileName: 'Consumption'
   }
   tags: tagValues
 }

@@ -28,33 +28,27 @@ param functionAppRuntime string = 'dotnet'
 @secure()
 param storageAccountConnectionString string
 
-@description('Key Vault URI Connection String reference')
-@secure()
-param databaseConnectionString string
-
-@description('Key Vault URI Connection String reference')
-@secure()
-param serviceBusConnectionString string
+@description('Specifies the additional setting to add to the functionapp.')
+param settings object
 
 //Passed in Tags
 param tagValues object
 
 // Variables and created data
 var kind = 'functionapp'
-var databaseConnectionStringKeyVaultRef = '@Microsoft.KeyVault(SecretUri=${databaseConnectionString})'
-var appServicePlanName = '${resourcePrefix}-aps-${functionAppName}'
+var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
-var applicationInsightsName ='${resourcePrefix}-ai-${functionAppName}'
 var functionName = '${resourcePrefix}-fa-${functionAppName}'
 
-//Resources
 
+//Resources
 //Application Insights Deployment
 module applicationInsightsModule '../components/appInsights.bicep' = {
   name: 'appInsightsDeploy-${functionAppName}'
   params: {
+    resourcePrefix: resourcePrefix
     location: location
-    appInsightsName: applicationInsightsName
+    appInsightsName: functionAppName
   }
 }
 
@@ -97,7 +91,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   parent: functionApp
   name: 'appsettings'
-  properties: {
+  properties: union(settings, {
     AzureWebJobsStorage: storageAccountConnectionString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: storageAccountConnectionString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
@@ -105,9 +99,7 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsModule.outputs.applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
     WEBSITE_RUN_FROM_PACKAGE: '1'
-    DatabaseConnectionString: databaseConnectionStringKeyVaultRef
-    ServiceBusConnectionString: serviceBusConnectionString
-  }
+  })
 }
 
 

@@ -2,11 +2,11 @@
 @description('Base domain name for Public API')
 param domain string
 
-@description('Subscription Name e.g. s101d01. Used as a prefix for created resources')
+@description('Subscription Name e.g. s101. Used as a prefix for created resources')
 param subscription string
 
 @description('Environment Name Used as a prefix for created resources')
-param environment string 
+param environment string = 'ees'
 
 @description('Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -29,7 +29,7 @@ param tagValues object = {
 
 //Networking Params --------------------------------------------------------------------------
 @description('Networking : Deploy subnets for networking')
-param deploySubnets bool = true
+param deploySubnets bool = false
 
 @description('Networking : Included whitelist')
 param storageFirewallRules array = ['0.0.0.0/0']
@@ -48,7 +48,7 @@ param fileShareQuota int = 1
 
 //PostgreSQL Database Params -------------------------------------------------------------------
 @description('Database : PostgreSQL server Name')
-param postgreSQLserverName string
+param dbServerName string = 'publicapi-data'
 
 @description('Database : administrator login name')
 @minLength(0)
@@ -68,10 +68,10 @@ param dbAdminPassword string
 param dbSkuName string = 'Standard_B1ms'
 
 @description('Database : Azure Database for PostgreSQL Storage Size in GB')
-param storageSizeGB int = 32
+param dbStorageSizeGB int = 32
 
 @description('Database : Azure Database for PostgreSQL Autogrow setting')
-param autoGrowStatus string = 'Disabled'
+param dbAutoGrowStatus string = 'Disabled'
 
 //Container Registry Params ----------------------------------------------------------------
 @minLength(5)
@@ -81,12 +81,6 @@ param containerRegistryName string
 
 @description('Deploy the Container Registry if you are not using an existing registry')
 param deployRegistry bool
-
-@description('Container App : Specifies the container image to seed to the ACR.')
-param containerSeedImage string
-
-@description('Select if you want to seed the ACR with a base image.')
-param seedRegistry bool
 
 //Container App Params -------------------------------------------------------------------
 @minLength(2)
@@ -101,10 +95,10 @@ param containerAppEnvName string = 'publicapi'
 param containerAppLogAnalyticsName string = 'publicapi'
 
 @description('Container App : Specifies the container image to deploy from the registry <name>:<tag>.')
-param acrHostedImageName string
+param containerAppImageName string
 
 @description('Specifies the container port.')
-param targetPort int = 80
+param containerAppTargetPort int = 80
 
 @description('Select if you want to use a public dummy image to start the container app.')
 param useDummyImage bool
@@ -127,7 +121,7 @@ param functionAppName string = 'processor'
 // Variables and created data
 //---------------------------------------------------------------------------------------------------------------
 var resourcePrefix = '${subscription}-${environment}'
-var redResourcePrefix = '${subscription}-api'
+var reducedResourcePrefix = '${subscription}-api'
 
 
 //---------------------------------------------------------------------------------------------------------------
@@ -146,19 +140,37 @@ module vnetModule 'components/network.bicep' = {
   }
 }
 
+//Deploy Key Vault
+module keyVaultModule 'components/keyVault.bicep' = {
+  name: 'keyVaultDeploy'
+  params: {
+    resourcePrefix: reducedResourcePrefix
+    location: location
+    tenantId: az.subscription().tenantId
+    tagValues: tagValues
+  }
+}
+
+resource eesKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+  name: keyVaultModule.outputs.keyVaultName
+  scope: resourceGroup(resourceGroup().name)
+}
+
 //Deploy Storage Account
 module storageAccountModule 'components/storageAccount.bicep' = {
   name: 'storageAccountDeploy'
   params: {
-    resourcePrefix: redResourcePrefix
+    resourcePrefix: reducedResourcePrefix
     location: location
     storageAccountName: storageAccountName
     storageSubnetRules: [vnetModule.outputs.adminSubnetRef, vnetModule.outputs.importerSubnetRef, vnetModule.outputs.publisherSubnetRef]
     storageFirewallRules: storageFirewallRules
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     tagValues: tagValues
   }
   dependsOn: [
     vnetModule
+    keyVaultModule
   ]
 }
 
@@ -176,16 +188,6 @@ module fileShareModule 'components/fileShares.bicep' = {
   ]
 }
 
-//Deploy Key Vault
-module keyVaultModule 'components/keyVault.bicep' = {
-  name: 'keyVaultDeploy'
-  params: {
-    resourcePrefix: redResourcePrefix
-    location: location
-    tenantId: az.subscription().tenantId
-    tagValues: tagValues
-  }
-}
 
 //Deploy PostgreSQL Database
 module databaseModule 'components/postgresqlDatabase.bicep' = {
@@ -193,12 +195,12 @@ module databaseModule 'components/postgresqlDatabase.bicep' = {
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    serverName: postgreSQLserverName
+    serverName: dbServerName
     adminName: dbAdminName
     adminPassword: dbAdminPassword
     dbSkuName: dbSkuName
-    storageSizeGB: storageSizeGB
-    autoGrowStatus: autoGrowStatus
+    dbStorageSizeGB: dbStorageSizeGB 
+    dbAutoGrowStatus: dbAutoGrowStatus
     keyVaultName: keyVaultModule.outputs.keyVaultName
     tagValues: tagValues
   }
@@ -220,21 +222,6 @@ module containerRegistryModule 'components/containerRegistry.bicep' = {
   }
 }
 
-//Seed Container Registry 
-module seedRegistryModule 'components/acrSeeder.bicep' = if (seedRegistry) {
-  name: 'acrSeeder'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    containerRegistryName: containerRegistryModule.outputs.containerRegistryName
-    containerSeedImage: containerSeedImage
-  }
-  dependsOn: [
-    containerRegistryModule
-    keyVaultModule
-  ]
-}
-
 //Deploy Container Application
 module containerAppModule 'components/containerApp.bicep' = {
   name: 'appContainerDeploy'
@@ -245,21 +232,18 @@ module containerAppModule 'components/containerApp.bicep' = {
     containerAppEnvName: containerAppEnvName
     containerAppLogAnalyticsName: containerAppLogAnalyticsName
     acrLoginServer: containerRegistryModule.outputs.containerRegistryLoginServer
-    acrHostedImageName: acrHostedImageName
-    targetPort: targetPort
+    containerAppImageName: containerAppImageName
+    containerAppTargetPort: containerAppTargetPort
     useDummyImage: useDummyImage
-    envParams: [
-      {
-        name: 'adoDBConnectionString'
-        value: databaseModule.outputs.dbConnectionString
-      }
-      {
-        name: 'serviceBusConnectionString'
-        value: serviceBusFunctionQueueModule.outputs.serviceBusConnectionString
-      }
-    ]
+    dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
+    serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
   }
+  dependsOn: [
+    keyVaultModule
+    databaseModule
+    serviceBusFunctionQueueModule
+  ]
 }
 
 //Deploy Service Bus
@@ -270,26 +254,31 @@ module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
     location: location
     namespaceName: namespaceName
     queueName:queueName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     tagValues: tagValues
   }
+  dependsOn: [
+    keyVaultModule
+  ]
 }
 
 //Deploy ETL Function
-module etlFunctionAppModule 'application/etlFunctionApp.bicep' = {
-  name: 'etlFunctionAppDeploy'
+module etlFunctionAppModule 'application/processorFunctionApp.bicep' = {
+  name: 'processorFunctionAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
     functionAppName: functionAppName
-    keyVaultName: keyVaultModule.outputs.keyVaultName
-    databaseConnectionStringURI: databaseModule.outputs.connectionStringSecretUri
-    storageAccountConnectionString: storageAccountModule.outputs.storageAccountConnectionString
-    serviceBusConnectionString: serviceBusFunctionQueueModule.outputs.serviceBusConnectionString
+    storageAccountConnectionString: eesKeyVault.getSecret(storageAccountModule.outputs.connectionStringSecretName)
+    dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
+    serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
   }
   dependsOn: [
-    serviceBusFunctionQueueModule
     keyVaultModule
+    databaseModule
+    storageAccountModule
+    serviceBusFunctionQueueModule
   ]
 }
 

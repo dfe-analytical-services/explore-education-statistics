@@ -27,11 +27,16 @@ param storageFirewallRules array = []
 ])
 param skuStorageResource string = 'Standard_LRS'
 
+@description('The name of the Key Vault to store the connection strings')
+param keyVaultName string
+
 //Passed in Tags
 param tagValues object
 
 // Variables and created data
-var storageName = replace('${resourcePrefix}sacc${storageAccountName}', '-', '')
+var storageName = replace('${resourcePrefix}sa${storageAccountName}', '-', '')
+var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
+var connectionStringSecretName = '${resourcePrefix}-sa-${storageAccountName}-connectionString'
 var endpointSuffix = environment().suffixes.storage
 var key = storageAccount.listKeys().keys[0].value
 
@@ -62,6 +67,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   tags: tagValues
 }
 
+//store connections string
+module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
+  name: 'saConnectionStringSecretDeploy'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretValue: storageAccountConnectionString 
+    contentType: 'text/plain'
+    secretName: connectionStringSecretName
+  }
+}
+
 //Outputs
 output storageAccountName string = storageAccount.name
-output storageAccountConnectionString string = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
+output connectionStringSecretName string = connectionStringSecretName

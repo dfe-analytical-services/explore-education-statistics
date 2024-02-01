@@ -9,19 +9,18 @@ param location string
 param functionAppRuntime string = 'dotnet'
 
 @description('Specifies the name of the function.')
-param functionAppName string = 'processor'
+param functionAppName string = 'publicapi-processor'
 
-@description('Specifies the name of the Key Vault.')
-param keyVaultName string
-
-@description('Database Connection String URI')
+@description('Storage Account connection string')
 @secure()
-param databaseConnectionStringURI string
-
-@description('Storage Account Connection String')
 param storageAccountConnectionString string
 
-@description('Service Bus Connection String reference')
+@description('Specifies the database connection string')
+@secure()
+param dbConnectionString string
+
+@description('Specifies the service bus connection string.')
+@secure()
 param serviceBusConnectionString string
 
 //Passed in Tags
@@ -31,35 +30,25 @@ param tagValues object
 // Variables and created data
 
 
+
 //---------------------------------------------------------------------------------------------------------------
 // All resources via modules
 //---------------------------------------------------------------------------------------------------------------
 
+
 //Function App Deployment
 module functionAppModule '../components/functionApp.bicep' = {
-  name: 'functionAppDeploy-${functionAppName}'
+  name: '${resourcePrefix}-${functionAppName}'
   params: {
     resourcePrefix: resourcePrefix
     functionAppName: functionAppName
+    storageAccountConnectionString: storageAccountConnectionString
     location: location
     tagValues: tagValues
-    databaseConnectionString: databaseConnectionStringURI
+    settings: {
+      dbConnectionString: dbConnectionString
+      serviceBusConnectionString: serviceBusConnectionString
+    }
     functionAppRuntime: functionAppRuntime
-    storageAccountConnectionString: storageAccountConnectionString
-    serviceBusConnectionString: serviceBusConnectionString
   }
 }
-
-//Key Vault Access Policy Deployment
-module keyVaultAccessPolicy '../components/keyVaultAccessPolicy.bicep' = {
-  name: 'keyVaultAccessPolicyDeploy-${functionAppName}'
-  params: {
-    keyVaultName: keyVaultName
-    principalId: functionAppModule.outputs.principalId
-    tenantId: functionAppModule.outputs.tenantId
-  }
-  dependsOn: [
-    functionAppModule
-  ]
-}
-
