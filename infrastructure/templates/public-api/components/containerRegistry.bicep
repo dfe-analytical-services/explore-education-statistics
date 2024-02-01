@@ -24,12 +24,12 @@ param deployRegistry bool
 param tagValues object
 
 //Variables
-var RegistryName = replace('${resourcePrefix}cr${containerRegistryName}', '-', '')
+var registryName = replace('${resourcePrefix}cr${containerRegistryName}', '-', '')
 
 
 //Resources 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (deployRegistry) {
-  name: RegistryName
+  name: registryName
   location: location
   sku: {
     name: skuName
@@ -48,7 +48,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 
 
 resource currentContainerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
-  name: RegistryName
+  name: registryName
 }
 
 

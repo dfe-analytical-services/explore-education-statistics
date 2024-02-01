@@ -11,6 +11,9 @@ param namespaceName string
 @description('Name of the Queue')
 param queueName string
 
+@description('The name of the Key Vault to store the connection strings')
+param keyVaultName string
+
 //Passed in Tags
 param tagValues object
 
@@ -20,6 +23,7 @@ var serviceBusNamespaceName = '${resourcePrefix}-sbns-${namespaceName}'
 var serviceBusQueueName = '${resourcePrefix}-sbq-${queueName}'
 var serviceBusEndpoint = '${serviceBusNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
 var serviceBusConnectionString = listKeys(serviceBusEndpoint, serviceBusNamespace.apiVersion).primaryConnectionString
+var connectionStringSecretName = '${resourcePrefix}-sbq-${queueName}-connectionString'
 
 
 //Resources 
@@ -54,10 +58,20 @@ resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-prev
   }
 }
 
+//store connections string
+module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
+  name: 'sbqConnectionStringSecretDeploy'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretValue: serviceBusConnectionString 
+    contentType: 'text/plain'
+    secretName: connectionStringSecretName
+  }
+}
+
 
 //Outputs
 output serviceBusQueueRef string = serviceBusQueue.id
 output serviceBusQueueName string = serviceBusQueue.name
-output serviceBusConnectionString string = serviceBusConnectionString
-
-
+output connectionStringSecretName string = connectionStringSecretName

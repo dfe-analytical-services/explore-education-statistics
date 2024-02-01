@@ -21,10 +21,10 @@ param adminPassword string
 param dbSkuName string
 
 @description('Azure Database for PostgreSQL Storage Size ')
-param storageSizeGB int
+param dbStorageSizeGB int
 
 @description('Azure Database for PostgreSQL Autogrow setting')
-param autoGrowStatus string
+param dbAutoGrowStatus string
 
 @description('Azure Database for PostgreSQL pricing tier')
 @allowed([
@@ -76,8 +76,8 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     administratorLogin: adminName
     administratorLoginPassword: adminPassword
     storage: {
-      storageSizeGB: storageSizeGB
-      autoGrow: autoGrowStatus
+      storageSizeGB: dbStorageSizeGB
+      autoGrow: dbAutoGrowStatus
     }
     backup: {
       backupRetentionDays: backupRetentionDays
@@ -92,7 +92,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
 
 //store connections string
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
-  name: 'connectionString'
+  name: 'dbConnectionStringSecretDeploy'
   params: {
     keyVaultName: keyVaultName
     isEnabled: true
@@ -110,5 +110,3 @@ output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServer
 
 @description('Connection String Secrets.')
 output connectionStringSecretName string = connectionStringSecretName
-output connectionStringSecretUri string = storeADOConnectionStringToKeyVault.outputs.keyVaultSecretUri
-output dbConnectionString string = connectionString

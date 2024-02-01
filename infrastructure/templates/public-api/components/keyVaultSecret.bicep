@@ -14,13 +14,13 @@ param contentType string = 'text/plain'
 @description('Optional: Determines whether the secret is enabled')
 param isEnabled bool = true
 
-resource KeyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
 
-resource KeyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   name: replace(replace(secretName, '.', '-'), ' ', '-')
-  parent: KeyVault
+  parent: keyVault
   properties: {
     contentType: contentType
     attributes: {
@@ -31,4 +31,4 @@ resource KeyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
 }
 
 //The URI pointing at the created secret
-output keyVaultSecretUri string = KeyVaultSecret.properties.secretUri
+output keyVaultSecretUri string = keyVaultSecret.properties.secretUri

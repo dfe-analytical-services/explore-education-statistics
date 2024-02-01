@@ -1,0 +1,182 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - dev
+  paths:
+    include:
+    - infrastructure/public-api/*
+pr: none
+
+name: Deploy Public API Bicep files
+
+parameters:
+  - name: resourceGroupName
+    displayName: Resource Group Name
+    type: string
+    default: 'dfe-development'
+  - name: azureSubscription
+    displayName: The current Azure subscription 
+    type: string
+    default: 'AzureConnection'
+  - name: dbAdminPassword
+    displayName: The Postgresql DB Admin Password 
+    type: string
+    default: 'postgreSQLAdminPassword'
+
+variables:
+  isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  vmImageName: 'ubuntu-latest'
+  templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/public-api
+  templateFile: $(templateDirectory)/main.bicep
+  paramDirectory: $(templateDirectory)/parameters
+  devParamFile: $(paramDirectory)/main-dev.bicepparam
+  testParamFile: $(paramDirectory)/main-test.bicepparam
+  preProdParamFile: $(paramDirectory)/main-preprod.bicepparam
+  prodParamFile: $(paramDirectory)/main-prod.bicepparam
+
+pool:
+  vmImage: $(vmImageName)
+
+stages:
+- stage: Build
+  jobs:
+  - job: CheckInfrastructure
+    steps:
+    - checkout: self
+    - task: CmdLine@2
+      displayName: 'List source files'
+      inputs:
+        script: |
+          echo "Structure of work folder of this pipeline:"
+          tree $(Build.SourcesDirectory)
+
+    - task: AzureCLI@2
+      displayName: 'Install Bicep' 
+      inputs:
+        azureSubscription: ${{parameters.azureSubscription}} 
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: 'az bicep install'
+
+    - task: AzureCLI@2
+      displayName: 'Validate bicep scripts' 
+      inputs:
+        azureSubscription: ${{parameters.azureSubscription}} 
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az deployment group validate \
+          --resource-group ${{parameters.resourceGroupName}} \
+          --template-file $(templateFile) \
+          --parameters $(devParamFile)
+
+- stage: DeployDev
+  displayName: 'Deploy to Development'
+  condition: and(succeeded(), eq(variables.isDev, 'true'))
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy Dev Infrastructure'
+    environment: 'Dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: none
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Deploy bicep template to Azure'
+            inputs:
+              azureSubscription: ${{parameters.azureSubscription}}
+              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group create \
+                --resource-group ${{parameters.resourceGroupName}} \
+                --template-file $(templateFile) \
+                --parameters $(devParamFile)
+
+- stage: DeployTest
+  displayName: 'Deploy to Testing'
+  condition: and(succeeded(), eq(variables.isDev, 'true'))
+  dependsOn: DeployDev
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy Testing Infrastructure'
+    environment: 'Test'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: none
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Deploy bicep template to Azure'
+            inputs:
+              azureSubscription: ${{parameters.azureSubscription}}
+              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group create \
+                --resource-group ${{parameters.resourceGroupName}} \
+                --template-file $(templateFile) \
+                --parameters $(testParamFile)
+
+- stage: DeployPreProd
+  displayName: 'Deploy to Pre-Prod'
+  condition: and(succeeded(), eq(variables.isMain, 'true'))
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy Pre Prod Infrastructure'
+    environment: 'Pre-prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: none
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Deploy bicep template to Azure'
+            inputs:
+              azureSubscription: ${{parameters.azureSubscription}}
+              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group create \
+                --resource-group ${{parameters.resourceGroupName}} \
+                --template-file $(templateFile) \
+                --parameters $(preProdParamFile)
+
+- stage: DeployProd
+  displayName: 'Deploy to Production'
+  condition: and(succeeded(), eq(variables.isMain, 'true'))
+  dependsOn: DeployPreProd
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy Production Infrastructure'
+    environment: 'Prod'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: none
+          - checkout: self
+          - task: AzureCLI@2
+            displayName: 'Deploy bicep template to Azure'
+            inputs:
+              azureSubscription: ${{parameters.azureSubscription}}
+              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group create \
+                --resource-group ${{parameters.resourceGroupName}} \
+                --template-file $(templateFile) \
+                --parameters $(prodParamFile)
