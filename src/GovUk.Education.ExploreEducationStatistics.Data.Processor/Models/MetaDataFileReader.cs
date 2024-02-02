@@ -45,7 +45,7 @@ public class MetaDataFileReader
             FilterGroupingColumn = ReadMetaColumnValue(MetaColumns.filter_grouping_column, rowValues),
             FilterHint = ReadMetaColumnValue(MetaColumns.filter_hint, rowValues),
             IndicatorGrouping = ReadMetaColumnValue(MetaColumns.indicator_grouping, rowValues),
-            IndicatorUnit = EnumUtil.GetFromString<IndicatorUnit>(!indicatorUnit.IsNullOrEmpty() ? indicatorUnit : ""),
+            IndicatorUnit = EnumUtil.GetFromEnumValue<IndicatorUnit>(!indicatorUnit.IsNullOrEmpty() ? indicatorUnit : ""),
             DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
         };
     }

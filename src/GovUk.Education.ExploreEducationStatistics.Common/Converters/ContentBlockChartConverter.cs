@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
         {
             var jsonObject = JObject.Load(reader);
             var type = jsonObject["Type"] ?? jsonObject["type"];
-            var chartType = EnumUtil.GetFromString<ChartType>(type.Value<string>());
+            var chartType = EnumUtil.GetFromEnumValue<ChartType>(type.Value<string>());
 
             IChart contentBlock = chartType switch
             {

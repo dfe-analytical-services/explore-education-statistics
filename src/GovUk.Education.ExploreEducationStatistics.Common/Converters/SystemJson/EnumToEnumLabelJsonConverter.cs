@@ -10,7 +10,7 @@ public class EnumToEnumLabelJsonConverter<TEnum> : JsonConverter<TEnum> where TE
 {
     public override TEnum? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return EnumUtil.GetFromLabel<TEnum>(reader.GetString());
+        return EnumUtil.GetFromEnumLabel<TEnum>(reader.GetString());
     }
 
     public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)

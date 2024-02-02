@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
         public override TEnum ReadJson(JsonReader reader, Type objectType, TEnum existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            return EnumUtil.GetFromString<TEnum>(reader.Value.ToString());
+            return EnumUtil.GetFromEnumValue<TEnum>(reader.Value.ToString());
         }
     }
 }

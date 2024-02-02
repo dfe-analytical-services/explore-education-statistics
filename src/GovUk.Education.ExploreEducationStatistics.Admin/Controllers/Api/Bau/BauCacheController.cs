@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                         async entry =>
                         {
                             var allowedPath =
-                                EnumUtil.GetFromString<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
+                                EnumUtil.GetFromEnumValue<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
 
                             switch (allowedPath)
                             {
