@@ -1,8 +1,5 @@
-import Banner from '@common/components/Banner';
-import useMounted from '@common/hooks/useMounted';
 import CookieBanner from '@frontend/components/CookieBanner';
-import Link from '@frontend/components/Link';
-import { useCookies } from '@frontend/hooks/useCookies';
+import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
@@ -41,9 +38,6 @@ const Page = ({
   breadcrumbs = [],
 }: Props) => {
   const router = useRouter();
-  const { isMounted } = useMounted();
-  const { getCookie, setUserTestingBannerSeenCookie } = useCookies();
-  const isUserTestingBannerSeen = getCookie('userTestingBannerSeen') === 'true';
 
   return (
     <>
@@ -55,23 +49,7 @@ const Page = ({
       />
       <PageHeader />
 
-      {isMounted && !isUserTestingBannerSeen && (
-        <Banner onClose={() => setUserTestingBannerSeenCookie(true)}>
-          <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-            Help develop Explore education statistics
-          </p>
-          <p className="govuk-!-margin-bottom-2">
-            <Link
-              className="govuk-link--inverse"
-              to="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UQVNYVkxZSEJVVjhPOURXSjJVMjhZRTdYMi4u"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Get involved in making this service better
-            </Link>
-          </p>
-        </Banner>
-      )}
+      <UserTestingBanner />
 
       {router.asPath.includes(
         'find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',

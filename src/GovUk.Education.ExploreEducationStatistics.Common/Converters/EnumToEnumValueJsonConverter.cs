@@ -1,6 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
         public override TEnum ReadJson(JsonReader reader, Type objectType, TEnum existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
-            return EnumUtil.GetFromString<TEnum>(reader.Value.ToString());
+            return EnumUtil.GetFromEnumValue<TEnum>(reader.Value.ToString());
         }
     }
 }

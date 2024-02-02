@@ -31,8 +31,7 @@ public record PublicationsListRequest
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
             RuleFor(request => request.PageSize)
-                .GreaterThanOrEqualTo(1)
-                .LessThanOrEqualTo(40);
+                .InclusiveBetween(1, 40);
         }
     }
 }

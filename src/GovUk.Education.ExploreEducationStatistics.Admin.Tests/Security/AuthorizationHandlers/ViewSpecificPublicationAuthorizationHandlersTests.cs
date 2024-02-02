@@ -6,16 +6,20 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static Moq.MockBehavior;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -100,7 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertHasRoleOnAnyChildReleaseHandlesOk(true, roleOnThisPublication);
         }
 
-        private async Task AssertHasRoleOnAnyChildReleaseHandlesOk(bool expectedToSucceed, params UserReleaseRole[] releaseRoles)
+        private async Task AssertHasRoleOnAnyChildReleaseHandlesOk(bool expectedToSucceed,
+            params UserReleaseRole[] releaseRoles)
         {
             await using (var context = DbUtils.InMemoryApplicationDbContext())
             {
@@ -110,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var handler = new ViewSpecificPublicationAuthorizationHandler(
                     context,
                     new AuthorizationHandlerService(
-                        context,
+                        new ReleaseRepository(context),
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(context),
                         Mock.Of<IPreReleaseService>(Strict)));
@@ -134,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new ViewSpecificPublicationAuthorizationHandler(
                 context,
                 new AuthorizationHandlerService(
-                    context,
+                    new ReleaseRepository(context),
                     userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
                     userPublicationRoleRepository ?? new UserPublicationRoleRepository(context),
                     preReleaseService ?? Mock.Of<IPreReleaseService>(Strict)));

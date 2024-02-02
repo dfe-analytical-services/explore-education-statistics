@@ -10,4 +10,6 @@ public interface IPublicationService
         int page,
         int pageSize, 
         string? search = null);
+
+    Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId);
 }

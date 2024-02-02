@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -25,15 +25,42 @@ public class PublicationService : IPublicationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPublicationRepository _publicationRepository;
+    private readonly IReleaseRepository _releaseRepository;
 
     public PublicationService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IPublicationRepository publicationRepository)
+        IPublicationRepository publicationRepository,
+        IReleaseRepository releaseRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _publicationRepository = publicationRepository;
+        _releaseRepository = releaseRepository;
+    }
+
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
+    {
+        return await _contentPersistenceHelper
+            .CheckEntityExists<Publication>(query => query
+                .Include(p => p.LatestPublishedRelease)
+                .Where(p => p.Id == publicationId))
+            .OnSuccess(publication =>
+            {
+                if (publication.LatestPublishedReleaseId == null)
+                {
+                    return new Either<ActionResult, PublishedPublicationSummaryViewModel>(new NotFoundResult());
+                }
+
+                return new PublishedPublicationSummaryViewModel
+                {
+                    Id = publication.Id,
+                    Title = publication.Title,
+                    Slug = publication.Slug,
+                    Summary = publication.Summary,
+                    Published = publication.LatestPublishedRelease!.Published!.Value,
+                };
+            });
     }
 
     public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
@@ -55,17 +82,14 @@ public class PublicationService : IPublicationService
                 }
 
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-                return BuildPublicationViewModel(publication, isSuperseded);
+                var publishedReleases = await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
             });
     }
 
     public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
     {
         var themes = await _contentDbContext.Themes
-            .Include(theme => theme.Topics)
-            .ThenInclude(topic => topic.Publications)
-            .ThenInclude(publication => publication.Releases)
-        
             .Include(theme => theme.Topics)
             .ThenInclude(topic => topic.Publications)
             .ThenInclude(publication => publication.SupersededBy)
@@ -90,7 +114,7 @@ public class PublicationService : IPublicationService
         IEnumerable<Guid>? publicationIds = null)
     {
         sort ??= search == null ? Title : Relevance;
-        order ??= order ?? (sort == Title ? Asc : Desc);
+        order ??= sort == Title ? Asc : Desc;
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
@@ -115,52 +139,46 @@ public class PublicationService : IPublicationService
         }
 
         // Apply a free-text search filter
-        var queryable = search == null
-            ? baseQueryable.Select(publication => new { Publication = publication, Rank = 0 })
-            : baseQueryable.Join(_contentDbContext.PublicationsFreeTextTable(search),
-                publication => publication.Id,
-                freeTextRank => freeTextRank.Id,
-                (publication, freeTextRank) => new { Publication = publication, freeTextRank.Rank });
+        var queryable = baseQueryable.JoinFreeText(_contentDbContext.PublicationsFreeTextTable, p => p.Id, search);
 
         // Apply sorting
         var orderedQueryable = sort switch
         {
             Published =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.LatestPublishedRelease!.Published)
-                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedRelease!.Published),
+                    ? queryable.OrderBy(result => result.Value.LatestPublishedRelease!.Published)
+                    : queryable.OrderByDescending(result => result.Value.LatestPublishedRelease!.Published),
             Relevance =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Rank)
-                    : queryable.OrderByDescending(p => p.Rank),
+                    ? queryable.OrderBy(result => result.Rank)
+                    : queryable.OrderByDescending(result => result.Rank),
             Title =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.Title)
-                    : queryable.OrderByDescending(p => p.Publication.Title),
+                    ? queryable.OrderBy(result => result.Value.Title)
+                    : queryable.OrderByDescending(result => result.Value.Title),
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)
         };
 
         // Then sort by publication id to provide a stable sort order
-        orderedQueryable = orderedQueryable.ThenBy(p => p.Publication.Id);
+        orderedQueryable = orderedQueryable.ThenBy(result => result.Value.Id);
 
         // Get the total results count for the paginated response
         var totalResults = await orderedQueryable.CountAsync();
 
         // Apply offset pagination and execute the query
         var results = await orderedQueryable
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(tuple =>
+            .Paginate(page, pageSize)
+            .Select(result =>
                 new PublicationSearchResultViewModel
                 {
-                    Id = tuple.Publication.Id,
-                    Slug = tuple.Publication.Slug,
-                    Summary = tuple.Publication.Summary,
-                    Title = tuple.Publication.Title,
-                    Theme = tuple.Publication.Topic.Theme.Title,
-                    Published = tuple.Publication.LatestPublishedRelease!.Published!.Value,
-                    Type = tuple.Publication.LatestPublishedRelease!.Type,
-                    Rank = tuple.Rank
+                    Id = result.Value.Id,
+                    Slug = result.Value.Slug,
+                    Summary = result.Value.Summary,
+                    Title = result.Value.Title,
+                    Theme = result.Value.Topic.Theme.Title,
+                    Published = result.Value.LatestPublishedRelease!.Published!.Value,
+                    Type = result.Value.LatestPublishedRelease!.Type,
+                    Rank = result.Rank
                 }).ToListAsync();
 
         return new PaginatedListViewModel<PublicationSearchResultViewModel>(results, totalResults, page, pageSize);
@@ -168,6 +186,7 @@ public class PublicationService : IPublicationService
 
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
+        List<Release> releases,
         bool isSuperseded)
     {
         var topic = new TopicViewModel(new ThemeViewModel(
@@ -201,22 +220,15 @@ public class PublicationService : IPublicationService
                     Title = publication.SupersededBy.Title
                 }
                 : null,
-            Releases = ListPublishedReleases(publication)
+            Releases = releases
+                .Select(release => new ReleaseTitleViewModel
+                {
+                    Id = release.Id,
+                    Slug = release.Slug,
+                    Title = release.Title
+                })
+                .ToList()
         };
-    }
-
-    private static List<ReleaseTitleViewModel> ListPublishedReleases(Publication publication)
-    {
-        return publication.GetPublishedReleases()
-            .OrderByDescending(release => release.Year)
-            .ThenByDescending(release => release.TimePeriodCoverage)
-            .Select(release => new ReleaseTitleViewModel
-            {
-                Id = release.Id,
-                Slug = release.Slug,
-                Title = release.Title
-            })
-            .ToList();
     }
 
     private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
@@ -257,9 +269,17 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
-        var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
         var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-        
+
+        var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
+        var latestReleaseHasData =
+            latestPublishedReleaseId.HasValue && await HasAnyDataFiles(latestPublishedReleaseId.Value);
+
+        var publishedReleaseIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
+        var anyLiveReleaseHasData = await publishedReleaseIds
+            .ToAsyncEnumerable()
+            .AnyAwaitAsync(async id => await HasAnyDataFiles(id));
+
         return new PublicationTreePublicationViewModel
         {
             Id = publication.Id,
@@ -274,12 +294,8 @@ public class PublicationService : IPublicationService
                     Title = publication.SupersededBy.Title
                 }
                 : null,
-            LatestReleaseHasData = latestPublishedReleaseId != null &&
-                                   await HasAnyDataFiles(latestPublishedReleaseId.Value),
-            AnyLiveReleaseHasData = await publication.Releases
-                .ToAsyncEnumerable()
-                .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
-                                          && await HasAnyDataFiles(r.Id))
+            LatestReleaseHasData = latestReleaseHasData,
+            AnyLiveReleaseHasData = anyLiveReleaseHasData
         };
     }
 

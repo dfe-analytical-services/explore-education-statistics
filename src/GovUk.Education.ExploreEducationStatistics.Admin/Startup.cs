@@ -58,6 +58,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -169,6 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
                     options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
@@ -276,13 +278,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
 
                             spaClient.RefreshTokenUsage = tokenUsage != null
-                                ? EnumUtil.GetFromString<TokenUsage>(tokenUsage)
+                                ? EnumUtil.GetFromEnumValue<TokenUsage>(tokenUsage)
                                 : TokenUsage.OneTimeOnly;
 
                             var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
 
                             spaClient.RefreshTokenExpiration = tokenExpiration != null
-                                ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
+                                ? EnumUtil.GetFromEnumValue<TokenExpiration>(tokenExpiration)
                                 : TokenExpiration.Absolute;
                         }
                     })

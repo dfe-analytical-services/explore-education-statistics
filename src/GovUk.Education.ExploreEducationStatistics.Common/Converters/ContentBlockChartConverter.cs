@@ -1,6 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
         {
             var jsonObject = JObject.Load(reader);
             var type = jsonObject["Type"] ?? jsonObject["type"];
-            var chartType = EnumUtil.GetFromString<ChartType>(type.Value<string>());
+            var chartType = EnumUtil.GetFromEnumValue<ChartType>(type.Value<string>());
 
             IChart contentBlock = chartType switch
             {

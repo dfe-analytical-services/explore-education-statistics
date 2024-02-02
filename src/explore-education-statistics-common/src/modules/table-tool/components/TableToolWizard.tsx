@@ -38,6 +38,7 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
+import WarningMessage from '@common/components/WarningMessage';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -158,9 +159,7 @@ export default function TableToolWizard({
       draft.query.releaseId = undefined;
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
-        id: publication.id,
-        slug: publication.slug,
-        title: publication.title,
+        ...publication,
         selectedRelease: {
           id: latestRelease.id,
           latestData: latestRelease.latestRelease,
@@ -434,6 +433,20 @@ export default function TableToolWizard({
                       themeId: '',
                     }}
                     themes={themeMeta}
+                    renderSummaryAfter={
+                      state.selectedPublication?.isSuperseded &&
+                      state.selectedPublication.supersededBy ? (
+                        <WarningMessage testId="superseded-warning">
+                          This publication has been superseded by{' '}
+                          <a
+                            data-testid="superseded-by-link"
+                            href={`/find-statistics/${state.selectedPublication.supersededBy.slug}`}
+                          >
+                            {state.selectedPublication.supersededBy.title}
+                          </a>
+                        </WarningMessage>
+                      ) : null
+                    }
                     onSubmit={handlePublicationFormSubmit}
                   />
                 )}

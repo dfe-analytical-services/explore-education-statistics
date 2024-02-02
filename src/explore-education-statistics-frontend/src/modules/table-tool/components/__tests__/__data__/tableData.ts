@@ -204,6 +204,7 @@ export const testTableHeaders: TableHeadersConfig = {
 
 export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
   id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+  isSuperseded: false,
   title: 'Test publication',
   slug: 'test-publication',
   selectedRelease: {
@@ -221,6 +222,7 @@ export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
 export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
   {
     id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    isSuperseded: false,
     title: 'Test publication',
     slug: 'test-publication',
     selectedRelease: {

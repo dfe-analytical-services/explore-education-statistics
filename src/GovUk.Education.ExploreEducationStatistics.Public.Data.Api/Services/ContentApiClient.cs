@@ -21,9 +21,9 @@ internal class ContentApiClient : IContentApiClient
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-        int page, 
-        int pageSize, 
-        string? search = null, 
+        int page,
+        int pageSize,
+        string? search = null,
         IEnumerable<Guid>? publicationIds = null)
     {
         var request = new PublicationsListPostRequest(
@@ -36,18 +36,17 @@ internal class ContentApiClient : IContentApiClient
 
         if (!response.IsSuccessStatusCode)
         {
-            var message = await response.Content.ReadAsStringAsync();
-            _logger.LogError(StringExtensions.TrimIndent(
-                $"""
-                 Failed to retrieve publications with status code: {response.StatusCode}. Message:
-                 {message}
-                 """));
-
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemDetails>());
+                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 default:
+                    var message = await response.Content.ReadAsStringAsync();
+                    _logger.LogError(StringExtensions.TrimIndent(
+                        $"""
+                         Failed to retrieve publications with status code: {response.StatusCode}. Message:
+                         {message}
+                         """));
                     response.EnsureSuccessStatusCode();
                     break;
             }
@@ -57,6 +56,36 @@ internal class ContentApiClient : IContentApiClient
             await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
 
         return publications
-            ?? throw new Exception("Could deserialize publications from content API.");
+            ?? throw new Exception("Could not deserialize publications from content API.");
+    }
+
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    {
+        var response = await _httpClient.GetAsync($"api/publications/{publicationId}/summary");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
+                case HttpStatusCode.NotFound:
+                    return new NotFoundResult();
+                default:
+                    var message = await response.Content.ReadAsStringAsync();
+                    _logger.LogError(StringExtensions.TrimIndent(
+                        $"""
+                         Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
+                         {message}
+                         """));
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
+        }
+
+        var publications = await response.Content.ReadFromJsonAsync<PublishedPublicationSummaryViewModel>();
+
+        return publications
+            ?? throw new Exception("Could not deserialize publication from content API.");
     }
 }

@@ -44,8 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId,
             Guid publicationId);
 
-        Task<bool> IsUserPrereleaseViewerOnLatestPreReleaseRelease(Guid userId, Guid publicationId);
-
         Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude);
 
         Task<bool> HasUserReleaseRole(Guid userId,

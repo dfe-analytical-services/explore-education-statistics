@@ -51,4 +51,20 @@ public static class QueryableExtensions
         Expression<Func<T, bool>> predicate,
         CancellationToken cancellationToken = default) where T : class?
         => source.SingleOrDefaultAsync(predicate, cancellationToken).OrNotFound();
+
+    /// <summary>
+    /// Apply offset pagination to a queryable.
+    /// </summary>
+    /// <param name="source">An IQueryable&lt;out T&gt; to return elements from</param>
+    /// <param name="page">The page number which is used to calculate the offset</param>
+    /// <param name="pageSize">The number of elements that should be returned</param>
+    /// <typeparam name="T">The type of the data in the data source.</typeparam>
+    /// <returns>An IQueryable&lt;out T&gt; that contains elements that occur after the specified index in the input sequence.</returns>
+    public static IQueryable<T> Paginate<T>(
+        this IQueryable<T> source,
+        int page,
+        int pageSize)
+    {
+        return source.Skip((page - 1) * pageSize).Take(pageSize);
+    }
 }

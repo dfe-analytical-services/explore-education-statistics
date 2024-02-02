@@ -15,6 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static Moq.MockBehavior;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task CanUpdateReleaseRolesAuthorizationHandler_Contributor_SucceedsWithPublicationOwner()
         {
-            var publication = new Publication {Id = Guid.NewGuid()};
+            var publication = new Publication { Id = Guid.NewGuid() };
             var tuple = TupleOf(publication, ReleaseRole.Contributor);
             await AssertHandlerOnlySucceedsWithPublicationRoles
                 <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
@@ -48,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task CanUpdateReleaseRolesAuthorizationHandler_NotContributor_FailsWithPublicationOwner()
         {
-            var publication = new Publication {Id = Guid.NewGuid()};
+            var publication = new Publication { Id = Guid.NewGuid() };
             var tuple = TupleOf(publication, ReleaseRole.PrereleaseViewer);
             await AssertHandlerOnlySucceedsWithPublicationRoles
                 <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
@@ -62,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new UpdateReleaseRoleAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    contentDbContext,
-                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new ReleaseRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)));
         }

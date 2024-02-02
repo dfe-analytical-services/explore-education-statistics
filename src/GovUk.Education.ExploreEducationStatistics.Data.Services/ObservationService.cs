@@ -125,16 +125,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 var parameters = ListOf(new SqlParameter("subjectId", subjectId));
                 
                 var tableReferences = new List<IAsyncDisposable>();
-                
+
                 if (locationIdsTempTable != null) {
                     tableReferences.Add(locationIdsTempTable);
                 }
-                
+
                 if (!filterItemIdTempTables.IsNullOrEmpty())
                 {
                     tableReferences.AddRange(filterItemIdTempTables);
                 }
-                
+
                 return (sql, parameters, tableReferences);
             }
             
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
                     context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
-                
+
                 return ($"o.LocationId IN (SELECT Id FROM {SanitizeTempTableName(locationsTempTable.Name)})", locationsTempTable);
             }
 

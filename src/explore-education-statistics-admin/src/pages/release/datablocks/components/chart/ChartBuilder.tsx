@@ -45,11 +45,9 @@ import {
   TableDataResult,
 } from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import { ValidationProblemDetails } from '@common/services/types/problemDetails';
 import parseNumber from '@common/utils/number/parseNumber';
-import {
-  isServerValidationError,
-  ServerValidationErrorResponse,
-} from '@common/validation/serverValidations';
+import { isServerValidationError } from '@common/validation/serverValidations';
 import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -134,8 +132,7 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const [submitError, setSubmitError] =
-    useState<ServerValidationErrorResponse>();
+  const [submitError, setSubmitError] = useState<ValidationProblemDetails>();
 
   const dataSetsUnits = useMemo(
     () =>
