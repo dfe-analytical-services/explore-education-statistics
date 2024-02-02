@@ -278,13 +278,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
 
                             spaClient.RefreshTokenUsage = tokenUsage != null
-                                ? EnumUtil.GetFromString<TokenUsage>(tokenUsage)
+                                ? EnumUtil.GetFromEnumValue<TokenUsage>(tokenUsage)
                                 : TokenUsage.OneTimeOnly;
 
                             var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
 
                             spaClient.RefreshTokenExpiration = tokenExpiration != null
-                                ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
+                                ? EnumUtil.GetFromEnumValue<TokenExpiration>(tokenExpiration)
                                 : TokenExpiration.Absolute;
                         }
                     })
