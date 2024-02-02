@@ -287,9 +287,7 @@ export const getServerSideProps: GetServerSideProps<
     props: {
       themeMeta,
       selectedPublication: {
-        id: selectedPublication.id,
-        slug: selectedPublication.slug,
-        title: selectedPublication.title,
+        ...selectedPublication,
         selectedRelease: {
           id: selectedRelease.id,
           latestData: selectedRelease.latestRelease,

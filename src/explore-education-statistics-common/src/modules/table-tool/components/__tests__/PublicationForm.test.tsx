@@ -172,6 +172,38 @@ describe('PublicationForm', () => {
     },
   ];
 
+  const testThemeWithSupercededPublication: Theme = {
+    id: 'theme-5',
+    title: 'Theme 5',
+    summary: '',
+    topics: [
+      {
+        id: 'topic-11',
+        title: 'Topic 11',
+        summary: '',
+        publications: [
+          {
+            id: 'publication-11',
+            title: 'Publication 11',
+            slug: 'publication-slug-11',
+            isSuperseded: true,
+            supersededBy: {
+              id: 'superseding-publication',
+              slug: 'superseding-publication-slug',
+              title: 'Superseding publication',
+            },
+          },
+          {
+            id: 'publication-12',
+            title: 'Publication 12',
+            slug: 'publication-slug-12',
+            isSuperseded: false,
+          },
+        ],
+      },
+    ],
+  };
+
   const wizardProps: InjectedWizardProps = {
     shouldScroll: true,
     stepNumber: 1,
@@ -259,6 +291,32 @@ describe('PublicationForm', () => {
         name: 'Publication 4 find me',
       }),
     );
+  });
+
+  test('does not render superseded publications when using search field', async () => {
+    render(
+      <PublicationForm
+        {...wizardProps}
+        themes={[...testThemes, testThemeWithSupercededPublication]}
+        onSubmit={noop}
+      />,
+    );
+
+    await userEvent.type(
+      screen.getByLabelText('Search publications'),
+      'Publication 11',
+    );
+
+    jest.runOnlyPendingTimers();
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(0);
+
+    expect(screen.queryByLabelText('Publication 11')).not.toBeInTheDocument();
   });
 
   test('renders the theme as a hint on the publication options when using search field', async () => {
@@ -406,6 +464,42 @@ describe('PublicationForm', () => {
         name: 'Publication 10',
       }),
     );
+  });
+
+  test('does not render superseded publications when a theme is selected', async () => {
+    render(
+      <PublicationForm
+        {...wizardProps}
+        themes={[...testThemes, testThemeWithSupercededPublication]}
+        onSubmit={noop}
+      />,
+    );
+
+    userEvent.click(
+      screen.getByRole('radio', {
+        name: 'Theme 5',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument();
+    });
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(1);
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 12',
+      }),
+    );
+
+    expect(screen.queryByLabelText('Publication 11')).not.toBeInTheDocument();
   });
 
   test('renders read-only view with initial `publicationId` when step is not active', () => {

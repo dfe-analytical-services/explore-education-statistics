@@ -128,8 +128,7 @@ public class PublicationCacheService : IPublicationCacheService
         switch (filter)
         {
             case PublicationTreeFilter.DataTables:
-                return publication.LatestReleaseHasData
-                       && !publication.IsSuperseded;
+                return publication.LatestReleaseHasData;
             case PublicationTreeFilter.DataCatalogue:
             case PublicationTreeFilter.FastTrack:
                 return publication.AnyLiveReleaseHasData;

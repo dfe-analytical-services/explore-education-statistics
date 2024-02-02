@@ -236,7 +236,7 @@ Check public data tables page contains superseding-publication's subject
 
     user clicks radio    %{TEST_THEME_NAME}
 
-    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page does not contain element    label:${PUBLICATION_NAME_ARCHIVE}
 
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks element    id:publicationForm-submit

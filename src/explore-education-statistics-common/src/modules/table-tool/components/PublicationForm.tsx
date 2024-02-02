@@ -36,6 +36,7 @@ const formId = 'publicationForm';
 
 interface Props extends InjectedWizardProps {
   initialValues?: FormValues;
+  showSupersededPublications?: boolean;
   themes: Theme[];
   onSubmit: PublicationFormSubmitHandler;
   renderSummaryAfter?: ReactNode;
@@ -46,6 +47,7 @@ const PublicationForm = ({
     publicationId: '',
     themeId: '',
   },
+  showSupersededPublications = false,
   themes,
   onSubmit,
   renderSummaryAfter,
@@ -61,19 +63,29 @@ const PublicationForm = ({
       return (
         themes
           .find(theme => theme.id === selectedThemeId)
-          ?.topics.flatMap(topic => topic.publications) ?? []
+          ?.topics.flatMap(topic => topic.publications)
+          .filter(publication =>
+            showSupersededPublications
+              ? publication
+              : !publication.isSuperseded,
+          ) ?? []
       );
     }
     if (searchTerm) {
       return themes
         .flatMap(theme => theme.topics.flatMap(topic => topic.publications))
         .filter(publication =>
-          publication.title.toLowerCase().includes(searchTerm.toLowerCase()),
+          showSupersededPublications
+            ? publication.title.toLowerCase().includes(searchTerm.toLowerCase())
+            : !publication.isSuperseded &&
+              publication.title
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase()),
         );
     }
 
     return [];
-  }, [themes, searchTerm, selectedThemeId]);
+  }, [themes, searchTerm, selectedThemeId, showSupersededPublications]);
 
   const getThemeForPublication = (publicationId: string) => {
     return themes.find(theme =>

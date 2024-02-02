@@ -1,10 +1,7 @@
+import { PublicationTreeSummary } from '@common/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
 
-// TODO: EES-4312 Cleanup this type - use PublicationTreeSummary
-export interface SelectedPublication {
-  id: string;
-  title: string;
-  slug: string;
+export interface SelectedPublication extends PublicationTreeSummary {
   selectedRelease: SelectedRelease;
   latestRelease: {
     title: string;

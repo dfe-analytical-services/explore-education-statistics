@@ -159,6 +159,7 @@ const DataCataloguePage: NextPage<Props> = ({
               initialValues={{
                 publicationId: state.query.publication?.id ?? '',
               }}
+              showSupersededPublications
               onSubmit={handlePublicationFormSubmit}
               themes={themes}
               renderSummaryAfter={

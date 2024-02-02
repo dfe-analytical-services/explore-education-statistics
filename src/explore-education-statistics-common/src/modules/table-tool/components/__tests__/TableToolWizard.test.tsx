@@ -38,6 +38,38 @@ describe('TableToolWizard', () => {
     },
   ];
 
+  const testThemeWithSupercededPublication: Theme = {
+    id: 'theme-5',
+    title: 'Theme 5',
+    summary: '',
+    topics: [
+      {
+        id: 'topic-11',
+        title: 'Topic 11',
+        summary: '',
+        publications: [
+          {
+            id: 'publication-11',
+            title: 'Publication 11',
+            slug: 'publication-slug-11',
+            isSuperseded: true,
+            supersededBy: {
+              id: 'superseding-publication',
+              slug: 'superseding-publication-slug',
+              title: 'Superseding publication',
+            },
+          },
+          {
+            id: 'publication-12',
+            title: 'Publication 12',
+            slug: 'publication-slug-12',
+            isSuperseded: false,
+          },
+        ],
+      },
+    ],
+  };
+
   const testSubjects: Subject[] = [
     {
       id: 'subject-1',
@@ -214,6 +246,51 @@ describe('TableToolWizard', () => {
       expect(screen.getByLabelText('Subject 1')).toBeInTheDocument();
       expect(screen.getByLabelText('Subject 2')).toBeInTheDocument();
     });
+  });
+
+  test('shows a warning when the selected publication is superseded', async () => {
+    render(
+      <TableToolWizard
+        themeMeta={[...testThemeMeta, testThemeWithSupercededPublication]}
+        initialState={{
+          initialStep: 2,
+          subjects: testSubjects,
+          query: {
+            publicationId: 'publication-11',
+            subjectId: '',
+            locationIds: [],
+            filters: [],
+            indicators: [],
+          },
+          selectedPublication: {
+            ...testThemeWithSupercededPublication.topics[0].publications[0],
+            selectedRelease: {
+              id: 'selected-release',
+              latestData: false,
+              slug: 'selected-release-slug',
+              title: 'Selected release',
+              type: 'AdHocStatistics',
+            },
+            latestRelease: { title: 'Latest release title' },
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText('This publication has been superseded by'),
+    ).toBeInTheDocument();
+
+    const supersededWarningLink = within(
+      screen.getByTestId('superseded-warning'),
+    ).getByRole('link', {
+      name: 'Superseding publication',
+    });
+
+    expect(supersededWarningLink).toHaveAttribute(
+      'href',
+      '/find-statistics/superseding-publication-slug',
+    );
   });
 
   test('does not render publication step if instructed to hide it', async () => {
