@@ -8,14 +8,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class EnumUtil
 {
+    private static class EnumCache<TEnum> where TEnum : Enum
+    {
+        public static readonly Lazy<Dictionary<string, TEnum>> Values = new(() =>
+            GetEnumValues<TEnum>().ToDictionary(e => e.GetEnumValue()));
+
+        public static readonly Lazy<Dictionary<string, TEnum>> Labels = new(() =>
+            GetEnumValues<TEnum>().ToDictionary(e => e.GetEnumLabel()));
+    }
+
     public static TEnum GetFromEnumValue<TEnum>(string value) where TEnum : Enum
     {
-        foreach (var val in Enum.GetValues(typeof(TEnum)).Cast<TEnum>())
+        if (EnumCache<TEnum>.Values.Value.TryGetValue(value, out var enumValue))
         {
-            if (val.GetEnumValue().Equals(value))
-            {
-                return val;
-            }
+            return enumValue;
         }
 
         throw new ArgumentException($"The value '{value}' is not a valid {typeof(TEnum).Name}");
@@ -23,12 +29,9 @@ public static class EnumUtil
 
     public static TEnum GetFromEnumLabel<TEnum>(string label) where TEnum : Enum
     {
-        foreach (var val in Enum.GetValues(typeof(TEnum)).Cast<TEnum>())
+        if (EnumCache<TEnum>.Labels.Value.TryGetValue(label, out var enumValue))
         {
-            if (val.GetEnumLabel().Equals(label))
-            {
-                return val;
-            }
+            return enumValue;
         }
 
         throw new ArgumentException($"The label '{label}' is not a valid {typeof(TEnum).Name}");
