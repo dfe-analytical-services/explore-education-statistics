@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -12,7 +13,7 @@ public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
     {
         if (reader.TokenType == JsonTokenType.Null)
         {
-            return default;
+            return new List<T>();
         }
 
         if (reader.TokenType != JsonTokenType.StartArray)
@@ -24,7 +25,7 @@ public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
         jsonSerializerOptions.Converters.Clear();
         jsonSerializerOptions.Converters.Add(Activator.CreateInstance<TConverter>());
 
-        var _valueType = typeof(T);
+        var valueType = typeof(T);
 
         var list = new List<T>();
 
@@ -35,7 +36,7 @@ public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
                 return list;
             }
 
-            var value = (T)JsonSerializer.Deserialize(ref reader, _valueType, jsonSerializerOptions);
+            var value = (T)JsonSerializer.Deserialize(ref reader, valueType, jsonSerializerOptions)!;
 
             list.Add(value);
         }
@@ -43,7 +44,7 @@ public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
         throw new JsonException();
     }
 
-    public override void Write(Utf8JsonWriter writer, IReadOnlyList<T> value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, IReadOnlyList<T>? value, JsonSerializerOptions options)
     {
         if (value == null)
         {
@@ -57,7 +58,7 @@ public class ListJsonConverter<T, TConverter> : JsonConverter<IReadOnlyList<T>>
 
         writer.WriteStartArray();
 
-        foreach (T item in value)
+        foreach (var item in value)
         {
             JsonSerializer.Serialize(writer, item, jsonSerializerOptions);
         }

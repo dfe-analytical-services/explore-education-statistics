@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Database;
+#nullable enable
 using System.Collections.Generic;
 using System;
 using System.Text.Json;
@@ -7,6 +7,7 @@ using Xunit;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using AngleSharp.Text;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters.SystemJson;
 
@@ -14,53 +15,27 @@ public class ListJsonConverterTests
 {
     private abstract class SampleClass<T>
     {
-        public abstract IReadOnlyList<T> SampleField { get; set; }
-
-        protected bool Equals(SampleClass<T> other)
-        {
-            return Enumerable.SequenceEqual(SampleField, other.SampleField);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SampleClass<T>)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return SampleField.Sum(s => s.GetHashCode() * 17);
-        }
+        public abstract IReadOnlyList<T>? SampleField { get; set; }
     }
 
-    private class SampleObject
+    private record SampleObject(string Name);
+
+    private enum SampleEnum
     {
-        public string Name { get; }
+        SampleValue1,
+        SampleValue2
+    }
 
-        public SampleObject(string name)
-        {
-            Name = name;
-        }
+    private class ClassWithObjectConverter : SampleClass<SampleObject>
+    {
+        [JsonConverter(typeof(ListJsonConverter<SampleObject, SampleObjectJsonConverter>))]
+        public override IReadOnlyList<SampleObject>? SampleField { get; set; }
+    }
 
-        protected bool Equals(SampleObject other)
-        {
-            return Name == other.Name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SampleObject)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
+    private class ClassWithEnumConverter : SampleClass<SampleEnum>
+    {
+        [JsonConverter(typeof(ListJsonConverter<SampleEnum, JsonStringEnumConverter>))]
+        public override IReadOnlyList<SampleEnum>? SampleField { get; set; }
     }
 
     private class SampleObjectJsonConverter : JsonConverter<SampleObject>
@@ -82,7 +57,7 @@ public class ListJsonConverterTests
             }
 
             reader.Read();
-            var name = reader.GetString();
+            var name = reader.GetString()!;
 
             reader.Read();
 
@@ -98,26 +73,8 @@ public class ListJsonConverterTests
         }
     }
 
-    private enum SampleEnum
-    {
-        SampleValue1,
-        SampleValue2
-    }
-
-    private class ClassWithObjectConverter : SampleClass<SampleObject>
-    {
-        [JsonConverter(typeof(ListJsonConverter<SampleObject, SampleObjectJsonConverter>))]
-        public override IReadOnlyList<SampleObject> SampleField { get; set; }
-    }
-
-    private class ClassWithEnumConverter : SampleClass<SampleEnum>
-    {
-        [JsonConverter(typeof(ListJsonConverter<SampleEnum, JsonStringEnumConverter>))]
-        public override IReadOnlyList<SampleEnum> SampleField { get; set; }
-    }
-
     [Fact]
-    public void WithObject_SerializeObject()
+    public void WithObjectConverter_SerializeObject()
     {
         var objectToSerialize = new ClassWithObjectConverter
         {
@@ -142,9 +99,45 @@ public class ListJsonConverterTests
     }
 
     [Fact]
-    public void WithObject_DeserializeObject()
+    public void WithObjectConverter_SerializeObject_ListNull()
     {
-        const string jsonText = 
+        var objectToSerialize = new ClassWithObjectConverter
+        {
+            SampleField = null
+        };
+
+        var expectedJson = new string(
+            @"{
+                ""SampleField"" : null
+            }"
+                .Where(c => !c.IsWhiteSpaceCharacter())
+                .ToArray());
+
+        Assert.Equal(expectedJson, JsonSerializer.Serialize(objectToSerialize));
+    }
+
+    [Fact]
+    public void WithObjectConverter_SerializeObject_ListEmpty()
+    {
+        var objectToSerialize = new ClassWithObjectConverter
+        {
+            SampleField = new List<SampleObject>()
+        };
+
+        var expectedJson = new string(
+            @"{
+                ""SampleField"" : []
+            }"
+                .Where(c => !c.IsWhiteSpaceCharacter())
+                .ToArray());
+
+        Assert.Equal(expectedJson, JsonSerializer.Serialize(objectToSerialize));
+    }
+
+    [Fact]
+    public void WithObjectConverter_DeserializeObject()
+    {
+        const string jsonText =
             @"{
                 ""SampleField"" : [
                     {
@@ -165,11 +158,79 @@ public class ListJsonConverterTests
             }
         };
 
-        Assert.Equal(expected, JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText));
+        JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText).AssertDeepEqualTo(expected);
     }
 
     [Fact]
-    public void WithEnum_SerializeObject()
+    public void WithObjectConverter_DeserializeObject_ListEmpty()
+    {
+        var expected = new ClassWithObjectConverter
+        {
+            SampleField = new List<SampleObject>()
+        };
+
+        const string jsonText =
+            @"{
+                ""SampleField"" : []
+            }";
+
+        JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText).AssertDeepEqualTo(expected);
+    }
+
+    [Fact]
+    public void WithObjectConverter_DeserializeObject_ListNull()
+    {
+        var expected = new ClassWithObjectConverter
+        {
+            SampleField = null
+        };
+
+        const string jsonText =
+            @"{
+                ""SampleField"" : null
+            }";
+
+        JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText).AssertDeepEqualTo(expected);
+    }
+
+    [Fact]
+    public void WithObjectConverter_DeserializeObject_ListMissingStartingBracket_Throws()
+    {
+        const string jsonText =
+            @"{
+                ""SampleField"" : 
+                    {
+                        ""Name"": ""SampleValue1""
+                    },
+                    {
+                        ""Name"": ""SampleValue2""
+                    }
+                ]
+            }";
+
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText));
+    }
+
+    [Fact]
+    public void WithObjectConverter_DeserializeObject_ListMissingClosingBracket_Throws()
+    {
+        const string jsonText =
+            @"{
+                ""SampleField"" : [
+                    {
+                        ""Name"": ""SampleValue1""
+                    },
+                    {
+                        ""Name"": ""SampleValue2""
+                    }
+                
+            }";
+
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ClassWithObjectConverter>(jsonText));
+    }
+
+    [Fact]
+    public void WithEnumConverter_SerializeObject()
     {
         var objectToSerialize = new ClassWithEnumConverter
         {
@@ -194,7 +255,43 @@ public class ListJsonConverterTests
     }
 
     [Fact]
-    public void WithEnum_DeserializeObject()
+    public void WithEnumConverter_SerializeObject_ListNull()
+    {
+        var objectToSerialize = new ClassWithEnumConverter
+        {
+            SampleField = null
+        };
+
+        var expectedJson = new string(
+            @"{
+                ""SampleField"" : null
+            }"
+                .Where(c => !c.IsWhiteSpaceCharacter())
+                .ToArray());
+
+        Assert.Equal(expectedJson, JsonSerializer.Serialize(objectToSerialize));
+    }
+
+    [Fact]
+    public void WithEnumConverter_SerializeObject_ListEmpty()
+    {
+        var objectToSerialize = new ClassWithEnumConverter
+        {
+            SampleField = new List<SampleEnum>()
+        };
+
+        var expectedJson = new string(
+            @"{
+                ""SampleField"" : []
+            }"
+                .Where(c => !c.IsWhiteSpaceCharacter())
+                .ToArray());
+
+        Assert.Equal(expectedJson, JsonSerializer.Serialize(objectToSerialize));
+    }
+
+    [Fact]
+    public void WithEnumConverter_DeserializeObject()
     {
         const string jsonText =
             @"{
@@ -213,6 +310,65 @@ public class ListJsonConverterTests
             }
         };
 
-        Assert.Equal(expected, JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText));
+        JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText).AssertDeepEqualTo(expected);
+    }
+
+    [Fact]
+    public void WithEnumConverter_DeserializeObject_ListEmpty()
+    {
+        var expected = new ClassWithEnumConverter
+        {
+            SampleField = new List<SampleEnum>()
+        };
+
+        const string jsonText =
+            @"{
+                ""SampleField"" : []
+            }";
+
+        JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText).AssertDeepEqualTo(expected);
+    }
+
+    [Fact]
+    public void WithEnumConverter_DeserializeObject_ListNull()
+    {
+        var expected = new ClassWithEnumConverter
+        {
+            SampleField = null
+        };
+
+        const string jsonText =
+            @"{
+                ""SampleField"" : null
+            }";
+
+        JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText).AssertDeepEqualTo(expected);
+    }
+
+    [Fact]
+    public void WithEnumConverter_DeserializeObject_ListMissingStartingBracket_Throws()
+    {
+        const string jsonText =
+            @"{
+                ""SampleField"" : 
+                    ""SampleValue1"",
+                    ""SampleValue2""
+                ]
+            }";
+
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText));
+    }
+
+    [Fact]
+    public void WithEnumConverter_DeserializeObject_ListMissingClosingBracket_Throws()
+    {
+        const string jsonText =
+            @"{
+                ""SampleField"" : [
+                    ""SampleValue1"",
+                    ""SampleValue2""
+            }";
+
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ClassWithEnumConverter>(jsonText));
     }
 }
