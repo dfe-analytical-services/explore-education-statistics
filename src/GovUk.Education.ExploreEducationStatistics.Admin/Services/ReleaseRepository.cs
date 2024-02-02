@@ -84,11 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     PublicationId = release.PublicationId
                 });
             }
-            else
-            {
-                existingStatsRelease.PublicationId = release.PublicationId;
-                _statisticsDbContext.Release.Update(existingStatsRelease);
-            }
 
             var releaseSubject = new ReleaseSubject
             {

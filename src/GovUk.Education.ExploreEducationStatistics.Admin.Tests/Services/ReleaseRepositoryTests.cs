@@ -317,8 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var statsRelease = await statisticsDbContext.Release
-                        .FirstAsync(r => r.Id == release.Id);
+                    var statsRelease = Assert.Single(statisticsDbContext.Release);
 
                     Assert.Equal(release.Id, statsRelease.Id);
                     Assert.Equal(release.PublicationId, statsRelease.PublicationId);
@@ -331,18 +330,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             [Fact]
-            public async Task StatsReleaseExists_UpdatesStatsReleaseAndCreatesReleaseSubject()
+            public async Task StatsReleaseExists_CreatesReleaseSubject()
             {
                 Release release = _fixture
                     .DefaultRelease()
                     .WithPublication(_fixture
                         .DefaultPublication());
 
-                // Create a stats release with a different publication Id to the content release
                 Data.Model.Release existingStatsRelease = _fixture
                     .DefaultStatsRelease()
                     .WithId(release.Id)
-                    .WithPublicationId(Guid.NewGuid());
+                    .WithPublicationId(release.PublicationId);
 
                 ReleaseSubject existingReleaseSubject = _fixture
                     .DefaultReleaseSubject()
@@ -357,7 +355,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await contentDbContext.SaveChangesAsync();
                 }
 
-                Guid? createdSubjectId;
                 var statisticsDbContextId = Guid.NewGuid().ToString();
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
@@ -366,6 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await statisticsDbContext.SaveChangesAsync();
                 }
 
+                Guid? createdSubjectId;
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
@@ -375,8 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var statsRelease = await statisticsDbContext.Release
-                        .FirstAsync(r => r.Id == release.Id);
+                    var statsRelease = Assert.Single(statisticsDbContext.Release);
 
                     Assert.Equal(release.Id, statsRelease.Id);
                     Assert.Equal(release.PublicationId, statsRelease.PublicationId);
