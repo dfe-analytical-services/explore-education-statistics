@@ -1,6 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

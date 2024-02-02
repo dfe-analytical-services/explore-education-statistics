@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils
 {

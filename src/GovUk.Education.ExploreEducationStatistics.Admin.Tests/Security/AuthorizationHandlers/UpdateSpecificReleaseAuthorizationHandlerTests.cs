@@ -16,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static Moq.MockBehavior;
