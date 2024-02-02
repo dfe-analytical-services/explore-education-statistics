@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -8,12 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJso
 
 public class EnumToEnumLabelJsonConverter<TEnum> : JsonConverter<TEnum> where TEnum : Enum
 {
-    public override TEnum? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        return EnumUtil.GetFromEnumLabel<TEnum>(reader.GetString());
+        var label = reader.GetString();
+
+        if (label is null)
+        {
+            throw new NullReferenceException("Enum label cannot be null");
+        }
+
+        return EnumUtil.GetFromEnumLabel<TEnum>(label);
     }
 
-    public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, TEnum? value, JsonSerializerOptions options)
     {
         if (value != null)
         {

@@ -1,3 +1,5 @@
+#nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using System.Text.Json;
@@ -14,28 +16,10 @@ public class EnumToEnumLabelJsonConverterTests
         Sample
     }
 
-    private class SampleClass
+    private record SampleClass
     {
         [JsonConverter(typeof(EnumToEnumLabelJsonConverter<SampleEnum>))]
-        public SampleEnum SampleField { get; set; }
-
-        protected bool Equals(SampleClass other)
-        {
-            return SampleField == other.SampleField;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((SampleClass)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return (int)SampleField;
-        }
+        public SampleEnum SampleField { get; init; }
     }
 
     [Fact]
@@ -60,5 +44,21 @@ public class EnumToEnumLabelJsonConverterTests
         };
 
         Assert.Equal(expected, JsonSerializer.Deserialize<SampleClass>(jsonText));
+    }
+
+    [Fact]
+    public void DeserializeObject_Null_Throws()
+    {
+        const string jsonText = "{\"SampleField\":null}";
+
+        Assert.Throws<NullReferenceException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
+    }
+
+    [Fact]
+    public void DeserializeObject_InvalidLabel_Throws()
+    {
+        const string jsonText = "{\"SampleField\":\"Invalid label\"}";
+
+        Assert.Throws<ArgumentException>(() => JsonSerializer.Deserialize<SampleClass>(jsonText));
     }
 }
