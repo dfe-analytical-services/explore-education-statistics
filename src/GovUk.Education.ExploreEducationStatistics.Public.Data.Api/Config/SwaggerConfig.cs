@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Asp.Versioning.ApiExplorer;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -12,6 +13,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
     public void Configure(SwaggerGenOptions options)
     {
         options.OperationFilter<SwaggerDefaultValues>();
+        options.SchemaFilter<JsonConverterSchemaFilter>();
 
         var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
         var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
