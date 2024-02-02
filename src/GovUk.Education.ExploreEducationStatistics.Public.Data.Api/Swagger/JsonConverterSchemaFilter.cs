@@ -90,6 +90,16 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 .Select(name => new OpenApiString(name.GetEnumLabel()))
                 .ToList<IOpenApiAny>();
         }
+        else if (converterBaseType == typeof(EnumToEnumValueJsonConverter<>))
+        {
+            enumType = property.PropertyType;
+
+            propertySchema.Type = "string";
+            propertySchema.Enum = Enum.GetValues(enumType)
+                .Cast<Enum>()
+                .Select(name => new OpenApiString(name.GetEnumValue()))
+                .ToList<IOpenApiAny>();
+        }
 
         if (enumType is not null && schemaRepository.TryLookupByType(enumType, out var enumSchema))
         {

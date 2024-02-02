@@ -70,6 +70,27 @@ public class JsonConverterSchemaFilterTests
         Assert.Equal(TestEnum.Sample2.GetEnumLabel(), enumString2.Value);
     }
 
+    [Fact]
+    public void EnumToEnumValueConverter()
+    {
+        var schema = GenerateTestEnumConvertersSchema();
+
+        var schemaPropertyName = nameof(TestEnumConverters.EnumToEnumValue).CamelCase();
+        var propertySchema = schema.Properties[schemaPropertyName];
+
+        Assert.Null(propertySchema.Reference);
+        Assert.Empty(propertySchema.AllOf);
+
+        Assert.Equal("string", propertySchema.Type);
+        Assert.Equal(2, propertySchema.Enum.Count);
+
+        var enumString1 = Assert.IsType<OpenApiString>(propertySchema.Enum[0]);
+        Assert.Equal(TestEnum.Sample1.GetEnumValue(), enumString1.Value);
+
+        var enumString2 = Assert.IsType<OpenApiString>(propertySchema.Enum[1]);
+        Assert.Equal(TestEnum.Sample2.GetEnumValue(), enumString2.Value);
+    }
+
     private OpenApiSchema GenerateTestEnumConvertersSchema()
     {
         _schemaRepository.RegisterType(typeof(TestEnum), nameof(TestEnum));
@@ -98,6 +119,9 @@ public class JsonConverterSchemaFilterTests
 
         [JsonConverter(typeof(EnumToEnumLabelJsonConverter<TestEnum>))]
         public TestEnum EnumToEnumLabel { get; init; }
+
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<TestEnum>))]
+        public TestEnum EnumToEnumValue { get; init; }
     }
 
     private enum TestEnum
