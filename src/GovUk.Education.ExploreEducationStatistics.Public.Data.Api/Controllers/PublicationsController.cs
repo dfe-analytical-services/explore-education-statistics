@@ -70,8 +70,9 @@ public class PublicationsController : ControllerBase
     /// </remarks>
     [HttpGet("{publicationId}/data-sets")]
     [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(PaginatedPublicationListViewModel))]
+    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(PaginatedDataSetViewModel))]
     [SwaggerResponse(400)]
+    [SwaggerResponse(404)]
     public async Task<ActionResult<PaginatedDataSetViewModel>> ListDataSets(
         [FromQuery] ListDataSetsRequest request, 
         Guid publicationId)
