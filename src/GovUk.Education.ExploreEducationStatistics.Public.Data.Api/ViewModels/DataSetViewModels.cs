@@ -1,5 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
@@ -44,6 +46,7 @@ public record DataSetLatestVersionViewModel
 
     public required TimePeriodRangeViewModel TimePeriods { get; init; }
 
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     public required IReadOnlyList<string> Filters { get; init; }
