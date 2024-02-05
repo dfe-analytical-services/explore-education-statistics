@@ -32,7 +32,7 @@ public class TimeIdentifierUtilsTests
         [Fact]
         public void DoesNotContainReleaseOnlyCodes()
         {
-            var diff = EnumUtil.GetEnumValues<TimeIdentifier>()
+            var diff = EnumUtil.GetEnumValuesSet<TimeIdentifier>()
                 .Except(TimeIdentifierUtils.DataCodes)
                 .ToHashSet();
 
@@ -45,7 +45,7 @@ public class TimeIdentifierUtilsTests
         [Fact]
         public void DoesNotContainReleaseOnlyLabels()
         {
-            var diff = EnumUtil.GetEnumLabels<TimeIdentifier>()
+            var diff = EnumUtil.GetEnumLabelsSet<TimeIdentifier>()
                 .Except(TimeIdentifierUtils.DataLabels)
                 .ToHashSet();
 

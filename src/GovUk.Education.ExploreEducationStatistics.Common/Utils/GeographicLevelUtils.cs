@@ -8,8 +8,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class GeographicLevelUtils
 {
-    private static readonly Lazy<GeographicLevel[]> LevelsLazy =
-        new(EnumUtil.GetEnumsArray<GeographicLevel>);
+    private static readonly Lazy<IReadOnlyList<GeographicLevel>> LevelsLazy =
+        new(EnumUtil.GetEnums<GeographicLevel>());
+
+    private static readonly Lazy<IReadOnlyList<GeographicLevel>> OrderedLevelsLazy =
+        new(EnumUtil.GetEnums<GeographicLevel>().OrderBy(l => l).ToList);
 
     private static readonly Lazy<IReadOnlyDictionary<GeographicLevel, GeographicCsvColumns>> GeographicLevelCsvColumns =
         new(() => new Dictionary<GeographicLevel, GeographicCsvColumns>
@@ -151,7 +154,9 @@ public static class GeographicLevelUtils
         )
     );
 
-    public static GeographicLevel[] Levels => LevelsLazy.Value;
+    public static IReadOnlyList<GeographicLevel> Levels => LevelsLazy.Value;
+
+    public static IReadOnlyList<GeographicLevel> OrderedLevels => OrderedLevelsLazy.Value;
 
     public static GeographicCsvColumns CsvColumns(this GeographicLevel level) => GeographicLevelCsvColumns.Value[level];
 
