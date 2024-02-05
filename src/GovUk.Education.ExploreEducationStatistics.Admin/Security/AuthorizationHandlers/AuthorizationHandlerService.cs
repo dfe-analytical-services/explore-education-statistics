@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using IReleaseRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -34,18 +36,18 @@ public class AuthorizationHandlerService
             .Append(ReleaseRole.Approver)
             .ToList();
 
-    private readonly ContentDbContext _contentDbContext;
+    private readonly IReleaseRepository _releaseRepository;
     private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
     private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
     private readonly IPreReleaseService _preReleaseService;
 
     public AuthorizationHandlerService(
-        ContentDbContext contentDbContext,
+        IReleaseRepository releaseRepository,
         IUserReleaseRoleRepository userReleaseRoleRepository,
         IUserPublicationRoleRepository userPublicationRoleRepository,
         IPreReleaseService preReleaseService)
     {
-        _contentDbContext = contentDbContext;
+        _releaseRepository = releaseRepository;
         _userReleaseRoleRepository = userReleaseRoleRepository;
         _userPublicationRoleRepository = userPublicationRoleRepository;
         _preReleaseService = preReleaseService;
@@ -176,17 +178,7 @@ public class AuthorizationHandlerService
             }
         }
 
-        await _contentDbContext
-            .Entry(release)
-            .Reference(r => r.Publication)
-            .LoadAsync();
-
-        await _contentDbContext
-            .Entry(release.Publication)
-            .Collection(p => p.Releases)
-            .LoadAsync();
-
         // If the Release is public, anyone can see it.
-        return release.IsLatestPublishedVersionOfRelease();
+        return await _releaseRepository.IsLatestPublishedReleaseVersion(release.Id);
     }
 }

@@ -35,7 +35,21 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithPublication(
         this Generator<Release> generator,
         Publication publication)
-        => generator.ForInstance(release => release.SetPublication(publication));
+        => generator.ForInstance(s => s.SetPublication(publication));
+
+    public static Generator<Release> WithPublications(this Generator<Release> generator,
+        IEnumerable<Publication> publications)
+    {
+        publications.ForEach((publication, index) =>
+            generator.ForIndex(index, release => release.SetPublication(publication)));
+
+        return generator;
+    }
+
+    public static Generator<Release> WithReleaseParent(
+        this Generator<Release> generator,
+        ReleaseParent releaseParent)
+        => generator.ForInstance(s => s.SetReleaseParent(releaseParent));
 
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
@@ -84,6 +98,7 @@ public static class ReleaseGeneratorExtensions
     {
         return generator.ForInstance(r => r.SetCreated(created, createdById));
     }
+
     public static Generator<Release> WithNextReleaseDate(
         this Generator<Release> generator,
         PartialDate nextReleaseDate)
@@ -190,6 +205,17 @@ public static class ReleaseGeneratorExtensions
             release.Publication = publication;
             release.PublicationId = publication.Id;
         });
+
+    public static InstanceSetters<Release> SetReleaseParent(
+        this InstanceSetters<Release> setters,
+        ReleaseParent releaseParent)
+        => setters.Set(r => r.ReleaseParent, releaseParent)
+            .SetReleaseParentId(releaseParent.Id);
+
+    public static InstanceSetters<Release> SetReleaseParentId(
+        this InstanceSetters<Release> setters,
+        Guid releaseParentId)
+        => setters.Set(r => r.ReleaseParentId, releaseParentId);
 
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,

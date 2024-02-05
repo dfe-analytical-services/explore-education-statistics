@@ -151,6 +151,7 @@ const PrototypeTableToolWizard = ({
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
         id: publication.id,
+        isSuperseded: false,
         slug: publication.slug,
         title: publication.title,
         selectedRelease: {

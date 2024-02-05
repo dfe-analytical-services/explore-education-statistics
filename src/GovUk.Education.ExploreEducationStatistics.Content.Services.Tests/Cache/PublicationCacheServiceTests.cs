@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -292,7 +291,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public async Task GetPublicationTree_DataTables_SupersededPublicationWithDataOnLatestRelease_Excluded()
+    public async Task GetPublicationTree_DataTables_SupersededPublicationWithDataOnLatestRelease_Included()
     {
         var publicationTree = new PublicationTreeThemeViewModel
         {
@@ -312,7 +311,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             }
         };
 
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
     }
 
     [Fact]

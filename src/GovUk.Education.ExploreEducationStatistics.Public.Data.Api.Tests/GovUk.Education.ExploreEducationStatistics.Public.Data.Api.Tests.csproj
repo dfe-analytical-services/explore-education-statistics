@@ -31,6 +31,7 @@
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Api\GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
     </ItemGroup>
 
 </Project>

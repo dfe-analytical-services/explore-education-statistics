@@ -13,6 +13,8 @@ import {
 } from 'nookies';
 import { useState } from 'react';
 
+export const userTestingBannerVersion = 1;
+
 interface Cookie {
   name: string;
   duration?: string;
@@ -80,7 +82,7 @@ export function useCookies(initialCookies?: Dictionary<string>) {
   };
 
   return {
-    getCookie(cookieKey: keyof AllowedCookies): string {
+    getCookie(cookieKey: keyof AllowedCookies): string | undefined {
       if (!allowedCookies[cookieKey]) {
         throw new Error(`Invalid cookie key: '${cookieKey}'`);
       }
@@ -96,8 +98,8 @@ export function useCookies(initialCookies?: Dictionary<string>) {
         allowedCookies.bannerSeen.options,
       );
     },
-    setUserTestingBannerSeenCookie(isSeen: boolean) {
-      const value = isSeen ? 'true' : 'false';
+    setUserTestingBannerSeenCookie(version: number) {
+      const value = JSON.stringify({ version });
 
       setCookie(
         allowedCookies.userTestingBannerSeen.name,

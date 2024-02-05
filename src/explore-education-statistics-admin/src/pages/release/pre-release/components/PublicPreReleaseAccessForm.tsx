@@ -12,8 +12,8 @@ import { Formik } from 'formik';
 import React from 'react';
 
 const defaultAccessListText = `
-<p>Beside Department for Education (DfE) professional and production staff the 
-following post holders are given pre-release access up to 24 hours before release.</p>
+<p>Besides Department for Education (DfE) professional and production staff, the 
+following post holders were given pre-release access up to 24 hours before release.</p>
 
 <ul>
     <li>ADD ROLES HERE</li>
@@ -76,6 +76,7 @@ const PublicPreReleaseAccessForm = ({
               name="preReleaseAccessList"
               label="Public access list"
               focusOnInit
+              toolbarConfig={['bulletedList']}
             />
 
             <ButtonGroup>

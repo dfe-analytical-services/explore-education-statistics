@@ -7,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -75,45 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId)
-        {
-            return await UserHasAnyOfRolesOnLatestRelease(
-                userId,
-                publicationId,
-                ListOf(ReleaseRole.Approver));
-        }
-
-        public async Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId)
-        {
-            return await UserHasAnyOfRolesOnLatestRelease(
-                userId,
-                publicationId,
-                ReleaseEditorAndApproverRoles);
-        }
-
-        public async Task<bool> IsUserPrereleaseViewerOnLatestPreReleaseRelease(Guid userId, Guid publicationId)
-        {
-            var publication = await ContentDbContext.Publications
-                .Include(p => p.Releases)
-                .SingleAsync(p => p.Id == publicationId);
-
-            var latestRelease = publication.LatestRelease();
-
-            // Publication may have no releases
-            if (latestRelease == null
-                // Release should be in prerelease
-                || latestRelease.Published != null
-                || latestRelease.ApprovalStatus != ReleaseApprovalStatus.Approved)
-            {
-                return false;
-            }
-
-            return await HasUserReleaseRole(
-                userId,
-                latestRelease.Id,
-                ReleaseRole.PrereleaseViewer);
-        }
-
         public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await GetResourceRole(userId, releaseId, role);
@@ -132,30 +91,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude)
         {
             return ListResourceRoles(releaseId, rolesToInclude);
-        }
-
-        public async Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,
-            Guid publicationId,
-            IEnumerable<ReleaseRole> roles)
-        {
-            var publication = await ContentDbContext.Publications
-                .Include(p => p.Releases)
-                .SingleAsync(p => p.Id == publicationId);
-
-            var latestRelease = publication.LatestRelease();
-
-            // Publication may have no releases
-            if (latestRelease == null)
-            {
-                return false;
-            }
-
-            return await ContentDbContext.UserReleaseRoles
-                .AsQueryable()
-                .AnyAsync(r =>
-                    r.UserId == userId &&
-                    r.ReleaseId == latestRelease.Id &&
-                    roles.Contains(r.Role));
         }
     }
 }

@@ -325,6 +325,7 @@ describe('TableToolPage', () => {
 
   const testSelectedPublicationWithLatestRelease: SelectedPublication = {
     id: testPublicationId,
+    isSuperseded: false,
     title: 'Test Publication',
     slug: 'test-publication',
     selectedRelease: {
@@ -341,6 +342,7 @@ describe('TableToolPage', () => {
 
   const testSelectedPublicationWithNonLatestRelease: SelectedPublication = {
     id: testPublicationId,
+    isSuperseded: false,
     title: 'Test Publication',
     slug: 'test-publication',
     selectedRelease: {

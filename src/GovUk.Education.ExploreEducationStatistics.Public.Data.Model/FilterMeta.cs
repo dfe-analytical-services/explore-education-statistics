@@ -8,5 +8,5 @@ public class FilterMeta
 
     public string Hint { get; set; } = string.Empty;
 
-    public required List<FilterOptionMeta> Options { get; set; }
+    public required List<FilterOptionMeta> Options { get; set; } = [];
 }

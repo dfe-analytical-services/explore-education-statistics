@@ -1,5 +1,4 @@
 #nullable enable
-#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -22,7 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
-            Publication = new Publication()
+            Publication = new Publication(),
+            ReleaseParent = new ReleaseParent()
         };
 
         [Fact]

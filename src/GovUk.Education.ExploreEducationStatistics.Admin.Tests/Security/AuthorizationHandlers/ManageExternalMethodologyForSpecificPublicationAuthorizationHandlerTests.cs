@@ -5,9 +5,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    InMemoryApplicationDbContext(),
+                    new ReleaseRepository(InMemoryApplicationDbContext()),
                      Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));

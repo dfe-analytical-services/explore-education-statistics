@@ -97,25 +97,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return publications;
         }
-
-        public async Task<List<Release>> ListActiveReleases(Guid publicationId)
-        {
-            var publication = await _context.Publications
-                .Include(p => p.Releases)
-                .AsAsyncEnumerable()
-                .SingleAsync(p => p.Id == publicationId);
-
-            return publication.ListActiveReleases();
-        }
-
-        public async Task<Release?> GetLatestReleaseForPublication(Guid publicationId)
-        {
-            var publication = await _context
-                .Publications
-                .Include(p => p.Releases)
-                .SingleAsync(p => p.Id == publicationId);
-
-            return publication.LatestRelease();
-        }
     }
 }

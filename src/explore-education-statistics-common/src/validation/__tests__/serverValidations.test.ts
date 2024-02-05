@@ -9,7 +9,7 @@ import {
 
 describe('serverValidations', () => {
   describe('mapFieldErrors', () => {
-    test('maps non-field error to `target` field based on its message matching one of its `messages`', () => {
+    test('maps non-field error to `target` field based on its code matching one of its `messages`', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         messages: {
@@ -19,7 +19,8 @@ describe('serverValidations', () => {
 
       expect(
         mapper({
-          message: 'TestCode',
+          code: 'TestCode',
+          message: '',
         }),
       ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
@@ -39,7 +40,8 @@ describe('serverValidations', () => {
       expect(
         mapper({
           sourceField: 'test2',
-          message: 'TestCode',
+          code: 'TestCode',
+          message: '',
         }),
       ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
@@ -56,6 +58,7 @@ describe('serverValidations', () => {
       expect(
         mapper({
           sourceField: 'test2',
+          code: '',
           message: 'The original error message',
         }),
       ).toEqual<ReturnType<FieldMessageMapper>>({
@@ -95,20 +98,20 @@ describe('serverValidations', () => {
       expect(
         mapper({
           sourceField: 'test2',
-          message: 'WRONG_CODE',
+          code: 'WRONG_CODE',
+          message: 'Server error',
         }),
       ).toBeUndefined();
 
       expect(
-        mapper({
-          message: 'TestCode',
-        }),
+        mapper({ code: 'TestCode', message: 'Server error' }),
       ).toBeUndefined();
 
       expect(
         mapper({
           sourceField: 'test3',
-          message: 'TestCode',
+          code: 'TestCode',
+          message: 'Another server error',
         }),
       ).toBeUndefined();
     });
@@ -117,11 +120,15 @@ describe('serverValidations', () => {
   describe('mapServerFieldErrors', () => {
     test('returns field errors without mappers', () => {
       const fieldErrors = mapServerFieldErrors({
-        errors: {
-          test: ['Test message'],
-        },
+        errors: [
+          {
+            message: 'Test message',
+            path: 'test',
+          },
+        ],
         status: 400,
         title: 'Something went wrong',
+        type: '',
       });
 
       expect(fieldErrors).toEqual<FieldMessage<unknown>[]>([
@@ -135,11 +142,10 @@ describe('serverValidations', () => {
 
     test('returns nested field error without mappers', () => {
       const fieldErrors = mapServerFieldErrors({
-        errors: {
-          'test.field.here': ['Test message'],
-        },
+        errors: [{ message: 'Test message', path: 'test.field.here' }],
         status: 400,
         title: 'Something went wrong',
+        type: '',
       });
 
       expect(fieldErrors).toEqual<FieldMessage<unknown>[]>([
@@ -153,12 +159,13 @@ describe('serverValidations', () => {
 
     test('returns array field error without mappers', () => {
       const fieldErrors = mapServerFieldErrors({
-        errors: {
-          'test[1]': ['Test message'],
-          'testField.here[1]': ['Test message 2'],
-        },
+        errors: [
+          { path: 'test[1]', message: 'Test message' },
+          { path: 'testField.here[1]', message: 'Test message 2' },
+        ],
         status: 400,
         title: 'Something went wrong',
+        type: '',
       });
 
       expect(fieldErrors).toEqual<FieldMessage<unknown>[]>([
@@ -177,11 +184,10 @@ describe('serverValidations', () => {
 
     test('returns no field errors for empty server source field without mappers', () => {
       const fieldErrors = mapServerFieldErrors({
-        errors: {
-          '': ['Test message'],
-        },
+        errors: [{ message: 'Test message' }],
         status: 400,
         title: 'Something went wrong',
+        type: '',
       });
 
       expect(fieldErrors).toEqual([]);
@@ -190,11 +196,10 @@ describe('serverValidations', () => {
     test('returns field error mapped to multiple mappers', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            test: ['TestCode'],
-          },
+          errors: [{ path: 'test', message: '', code: 'TestCode' }],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -229,12 +234,13 @@ describe('serverValidations', () => {
     test('returns field errors for multiple server source fields', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            test1: ['TestCode'],
-            test2: ['TestCode'],
-          },
+          errors: [
+            { path: 'test1', message: '', code: 'TestCode' },
+            { path: 'test2', message: '', code: 'TestCode' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -266,14 +272,16 @@ describe('serverValidations', () => {
       ]);
     });
 
-    test('returns field errors mapped from empty server source field', () => {
+    test('returns field errors mapped from empty server source fields', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            '': ['TestCode'],
-          },
+          errors: [
+            { message: '', code: 'TestCode' },
+            { message: '', code: 'TestCode2' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -285,7 +293,7 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test2',
             messages: {
-              TestCode: 'Test message 2',
+              TestCode2: 'Test message 2',
             },
           }),
         ],
@@ -308,11 +316,12 @@ describe('serverValidations', () => {
     test('returns nested field error mapped from from nested server source field', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            'test.nestedField.here': ['TestCode'],
-          },
+          errors: [
+            { path: 'test.nestedField.here', message: '', code: 'TestCode' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -336,11 +345,10 @@ describe('serverValidations', () => {
     test('returns nested field error mapped from empty server source field', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            '': ['TestCode'],
-          },
+          errors: [{ message: '', code: 'TestCode' }],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -364,11 +372,10 @@ describe('serverValidations', () => {
     test('returns array field error mapped from array server source field', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            'test[1]': ['TestCode'],
-          },
+          errors: [{ path: 'test[1]', message: '', code: 'TestCode' }],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -392,11 +399,10 @@ describe('serverValidations', () => {
     test('returns array field error mapped from empty server source field', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            '': ['TestCode'],
-          },
+          errors: [{ message: '', code: 'TestCode' }],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -420,12 +426,13 @@ describe('serverValidations', () => {
     test('returns mapped field errors regardless of server source field casing', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            TestField: ['TestCode'],
-            test_field_2: ['TestCode'],
-          },
+          errors: [
+            { path: 'TestField', message: '', code: 'TestCode' },
+            { path: 'test_field_2', message: '', code: 'TestCode' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -460,12 +467,13 @@ describe('serverValidations', () => {
     test('returns mapped nested field errors regardless of server source field casing', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            'Test.Field.Here': ['TestCode'],
-            'test.field_2.here': ['TestCode'],
-          },
+          errors: [
+            { path: 'Test.Field.Here', message: '', code: 'TestCode' },
+            { path: 'test.field_2.here', message: '', code: 'TestCode' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -500,12 +508,13 @@ describe('serverValidations', () => {
     test('returns mapped array field errors regardless of server source field casing', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            'TestField[1]': ['TestCode'],
-            'test.field_2[1]': ['TestCode'],
-          },
+          errors: [
+            { path: 'TestField[1]', message: '', code: 'TestCode' },
+            { path: 'test.field_2[1]', message: '', code: 'TestCode' },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -540,12 +549,17 @@ describe('serverValidations', () => {
     test('returns mixture of mapped and unmapped field errors', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            test1: ['TestCode'],
-            test2: ['Not a test code'],
-          },
+          errors: [
+            { path: 'test1', message: '', code: 'TestCode' },
+            {
+              path: 'test2',
+              message: 'Test unmapped message',
+              code: 'AnotherCode',
+            },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -571,7 +585,7 @@ describe('serverValidations', () => {
         },
         {
           field: 'test2',
-          message: 'Not a test code',
+          message: 'Test unmapped message',
           mapped: false,
         },
       ]);
@@ -580,11 +594,10 @@ describe('serverValidations', () => {
     test('returns fallback message mapped to field if no other mappings match', () => {
       const fieldErrors = mapServerFieldErrors<Dictionary<string>>(
         {
-          errors: {
-            '': ['UnmappedTestCode'],
-          },
+          errors: [{ message: '', code: 'UnmappedTestCode' }],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -618,11 +631,21 @@ describe('serverValidations', () => {
     test('returns unmapped field errors when no mappers match', () => {
       const fieldErrors = mapServerFieldErrors(
         {
-          errors: {
-            test: ['TestCode'],
-          },
+          errors: [
+            {
+              path: 'test',
+              message: 'Test unmapped message',
+              code: 'TestCode',
+            },
+            {
+              path: 'test2',
+              message: 'Test unmapped message 2',
+              code: 'TestCode2',
+            },
+          ],
           status: 400,
           title: 'Something went wrong',
+          type: '',
         },
         [
           mapFieldErrors({
@@ -644,7 +667,12 @@ describe('serverValidations', () => {
       expect(fieldErrors).toEqual<FieldMessage<unknown>[]>([
         {
           field: 'test',
-          message: 'TestCode',
+          message: 'Test unmapped message',
+          mapped: false,
+        },
+        {
+          field: 'test2',
+          message: 'Test unmapped message 2',
           mapped: false,
         },
       ]);

@@ -29,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) :
+            base(options)
         {
             Configure(updateTimestamps);
         }
@@ -53,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Topic> Topics { get; set; }
         public virtual DbSet<Publication> Publications { get; set; }
         public virtual DbSet<Release> Releases { get; set; }
+        public virtual DbSet<ReleaseParent> ReleaseParents { get; set; }
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<LegacyRelease> LegacyReleases { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
@@ -86,13 +88,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
         public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
 
-        public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string search) =>
-            FromExpression(() => PublicationsFreeTextTable(search));
+        [DbFunction]
+        public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string searchTerm) =>
+            FromExpression(() => PublicationsFreeTextTable(searchTerm));
+
+        [DbFunction]
+        public virtual IQueryable<FreeTextRank> ReleaseFilesFreeTextTable(string searchTerm) =>
+            FromExpression(() => ReleaseFilesFreeTextTable(searchTerm));
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.AddFreeTextTableSupport();
-
             ConfigureComment(modelBuilder);
             ConfigureDataImport(modelBuilder);
             ConfigureDataImportError(modelBuilder);
@@ -127,6 +132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureKeyStatisticsText(modelBuilder);
             ConfigureDataBlockParent(modelBuilder);
             ConfigureDataBlockVersion(modelBuilder);
+
+            // Apply model configuration for types which implement IEntityTypeConfiguration
+
+            new FreeTextRank.Config().Configure(modelBuilder.Entity<FreeTextRank>());
         }
 
         private static void ConfigureComment(ModelBuilder modelBuilder)
@@ -370,15 +379,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         private static void ConfigureReleaseFile(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ReleaseFile>()
-                .HasOne(rf => rf.Release)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ReleaseFile>()
-                .HasOne(rf => rf.File)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<ReleaseFile>(entity =>
+            {
+                entity.HasQueryFilter(e => !e.Release.SoftDeleted);
+                entity.HasOne(rf => rf.Release)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(rf => rf.File)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
         }
 
         private static void ConfigureFile(ModelBuilder modelBuilder)
@@ -458,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<Release>()
-                .HasIndex(r => new {r.PreviousVersionId, r.Version});
+                .HasIndex(r => new { r.PreviousVersionId, r.Version });
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.CreatedBy)

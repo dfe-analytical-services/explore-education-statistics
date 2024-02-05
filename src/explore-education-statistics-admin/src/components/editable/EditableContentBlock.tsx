@@ -2,10 +2,9 @@ import EditableBlockLockedMessage from '@admin/components/editable/EditableBlock
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
-import EditableContentForm, {
-  AltTextWarningMessage,
-} from '@admin/components/editable/EditableContentForm';
+import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
+import { AltTextWarningMessage } from '@admin/components/form/FormFieldEditor';
 import glossaryService from '@admin/services/glossaryService';
 import { UserDetails } from '@admin/services/types/user';
 import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';

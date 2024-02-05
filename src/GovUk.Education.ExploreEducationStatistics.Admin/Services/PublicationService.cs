@@ -18,12 +18,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
@@ -49,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
+            IReleaseRepository releaseRepository,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
             IMethodologyCacheService methodologyCacheService,
@@ -59,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
+            _releaseRepository = releaseRepository;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
@@ -394,14 +397,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
-            ListActiveReleasesPaginated(
+            ListLatestReleaseVersionsPaginated(
                 Guid publicationId,
                 int page = 1,
                 int pageSize = 5,
                 bool? live = null,
                 bool includePermissions = false)
         {
-            return await ListActiveReleases(publicationId, live, includePermissions)
+            return await ListLatestReleaseVersions(publicationId, live, includePermissions)
                 .OnSuccess(
                     releases =>
                         // This is not ideal - we should paginate results in the database, however,
@@ -413,24 +416,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query => query
-                    .Include(p => p.Releases)
-                    .ThenInclude(r => r.ReleaseStatuses))
+                .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(async publication =>
+                .OnSuccess(async () =>
                 {
-                    var activeReleases = publication.ListActiveReleases()
+                    // Note the 'live' filter is applied after the latest release versions are retrieved.
+                    // A published release with a current draft version is deliberately not returned when 'live' is true.
+                    var releases = (await _releaseRepository.ListLatestReleaseVersions(publicationId))
                         .Where(release => live == null || release.Live == live)
-                        .OrderByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage);
+                        .ToList();
 
-                    return await activeReleases
+                    return await releases
                         .ToAsyncEnumerable()
                         .SelectAwait(async r => await HydrateReleaseListItemViewModel(r, includePermissions))
                         .ToListAsync();

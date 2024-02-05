@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +14,15 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
+using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -511,7 +515,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             // Assert that a user who has the "Approver" role on the
                             // Publication for the Release can update its status
-                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsApprovedRequirement>(
+                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                                MarkReleaseAsApprovedRequirement>(
                                 context =>
                                 {
                                     context.Add(release);
@@ -648,7 +653,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllClaimsFailWhenReleasePublished<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+                IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>()
@@ -695,7 +701,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublishing<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+                IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>()
@@ -759,7 +766,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static async Task AssertAllRolesFailWhenReleasePublished<TRequirement>(
-            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository, IAuthorizationHandler> authorizationHandler)
+            Func<IReleasePublishingStatusRepository, IUserPublicationRoleRepository, IUserReleaseRoleRepository,
+                IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
             await GetEnumValues<ReleaseApprovalStatus>()
@@ -826,7 +834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    InMemoryApplicationDbContext(),
+                    new ReleaseRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));
@@ -840,7 +848,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    InMemoryApplicationDbContext(),
+                    new ReleaseRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));
@@ -854,7 +862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    InMemoryApplicationDbContext(),
+                    new ReleaseRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));

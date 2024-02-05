@@ -134,6 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
                 Assert.Equal(0, actual.Version);
+                Assert.NotEqual(Guid.Empty, actual.ReleaseParentId);
 
                 Assert.Null(actual.PreviousVersionId);
                 Assert.Null(actual.PublishScheduled);
