@@ -7,7 +7,7 @@ import _preReleaseService, {
   PreReleaseSummary,
 } from '@admin/services/preReleaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import { addHours, subHours } from 'date-fns';
+import { subHours } from 'date-fns';
 import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
@@ -36,102 +36,139 @@ describe('PreReleasePageContainer', () => {
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'After',
       start: new Date('2018-12-12T09:00:00Z'),
-      end: new Date('2018-12-13T00:00:00Z'),
+      scheduledPublishDate: new Date('2018-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
       testPreReleaseSummary,
     );
 
-    renderPage();
+    await renderPageAndAwaitForText('Pre-release access has ended');
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Pre-release access has ended' }),
-      ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Pre-release access has ended' }),
+    ).toBeInTheDocument();
 
-      expect(
-        screen.getByRole('link', { name: 'View this release' }),
-      ).toHaveAttribute(
-        'href',
-        'http://localhost/find-statistics/test-publication/2018',
-      );
-    });
+    expect(
+      screen.getByRole('link', { name: 'View this release' }),
+    ).toHaveAttribute(
+      'href',
+      'http://localhost/find-statistics/test-publication/2018',
+    );
   });
 
   test('renders correctly when pre-release has not started', async () => {
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'Before',
       start: new Date('3000-12-12T09:00:00Z'),
-      end: new Date('3000-12-13T00:00:00Z'),
+      scheduledPublishDate: new Date('3000-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
       testPreReleaseSummary,
     );
 
-    renderPage();
+    await renderPageAndAwaitForText('Pre-release access is not yet available');
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', {
-          name: 'Pre-release access is not yet available',
-        }),
-      ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).toBeInTheDocument();
 
-      expect(
-        screen.getByText(
-          'Pre-release access will be available from 12 December 3000 at 09:00 until 13 December 3000 at 00:00.',
-        ),
-      ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000.',
+      ),
+    ).toBeInTheDocument();
 
-      expect(
-        screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
-      ).not.toBeInTheDocument();
-    });
+    expect(
+      screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly when within pre-release window', async () => {
-    const now = new Date();
+    const now = new Date('2018-12-12T14:32:00Z');
 
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({
       access: 'Within',
       start: subHours(now, 6),
-      end: addHours(now, 18),
+      scheduledPublishDate: new Date('2018-12-13T00:00:00Z'),
     });
 
     preReleaseService.getPreReleaseSummary.mockResolvedValue(
       testPreReleaseSummary,
     );
 
-    renderPage();
+    await renderPageAndAwaitForText(
+      'If you have an enquiry about this release contact:',
+    );
 
-    await waitFor(() => {
-      const banner = within(screen.getByRole('region', { name: 'Contact' }));
-      expect(
-        banner.getByText('If you have an enquiry about this release contact:'),
-      ).toBeInTheDocument();
+    const banner = within(screen.getByRole('region', { name: 'Contact' }));
+    expect(
+      banner.getByText('If you have an enquiry about this release contact:'),
+    ).toBeInTheDocument();
 
-      expect(banner.getByText('Test team:')).toBeInTheDocument();
-      expect(
-        banner.getByRole('link', { name: 'test@test.com' }),
-      ).toBeInTheDocument();
+    expect(banner.getByText('Test team:')).toBeInTheDocument();
+    expect(
+      banner.getByRole('link', { name: 'test@test.com' }),
+    ).toBeInTheDocument();
 
-      expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
 
-      expect(
-        screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('heading', {
-          name: 'Pre-release access is not yet available',
-        }),
-      ).not.toBeInTheDocument();
-    });
+    expect(
+      screen.queryByRole('heading', { name: 'Pre-release access has ended' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).not.toBeInTheDocument();
   });
 
-  const renderPage = () => {
-    return render(
+  test('renders correctly when on release day but release is yet to be published', async () => {
+    const now = new Date(); // 2am on Publish Day
+
+    permissionService.getPreReleaseWindowStatus.mockResolvedValue({
+      access: 'Within',
+      start: subHours(now, 26),
+      scheduledPublishDate: subHours(now, 2),
+    });
+
+    preReleaseService.getPreReleaseSummary.mockResolvedValue(
+      testPreReleaseSummary,
+    );
+
+    await renderPageAndAwaitForText(
+      'If you have an enquiry about this release contact:',
+    );
+
+    const banner = within(screen.getByRole('region', { name: 'Contact' }));
+    expect(
+      banner.getByText('If you have an enquiry about this release contact:'),
+    ).toBeInTheDocument();
+
+    expect(banner.getByText('Test team:')).toBeInTheDocument();
+    expect(
+      banner.getByRole('link', { name: 'test@test.com' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access has ended',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', {
+        name: 'Pre-release access is not yet available',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  const renderPageAndAwaitForText = async (textToWaitFor: string) => {
+    render(
       <TestConfigContextProvider>
         <MemoryRouter
           initialEntries={[
@@ -148,5 +185,9 @@ describe('PreReleasePageContainer', () => {
         </MemoryRouter>
       </TestConfigContextProvider>,
     );
+
+    await waitFor(() => {
+      expect(screen.getByText(textToWaitFor)).toBeInTheDocument();
+    });
   };
 });
