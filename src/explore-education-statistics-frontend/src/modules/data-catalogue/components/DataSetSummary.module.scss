@@ -1,0 +1,11 @@
+.content {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  &.expanded {
+    -webkit-line-clamp: unset;
+  }
+}
