@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Helpers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -71,8 +71,8 @@ internal class DataSetService : IDataSetService
     {
         return new TimePeriodRangeViewModel
         {
-            Start = TimePeriodLabelFormatter.FormatYear(timePeriodRange.Start.Year, timePeriodRange.Start.Code),
-            End = TimePeriodLabelFormatter.FormatYear(timePeriodRange.End.Year, timePeriodRange.End.Code),
+            Start = TimePeriodFormatter.Format(timePeriodRange.Start.Year, timePeriodRange.Start.Code),
+            End = TimePeriodFormatter.Format(timePeriodRange.End.Year, timePeriodRange.End.Code),
         };
     }
 }
