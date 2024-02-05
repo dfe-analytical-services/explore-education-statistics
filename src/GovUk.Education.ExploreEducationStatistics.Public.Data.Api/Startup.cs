@@ -108,6 +108,7 @@ public class Startup
         });
 
         services.AddScoped<IPublicationService, PublicationService>();
+        services.AddScoped<IDataSetService, DataSetService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
