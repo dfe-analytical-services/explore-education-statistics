@@ -51,7 +51,7 @@ const Details = ({
   preventToggle = false,
 }: DetailsProps) => {
   const [id] = useState(propId);
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDetailsElement>(null);
 
   const { onMounted } = useMounted(undefined, jsRequired);
   const [open, toggleOpen] = useToggle(defaultOpen);

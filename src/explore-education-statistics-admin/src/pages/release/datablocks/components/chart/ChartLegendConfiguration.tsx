@@ -268,7 +268,7 @@ const ChartLegendConfiguration = ({
   ]);
 
   const handleChange = useCallback(
-    values => {
+    (values: LegendConfiguration) => {
       if (validationSchema.isValidSync(values)) {
         onChange(values);
       }

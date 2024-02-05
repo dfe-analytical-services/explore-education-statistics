@@ -66,7 +66,7 @@ const MethodologyAccordionSection = ({
   ]);
 
   const updateBlockInAccordionSection = useCallback(
-    async (blockId, bodyContent) => {
+    async (blockId: string, bodyContent: string) => {
       await updateContentSectionBlock({
         methodologyId,
         sectionId,

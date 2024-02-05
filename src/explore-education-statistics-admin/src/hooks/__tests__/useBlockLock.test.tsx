@@ -4,7 +4,7 @@ import { GlobalPermissions } from '@admin/services/permissionService';
 import { UserDetails } from '@admin/services/types/user';
 import MockDate from '@common-test/mockDate';
 import { renderHook } from '@testing-library/react-hooks';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 describe('useBlockLock', () => {
   beforeEach(() => {
@@ -23,7 +23,11 @@ describe('useBlockLock', () => {
     displayName: 'Rob Rowe',
   };
 
-  const wrapper: FC = ({ children }) => (
+  interface Props {
+    children: ReactNode;
+  }
+
+  const wrapper: FC<Props> = ({ children }) => (
     <AuthContextTestProvider
       user={{
         id: 'user-1',

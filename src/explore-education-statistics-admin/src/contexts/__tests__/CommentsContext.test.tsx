@@ -10,11 +10,13 @@ import {
   testCommentUser1,
 } from '@admin/components/comments/__data__/testComments';
 import { Comment } from '@admin/services/types/content';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
 describe('CommentsContext', () => {
-  type Props = OmitStrict<CommentsContextProviderProps, 'children'>;
+  interface Props extends OmitStrict<CommentsContextProviderProps, 'children'> {
+    children?: ReactNode;
+  }
 
   const wrapper: FC<Props> = ({ ...props }) => (
     <CommentsContextProvider {...props}>

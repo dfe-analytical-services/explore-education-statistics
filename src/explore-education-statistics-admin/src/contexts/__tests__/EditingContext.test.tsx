@@ -4,11 +4,13 @@ import {
   useEditingContext,
 } from '@admin/contexts/EditingContext';
 import { OmitStrict } from '@common/types';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
 describe('EditingContext', () => {
-  type Props = OmitStrict<EditingContextProviderProps, 'children'>;
+  interface Props extends OmitStrict<EditingContextProviderProps, 'children'> {
+    children?: ReactNode;
+  }
 
   const wrapper: FC<Props> = ({ ...props }) => (
     <EditingContextProvider {...props}>{props.children}</EditingContextProvider>

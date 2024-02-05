@@ -7,10 +7,13 @@ import {
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { OmitStrict } from '@common/types';
 import { renderHook } from '@testing-library/react-hooks';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 
 describe('useChartBuilderFormsContext', () => {
-  type Props = OmitStrict<ChartBuilderFormContextProviderProps, 'children'>;
+  interface Props
+    extends OmitStrict<ChartBuilderFormContextProviderProps, 'children'> {
+    children?: ReactNode;
+  }
 
   const wrapper: FC<Props> = ({ ...props }) => (
     <ChartBuilderFormsContextProvider {...props}>

@@ -2,7 +2,8 @@ import { OmitStrict } from '@common/types';
 import React, { ComponentType, ReactNode } from 'react';
 import LazyLoad, { LazyLoadProps as BaseLazyLoadProps } from 'react-lazyload';
 
-interface LazyLoadProps<P> extends OmitStrict<BaseLazyLoadProps, 'children'> {
+interface LazyLoadProps<P>
+  extends OmitStrict<BaseLazyLoadProps, 'children' | 'placeholder'> {
   placeholder?: ((props: P) => ReactNode) | ReactNode;
 }
 

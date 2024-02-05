@@ -9,11 +9,14 @@ import Client from '@common/services/api/Client';
 import delay from '@common/utils/delay';
 import { renderHook } from '@testing-library/react-hooks';
 import { AxiosError } from 'axios';
-import React, { FC } from 'react';
+import React, { FC, ReactNode } from 'react';
 import xhrMock from 'xhr-mock';
 
 describe('useNetworkActivityContext', () => {
-  const wrapper: FC = ({ children }) => (
+  interface Props {
+    children: ReactNode;
+  }
+  const wrapper: FC<Props> = ({ children }) => (
     <NetworkActivityContextProvider>{children}</NetworkActivityContextProvider>
   );
 
