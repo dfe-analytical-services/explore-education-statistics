@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class TimeIdentifierUtils
 {
+    // TODO: EES-3959 - Remove when we've decoupled time identifiers from releases
     private static readonly HashSet<TimeIdentifier> ReleaseOnlyEnums = new()
     {
         TimeIdentifier.AcademicYearNationalTutoringProgramme
