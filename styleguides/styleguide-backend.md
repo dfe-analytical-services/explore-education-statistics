@@ -6,7 +6,10 @@
 -   [1 Background](#s1)
 -   [2 C# Language Rules](#s2)
     *   [2.1 Style](#s2.1)
-        +   [2.1.1 Named Parameters](#s2.1.1)
+        +   [2.1.1 File Scoped Namespaces](#s2.1.1)
+        +   [2.1.2 Implicitly Typed Local Variables](#s2.1.2)
+        +   [2.1.3 Named Parameters](#s2.1.3)
+        +   [2.1.4 Nullable Reference Types](#s2.1.4)
     *   [2.2 Structure](#s2.2)
         +   [2.2.1 Entity Framework (EF)](#s2.2.1)
             +   [2.2.1.1 Annotations VS Fluent API](#s2.2.1.1)
@@ -36,12 +39,34 @@ of agreed coding standards to conform to when writing C# code for this repositor
 ### 2.1 Style 
 
 <a id="s2.1.1"></a>
-#### 2.1.1 Named Parameters
+#### 2.1.1 File Scoped Namespaces
+
+- Use file scoped namespace declarations e.g `namespace X.Y.Z;` over standard namespace declarations e.g. `namespace X.Y.Z { ... }` when creating new files.
+- Change existing files to use file scoped namespace declarations only if there are significant line changes or if files are small, to minimise the impact on readability of pull requests.
+
+<a id="s2.1.2"></a>
+#### 2.1.2 Implicitly Typed Local Variables
+
+- Prefer using the `var` keyword to declare local variables without specifying an explicit type.
+
+<a id="s2.1.3"></a>
+#### 2.1.3 Named Parameters
 
 - As a rule, if we hit 3 or more parameters for a method call, consider using named parameters, or break out a class/record to hold the parameters*
 - If we have multiple parameters of the same type, use named parameters to protect against the accidental reordering of parameters*
 
 *This includes constructors
+
+<a id="s2.1.4"></a>
+#### 2.1.4 Nullable Reference Types
+
+- Enable nullable reference types by setting the nullable annotation context and nullable warning context to enable.
+  * Use the `<Nullable>enable</Nullable>` setting in the *.csproj* file when creating new projects.
+  * As we begin enabling nullable reference types in existing projects, add the `#nullable enable` pragma file-by-file when creating new files or touching existing files.
+- Use the `?` suffix to explicitly declare the nullability of reference types.
+- Consider using the `!` (null-forgiving) operator to supress compiler warnings when you know an expression can't be null.
+- Avoid introducing new compiler warnings and address any existing warnings when refactoring code.
+- Generate new database migrations when the nullable state of properties in entity model types change, requiring changes to the database model.
 
 <a id="s2.2"></a>
 ### 2.2 Structure 
