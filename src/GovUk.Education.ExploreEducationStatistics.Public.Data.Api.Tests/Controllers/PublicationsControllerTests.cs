@@ -8,9 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
@@ -65,7 +67,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 .Select(p => p.PublicationId)
                 .ToList();
 
-            var numberOfPublicationsToReturn = Math.Min(pageSize, numberOfPublishedDataSets);
+            var lastPageNumber = (int)Math.Ceiling((decimal)numberOfPublishedDataSets / pageSize);
+
+            var numberOfPublicationsToReturn = page > lastPageNumber 
+                ? 0
+                : page < lastPageNumber 
+                ? pageSize
+                : numberOfPublishedDataSets % pageSize;
 
             var publicationIdsToReturn = publishedDataSetPublicationIds
                 .Take(numberOfPublicationsToReturn)
@@ -351,6 +359,214 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
         {
             var uri = new Uri($"{BaseUrl}/{publicationId}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class ListDataSetsTests : PublicationsControllerTests
+    {
+        public ListDataSetsTests(TestApplicationFactory testApp) : base(testApp)
+        {
+        }
+
+        [Theory]
+        [InlineData(1, 2, 2, 0)]
+        [InlineData(1, 2, 2, 1)]
+        [InlineData(2, 2, 2, 1)]
+        [InlineData(1, 2, 2, 10)]
+        [InlineData(1, 2, 9, 1)]
+        [InlineData(2, 2, 9, 1)]
+        [InlineData(1, 2, 9, 10)]
+        [InlineData(1, 3, 2, 1)]
+        public async Task PublishedDataSetsForRequestedPublication_Returns200(
+             int page,
+             int pageSize,
+             int numberOfPublishedDataSets,
+             int numberOfUnpublishedDataSets)
+        {
+            var publicationId = Guid.NewGuid();
+
+            var publishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publicationId)
+                .GenerateList(numberOfPublishedDataSets);
+
+            var unpublishedDataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusUnpublished()
+                .WithPublicationId(publicationId)
+                .GenerateList(numberOfUnpublishedDataSets);
+
+            var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
+
+            var allDataSetVersions = allDataSets
+                .Select(ds =>
+                    DataFixture
+                    .DefaultDataSetVersion(1, 1, 1, 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(ds.Id)
+                    .Generate())
+                .ToList();
+
+            var dataSetVersionsLookupByDataSetId = allDataSetVersions
+                .ToDictionary(dsv => dsv.DataSetId);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(allDataSetVersions);
+
+                foreach (var dataSet in context.DataSets)
+                {
+                    dataSet.LatestVersionId = dataSetVersionsLookupByDataSetId[dataSet.Id].Id;
+                }
+            });
+
+            var dataSetIdsToReturn = publishedDataSets
+                .Select(p => p.Id)
+                .Order() // The service returns the DataSets ordered by ID
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: publicationId,
+                page: page,
+                pageSize: pageSize);
+
+            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(page, content.Paging.Page);
+            Assert.Equal(pageSize, content.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
+            Assert.Equal(dataSetIdsToReturn.Count, content.Results.Count);
+
+            var unexpectedDataSetIds = allDataSets
+                .Select(ds => ds.Id)
+                .Except(dataSetIdsToReturn);
+
+            foreach (var id in dataSetIdsToReturn)
+            {
+                Assert.Contains(content.Results, r => r.Id == id);
+            }
+
+            foreach (var id in unexpectedDataSetIds)
+            {
+                Assert.DoesNotContain(content.Results, r => r.Id == id);
+            }
+        }
+
+        [Fact]
+        public async Task NoPublishedDataSetsForRequestedPublication_PublishedDataSetsForOtherPublication_Returns200_EmptyList()
+        {
+            var publicationIdWithPublishedDataSets = Guid.NewGuid();
+
+            var publishedDataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Published)
+                .WithPublicationId(publicationIdWithPublishedDataSets)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: Guid.NewGuid(),
+                page: 1,
+                pageSize: 1);
+
+            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(1, content.Paging.Page);
+            Assert.Equal(1, content.Paging.PageSize);
+            Assert.Equal(0, content.Paging.TotalResults);
+            Assert.Empty(content.Results);
+        }
+
+        [Fact]
+        public async Task NoPublishedDataSets_Returns200_EmptyList()
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: Guid.NewGuid(),
+                page: 1,
+                pageSize: 1);
+
+            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(1, content.Paging.Page);
+            Assert.Equal(1, content.Paging.PageSize);
+            Assert.Equal(0, content.Paging.TotalResults);
+            Assert.Empty(content.Results);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task PageTooSmall_Returns400(int page)
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: Guid.NewGuid(),
+                page: page,
+                pageSize: 1);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page");
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(21)]
+        public async Task PageSizeOutOfBounds_Returns400(int pageSize)
+        {
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client, 
+                publicationId: Guid.NewGuid(), 
+                page: 1, 
+                pageSize: pageSize);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+        }
+
+        private static async Task<HttpResponseMessage> ListDataSets(
+            HttpClient client,
+            Guid publicationId,
+            int? page = null,
+            int? pageSize = null)
+        {
+            var query = new Dictionary<string, string?>
+            {
+                { "page", page?.ToString() },
+                { "pageSize", pageSize?.ToString() },
+            };
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{publicationId}/data-sets", query);
 
             return await client.GetAsync(uri);
         }
