@@ -31,6 +31,7 @@ internal class DataSetService : IDataSetService
         var totalResults = await queryable.CountAsync();
 
         var dataSets = (await queryable
+            .OrderBy(ds => ds.Id) // Ordering by Id to provide a stable sort order
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync())
