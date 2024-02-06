@@ -1,6 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Config;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
