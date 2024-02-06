@@ -238,12 +238,13 @@ Validate prerelease window is not yet open for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${day}=    get current datetime    %d    1
-    ${month}=    get current datetime    %m    1
-    ${year}=    get current datetime    %Y    1
-    ${time_start}=    format uk to local datetime    ${year}-${month}-${day}T00:00:00    %-d %B %Y at %H:%M
-    ${time_end}=    format uk to local datetime    ${year}-${month}-${day}T23:59:00    %-d %B %Y at %H:%M
-    user checks page contains    Pre-release access will be available from ${time_start} until ${time_end}.
+    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
+    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+
+    ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
+    ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
+    user checks page contains
+    ...    Pre-release access will be available from ${time_start} until it is published on ${time_end}.
 
 Start prerelease
     user changes to bau1

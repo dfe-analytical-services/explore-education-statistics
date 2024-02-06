@@ -2,7 +2,7 @@ import Button from '@common/components/Button';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import { ThemeSummary } from '@common/services/themeService';
 import ThemesModal from '@frontend/modules/find-statistics/components/ThemesModal';
-import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
+import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/Filters';
 import React from 'react';
 
 interface Props {

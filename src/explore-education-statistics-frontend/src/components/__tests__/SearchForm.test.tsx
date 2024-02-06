@@ -1,4 +1,4 @@
-import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
+import SearchForm from '@frontend/components/SearchForm';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';

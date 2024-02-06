@@ -507,13 +507,6 @@
         "description": "Prerelease start time as number of minutes before a release is scheduled to be published"
       }
     },
-    "preReleaseMinutesBeforeEnd": {
-      "type": "int",
-      "defaultValue": 1,
-      "metadata": {
-        "description": "Prerelease end time as number of minutes before a release is scheduled to be published"
-      }
-    },
     "blobDeleteRetentionEnabled": {
       "defaultValue": true,
       "type": "bool",
@@ -1773,7 +1766,6 @@
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeStart": "[parameters('preReleaseMinutesBeforeStart')]",
-        "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]",
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
