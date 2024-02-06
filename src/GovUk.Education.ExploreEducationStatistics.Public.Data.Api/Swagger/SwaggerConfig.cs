@@ -15,6 +15,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
         var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
         var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
 
+        options.UseAllOfToExtendReferenceSchemas();
         options.IncludeXmlComments(filePath);
         options.CustomOperationIds(apiDesc =>
             {
