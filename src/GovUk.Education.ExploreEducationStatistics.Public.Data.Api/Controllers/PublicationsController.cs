@@ -68,7 +68,7 @@ public class PublicationsController : ControllerBase
     /// <remarks>
     /// Lists summary details of all the data sets related to a publication.
     /// </remarks>
-    [HttpGet("{publicationId}/data-sets")]
+    [HttpGet("{publicationId:guid}/data-sets")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data sets", type: typeof(PaginatedDataSetViewModel))]
     [SwaggerResponse(400)]

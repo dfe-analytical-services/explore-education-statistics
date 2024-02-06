@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
+using System.Drawing.Printing;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -426,8 +427,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             });
 
             var dataSetIdsToReturn = publishedDataSets
-                .Select(p => p.Id)
-                .Order() // The service returns the DataSets ordered by ID
+                .OrderByDescending(ds => ds.LatestVersion!.Published)
+                .ThenBy(ds => ds.Title)
+                .ThenBy(ds => ds.Id) // The service returns the DataSets ordered by Published date (DESC), then by Title, then by ID
+                .Select(ds => ds.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
@@ -552,6 +555,24 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Single(validationProblem.Errors);
 
             validationProblem.AssertHasInclusiveBetweenError("pageSize");
+        }
+
+        [Fact]
+        public async Task InvalidPublicationId_Returns404()
+        {
+            var client = BuildApp().CreateClient();
+
+            var query = new Dictionary<string, string?>
+            {
+                { "page", "1" },
+                { "pageSize", "1" },
+            };
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/not_a_valid_guid/data-sets", query);
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
         }
 
         private static async Task<HttpResponseMessage> ListDataSets(
