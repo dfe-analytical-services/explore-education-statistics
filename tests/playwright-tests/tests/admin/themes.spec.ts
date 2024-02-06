@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
-import environment from '../../utils/env';
-import AzureLoginPage from '../../admin/azpage/AzureLoginPage';
-import AdminPage from '../../admin/pages/AdminPage';
-import ThemesPage from '../../admin/pages/ThemesPage';
-import CreateThemePage from '../../admin/pages/CreateThemePage';
-import uiTestString from '../../utils/uiTestString';
+import environment from '@util/env';
+import AzureLoginPage from '@admin/azpage/AzureLoginPage';
+import AdminPage from '@admin/pages/AdminPage';
+import ThemesPage from '@admin/pages/ThemesPage';
+import CreateThemePage from '@admin/pages/CreateThemePage';
+import uiTestString from '@util/uiTestString';
 
 test.describe('Verify the end to end functionality of themes and topics', () => {
   let adminPage: AdminPage;
