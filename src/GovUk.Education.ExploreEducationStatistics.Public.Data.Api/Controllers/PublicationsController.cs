@@ -55,7 +55,7 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(400)]
     [SwaggerResponse(404)]
     // add other responses
-    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication([SwaggerParameter("The ID of the publication.")] Guid publicationId)
     {
         return await _publicationService
             .GetPublication(publicationId)
@@ -74,8 +74,8 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(400)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<PaginatedDataSetViewModel>> ListDataSets(
-        [FromQuery] ListDataSetsRequest request, 
-        Guid publicationId)
+        [FromQuery] ListDataSetsRequest request,
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId)
     {
         return await _dataSetService
             .ListDataSets(
