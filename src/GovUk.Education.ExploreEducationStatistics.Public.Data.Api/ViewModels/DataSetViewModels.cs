@@ -31,17 +31,9 @@ public record DataSetViewModel
     /// <summary>
     /// The status of the data set. Can be one of the following: 
     /// <br/><br/>
-    /// Staged - the data set is not yet published \
     /// Published - the data set has been published and will receive updates \
     /// Deprecated - the data set is being discontinued and will no receive updates \
     /// Unpublished - the data set has been unpublished and can no longer be used 
-    /// <br/><br/>
-    /// Available options: 
-    /// <br/><br/>
-    /// Staged \
-    /// Published \
-    /// Deprecated \
-    /// Unpublished \
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetStatus Status { get; init; }
