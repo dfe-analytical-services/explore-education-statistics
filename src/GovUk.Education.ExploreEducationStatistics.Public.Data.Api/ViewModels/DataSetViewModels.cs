@@ -5,22 +5,6 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
-public record PaginatedDataSetViewModel : PaginatedListViewModel<DataSetViewModel>
-{
-    public PaginatedDataSetViewModel(
-        List<DataSetViewModel> results,
-        int totalResults,
-        int page,
-        int pageSize)
-        : base(
-            results: results,
-            totalResults: totalResults,
-            page: page,
-            pageSize: pageSize)
-    {
-    }
-}
-
 public record DataSetViewModel
 {
     public required Guid Id { get; init; }
@@ -59,4 +43,26 @@ public record TimePeriodRangeViewModel
     public required string Start { get; set; }
 
     public required string End { get; set; }
+}
+
+public record PaginatedDataSetViewModel : PaginatedListViewModel<DataSetViewModel>
+{
+    public PaginatedDataSetViewModel(
+        List<DataSetViewModel> results,
+        int totalResults,
+        int page,
+        int pageSize)
+        : base(
+            results: results,
+            totalResults: totalResults,
+            page: page,
+            pageSize: pageSize)
+    {
+    }
+
+    [JsonConstructor]
+    public PaginatedDataSetViewModel(List<DataSetViewModel> results, PagingViewModel paging)
+        : base(results, paging)
+    {
+    }
 }

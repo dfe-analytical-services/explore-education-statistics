@@ -24,8 +24,7 @@ public record ListDataSetsRequest
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
             RuleFor(request => request.PageSize)
-                .GreaterThanOrEqualTo(1)
-                .LessThanOrEqualTo(20);
+                .InclusiveBetween(1, 20);
         }
     }
 }
