@@ -230,8 +230,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             const string expectedSql = @"
                   INSERT INTO #MatchedObservation 
                   SELECT o.id FROM Observation o
-                  JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
                   WHERE o.SubjectId = @subjectId
+                  AND (o.LocationId IN (SELECT Id FROM #LocationTempTable)) 
                   ORDER BY o.Id;";
             
             Assert.Equal(FormatSql(expectedSql), FormatSql(sql));
@@ -539,13 +539,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 const string expectedSql = @"
                       INSERT INTO #MatchedObservation 
                       SELECT o.id FROM Observation o
-                      JOIN #LocationTempTable ON #LocationTempTable.Id = o.LocationId 
                       WHERE o.SubjectId = @subjectId 
                       AND (
                         (o.TimeIdentifier = 'AY' AND o.Year = 2015) OR 
                         (o.TimeIdentifier = 'AY' AND o.Year = 2016) OR 
                         (o.TimeIdentifier = 'AY' AND o.Year = 2017)
                       ) 
+                      AND (o.LocationId IN (SELECT Id FROM #LocationTempTable)) 
                       AND (
                           EXISTS (SELECT 1 FROM ObservationFilterItem ofi 
                                   WHERE ofi.ObservationId = o.id 

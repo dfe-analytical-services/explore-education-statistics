@@ -105,9 +105,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
-                var (locationIdsTempTableName, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
-                    ? await GetLocationsTempTable(context, locationIds!, cancellationToken)
-                    : (null, null);
+                var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
+                    ? await GetLocationsClause(context, locationIds!, cancellationToken)
+                    : default;
 
                 var (filterItemIdsClause, filterItemIdTempTables) = !filterItemIds.IsNullOrEmpty()
                     ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
@@ -115,12 +115,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 var sql = @$"
                     INSERT INTO #{nameof(MatchedObservation)} 
-                    SELECT o.id FROM Observation o " +
-                    (locationIdsTempTableName != null
-                        ? $"JOIN {locationIdsTempTableName} ON {locationIdsTempTableName}.Id = o.LocationId "
-                        : "") +
-                    "WHERE o.SubjectId = @subjectId " +
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId " +
                     (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
+                    (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
                     (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
                     "ORDER BY o.Id;";
 
@@ -224,17 +222,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         });
             }
 
-            private async Task<(string?, ITempTableQuery<IdTempTable>?)> GetLocationsTempTable(
+            private async Task<(string, ITempTableQuery<IdTempTable>)> GetLocationsClause(
                 StatisticsDbContext context, 
                 IList<Guid> locationIds,
                 CancellationToken cancellationToken)
             {
-                var locationIdsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
-                    context, locationIds!.Select(id => new IdTempTable(id)), cancellationToken);
+                var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
+                    context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
 
-                var locationTempTableName = SanitizeTempTableName(locationIdsTempTable.Name);
-
-                return (locationTempTableName, locationIdsTempTable);
+                return ($"o.LocationId IN (SELECT Id FROM {SanitizeTempTableName(locationsTempTable.Name)})", locationsTempTable);
             }
 
             private string SanitizeTempTableName(string tempTableName)
