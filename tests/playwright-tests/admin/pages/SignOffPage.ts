@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-export default class SingOffPage {
+export default class SignOffPage {
   readonly page: Page;
   readonly signOffLink: Locator;
   readonly editReleaseStatusButton: Locator;
@@ -53,7 +53,7 @@ export default class SingOffPage {
     await this.updateStatusButton.click();
   }
 
-  async waitUntilReleaseStatusToCommplete() {
+  async waitUntilReleaseStatusIsComplete() {
     const releaseStatus = await this.releaseProcessStatus.innerText();
     await this.page.waitForFunction(async expectedtext => {
       return expectedtext.toLowerCase() === 'complete';

@@ -5,8 +5,8 @@ export default class AdminPage {
   readonly signInButton: Locator;
   readonly manageThemesTopicLink: Locator;
   readonly createNewPublicationButton: Locator;
-  readonly testThemeDropdown: Locator;
-  readonly testTopicDropdown: Locator;
+  readonly themeDropdown: Locator;
+  readonly topicDropdown: Locator;
   readonly publicationLink: (text: string) => Locator;
 
   constructor(page: Page) {
@@ -19,10 +19,10 @@ export default class AdminPage {
     this.createNewPublicationButton = page.locator(
       '//a[contains(text(),"Create new publication")]',
     );
-    this.testThemeDropdown = page.locator(
+    this.themeDropdown = page.locator(
       'select[id="publicationsReleases-themeTopic-themeId"]',
     );
-    this.testTopicDropdown = page.locator(
+    this.topicDropdown = page.locator(
       'select[id="publicationsReleases-themeTopic-topicId"]',
     );
     this.publicationLink = (text: string) =>
@@ -34,7 +34,7 @@ export default class AdminPage {
   }
 
   async selectTestThemeAndTestTopic() {
-    await this.testThemeDropdown.selectOption({ label: 'Test theme' });
+    await this.themeDropdown.selectOption({ label: 'Test theme' });
   }
 
   async clickPublication(publicationName: string) {

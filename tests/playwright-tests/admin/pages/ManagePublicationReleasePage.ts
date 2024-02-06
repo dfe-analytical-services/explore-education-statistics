@@ -12,7 +12,7 @@ export default class ManagePublicationReleasePage {
     );
   }
 
-  async createNewReleaseLink() {
+  async clickCreateNewReleaseLink() {
     await this.createNewRelease.click();
   }
 }

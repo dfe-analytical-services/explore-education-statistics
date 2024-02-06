@@ -22,9 +22,9 @@ export default class CreateNewReleasePage {
     );
   }
 
-  async createNewRelease() {
-    await this.academicType.selectOption('AYQ1');
-    await this.academicYear.fill('2022');
+  async createNewRelease(academicType:string, academicYear: string) {
+    await this.academicType.selectOption(academicType);
+    await this.academicYear.fill(academicYear);
     await this.releaseType.click();
     await this.createNewReleaseButton.click();
   }
