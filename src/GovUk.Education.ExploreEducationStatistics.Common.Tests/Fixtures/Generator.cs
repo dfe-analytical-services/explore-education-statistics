@@ -269,7 +269,7 @@ public class Generator<T> where T : class
             var rangeEnd = rangeOffset + rangeLength;
 
             // Ranges are not inclusive of the end index
-            if (rangeLength > 0 && (index < rangeOffset || index >= rangeEnd))
+            if (rangeEnd == 0 || rangeLength > 0 && (index < rangeOffset || index >= rangeEnd))
             {
                 continue;
             }
