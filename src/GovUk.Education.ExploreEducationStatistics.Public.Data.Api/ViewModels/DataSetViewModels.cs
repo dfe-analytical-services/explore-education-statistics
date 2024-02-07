@@ -32,7 +32,6 @@ public record DataSetViewModel
     /// - `Deprecated` - the data set is being discontinued and will no receive updates
     /// - `Unpublished` - the data set has been unpublished and can no longer be used
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetStatus Status { get; init; }
 
     /// <summary>
