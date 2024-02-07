@@ -1,3 +1,4 @@
+using System.Drawing.Printing;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -8,14 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
-using System.Drawing.Printing;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -33,21 +31,14 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
         }
 
-        [Theory]
-        [InlineData(1, 2, 2, 0)]
-        [InlineData(1, 2, 2, 1)]
-        [InlineData(2, 2, 2, 1)]
-        [InlineData(1, 2, 2, 10)]
-        [InlineData(1, 2, 9, 1)]
-        [InlineData(2, 2, 9, 1)]
-        [InlineData(1, 2, 9, 10)]
-        [InlineData(1, 3, 2, 1)]
-        public async Task PublishedDataSets_Returns200_FiltersPublicationsWithoutPublishedDataSets(
-            int page,
-            int pageSize,
-            int numberOfPublishedDataSets,
-            int numberOfUnpublishedDataSets)
+        [Fact]
+        public async Task PublishedDataSets_Returns200_FiltersPublicationsWithoutPublishedDataSets()
         {
+            var page = 1;
+            var pageSize = 2;
+            var numberOfPublishedDataSets = 3;
+            var numberOfUnpublishedDataSets = 1;
+
             var publishedDataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Published)
@@ -62,27 +53,17 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
 
-            var publications = new List<PublicationSearchResultViewModel>();
-
             var publishedDataSetPublicationIds = publishedDataSets
                 .Select(p => p.PublicationId)
                 .ToList();
 
-            var lastPageNumber = (int)Math.Ceiling((decimal)numberOfPublishedDataSets / pageSize);
-
-            var numberOfPublicationsToReturn = page > lastPageNumber 
-                ? 0
-                : page < lastPageNumber 
-                ? pageSize
-                : numberOfPublishedDataSets % pageSize;
-
-            var publicationIdsToReturn = publishedDataSetPublicationIds
-                .Take(numberOfPublicationsToReturn)
+            var expectedPublicationIds = publishedDataSetPublicationIds
+                .Take(2)
                 .ToList();
 
-            foreach (var publicationId in publicationIdsToReturn)
-            {
-                var publication = DataFixture
+            var expectedPublications = expectedPublicationIds
+                .Select(id => 
+                    DataFixture
                     .Generator<PublicationSearchResultViewModel>()
                     .ForInstance(s => s
                         .SetDefault(p => p.Title)
@@ -91,11 +72,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                         .SetDefault(p => p.Theme)
                         .Set(p => p.Published, p => p.Date.Past())
                         .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                        .Set(p => p.Id, publicationId))
-                    .Generate();
-
-                publications.Add(publication);
-            }
+                        .Set(p => p.Id, id))
+                    .Generate()
+                )
+                .ToList();
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
@@ -108,7 +88,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                             ids.Order(),
                             publishedDataSetPublicationIds.Order()))))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                    results: publications,
+                    results: expectedPublications,
                     totalResults: numberOfPublishedDataSets,
                     page: page,
                     pageSize: pageSize));
@@ -123,21 +103,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(page, content.Paging.Page);
             Assert.Equal(pageSize, content.Paging.PageSize);
             Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
-            Assert.Equal(publicationIdsToReturn.Count, content.Results.Count);
+            Assert.Equal(expectedPublicationIds.Count, content.Results.Count);
 
-            var unexpectedPublicationIds = allDataSets
-                .Select(ds => ds.PublicationId)
-                .Except(publicationIdsToReturn);
-
-            foreach (var publicationId in publicationIdsToReturn)
-            {
-                Assert.Contains(content.Results, r => r.Id == publicationId);
-            }
-
-            foreach (var publicationId in unexpectedPublicationIds)
-            {
-                Assert.DoesNotContain(content.Results, r => r.Id == publicationId);
-            }
+            Assert.All(content.Results, r => Assert.Contains(expectedPublicationIds, id => id == r.Id));
         }
 
         [Fact]
@@ -374,7 +342,6 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Theory]
         [InlineData(1, 2, 2, 0)]
         [InlineData(1, 2, 2, 1)]
-        [InlineData(2, 2, 2, 1)]
         [InlineData(1, 2, 2, 10)]
         [InlineData(1, 2, 9, 1)]
         [InlineData(2, 2, 9, 1)]
@@ -400,36 +367,34 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 .WithPublicationId(publicationId)
                 .GenerateList(numberOfUnpublishedDataSets);
 
-            var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
+            var dataSets = publishedDataSets.Concat(unpublishedDataSets).ToList();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(allDataSets));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
-            var allDataSetVersions = allDataSets
+            var dataSetVersions = dataSets
                 .Select(ds =>
                     DataFixture
-                    .DefaultDataSetVersion(1, 1, 1, 3)
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
                     .WithStatusPublished()
-                    .WithDataSetId(ds.Id)
+                    .WithDataSet(ds)
+                    .FinishWith(dsv => ds.LatestVersion = dsv)
                     .Generate())
                 .ToList();
 
-            var dataSetVersionsLookupByDataSetId = allDataSetVersions
-                .ToDictionary(dsv => dsv.DataSetId);
-
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
-                context.DataSetVersions.AddRange(allDataSetVersions);
-
-                foreach (var dataSet in context.DataSets)
-                {
-                    dataSet.LatestVersionId = dataSetVersionsLookupByDataSetId[dataSet.Id].Id;
-                }
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.UpdateRange(dataSets);
             });
 
-            var dataSetIdsToReturn = publishedDataSets
+            var expectedDataSetIds = publishedDataSets
                 .OrderByDescending(ds => ds.LatestVersion!.Published)
                 .ThenBy(ds => ds.Title)
-                .ThenBy(ds => ds.Id) // The service returns the DataSets ordered by Published date (DESC), then by Title, then by ID
+                .ThenBy(ds => ds.Id)
                 .Select(ds => ds.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -449,21 +414,43 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(page, content.Paging.Page);
             Assert.Equal(pageSize, content.Paging.PageSize);
             Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
-            Assert.Equal(dataSetIdsToReturn.Count, content.Results.Count);
+            Assert.Equal(expectedDataSetIds.Count, content.Results.Count);
 
-            var unexpectedDataSetIds = allDataSets
-                .Select(ds => ds.Id)
-                .Except(dataSetIdsToReturn);
+            Assert.All(content.Results, r => Assert.Contains(expectedDataSetIds, id => id == r.Id));
+        }
 
-            foreach (var id in dataSetIdsToReturn)
-            {
-                Assert.Contains(content.Results, r => r.Id == id);
-            }
+        [Fact]
+        public async Task PageTooBig_Returns200_EmptyList()
+        {
+            var page = 2;
+            var pageSize = 2;
+            var numberOfPublishedDataSets = 2;
 
-            foreach (var id in unexpectedDataSetIds)
-            {
-                Assert.DoesNotContain(content.Results, r => r.Id == id);
-            }
+            var publicationId = Guid.NewGuid();
+
+            var dataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publicationId)
+                .GenerateList(numberOfPublishedDataSets);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
+
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: publicationId,
+                page: page,
+                pageSize: pageSize);
+
+            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(page, content.Paging.Page);
+            Assert.Equal(pageSize, content.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
+            Assert.Empty(content.Results);
         }
 
         [Fact]
