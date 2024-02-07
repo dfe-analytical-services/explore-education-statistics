@@ -52,6 +52,16 @@ public static class PublicationGeneratorExtensions
         Contact contact)
         => generator.ForInstance(p => p.SetContact(contact));
 
+    public static Generator<Publication> WithExternalMethodology(
+        this Generator<Publication> generator,
+        ExternalMethodology externalMethodology)
+        => generator.ForInstance(p => p.SetExternalMethodology(externalMethodology));
+
+    public static Generator<Publication> WithLegacyReleases(
+        this Generator<Publication> generator,
+        IEnumerable<LegacyRelease> legacyReleases)
+        => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
+
     public static Generator<Publication> WithTopicId(
         this Generator<Publication> generator,
         Guid topicId)
@@ -165,6 +175,16 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         Contact contact)
         => setters.Set(p => p.Contact, contact);
+
+    private static InstanceSetters<Publication> SetExternalMethodology(
+        this InstanceSetters<Publication> setters,
+        ExternalMethodology externalMethodology)
+        => setters.Set(p => p.ExternalMethodology, externalMethodology);
+
+    private static InstanceSetters<Publication> SetLegacyReleases(
+        this InstanceSetters<Publication> setters,
+        IEnumerable<LegacyRelease> legacyReleases)
+        => setters.Set(p => p.LegacyReleases, legacyReleases);
 
     private static InstanceSetters<Publication> SetTopicId(
         this InstanceSetters<Publication> setters,
