@@ -10,6 +10,36 @@ public static class ReleaseParentGeneratorExtensions
     public static Generator<ReleaseParent> DefaultReleaseParent(this DataFixture fixture)
         => fixture.Generator<ReleaseParent>().WithDefaults();
 
+    public static Generator<ReleaseParent> DefaultReleaseParent(
+        this DataFixture fixture,
+        int publishedVersions,
+        bool draftVersion = false,
+        int? year = null)
+    {
+        Release? previousVersion = null;
+        return fixture.Generator<ReleaseParent>()
+            .WithDefaults()
+            .WithReleases(releaseParentContext => fixture
+                .DefaultRelease()
+                .ForInstance(s => s
+                    .Set(r => r.ReleaseName,
+                        year != null ? year.ToString() : $"{2000 + releaseParentContext.FixtureTypeIndex}")
+                    .Set(p => p.Slug,
+                        (_, release, _) => NamingUtils.SlugFromTitle(release.YearTitle))
+                    .Set(r => r.Version,
+                        (_, _, context) => context.Index))
+                .ForRange(..publishedVersions, s => s
+                    .SetApprovalStatus(ReleaseApprovalStatus.Approved)
+                    .Set(r => r.Published, (f, rel) =>
+                        rel.Version == 0
+                            ? f.Date.Past()
+                            : f.Date.Between(previousVersion!.Published!.Value, DateTime.UtcNow)))
+                .ForRange(1.., s => s
+                    .SetPreviousVersion(previousVersion))
+                .FinishWith(release => previousVersion = release)
+                .Generate(draftVersion ? publishedVersions + 1 : publishedVersions));
+    }
+
     public static Generator<ReleaseParent> WithDefaults(this Generator<ReleaseParent> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
@@ -18,6 +48,11 @@ public static class ReleaseParentGeneratorExtensions
             .SetDefault(rp => rp.Id)
             .Set(rp => rp.Created, f => f.Date.Past())
             .Set(rp => rp.Updated, (f, rp) => f.Date.Soon(refDate: rp.Created));
+
+    public static Generator<ReleaseParent> WithReleases(
+        this Generator<ReleaseParent> generator,
+        Func<SetterContext, IEnumerable<Release>> releases)
+        => generator.ForInstance(s => s.SetReleases(releases.Invoke));
 
     public static Generator<ReleaseParent> WithReleases(
         this Generator<ReleaseParent> generator,
