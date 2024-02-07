@@ -59,7 +59,7 @@ test('Verify that user is able to create a release via admin', async ({
   );
   await adminPage.clickPublication(publicationName);
   await managePublicationReleasePage.clickCreateNewReleaseLink();
-  await createNewReleasePage.createNewRelease('AYQ1', '2022');
+  await createNewReleasePage.clickCreateNewRelease('AYQ1', '2022');
   await contentPage.fillHeadlineTextContentDetails();
   await signOffPage.publishReleaseImmediately();
   await signOffPage.waitUntilReleaseStatusIsComplete();
