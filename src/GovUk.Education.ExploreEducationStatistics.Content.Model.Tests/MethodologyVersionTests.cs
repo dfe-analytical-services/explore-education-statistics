@@ -1,9 +1,5 @@
-#nullable enable
 using System;
-using System.Collections.Generic;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests

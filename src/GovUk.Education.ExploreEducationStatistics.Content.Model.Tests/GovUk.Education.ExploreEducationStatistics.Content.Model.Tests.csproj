@@ -4,6 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10.0</LangVersion>
         <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Model.Tests</RootNamespace>
     </PropertyGroup>
 
