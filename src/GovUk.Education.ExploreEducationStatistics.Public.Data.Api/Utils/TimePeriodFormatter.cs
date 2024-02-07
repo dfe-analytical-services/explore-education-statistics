@@ -2,19 +2,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using System.Text.RegularExpressions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Helpers;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 
-public static class TimePeriodFormatter
+public static partial class TimePeriodFormatter
 {
-    private static readonly Regex YearRegex = new(@"^[0-9]{4}([0-9]{2})?$");
+    [GeneratedRegex(@"^[0-9]{4}([0-9]{2})?$")]
+    private static partial Regex YearRegex();
 
     public static string Format(int year, TimeIdentifier timeIdentifier)
     {
-        var match = YearRegex.Match(year.ToString());
+        var match = YearRegex().Match(year.ToString());
 
         if (!match.Success)
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException(nameof(year));
         }
 
         if (match.Length == 6)

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -47,7 +48,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var unpublishedDataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Unpublished)
-                .GenerateList(numberOfUnpublishedDataSets); 
+                .GenerateList(numberOfUnpublishedDataSets);
 
             var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
 
@@ -62,7 +63,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 .ToList();
 
             var expectedPublications = expectedPublicationIds
-                .Select(id => 
+                .Select(id =>
                     DataFixture
                     .Generator<PublicationSearchResultViewModel>()
                     .ForInstance(s => s
@@ -83,7 +84,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     page,
                     pageSize,
                     null,
-                    It.Is<IEnumerable<Guid>>(ids => 
+                    It.Is<IEnumerable<Guid>>(ids =>
                         Enumerable.SequenceEqual(
                             ids.Order(),
                             publishedDataSetPublicationIds.Order()))))
@@ -97,7 +98,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, page, pageSize);
 
-            var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
+            var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(page, content.Paging.Page);
@@ -106,6 +107,67 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(expectedPublicationIds.Count, content.Results.Count);
 
             Assert.All(content.Results, r => Assert.Contains(expectedPublicationIds, id => id == r.Id));
+        }
+
+        [Fact]
+        public async Task ReturnsCorrectViewModel()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publicationId)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var publication = DataFixture
+                .Generator<PublicationSearchResultViewModel>()
+                .ForInstance(s => s
+                    .SetDefault(p => p.Title)
+                    .SetDefault(p => p.Slug)
+                    .SetDefault(p => p.Summary)
+                    .SetDefault(p => p.Theme)
+                    .Set(p => p.Published, p => p.Date.Past())
+                    .Set(p => p.Type, ReleaseType.OfficialStatistics)
+                    .Set(p => p.Id, publicationId))
+                .Generate();
+
+            var contentApiClient = new Mock<IContentApiClient>();
+            contentApiClient
+                .Setup(c => c.ListPublications(
+                    1,
+                    1,
+                    null,
+                    It.Is<IEnumerable<Guid>>(ids =>
+                        Enumerable.SequenceEqual(
+                            ids,
+                            new List<Guid>() { publicationId }))))
+                .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
+                    results: new List<PublicationSearchResultViewModel>() { publication },
+                    totalResults: 1,
+                    page: 1,
+                    pageSize: 1));
+
+            var client = BuildApp(contentApiClient.Object).CreateClient();
+
+            var response = await ListPublications(client, 1, 1);
+
+            var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(1, content.Paging.Page);
+            Assert.Equal(1, content.Paging.PageSize);
+            Assert.Equal(1, content.Paging.TotalResults);
+
+            var result = Assert.Single(content.Results);
+
+            Assert.Equal(publication.Id, result.Id);
+            Assert.Equal(publication.Title, result.Title);
+            Assert.Equal(publication.Slug, result.Slug);
+            Assert.Equal(publication.Summary, result.Summary);
+            Assert.Equal(publication.Published, result.LastPublished);
         }
 
         [Fact]
@@ -128,7 +190,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var response = await ListPublications(client, 1, 1);
 
-            var content = response.AssertOk<PaginatedPublicationListViewModel>(useSystemJson: true);
+            var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(1, content.Paging.Page);
@@ -258,7 +320,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             contentApiClient
                 .Setup(c => c.GetPublication(publicationId))
                 .ReturnsAsync(new NotFoundResult());
-            
+
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
             var response = await GetPublication(client, publicationId);
@@ -408,7 +470,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 page: page,
                 pageSize: pageSize);
 
-            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(page, content.Paging.Page);
@@ -417,6 +479,76 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(expectedDataSetIds.Count, content.Results.Count);
 
             Assert.All(content.Results, r => Assert.Contains(expectedDataSetIds, id => id == r.Id));
+        }
+
+        [Fact]
+        public async Task ReturnsCorrectViewModel()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publicationId)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestVersion = dsv)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: publicationId,
+                page: 1,
+                pageSize: 1);
+
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(1, content.Paging.Page);
+            Assert.Equal(1, content.Paging.PageSize);
+            Assert.Equal(1, content.Paging.TotalResults);
+
+            var result = Assert.Single(content.Results);
+
+            Assert.Equal(dataSet.Id, result.Id);
+            Assert.Equal(dataSet.Title, result.Title);
+            Assert.Equal(dataSet.Summary, result.Summary);
+            Assert.Equal(dataSet.Status, result.Status);
+            Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
+            Assert.Equal(dataSetVersion.Version(), result.LatestVersion.Number);
+            Assert.True(Math.Abs(dataSetVersion.Published!.Value.Subtract(result.LatestVersion.Published).TotalMilliseconds) < 1);
+            Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
+            Assert.Equal(
+                TimePeriodFormatter.Format(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
+                result.LatestVersion.TimePeriods.Start);
+            Assert.Equal(
+                TimePeriodFormatter.Format(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
+                result.LatestVersion.TimePeriods.End);
+            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels.Order(), result.LatestVersion.GeographicLevels.Order());
+            Assert.Equal(dataSetVersion.MetaSummary.Filters.Order(), result.LatestVersion.Filters.Order());
+            Assert.Equal(dataSetVersion.MetaSummary.Indicators.Order(), result.LatestVersion.Indicators.Order());
         }
 
         [Fact]
@@ -444,7 +576,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 page: page,
                 pageSize: pageSize);
 
-            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(page, content.Paging.Page);
@@ -474,7 +606,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 page: 1,
                 pageSize: 1);
 
-            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(1, content.Paging.Page);
@@ -494,7 +626,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 page: 1,
                 pageSize: 1);
 
-            var content = response.AssertOk<PaginatedDataSetViewModel>(useSystemJson: true);
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
             Assert.Equal(1, content.Paging.Page);
@@ -532,9 +664,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var client = BuildApp().CreateClient();
 
             var response = await ListDataSets(
-                client: client, 
-                publicationId: Guid.NewGuid(), 
-                page: 1, 
+                client: client,
+                publicationId: Guid.NewGuid(),
+                page: 1,
                 pageSize: pageSize);
 
             var validationProblem = response.AssertValidationProblem();

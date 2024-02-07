@@ -1,5 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Helpers;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -18,7 +18,7 @@ internal class DataSetService : IDataSetService
         _publicDataDbContext = publicDataDbContext;
     }
 
-    public async Task<Either<ActionResult, PaginatedDataSetViewModel>> ListDataSets(
+    public async Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize,
         Guid publicationId)
@@ -40,7 +40,7 @@ internal class DataSetService : IDataSetService
             .Select(MapDataSet)
             .ToList();
 
-        return new PaginatedDataSetViewModel(dataSets, totalResults, page, pageSize);
+        return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -60,13 +60,13 @@ internal class DataSetService : IDataSetService
     {
         return new DataSetLatestVersionViewModel
         {
-            Number = $"{latestVersion.VersionMajor}.{latestVersion.VersionMinor}",
+            Number = latestVersion.Version(),
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary.TimePeriodRange),
             GeographicLevels = latestVersion.MetaSummary.GeographicLevels,
             Filters = latestVersion.MetaSummary.Filters,
-            Indicators = latestVersion.MetaSummary.Filters,
+            Indicators = latestVersion.MetaSummary.Indicators,
         };
     }
 

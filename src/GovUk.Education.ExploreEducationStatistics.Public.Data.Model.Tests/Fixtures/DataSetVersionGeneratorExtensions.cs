@@ -37,11 +37,6 @@ public static class DataSetVersionGeneratorExtensions
         DataSet dataSet)
         => generator.ForInstance(s => s.SetDataSet(dataSet));
 
-    public static Generator<DataSetVersion> WithDataSetId(
-        this Generator<DataSetVersion> generator,
-        Guid dataSetId)
-        => generator.ForInstance(s => s.SetDataSetId(dataSetId));
-
     public static Generator<DataSetVersion> WithCsvFileId(
         this Generator<DataSetVersion> generator,
         Guid csvFileId)
@@ -135,12 +130,6 @@ public static class DataSetVersionGeneratorExtensions
         => instanceSetter
             .Set(dsv => dsv.DataSet, dataSet)
             .Set(dsv => dsv.DataSetId, dataSet.Id);
-
-    public static InstanceSetters<DataSetVersion> SetDataSetId(
-        this InstanceSetters<DataSetVersion> instanceSetter,
-        Guid dataSetId)
-        => instanceSetter
-            .Set(dsv => dsv.DataSetId, dataSetId);
 
     public static InstanceSetters<DataSetVersion> SetCsvFileId(
         this InstanceSetters<DataSetVersion> instanceSetter,

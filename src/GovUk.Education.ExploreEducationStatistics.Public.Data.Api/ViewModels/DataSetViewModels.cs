@@ -1,20 +1,17 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
-using Newtonsoft.Json.Converters;
-using System.Net.NetworkInformation;
-using System.Security.Policy;
 using System.Text.Json.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
+/// <summary>
+/// Describes and provides high-level information about a data set.
+/// </summary>
 public record DataSetViewModel
 {
     /// <summary>
     /// The ID of the data set. 
-    /// <br/><br/>
-    /// thing
     /// </summary>
     public required Guid Id { get; init; }
 
@@ -29,11 +26,11 @@ public record DataSetViewModel
     public required string Summary { get; init; }
 
     /// <summary>
-    /// The status of the data set. Can be one of the following: 
-    /// <br/><br/>
-    /// Published - the data set has been published and will receive updates \
-    /// Deprecated - the data set is being discontinued and will no receive updates \
-    /// Unpublished - the data set has been unpublished and can no longer be used 
+    /// The status of the data set.Can be one of the following:
+    ///
+    /// - `Published` - the data set has been published and will receive updates
+    /// - `Deprecated` - the data set is being discontinued and will no receive updates
+    /// - `Unpublished` - the data set has been unpublished and can no longer be used
     /// </summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetStatus Status { get; init; }
@@ -49,6 +46,9 @@ public record DataSetViewModel
     public Guid? SupersedingDataSetId { get; init; }
 }
 
+/// <summary>
+/// Describes and provides high-level information about the latest version for a given data-set.
+/// </summary>
 public record DataSetLatestVersionViewModel
 {
     /// <summary>
@@ -88,22 +88,12 @@ public record DataSetLatestVersionViewModel
     public required IReadOnlyList<string> Indicators { get; init; }
 }
 
-public record TimePeriodRangeViewModel
+/// <summary>
+/// A paginated list of data-set summaries.
+/// </summary>
+public record DataSetPaginatedListViewModel : PaginatedListViewModel<DataSetViewModel>
 {
-    /// <summary>
-    /// The starting time period in human-readable format.
-    /// </summary>
-    public required string Start { get; set; }
-
-    /// <summary>
-    /// The ending time period in human-readable format.
-    /// </summary>
-    public required string End { get; set; }
-}
-
-public record PaginatedDataSetViewModel : PaginatedListViewModel<DataSetViewModel>
-{
-    public PaginatedDataSetViewModel(
+    public DataSetPaginatedListViewModel(
         List<DataSetViewModel> results,
         int totalResults,
         int page,
@@ -117,7 +107,7 @@ public record PaginatedDataSetViewModel : PaginatedListViewModel<DataSetViewMode
     }
 
     [JsonConstructor]
-    public PaginatedDataSetViewModel(List<DataSetViewModel> results, PagingViewModel paging)
+    public DataSetPaginatedListViewModel(List<DataSetViewModel> results, PagingViewModel paging)
         : base(results, paging)
     {
     }

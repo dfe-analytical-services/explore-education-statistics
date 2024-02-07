@@ -125,25 +125,7 @@ public static class DataSetGeneratorExtensions
     public static InstanceSetters<DataSet> SetLatestVersion(
         this InstanceSetters<DataSet> instanceSetter,
         DataSetVersion? dataSetVersion)
-        => instanceSetter
-            .Set(
-                (_, ds) =>
-                {
-                    if (dataSetVersion is not null)
-                    {
-                        dataSetVersion.DataSet = ds;
-                        dataSetVersion.DataSetId = ds.Id;
-
-                        if (!ds.Versions.Contains(dataSetVersion))
-                        {
-                            ds.Versions.Add(dataSetVersion);
-                        }
-                    }
-
-                    ds.LatestVersion = dataSetVersion;
-                    ds.LatestVersionId = dataSetVersion?.Id;
-                }
-            );
+        => instanceSetter.SetLatestVersion(() => dataSetVersion);
 
     public static InstanceSetters<DataSet> SetLatestVersion(
         this InstanceSetters<DataSet> instanceSetter,
@@ -173,29 +155,7 @@ public static class DataSetGeneratorExtensions
     public static InstanceSetters<DataSet> SetVersions(
         this InstanceSetters<DataSet> instanceSetter,
         IEnumerable<DataSetVersion> dataSetVersions)
-        => instanceSetter
-            .Set(
-                (_, ds) =>
-                {
-                    ds.Versions = dataSetVersions
-                        .Select(
-                            version =>
-                            {
-                                version.DataSet = ds;
-                                version.DataSetId = ds.Id;
-
-                                return version;
-                            }
-                        )
-                        .ToList();
-
-                    ds.LatestVersion = ds.Versions
-                        .Where(version => version.Status == DataSetVersionStatus.Published)
-                        .OrderBy(version => version.VersionMajor)
-                        .ThenBy(version => version.VersionMinor)
-                        .LastOrDefault();
-                }
-            );
+        => instanceSetter.SetVersions(() => dataSetVersions);
 
     public static InstanceSetters<DataSet> SetVersions(
         this InstanceSetters<DataSet> instanceSetter,

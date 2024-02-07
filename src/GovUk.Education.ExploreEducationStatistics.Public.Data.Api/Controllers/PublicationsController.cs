@@ -30,10 +30,10 @@ public class PublicationsController : ControllerBase
     /// </remarks>
     [HttpGet]
     [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PaginatedPublicationListViewModel))]
+    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    public async Task<ActionResult<PaginatedPublicationListViewModel>> ListPublications(
-        [FromQuery] ListPublicationsRequest request)
+    public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
+        [FromQuery] PublicationListRequest request)
     {
         return await _publicationService
             .ListPublications(
@@ -70,11 +70,11 @@ public class PublicationsController : ControllerBase
     /// </remarks>
     [HttpGet("{publicationId:guid}/data-sets")]
     [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(PaginatedDataSetViewModel))]
+    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400)]
     [SwaggerResponse(404)]
-    public async Task<ActionResult<PaginatedDataSetViewModel>> ListDataSets(
-        [FromQuery] ListDataSetsRequest request,
+    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListDataSets(
+        [FromQuery] DataSetListRequest request,
         [SwaggerParameter("The ID of the publication.")] Guid publicationId)
     {
         return await _dataSetService

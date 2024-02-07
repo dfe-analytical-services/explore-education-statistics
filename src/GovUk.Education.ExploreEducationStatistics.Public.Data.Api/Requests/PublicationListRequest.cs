@@ -3,8 +3,13 @@ using System.ComponentModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
-public record ListDataSetsRequest
+public record PublicationListRequest
 {
+    /// <summary>
+    /// A search term to find matching publications.
+    /// </summary>
+    public string? Search { get; init; }
+
     /// <summary>
     /// The page of results to fetch.
     /// </summary>
@@ -14,17 +19,19 @@ public record ListDataSetsRequest
     /// <summary>
     /// The maximum number of results per page.
     /// </summary>
-    [DefaultValue(10)]
-    public int PageSize { get; init; } = 10;
+    [DefaultValue(20)]
+    public int PageSize { get; init; } = 20;
 
-    public class Validator : AbstractValidator<ListDataSetsRequest>
+    public class Validator : AbstractValidator<PublicationListRequest>
     {
         public Validator()
         {
+            RuleFor(request => request.Search)
+                .MinimumLength(3);
             RuleFor(request => request.Page)
                 .GreaterThanOrEqualTo(1);
             RuleFor(request => request.PageSize)
-                .InclusiveBetween(1, 20);
+                .InclusiveBetween(1, 40);
         }
     }
 }
