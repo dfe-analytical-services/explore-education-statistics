@@ -4,9 +4,7 @@
     "paths": {
       "@util/*": ["./utils/*"],
       "@admin/*": ["./admin/*"],
-      "@general-public/*": ["./general-public/*"],
-
-
+      "@general-public/*": ["./general-public/*"]
     }
   },
   "include": ["**/*.ts"],

@@ -22,7 +22,7 @@ export default class CreateNewReleasePage {
     );
   }
 
-  async createNewRelease(academicType:string, academicYear: string) {
+  async createNewRelease(academicType: string, academicYear: string) {
     await this.academicType.selectOption(academicType);
     await this.academicYear.fill(academicYear);
     await this.releaseType.click();
