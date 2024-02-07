@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
@@ -300,13 +301,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new ReleaseService(
                 context ?? Mock.Of<ContentDbContext>(),
+                Mock.Of<StatisticsDbContext>(),
                 AdminMapper(),
                 DefaultPersistenceHelperMock().Object,
                 userService,
                 releaseRepository ?? Mock.Of<IReleaseRepository>(),
                 Mock.Of<IReleaseCacheService>(),
                 Mock.Of<IReleaseFileRepository>(),
-                Mock.Of<ISubjectRepository>(),
                 Mock.Of<IReleaseDataFileService>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IDataImportService>(),
