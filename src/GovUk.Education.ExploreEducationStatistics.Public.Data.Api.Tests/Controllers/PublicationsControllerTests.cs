@@ -1,4 +1,3 @@
-using System.Drawing.Printing;
 using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -85,9 +84,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     pageSize,
                     null,
                     It.Is<IEnumerable<Guid>>(ids =>
-                        Enumerable.SequenceEqual(
-                            ids.Order(),
-                            publishedDataSetPublicationIds.Order()))))
+                        ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order()))))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: expectedPublications,
                     totalResults: numberOfPublishedDataSets,
@@ -145,7 +142,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     null,
                     new List<Guid>() { publicationId }))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
-                    results: new List<PublicationSearchResultViewModel>() { publication },
+                    results: [publication],
                     totalResults: 1,
                     page: 1,
                     pageSize: 1));
@@ -550,7 +547,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSet.Status, result.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
             Assert.Equal(dataSetVersion.Version, result.LatestVersion.Number);
-            Assert.Equal(dataSetVersion.Published!.Value.ToUnixTimeSeconds(), result.LatestVersion.Published.ToUnixTimeSeconds());
+            Assert.Equal(
+                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
+                result.LatestVersion.Published.ToUnixTimeSeconds()
+            );
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.Format(
@@ -585,7 +585,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 .WithPublicationId(publicationId2)
                 .Generate();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(publication1DataSet, publication2DataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSets.AddRange(publication1DataSet, publication2DataSet));
 
             var publication1DataSetVersion = DataFixture
                 .DefaultDataSetVersion(

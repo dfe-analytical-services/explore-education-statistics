@@ -46,7 +46,7 @@ public record DataSetViewModel
 }
 
 /// <summary>
-/// Provides high-level information about the latest version for a given data set.
+/// Provides high-level information about the latest version of a data set.
 /// </summary>
 public record DataSetLatestVersionViewModel
 {
@@ -88,7 +88,7 @@ public record DataSetLatestVersionViewModel
 }
 
 /// <summary>
-/// A paginated list of data-set summaries.
+/// A paginated list of data sets.
 /// </summary>
 public record DataSetPaginatedListViewModel : PaginatedListViewModel<DataSetViewModel>
 {
