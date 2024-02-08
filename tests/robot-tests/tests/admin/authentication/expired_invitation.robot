@@ -35,7 +35,7 @@ Check that the invite does not appear on the Invite Users page
 Login with an expired invite and assert that the user is redirected to the expired invite page
     user opens the browser    %{ADMIN_URL}
     user navigates to admin frontend
-    user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
+    user waits until h1 is visible    Sign in
     user clicks element    id:signin-button
     user logs in via identity provider
     ...    %{EXPIRED_INVITE_USER_EMAIL}
@@ -48,12 +48,4 @@ Check that the user is on the Expired Invite page
 
 Check that the expired invite is now removed
     user navigates to admin frontend
-    user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
-    user clicks element    id:signin-button
-
-    # Currently, users attempting to login with no existing user record or user invite
-    # are simply redirected to the "Sign in" page - the user is not prompted to log into
-    # the Identity Provider again as they have already confirmed their correct login
-    # credentials there and are therefore sent straight back to the service.
-    user waits until page contains title    Sign in
-    user waits until page contains    Use this service to create
+    user waits until h1 is visible    No invitation    %{WAIT_MEDIUM}
