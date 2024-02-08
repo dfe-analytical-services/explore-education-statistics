@@ -1,6 +1,7 @@
 import Link from '@admin/components/Link';
+import { handleLogout } from '@admin/auth/msal';
+import { signInRoute } from '@admin/routes/routes';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
-import loginService from '@admin/services/loginService';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -105,11 +106,7 @@ const PageHeader = ({ wide }: Props) => {
                 className="govuk-header__navigation-list"
                 hidden={isMobileMedia && !menuOpen}
               >
-                {user?.validToken ? (
-                  <LoggedInLinks user={user} />
-                ) : (
-                  <NotLoggedInLinks />
-                )}
+                {user ? <LoggedInLinks user={user} /> : <NotLoggedInLinks />}
               </ul>
             </nav>
           </div>
@@ -142,7 +139,12 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
       </li>
     )}
     <li className="govuk-header__navigation-item">
-      <Link className="govuk-header__link" to={loginService.getSignOutLink()}>
+      {/* TODO EES-4814 - this needs changing to a button or similar */}
+      <Link
+        className="govuk-header__link"
+        to="#"
+        onClick={() => handleLogout()}
+      >
         Sign out
       </Link>
     </li>
@@ -151,7 +153,7 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
 
 const NotLoggedInLinks = () => (
   <li className="govuk-header__navigation-item">
-    <a className="govuk-header__link" href={loginService.getSignInLink()}>
+    <a className="govuk-header__link" href={signInRoute.path}>
       Sign in
     </a>
   </li>

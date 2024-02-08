@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@azure/msal-browser": "^3.7.1",
+    "@azure/msal-react": "^2.0.10",
     "@babel/core": "^7.20.12",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.20.2",
@@ -50,7 +52,6 @@
     "marked": "^5.1.2",
     "mini-css-extract-plugin": "^2.7.5",
     "normalize.css": "^8.0.1",
-    "oidc-client": "^1.10.1",
     "path-browserify": "^1.0.1",
     "postcss": "^8.4.21",
     "postcss-flexbugs-fixes": "^5.0.2",

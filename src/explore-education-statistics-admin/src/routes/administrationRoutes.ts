@@ -10,49 +10,49 @@ import UserInvitePage from '@admin/pages/users/UserInvitePage';
 export const administrationIndexRoute: ProtectedRouteProps = {
   path: '/administration',
   component: BauDashboardPage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
 export const administrationImportsRoute: ProtectedRouteProps = {
   path: '/administration/imports',
   component: BauImportsPage,
-  protectionAction: user => user.permissions.canAccessAllImports,
+  protectionAction: permissions => permissions.canAccessAllImports,
   exact: true,
 };
 
 export const administrationUsersRoute: ProtectedRouteProps = {
   path: '/administration/users',
   component: BauUsersPage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
 export const administrationUserInviteRoute: ProtectedRouteProps = {
   path: '/administration/users/invites/create',
   component: UserInvitePage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
 export const administrationInvitedUsersRoute: ProtectedRouteProps = {
   path: '/administration/users/invites',
   component: InvitedUsersPage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
 export const administrationPreReleaseUsersRoute: ProtectedRouteProps = {
   path: '/administration/users/pre-release',
   component: PreReleaseUsersPage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
   exact: true,
 };
 
 export const administrationUserManageRoute: ProtectedRouteProps = {
   path: '/administration/users/:userId',
   component: ManageUserPage,
-  protectionAction: user => user.permissions.isBauUser,
+  protectionAction: permissions => permissions.isBauUser,
 };
 
 const administrationRoutes = {

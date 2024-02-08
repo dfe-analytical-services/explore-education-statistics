@@ -62,7 +62,7 @@ const ReleaseStatusPage = () => {
     () => permissionService.getReleaseStatusPermissions(releaseId),
   );
 
-  const { PublicAppUrl } = useConfig();
+  const { publicAppUrl } = useConfig();
 
   if (!release) {
     return <LoadingSpinner />;
@@ -97,7 +97,7 @@ const ReleaseStatusPage = () => {
       <p>
         <UrlContainer
           data-testid="public-release-url"
-          url={`${PublicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
+          url={`${publicAppUrl}/find-statistics/${release.publicationSlug}/${release.slug}`}
         />
       </p>
 
