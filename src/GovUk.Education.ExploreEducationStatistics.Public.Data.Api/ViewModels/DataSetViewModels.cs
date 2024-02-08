@@ -26,7 +26,7 @@ public record DataSetViewModel
     public required string Summary { get; init; }
 
     /// <summary>
-    /// The status of the data set.Can be one of the following:
+    /// The status of the data set. Can be one of the following:
     ///
     /// - `Published` - the data set has been published and will receive updates
     /// - `Deprecated` - the data set is being discontinued and will no receive updates
