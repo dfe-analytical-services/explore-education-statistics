@@ -18,9 +18,24 @@ public static partial class TimePeriodFormatter
             throw new ArgumentOutOfRangeException(nameof(year));
         }
 
-        if (match.Length == 6)
+        if (match.Length == 4)
         {
-            year /= 100;
+            return TimePeriodLabelFormatter.Format(year, timeIdentifier);
+        }
+
+        var firstTwoDigitYear = int.Parse(match.Groups[0].Value.Substring(2, 2));
+        var secondTwoDigitYear = int.Parse(match.Groups[1].Value);
+
+        year /= 100;
+
+        if (firstTwoDigitYear == 99 && secondTwoDigitYear == 0)
+        {
+            return TimePeriodLabelFormatter.Format(year, timeIdentifier);
+        }
+
+        if (secondTwoDigitYear != firstTwoDigitYear + 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(year));
         }
 
         return TimePeriodLabelFormatter.Format(year, timeIdentifier);
