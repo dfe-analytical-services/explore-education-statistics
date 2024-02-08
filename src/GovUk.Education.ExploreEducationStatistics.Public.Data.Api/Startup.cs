@@ -74,17 +74,20 @@ public class Startup
 
         // Databases
 
-        var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
-        dataSourceBuilder.MapEnum<GeographicLevel>();
-
-        var dbDataSource = dataSourceBuilder.Build();
-
-        services.AddDbContext<PublicDataDbContext>(options =>
+        if (!_hostEnvironment.IsIntegrationTest())
         {
-            options
-                .UseNpgsql(dbDataSource)
-                .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
-        });
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
+            dataSourceBuilder.MapEnum<GeographicLevel>();
+
+            var dbDataSource = dataSourceBuilder.Build();
+
+            services.AddDbContext<PublicDataDbContext>(options =>
+            {
+                options
+                    .UseNpgsql(dbDataSource)
+                    .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
+            });
+        }
 
         // Caching and compression
 
