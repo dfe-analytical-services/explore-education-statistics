@@ -43,7 +43,7 @@ public class TimePeriodFormatterTests
         [InlineData(199899, "1998/99 Q1")]
         [InlineData(199900, "1999/00 Q1")]
         [InlineData(200001, "2000/01 Q1")]
-        [InlineData(200102, "2000/02 Q1")]
+        [InlineData(200102, "2001/02 Q1")]
         public void SixDigitYear_Success(int year, string expected)
         {
             var formattedTimePeriod = TimePeriodFormatter.Format(year, TimeIdentifier.AcademicYearQ1);
