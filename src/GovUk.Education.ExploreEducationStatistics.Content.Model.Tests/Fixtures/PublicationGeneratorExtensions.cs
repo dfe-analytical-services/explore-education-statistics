@@ -191,7 +191,7 @@ public static class PublicationGeneratorExtensions
         IEnumerable<LegacyRelease> legacyReleases)
         => setters.Set(p => p.LegacyReleases, legacyReleases);
 
-    private static InstanceSetters<Publication> SetSupersededBy(
+    public static InstanceSetters<Publication> SetSupersededBy(
         this InstanceSetters<Publication> setters,
         Publication? supersededBy)
         => setters.Set(p => p.SupersededBy, supersededBy)
