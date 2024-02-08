@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles.RoleNames;
@@ -18,7 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         {
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
-                SecurityClaim(ApplicationAccessGranted));
+                SecurityClaim(ApplicationAccessGranted),
+                ScopeClaim("access-admin-api"));
         }
 
         public static ClaimsPrincipal BauUser()
@@ -26,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             // Give the BAU User the "BAU User" role, plus every Claim from the SecurityClaimTypes enum.
             var claims =
                 ListOf(RoleClaim(RoleNames.BauUser))
-                .Concat(EnumUtil.GetEnumValues<SecurityClaimTypes>().Select(SecurityClaim));
+                .Concat(EnumUtil.GetEnumValues<SecurityClaimTypes>().Select(SecurityClaim))
+                .Append(ScopeClaim("access-admin-api"));
 
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
@@ -41,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 SecurityClaim(ApplicationAccessGranted),
                 SecurityClaim(AnalystPagesAccessGranted),
                 SecurityClaim(PrereleasePagesAccessGranted),
-                SecurityClaim(CanViewPrereleaseContacts));
+                SecurityClaim(CanViewPrereleaseContacts),
+                ScopeClaim("access-admin-api"));
         }
 
         public static ClaimsPrincipal PreReleaseUser()
@@ -50,8 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 Guid.NewGuid(),
                 RoleClaim(PrereleaseUser),
                 SecurityClaim(ApplicationAccessGranted),
-                SecurityClaim(PrereleasePagesAccessGranted));
-
+                SecurityClaim(PrereleasePagesAccessGranted),
+                ScopeClaim("access-admin-api"));
         }
 
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)
@@ -63,13 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         {
             var identity = new ClaimsIdentity(
                 claims: new List<Claim>(),
-                authenticationType: "TestAuthenticationType",
-                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Name
-                "name",
-                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Role
-                "role");
+                authenticationType: JwtBearerDefaults.AuthenticationScheme,
+                nameType: EesClaimTypes.Name,
+                roleType: EesClaimTypes.Role);
 
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
+            identity.AddClaim(new Claim(EesClaimTypes.LocalId, userId.ToString()));
             identity.AddClaims(additionalClaims);
             var user = new ClaimsPrincipal(identity);
             return user;
@@ -94,9 +97,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         /// </summary>
         private static Claim RoleClaim(string roleName)
         {
-            return new Claim(
-                // TODO EES-4814 - find better constant for this replacement for JwtClaimTypes.Role
-                "role", roleName);
+            return new Claim(EesClaimTypes.Role, roleName);
+        }
+
+        /// <summary>
+        /// Create a Claim representing a Global Role (i.e. an AspNetUserRoles assignment).
+        /// </summary>
+        private static Claim ScopeClaim(string scope)
+        {
+            return new Claim(EesClaimTypes.SupportedMsalScope, scope);
         }
     }
 }

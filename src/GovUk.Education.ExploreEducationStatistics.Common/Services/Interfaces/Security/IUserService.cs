@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -11,14 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.
     {
         Guid GetUserId();
 
-        UserProfile GetProfile();
+        UserProfileFromClaims GetProfileFromClaims();
 
         Task<bool> MatchesPolicy(Enum policy);
 
         Task<bool> MatchesPolicy(object resource, Enum policy);
     }
 
-    public record UserProfile(string Email, string FirstName, string LastName);
+    public record UserProfileFromClaims(string Email, string FirstName, string LastName);
 
     public static class UserServiceExtensions
     {

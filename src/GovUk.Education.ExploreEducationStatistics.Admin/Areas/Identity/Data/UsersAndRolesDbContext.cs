@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
-// TODO EES-4814 - move to appropriate folder.
+// TODO EES-4814 - move to appropriate folder after the main 4814 PR has gone in.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
     public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>

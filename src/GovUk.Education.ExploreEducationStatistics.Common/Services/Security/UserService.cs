@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -31,23 +32,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
 
         public Guid GetUserId()
         {
-            return GetUser().GetUserId();
+            var user = GetUser();
+
+            if (user == null)
+            {
+                throw new AuthenticationException("No user was found to get Id from");
+            }
+
+            return user.GetUserId();
         }
 
-        public UserProfile GetProfile()
+        public UserProfileFromClaims GetProfileFromClaims()
         {
             var user = GetUser();
 
-            // TODO EES-4814 - can we just rely on a single set of Claims now?
-            var email = user.FindFirstValue(ClaimTypes.Email) ?? user.FindFirstValue(ClaimTypes.Name);
+            if (user == null)
+            {
+                throw new AuthenticationException("No user was found to get Claims from");
+            }
 
-            // Try to infer the user's name from the explicit "Given Name" and "Surname" Claims
-            // if they are available.
-            // TODO EES-4814 - can we just rely on a single set of Claims now?
-            var givenName = user.FindFirstValue(ClaimTypes.GivenName);
-            var surname = user.FindFirstValue(ClaimTypes.Surname);
-
-            return new UserProfile(Email: email, FirstName: givenName, LastName: surname);
+            var email = user.GetEmail();
+            var (firstName, lastName) = user.GetNameParts();
+            return new UserProfileFromClaims(Email: email, FirstName: firstName, LastName: lastName);
         }
 
         private ClaimsPrincipal? GetUser()

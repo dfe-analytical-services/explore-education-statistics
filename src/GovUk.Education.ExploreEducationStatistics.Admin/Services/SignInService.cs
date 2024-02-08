@@ -51,10 +51,10 @@ public class SignInService : ISignInService
         _publicationInviteRepository = publicationInviteRepository;
     }
 
-    public async Task<Either<ActionResult, LoginResult>> RegisterOrSignIn()
+    public async Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn()
     {
         // Get the profile of the current user who has logged into the external Identity Provider.
-        var profile = _userService.GetProfile();
+        var profile = _userService.GetProfileFromClaims();
 
         // If this email address is recognised as belonging to an existing user in the service, they have
         // been registered previously and can continue to use the service.
@@ -62,9 +62,11 @@ public class SignInService : ISignInService
 
         if (existingUser != null)
         {
-            // TODO EES-4814 - wanna add any checking for lockout here?
-            // TODO EES-4814 - wanna do any last logged in tracking here? Does Identity Framework's services help here?
-            return LoginResult.LoginSuccess;
+            return new SignInResponseViewModel(
+                LoginResult: LoginResult.LoginSuccess,
+                UserProfile: new UserProfile(
+                    Id: Guid.Parse(existingUser.Id),
+                    FirstName: existingUser.FirstName));
         }
 
         // If the email address does not match an existing user in the service, see if they have been invited.
@@ -84,17 +86,17 @@ public class SignInService : ISignInService
             return await HandleNewInvitedUser(inviteToSystem, profile);
         }
 
-        return LoginResult.NoInvite;
+        return new SignInResponseViewModel(LoginResult.NoInvite);
     }
 
-    private async Task<Either<ActionResult, LoginResult>> HandleNewInvitedUser(
+    private async Task<Either<ActionResult, SignInResponseViewModel>> HandleNewInvitedUser(
         UserInvite inviteToSystem,
-        UserProfile profile)
+        UserProfileFromClaims profile)
     {
         if (inviteToSystem.Expired)
         {
             await HandleExpiredInvite(inviteToSystem, profile.Email);
-            return LoginResult.ExpiredInvite;
+            return new SignInResponseViewModel(LoginResult.ExpiredInvite);
         }
 
         // Mark the invite as accepted.
@@ -119,14 +121,15 @@ public class SignInService : ISignInService
             LastName = profile.LastName
         };
 
+        await _usersAndRolesDbContext.Users.AddAsync(newAspNetUser);
+        await _usersAndRolesDbContext.SaveChangesAsync();
+
         // Add them to their global role.
         var addedIdentityUserRoles = await _userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
 
         if (!addedIdentityUserRoles.Succeeded)
         {
             _logger.LogError("Error adding role to invited User - unable to log in");
-
-            // TODO EES-4814 - better result than this
             return new StatusCodeResult(500);
         }
 
@@ -172,7 +175,11 @@ public class SignInService : ISignInService
         await _contentDbContext.SaveChangesAsync();
         await _usersAndRolesDbContext.SaveChangesAsync();
 
-        return LoginResult.RegistrationSuccess;
+        return new SignInResponseViewModel(
+            LoginResult: LoginResult.RegistrationSuccess,
+            UserProfile: new UserProfile(
+                Id: Guid.Parse(newAspNetUser.Id),
+                FirstName: newAspNetUser.FirstName));
     }
 
     private async Task HandleExpiredInvite(

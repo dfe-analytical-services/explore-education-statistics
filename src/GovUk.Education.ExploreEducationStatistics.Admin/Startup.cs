@@ -2,6 +2,7 @@
 using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -42,6 +43,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -98,15 +100,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
-        // private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
-
-        // private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021");
-
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
-
-        // TODO EES-4814
-        // private readonly List<string> _adminUrlAndAliases;
 
         public Startup(
             IConfiguration configuration,
@@ -114,12 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
-
-            // _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
-            // if (hostEnvironment.IsDevelopment())
-            // {
-            //     _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
-            // }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -157,9 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddMvc(options =>
                 {
-                    // TODO EES-4814
-                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
-                    options.Filters.Add(new AuthorizeFilter("Has \"access-admin-api\" scope"));
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
                     options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
@@ -180,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Database contexts
              */
 
-            // TODO EES-4814 - can probably simplify these tables
+            // TODO EES-4869 - review if we need to retain these tables.
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
@@ -224,11 +211,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // Claims. It sets up the UserManager and RoleManager in DI, and links them to the database via the
             // UsersAndRolesDbContext.
             //
-            // TODO EES-4814 - are these services supplying any benefit anymore, or should we rewrite and ditch
-            // "AddIdentity"?  Can SignInUserAsync be used for anything useful, like supplying extra information about
-            // the users in the AspNet cookie?
+            // AddIdentityCore() sets up the bare minimum configuration to provide JWT validation and setting of the
+            // ClaimsPrincipal on the HttpContext based upon the content of incoming JWTs, as opposed to AddIdentity()
+            // which sets up additional configuration such as Forbidden and Login routes, which we don't need.
+            //
+            // In order to provide it with strategies for how to deal with invalid JWTs, unauthenticated users etc
+            // though, we need to register a handler for these.
+            //
+            // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
             services
-                .AddIdentity<ApplicationUser, IdentityRole>()
+                .AddIdentityCore<ApplicationUser>()
+                .AddRoles<IdentityRole>()
                 .AddUserManager<UserManager<ApplicationUser>>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
                 .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
@@ -242,18 +235,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         // headers as a way of identifying users.
                     .AddAuthentication(options =>
                     {
-                        // This line tells Identity Framework to use the JWT mechanism for logging in users, rather
-                        // than Identity's default cookie-based one.  Without this line, the defaults set up in
-                        // services.AddIdentity(...) above would take precedence.
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        // This line tells Identity Framework to use the JWT mechanism for verifying users based upon
+                        // JWTs found in Bearer tokens carried in the Authorization headers of requests made to the
+                        // Admin API.  It also tells Identity Framework to use its default AuthenticationHandler
+                        // implementation for handling challenges, forbid errors etc with appropriate status code
+                        // responses rather than redirect responses.
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                     })
                     // This adds verification of the incoming JWTs after they have been located in the
                     // Authorization headers above.
-                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnect"));
+                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
 
+                // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
+                // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
+                // ClaimsPrincipal already from information in the JWT).
                 services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
-                // TODO EES-4814
+                // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
+                // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an
+                // "access_token" query parameter. This code grabs the token from the query parameter and makes it
+                // available for Identity Framework to find (in order for it to validate it and build its
+                // ClaimsPrincipal).
                 services.Configure<JwtBearerOptions>(
                     JwtBearerDefaults.AuthenticationScheme,
                     options =>
@@ -269,10 +271,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                                 return;
                             }
 
-                            // Allows requests with `access_token` query parameter to authenticate.
-                            // Only really needed for websockets as we unfortunately can't set any
-                            // headers in the browser for the initial handshake.
-                            // TODO EES-4814 - do we need to support this in a different way?
                             if (context.Request.Query.ContainsKey("access_token"))
                             {
                                 context.Token = context.Request.Query["access_token"];
@@ -311,8 +309,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
+                OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, Configuration);
 
             /*
              * Services
@@ -595,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnect").GetValue<string>("Authority");
+                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
@@ -623,9 +623,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
                 }
             );
-
-            // TODO EES-4814 - remove when possible
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader());
 
             app.UseMvc();
 

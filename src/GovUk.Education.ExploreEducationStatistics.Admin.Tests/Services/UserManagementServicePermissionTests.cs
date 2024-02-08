@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -9,10 +10,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
@@ -131,7 +136,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IUserPublicationInviteRepository? userPublicationInviteRepository = null)
+            IUserPublicationInviteRepository? userPublicationInviteRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IConfiguration? configuration = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -146,7 +153,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
-                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext)
+                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
+                userManager ?? MockUserManager().Object,
+                configuration ?? CreateMockConfiguration(TupleOf("enableThemeDeletion", "true")).Object
             );
         }
     }

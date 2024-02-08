@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Identity;
 
-// TODO EES-4814 - move to appropriate folder.
+// TODO EES-4814 - move to appropriate folder after the main 4814 PR has gone in.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models
 {
     public class UserInvite

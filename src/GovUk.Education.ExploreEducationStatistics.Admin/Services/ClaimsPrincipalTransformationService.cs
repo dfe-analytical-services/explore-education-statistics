@@ -2,10 +2,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
-using ClaimsPrincipalExtensions = GovUk.Education.ExploreEducationStatistics.Common.Services.Security.ClaimsPrincipalExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -24,13 +24,18 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
 
         public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
-            var localIdentity = new ClaimsIdentity();
+            var localIdentity = new ClaimsIdentity(
+                authenticationType: "",
+                nameType: EesClaimTypes.Name,
+                roleType: EesClaimTypes.Role);
+
             principal.AddIdentity(localIdentity);
 
             TransferUnsupportedClaims(principal, localIdentity);
 
-            // TODO EES-4814 - can we just rely on a single set of Claims now?
-            var email = principal.FindFirstValue(ClaimTypes.Email) ?? principal.FindFirstValue(ClaimTypes.Name);
+            // Entra ID will return email addresses in either the "Email" Claim or the "Name" Claim, depending on
+            // its configuration and the type of user logging in.
+            var email = principal.GetEmail();
 
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -46,8 +51,7 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
 
         private void AddUserId(ClaimsIdentity localIdentity, ApplicationUser user)
         {
-            // TODO EES-4814 - put EES-specific claims somewhere better.
-            localIdentity.AddClaim(new Claim(ClaimsPrincipalExtensions.EesUserIdClaim, user.Id));
+            localIdentity.AddClaim(new Claim(EesClaimTypes.LocalId, user.Id));
         }
 
         private async Task AddRolesAndClaims(ClaimsIdentity localIdentity, ApplicationUser user)
@@ -68,9 +72,7 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
             // Add the user's global roles as role-type claims, so we can provide role-based authorization.
             var roleClaims = roleNames
                 .ToList()
-                // TODO EES-4814 - "role" below is a replacement for JwtClaimTypes.Role, but could it instead use a
-                // different alternative e.g. ClaimConstants.Role or ClaimConstants.Roles?
-                .Select(roleName => new Claim("role", roleName));
+                .Select(roleName => new Claim(EesClaimTypes.Role, roleName));
             localIdentity.AddClaims(roleClaims);
         }
 
@@ -90,13 +92,11 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
 
             if (supportedScopeClaim == null)
             {
-                var unsupportedScopeClaim = principal.FindFirst(claim => claim.Type == "scope");
+                var unsupportedScopeClaim = principal.FindFirst(claim => claim.Type == EesClaimTypes.KeycloakScope);
                 if (unsupportedScopeClaim != null)
                 {
-                    localIdentity.AddClaim(new Claim(ClaimConstants.Scp, unsupportedScopeClaim.Value));
+                    localIdentity.AddClaim(new Claim(EesClaimTypes.SupportedMsalScope, unsupportedScopeClaim.Value));
                 }
             }
-
-            principal.AddIdentity(localIdentity);
         }
 }

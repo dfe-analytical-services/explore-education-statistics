@@ -1,4 +1,5 @@
 #nullable enable
+using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Web;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -17,18 +19,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Configure security Policies
          */
-        public static void ConfigureAuthorizationPolicies(IServiceCollection services)
+        public static void ConfigureAuthorizationPolicies(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("Has \"access-admin-api\" scope", policy =>
-                    policy.RequireScope("access-admin-api"));
+                // options.AddPolicy(SecurityPolicies.HasAdminApiScope.ToString(), policy =>
+                //     policy.RequireScope(GetAccessAdminApiScopeName(configuration)));
+                var adminApiAccessScope = GetAccessAdminApiScopeName(configuration);
+
+                // This policy ensures that the user has been issued a valid access token from the Identity Provider
+                // and has consented to the SPA accessing the Admin APIs on their behalf.  This policy does not enforce
+                // that the user has any roles yet.  This policy is useful in cases where protected endpoints can be
+                // called by a user who is not yet fully registered on the service.
+                options.AddPolicy(SecurityPolicies.AuthenticatedByIdentityProvider.ToString(), policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.FindFirstValue(EesClaimTypes.SupportedMsalScope) == adminApiAccessScope));
+
+                // This policy ensures that the user has been issued a valid access token from the Identity Provider
+                // and has consented to the SPA accessing the Admin APIs on their behalf.  It also ensures that the user
+                // has been allocated a role that gives them permission to use the protected pages of the Admin SPA and
+                // the majority of the API endpoints.  This policy is useful for protecting endpoints where we expect
+                // the user to have registered successfully with the service already.
+                options.AddPolicy(SecurityPolicies.RegisteredUser.ToString(), policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(claim => claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
+                        context.User.FindFirstValue(EesClaimTypes.SupportedMsalScope) == adminApiAccessScope));
 
                 /**
                  * General role-based page access
                  */
-                options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
 
                 options.AddPolicy(SecurityPolicies.IsBauUser.ToString(), policy =>
                     policy.RequireRole(RoleNames.BauUser));
@@ -254,6 +273,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, MarkMethodologyAsApprovedAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificMethodologyAuthorizationHandler>();
+        }
+
+        /**
+         * When using Entra ID as the external IdP, the SPA must request the "access-admin-api" scope using its fully
+         * qualified name (e.g. api://<guid>/access-admin-api). The access token returned holds the requested scope as
+         * its "simple" name however, "access-admin-api", and this is the value that it presents to the Admin API as
+         * the "audience" of the token. This means that we need to configure the SPA to send the fully qualified name
+         * of the scope, but configure the Admin API to expect to be presented with the simple name of the scope.
+         *
+         * In contrast, when using another external IdP such as Keycloak, both the scope name that the SPA sends, and
+         * the scope value that is provided in the resulting access token are both identical.
+         */
+        private static string GetAccessAdminApiScopeName(IConfiguration configuration)
+        {
+            return configuration.GetRequiredSection("OpenIdConnectAdminApiExtras")
+                .GetValue<string>("AdminApiScopeForAudience");
         }
     }
 }

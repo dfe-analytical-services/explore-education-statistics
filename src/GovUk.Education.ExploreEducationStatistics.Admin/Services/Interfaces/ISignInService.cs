@@ -1,14 +1,16 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface ISignInService
 {
-    public Task<Either<ActionResult, LoginResult>> RegisterOrSignIn();
+    public Task<Either<ActionResult, SignInResponseViewModel>> RegisterOrSignIn();
 }
 
 public enum LoginResult
@@ -18,3 +20,9 @@ public enum LoginResult
     NoInvite,
     ExpiredInvite
 }
+
+public record UserProfile(Guid Id, string FirstName);
+
+public record SignInResponseViewModel(
+    [property: JsonConverter(typeof(StringEnumConverter))] LoginResult LoginResult,
+    UserProfile? UserProfile = null);

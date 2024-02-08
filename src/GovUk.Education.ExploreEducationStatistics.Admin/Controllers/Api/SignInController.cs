@@ -9,21 +9,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Web;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 
 [Route("api")]
 [ApiController]
-[Authorize]
+[AllowAnonymous]
 public class SignInController : ControllerBase
 {
     private readonly ILogger<SignInController> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ISignInService _signInService;
-
-    public record SignInResponse([property: JsonConverter(typeof(StringEnumConverter))] LoginResult result);
 
     public SignInController(
         ILogger<SignInController> logger,
@@ -36,7 +32,8 @@ public class SignInController : ControllerBase
     }
 
     [HttpPost("sign-in")]
-    public async Task<ActionResult<SignInResponse>> RegisterOrSignIn()
+    [Authorize(Policy="AuthenticatedByIdentityProvider")]
+    public async Task<ActionResult<SignInResponseViewModel>> RegisterOrSignIn()
     {
         var remoteUserId = _httpContextAccessor
             .HttpContext!
@@ -48,9 +45,9 @@ public class SignInController : ControllerBase
             .OnFailureDo(_ =>
                 _logger.LogWarning("User with remote Id \"{UserId}\" " +
                                    "failed to sign in or register", remoteUserId))
-            .HandleFailuresOr(loginResult =>
+            .HandleFailuresOr(signInResponse =>
             {
-                switch (loginResult)
+                switch (signInResponse.LoginResult)
                 {
                     case LoginResult.NoInvite:
                         _logger.LogWarning("User with remote Id \"{UserId}\" had no invite to accept", remoteUserId);
@@ -60,7 +57,7 @@ public class SignInController : ControllerBase
                         break;
                 }
 
-                return new OkObjectResult(new SignInResponse(loginResult));
+                return new OkObjectResult(signInResponse);
             });
     }
 }
