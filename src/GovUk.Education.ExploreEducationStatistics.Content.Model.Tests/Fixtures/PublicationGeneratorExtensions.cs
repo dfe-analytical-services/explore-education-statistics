@@ -62,6 +62,11 @@ public static class PublicationGeneratorExtensions
         IEnumerable<LegacyRelease> legacyReleases)
         => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
 
+    public static Generator<Publication> WithSupersededBy(
+        this Generator<Publication> generator,
+        Publication? supersededBy)
+        => generator.ForInstance(p => p.SetSupersededBy(supersededBy));
+
     public static Generator<Publication> WithTopicId(
         this Generator<Publication> generator,
         Guid topicId)
@@ -185,6 +190,17 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         IEnumerable<LegacyRelease> legacyReleases)
         => setters.Set(p => p.LegacyReleases, legacyReleases);
+
+    private static InstanceSetters<Publication> SetSupersededBy(
+        this InstanceSetters<Publication> setters,
+        Publication? supersededBy)
+        => setters.Set(p => p.SupersededBy, supersededBy)
+            .SetSupersededById(supersededBy?.Id);
+
+    private static InstanceSetters<Publication> SetSupersededById(
+        this InstanceSetters<Publication> setters,
+        Guid? supersededById)
+        => setters.Set(p => p.SupersededById, supersededById);
 
     private static InstanceSetters<Publication> SetTopicId(
         this InstanceSetters<Publication> setters,

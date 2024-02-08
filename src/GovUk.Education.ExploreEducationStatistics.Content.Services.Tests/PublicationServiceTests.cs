@@ -26,26 +26,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public abstract class PublicationServiceTests
     {
-        private const string PublicationSlug = "publication-slug";
-
         private readonly string _contentDbContextId = Guid.NewGuid().ToString();
 
-        protected readonly DataFixture DataFixture = new();
+        private readonly DataFixture _dataFixture = new();
 
         public class GetSummaryTests : PublicationServiceTests
         {
             [Fact]
-            public async Task PublicationExists_HasLatestPublishedRelease_ReturnsPublication()
+            public async Task PublicationExists_HasPublishedReleaseVersion_ReturnsPublication()
             {
-                var latestRelease = DataFixture
-                    .DefaultRelease()
-                    .WithPublished(DateTime.UtcNow)
-                    .Generate();
-
-                var publication = DataFixture
+                Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithLatestPublishedRelease(latestRelease)
-                    .Generate();
+                    .WithReleaseParents(_dataFixture
+                        .DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1));
 
                 await SeedDatabase(publication, _contentDbContextId);
 
@@ -61,11 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
 
             [Fact]
-            public async Task PublicationExists_NoLatestPublishedRelease_NotFound()
+            public async Task PublicationExists_NoPublishedReleaseVersion_ReturnsNotFound()
             {
-                var publication = DataFixture
+                Publication publication = _dataFixture
                     .DefaultPublication()
-                    .Generate();
+                    .WithReleaseParents(_dataFixture
+                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                        .Generate(1));
 
                 await SeedDatabase(publication, _contentDbContextId);
 
@@ -96,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
 
             private static async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(
-                Guid publicationId, 
+                Guid publicationId,
                 string contentDbContextId)
             {
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -106,96 +102,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     return await service.GetSummary(publicationId);
                 }
             }
-        } 
+        }
 
         public class GetTests : PublicationServiceTests
         {
+            private readonly Contact _contact = new()
+            {
+                TeamName = "Team name",
+                TeamEmail = "team@email.com",
+                ContactName = "Contact name",
+                ContactTelNo = "1234"
+            };
+
+            private readonly ExternalMethodology _externalMethodology = new()
+            {
+                Title = "External methodology title",
+                Url = "https://external.methodology.com",
+            };
+
+            private readonly LegacyRelease _legacyRelease = new()
+            {
+                Description = "Legacy release description",
+                Url = "https://legacy.release.com",
+                Order = 0,
+            };
+
             [Fact]
             public async Task Success()
             {
-                var release2000Version0Id = Guid.NewGuid();
-                var release2000Version1Id = Guid.NewGuid();
-                var publication = new Publication
-                {
-                    Title = "Publication Title",
-                    Slug = PublicationSlug,
-                    LatestPublishedReleaseId = release2000Version1Id,
-                    Releases = new List<Release>
-                {
-                    new() // latest published release
-                    {
-                        Id = release2000Version1Id,
-                        ReleaseName = "2000",
-                        Slug = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                        Version = 1,
-                        PreviousVersionId = release2000Version0Id,
-                    },
-                    new() // previous version
-                    {
-                        Id = release2000Version0Id,
-                        ReleaseName = "2000",
-                        Slug = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                        Version = 0,
-                    },
-                    new() // not published
-                    {
-                        ReleaseName = "2001",
-                        Slug = "2001",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = null,
-                        Version = 0,
-                    },
-                    new() // published so appears in ListPublishedReleases result
-                    {
-                        ReleaseName = "1999",
-                        Slug = "1999",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                        Version = 0,
-                    },
-                },
-                    LegacyReleases = new List<LegacyRelease>
-                {
-                    new()
-                    {
-                        Description = "Legacy release description",
-                        Url = "https://legacy.release.com",
-                        Order = 0,
-                    }
-                },
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Slug = "test-topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme",
-                            Slug = "test-theme",
-                            Summary = "Test theme summary"
-                        }
-                    },
-                    Contact = new Contact
-                    {
-                        TeamName = "Team name",
-                        TeamEmail = "team@email.com",
-                        ContactName = "Contact name",
-                        ContactTelNo = "1234",
-                    },
-                    ExternalMethodology = new ExternalMethodology
-                    {
-                        Title = "External methodology title",
-                        Url = "https://external.methodology.com",
-                    },
-                };
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleaseParents(ListOf<ReleaseParent>(
+                        _dataFixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2020),
+                        _dataFixture
+                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        _dataFixture
+                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2022)))
+                    .WithContact(_contact)
+                    .WithExternalMethodology(_externalMethodology)
+                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithTopic(_dataFixture
+                        .DefaultTopic()
+                        .WithTheme(_dataFixture
+                            .DefaultTheme()));
+
+                // Expect the latest published release versions in reverse chronological order
+                var expectedReleaseVersion1 = publication.Releases.Single(r => r is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion2 = publication.Releases.Single(r => r is { Year: 2020, Version: 0 });
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
-                    await contentDbContext.AddAsync(publication);
+                    contentDbContext.Publications.Add(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -213,89 +172,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.False(publicationViewModel.IsSuperseded);
 
                     Assert.Equal(2, publicationViewModel.Releases.Count);
-                    Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
+                    Assert.Equal(expectedReleaseVersion1.Id, publicationViewModel.LatestReleaseId);
 
-                    Assert.Equal(publication.Releases[0].Id, publicationViewModel.Releases[0].Id);
-                    Assert.Equal(publication.Releases[0].Slug, publicationViewModel.Releases[0].Slug);
-                    Assert.Equal(publication.Releases[0].Title, publicationViewModel.Releases[0].Title);
+                    Assert.Equal(expectedReleaseVersion1.Id, publicationViewModel.Releases[0].Id);
+                    Assert.Equal(expectedReleaseVersion1.Slug, publicationViewModel.Releases[0].Slug);
+                    Assert.Equal(expectedReleaseVersion1.Title, publicationViewModel.Releases[0].Title);
 
-                    Assert.Equal(publication.Releases[3].Id, publicationViewModel.Releases[1].Id);
-                    Assert.Equal(publication.Releases[3].Slug, publicationViewModel.Releases[1].Slug);
-                    Assert.Equal(publication.Releases[3].Title, publicationViewModel.Releases[1].Title);
+                    Assert.Equal(expectedReleaseVersion2.Id, publicationViewModel.Releases[1].Id);
+                    Assert.Equal(expectedReleaseVersion2.Slug, publicationViewModel.Releases[1].Slug);
+                    Assert.Equal(expectedReleaseVersion2.Title, publicationViewModel.Releases[1].Title);
 
-                    Assert.Single(publication.LegacyReleases);
-                    Assert.Equal(publication.LegacyReleases[0].Id, publicationViewModel.LegacyReleases[0].Id);
-                    Assert.Equal(publication.LegacyReleases[0].Description,
-                        publicationViewModel.LegacyReleases[0].Description);
-                    Assert.Equal(publication.LegacyReleases[0].Url, publicationViewModel.LegacyReleases[0].Url);
+                    Assert.Single(publicationViewModel.LegacyReleases);
+                    Assert.Equal(_legacyRelease.Id, publicationViewModel.LegacyReleases[0].Id);
+                    Assert.Equal(_legacyRelease.Description, _legacyRelease.Description);
+                    Assert.Equal(_legacyRelease.Url, publicationViewModel.LegacyReleases[0].Url);
 
                     Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
                     Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
                     Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
                     Assert.Equal(publication.Topic.Theme.Summary, publicationViewModel.Topic.Theme.Summary);
 
-                    Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
-                    Assert.Equal(publication.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
-                    Assert.Equal(publication.Contact.ContactName, publicationViewModel.Contact.ContactName);
-                    Assert.Equal(publication.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
+                    Assert.Equal(_contact.TeamName, publicationViewModel.Contact.TeamName);
+                    Assert.Equal(_contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
+                    Assert.Equal(_contact.ContactName, publicationViewModel.Contact.ContactName);
+                    Assert.Equal(_contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
 
                     Assert.NotNull(publicationViewModel.ExternalMethodology);
-                    Assert.Equal(publication.ExternalMethodology.Title, publicationViewModel.ExternalMethodology!.Title);
-                    Assert.Equal(publication.ExternalMethodology.Url, publicationViewModel.ExternalMethodology.Url);
+                    Assert.Equal(_externalMethodology.Title, publicationViewModel.ExternalMethodology!.Title);
+                    Assert.Equal(_externalMethodology.Url, publicationViewModel.ExternalMethodology.Url);
                 }
             }
 
             [Fact]
             public async Task IsSuperseded_SupersedingPublicationHasPublishedRelease()
             {
-                var releaseId = Guid.NewGuid();
+                Publication supersedingPublication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1));
 
-                var publication = new Publication
-                {
-                    Title = "Publication Title",
-                    Slug = PublicationSlug,
-                    LatestPublishedReleaseId = releaseId,
-                    SupersededBy = new Publication
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Superseding Publication Title",
-                        Slug = "superseding-publication",
-                        LatestPublishedReleaseId = Guid.NewGuid()
-                    },
-                    Releases = new List<Release>
-                {
-                    new()
-                    {
-                        Id = releaseId,
-                        ReleaseName = "2000",
-                        Slug = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow
-                    },
-                },
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Slug = "test-topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme",
-                            Slug = "test-theme",
-                        }
-                    },
-                    Contact = new Contact
-                    {
-                        TeamName = "Team name",
-                        TeamEmail = "team@email.com",
-                        ContactName = "Contact name",
-                        ContactTelNo = "1234",
-                    },
-                };
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithSupersededBy(supersedingPublication)
+                    .WithReleaseParents(_dataFixture
+                        .DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1))
+                    .WithContact(_contact)
+                    .WithExternalMethodology(_externalMethodology)
+                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithTopic(_dataFixture
+                        .DefaultTopic()
+                        .WithTheme(_dataFixture
+                            .DefaultTheme()));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
-                    await contentDbContext.AddAsync(publication);
+                    contentDbContext.Publications.Add(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -311,60 +244,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.True(publicationViewModel.IsSuperseded);
 
                     Assert.NotNull(publicationViewModel.SupersededBy);
-                    Assert.Equal(publication.SupersededBy.Id, publicationViewModel.SupersededBy!.Id);
-                    Assert.Equal(publication.SupersededBy.Title, publicationViewModel.SupersededBy.Title);
-                    Assert.Equal(publication.SupersededBy.Slug, publicationViewModel.SupersededBy.Slug);
+                    Assert.Equal(supersedingPublication.Id, publicationViewModel.SupersededBy!.Id);
+                    Assert.Equal(supersedingPublication.Title, publicationViewModel.SupersededBy.Title);
+                    Assert.Equal(supersedingPublication.Slug, publicationViewModel.SupersededBy.Slug);
                 }
             }
 
             [Fact]
             public async Task IsSuperseded_SupersedingPublicationHasNoPublishedRelease()
             {
-                var releaseId = Guid.NewGuid();
+                Publication supersedingPublication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                        .Generate(1));
 
-                var publication = new Publication
-                {
-                    Title = "Publication Title",
-                    Slug = PublicationSlug,
-                    LatestPublishedReleaseId = releaseId,
-                    SupersededBy = new Publication
-                    {
-                        LatestPublishedReleaseId = null
-                    },
-                    Releases = new List<Release>
-                {
-                    new()
-                    {
-                        Id = releaseId,
-                        ReleaseName = "2000",
-                        Slug = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                    }
-                },
-                    Topic = new Topic
-                    {
-                        Title = "Test topic",
-                        Slug = "test-topic",
-                        Theme = new Theme
-                        {
-                            Title = "Test theme",
-                            Slug = "test-theme",
-                        }
-                    },
-                    Contact = new Contact
-                    {
-                        TeamName = "Team name",
-                        TeamEmail = "team@email.com",
-                        ContactName = "Contact name",
-                        ContactTelNo = "1234",
-                    },
-                };
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithSupersededBy(supersedingPublication)
+                    .WithReleaseParents(_dataFixture
+                        .DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1))
+                    .WithContact(_contact)
+                    .WithExternalMethodology(_externalMethodology)
+                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithTopic(_dataFixture
+                        .DefaultTopic()
+                        .WithTheme(_dataFixture
+                            .DefaultTheme()));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
-                    await contentDbContext.AddAsync(publication);
+                    contentDbContext.Publications.Add(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -383,27 +294,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
 
             [Fact]
-            public async Task PublicationHasNoPublishedRelease()
+            public async Task PublicationHasNoPublishedRelease_ReturnsNotFound()
             {
-                var publication = new Publication
-                {
-                    Slug = PublicationSlug,
-                    Releases = new List<Release>
-                {
-                    new()
-                    {
-                        ReleaseName = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = null
-                    }
-                },
-                    LatestPublishedRelease = null
-                };
+                Publication publication = _dataFixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_dataFixture
+                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                        .Generate(1))
+                    .WithContact(_contact)
+                    .WithExternalMethodology(_externalMethodology)
+                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithTopic(_dataFixture
+                        .DefaultTopic()
+                        .WithTheme(_dataFixture
+                            .DefaultTheme()));
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
-                    await contentDbContext.Publications.AddAsync(publication);
+                    contentDbContext.Publications.Add(publication);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -411,14 +320,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     var service = SetupPublicationService(contentDbContext);
 
-                    var result = await service.Get(PublicationSlug);
+                    var result = await service.Get(publication.Slug);
 
                     result.AssertNotFound();
                 }
             }
 
             [Fact]
-            public async Task NoPublication()
+            public async Task NoPublication_ReturnsNotFound()
             {
                 var service = SetupPublicationService();
 
