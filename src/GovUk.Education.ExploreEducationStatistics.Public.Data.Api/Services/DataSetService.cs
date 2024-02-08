@@ -60,7 +60,7 @@ internal class DataSetService : IDataSetService
     {
         return new DataSetLatestVersionViewModel
         {
-            Number = latestVersion.Version(),
+            Number = latestVersion.Version,
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary.TimePeriodRange),

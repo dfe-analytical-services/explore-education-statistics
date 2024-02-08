@@ -96,7 +96,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
-            var response = await ListPublications(client, page, pageSize);
+            var response = await ListPublications(
+                client: client,
+                page: page,
+                pageSize: pageSize);
 
             var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
@@ -140,10 +143,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     1,
                     1,
                     null,
-                    It.Is<IEnumerable<Guid>>(ids =>
-                        Enumerable.SequenceEqual(
-                            ids,
-                            new List<Guid>() { publicationId }))))
+                    new List<Guid>() { publicationId }))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: new List<PublicationSearchResultViewModel>() { publication },
                     totalResults: 1,
@@ -152,7 +152,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
-            var response = await ListPublications(client, 1, 1);
+            var response = await ListPublications(
+                client: client,
+                page: 1,
+                pageSize: 1);
 
             var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
@@ -188,7 +191,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
 
-            var response = await ListPublications(client, 1, 1);
+            var response = await ListPublications(
+                client: client,
+                page: 1,
+                pageSize: 1);
 
             var content = response.AssertOk<PublicationPaginatedListViewModel>(useSystemJson: true);
 
@@ -206,7 +212,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListPublications(client, page, 1);
+            var response = await ListPublications(
+                client: client,
+                page: page,
+                pageSize: 1);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -223,7 +232,10 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListPublications(client, 1, pageSize);
+            var response = await ListPublications(
+                client: client,
+                page: 1,
+                pageSize: pageSize);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -239,7 +251,11 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListPublications(client, null, null, searchTerm);
+            var response = await ListPublications(
+                client: client,
+                page: null,
+                pageSize: null,
+                search: searchTerm);
 
             var validationProblem = response.AssertValidationProblem();
 
@@ -533,8 +549,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSet.Summary, result.Summary);
             Assert.Equal(dataSet.Status, result.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version(), result.LatestVersion.Number);
-            Assert.True(Math.Abs(dataSetVersion.Published!.Value.Subtract(result.LatestVersion.Published).TotalMilliseconds) < 1);
+            Assert.Equal(dataSetVersion.Version, result.LatestVersion.Number);
+            Assert.Equal(dataSetVersion.Published!.Value.ToUnixTimeSeconds(), result.LatestVersion.Published.ToUnixTimeSeconds());
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.Format(
@@ -546,43 +562,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 result.LatestVersion.TimePeriods.End);
-            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels.Order(), result.LatestVersion.GeographicLevels.Order());
-            Assert.Equal(dataSetVersion.MetaSummary.Filters.Order(), result.LatestVersion.Filters.Order());
-            Assert.Equal(dataSetVersion.MetaSummary.Indicators.Order(), result.LatestVersion.Indicators.Order());
-        }
-
-        [Fact]
-        public async Task PageTooBig_Returns200_EmptyList()
-        {
-            var page = 2;
-            var pageSize = 2;
-            var numberOfPublishedDataSets = 2;
-
-            var publicationId = Guid.NewGuid();
-
-            var dataSets = DataFixture
-                .DefaultDataSet()
-                .WithStatusPublished()
-                .WithPublicationId(publicationId)
-                .GenerateList(numberOfPublishedDataSets);
-
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
-
-            var client = BuildApp().CreateClient();
-
-            var response = await ListDataSets(
-                client: client,
-                publicationId: publicationId,
-                page: page,
-                pageSize: pageSize);
-
-            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
-
-            Assert.NotNull(content);
-            Assert.Equal(page, content.Paging.Page);
-            Assert.Equal(pageSize, content.Paging.PageSize);
-            Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
-            Assert.Empty(content.Results);
+            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.LatestVersion.GeographicLevels);
+            Assert.Equal(dataSetVersion.MetaSummary.Filters, result.LatestVersion.Filters);
+            Assert.Equal(dataSetVersion.MetaSummary.Indicators, result.LatestVersion.Indicators);
         }
 
         [Fact]
@@ -668,6 +650,40 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(1, content.Paging.Page);
             Assert.Equal(1, content.Paging.PageSize);
             Assert.Equal(0, content.Paging.TotalResults);
+            Assert.Empty(content.Results);
+        }
+
+        [Fact]
+        public async Task PageTooBig_Returns200_EmptyList()
+        {
+            var page = 2;
+            var pageSize = 2;
+            var numberOfPublishedDataSets = 2;
+
+            var publicationId = Guid.NewGuid();
+
+            var dataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publicationId)
+                .GenerateList(numberOfPublishedDataSets);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
+
+            var client = BuildApp().CreateClient();
+
+            var response = await ListDataSets(
+                client: client,
+                publicationId: publicationId,
+                page: page,
+                pageSize: pageSize);
+
+            var content = response.AssertOk<DataSetPaginatedListViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(page, content.Paging.Page);
+            Assert.Equal(pageSize, content.Paging.PageSize);
+            Assert.Equal(numberOfPublishedDataSets, content.Paging.TotalResults);
             Assert.Empty(content.Results);
         }
 

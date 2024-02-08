@@ -74,19 +74,17 @@ public class Startup
 
         // Databases
 
-        // We must only set the DbContext up, at Startup, outside of an integration test environment.
-        // This is because the 'PublicDataDb' connection string is null within the integration test environment;
-        // so the `dataSourceBuilder.Build()` step will error.
-        // Futhermore, we cannot avoid this by placing the build step inside the DbContextOptionsBuilder actions
-        // due to a Microsoft.EntityFramework.Infrastructure.ManyServiceProvidersCreatedWarning warning which occurs
-        // after more than twenty `IServiceProvider` instances have been created for internal use by 
-        // Entity Framework. This will happen after the DbContext has been injected into one or more services more 
-        // than 20 times.
+        // Only set up the `PublicDataDbContext` in non-integration test
+        // environments. Otherwise, the connection string will be null and
+        // cause the data source builder to throw a host exception.
         if (!_hostEnvironment.IsIntegrationTest())
         {
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
             dataSourceBuilder.MapEnum<GeographicLevel>();
 
+            // Set up the data source outside the `AddDbContext` action as this
+            // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+            // creating over 20 `IServiceProvider` instances.
             var dbDataSource = dataSourceBuilder.Build();
 
             services.AddDbContext<PublicDataDbContext>(options =>

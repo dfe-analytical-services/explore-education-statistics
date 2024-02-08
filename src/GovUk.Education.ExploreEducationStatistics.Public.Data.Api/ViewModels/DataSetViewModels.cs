@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 /// <summary>
-/// Describes and provides high-level information about a data set.
+/// Provides high-level information about a data set.
 /// </summary>
 public record DataSetViewModel
 {
@@ -46,7 +46,7 @@ public record DataSetViewModel
 }
 
 /// <summary>
-/// Describes and provides high-level information about the latest version for a given data-set.
+/// Provides high-level information about the latest version for a given data set.
 /// </summary>
 public record DataSetLatestVersionViewModel
 {
@@ -66,7 +66,7 @@ public record DataSetLatestVersionViewModel
     public required long TotalResults { get; init; }
 
     /// <summary>
-    /// Describes a time period range in human-readable format.
+    /// The time period range covered by the data set.
     /// </summary>
     public required TimePeriodRangeViewModel TimePeriods { get; init; }
 
