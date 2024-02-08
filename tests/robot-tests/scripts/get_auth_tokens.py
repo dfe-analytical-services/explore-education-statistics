@@ -1,11 +1,10 @@
 import argparse
-import json
 import time
 import traceback
-from typing import Union
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from tests.libs import local_storage_helper
 
 from .get_webdriver import get_webdriver
 
@@ -24,7 +23,7 @@ def wait_until_page_contains_xpath(context, selector):
     raise Exception(f"Timeout! Couldn't find element with xpath selector '{selector}'")
 
 
-def login_with_keycloak(url, email, password, driver):
+def login_with_keycloak(url, email, password, driver) -> dict:
     try:
         driver.get(url)
         try:
@@ -47,10 +46,10 @@ def login_with_keycloak(url, email, password, driver):
     except BaseException:
         raise AssertionError(f"Couldn't login with keycloak. Error: {traceback.format_exc()}")
 
-    return get_local_storage_json(driver, url), get_identity_cookie(driver)
+    return local_storage_helper.get_local_storage_json_from_browser(driver)
 
 
-def login_with_azure(url, email, password, first_name, last_name, driver):
+def login_with_azure(url, email, password, first_name, last_name, driver) -> dict:
     driver.get(url)
 
     wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign in")]')
@@ -106,30 +105,12 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
             f"Couldn't find '//h1[text()=\"Dashboard\"]' on page. Incorrect user details used? Found page source: \n{driver.page_source}"
         )
 
-    return get_local_storage_json(driver, url), get_identity_cookie(driver)
+    return local_storage_helper.get_local_storage_json_from_browser(driver)
 
 
-def get_local_storage_json(driver, url) -> str:
-    local_storage_json = driver.execute_script(
-        f"return window.localStorage.getItem('GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin')"
-    )
-    assert (
-        local_storage_json is not None
-    ), f"Couldn't find 'GovUk.Education.ExploreEducationStatistics.Adminuser:{url}:GovUk.Education.ExploreEducationStatistics.Admin' in Local Storage!"
-    return local_storage_json
-
-
-def get_identity_cookie(driver) -> str:
-    identity_cookie_dict = driver.get_cookie(".AspNetCore.Identity.Application")
-    assert identity_cookie_dict is not None, "Couldn't get cookie '.AspNetCore.Identity.Application'"
-    identity_cookie = json.dumps(identity_cookie_dict)
-
-    return identity_cookie
-
-
-def get_identity_info(
+def get_local_storage_identity_json(
     identity_provider, url, email, password, first_name="Bau1", last_name="EESADMIN", driver=None
-) -> Union[str, str]:
+) -> dict:
     using_existing_driver = driver is not None
 
     if not driver:
@@ -171,10 +152,8 @@ if __name__ == "__main__":
     parser.add_argument(dest="identity_provider", help="Identity provider to use"),
     args = parser.parse_args()
 
-    (local_storage_token, _) = get_identity_info(args.url, args.email, args.password, args.identity_provider)
-    jwt = json.loads(local_storage_token)["access_token"]
-    assert jwt is not None, "Couldn't get 'access_token' from local storage!"
+    local_storage_json = get_local_storage_identity_json(args.url, args.email, args.password, args.identity_provider)
+    jwt = local_storage_helper.get_access_token_from_local_storage_json(local_storage_json)
 
-    f = open("jwt", "w")
-    f.write(jwt)
-    f.close()
+    with open("jwt", "w") as jwt_file:
+        jwt_file.write(jwt)

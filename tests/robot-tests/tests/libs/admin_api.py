@@ -1,9 +1,9 @@
-import json
 import os
 from datetime import datetime
 
 import requests
 from robot.libraries.BuiltIn import BuiltIn
+from tests.libs import local_storage_helper
 
 # To prevent InsecureRequestWarning
 requests.packages.urllib3.disable_warnings()
@@ -15,16 +15,16 @@ class AdminClient:
     @staticmethod
     def __request(method: str, url: str, body: object = None):
         assert method and url
-        assert os.getenv("IDENTITY_LOCAL_STORAGE_ADMIN") is not None
         assert os.getenv("ADMIN_URL") is not None
 
         requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
         session = requests.Session()
 
-        jwt_token = json.loads(os.getenv("IDENTITY_LOCAL_STORAGE_ADMIN"))["access_token"]
+        jwt = local_storage_helper.get_access_token_from_file("ADMIN")
+
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {jwt_token}",
+            "Authorization": f"Bearer {jwt}",
         }
 
         return session.request(
@@ -208,6 +208,13 @@ def user_updates_release_published_date_via_api(release_id: str, published: date
     assert (
         response.status_code < 300
     ), f"Updating release published date failed with {response.status_code} and {response.text}"
+
+
+def delete_test_user(email: str):
+    response = admin_client.delete(f"/api/user-management/user/{email}")
+    assert (
+        response.status_code < 300
+    ), f"Deleting test user {email} failed with {response.status_code} and {response.text}"
 
 
 def _get_user_details_via_api(user_email: str):
