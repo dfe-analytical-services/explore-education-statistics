@@ -4,12 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 
-public interface IPublicationService
+public interface IDataSetService
 {
-    Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
+    Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize, 
-        string? search = null);
-
-    Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId);
+        Guid publicationId);
 }

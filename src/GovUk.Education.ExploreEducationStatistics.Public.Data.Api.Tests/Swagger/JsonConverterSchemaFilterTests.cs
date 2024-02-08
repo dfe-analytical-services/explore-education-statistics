@@ -93,21 +93,11 @@ public class JsonConverterSchemaFilterTests
 
     private OpenApiSchema GenerateTestEnumConvertersSchema()
     {
-        _schemaRepository.RegisterType(typeof(TestEnum), nameof(TestEnum));
-        _schemaRepository.AddDefinition(nameof(TestEnum), TestEnumSchema);
-
+        _schemaGenerator.GenerateSchema(typeof(TestEnum), _schemaRepository);
         _schemaGenerator.GenerateSchema(typeof(TestEnumConverters), _schemaRepository);
 
         return _schemaRepository.Schemas[nameof(TestEnumConverters)];
     }
-
-    private static OpenApiSchema TestEnumSchema => new()
-    {
-        Type = "number",
-        Enum = Enum.GetValues<TestEnum>()
-            .Select(e => new OpenApiInteger((int)e))
-            .ToList<IOpenApiAny>()
-    };
 
     private class TestEnumConverters
     {

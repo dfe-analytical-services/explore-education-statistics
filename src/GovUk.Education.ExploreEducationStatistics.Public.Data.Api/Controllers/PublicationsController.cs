@@ -14,10 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 public class PublicationsController : ControllerBase
 {
     private readonly IPublicationService _publicationService;
+    private readonly IDataSetService _dataSetService;
 
-    public PublicationsController(IPublicationService publicationService)
+    public PublicationsController(IPublicationService publicationService, IDataSetService dataSetService)
     {
-        this._publicationService = publicationService;
+        _publicationService = publicationService;
+        _dataSetService = dataSetService;
     }
 
     /// <summary>
@@ -28,10 +30,10 @@ public class PublicationsController : ControllerBase
     /// </remarks>
     [HttpGet]
     [Produces("application/json")]
-    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PaginatedPublicationListViewModel))]
+    [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    public async Task<ActionResult<PaginatedPublicationListViewModel>> ListPublications(
-        [FromQuery] PublicationsListRequest request)
+    public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
+        [FromQuery] PublicationListRequest request)
     {
         return await _publicationService
             .ListPublications(
@@ -53,10 +55,33 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(400)]
     [SwaggerResponse(404)]
     // add other responses
-    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication([SwaggerParameter("The ID of the publication.")] Guid publicationId)
     {
         return await _publicationService
             .GetPublication(publicationId)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// List a publication’s data sets
+    /// </summary>
+    /// <remarks>
+    /// Lists summary details of all the data sets related to a publication.
+    /// </remarks>
+    [HttpGet("{publicationId:guid}/data-sets")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
+    [SwaggerResponse(400)]
+    [SwaggerResponse(404)]
+    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListDataSets(
+        [FromQuery] DataSetListRequest request,
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId)
+    {
+        return await _dataSetService
+            .ListDataSets(
+                page: request.Page,
+                pageSize: request.PageSize,
+                publicationId)
             .HandleFailuresOrOk();
     }
 }
