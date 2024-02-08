@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IDataSetService
 {
+    Task<Either<ActionResult, DataSetViewModel>> GetDataSet(Guid dataSetId);
+
     Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize, 

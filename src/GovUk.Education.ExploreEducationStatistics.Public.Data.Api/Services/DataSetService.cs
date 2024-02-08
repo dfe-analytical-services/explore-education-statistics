@@ -18,6 +18,12 @@ internal class DataSetService : IDataSetService
         _publicDataDbContext = publicDataDbContext;
     }
 
+    public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(Guid dataSetId)
+    {
+        return await CheckDataSetExists(dataSetId)
+            .OnSuccess(MapDataSet);
+    }
+
     public async Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize,
@@ -41,6 +47,19 @@ internal class DataSetService : IDataSetService
             .ToList();
 
         return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+    }
+
+    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
+    {
+        var dataSet = await _publicDataDbContext.DataSets
+            .Include(ds => ds.LatestVersion)
+            .Where(ds => ds.Id == dataSetId)
+            .Where(ds => ds.Status == DataSetStatus.Published)
+            .SingleOrDefaultAsync();
+
+        return dataSet is null
+            ? new NotFoundResult()
+            : dataSet;
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
