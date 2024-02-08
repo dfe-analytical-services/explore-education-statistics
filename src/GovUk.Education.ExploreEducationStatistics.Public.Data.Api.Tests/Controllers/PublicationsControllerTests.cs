@@ -586,23 +586,58 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task NoPublishedDataSetsForRequestedPublication_PublishedDataSetsForOtherPublication_Returns200_EmptyList()
+        public async Task PublishedDataSetsForOtherPublication_Returns200_OnlyRequestedPublicationDataSets()
         {
-            var publicationIdWithPublishedDataSets = Guid.NewGuid();
+            var publicationId1 = Guid.NewGuid();
+            var publicationId2 = Guid.NewGuid();
 
-            var publishedDataSet = DataFixture
+            var publication1DataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Published)
-                .WithPublicationId(publicationIdWithPublishedDataSets)
+                .WithPublicationId(publicationId1)
                 .Generate();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(publishedDataSet));
+            var publication2DataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatus(DataSetStatus.Published)
+                .WithPublicationId(publicationId2)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(publication1DataSet, publication2DataSet));
+
+            var publication1DataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(publication1DataSet)
+                .FinishWith(dsv => publication1DataSet.LatestVersion = dsv)
+                .Generate();
+
+            var publication2DataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(publication2DataSet)
+                .FinishWith(dsv => publication2DataSet.LatestVersion = dsv)
+                .Generate();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(publication1DataSetVersion, publication2DataSetVersion);
+                context.DataSets.UpdateRange(publication1DataSet, publication2DataSet);
+            });
 
             var client = BuildApp().CreateClient();
 
             var response = await ListDataSets(
                 client: client,
-                publicationId: Guid.NewGuid(),
+                publicationId: publicationId1,
                 page: 1,
                 pageSize: 1);
 
@@ -611,8 +646,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.NotNull(content);
             Assert.Equal(1, content.Paging.Page);
             Assert.Equal(1, content.Paging.PageSize);
-            Assert.Equal(0, content.Paging.TotalResults);
-            Assert.Empty(content.Results);
+            Assert.Equal(1, content.Paging.TotalResults);
+            var result = Assert.Single(content.Results);
+            Assert.Equal(publication1DataSet.Id, result.Id);
         }
 
         [Fact]
