@@ -11,12 +11,12 @@ import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import PublicationUpdateConfirmModal from '@admin/pages/publication/components/PublicationUpdateConfirmModal';
 
 const id = 'publicationDetailsForm';
 
@@ -32,6 +32,7 @@ interface Props {
   canUpdatePublicationSummary?: boolean;
   initialValues: FormValues;
   publicationId: string;
+  publicationSlug: string;
   onCancel: () => void;
   onSubmit: () => void | Promise<void>;
 }
@@ -41,6 +42,7 @@ export default function PublicationDetailsForm({
   canUpdatePublicationSummary = false,
   initialValues,
   publicationId,
+  publicationSlug,
   onCancel,
   onSubmit,
 }: Props) {
@@ -157,21 +159,18 @@ export default function PublicationDetailsForm({
                 </ButtonGroup>
               </RHFForm>
 
-              <ModalConfirm
-                title="Confirm publication changes"
-                onConfirm={async () => {
-                  await form.handleSubmit(handleSubmit)();
-                }}
-                onExit={toggleConfirmModal.off}
-                onCancel={toggleConfirmModal.off}
-                open={showConfirmModal}
-              >
-                <p>
-                  Any changes made here will appear on the public site
-                  immediately.
-                </p>
-                <p>Are you sure you want to save the changes?</p>
-              </ModalConfirm>
+              {showConfirmModal && (
+                <PublicationUpdateConfirmModal
+                  title={initialValues.title}
+                  slug={publicationSlug}
+                  newTitle={form.getValues().title}
+                  onConfirm={async () => {
+                    await form.handleSubmit(handleSubmit)();
+                  }}
+                  onExit={toggleConfirmModal.off}
+                  onCancel={toggleConfirmModal.off}
+                />
+              )}
             </>
           );
         }}
