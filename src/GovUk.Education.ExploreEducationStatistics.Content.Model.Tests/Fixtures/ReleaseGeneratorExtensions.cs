@@ -196,7 +196,11 @@ public static class ReleaseGeneratorExtensions
             .SetDefault(p => p.Type)
             .SetApprovalStatus(ReleaseApprovalStatus.Draft)
             .SetTimePeriodCoverage(TimeIdentifier.AcademicYear)
-            .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}");
+            .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}")
+            .Set(p => p.NextReleaseDate, (_, _, context) => new PartialDate
+            {
+                Day = "1", Month = "1", Year = $"{2000 + context.Index}"
+            });
 
     public static InstanceSetters<Release> SetId(
         this InstanceSetters<Release> setters,
