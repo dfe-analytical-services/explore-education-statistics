@@ -79,8 +79,8 @@ public class Startup
         // cause the data source builder to throw a host exception.
         if (!_hostEnvironment.IsIntegrationTest())
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
-            dataSourceBuilder.MapEnum<GeographicLevel>();
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                _configuration.GetConnectionString("PublicDataDb"));
 
             // Set up the data source outside the `AddDbContext` action as this
             // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
