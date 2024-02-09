@@ -78,7 +78,6 @@ public class SeedDataCommand : ICommand
     private static async Task<PublicDataDbContext> SetUpPublicDataDbContext(CancellationToken cancellationToken)
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionString);
-        dataSourceBuilder.MapEnum<GeographicLevel>();
 
         var options = new DbContextOptionsBuilder<PublicDataDbContext>()
             .UseNpgsql(dataSourceBuilder.Build())
