@@ -244,7 +244,7 @@ Go to permalink
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Return to Admin
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
 
 Create release amendment
     user clicks link    Home
@@ -388,7 +388,7 @@ Check amended release doesn't contain deleted subject
     user checks page does not contain    ${SECOND_SUBJECT}
 
 Create amendment to modify release
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Add subject to release

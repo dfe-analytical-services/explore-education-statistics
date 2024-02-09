@@ -43,7 +43,7 @@ Check release isn't publically visible
     user checks page does not contain    ${RELEASE_NAME}
 
 Return to admin
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
 
 Create methodology for release
     user creates methodology for publication    ${PUBLICATION_NAME}
@@ -69,7 +69,7 @@ Check methodology isn't publically visible
     user waits until page contains    Page not found
 
 Return to admin again
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
 
 Add public prerelease access list
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -146,7 +146,7 @@ Check methodology isn't accessible via URL
     user waits until page contains    Page not found
 
 Go to admin release summary
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user navigates to scheduled release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 

@@ -212,8 +212,8 @@ def run():
                 os.environ["RUN_IDENTIFIER"] = run_identifier
 
                 # Create a Test Topic under which all of this test run's data will be created.
-                if args_and_variables.includes_data_changing_tests(args):
-                    admin_api.create_test_topic(run_identifier)
+                # if args_and_variables.includes_data_changing_tests(args):
+                #     admin_api.create_test_topic(run_identifier)
 
                 # Run the tests.
                 logger.info(f"Performing test run {test_run_index + 1} with unique identifier {run_identifier}")
@@ -229,7 +229,7 @@ def run():
                 # Tear down any data created by this test run unless we've disabled teardown.
                 if args_and_variables.includes_data_changing_tests(args) and not args.disable_teardown:
                     logger.info("Tearing down test data...")
-                    admin_api.delete_test_topic()
+                    # admin_api.delete_test_topic()
 
             # If all tests passed, return early.
             if not get_failing_test_suites():

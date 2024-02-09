@@ -67,7 +67,9 @@ def user_signs_in_as(user: str):
         )
         set_cookie_from_json(cookie_token)
 
+        print("Going to admin")
         sl().go_to(admin_url)
+        print("Gone to admin")
     except Exception as e:
         raise_assertion_error(e)
 

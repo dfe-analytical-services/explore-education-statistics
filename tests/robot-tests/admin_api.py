@@ -178,6 +178,7 @@ def setup_auth_variables(
     cookie_file = Path(f"{cookie_name}.json")
 
     if clear_existing:
+        logger.info(f"Removing existing authentication local files... ")
         local_storage_file.unlink(True)
         cookie_file.unlink(True)
 

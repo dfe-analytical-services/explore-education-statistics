@@ -190,7 +190,7 @@ Verify release URL and page caption
     user waits until page contains title caption    ${RELEASE_NAME}
 
 Return to Admin and create amendment
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Change the Release type

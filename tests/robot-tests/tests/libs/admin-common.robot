@@ -37,7 +37,7 @@ user signs in as bau1
     user navigates to admin frontend
     user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
     user signs in as    ADMIN
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard

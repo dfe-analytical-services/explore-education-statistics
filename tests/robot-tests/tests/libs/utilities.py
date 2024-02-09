@@ -204,14 +204,27 @@ def user_sets_focus_to_element(selector):
 
 
 def set_to_local_storage(key: str, value: str):
-    sl().execute_javascript(f"localStorage.setItem('{key}', '{value}');")
+    try:
+        v = value.rstrip('\n')
+        logger.info(f"Setting local storage with key {key}... ")
+        sl().execute_javascript(f"localStorage.setItem('{key}', '{v}');")
+        logger.info(f"Set local storage successfully... ")
+    except JavascriptException as e:
+        logger.info(e)
+        raise_assertion_error("Couldn't set local storage")
+
 
 
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
     del cookie_dict["domain"]
 
-    sl().driver.add_cookie(cookie_dict)
+    try:
+        logger.info(f"Adding cookies... ")
+        sl().driver.add_cookie(cookie_dict)
+        logger.info(f"Added cookie... ")
+    except Exception as e:
+        raise_assertion_error("Couldn't set cookie - " + e)
 
 
 def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:

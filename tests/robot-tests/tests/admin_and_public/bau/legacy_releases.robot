@@ -36,7 +36,7 @@ Validate created legacy release
     user checks table cell contains    1    3    http://test.com
 
 Navigate to admin dashboard to create new release
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

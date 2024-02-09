@@ -142,7 +142,7 @@ def initialise() -> argparse.Namespace:
     if args.reseed and args.env == "prod":
         raise Exception(f"Cannot generate seed data against environment {args.env}")
 
-    if includes_data_changing_tests(args) and args.env not in ["local", "dev"]:
+    if includes_data_changing_tests(args) and args.env not in ["local", "dev", "test", "preprod"]:
         raise Exception(f"Cannot run tests that change data on environment {args.env}")
 
     load_environment_variables(args)

@@ -23,9 +23,10 @@ def setup_auth_variables(
     local_storage_file = Path(f"{local_storage_name}.json")
     cookie_file = Path(f"{cookie_name}.json")
 
-    if clear_existing:
-        local_storage_file.unlink(True)
-        cookie_file.unlink(True)
+    # if clear_existing:
+    #     logger.info(f"Removing existing authentication local files... ")
+    #     local_storage_file.unlink(True)
+    #     cookie_file.unlink(True)
 
     admin_url = os.getenv("ADMIN_URL")
     assert admin_url, "ADMIN_URL env variable must be set"
@@ -61,6 +62,9 @@ def setup_auth_variables(
         else:
             authenticated = False
             logger.warn("Found invalid authentication information in local files!")
+    else:
+        logger.info(f"Local authentication files not found... ")
+
 
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")

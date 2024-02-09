@@ -462,7 +462,7 @@ Verify embedded dashboard accordion section contains dashboard
     unselect frame
 
 Return to Admin and create first amendment
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Change the Release type
@@ -945,7 +945,7 @@ Verify amendment embedded dashboard accordion section is correct
     user closes accordion section    Test embedded dashboard section    id:content
 
 Return to published release page in Admin
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user navigates to published release page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -968,7 +968,7 @@ Verify public published date is overriden with past date
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
 
 Return to Admin and create second amendment
-    user navigates to admin dashboard    Bau1
+    user navigates to admin dashboard    Duncan
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Add release note to second amendment
