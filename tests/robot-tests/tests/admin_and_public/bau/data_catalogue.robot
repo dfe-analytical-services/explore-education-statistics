@@ -234,6 +234,8 @@ Filter by theme
 Filter by publication
     [Tags]    Local    Dev
     user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
