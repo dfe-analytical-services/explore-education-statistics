@@ -153,7 +153,7 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
 
 const NotLoggedInLinks = () => (
   <li className="govuk-header__navigation-item">
-    <a className="govuk-header__link" href={signInRoute.path}>
+    <a className="govuk-header__link" href={signInRoute.path as string}>
       Sign in
     </a>
   </li>

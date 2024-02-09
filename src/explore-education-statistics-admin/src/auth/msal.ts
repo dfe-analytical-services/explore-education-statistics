@@ -1,11 +1,10 @@
 import {
   AuthenticationResult,
+  Configuration,
   ProtocolMode,
   PublicClientApplication,
 } from '@azure/msal-browser';
-import { Configuration } from '@azure/msal-browser/src/config/Configuration';
 import { OidcConfig } from '@admin/config';
-import { produce } from 'immer';
 import logger from '@common/services/logger';
 
 export interface PostLoginState {
@@ -18,35 +17,31 @@ let adminApiScope: string;
 export async function createMsalInstance(
   config: OidcConfig,
 ): Promise<PublicClientApplication> {
-  const msalConfig = produce(
-    draft => {
-      if (config.authorityMetadata) {
-        draft.auth.authorityMetadata = JSON.stringify({
+  const msalConfig: Configuration = {
+    auth: {
+      clientId: config.clientId,
+      authority: config.authority,
+      redirectUri: '/dashboard',
+      postLogoutRedirectUri: '/signed-out',
+      knownAuthorities: config.knownAuthorities,
+      protocolMode: ProtocolMode.OIDC,
+      authorityMetadata:
+        config.authorityMetadata &&
+        JSON.stringify({
           authorization_endpoint:
             config.authorityMetadata.authorizationEndpoint,
           token_endpoint: config.authorityMetadata.tokenEndpoint,
           issuer: config.authorityMetadata.issuer,
           userinfo_endpoint: config.authorityMetadata.userInfoEndpoint,
-        });
-      }
+        }),
     },
-    {
-      auth: {
-        clientId: config.clientId,
-        authority: config.authority,
-        redirectUri: '/dashboard',
-        postLogoutRedirectUri: '/signed-out',
-        knownAuthorities: config.knownAuthorities,
-        protocolMode: ProtocolMode.OIDC,
-      },
-      cache: {
-        cacheLocation: 'localStorage',
-        storeAuthStateInCookie: false,
-      },
-      // A "loggerCallback" argument is available here if we wish to capture
-      // detailed messages about MSAL lifecycle event processing.
-    } as Configuration,
-  )();
+    cache: {
+      cacheLocation: 'localStorage',
+      storeAuthStateInCookie: false,
+    },
+    // A "loggerCallback" argument is available here if we wish to capture
+    // detailed messages about MSAL lifecycle event processing.
+  };
 
   adminApiScope = config.adminApiScope;
   msalInstance = new PublicClientApplication(msalConfig);

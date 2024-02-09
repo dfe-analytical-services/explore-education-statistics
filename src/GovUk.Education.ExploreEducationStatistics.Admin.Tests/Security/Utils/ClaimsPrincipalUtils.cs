@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles.RoleNames;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
@@ -22,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 Guid.NewGuid(),
                 ScopeClaim("some-other-scope"));
         }
-        
+
         public static ClaimsPrincipal VerifiedByIdentityProviderUser()
         {
             return CreateClaimsPrincipal(
@@ -109,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         /// <summary>
         /// Create a Claim representing a Global Role (i.e. an AspNetUserRoles assignment).
         /// </summary>
-        private static Claim RoleClaim(string roleName)
+        public static Claim RoleClaim(string roleName)
         {
             return new Claim(EesClaimTypes.Role, roleName);
         }

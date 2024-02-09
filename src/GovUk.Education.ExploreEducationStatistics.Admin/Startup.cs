@@ -43,7 +43,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -414,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
 
-                if (!HostEnvironment.IsDevelopment())
+                if (!HostEnvironment.IsDevelopment() && !HostEnvironment.IsIntegrationTest())
                 {
                     return new NotificationClient(notifyApiKey);
                 }

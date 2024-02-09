@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -40,6 +41,14 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
 
         public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
+            var email = principal.GetEmail();
+
+            // If we cannot identify the current user, there is no more transformation to be done.
+            if (email.IsNullOrEmpty())
+            {
+                return principal;
+            }
+            
             var localIdentity = new ClaimsIdentity(
                 authenticationType: "",
                 nameType: EesClaimTypes.Name,
@@ -48,10 +57,6 @@ public class ClaimsPrincipalTransformationService : IClaimsTransformation
             principal.AddIdentity(localIdentity);
 
             TransferUnsupportedClaims(principal, localIdentity);
-
-            // Entra ID will return email addresses in either the "Email" Claim or the "Name" Claim, depending on
-            // its configuration and the type of user logging in.
-            var email = principal.GetEmail();
 
             var user = await _userManager.FindByEmailAsync(email);
 

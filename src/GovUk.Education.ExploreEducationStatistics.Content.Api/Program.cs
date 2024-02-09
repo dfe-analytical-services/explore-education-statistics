@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     builder.AddJsonFile(
                         "appsettings.Local.json",
                         optional: true,
-                        reloadOnChange: true);
+                        reloadOnChange: false);
                 })
                 .ConfigureLogging(
                     builder =>

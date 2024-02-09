@@ -27,7 +27,7 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
                 {
                     builder
                         .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
-                        .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Debug);
+                        .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
                 }
             )
             .ConfigureWebHostDefaults(builder =>

@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
         {
             return new ConfigurationBuilder()
                 .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: false)
                 .AddEnvironmentVariables()
                 .Build();
         }
