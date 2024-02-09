@@ -23,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         {
             services.AddAuthorization(options =>
             {
-                // options.AddPolicy(SecurityPolicies.HasAdminApiScope.ToString(), policy =>
-                //     policy.RequireScope(GetAccessAdminApiScopeName(configuration)));
                 var adminApiAccessScope = GetAccessAdminApiScopeName(configuration);
 
                 // This policy ensures that the user has been issued a valid access token from the Identity Provider
@@ -32,8 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 // that the user has any roles yet.  This policy is useful in cases where protected endpoints can be
                 // called by a user who is not yet fully registered on the service.
                 options.AddPolicy(SecurityPolicies.AuthenticatedByIdentityProvider.ToString(), policy =>
-                    policy.RequireAssertion(context =>
-                        context.User.FindFirstValue(EesClaimTypes.SupportedMsalScope) == adminApiAccessScope));
+                    policy.RequireAssertion(context => context.User.HasScope(adminApiAccessScope)));
 
                 // This policy ensures that the user has been issued a valid access token from the Identity Provider
                 // and has consented to the SPA accessing the Admin APIs on their behalf.  It also ensures that the user
@@ -43,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.RegisteredUser.ToString(), policy =>
                     policy.RequireAssertion(context =>
                         context.User.HasClaim(claim => claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
-                        context.User.FindFirstValue(EesClaimTypes.SupportedMsalScope) == adminApiAccessScope));
+                        context.User.HasScope(adminApiAccessScope)));
 
                 /**
                  * General role-based page access

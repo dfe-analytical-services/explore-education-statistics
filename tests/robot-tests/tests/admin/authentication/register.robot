@@ -51,21 +51,15 @@ Invite the user as an Analyst with publication and release roles
     user closes the browser
 
 Sign in as the invitee to register as an Analyst
-    user opens the browser
-    user navigates to admin frontend
-    user waits until h1 is visible    Sign in
-    user clicks element    id:signin-button
-    user logs in via identity provider
-    ...    %{PENDING_INVITE_USER_EMAIL}
-    ...    %{PENDING_INVITE_USER_PASSWORD}
+    user opens browser and logs in via Identity Provider
 
 Check that the user is on the dashboard and has the correct access for an Analyst
-    user waits until page contains title    Dashboard
-    user waits until h3 is visible    %{TEST_THEME_NAME} / %{TEST_TOPIC_NAME}
-    user waits until page contains link    ${PUBLICATION_NAME}
-    user checks page contains    Logged in as Pending
-    user checks page does not contain link    Platform administration
+    user checks for Analyst access on the Dashboard
+
+Log out and log back in again to make sure that the user still has the correct access for an Analyst
     user closes the browser
+    user opens browser and logs in via Identity Provider
+    user checks for Analyst access on the Dashboard
 
 Clear down the invited user so that we can invite them again
     delete test user    %{PENDING_INVITE_USER_EMAIL}
@@ -85,6 +79,23 @@ Invite the user as a BAU user
     user closes the browser
 
 Sign in as the invitee to register as a BAU user
+    user opens browser and logs in via Identity Provider
+
+Check that the user is on the dashboard and has the correct access for a BAU user
+    user checks for BAU access on the Dashboard
+
+Log out and log back in again to make sure that the user still has the correct access for a BAU user
+    user closes the browser
+    user opens browser and logs in via Identity Provider
+    user checks for BAU access on the Dashboard
+
+
+*** Keywords ***
+user closes the browser and delete test user
+    user closes the browser
+    delete test user    %{PENDING_INVITE_USER_EMAIL}
+
+user opens browser and logs in via Identity Provider
     user opens the browser
     user navigates to admin frontend
     user waits until h1 is visible    Sign in
@@ -93,13 +104,14 @@ Sign in as the invitee to register as a BAU user
     ...    %{PENDING_INVITE_USER_EMAIL}
     ...    %{PENDING_INVITE_USER_PASSWORD}
 
-Check that the user is on the dashboard and has the correct access for a BAU user
+user checks for Analyst access on the Dashboard
+    user waits until page contains title    Dashboard
+    user waits until h3 is visible    %{TEST_THEME_NAME} / %{TEST_TOPIC_NAME}
+    user waits until page contains link    ${PUBLICATION_NAME}
+    user checks page contains    Logged in as Pending
+    user checks page does not contain link    Platform administration
+
+user checks for BAU access on the Dashboard
     user waits until page contains title    Dashboard
     user checks page contains    Logged in as Pending
     user checks page contains link    Platform administration
-
-
-*** Keywords ***
-user closes the browser and delete test user
-    user closes the browser
-    delete test user    %{PENDING_INVITE_USER_EMAIL}

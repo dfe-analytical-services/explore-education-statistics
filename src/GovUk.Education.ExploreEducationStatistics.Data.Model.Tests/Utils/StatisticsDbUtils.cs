@@ -37,4 +37,14 @@ public static class StatisticsDbUtils
     {
         return app.AddTestData(testData);
     }
+
+    public static WebApplicationFactory<TEntrypoint> VerifyStatisticsDbContext<TEntrypoint>(
+        this WebApplicationFactory<TEntrypoint> app,
+        Action<StatisticsDbContext> verificationAction)
+        where TEntrypoint : class
+    {
+        var context = (app.Services.GetService(typeof(StatisticsDbContext)) as StatisticsDbContext)!;
+        verificationAction(context);
+        return app;
+    }
 }

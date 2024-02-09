@@ -126,6 +126,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
+        public class DeleteUserTests
+        {
+            [Fact]
+            public async Task Success()
+            {
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .AssertSuccess(async userService =>
+                        {
+                            var service = SetupUserManagementService(
+                                userService: userService.Object,
+                                enableDeletion: true);
+                            return await service.DeleteUser("ees-test.user@education.gov.uk");
+                        }
+                    );
+            }
+
+            [Fact]
+            public async Task Forbidden_EnvironmentConfiguration()
+            {
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .AssertForbidden(async userService =>
+                        {
+                            var service = SetupUserManagementService(userService: userService.Object);
+                            return await service.DeleteUser("ees.test-user@education.gov.uk");
+                        }
+                    );
+            }
+
+            [Fact]
+            public async Task Forbidden_InvalidEmailAddressFormat()
+            {
+                await PolicyCheckBuilder<SecurityPolicies>()
+                    .AssertForbidden(async userService =>
+                        {
+                            var service = SetupUserManagementService(userService: userService.Object);
+                            return await service.DeleteUser("invalid-email-to-delete@education.gov.uk");
+                        }
+                    );
+            }
+        }
+
         private static UserManagementService SetupUserManagementService(
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
@@ -138,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserPublicationInviteRepository? userPublicationInviteRepository = null,
             UserManager<ApplicationUser>? userManager = null,
-            IConfiguration? configuration = null)
+            bool? enableDeletion = false)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -155,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
                 userManager ?? MockUserManager().Object,
-                configuration ?? CreateMockConfiguration(TupleOf("enableThemeDeletion", "true")).Object
+                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableDeletion + "")).Object
             );
         }
     }

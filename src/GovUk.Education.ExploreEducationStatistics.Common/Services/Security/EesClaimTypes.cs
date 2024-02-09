@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
         /**
          * This Claim will hold the logged-in user's id from within the content database.
          */
-        public const string LocalId = "LocalId";
+        public const string LocalUserId = "LocalId";
 
         /**
          * This is the name of the "scope" Claim that Keycloak provides, and that is incompatible with
@@ -30,5 +30,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
          * scopes are transferred to this supported Claim name. This is equivalent to "ClaimConstants.Scp".
          */
         public const string SupportedMsalScope = "scp";
+
+        /**
+         * This is the name of one of the scope Claims supported by the MSAL framework. We ensure that a user's
+         * scopes are transferred to this supported Claim name. This is equivalent to "ClaimConstants.Scope".
+         */
+        public const string SupportedMsalScope2 = "http://schemas.microsoft.com/identity/claims/scope";
     }
 }

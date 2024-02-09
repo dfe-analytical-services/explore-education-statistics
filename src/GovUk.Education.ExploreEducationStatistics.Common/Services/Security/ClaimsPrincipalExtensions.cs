@@ -10,7 +10,7 @@ public static class ClaimsPrincipalExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal principal)
     {
-        var userIdClaim = principal.FindFirstValue(EesClaimTypes.LocalId);
+        var userIdClaim = principal.FindFirstValue(EesClaimTypes.LocalUserId);
         return Guid.Parse(userIdClaim);
     }
 
@@ -62,5 +62,18 @@ public static class ClaimsPrincipalExtensions
         }
 
         return (FirstName: nameClaimParts.First(), LastName: "");
+    }
+
+    public static bool HasScope(this ClaimsPrincipal principal, string scope)
+    {
+        var scopesString = principal.FindFirstValue(EesClaimTypes.SupportedMsalScope) ??
+                           principal.FindFirstValue(EesClaimTypes.SupportedMsalScope2);
+
+        if (scopesString == null)
+        {
+            return false;
+        }
+
+        return scopesString.Split(' ').Contains(scope);
     }
 }

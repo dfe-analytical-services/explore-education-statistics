@@ -16,6 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
 {
     public static class ClaimsPrincipalUtils
     {
+        public static ClaimsPrincipal VerifiedButNotAuthorizedByIdentityProviderUser()
+        {
+            return CreateClaimsPrincipal(
+                Guid.NewGuid(),
+                ScopeClaim("some-other-scope"));
+        }
+        
+        public static ClaimsPrincipal VerifiedByIdentityProviderUser()
+        {
+            return CreateClaimsPrincipal(
+                Guid.NewGuid(),
+                ScopeClaim("access-admin-api"));
+        }
+
         public static ClaimsPrincipal AuthenticatedUser()
         {
             return CreateClaimsPrincipal(
@@ -72,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 nameType: EesClaimTypes.Name,
                 roleType: EesClaimTypes.Role);
 
-            identity.AddClaim(new Claim(EesClaimTypes.LocalId, userId.ToString()));
+            identity.AddClaim(new Claim(EesClaimTypes.LocalUserId, userId.ToString()));
             identity.AddClaims(additionalClaims);
             var user = new ClaimsPrincipal(identity);
             return user;
@@ -101,7 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         }
 
         /// <summary>
-        /// Create a Claim representing a Global Role (i.e. an AspNetUserRoles assignment).
+        /// Create a Claim representing a scope that is requested when requesting an Access
+        /// Token from the Identity Provider.
         /// </summary>
         private static Claim ScopeClaim(string scope)
         {

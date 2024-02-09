@@ -228,6 +228,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddRoleStore<RoleStore<IdentityRole, UsersAndRolesDbContext>>()
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
+            // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
+            // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
+            // ClaimsPrincipal already from information in the JWT).
+            services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
+
             if (!HostEnvironment.IsIntegrationTest())
             {
                 services
@@ -245,11 +250,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     // This adds verification of the incoming JWTs after they have been located in the
                     // Authorization headers above.
                     .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
-
-                // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
-                // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
-                // ClaimsPrincipal already from information in the JWT).
-                services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
                 // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
                 // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an

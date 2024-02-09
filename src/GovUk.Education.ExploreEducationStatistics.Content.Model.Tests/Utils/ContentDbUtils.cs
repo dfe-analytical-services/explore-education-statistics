@@ -47,5 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils
         {
             return app.AddTestData(testData);
         }
+
+        public static WebApplicationFactory<TEntrypoint> VerifyContentDbContext<TEntrypoint>(
+            this WebApplicationFactory<TEntrypoint> app,
+            Action<ContentDbContext> verificationAction)
+            where TEntrypoint : class
+        {
+            var context = (app.Services.GetService(typeof(ContentDbContext)) as ContentDbContext)!;
+            verificationAction(context);
+            return app;
+        }
     }
 }
