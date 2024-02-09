@@ -19,12 +19,12 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import FilterClearButton from '@frontend/modules/find-statistics/components/FilterClearButton';
-import FiltersDesktop from '@frontend/modules/find-statistics/components/FiltersDesktop';
-import FiltersMobile from '@frontend/modules/find-statistics/components/FiltersMobile';
+import FilterClearButton from '@frontend/components/FilterClearButton';
+import Filters from '@frontend/modules/find-statistics/components/Filters';
+import FiltersMobile from '@frontend/components/FiltersMobile';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
-import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
-import SortControls from '@frontend/modules/find-statistics/components/SortControls';
+import SearchForm from '@frontend/components/SearchForm';
+import SortControls, { SortOption } from '@frontend/components/SortControls';
 import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
@@ -201,12 +201,15 @@ const FindStatisticsPage: NextPage = () => {
             Skip to search results
           </a>
           {!isMobileMedia && (
-            <FiltersDesktop
-              releaseType={releaseType}
-              themeId={themeId}
-              themes={themes}
-              onChange={handleChangeFilter}
-            />
+            <div className="govuk-!-margin-top-3">
+              <h2 className="govuk-visually-hidden">Filter publications</h2>
+              <Filters
+                releaseType={releaseType}
+                themeId={themeId}
+                themes={themes}
+                onChange={handleChangeFilter}
+              />
+            </div>
           )}
         </div>
         <div className="govuk-grid-column-two-thirds">
@@ -247,7 +250,7 @@ const FindStatisticsPage: NextPage = () => {
             </div>
 
             {isFiltered && (
-              <div className="govuk-!-margin-bottom-5">
+              <div className="govuk-!-margin-bottom-5 dfe-flex dfe-flex-wrap">
                 {search && (
                   <FilterClearButton
                     name={search}
@@ -274,17 +277,34 @@ const FindStatisticsPage: NextPage = () => {
 
           {isMobileMedia && (
             <FiltersMobile
-              releaseType={releaseType}
-              themeId={themeId}
-              themes={themes}
+              title="Filter publications"
               totalResults={totalResults}
-              onChange={handleChangeFilter}
-            />
+            >
+              <Filters
+                releaseType={releaseType}
+                themeId={themeId}
+                themes={themes}
+                onChange={handleChangeFilter}
+              />
+            </FiltersMobile>
           )}
 
           {publications.length > 0 && (
             <SortControls
-              hasSearch={!!search}
+              className="dfe-border-bottom dfe-border-top"
+              options={[
+                { label: 'Newest', value: 'newest' },
+                { label: 'Oldest', value: 'oldest' },
+                { label: 'A to Z', value: 'title' },
+                ...(search
+                  ? [
+                      {
+                        label: 'Relevance',
+                        value: 'relevance',
+                      } as SortOption,
+                    ]
+                  : []),
+              ]}
               sortBy={sortBy}
               onChange={handleSortBy}
             />
@@ -336,7 +356,18 @@ const FindStatisticsPage: NextPage = () => {
               </>
             )}
             {page && totalPages && (
-              <Pagination currentPage={page} shallow totalPages={totalPages} />
+              <Pagination
+                currentPage={page}
+                shallow
+                totalPages={totalPages}
+                onClick={pageNumber => {
+                  logEvent({
+                    category: 'Find statistics and data',
+                    action: `Pagination clicked`,
+                    label: `Page ${pageNumber}`,
+                  });
+                }}
+              />
             )}
           </LoadingSpinner>
 

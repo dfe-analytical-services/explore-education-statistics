@@ -1,3 +1,10 @@
+import styles from '@common/components/Accordion.module.scss';
+import {
+  accordionSectionClasses,
+  AccordionSectionProps,
+} from '@common/components/AccordionSection';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import AccordionToggleButton from '@common/components/AccordionToggleButton';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
@@ -12,12 +19,6 @@ import React, {
   useRef,
 } from 'react';
 import { useImmer } from 'use-immer';
-import styles from './Accordion.module.scss';
-import {
-  accordionSectionClasses,
-  AccordionSectionProps,
-} from './AccordionSection';
-import VisuallyHidden from './VisuallyHidden';
 
 export interface AccordionProps {
   children: ReactNode;
@@ -167,10 +168,17 @@ const Accordion = ({
     >
       {isMounted && showOpenAll && (
         <div className="govuk-accordion__controls">
-          <button
-            aria-expanded={isAllOpen}
-            type="button"
-            className="govuk-accordion__show-all"
+          <AccordionToggleButton
+            expanded={isAllOpen}
+            label={
+              <>
+                {`${isAllOpen ? 'Hide' : 'Show'} all `}
+                {toggleAllHiddenText && (
+                  <VisuallyHidden>{toggleAllHiddenText} </VisuallyHidden>
+                )}
+                sections
+              </>
+            }
             onClick={() => {
               updateOpenSections(draft => {
                 Object.keys(draft).forEach(key => {
@@ -182,21 +190,7 @@ const Accordion = ({
                 onToggleAll(!isAllOpen);
               }
             }}
-          >
-            <span
-              className={classNames('govuk-accordion-nav__chevron', {
-                'govuk-accordion-nav__chevron--down': !isAllOpen,
-              })}
-            />
-
-            <span className="govuk-accordion__show-all-text">
-              {`${isAllOpen ? 'Hide' : 'Show'} all `}
-              {toggleAllHiddenText && (
-                <VisuallyHidden>{toggleAllHiddenText} </VisuallyHidden>
-              )}
-              sections
-            </span>
-          </button>
+          />
         </div>
       )}
 

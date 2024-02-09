@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -20,7 +19,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -215,8 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(
                     contentDbContext,
-                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                    AdminMapper()),
+                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),

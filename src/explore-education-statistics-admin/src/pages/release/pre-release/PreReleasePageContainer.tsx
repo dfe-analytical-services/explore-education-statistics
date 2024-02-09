@@ -68,7 +68,7 @@ const PreReleasePageContainer = ({
     }
 
     const {
-      preReleaseWindowStatus: { access, start, end },
+      preReleaseWindowStatus: { access, start, scheduledPublishDate },
       preReleaseSummary: {
         contactEmail,
         contactTeam,
@@ -117,10 +117,10 @@ const PreReleasePageContainer = ({
             {`Pre-release access will be available from ${format(
               start,
               'd MMMM yyyy',
-            )} at ${format(start, 'HH:mm')} until ${format(
-              end,
+            )} at ${format(start, 'HH:mm')} until it is published on ${format(
+              scheduledPublishDate,
               'd MMMM yyyy',
-            )} at ${format(end, 'HH:mm')}.`}
+            )}.`}
           </p>
 
           <p>

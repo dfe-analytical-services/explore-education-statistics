@@ -2,6 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
+/// <summary>
+/// Provides summary information about a publication.
+/// </summary>
 public record PublicationSummaryViewModel
 {
     /// <summary>
@@ -30,9 +33,12 @@ public record PublicationSummaryViewModel
     public required DateTimeOffset LastPublished { get; init; }
 }
 
-public record PaginatedPublicationListViewModel : PaginatedListViewModel<PublicationSummaryViewModel>
+/// <summary>
+/// A paginated list of publication summaries.
+/// </summary>
+public record PublicationPaginatedListViewModel : PaginatedListViewModel<PublicationSummaryViewModel>
 {
-    public PaginatedPublicationListViewModel(
+    public PublicationPaginatedListViewModel(
         List<PublicationSummaryViewModel> results,
         int totalResults,
         int page,
@@ -46,7 +52,7 @@ public record PaginatedPublicationListViewModel : PaginatedListViewModel<Publica
     }
 
     [JsonConstructor]
-    public PaginatedPublicationListViewModel(List<PublicationSummaryViewModel> results, PagingViewModel paging)
+    public PublicationPaginatedListViewModel(List<PublicationSummaryViewModel> results, PagingViewModel paging)
         : base(results, paging)
     {
     }

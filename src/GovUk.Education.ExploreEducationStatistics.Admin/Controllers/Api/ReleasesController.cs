@@ -158,10 +158,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId:guid}/status")]
-        public async Task<ActionResult<List<ReleaseStatusViewModel>>> GetReleaseStatuses(Guid releaseId)
+        public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseId)
         {
             return await _releaseApprovalService
-                .GetReleaseStatuses(releaseId)
+                .ListReleaseStatuses(releaseId)
                 .HandleFailuresOrOk();
         }
 

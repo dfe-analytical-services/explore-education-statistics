@@ -46,6 +46,11 @@ public static class ReleaseGeneratorExtensions
         return generator;
     }
 
+    public static Generator<Release> WithReleaseParent(
+        this Generator<Release> generator,
+        ReleaseParent releaseParent)
+        => generator.ForInstance(s => s.SetReleaseParent(releaseParent));
+
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
         ReleaseApprovalStatus status)
@@ -200,6 +205,17 @@ public static class ReleaseGeneratorExtensions
             release.Publication = publication;
             release.PublicationId = publication.Id;
         });
+
+    public static InstanceSetters<Release> SetReleaseParent(
+        this InstanceSetters<Release> setters,
+        ReleaseParent releaseParent)
+        => setters.Set(r => r.ReleaseParent, releaseParent)
+            .SetReleaseParentId(releaseParent.Id);
+
+    public static InstanceSetters<Release> SetReleaseParentId(
+        this InstanceSetters<Release> setters,
+        Guid releaseParentId)
+        => setters.Set(r => r.ReleaseParentId, releaseParentId);
 
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,

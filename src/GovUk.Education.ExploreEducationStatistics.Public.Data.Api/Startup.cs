@@ -74,15 +74,26 @@ public class Startup
 
         // Databases
 
-        services.AddDbContext<PublicDataDbContext>(options =>
+        // Only set up the `PublicDataDbContext` in non-integration test
+        // environments. Otherwise, the connection string will be null and
+        // cause the data source builder to throw a host exception.
+        if (!_hostEnvironment.IsIntegrationTest())
         {
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(_configuration.GetConnectionString("PublicDataDb"));
             dataSourceBuilder.MapEnum<GeographicLevel>();
 
-            options
-                .UseNpgsql(dataSourceBuilder.Build())
-                .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
-        });
+            // Set up the data source outside the `AddDbContext` action as this
+            // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+            // creating over 20 `IServiceProvider` instances.
+            var dbDataSource = dataSourceBuilder.Build();
+
+            services.AddDbContext<PublicDataDbContext>(options =>
+            {
+                options
+                    .UseNpgsql(dbDataSource)
+                    .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
+            });
+        }
 
         // Caching and compression
 
@@ -108,6 +119,7 @@ public class Startup
         });
 
         services.AddScoped<IPublicationService, PublicationService>();
+        services.AddScoped<IDataSetService, DataSetService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

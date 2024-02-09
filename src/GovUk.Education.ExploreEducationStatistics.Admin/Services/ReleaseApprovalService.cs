@@ -23,7 +23,6 @@ using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpressionUtil;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -38,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPreReleaseUserService _preReleaseUserService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseRepository _releaseRepository;
         private readonly ReleaseApprovalOptions _options;
         private readonly IUserReleaseRoleService _userReleaseRoleService;
         private readonly IEmailTemplateService _emailTemplateService;
@@ -54,7 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPreReleaseUserService preReleaseUserService,
             IReleaseFileRepository releaseFileRepository,
             IReleaseFileService releaseFileService,
-            IReleaseRepository releaseRepository,
             IOptions<ReleaseApprovalOptions> options,
             IUserReleaseRoleService userReleaseRoleService,
             IEmailTemplateService emailTemplateService,
@@ -69,30 +66,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _preReleaseUserService = preReleaseUserService;
             _releaseFileRepository = releaseFileRepository;
             _releaseFileService = releaseFileService;
-            _releaseRepository = releaseRepository;
             _userReleaseRoleService = userReleaseRoleService;
             _emailTemplateService = emailTemplateService;
             _userRepository = userRepository;
             _options = options.Value;
         }
 
-        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
+        public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(
             Guid releaseId)
         {
             return await _context
                 .Releases
-                .Include(r => r.ReleaseStatuses)
-                .ThenInclude(rs => rs.CreatedBy)
                 .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
                 .OnSuccess(async release =>
                 {
-                    var allReleaseVersionIds = await _releaseRepository.GetAllReleaseVersionIds(release);
-                    return _context.ReleaseStatus
-                        .Include(rs => rs.Release)
-                        .Include(rs => rs.CreatedBy)
-                        .Where(rs => allReleaseVersionIds.Contains(rs.ReleaseId))
-                        .ToList()
+                    return await _context.ReleaseStatus
+                        .Where(rs => rs.Release.ReleaseParentId == release.ReleaseParentId)
+                        .OrderByDescending(rs => rs.Created)
                         .Select(rs =>
                             new ReleaseStatusViewModel
                             {
@@ -100,11 +91,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 InternalReleaseNote = rs.InternalReleaseNote,
                                 ApprovalStatus = rs.ApprovalStatus,
                                 Created = rs.Created,
-                                CreatedByEmail = rs.CreatedBy?.Email,
-                                ReleaseVersion = rs.Release.Version,
+                                CreatedByEmail = rs.CreatedBy == null ? null : rs.CreatedBy.Email,
+                                ReleaseVersion = rs.Release.Version
                             })
-                        .OrderByDescending(vm => vm.Created)
-                        .ToList();
+                        .ToListAsync();
                 });
         }
 

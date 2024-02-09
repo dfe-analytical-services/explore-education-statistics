@@ -1,0 +1,192 @@
+import Filters from '@frontend/modules/data-catalogue/components/Filters';
+import { testReleases } from '@frontend/modules/data-catalogue/__data__/testReleases';
+import { testThemes } from '@frontend/modules/data-catalogue/__data__/testThemes';
+import { screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import noop from 'lodash/noop';
+
+describe('Filters', () => {
+  test('renders the default filters', () => {
+    render(<Filters themes={testThemes} onChange={noop} />);
+
+    const themesSelect = screen.getByLabelText('Theme');
+    const themes = within(themesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(themes).toHaveLength(3);
+
+    expect(themes[0]).toHaveTextContent('All');
+    expect(themes[0]).toHaveValue('all');
+    expect(themes[0].selected).toBe(true);
+
+    expect(themes[1]).toHaveTextContent('Theme title 1');
+    expect(themes[1]).toHaveValue('theme-1');
+    expect(themes[1].selected).toBe(false);
+
+    expect(themes[2]).toHaveTextContent('Theme title 2');
+    expect(themes[2]).toHaveValue('theme-2');
+    expect(themes[2].selected).toBe(false);
+
+    const publicationsSelect = screen.getByLabelText('Publication');
+    const publications = within(publicationsSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(publications).toHaveLength(1);
+
+    expect(publications[0]).toHaveTextContent('All');
+    expect(publications[0]).toHaveValue('all');
+    expect(publications[0].selected).toBe(true);
+
+    const releasesSelect = screen.getByLabelText('Releases');
+    const releases = within(releasesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(releases).toHaveLength(2);
+
+    expect(releases[0]).toHaveTextContent('Latest releases');
+    expect(releases[0]).toHaveValue('latest');
+    expect(releases[0].selected).toBe(true);
+
+    expect(releases[1]).toHaveTextContent('All releases');
+    expect(releases[1]).toHaveValue('all');
+    expect(releases[1].selected).toBe(false);
+  });
+
+  test('populates the release filter with all & releases when there is a publicationId', () => {
+    render(
+      <Filters
+        publicationId="publication-1"
+        releases={testReleases}
+        themes={testThemes}
+        themeId="theme-2"
+        onChange={noop}
+      />,
+    );
+
+    const releasesSelect = screen.getByLabelText('Releases');
+    const releases = within(releasesSelect).getAllByRole(
+      'option',
+    ) as HTMLOptionElement[];
+    expect(releases).toHaveLength(4);
+
+    expect(releases[0]).toHaveTextContent('All releases');
+    expect(releases[0]).toHaveValue('all');
+
+    expect(releases[1]).toHaveTextContent('Release title 3');
+    expect(releases[1]).toHaveValue('release-3');
+
+    expect(releases[2]).toHaveTextContent('Release title 2');
+    expect(releases[2]).toHaveValue('release-2');
+
+    expect(releases[3]).toHaveTextContent('Release title 1');
+    expect(releases[3]).toHaveValue('release-1');
+  });
+
+  test('disables the publication filter when there is no themeId', () => {
+    render(<Filters themes={testThemes} onChange={noop} />);
+
+    expect(screen.getByLabelText('Publication')).toBeDisabled();
+  });
+
+  test('enables the publication filter when there is a themeId', () => {
+    render(<Filters themes={testThemes} themeId="theme-2" onChange={noop} />);
+
+    expect(screen.getByLabelText('Publication')).not.toBeDisabled();
+  });
+
+  test('calls the onChange handler when the theme filter is changed', () => {
+    const handleChange = jest.fn();
+    render(<Filters themes={testThemes} onChange={handleChange} />);
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
+
+    expect(handleChange).toHaveBeenCalledWith({
+      filterType: 'themeId',
+      nextValue: 'theme-1',
+    });
+  });
+
+  test('calls the onChange handler when the publication filter is changed', () => {
+    const handleChange = jest.fn();
+    render(
+      <Filters
+        publications={testThemes[1].topics[0].publications}
+        themeId="theme-2"
+        themes={testThemes}
+        onChange={handleChange}
+      />,
+    );
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    userEvent.selectOptions(screen.getByLabelText('Publication'), [
+      'publication-2',
+    ]);
+
+    expect(handleChange).toHaveBeenCalledWith({
+      filterType: 'publicationId',
+      nextValue: 'publication-2',
+    });
+  });
+
+  test('calls the onChange handler when the release filter is changed', () => {
+    const handleChange = jest.fn();
+    render(
+      <Filters
+        publicationId="publication-2"
+        releases={testReleases}
+        themes={testThemes}
+        themeId="theme-2"
+        onChange={handleChange}
+      />,
+    );
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    userEvent.selectOptions(screen.getByLabelText('Releases'), ['release-1']);
+
+    expect(handleChange).toHaveBeenCalledWith({
+      filterType: 'releaseId',
+      nextValue: 'release-1',
+    });
+  });
+
+  test('sets the initial value for the theme filter', () => {
+    render(<Filters themes={testThemes} themeId="theme-2" onChange={noop} />);
+
+    expect(screen.getByLabelText('Theme')).toHaveValue('theme-2');
+  });
+
+  test('sets the initial value for the publication filter', () => {
+    render(
+      <Filters
+        publicationId="publication-2"
+        publications={testThemes[1].topics[0].publications}
+        themes={testThemes}
+        themeId="theme-2"
+        onChange={noop}
+      />,
+    );
+
+    expect(screen.getByLabelText('Publication')).toHaveValue('publication-2');
+  });
+
+  test('sets the initial value for the release filter', () => {
+    render(
+      <Filters
+        publicationId="publication-1"
+        releases={testReleases}
+        releaseId="release-2"
+        themes={testThemes}
+        themeId="theme-2"
+        onChange={noop}
+      />,
+    );
+
+    expect(screen.getByLabelText('Releases')).toHaveValue('release-2');
+  });
+});

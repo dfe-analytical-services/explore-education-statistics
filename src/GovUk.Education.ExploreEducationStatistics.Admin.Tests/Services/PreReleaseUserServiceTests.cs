@@ -1765,7 +1765,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PreReleaseWindow
                     {
                         Start = DateTime.Parse("2020-09-08T08:30:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                        End = DateTime.Parse("2020-09-08T22:59:59.00Z", styles: DateTimeStyles.AdjustToUniversal)
+                        ScheduledPublishDate = DateTime.Parse("2020-09-09T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal)
                     }
                 );
         }

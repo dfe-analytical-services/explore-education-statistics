@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         [EnumLabelValue("Local skills improvement plan area", "LSIP")]
         LocalSkillsImprovementPlanArea,
 
-        [EnumLabelValue("Institution", "INS")] Institution,
+        [EnumLabelValue("Institution", "INST")] Institution,
 
         [EnumLabelValue("Mayoral combined authority", "MCA")]
         MayoralCombinedAuthority,
@@ -32,21 +32,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         [EnumLabelValue("Opportunity area", "OA")]
         OpportunityArea,
 
-        [EnumLabelValue("Parliamentary constituency", "PC")]
+        [EnumLabelValue("Parliamentary constituency", "PCON")]
         ParliamentaryConstituency,
 
-        [EnumLabelValue("Provider", "PRO")] Provider,
+        [EnumLabelValue("Provider", "PROV")] Provider,
 
         [EnumLabelValue("Regional", "REG")] Region,
 
         // Regional School Commissioner Region
-        [EnumLabelValue("RSC region", "RSCR")] RscRegion,
+        [EnumLabelValue("RSC region", "RSC")] RscRegion,
 
         [EnumLabelValue("School", "SCH")] School,
 
-        [EnumLabelValue("Sponsor", "SPO")] Sponsor,
+        [EnumLabelValue("Sponsor", "SPON")] Sponsor,
 
-        [EnumLabelValue("Ward", "WAR")] Ward,
+        [EnumLabelValue("Ward", "WARD")] Ward,
 
         [EnumLabelValue("Planning area", "PA")] PlanningArea
     }

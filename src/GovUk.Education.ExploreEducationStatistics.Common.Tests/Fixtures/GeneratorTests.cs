@@ -424,6 +424,19 @@ public class GeneratorTests
     }
 
     [Fact]
+    public void Generate_ForRange_EmptyRange_RangeIsNotApplied()
+    {
+        var items = new Generator<Test>()
+            .ForRange(..0, s => s
+                .Set(t => t.FirstName, "John")
+                .Set(t => t.LastName, "Doe"))
+            .GenerateArray(2);
+
+        Assert.All(items, item => Assert.Equal("", item.FirstName));
+        Assert.All(items, item => Assert.Equal("", item.LastName));
+    }
+
+    [Fact]
     public void Generate_ForRange_RangeOutOfBoundsThrows()
     {
         Assert.Throws<ArgumentOutOfRangeException>(

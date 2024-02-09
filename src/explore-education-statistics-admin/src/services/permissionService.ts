@@ -33,7 +33,7 @@ export type PreReleaseAccess = 'Before' | 'After' | 'Within' | 'NoneSet';
 export interface PreReleaseWindowStatus {
   access: PreReleaseAccess;
   start: Date;
-  end: Date;
+  scheduledPublishDate: Date;
 }
 
 const permissionService = {
@@ -72,12 +72,12 @@ const permissionService = {
       .get<{
         access: PreReleaseAccess;
         start: string;
-        end: string;
+        scheduledPublishDate: string;
       }>(`/permissions/release/${releaseId}/prerelease/status`)
       .then(status => ({
         access: status.access,
         start: parseISO(status.start),
-        end: parseISO(status.end),
+        scheduledPublishDate: parseISO(status.scheduledPublishDate),
       }));
   },
   getDataFilePermissions(

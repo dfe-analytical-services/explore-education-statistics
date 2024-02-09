@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         public DateTime Start { get; set; }
 
-        public DateTime End { get; set; }
+        public DateTime ScheduledPublishDate { get; set; }
     }
 
     public enum PreReleaseAccess

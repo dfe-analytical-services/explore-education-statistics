@@ -22,6 +22,7 @@ interface LinkRenderProps {
   className: string;
   rel?: 'next' | 'prev';
   to: string;
+  onClick?: () => void;
 }
 
 export interface PaginationProps {
@@ -31,6 +32,7 @@ export interface PaginationProps {
   queryParams?: Params;
   renderLink: (props: LinkRenderProps) => ReactNode;
   totalPages: number;
+  onClick?: (pageNumber: number) => void;
 }
 
 const Pagination = ({
@@ -40,6 +42,7 @@ const Pagination = ({
   queryParams,
   renderLink,
   totalPages,
+  onClick,
 }: PaginationProps) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
@@ -71,6 +74,7 @@ const Pagination = ({
                 <span className="govuk-pagination__link-title">Previous</span>
               </>
             ),
+            onClick: () => onClick?.(currentPage - 1),
           })}
         </div>
       )}
@@ -106,6 +110,7 @@ const Pagination = ({
                   page: pageNumber,
                 }),
                 children: <>{pageNumber}</>,
+                onClick: () => onClick?.(pageNumber),
               })}
             </li>
           );
@@ -128,6 +133,7 @@ const Pagination = ({
                 <ArrowRight className="govuk-pagination__icon govuk-pagination__icon--next" />
               </>
             ),
+            onClick: () => onClick?.(currentPage + 1),
           })}
         </div>
       )}

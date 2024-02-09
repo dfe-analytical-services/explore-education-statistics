@@ -30,5 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return TimeZoneInfo.FindSystemTimeZoneById(
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "GMT Standard Time" : "Europe/London");
         }
+
+        public static bool IsBefore(this DateTime subject, DateTime target)
+        {
+            return subject.CompareTo(target) < 0;
+        }
+
+        public static bool IsAfterInclusive(this DateTime subject, DateTime target)
+        {
+            return subject.CompareTo(target) >= 0;
+        }
     }
 }
