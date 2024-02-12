@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync((Release?) null);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId))
+                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
             var service = BuildService(releaseRepository: releaseRepository.Object,
@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id, default))
                 .ReturnsAsync(_publicationId);
 
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);

@@ -8,13 +8,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,12 +28,14 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
+
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class SubjectResultMetaServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private readonly Country _england = new("E92000001", "England");
         private readonly Region _northEast = new("E12000001", "North East");
         private readonly Region _northWest = new("E12000002", "North West");
@@ -77,26 +83,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_EmptyModelReturnedForSubject()
         {
-            var publication = new Publication
-            {
-                Title = "Test Publication"
-            };
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject
-            };
+            var release = publication.Releases[0];
 
-            var releaseFile = new ReleaseFile
-            {
-                Name = "Test File"
-            };
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            ReleaseSubject releaseSubject = _dataFixture
+                .DefaultReleaseSubject()
+                .WithRelease(_dataFixture
+                    .DefaultStatsRelease()
+                    .WithId(release.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(subject);
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile();
 
             var observations = new List<Observation>();
 
@@ -111,13 +118,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -127,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>()))
@@ -149,9 +155,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(releaseFile);
 
-            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriodRange(observations))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -167,7 +170,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
@@ -183,7 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorRepository,
                     locationRepository,
                     releaseDataFileRepository,
-                    subjectRepository,
                     timePeriodService);
 
                 var viewModel = result.AssertRight();
@@ -203,18 +204,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_BoundaryLevelViewModelsReturnedForSubject()
         {
-            var publication = new Publication();
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject
-            };
+            var release = publication.Releases[0];
+
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            ReleaseSubject releaseSubject = _dataFixture
+                .DefaultReleaseSubject()
+                .WithRelease(_dataFixture
+                    .DefaultStatsRelease()
+                    .WithId(release.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(subject);
 
             var observations = ListOf(
                 new Observation
@@ -279,13 +286,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -295,7 +302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
@@ -326,9 +332,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriodRange(observations))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -344,7 +347,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
@@ -361,7 +363,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorRepository,
                     locationRepository,
                     releaseDataFileRepository,
-                    subjectRepository,
                     timePeriodService);
 
                 var viewModel = result.AssertRight();
@@ -380,18 +381,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject()
         {
-            var publication = new Publication();
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject
-            };
+            var release = publication.Releases[0];
+
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            ReleaseSubject releaseSubject = _dataFixture
+                .DefaultReleaseSubject()
+                .WithRelease(_dataFixture
+                    .DefaultStatsRelease()
+                    .WithId(release.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(subject);
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
 
@@ -504,13 +511,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -520,7 +527,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
@@ -549,9 +555,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriodRange(observations))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -567,7 +570,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
@@ -584,7 +586,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorRepository,
                     locationRepository,
                     releaseDataFileRepository,
-                    subjectRepository,
                     timePeriodService);
 
                 var viewModel = result.AssertRight();
@@ -672,18 +673,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
         {
-            var publication = new Publication();
-            var release = new Release();
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = subject
-            };
+            var release = publication.Releases[0];
+
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
+            ReleaseSubject releaseSubject = _dataFixture
+                .DefaultReleaseSubject()
+                .WithRelease(_dataFixture
+                    .DefaultStatsRelease()
+                    .WithId(release.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(subject);
 
             var observations = ListOf(
                 new Observation
@@ -744,13 +751,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -761,7 +768,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
@@ -809,9 +815,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriodRange(observations))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -828,7 +831,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     geoJsonRepository: geoJsonRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
@@ -846,7 +848,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorRepository,
                     locationRepository,
                     releaseDataFileRepository,
-                    subjectRepository,
                     timePeriodService);
 
                 var viewModel = result.AssertRight();
@@ -930,7 +931,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
-                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict),
                 options ?? DefaultLocationOptions(),
                 Mock.Of<ILogger<SubjectResultMetaService>>()

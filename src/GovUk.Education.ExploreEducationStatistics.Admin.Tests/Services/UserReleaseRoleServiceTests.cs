@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
@@ -17,66 +16,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserReleaseRoleServiceTests
     {
-        private readonly DataFixture _fixture = new();
+        private readonly DataFixture _dataFixture = new();
 
         [Fact]
         public async Task ListUserReleaseRolesByPublication()
         {
-            var (release1, release2) = _fixture.DefaultRelease()
+            var (publication, publicationIgnored) = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(2))
                 .Generate(2)
                 .ToTuple2();
 
-            var publication = _fixture.DefaultPublication()
-                .WithReleases(ListOf(release1, release2))
-                .Generate();
-
-            var releaseIgnored1 = _fixture.DefaultRelease()
-                .WithPublication(_fixture.DefaultPublication())
-                .Generate();
-
             var userReleaseRole1 = new UserReleaseRole
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = release1,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publication.Releases[0],
                 Role = Contributor,
             };
             var userReleaseRole2 = new UserReleaseRole
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = release1,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publication.Releases[0],
                 Role = Contributor,
             };
             var userReleaseRole3 = new UserReleaseRole
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = release2,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publication.Releases[1],
                 Role = Contributor,
             };
             var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = release1,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publication.Releases[0],
                 Role = Lead,
             };
             var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = release1,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publication.Releases[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
             var userReleaseRoleIgnored3 = new UserReleaseRole // Ignored due to release under different publication
             {
-                User = new User{ Id = Guid.NewGuid() },
-                Release = releaseIgnored1,
+                User = new User { Id = Guid.NewGuid() },
+                Release = publicationIgnored.Releases[0],
                 Role = Contributor,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    publication,
+                contentDbContext.Publications.AddRange(publication, publicationIgnored);
+                contentDbContext.UserReleaseRoles.AddRange(
                     userReleaseRole1, userReleaseRole2, userReleaseRole3,
                     userReleaseRoleIgnored1, userReleaseRoleIgnored2, userReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();

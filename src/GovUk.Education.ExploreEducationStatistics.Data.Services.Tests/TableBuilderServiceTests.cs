@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -34,7 +35,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -45,26 +45,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease()
         {
-            var releaseId = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var publication = new Publication
-            {
-                Id = publicationId,
-                LatestPublishedRelease = new Content.Model.Release
-                {
-                    Id = releaseId,
-                }
-            };
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    Id = releaseId,
-                    PublicationId = publicationId
-                },
-                Subject = new Subject()
-            };
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var indicator1Id = Guid.NewGuid();
             var indicator2Id = Guid.NewGuid();
@@ -148,16 +142,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
 
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.Observation.AddRangeAsync(observations);
-                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(observations);
+                statisticsDbContext.MatchedObservations.AddRange(
                     new MatchedObservation(observations[0].Id),
                     new MatchedObservation(observations[2].Id)
                 );
@@ -169,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Indicators = new[] { indicator1Id, indicator2Id },
                     LocationIds = ListOf(location1Id, location2Id, location3Id),
                     TimePeriod = new TimePeriodQuery
@@ -192,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectResultMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
-                            releaseId,
+                            releaseVersion.Id,
                             query,
                             It.IsAny<IList<Observation>>()
                         )
@@ -247,17 +240,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_SubjectNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -281,20 +286,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_PublicationNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    PublicationId = Guid.NewGuid(),
-                },
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            // Set up a ReleaseSubject that references a non-existent publication
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(Guid.NewGuid()));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -317,30 +332,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_ReleaseNotFound()
         {
-            var publicationId = Guid.NewGuid();
-            var publication = new Publication
-            {
-                Id = publicationId
-            };
-
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    PublicationId = publicationId,
-                },
-                Subject = new Subject()
-            };
+            // Set up a ReleaseSubject that references a non-existent release
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease());
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -349,6 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext: contentDbContext);
 
+                // SubjectId exists, but no Content.Model.Release
                 var query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject.SubjectId,
@@ -363,37 +366,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_PredictedTableTooBig()
         {
-            var releaseId = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var publication = new Publication
-            {
-                Id = publicationId,
-                LatestPublishedRelease = new Content.Model.Release
-                {
-                    Id = releaseId,
-                }
-            };
+            var releaseVersion = publication.Releases.Single();
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    Id = releaseId,
-                    PublicationId = publicationId
-                },
-                Subject = new Subject()
-            };
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
 
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -402,7 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     LocationIds = ListOf(Guid.NewGuid()),
@@ -454,11 +449,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_ReleaseId()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var indicator1Id = Guid.NewGuid();
             var indicator2Id = Guid.NewGuid();
@@ -542,12 +546,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.Observation.AddRangeAsync(observations);
-                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.AddRange(releaseSubject);
+                statisticsDbContext.Observation.AddRange(observations);
+                statisticsDbContext.MatchedObservations.AddRange(
                     new MatchedObservation(observations[0].Id),
                     new MatchedObservation(observations[2].Id)
                 );
@@ -558,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Indicators = new[] { indicator1Id, indicator2Id, },
                     LocationIds = ListOf(location1Id, location2Id, location3Id),
                     TimePeriod = new TimePeriodQuery
@@ -632,17 +639,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_ReleaseId_ReleaseNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject(),
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -652,9 +671,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId
                 };
 
+                // Query using a non-existent release id
                 var result = await service.Query(Guid.NewGuid(), query);
 
                 result.AssertNotFound();
@@ -664,17 +684,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_ReleaseId_SubjectNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject(),
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -688,7 +720,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     SubjectId = Guid.NewGuid(),
                 };
 
-                var result = await service.Query(Guid.NewGuid(), query);
+                var result = await service.Query(releaseVersion.Id, query);
 
                 result.AssertNotFound();
             }
@@ -697,17 +729,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_ReleaseId_PredictedTableTooBig()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -715,7 +759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     LocationIds = ListOf(Guid.NewGuid()),
@@ -767,14 +811,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_LatestRelease()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedRelease = new Content.Model.Release
-                {
-                    Id = Guid.NewGuid(),
-                }
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
@@ -850,30 +891,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList();
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    Id = publication.LatestPublishedRelease.Id,
-                    PublicationId = publication.Id
-                },
-                Subject = _fixture.DefaultSubject()
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(publication.Releases[0].Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(_fixture.DefaultSubject()
                     .WithFilters(filters)
                     .WithIndicatorGroups(indicatorGroups)
-                    .WithObservations(observations)
-            };
+                    .WithObservations(observations));
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
 
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.Observation.AddRangeAsync(observations);
-                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(observations);
+                statisticsDbContext.MatchedObservations.AddRange(
                     observations.Select(o => new MatchedObservation(o.Id)).ToArray()
                 );
                 await statisticsDbContext.SaveChangesAsync();
@@ -972,17 +1010,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_LatestRelease_ReleaseNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject(),
-            };
+            // Set up a ReleaseSubject that references a non-existent release
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease());
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1011,22 +1048,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_LatestRelease_SubjectNotFound()
         {
-            var publicationId = Guid.NewGuid();
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    PublicationId = publicationId
-                },
-                Subject = new Subject()
-            };
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1052,34 +1096,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_LatestRelease_PredictedTableTooBig()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                LatestPublishedRelease = new Content.Model.Release
-                {
-                    Id = Guid.NewGuid(),
-                }
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    Id = publication.LatestPublishedRelease.Id,
-                    PublicationId = publication.Id
-                },
-                Subject = new Subject()
-            };
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
 
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1088,7 +1127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     LocationIds = ListOf(Guid.NewGuid()),
@@ -1142,6 +1181,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId()
         {
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
                     s.SetGroupCsvColumn("filter_0_grouping")
@@ -1204,22 +1251,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList();
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = _fixture.DefaultStatsRelease(),
-                Subject = _fixture.DefaultSubject()
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(_fixture.DefaultSubject()
                     .WithFilters(filters)
                     .WithIndicatorGroups(indicatorGroups)
-                    .WithObservations(observations)
-            };
+                    .WithObservations(observations));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.Observation.AddRangeAsync(observations);
-                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(observations);
+                statisticsDbContext.MatchedObservations.AddRange(
                     observations.Select(o => new MatchedObservation(o.Id)).ToArray()
                 );
                 await statisticsDbContext.SaveChangesAsync();
@@ -1315,11 +1367,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId_NoFilters()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id))
+                .WithSubject(_fixture
+                    .DefaultSubject());
 
             var indicators = _fixture.DefaultIndicator()
                 .WithIndicatorGroup(
@@ -1344,12 +1407,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .GenerateList();
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.Observation.AddRangeAsync(observations);
-                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(observations);
+                statisticsDbContext.MatchedObservations.AddRange(
                     observations.Select(o => new MatchedObservation(o.Id)).ToArray()
                 );
                 await statisticsDbContext.SaveChangesAsync();
@@ -1437,17 +1503,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId_ReleaseNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject(),
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1456,7 +1534,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildTableBuilderService(statisticsDbContext, contentDbContext);
 
-                // SubjectId exists, but no Content.Model.Release
                 var query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject.SubjectId,
@@ -1464,6 +1541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
+                // Query using a non-existent release id
                 var result = await service.QueryToCsvStream(Guid.NewGuid(), query, stream);
 
                 result.AssertNotFound();
@@ -1473,17 +1551,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId_SubjectNotFound()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject(),
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1509,17 +1599,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId_PredictedTableTooBig()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
+            Publication publication = _fixture
+                .DefaultPublication()
+                .WithReleaseParents(_fixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(_fixture
+                    .DefaultStatsRelease()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(publication.Id));
 
             var contextId = Guid.NewGuid().ToString();
-
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1527,7 +1629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject.Subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Filters = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     Indicators = new[] { Guid.NewGuid(), Guid.NewGuid() },
                     LocationIds = ListOf(Guid.NewGuid()),

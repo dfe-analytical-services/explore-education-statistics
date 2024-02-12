@@ -9,9 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,29 +37,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Guid CreatedById = Guid.NewGuid();
         private const string NotifyContributorTemplateId = "contributor-invite-template-id";
 
+        private readonly DataFixture _dataFixture = new();
+
         [Fact]
         public async Task InviteContributor_CreateInvite()
         {
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var release2 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2001",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1, release2)
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(2));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -83,7 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id,
+                        publication.Releases[1].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -127,14 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseInvites.Count);
 
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(publication.Releases[0].Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
-                Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(publication.Releases[1].Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
                 Assert.True(userReleaseInvites[1].EmailSent);
@@ -145,31 +140,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor_ExistingUser()
         {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(2));
+
             var user = new User
             {
                 Email = "test@test.com",
             };
 
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var release2 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2001",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1, release2)
-            };
-
             var existingUserReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release1,
+                Release = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -178,7 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(user, publication, existingUserReleaseRole);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.Users.Add(user);
+                contentDbContext.UserReleaseRoles.Add(existingUserReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -215,7 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id,
+                        publication.Releases[1].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -253,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(existingUserReleaseRole.CreatedById, userReleaseRoles[0].CreatedById);
 
                 Assert.Equal(user.Id, userReleaseRoles[1].UserId);
-                Assert.Equal(release2.Id, userReleaseRoles[1].ReleaseId);
+                Assert.Equal(publication.Releases[1].Id, userReleaseRoles[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[1].Role);
                 Assert.Equal(CreatedById, userReleaseRoles[1].CreatedById);
                 userReleaseRoles[1].Created.AssertUtcNow();
@@ -269,34 +257,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor_UserAlreadyHasReleaseRoleInvites()
         {
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var release2 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2001",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1, release2)
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(2));
 
-            var userRelease1Invite = new UserReleaseInvite()
+            var userRelease1Invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release1,
+                Release = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
             };
-            var userRelease2Invite = new UserReleaseInvite()
+
+            var userRelease2Invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release2,
+                Release = publication.Releases[1],
                 Role = Contributor,
                 Created = new DateTime(2001, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -305,7 +284,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(publication, userRelease1Invite, userRelease2Invite);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.UserReleaseInvites.AddRange(userRelease1Invite, userRelease2Invite);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -320,7 +300,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id,
+                        publication.Releases[1].Id));
 
                 result.AssertBadRequest(UserAlreadyHasReleaseRoleInvites);
             }
@@ -353,39 +334,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor_UserAlreadyHasReleaseRoles()
         {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(2));
+
             var user = new User
             {
                 Email = "test@test.com",
             };
 
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var release2 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2001",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1, release2)
-            };
-
-            var userRelease1Role = new UserReleaseRole()
+            var userRelease1Role = new UserReleaseRole
             {
                 User = user,
-                Release = release1,
+                Release = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
             };
-            var userRelease2Role = new UserReleaseRole()
+
+            var userRelease2Role = new UserReleaseRole
             {
                 User = user,
-                Release = release2,
+                Release = publication.Releases[1],
                 Role = Contributor,
                 Created = new DateTime(2001, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -394,8 +366,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(user, publication,
-                    userRelease1Role, userRelease2Role);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.Users.Add(user);
+                contentDbContext.UserReleaseRoles.AddRange(userRelease1Role, userRelease2Role);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -410,7 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id,
+                        publication.Releases[1].Id));
 
                 result.AssertBadRequest(UserAlreadyHasReleaseRoles);
             }
@@ -444,21 +418,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor_NewUser_FailsSendingEmail()
         {
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1)
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -484,7 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -530,21 +499,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = "test@test.com",
             };
 
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1)
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(user, publication);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.Users.Add(user);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -570,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(release1.Id));
+                    releaseIds: ListOf(publication.Releases[0].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -612,32 +577,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor_NotAllReleasesBelongToPublication()
         {
-            var release1 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2000",
-            };
-            var publication1 = new Publication
-            {
-                Title = "Publication title",
-                Releases = ListOf(release1)
-            };
-
-            var release2 = new Release()
-            {
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                ReleaseName = "2001",
-            };
-            var publication2 = new Publication
-            {
-                Title = "Publication title 2",
-                Releases = ListOf(release2)
-            };
+            var (publication1, publication2) = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1))
+                .Generate(2)
+                .ToTuple2();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(publication1, publication2);
+                contentDbContext.Publications.AddRange(publication1, publication2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -652,7 +603,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication1.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id));
+                    releaseIds: ListOf(publication1.Releases[0].Id,
+                        publication2.Releases[0].Id));
 
                 result.AssertBadRequest(NotAllReleasesBelongToPublication);
             }

@@ -1,100 +1,80 @@
 ﻿#nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository;
+
+public class SubjectRepositoryTests
 {
-    public class SubjectRepositoryTests
+    private readonly DataFixture _dataFixture = new();
+
+    public class FindPublicationIdForSubjectTests : SubjectRepositoryTests
     {
         [Fact]
-        public async Task Find_WithSubjectId()
+        public async Task Success()
         {
-            var subject = new Subject();
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.AddAsync(subject);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildSubjectService(context);
-                var result = await service.Find(subject.Id);
-
-                Assert.NotNull(result);
-                Assert.Equal(subject.Id, result!.Id);
-            }
-        }
-
-
-        [Fact]
-        public async Task Find_WithSubjectId_NotFound()
-        {
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildSubjectService(context);
-                var result = await service.Find(Guid.NewGuid());
-
-                Assert.Null(result);
-            }
-        }
-
-        [Fact]
-        public async Task FindPublicationIdForSubject()
-        {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    PublicationId = Guid.NewGuid(),
-                },
-                Subject = new Subject()
-            };
+            ReleaseSubject releaseSubject = _dataFixture
+                .DefaultReleaseSubject()
+                .WithRelease(_dataFixture
+                    .DefaultStatsRelease());
 
             var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddAsync(releaseSubject);
-                await context.SaveChangesAsync();
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var context = InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildSubjectService(context);
+                var service = BuildService(statisticsDbContext);
+
                 var result = await service.FindPublicationIdForSubject(releaseSubject.SubjectId);
-
                 Assert.Equal(releaseSubject.Release.PublicationId, result);
             }
         }
 
         [Fact]
-        public async Task FindPublicationIdForSubject_NotFound()
+        public async Task ReleaseSubjectDoesNotExist_ReturnsNull()
         {
+            Subject subject = _dataFixture
+                .DefaultSubject();
+
             var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var service = BuildSubjectService(context);
-                var result = await service.FindPublicationIdForSubject(Guid.NewGuid());
+                statisticsDbContext.Subject.Add(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
 
-                Assert.Null(result);
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildService(statisticsDbContext);
+
+                Assert.Null(await service.FindPublicationIdForSubject(subject.Id));
             }
         }
 
-        private static SubjectRepository BuildSubjectService(StatisticsDbContext statisticsDbContext)
+        [Fact]
+        public async Task SubjectDoesNotExist_ReturnsNull()
         {
-            return new SubjectRepository(
-                statisticsDbContext
-            );
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = BuildService(statisticsDbContext);
+
+            Assert.Null(await service.FindPublicationIdForSubject(Guid.NewGuid()));
         }
+    }
+
+    private static SubjectRepository BuildService(
+        StatisticsDbContext statisticsDbContext)
+    {
+        return new SubjectRepository(
+            statisticsDbContext);
     }
 }

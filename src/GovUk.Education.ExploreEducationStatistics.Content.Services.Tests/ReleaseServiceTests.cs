@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
@@ -24,6 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
+        private readonly DataFixture _dataFixture = new();
+
         private static readonly Guid ReleaseId = Guid.NewGuid();
 
         private static readonly Guid DataBlock1Id = Guid.NewGuid();
@@ -58,9 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         };
 
+        private static readonly ReleaseParent ReleaseParent1 = new()
+        {
+            Id = Guid.NewGuid()
+        };
+
         private static readonly Release Release1V1 = new()
         {
             Id = ReleaseId,
+            ReleaseParent = ReleaseParent1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v1 Guidance",
@@ -102,6 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static readonly Release Release1V2Deleted = new()
         {
             Id = Guid.NewGuid(),
+            ReleaseParent = ReleaseParent1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v2 Guidance",
@@ -117,6 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static readonly Release Release1V3NotPublished = new()
         {
             Id = Guid.NewGuid(),
+            ReleaseParent = ReleaseParent1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v3 Guidance",
@@ -419,6 +432,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetRelease_FiltersContent()
         {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases[0];
+
             var originalContent = @"
                 <p>
                     Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
@@ -429,65 +449,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
                 </ul>".TrimIndent();
 
-            var release = new Release
+            releaseVersion.Content = new List<ContentSection>
             {
-                Publication = new Publication(),
-                ReleaseName = "2022",
-                TimePeriodCoverage = CalendarYear,
-                ApprovalStatus = Approved,
-                Published = DateTime.UtcNow,
-                Content = ListOf(
-                    new ContentSection
+                new()
+                {
+                    Type = ContentSectionType.ReleaseSummary,
+                    Content = new List<ContentBlock>
                     {
-                        Type = ContentSectionType.ReleaseSummary,
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Body = originalContent
-                            }
+                            Body = originalContent
                         }
-                    },
-                    new ContentSection
+                    }
+                },
+                new()
+                {
+                    Type = ContentSectionType.RelatedDashboards,
+                    Content = new List<ContentBlock>
                     {
-                        Type = ContentSectionType.RelatedDashboards,
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Body = originalContent
-                            }
+                            Body = originalContent
                         }
-                    },
-                    new ContentSection
+                    }
+                },
+                new()
+                {
+                    Type = ContentSectionType.Headlines,
+                    Content = new List<ContentBlock>
                     {
-                        Type = ContentSectionType.Headlines,
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Body = originalContent
-                            }
+                            Body = originalContent
                         }
-                    },
-                    new ContentSection
+                    }
+                },
+                new()
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Body = originalContent
-                            }
+                            Body = originalContent
                         }
-                    })
+                    }
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -495,10 +508,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.GetRelease(release.Id);
+                var result = await service.GetRelease(releaseVersion.Id);
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(release.Id, viewModel.Id);
+                Assert.Equal(releaseVersion.Id, viewModel.Id);
 
                 var expectedContent = @"
                     <p>
@@ -535,19 +548,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetRelease_NotPublished()
         {
-            var release = new Release
-            {
-                ReleaseName = "2022",
-                TimePeriodCoverage = CalendarYear,
-                ApprovalStatus = Approved,
-                Published = null
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single(r => r is { Published: null });
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -558,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
                 // on a scheduled date
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(release.Id, expectedPublishDate);
+                var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
                 var viewModel = result.AssertRight();
 
@@ -570,19 +581,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetRelease_NotPublished_ExpectedPublishDateIsNull()
         {
-            var release = new Release
-            {
-                ReleaseName = "2022",
-                TimePeriodCoverage = CalendarYear,
-                ApprovalStatus = Approved,
-                Published = null
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single(r => r is { Published: null });
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -592,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
                 // immediately.
-                var result = await service.GetRelease(release.Id,
+                var result = await service.GetRelease(releaseVersion.Id,
                     expectedPublishDate: null);
 
                 var viewModel = result.AssertRight();
@@ -605,31 +614,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsFalse()
         {
-            var previousRelease = new Release
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2023",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow.AddDays(-1),
-                PreviousVersionId = null,
-                Version = 0
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .Generate(1));
 
-            var release = new Release
-            {
-                ReleaseName = "2023",
-                TimePeriodCoverage = AcademicYear,
-                Published = null,
-                PreviousVersionId = previousRelease.Id,
-                Version = 1,
-                UpdatePublishedDate = false
-            };
+            var (previousReleaseVersion, releaseVersion) = publication.Releases.ToTuple2();
+            releaseVersion.UpdatePublishedDate = false;
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -641,44 +637,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // publishing it.
                 // An update to the published date *has not* been requested.
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(release.Id, expectedPublishDate);
+                var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(release.Id, viewModel.Id);
+                Assert.Equal(releaseVersion.Id, viewModel.Id);
                 // Published date in the view model should match the published date of the previous version
-                Assert.Equal(previousRelease.Published, viewModel.Published);
+                Assert.Equal(previousReleaseVersion.Published, viewModel.Published);
             }
         }
 
         [Fact]
         public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsTrue()
         {
-            var previousRelease = new Release
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2023",
-                TimePeriodCoverage = AcademicYear,
-                Published = DateTime.UtcNow.AddDays(-1),
-                PreviousVersionId = null,
-                Version = 0
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .Generate(1));
 
-            var release = new Release
-            {
-                ReleaseName = "2023",
-                TimePeriodCoverage = AcademicYear,
-                Published = null,
-                PreviousVersionId = previousRelease.Id,
-                Version = 1,
-                UpdatePublishedDate = true
-            };
+            var releaseVersion = publication.Releases[1];
+            releaseVersion.UpdatePublishedDate = true;
 
             var contentDbContextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -690,11 +673,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // publishing it.
                 // An update to the published date *has* been requested.
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(release.Id, expectedPublishDate);
+                var result = await service.GetRelease(releaseVersion.Id, expectedPublishDate);
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(release.Id, viewModel.Id);
+                Assert.Equal(releaseVersion.Id, viewModel.Id);
                 // Published date in the view model should match the expected publish date
                 Assert.Equal(expectedPublishDate, viewModel.Published);
             }
@@ -733,37 +716,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task List()
         {
-            var release1 = new Release
-            {
-                Slug = "release-1",
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2020",
-                Published = new DateTime(2020, 1, 1),
-                NextReleaseDate = new PartialDate { Year = "2020" },
-                Type = ReleaseType.NationalStatistics
-            };
-            var release2 = new Release
-            {
-                Slug = "release-2",
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021",
-                Published = new DateTime(2021, 1, 1),
-                NextReleaseDate = new PartialDate { Year = "2021" },
-                Type = ReleaseType.NationalStatistics
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(2));
 
-            var publication = new Publication
-            {
-                Slug = "publication-slug",
-                LatestPublishedRelease = release2,
-                Releases = ListOf(release1, release2),
-            };
+            var (release1Version1, release2Version1) = publication.Releases.ToTuple2();
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -778,26 +742,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(2, releases.Count);
 
                 // Ordered from most newest to oldest
-                Assert.Equal(release2.Id, releases[0].Id);
-                Assert.Equal(release2.Title, releases[0].Title);
-                Assert.Equal(release2.ReleaseName, releases[0].ReleaseName);
-                Assert.Equal(release2.Slug, releases[0].Slug);
-                Assert.Equal(release2.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
-                Assert.Equal(release2.YearTitle, releases[0].YearTitle);
-                Assert.Equal(release2.Published, releases[0].Published);
-                release2.NextReleaseDate.AssertDeepEqualTo(releases[0].NextReleaseDate);
-                Assert.Equal(release2.Type, releases[0].Type);
+                Assert.Equal(release2Version1.Id, releases[0].Id);
+                Assert.Equal(release2Version1.Title, releases[0].Title);
+                Assert.Equal(release2Version1.ReleaseName, releases[0].ReleaseName);
+                Assert.Equal(release2Version1.Slug, releases[0].Slug);
+                Assert.Equal(release2Version1.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
+                Assert.Equal(release2Version1.YearTitle, releases[0].YearTitle);
+                Assert.Equal(release2Version1.Published, releases[0].Published);
+                Assert.Equal(release2Version1.NextReleaseDate, releases[0].NextReleaseDate);
+                Assert.Equal(release2Version1.Type, releases[0].Type);
                 Assert.True(releases[0].LatestRelease);
 
-                Assert.Equal(release1.Id, releases[1].Id);
-                Assert.Equal(release1.Title, releases[1].Title);
-                Assert.Equal(release1.ReleaseName, releases[1].ReleaseName);
-                Assert.Equal(release1.Slug, releases[1].Slug);
-                Assert.Equal(release1.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
-                Assert.Equal(release1.YearTitle, releases[1].YearTitle);
-                Assert.Equal(release1.Published, releases[1].Published);
-                release1.NextReleaseDate.AssertDeepEqualTo(releases[1].NextReleaseDate);
-                Assert.Equal(release1.Type, releases[1].Type);
+                Assert.Equal(release1Version1.Id, releases[1].Id);
+                Assert.Equal(release1Version1.Title, releases[1].Title);
+                Assert.Equal(release1Version1.ReleaseName, releases[1].ReleaseName);
+                Assert.Equal(release1Version1.Slug, releases[1].Slug);
+                Assert.Equal(release1Version1.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
+                Assert.Equal(release1Version1.YearTitle, releases[1].YearTitle);
+                Assert.Equal(release1Version1.Published, releases[1].Published);
+                Assert.Equal(release1Version1.NextReleaseDate, releases[1].NextReleaseDate);
+                Assert.Equal(release1Version1.Type, releases[1].Type);
                 Assert.False(releases[1].LatestRelease);
             }
         }
@@ -805,28 +769,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task List_FiltersPreviousReleasesForAmendments()
         {
-            var originalRelease = new Release
-            {
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2020",
-                Published = new DateTime(2020, 1, 1),
-                Type = ReleaseType.NationalStatistics,
-            };
-            var amendedRelease = new Release
-            {
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021",
-                Published = new DateTime(2020, 2, 1),
-                Type = ReleaseType.NationalStatistics,
-                PreviousVersion = originalRelease
-            };
-
-            var publication = new Publication
-            {
-                Slug = "publication-slug",
-                Releases = ListOf(originalRelease, amendedRelease),
-                LatestPublishedRelease = amendedRelease
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 3)
+                    .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -844,50 +791,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var releases = result.AssertRight();
 
-                var releaseViewModel = Assert.Single(releases);
-                Assert.Equal(amendedRelease.Id, releaseViewModel.Id);
+                Assert.Equal(new[]
+                {
+                    publication.Releases.Single(r => r is { Version: 2 }).Id
+                }, releases.Select(r => r.Id).ToArray());
             }
         }
 
         [Fact]
         public async Task List_FiltersDraftReleases()
         {
-            // Draft
-            var release1 = new Release
-            {
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2020",
-                Type = ReleaseType.NationalStatistics
-            };
-            // Published
-            var release2 = new Release
-            {
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021",
-                Published = new DateTime(2021, 1, 1),
-                Type = ReleaseType.NationalStatistics
-            };
-            // Amendment is draft
-            var release2Amendment = new Release
-            {
-                TimePeriodCoverage = CalendarYear,
-                ReleaseName = "2021",
-                Type = ReleaseType.NationalStatistics,
-                PreviousVersion = release2
-            };
-
-            var publication = new Publication
-            {
-                Slug = "publication-slug",
-                Releases = ListOf(release1, release2, release2Amendment),
-                LatestPublishedRelease = release2
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .Generate(2));
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -899,8 +822,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var releases = result.AssertRight();
 
-                var releaseViewModel = Assert.Single(releases);
-                Assert.Equal(release2.Id, releaseViewModel.Id);
+                Assert.Equal(new[]
+                {
+                    publication.Releases.Single(r => r is { Year: 2001, Published: not null }).Id,
+                    publication.Releases.Single(r => r is { Year: 2000, Published: not null }).Id
+                }, releases.Select(r => r.Id).ToArray());
             }
         }
 
