@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.In
 
 public interface IPublicationService
 {
-    Task<Either<ActionResult, PaginatedPublicationListViewModel>> ListPublications(
+    Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize, 
         string? search = null);

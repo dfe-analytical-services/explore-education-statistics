@@ -2,12 +2,16 @@ import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React, { Children, createElement, ReactNode } from 'react';
+import VisuallyHidden from './VisuallyHidden';
 
 interface BaseProps {
+  buttonClassName?: string;
+  buttonHiddenText?: string;
   children: ReactNode;
   collapseAfter?: number;
   id: string;
   isCollapsed?: boolean;
+  listClassName?: string;
   listStyle?: 'none' | 'number' | 'bullet';
   testId?: string;
 }
@@ -25,12 +29,15 @@ type Props = BaseProps &
   );
 
 const CollapsibleList = ({
+  buttonClassName,
+  buttonHiddenText,
   children,
   collapseAfter = 5,
   id,
   itemName = 'item',
   itemNamePlural = 'items',
   isCollapsed = true,
+  listClassName,
   listStyle = 'none',
   testId,
 }: Props) => {
@@ -44,7 +51,7 @@ const CollapsibleList = ({
 
   const listTag = listStyle === 'number' ? 'ol' : 'ul';
 
-  const listClasses = classNames('govuk-list', {
+  const listClasses = classNames('govuk-list', listClassName, {
     'govuk-list--number': listStyle === 'number',
     'govuk-list--bullet': listStyle === 'bullet',
   });
@@ -66,7 +73,9 @@ const CollapsibleList = ({
         <ButtonText
           ariaControls={id}
           ariaExpanded={!collapsed}
-          className="govuk-!-display-none-print govuk-!-margin-bottom-4"
+          className={classNames('govuk-!-display-none-print', buttonClassName, {
+            'govuk-!-margin-bottom-4': !buttonClassName,
+          })}
           onClick={toggleCollapsed}
         >
           {collapsed
@@ -76,6 +85,9 @@ const CollapsibleList = ({
             : `Hide ${collapsedCount} ${
                 collapsedCount > 1 ? itemNamePlural : itemName
               }`}
+          {buttonHiddenText && (
+            <VisuallyHidden> {buttonHiddenText}</VisuallyHidden>
+          )}
         </ButtonText>
       )}
     </>

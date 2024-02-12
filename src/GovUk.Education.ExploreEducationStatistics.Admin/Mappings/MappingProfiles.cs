@@ -102,8 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<FeaturedTable, FeaturedTableViewModel>();
             CreateMap<FeaturedTableCreateRequest, FeaturedTable>();
 
-            CreateMap<Release, Data.Model.Release>();
-
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
             CreateMap<Topic, TopicViewModel>();

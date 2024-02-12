@@ -1,0 +1,13 @@
+@import '~govuk-frontend/govuk/base';
+
+.form {
+  padding: govuk-spacing(3) 0;
+
+  @include govuk-media-query($from: desktop) {
+    padding: govuk-spacing(4) 0;
+  }
+
+  :global(.govuk-form-group) {
+    margin-bottom: 0;
+  }
+}

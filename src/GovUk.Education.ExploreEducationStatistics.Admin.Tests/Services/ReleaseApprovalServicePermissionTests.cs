@@ -18,7 +18,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -33,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async Task GetReleaseStatuses()
+        public async Task ListReleaseStatuses()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<Release>(r => r.Id == _release.Id, CanViewReleaseStatusHistory)
@@ -49,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
-                        return await service.GetReleaseStatuses(_release.Id);
+                        return await service.ListReleaseStatuses(_release.Id);
                     }
                 });
         }
@@ -153,7 +152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IPreReleaseUserService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
-                Mock.Of<IReleaseRepository>(),
                 Options.Create(new ReleaseApprovalOptions()),
                 Mock.Of<IUserReleaseRoleService>(),
                 Mock.Of<IEmailTemplateService>(),

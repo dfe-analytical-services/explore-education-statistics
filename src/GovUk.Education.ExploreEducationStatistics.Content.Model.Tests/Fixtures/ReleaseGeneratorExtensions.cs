@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +44,11 @@ public static class ReleaseGeneratorExtensions
 
         return generator;
     }
+
+    public static Generator<Release> WithReleaseParent(
+        this Generator<Release> generator,
+        ReleaseParent releaseParent)
+        => generator.ForInstance(s => s.SetReleaseParent(releaseParent));
 
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
@@ -98,6 +102,11 @@ public static class ReleaseGeneratorExtensions
         this Generator<Release> generator,
         PartialDate nextReleaseDate)
         => generator.ForInstance(release => release.SetNextReleaseDate(nextReleaseDate));
+
+    public static Generator<Release> WithPreviousVersion(
+        this Generator<Release> generator,
+        Release previousVersion)
+        => generator.ForInstance(release => release.SetPreviousVersion(previousVersion));
 
     public static Generator<Release> WithPreviousVersionId(
         this Generator<Release> generator,
@@ -183,8 +192,10 @@ public static class ReleaseGeneratorExtensions
         => setters
             .SetDefault(p => p.Id)
             .SetDefault(p => p.Slug)
-            .SetDefault(p => p.Title)
             .SetDefault(p => p.DataGuidance)
+            .SetDefault(p => p.Type)
+            .SetApprovalStatus(ReleaseApprovalStatus.Draft)
+            .SetTimePeriodCoverage(TimeIdentifier.AcademicYear)
             .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}");
 
     public static InstanceSetters<Release> SetId(
@@ -200,6 +211,17 @@ public static class ReleaseGeneratorExtensions
             release.Publication = publication;
             release.PublicationId = publication.Id;
         });
+
+    public static InstanceSetters<Release> SetReleaseParent(
+        this InstanceSetters<Release> setters,
+        ReleaseParent releaseParent)
+        => setters.Set(r => r.ReleaseParent, releaseParent)
+            .SetReleaseParentId(releaseParent.Id);
+
+    public static InstanceSetters<Release> SetReleaseParentId(
+        this InstanceSetters<Release> setters,
+        Guid releaseParentId)
+        => setters.Set(r => r.ReleaseParentId, releaseParentId);
 
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,
@@ -269,9 +291,15 @@ public static class ReleaseGeneratorExtensions
         return setters;
     }
 
+    public static InstanceSetters<Release> SetPreviousVersion(
+        this InstanceSetters<Release> setters,
+        Release? previousVersion)
+        => setters.Set(release => release.PreviousVersion, previousVersion)
+            .SetPreviousVersionId(previousVersion?.Id);
+
     public static InstanceSetters<Release> SetPreviousVersionId(
         this InstanceSetters<Release> setters,
-        Guid previousVersionId)
+        Guid? previousVersionId)
         => setters.Set(release => release.PreviousVersionId, previousVersionId);
 
     public static InstanceSetters<Release> SetYear(

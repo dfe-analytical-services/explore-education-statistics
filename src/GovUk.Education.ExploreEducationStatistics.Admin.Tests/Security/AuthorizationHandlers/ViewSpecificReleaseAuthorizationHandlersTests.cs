@@ -205,7 +205,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             AccessWindow = new AccessWindowOptions
                             {
-                                MinutesBeforeReleaseTimeEnd = 100,
                                 MinutesBeforeReleaseTimeStart = 200,
                             }
                         }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -10,11 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public static class DbUtils
     {
-        public static ContentDbContext InMemoryApplicationDbContext(string dbName) => InMemoryContentDbContext(dbName);
-
-        public static ContentDbContext InMemoryApplicationDbContext()
+        public static ContentDbContext InMemoryApplicationDbContext(string dbName, bool updateTimestamps = true)
         {
-            return InMemoryContentDbContext();
+            return InMemoryContentDbContext(dbName, updateTimestamps);
+        }
+
+        public static ContentDbContext InMemoryApplicationDbContext(bool updateTimestamps = true)
+        {
+            return InMemoryContentDbContext(updateTimestamps);
         }
 
         public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName, bool updateTimestamps = true)

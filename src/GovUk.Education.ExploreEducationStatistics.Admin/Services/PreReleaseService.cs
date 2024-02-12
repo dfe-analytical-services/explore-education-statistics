@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return new PreReleaseWindow
             {
                 Start = GetStartTime(publishScheduled),
-                End = GetEndTime(publishScheduled)
+                ScheduledPublishDate = publishScheduled
             };
         }
 
@@ -38,9 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return new PreReleaseWindowStatus
                 {
                     Access = PreReleaseAccess.After
-                };             
+                };
             }
-            
+
             if (!release.PublishScheduled.HasValue)
             {
                 return new PreReleaseWindowStatus
@@ -51,13 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var publishScheduled = release.PublishScheduled.Value;
             var startTime = GetStartTime(publishScheduled);
-            var endTime = GetEndTime(publishScheduled);
 
             return new PreReleaseWindowStatus
             {
-                Start = startTime,
-                End = endTime,
-                Access = GetAccess(release, startTime, endTime, referenceTime)
+                Start = GetStartTime(publishScheduled),
+                ScheduledPublishDate = publishScheduled,
+                Access = GetAccess(release, startTime, referenceTime)
             };
         }
 
@@ -66,15 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeStart);
         }
 
-        private DateTime GetEndTime(DateTime publishScheduled)
-        {
-            return publishScheduled.AddMinutes(-_preReleaseOptions.MinutesBeforeReleaseTimeEnd);
-        }
-
         private static PreReleaseAccess GetAccess(
             Release release,
             DateTime startTime,
-            DateTime endTime,
             DateTime referenceTime)
         {
             if (!release.PublishScheduled.HasValue || release.ApprovalStatus != ReleaseApprovalStatus.Approved)
@@ -82,17 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return PreReleaseAccess.NoneSet;
             }
 
-            if (referenceTime.CompareTo(startTime) < 0)
+            if (referenceTime.IsBefore(startTime))
             {
                 return PreReleaseAccess.Before;
             }
 
-            if (referenceTime.CompareTo(endTime) >= 0)
-            {
-                return PreReleaseAccess.After;
-            }
-
-            return PreReleaseAccess.Within;
+            return release.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
         }
     }
 
@@ -104,8 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class AccessWindowOptions
     {
         public int MinutesBeforeReleaseTimeStart { get; set; }
-
-        public int MinutesBeforeReleaseTimeEnd { get; set; }
     }
 
     public class PreReleaseAccessOptions

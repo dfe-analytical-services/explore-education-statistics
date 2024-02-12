@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,7 +15,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             params ReleaseApprovalStatus[] releaseApprovalStatuses);
 
         Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId);
-
-        public Task<List<Guid>> GetAllReleaseVersionIds(Release release);
     }
 }

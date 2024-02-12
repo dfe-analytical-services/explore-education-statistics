@@ -64,10 +64,6 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
             .CreateHostBuilder()
             .ConfigureServices(services =>
             {
-                var dbContext = services.Single(
-                    sd => sd.ServiceType == typeof(DbContextOptions<PublicDataDbContext>));
-                services.Remove(dbContext);
-
                 services.AddDbContext<PublicDataDbContext>(
                     options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
             });

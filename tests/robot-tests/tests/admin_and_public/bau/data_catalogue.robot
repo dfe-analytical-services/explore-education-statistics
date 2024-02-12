@@ -4,6 +4,7 @@ Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../seed_data/seed_data_theme_1_constants.robot
+Resource            ../../seed_data/seed_data_theme_2_constants.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -161,3 +162,138 @@ Validate new zip contains correct files
     sleep    8    # wait for file to download
     ${list}=    create list    data/seven_filters.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2020-21-q1.zip    ${list}
+
+# TO DO EES-4781 - remove the above tests for the old version.
+
+User navigates to data catalogue page
+    user navigates to new data catalogue page on public frontend
+
+Validate Related information section and links exist
+    ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
+
+    user checks element contains child element    ${relatedInformation}    xpath://h2[text()="Related information"]
+
+    user checks page contains link with text and url
+    ...    Find statistics and data
+    ...    /find-statistics
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
+    ...    Glossary
+    ...    /glossary
+    ...    ${relatedInformation}
+
+Validate data sets list
+    [Tags]    Local    Dev
+
+    user checks list has x items    testid:data-sets-list    10
+
+    ${dataSet}=    user gets testid element    data-set-summary-${SUBJECT_NAME_3}
+
+    user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
+    user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
+    user checks element contains    ${dataSet}    Test theme
+    user checks element contains    ${dataSet}    This is the latest data
+    user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
+    user checks element contains    ${dataSet}    ${RELEASE_NAME}
+
+    user clicks button    Show more details
+    user clicks button containing text    Download data set
+
+Validate zip contains correct files
+    [Documentation]    EES-4147
+    sleep    8    # wait for file to download
+    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
+    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
+
+Validate sort controls exist
+    [Tags]    Local    Dev
+    user checks radio is checked    Newest
+    user checks page contains radio    Oldest
+    user checks page contains radio    A to Z
+
+Validate theme filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:theme    All themes
+    user checks select contains option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks select contains option    id:theme    ${ROLE_PERMISSIONS_THEME_TITLE}
+
+Validate publication filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:publication    All publications
+
+Validate release filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:release    Latest releases
+    user checks select contains option    id:release    All releases
+
+Filter by theme
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+
+Filter by publication
+    [Tags]    Local    Dev
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
+
+Filter by all releases
+    [Tags]    Local    Dev
+    user chooses select option    id:release    All releases
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
+
+Remove theme filter
+    [Tags]    Local    Dev
+    user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+
+Remove publication filter
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
+
+Remove release filter
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
+    user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
+
+Clear all filters
+    [Tags]    Local    Dev
+    user clicks element    id:searchForm-search
+    user presses keys    pupil
+    user clicks button    Search
+    user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+
+    user checks page contains button    pupil
+    user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+
+    user clicks button    Clear filters
+
+    user checks page does not contain button    pupil
+    user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
+    user checks page does not contain button    Clear filters
+
+Searching
+    [Tags]    Local    Dev
+    user clicks element    id:searchForm-search
+    user presses keys    Exclusions by geographic level
+    user clicks button    Search
+    user checks page contains button    Exclusions by geographic level
+    user checks list item contains    testid:data-sets-list    1    Exclusions by geographic level
+
+Removing search
+    [Tags]    Local    Dev
+    user clicks button    Exclusions by geographic level
+    user checks page does not contain button    Exclusions by geographic level

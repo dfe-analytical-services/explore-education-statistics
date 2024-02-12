@@ -20,7 +20,7 @@ internal class PublicationService : IPublicationService
         _contentApiClient = contentApiClient;
     }
 
-    public async Task<Either<ActionResult, PaginatedPublicationListViewModel>> ListPublications(
+    public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize,
         string? search = null)
@@ -32,7 +32,7 @@ internal class PublicationService : IPublicationService
             {
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
 
-                return new PaginatedPublicationListViewModel(
+                return new PublicationPaginatedListViewModel(
                     results: results,
                     totalResults: paginatedPublications.Paging.TotalResults,
                     page: paginatedPublications.Paging.Page,
