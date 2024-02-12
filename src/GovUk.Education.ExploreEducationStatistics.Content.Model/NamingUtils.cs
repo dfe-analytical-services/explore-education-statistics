@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public static string SlugFromTitle(string title)
         {
+            // NOTE: If you change anything here, you should also update `slugFromTitle.ts` in the frontend
             var replaceNonAlphaNumericWithSpace = ReplaceNonAlphaNumericWithSpaceAndTrim(title);
             var toLower = new string(replaceNonAlphaNumericWithSpace.Select(ToLower).ToArray());
             var removeMultipleSpaces = Regex.Replace(toLower, @"\s+", " ");
