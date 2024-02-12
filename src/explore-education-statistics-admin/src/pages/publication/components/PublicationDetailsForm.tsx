@@ -161,9 +161,9 @@ export default function PublicationDetailsForm({
 
               {showConfirmModal && (
                 <PublicationUpdateConfirmModal
-                  title={initialValues.title}
-                  slug={publicationSlug}
-                  newTitle={form.getValues().title}
+                  initialPublicationTitle={initialValues.title}
+                  initialPublicationSlug={publicationSlug}
+                  newPublicationTitle={form.getValues().title}
                   onConfirm={async () => {
                     await form.handleSubmit(handleSubmit)();
                   }}

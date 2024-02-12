@@ -5,26 +5,26 @@ import UrlContainer from '@common/components/UrlContainer';
 import slugFromTitle from '@common/utils/slugFromTitle';
 
 interface Props {
-  title: string;
-  slug: string;
-  newTitle: string;
+  initialPublicationTitle: string;
+  initialPublicationSlug: string;
+  newPublicationTitle: string;
   onConfirm: () => void;
   onCancel: () => void;
   onExit: () => void;
 }
 
-const PublicationUpdateConfirmModal = ({
-  title,
-  slug,
-  newTitle,
+export default function PublicationUpdateConfirmModal({
+  initialPublicationTitle,
+  initialPublicationSlug,
+  newPublicationTitle,
   onConfirm,
   onCancel,
   onExit,
-}: Props) => {
-  const newSlug = slugFromTitle(newTitle);
+}: Props) {
+  const newPublicationSlug = slugFromTitle(newPublicationTitle);
 
-  const titleHasChanged = title !== newTitle;
-  const slugHasChanged = slug !== newSlug;
+  const titleHasChanged = initialPublicationTitle !== newPublicationTitle;
+  const slugHasChanged = initialPublicationSlug !== newPublicationSlug;
 
   const { PublicAppUrl } = useConfig();
 
@@ -39,8 +39,9 @@ const PublicationUpdateConfirmModal = ({
       <p>Any changes will appear on the public site immediately.</p>
       {titleHasChanged && (
         <p>
-          The publication title will change from <strong>{title}</strong> to{' '}
-          <strong>{newTitle}</strong>
+          The publication title will change from{' '}
+          <strong>{initialPublicationTitle}</strong> to{' '}
+          <strong>{newPublicationTitle}</strong>
         </p>
       )}
       {slugHasChanged && (
@@ -48,19 +49,19 @@ const PublicationUpdateConfirmModal = ({
           <p>The URL for this publication will change from</p>
           <UrlContainer
             data-testid="before-url"
-            url={`${PublicAppUrl}/find-statistics/${slug}`}
+            url={`${PublicAppUrl}/find-statistics/${initialPublicationSlug}`}
           />{' '}
           to{' '}
           <UrlContainer
             data-testid="after-url"
-            url={`${PublicAppUrl}/find-statistics/${newSlug}`}
+            url={`${PublicAppUrl}/find-statistics/${newPublicationSlug}`}
           />
         </>
       )}
 
-      <p>Are you sure you want to save the changes?</p>
+      <p className="govuk-!-margin-top-4">
+        Are you sure you want to save the changes?
+      </p>
     </ModalConfirm>
   );
-};
-
-export default PublicationUpdateConfirmModal;
+}

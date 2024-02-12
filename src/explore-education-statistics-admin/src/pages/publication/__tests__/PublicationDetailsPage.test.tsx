@@ -395,7 +395,7 @@ describe('PublicationDetailsPage', () => {
       );
     });
 
-    test('confirmation modal mentions title change', async () => {
+    test('confirmation modal renders correctly when title is changed to match the slug', async () => {
       renderPage({
         ...testPublication,
         title: 'Publication 1',
@@ -441,7 +441,7 @@ describe('PublicationDetailsPage', () => {
       );
     });
 
-    test('confirmation modal mentions URL change', async () => {
+    test('confirmation modal renders correctly when a publication title remains the same, but the slug is changed to match the title', async () => {
       renderPage({
         ...testPublication,
         title: 'Publication 1 updated',
@@ -475,6 +475,59 @@ describe('PublicationDetailsPage', () => {
       expect(
         screen.queryByText('The publication title will change from'),
       ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByText('The URL for this publication will change from'),
+      ).toBeInTheDocument();
+
+      expect(screen.getByTestId('before-url')).toHaveValue(
+        'http://localhost/find-statistics/publication-1',
+      );
+      expect(screen.getByTestId('after-url')).toHaveValue(
+        'http://localhost/find-statistics/publication-1-updated',
+      );
+    });
+
+    test('confirmation modal renders correctly when title and slug are changed', async () => {
+      renderPage({
+        ...testPublication,
+        title: 'Publication 1',
+        slug: 'publication-1',
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
+
+      userEvent.clear(screen.getByLabelText('Publication title'));
+      userEvent.type(
+        screen.getByLabelText('Publication title'),
+        'Publication 1 updated',
+      );
+
+      expect(publicationService.updatePublication).not.toHaveBeenCalled();
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Update publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm publication changes'),
+        ).toBeInTheDocument();
+      });
+
+      expect(screen.getByRole('dialog')).toHaveTextContent(
+        'The publication title will change from Publication 1 to Publication 1 updated',
+      );
 
       expect(
         screen.getByText('The URL for this publication will change from'),
