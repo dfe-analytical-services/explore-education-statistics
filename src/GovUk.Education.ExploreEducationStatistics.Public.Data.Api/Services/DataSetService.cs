@@ -32,7 +32,8 @@ internal class DataSetService : IDataSetService
         var queryable = _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
-            .Where(ds => ds.Status == DataSetStatus.Published);
+            .Where(ds => ds.Status == DataSetStatus.Published 
+                || ds.Status == DataSetStatus.Deprecated);
 
         var totalResults = await queryable.CountAsync();
 
@@ -54,7 +55,8 @@ internal class DataSetService : IDataSetService
         var dataSet = await _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.Id == dataSetId)
-            .Where(ds => ds.Status == DataSetStatus.Published)
+            .Where(ds => ds.Status == DataSetStatus.Published
+                || ds.Status == DataSetStatus.Deprecated)
             .SingleOrDefaultAsync();
 
         return dataSet is null

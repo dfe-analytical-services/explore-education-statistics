@@ -22,12 +22,14 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         {
         }
 
-        [Fact]
-        public async Task DataSetIsPublished_Returns200()
+        [Theory]
+        [InlineData(DataSetStatus.Published)]
+        [InlineData(DataSetStatus.Deprecated)]
+        public async Task DataSetIsAvailable_Returns200(DataSetStatus dataSetStatus)
         {
             var dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(DataSetStatus.Published)
+                .WithStatus(dataSetStatus)
                 .Generate();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
@@ -80,17 +82,19 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSetVersion.MetaSummary.Indicators, content.LatestVersion.Indicators);
         }
 
-        [Fact]
-        public async Task DataSetNotPublished_Returns404()
+        [Theory]
+        [InlineData(DataSetStatus.Staged)]
+        [InlineData(DataSetStatus.Unpublished)]
+        public async Task DataSetNotAvailable_Returns404(DataSetStatus dataSetStatus)
         {
-            var unpublishedDataSet = DataFixture
+            var dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(DataSetStatus.Unpublished)
+                .WithStatus(dataSetStatus)
                 .Generate();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(unpublishedDataSet));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await GetDataSet(unpublishedDataSet.Id);
+            var response = await GetDataSet(dataSet.Id);
 
             response.AssertNotFound();
         }
