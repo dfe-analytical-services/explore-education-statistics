@@ -27,7 +27,7 @@ const ProtectedRoute = ({
   if (!user) {
     return (
       <Redirect
-        to={appendQuery(signInRoute.path as string, {
+        to={appendQuery(signInRoute.path, {
           returnUrl: encodeURI(window.location.pathname),
         })}
       />

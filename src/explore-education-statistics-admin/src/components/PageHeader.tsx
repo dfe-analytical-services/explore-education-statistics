@@ -2,6 +2,7 @@ import Link from '@admin/components/Link';
 import { handleLogout } from '@admin/auth/msal';
 import { signInRoute } from '@admin/routes/routes';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
+import ButtonText from '@common/components/ButtonText';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -139,21 +140,19 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
       </li>
     )}
     <li className="govuk-header__navigation-item">
-      {/* TODO EES-4814 - this needs changing to a button or similar */}
-      <Link
-        className="govuk-header__link"
-        to="#"
+      <ButtonText
+        className={`govuk-header__link ${styles.signOutLink}`}
         onClick={() => handleLogout()}
       >
         Sign out
-      </Link>
+      </ButtonText>
     </li>
   </>
 );
 
 const NotLoggedInLinks = () => (
   <li className="govuk-header__navigation-item">
-    <a className="govuk-header__link" href={signInRoute.path as string}>
+    <a className="govuk-header__link" href={signInRoute.path}>
       Sign in
     </a>
   </li>

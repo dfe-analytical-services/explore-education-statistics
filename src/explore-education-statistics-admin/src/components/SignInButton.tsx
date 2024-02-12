@@ -1,17 +1,16 @@
 import { handleLogin } from '@admin/auth/msal';
-import React from 'react';
 import useQueryParams from '@admin/hooks/useQueryParams';
 import StartButton from '@common/components/StartButton';
+import getFirst from '@common/utils/getFirst';
+import React from 'react';
 
-const SignInButton = () => {
+export default function SignInButton() {
   const { returnUrl } = useQueryParams();
   return (
     <StartButton
       id="signin-button"
       label="Sign in"
-      onClick={() => handleLogin(returnUrl as string)}
+      onClick={() => handleLogin(getFirst(returnUrl))}
     />
   );
-};
-
-export default SignInButton;
+}

@@ -1,8 +1,8 @@
 import Page from '@admin/components/Page';
-import React from 'react';
 import SignInButton from '@admin/components/SignInButton';
+import React from 'react';
 
-const SignInPage = () => {
+export default function SignInPage() {
   return (
     <Page title="Sign in" caption="Explore education statistics">
       <p>
@@ -12,6 +12,4 @@ const SignInPage = () => {
       <SignInButton />
     </Page>
   );
-};
-
-export default SignInPage;
+}

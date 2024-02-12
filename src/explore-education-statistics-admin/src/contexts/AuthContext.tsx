@@ -154,7 +154,6 @@ export const AuthContextProvider = ({ children }: Props) => {
         readyToRenderChildren: true,
       }));
       logger.info(`AuthContext: redirecting to ${state.redirect}.`);
-      // TODO EES-4814 - is this an acceptable place to add redirects?
       history.push(state.redirect);
     }
   }, [history, state.redirect]);

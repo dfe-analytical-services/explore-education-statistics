@@ -26,6 +26,10 @@ import { RouteProps } from 'react-router';
 import ExpiredInvitePage from '@admin/pages/sign-in/ExpiredInvitePage';
 import NoInvitationPage from '@admin/pages/sign-in/NoInvitationPage';
 
+interface PublicRouteProps extends RouteProps {
+  path: string;
+}
+
 export type PublicationRouteParams = {
   publicationId: string;
 };
@@ -40,25 +44,25 @@ export type TopicParams = {
 
 export type ThemeTopicParams = ThemeParams & TopicParams;
 
-export const signInRoute: RouteProps = {
+export const signInRoute: PublicRouteProps = {
   path: '/sign-in',
   component: SignInPage,
   exact: true,
 };
 
-export const signOutRoute: RouteProps = {
+export const signOutRoute: PublicRouteProps = {
   path: '/sign-out',
   component: SignedOutPage,
   exact: true,
 };
 
-export const expiredInviteRoute: RouteProps = {
+export const expiredInviteRoute: PublicRouteProps = {
   path: '/expired-invite',
   component: ExpiredInvitePage,
   exact: true,
 };
 
-export const noInvitationRoute: RouteProps = {
+export const noInvitationRoute: PublicRouteProps = {
   path: '/no-invitation',
   component: NoInvitationPage,
   exact: true,

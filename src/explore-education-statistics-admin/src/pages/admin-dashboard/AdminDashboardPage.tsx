@@ -69,9 +69,7 @@ const AdminDashboardPage = () => {
                 Logged in as <strong>{user?.name}</strong>. Not you?{' '}
               </>
             )}
-            <Link className="govuk-link" to={signOutRoute.path as string}>
-              Sign out
-            </Link>
+            <Link to={signOutRoute.path}>Sign out</Link>
           </p>
 
           {isApprover && totalApprovals > 0 && (

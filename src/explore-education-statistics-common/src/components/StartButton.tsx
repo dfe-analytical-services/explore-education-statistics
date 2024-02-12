@@ -1,12 +1,12 @@
 import { ButtonOptions } from '@common/hooks/useButton';
-import React from 'react';
 import Button from '@common/components/Button';
+import React from 'react';
 
 interface Props extends Omit<ButtonOptions, 'children'> {
   label: string;
 }
 
-const StartButton = ({ label, ...props }: Props) => {
+export default function StartButton({ label, ...props }: Props) {
   return (
     <Button className="govuk-button--start" {...props}>
       {label}
@@ -23,6 +23,4 @@ const StartButton = ({ label, ...props }: Props) => {
       </svg>
     </Button>
   );
-};
-
-export default StartButton;
+}
