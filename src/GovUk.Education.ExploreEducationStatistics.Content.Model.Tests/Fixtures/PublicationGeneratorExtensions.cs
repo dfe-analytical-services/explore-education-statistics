@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +27,16 @@ public static class PublicationGeneratorExtensions
         Release release)
         => generator.ForInstance(s => s.SetLatestPublishedRelease(release));
 
+    public static Generator<Publication> WithReleaseParents(
+        this Generator<Publication> generator,
+        IEnumerable<ReleaseParent> releaseParents)
+        => generator.ForInstance(s => s.SetReleaseParents(releaseParents));
+
+    public static Generator<Publication> WithReleaseParents(
+        this Generator<Publication> generator,
+        Func<SetterContext, IEnumerable<ReleaseParent>> releaseParents)
+        => generator.ForInstance(s => s.SetReleaseParents(releaseParents.Invoke));
+
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
         IEnumerable<Release> releases)
@@ -55,8 +64,14 @@ public static class PublicationGeneratorExtensions
 
     public static InstanceSetters<Publication> SetLatestPublishedRelease(
         this InstanceSetters<Publication> setters,
-        Release release)
-        => setters.Set(p => p.LatestPublishedRelease, release);
+        Release? release)
+        => setters.Set(p => p.LatestPublishedRelease, release)
+            .SetLatestPublishedReleaseId(release?.Id);
+
+    public static InstanceSetters<Publication> SetLatestPublishedReleaseId(
+        this InstanceSetters<Publication> setters,
+        Guid? latestPublishedReleaseId)
+        => setters.Set(p => p.LatestPublishedReleaseId, latestPublishedReleaseId);
 
     public static Generator<Publication> WithTopics(this Generator<Publication> generator,
         IEnumerable<Topic> topics)
@@ -66,6 +81,65 @@ public static class PublicationGeneratorExtensions
 
         return generator;
     }
+
+    public static InstanceSetters<Publication> SetReleaseParents(
+        this InstanceSetters<Publication> setters,
+        IEnumerable<ReleaseParent> releaseParents)
+        => setters.SetReleaseParents(_ => releaseParents);
+
+    private static InstanceSetters<Publication> SetReleaseParents(
+        this InstanceSetters<Publication> setters,
+        Func<SetterContext, IEnumerable<ReleaseParent>> releaseParents)
+        => setters.Set(
+                p => p.Releases,
+                (_, publication, context) =>
+                {
+                    var list = releaseParents.Invoke(context).ToList();
+
+                    var releases = list.SelectMany(rp => rp.Releases)
+                        .ToList();
+
+                    releases.ForEach(release =>
+                    {
+                        release.Publication = publication;
+                        release.PublicationId = publication.Id;
+                    });
+
+                    return releases;
+                }
+            )
+            .Set(p => p.LatestPublishedRelease, (_, publication, _) =>
+            {
+                var publishedVersions = publication.Releases
+                    .Where(release => release.Published.HasValue)
+                    .ToList();
+
+                if (publishedVersions.Count == 0)
+                {
+                    return null;
+                }
+
+                if (publishedVersions.Count == 1)
+                {
+                    return publishedVersions[0];
+                }
+
+                return publishedVersions
+                    .GroupBy(release => release.ReleaseParentId)
+                    .Select(groupedReleases =>
+                        new
+                        {
+                            ReleaseParentId = groupedReleases.Key,
+                            Version = groupedReleases.Max(release => release.Version)
+                        })
+                    .Join(publishedVersions,
+                        maxVersion => maxVersion,
+                        release => new { release.ReleaseParentId, release.Version },
+                        (_, release) => release)
+                    .OrderByDescending(release => release.Year)
+                    .ThenByDescending(release => release.TimePeriodCoverage)
+                    .FirstOrDefault();
+            });
 
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
@@ -90,7 +164,7 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetContact(
         this InstanceSetters<Publication> setters,
         Contact contact)
-        => setters.Set(m => m.Contact, contact);
+        => setters.Set(p => p.Contact, contact);
 
     private static InstanceSetters<Publication> SetTopicId(
         this InstanceSetters<Publication> setters,
