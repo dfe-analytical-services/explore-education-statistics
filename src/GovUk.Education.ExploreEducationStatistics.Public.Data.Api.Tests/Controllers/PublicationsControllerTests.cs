@@ -415,49 +415,15 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
         }
 
-        public static IEnumerable<object[]> AvailableDataSetPaginationCombinations()
-        {
-            var dataSetStatuses = new HashSet<DataSetStatus>()
-            {
-                DataSetStatus.Published,
-                DataSetStatus.Deprecated,
-            };
-
-            var paginationCombinations = new List<(
-                int page, 
-                int pageSize, 
-                int numberOfAvailableDataSets, 
-                int numberOfUnpublishedDataSets)>()
-            {
-                ( 1, 2, 2, 0 ),
-                ( 1, 2, 2, 1 ),
-                ( 1, 2, 2, 10 ),
-                ( 1, 2, 9, 1 ),
-                ( 2, 2, 9, 1 ),
-                ( 1, 2, 9, 10 ),
-                ( 1, 3, 2, 1 ),
-            };
-
-            foreach (var dataSetStatus in dataSetStatuses)
-            {
-                foreach (var paginationCombination in paginationCombinations)
-                {
-                    yield return new object[]
-                    {
-                        dataSetStatus,
-                        paginationCombination.page,
-                        paginationCombination.pageSize,
-                        paginationCombination.numberOfAvailableDataSets,
-                        paginationCombination.numberOfUnpublishedDataSets
-                    };
-                }
-            }
-        }
-
         [Theory]
-        [MemberData(nameof(AvailableDataSetPaginationCombinations))]
+        [InlineData(1, 2, 2, 0)]
+        [InlineData(1, 2, 2, 1)]
+        [InlineData(1, 2, 2, 10)]
+        [InlineData(1, 2, 9, 1)]
+        [InlineData(2, 2, 9, 1)]
+        [InlineData(1, 2, 9, 10)]
+        [InlineData(1, 3, 2, 1)]
         public async Task MultipleDataSetsAvailableForRequestedPublication_Returns200(
-            DataSetStatus availableDataSetStatus,
             int page,
             int pageSize,
             int numberOfAvailableDataSets,
@@ -467,7 +433,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var availableDataSets = DataFixture
                 .DefaultDataSet()
-                .WithStatus(availableDataSetStatus)
+                .WithStatusPublished()
                 .WithPublicationId(publicationId)
                 .GenerateList(numberOfAvailableDataSets);
 
@@ -532,7 +498,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Theory]
         [InlineData(DataSetStatus.Published)]
         [InlineData(DataSetStatus.Deprecated)]
-        public async Task ReturnsCorrectViewModel(DataSetStatus dataSetStatus)
+        public async Task DataSetIsAvailable_Returns200_CorrectViewModel(DataSetStatus dataSetStatus)
         {
             var publicationId = Guid.NewGuid();
 
@@ -604,23 +570,21 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSetVersion.MetaSummary.Indicators, result.LatestVersion.Indicators);
         }
 
-        [Theory]
-        [InlineData(DataSetStatus.Published)]
-        [InlineData(DataSetStatus.Deprecated)]
-        public async Task DataSetAvailableForOtherPublication_Returns200_OnlyRequestedPublicationDataSet(DataSetStatus dataSetStatus)
+        [Fact]
+        public async Task DataSetAvailableForOtherPublication_Returns200_OnlyRequestedPublicationDataSet()
         {
             var publicationId1 = Guid.NewGuid();
             var publicationId2 = Guid.NewGuid();
 
             var publication1DataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(dataSetStatus)
+                .WithStatusPublished()
                 .WithPublicationId(publicationId1)
                 .Generate();
 
             var publication2DataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(dataSetStatus)
+                .WithStatusPublished()
                 .WithPublicationId(publicationId2)
                 .Generate();
 
