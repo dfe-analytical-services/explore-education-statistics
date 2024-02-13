@@ -5,6 +5,7 @@
         <LangVersion>10.0</LangVersion>
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>

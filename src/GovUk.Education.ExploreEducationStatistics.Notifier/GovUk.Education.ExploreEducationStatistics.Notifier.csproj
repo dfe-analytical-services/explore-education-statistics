@@ -4,6 +4,7 @@
     <LangVersion>10.0</LangVersion>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="GovukNotify" Version="6.1.0" />

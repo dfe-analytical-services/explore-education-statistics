@@ -6,6 +6,7 @@
         <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Model.Tests</RootNamespace>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>

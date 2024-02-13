@@ -3,6 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <LangVersion>10.0</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />

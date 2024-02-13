@@ -5,6 +5,7 @@
         <LangVersion>10.0</LangVersion>
         <AssemblyName>GovUk.Education.ExploreEducationStatistics.Content.Api</AssemblyName>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Api</RootNamespace>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>

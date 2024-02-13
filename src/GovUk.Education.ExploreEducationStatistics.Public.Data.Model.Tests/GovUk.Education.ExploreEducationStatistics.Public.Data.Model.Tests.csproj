@@ -5,11 +5,10 @@
         <IsPackable>false</IsPackable>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests</RootNamespace>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <ItemGroup>

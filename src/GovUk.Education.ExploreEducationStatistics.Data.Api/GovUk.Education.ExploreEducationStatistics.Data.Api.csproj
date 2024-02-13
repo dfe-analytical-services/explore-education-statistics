@@ -5,6 +5,7 @@
     <LangVersion>10.0</LangVersion>
     <AssemblyName>GovUk.Education.ExploreEducationStatistics.Data.Api</AssemblyName>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
