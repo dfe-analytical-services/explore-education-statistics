@@ -2,7 +2,7 @@
 import './styles/_all.scss';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
-import { AuthContextProvider } from '@admin/contexts/AuthContext';
+import { AuthContextProvider as BaseAuthContextProvider } from '@admin/contexts/AuthContext';
 import {
   ConfigContextProvider,
   useConfig,
@@ -135,5 +135,13 @@ function QueryClientProvider({ children }: { children?: ReactNode }) {
     <BaseQueryClientProvider client={queryClient}>
       {children}
     </BaseQueryClientProvider>
+  );
+}
+
+function AuthContextProvider({ children }: { children?: ReactNode }) {
+  return (
+    <BaseAuthContextProvider verboseLogging={false}>
+      {children}
+    </BaseAuthContextProvider>
   );
 }

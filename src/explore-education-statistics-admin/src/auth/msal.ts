@@ -87,9 +87,6 @@ export function handleLogout() {
       account: getMsalInstance().getAllAccounts()[0],
       postLogoutRedirectUri: '/sign-in',
     })
-    .then(() => {
-      window.location.href = '/sign-in';
-    })
     .catch(error => {
       logger.info(
         `Error encountered when processing post-redirection from Identity 

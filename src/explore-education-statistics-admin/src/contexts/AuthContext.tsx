@@ -38,6 +38,7 @@ export const AuthContext = createContext<AuthContextState | undefined>(
 
 interface Props {
   children?: ReactNode;
+  verboseLogging: boolean;
 }
 
 interface State {
@@ -102,7 +103,10 @@ interface State {
   redirect?: string;
 }
 
-export const AuthContextProvider = ({ children }: Props) => {
+export const AuthContextProvider = ({
+  children,
+  verboseLogging = false,
+}: Props) => {
   const [state, setState] = useState<State>({
     readyToRenderChildren: false,
   });
@@ -117,6 +121,12 @@ export const AuthContextProvider = ({ children }: Props) => {
 
   const history = useHistory();
   const location = useLocation();
+
+  function log(message: string) {
+    if (verboseLogging) {
+      logger.info(message);
+    }
+  }
 
   // Register a listener for the post-login callback when returning from
   // the external Identity Provider login. This will allow us to access the
@@ -145,7 +155,7 @@ export const AuthContextProvider = ({ children }: Props) => {
   // and an explicit redirect URL has been specified post-login.
   useEffect(() => {
     if (state.redirect) {
-      logger.info(
+      log(
         `AuthContext: redirect to ${state.redirect} requested. Setting user ` +
           'ready to use service.',
       );
@@ -153,7 +163,7 @@ export const AuthContextProvider = ({ children }: Props) => {
         ...previousState,
         readyToRenderChildren: true,
       }));
-      logger.info(`AuthContext: redirecting to ${state.redirect}.`);
+      log(`AuthContext: redirecting to ${state.redirect}.`);
       history.push(state.redirect);
     }
   }, [history, state.redirect]);
@@ -168,9 +178,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       }
 
       function requestRedirect(path: string) {
-        logger.info(
-          `AuthContext: Requesting that user is redirected to ${path}.`,
-        );
+        log(`AuthContext: Requesting that user is redirected to ${path}.`);
         setState(previousState => ({
           ...previousState,
           redirect: path,
@@ -184,7 +192,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       // If we're ready to allow the user (or no user) to continue to see pages
       // in the service, there is nothing more to do in this effect.
       if (state.readyToRenderChildren) {
-        logger.info(
+        log(
           'AuthContext: User is already ready to view pages. Exiting out of ' +
             'effect.',
         );
@@ -196,7 +204,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       // completed its user authentication flow, if a user currently is signed
       // in.
       if (loginInProgress) {
-        logger.info(
+        log(
           'AuthContext: MSAL login or initialisation is in progress. ' +
             'Exiting out of effect until it is complete.',
         );
@@ -213,7 +221,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       // "useAuth()" hook, they will see at this point that there is no
       // logged-in user.
       if (!accounts.length || !Object.keys(accounts[0]).length) {
-        logger.info(
+        log(
           'AuthContext: MSAL login or initialisation has completed and ' +
             'there is no logged-in user. Setting user as "none" and continuing.',
         );
@@ -224,19 +232,17 @@ export const AuthContextProvider = ({ children }: Props) => {
       // If we are here, MSAL has finished initialising, and there is an active
       // user account present in local storage. We now attempt to silently
       // acquire a valid access token using the details in local storage.
-      logger.info(
-        'AuthContext: Acquiring access token silently for current user.',
-      );
+      log('AuthContext: Acquiring access token silently for current user.');
 
       let authenticationResult;
 
       try {
         authenticationResult = await acquireTokenSilent();
-        logger.info(
+        log(
           'AuthContext: Successfully retrieved access tokens for current user.',
         );
       } catch (error) {
-        logger.info(
+        log(
           `AuthContext: Error whilst acquiring valid access token - ${error}` +
             'Redirecting to login page.',
         );
@@ -251,7 +257,7 @@ export const AuthContextProvider = ({ children }: Props) => {
         !authenticationResult.account ||
         !Object.keys(authenticationResult.account).length
       ) {
-        logger.info(
+        log(
           'AuthContext: Unable to acquire a valid access token silently for ' +
             'current user.',
         );
@@ -269,20 +275,20 @@ export const AuthContextProvider = ({ children }: Props) => {
         // the Admin API to determine if the user is an existing or an invited
         // user, or on the other hand if they're a person with no invitations or
         // expired invitations.
-        logger.info('AuthContext: Calling internal login endpoint.');
+        log('AuthContext: Calling internal login endpoint.');
 
         signInResponse = await authService.signIn();
       } catch (error) {
-        logger.info(
+        log(
           'AuthContext: Error whilst calling internal login / registration ' +
             `endpoint - ${error}`,
         );
-        logger.info('Redirecting to login page.');
+        log('Redirecting to login page.');
         forceSignIn();
         return;
       }
 
-      logger.info(
+      log(
         `AuthContext: Local login / registration endpoint called with result ` +
           `"${signInResponse.loginResult}".`,
       );
@@ -293,14 +299,14 @@ export const AuthContextProvider = ({ children }: Props) => {
         // If the person logged in is not an existing user and has no invites,
         // redirect them to the "No Invite" page.
         case 'NoInvite':
-          logger.info(
+          log(
             'AuthContext: User has no invites to use the service. Redirecting ' +
               'to "No Invites" page.',
           );
           requestRedirect(noInvitationRoute.path as string);
           return;
         case 'ExpiredInvite':
-          logger.info(
+          log(
             'AuthContext: User has expired invite for the service. Redirecting ' +
               'to "Expired Invite" page.',
           );
@@ -310,7 +316,7 @@ export const AuthContextProvider = ({ children }: Props) => {
         // ready to use it. Set the user details so that child components can
         // use them.
         default: {
-          logger.info(
+          log(
             'AuthContext: User has valid credentials to use the service. Adding ' +
               'user details to the AuthContext state.',
           );
@@ -334,7 +340,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       // the appropriate redirect URL now if it is not the current URL.
       const loginRedirectUrl = state.loginRedirectState?.returnUrl;
       if (loginRedirectUrl && loginRedirectUrl !== location.pathname) {
-        logger.info(
+        log(
           'AuthContext: Post-login redirect URL found from Identity Provider ' +
             'response and not on current URL. Redirecting user.',
         );
@@ -350,7 +356,7 @@ export const AuthContextProvider = ({ children }: Props) => {
       // able to use the permissions that were retrieved during the local
       // login / registration endpoint call to test whether the currently
       // logged-in user should be able to see those routes or not.
-      logger.info(
+      log(
         'AuthContext: User can now view current page. Setting "ready" to true.',
       );
       setState(previousState => ({
@@ -368,6 +374,7 @@ export const AuthContextProvider = ({ children }: Props) => {
     location,
     state.readyToRenderChildren,
     state.loginRedirectState,
+    log,
   ]);
 
   const contextState: AuthContextState = useMemo(() => {
