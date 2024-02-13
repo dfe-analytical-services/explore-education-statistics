@@ -608,6 +608,34 @@ buildable state (rather than be completely broken).
 
 ## Backend development
 
+### Code Style Formatting
+
+.NET coding styles are imposed and managed by the Solution itself by way of a [Editor Config (.editorconfig) file.](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options)
+
+The warnings and errors about violations of these rules are surfaced at build time by enabling [Enforce Code Style In Build (<EnforceCodeStyleInBuild>)](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#enforcecodestyleinbuild) in each `.csproj` file.
+
+To that end - regardless of your IDE of choice - if your solution builds without warnings then your changes should not have caused any style violations. 
+
+*NOTE* We currently have a large number of warnings, many of which we're present before introducing an `.editorconfig` file, and many more of which have been created by imposing style rules we previously weren't. Once the work has been done to resolve these warnings, we can turn on `TreatWarningsAsErrors` to make the build itself fail if there are style violations. 
+
+You can perform the same check as the pre-commit hooks / GitHubs actions do and receive a report by running the following command from the repository root:
+
+```bash
+dotnet format src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json
+```
+
+This will create a report named `dotnet-format-report.json` in the repository root. This has been added to the `.gitignore` file so should not cause a tracked change.
+
+The `--verify-no-changes` argument tells `format` to make no changes. If you want it to automatically apply fixes, simply remove this argument:
+
+```bash
+dotnet format src/GovUk.Education.ExploreEducationStatistics.sln
+```
+
+If you want to run it against one or more specific directories in the solution (or indeed exclude one or more), these can be specified through the `--include <PATH>` and `--exclude <PATH>` arguments. 
+
+See the [docs](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format) for more on this.
+
 ### Migrations
 
 The backend c# projects use code first migrations to generate the application's database schema. 
@@ -656,7 +684,7 @@ dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext
 ### Resetting Azurite
 
 During development you might want to reset your Azurite instance to clear out all data from 
-blobs, queues and tables. This is typically done at the same time as resetting the databases.
+blobs, queues and tables. This is typically done at the same time as resetting the databases. 
 
 To delete all data in Azurite simply delete the Azurite docker container, remove the Azurite volume and recreate it:
 

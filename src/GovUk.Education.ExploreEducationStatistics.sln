@@ -65,15 +65,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Requests", "GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj", "{0F0F94FF-AD31-4F0E-BE7B-4D9C26FF1E82}"
 EndProject
-Project("{00000000-0000-0000-0000-000000000000}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Data.ViewModels", "GovUk.Education.ExploreEducationStatistics.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Data.ViewModels.csproj", "{CEA32610-A401-4A66-9874-45838C497DE7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Notifier.Tests", "GovUk.Education.ExploreEducationStatistics.Notifier.Tests\GovUk.Education.ExploreEducationStatistics.Notifier.Tests.csproj", "{630EDEC2-DB6C-4D9E-86C5-586C2B42A351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor", "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj", "{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor", "GovUk.Education.ExploreEducationStatistics.Public.Data.Processor\GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj", "{35AFC52C-BF70-4A94-890D-A7BA98DBFC5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests", "GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj", "{DE3C1AC4-27FA-4EC1-9F41-E2B2FFE94427}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests", "GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj", "{DE3C1AC4-27FA-4EC1-9F41-E2B2FFE94427}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{259A0E76-88E3-422E-B43D-CA0E9DE6E48B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Utils", "GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj", "{825096EE-DD5F-44F6-9784-67655C46372E}"
 EndProject
