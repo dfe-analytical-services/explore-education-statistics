@@ -27,6 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MockQueryable.Moq;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
@@ -170,8 +171,104 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 AssertResultsForExpectedReleaseFiles(publication1Release1Version1Files, pagedResult.Results);
             }
 
+            [Theory]
+            [InlineData(false)]
+            [InlineData(null)]
+            public async Task FilterByReleaseIdWhereReleaseIsNotLatestForPublication_Success(bool? latestOnly)
+            {
+                // Set up a publication with 2 releases each with a published version.
+                // The 2021/22 Academic year will be the latest release in reverse chronological order.
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release2Version1Files = GenerateDataSetsForRelease(publication.Releases[1]);
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release2Version1Files);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = publication.Releases[1].Id,
+                    LatestOnly = latestOnly
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect data set files of an old release to be returned when LatestOnly is false or null
+                // (LatestOnly should default to false when a releaseId is specified).
+                pagedResult.AssertHasExpectedPagingAndResultCount(
+                    expectedTotalResults: release2Version1Files.Count);
+                AssertResultsForExpectedReleaseFiles(release2Version1Files, pagedResult.Results);
+            }
+
             [Fact]
-            public async Task FilterByReleaseIdWhereReleaseIsUnpublished_ReturnsEmpty()
+            public async Task FilterByReleaseIdWhereReleaseIsNotLatestForPublicationAndLatestOnlyTrue_ReturnsEmpty()
+            {
+                // Set up a publication with 2 releases each with a published version.
+                // The 2021/22 Academic year will be the latest release in reverse chronological order.
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release2Version1Files = GenerateDataSetsForRelease(publication.Releases[1]);
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release2Version1Files);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = publication.Releases[1].Id,
+                    LatestOnly = true
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect no data set files to be returned for an old release when LatestOnly is true
+                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+            }
+
+            [Theory]
+            [InlineData(true)]
+            [InlineData(false)]
+            [InlineData(null)]
+            public async Task FilterByReleaseIdWhereReleaseIsUnpublished_ReturnsEmpty(bool? latestOnly)
             {
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
@@ -204,13 +301,63 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(ReleaseId: publication1.Releases[1].Id);
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = publication1.Releases[1].Id,
+                    LatestOnly = latestOnly
+                };
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
 
+                // Expect no data set files to be returned for an unpublished release version regardless of LatestOnly
+                pagedResult.AssertHasPagingConsistentWithEmptyResults();
+            }
+
+            [Theory]
+            [InlineData(true)]
+            [InlineData(false)]
+            [InlineData(null)]
+            public async Task FilterByReleaseIdWhereReleaseIsNotLatestVersion_ReturnsEmpty(bool? latestOnly)
+            {
+                // Set up a publication with a release that has 2 published versions
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_fixture
+                        .DefaultReleaseParent(publishedVersions: 2)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version2Files = GenerateDataSetsForRelease(publication.Releases[1]);
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(release1Version1Files);
+                        context.ReleaseFiles.AddRange(release1Version2Files);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetsListRequest
+                {
+                    ReleaseId = publication.Releases[0].Id,
+                    LatestOnly = latestOnly
+                };
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect no data set files to be returned unless they are associated with a latest published release
+                // version regardless of LatestOnly
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
 
@@ -323,6 +470,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
+                    publication.Releases,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -362,7 +510,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
-                var contentDbContext = ContentDbContextMock(release1Version1Files);
+                var contentDbContext = ContentDbContextMock(
+                    publication.Releases,
+                    release1Version1Files);
 
                 var client = BuildApp(
                         dataSetService: new DataSetService(contentDbContext.Object))
@@ -376,6 +526,160 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
+            }
+
+            [Theory]
+            [InlineData(true)]
+            [InlineData(null)]
+            public async Task FilterByLatestOnly_ReturnsDataSetsFromLatestPublishedReleaseVersionOfPublications(
+                bool? latestOnly)
+            {
+                // Set up 2 publications where both have multiple releases each with a mix of published and
+                // unpublished versions. The 2021/22 Academic year will be the latest release in
+                // reverse chronological order with a published release version for both publications.
+                var (publication1, publication2) = _fixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2022),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()))
+                    .Generate(2)
+                    .ToTuple2();
+
+                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
+                var publication1Release2Version1Files = GenerateDataSetsForRelease(publication1.Releases[1]);
+                var publication1Release2Version2Files = GenerateDataSetsForRelease(publication1.Releases[2]);
+                var publication1Release2Version3Files = GenerateDataSetsForRelease(publication1.Releases[3]);
+                var publication1Release3Version1Files = GenerateDataSetsForRelease(publication1.Releases[4]);
+
+                var publication1ReleaseFiles = publication1Release1Version1Files
+                    .Concat(publication1Release2Version1Files)
+                    .Concat(publication1Release2Version2Files)
+                    .Concat(publication1Release2Version3Files)
+                    .Concat(publication1Release3Version1Files)
+                    .ToList();
+
+                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication2Release2Version1Files = GenerateDataSetsForRelease(publication2.Releases[1]);
+                var publication2Release2Version2Files = GenerateDataSetsForRelease(publication2.Releases[2]);
+                var publication2Release2Version3Files = GenerateDataSetsForRelease(publication2.Releases[3]);
+                var publication2Release3Version1Files = GenerateDataSetsForRelease(publication2.Releases[4]);
+
+                var publication2ReleaseFiles = publication2Release1Version1Files
+                    .Concat(publication2Release2Version1Files)
+                    .Concat(publication2Release2Version2Files)
+                    .Concat(publication2Release2Version3Files)
+                    .Concat(publication2Release3Version1Files)
+                    .ToList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetsListRequest(LatestOnly: latestOnly);
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect the result to be the data set files of the latest published release versions
+                // of the latest published releases of both publications, in ascending title order
+                var expectedReleaseFiles = publication1Release2Version2Files
+                    .Concat(publication2Release2Version2Files)
+                    .OrderBy(rf => rf.Name)
+                    .ToList();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Fact]
+            public async Task FilterByLatestOnlyFalse_ReturnsDataSetsFromAnyLatestPublishedReleaseVersions()
+            {
+                // Set up 2 publications where both have multiple releases each with a mix of published and
+                // unpublished versions
+                var (publication1, publication2) = _fixture
+                    .DefaultPublication()
+                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        _fixture
+                            .DefaultReleaseParent(publishedVersions: 1)))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()))
+                    .Generate(2)
+                    .ToTuple2();
+
+                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
+                var publication1Release2Version1Files = GenerateDataSetsForRelease(publication1.Releases[1]);
+                var publication1Release2Version2Files = GenerateDataSetsForRelease(publication1.Releases[2]);
+                var publication1Release2Version3Files = GenerateDataSetsForRelease(publication1.Releases[3]);
+                var publication1Release3Version1Files = GenerateDataSetsForRelease(publication1.Releases[4]);
+
+                var publication1ReleaseFiles = publication1Release1Version1Files
+                    .Concat(publication1Release2Version1Files)
+                    .Concat(publication1Release2Version2Files)
+                    .Concat(publication1Release2Version3Files)
+                    .Concat(publication1Release3Version1Files)
+                    .ToList();
+
+                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication2Release2Version1Files = GenerateDataSetsForRelease(publication2.Releases[1]);
+                var publication2Release2Version2Files = GenerateDataSetsForRelease(publication2.Releases[2]);
+                var publication2Release2Version3Files = GenerateDataSetsForRelease(publication2.Releases[3]);
+                var publication2Release3Version1Files = GenerateDataSetsForRelease(publication2.Releases[4]);
+
+                var publication2ReleaseFiles = publication2Release1Version1Files
+                    .Concat(publication2Release2Version1Files)
+                    .Concat(publication2Release2Version2Files)
+                    .Concat(publication2Release2Version3Files)
+                    .Concat(publication2Release3Version1Files)
+                    .ToList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context =>
+                    {
+                        context.ReleaseFiles.AddRange(publication1ReleaseFiles);
+                        context.ReleaseFiles.AddRange(publication2ReleaseFiles);
+                    })
+                    .CreateClient();
+
+                var query = new DataSetsListRequest(LatestOnly: false);
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+
+                // Expect the result to be the data set files of the latest published release versions
+                // of both publications, in ascending title order
+                var expectedReleaseFiles = publication1Release2Version2Files
+                    .Concat(publication1Release3Version1Files)
+                    .Concat(publication2Release2Version2Files)
+                    .Concat(publication2Release3Version1Files)
+                    .OrderBy(rf => rf.Name)
+                    .ToList();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
             }
 
             [Fact]
@@ -756,6 +1060,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
+                    publication.Releases,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -812,6 +1117,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
+                    publication.Releases,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -1323,10 +1629,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         private static Mock<ContentDbContext> ContentDbContextMock(
+            IEnumerable<Release>? releases = null,
             IEnumerable<ReleaseFile>? releaseFiles = null,
             IEnumerable<FreeTextRank>? freeTextRanks = null)
         {
             var contentDbContext = new Mock<ContentDbContext>();
+            contentDbContext.Setup(context => context.Releases)
+                .Returns((releases ?? Array.Empty<Release>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFiles)
                 .Returns((releaseFiles ?? Array.Empty<ReleaseFile>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))

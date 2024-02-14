@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -43,15 +44,22 @@ public class DataSetService : IDataSetService
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
+        // If latestOnly is not specified default it to true except when a releaseId is specified
+        latestOnly ??= !releaseId.HasValue;
+
         orderBy ??= searchTerm == null ? Title : Relevance;
         sort ??= orderBy is Title or Natural ? Asc : Desc;
+
+        var latestPublishedReleaseVersions =
+            _contentDbContext.Releases.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
-            .HavingReleaseIdOrLatestReleases(releaseId, latestOnly)
+            .HavingReleaseId(releaseId)
+            .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
         var results = await query
@@ -190,27 +198,31 @@ internal static class ReleaseFileQueryableExtensions
                                  !rf.Release.Publication.SupersededBy!.LatestPublishedReleaseId.HasValue);
     }
 
-    internal static IQueryable<ReleaseFile> HavingReleaseIdOrLatestReleases(
+    internal static IQueryable<ReleaseFile> HavingReleaseId(
         this IQueryable<ReleaseFile> query,
-        Guid? releaseId,
-        bool? latestOnly)
+        Guid? releaseId)
     {
-        if (releaseId.HasValue)
+        return releaseId.HasValue ? query.Where(rf => rf.ReleaseId == releaseId.Value) : query;
+    }
+
+    internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(
+        this IQueryable<ReleaseFile> query,
+        IQueryable<Release> latestPublishedReleaseVersions,
+        bool latestOnly)
+    {
+        // Data set files must only ever be those associated with a latest published release version.
+        // The latestOnly parameter allows further restricting data set files to be from the latest published release
+        // of the publication.
+        if (latestOnly)
         {
-            // TODO In EES-4665 we will allow filtering by a specific release version ensuring that it's the latest
-            // published version of that release. Until then, if a release id is provided,
-            // it must be the latest published release version by time series in a publication
-            return query.Where(rf => rf.Release.Publication.LatestPublishedReleaseId == releaseId.Value);
+            // Restrict data set files to be from the latest published release version of the publication
+            return query.Where(rf => rf.ReleaseId == rf.Release.Publication.LatestPublishedReleaseId);
         }
 
-        if (!latestOnly.HasValue || latestOnly.Value)
-        {
-            // Restrict data set files to be for the latest published release version by time series in a publication
-            return query.Where(rf => rf.Release.Publication.LatestPublishedReleaseId == rf.ReleaseId);
-        }
-
-        // Restrict data set files to be for any latest published release version in a publication
-        // TODO EES-4665
-        throw new NotSupportedException("Querying by non-latest data is not yet supported");
+        // Restrict data set files to be for *any* latest published release version
+        return query.Join(latestPublishedReleaseVersions,
+            rf => rf.ReleaseId,
+            r => r.Id,
+            (rf, _) => rf);
     }
 }
