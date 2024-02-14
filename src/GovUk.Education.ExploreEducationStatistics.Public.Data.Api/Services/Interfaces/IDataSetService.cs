@@ -12,4 +12,9 @@ public interface IDataSetService
         int page,
         int pageSize, 
         Guid publicationId);
+
+    Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
+        int page,
+        int pageSize,
+        Guid dataSetId);
 }

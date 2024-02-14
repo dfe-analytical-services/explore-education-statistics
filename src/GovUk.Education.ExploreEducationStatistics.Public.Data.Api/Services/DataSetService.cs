@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -49,6 +50,31 @@ internal class DataSetService : IDataSetService
             .ToList();
 
         return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
+        int page,
+        int pageSize,
+        Guid dataSetId)
+    {
+        var queryable = _publicDataDbContext.DataSetVersions
+            .Where(ds => ds.DataSetId == dataSetId)
+            .Where(ds => ds.Status == DataSetVersionStatus.Published
+                || ds.Status == DataSetVersionStatus.Unpublished
+                || ds.Status == DataSetVersionStatus.Deprecated);
+
+        var totalResults = await queryable.CountAsync();
+
+        var dataSetVersions = (await queryable
+            .OrderByDescending(ds => ds.VersionMajor)
+            .ThenByDescending(ds => ds.VersionMinor)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync())
+            .Select(MapDataSetVersion)
+            .ToList();
+
+        return new DataSetVersionPaginatedListViewModel(dataSetVersions, totalResults, page, pageSize);
     }
 
     private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
@@ -94,6 +120,24 @@ internal class DataSetService : IDataSetService
         {
             Start = TimePeriodFormatter.Format(timePeriodRange.Start.Year, timePeriodRange.Start.Code),
             End = TimePeriodFormatter.Format(timePeriodRange.End.Year, timePeriodRange.End.Code),
+        };
+    }
+
+    private static DataSetVersionViewModel MapDataSetVersion(DataSetVersion dataSetVersion)
+    {
+        return new DataSetVersionViewModel
+        {
+            Number = dataSetVersion.Version,
+            Type = dataSetVersion.VersionType(),
+            Status = dataSetVersion.Status,
+            Published = dataSetVersion.Published!.Value,
+            Unpublished = dataSetVersion.Unpublished,
+            Notes = dataSetVersion.Notes,
+            TotalResults = dataSetVersion.TotalResults,
+            TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary.TimePeriodRange),
+            GeographicLevels = dataSetVersion.MetaSummary.GeographicLevels,
+            Filters = dataSetVersion.MetaSummary.Filters,
+            Indicators = dataSetVersion.MetaSummary.Indicators,
         };
     }
 }
