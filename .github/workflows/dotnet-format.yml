@@ -1,0 +1,40 @@
+name: dotnet format
+
+on:
+  pull_request:
+    branches: [ dev, master ]
+
+jobs:
+  check-format:
+    runs-on: windows-latest
+
+    steps:
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: | 
+            6.0.x
+            8.0.x
+
+      # This shouldn't be necessary when using SDK V6 or later
+      # TODO: uncomment if doesn't work, remove if does
+      # - name: Install dotnet-format tool
+      #  run: dotnet tool install -g dotnet-format
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # TODO: Uncomment this step once formatter has been run globally. 
+      # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
+      #- name: Run dotnet format whitespace
+      #  run: dotnet format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes
+
+      - name: Run dotnet format style
+        ## TODO: Remove "--severity error" once style formatter has been run across project
+        run: dotnet format style src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json --verbosity diag --severity error
+
+      - name: Run dotnet format analyzers
+        ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
+        run: dotnet format analyzers src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json --verbosity diag --severity error
+
+      # TODO: Wrap these three subcommands up into a single `dotnet format` command once all 3 above TODOs are TO-DONE ;) 
