@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -18,6 +19,12 @@ internal class DataSetService : IDataSetService
         _publicDataDbContext = publicDataDbContext;
     }
 
+    public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(Guid dataSetId)
+    {
+        return await CheckDataSetExists(dataSetId)
+            .OnSuccess(MapDataSet);
+    }
+
     public async Task<Either<ActionResult, DataSetPaginatedListViewModel>> ListDataSets(
         int page,
         int pageSize,
@@ -26,7 +33,8 @@ internal class DataSetService : IDataSetService
         var queryable = _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
-            .Where(ds => ds.Status == DataSetStatus.Published);
+            .Where(ds => ds.Status == DataSetStatus.Published 
+                || ds.Status == DataSetStatus.Deprecated);
 
         var totalResults = await queryable.CountAsync();
 
@@ -41,6 +49,16 @@ internal class DataSetService : IDataSetService
             .ToList();
 
         return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+    }
+
+    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
+    {
+        return await _publicDataDbContext.DataSets
+            .Include(ds => ds.LatestVersion)
+            .Where(ds => ds.Id == dataSetId)
+            .Where(ds => ds.Status == DataSetStatus.Published
+                || ds.Status == DataSetStatus.Deprecated)
+            .SingleOrNotFound();
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
