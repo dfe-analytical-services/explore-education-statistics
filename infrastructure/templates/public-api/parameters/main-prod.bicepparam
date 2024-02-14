@@ -2,8 +2,7 @@ using '../main.bicep'
 
 //Environment Params -------------------------------------------------------------------
 param domain = 'publicapi'
-param subscription = 's101d01'
-param environment = 'eesapi'
+param subscription = 's101p01'
 param environmentName = 'Production'
 
 //Networking Params --------------------------------------------------------------------------

@@ -2,7 +2,7 @@ using '../main.bicep'
 
 //Environment Params -------------------------------------------------------------------
 param domain = 'publicapi'
-param subscription = 's101'
+param subscription = 's101d01'
 param environmentName = 'Development'
 
 //Networking Params --------------------------------------------------------------------------
@@ -16,7 +16,7 @@ param dbStorageSizeGB = 32
 param dbAutoGrowStatus = 'Disabled'
 
 //Container Registry -------------------------------------------------------------------
-param containerRegistryName = 'publicapi'
+param containerRegistryName = 'eesapiacr'
 param deployRegistry = true
 
 //Container App Params -------------------------------------------------------------------
