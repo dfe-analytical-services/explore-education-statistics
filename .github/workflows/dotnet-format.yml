@@ -31,10 +31,10 @@ jobs:
 
       - name: Run dotnet format style
         ## TODO: Remove "--severity error" once style formatter has been run across project
-        run: dotnet format style src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json --verbosity diag --severity error
+        run: dotnet format style src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
 
       - name: Run dotnet format analyzers
         ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-        run: dotnet format analyzers src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --report dotnet-format-report.json --verbosity diag --severity error
+        run: dotnet format analyzers src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error
 
       # TODO: Wrap these three subcommands up into a single `dotnet format` command once all 3 above TODOs are TO-DONE ;) 

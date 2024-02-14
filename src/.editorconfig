@@ -262,7 +262,7 @@ csharp_style_var_elsewhere = true:warning
 # .NET / C# Naming preferences                                 #
 ################################################################
 
-## TODO
+## If we want to enforce anything about naming style of interfaces, classes, vars etc. e.g. camelCase or snake_case, we should do it here.
 
 ################################################################
 # Python / robot preferences                                   #

@@ -684,7 +684,7 @@ dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext
 ### Resetting Azurite
 
 During development you might want to reset your Azurite instance to clear out all data from 
-blobs, queues and tables. This is typically done at the same time as resetting the databases. 
+blobs, queues and tables. This is typically done at the same time as resetting the databases.
 
 To delete all data in Azurite simply delete the Azurite docker container, remove the Azurite volume and recreate it:
 
