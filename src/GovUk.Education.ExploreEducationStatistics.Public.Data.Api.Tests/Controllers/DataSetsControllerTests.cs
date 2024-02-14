@@ -27,14 +27,13 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(DataSetStatus.Deprecated)]
         public async Task DataSetIsAvailable_Returns200(DataSetStatus dataSetStatus)
         {
-            var dataSet = DataFixture
+            DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(dataSetStatus)
-                .Generate();
+                .WithStatus(dataSetStatus);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var dataSetVersion = DataFixture
+            DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -42,8 +41,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv)
-                .Generate();
+                .FinishWith(dsv => dataSet.LatestVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -87,10 +85,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(DataSetStatus.Unpublished)]
         public async Task DataSetNotAvailable_Returns404(DataSetStatus dataSetStatus)
         {
-            var dataSet = DataFixture
+            DataSet dataSet = DataFixture
                 .DefaultDataSet()
-                .WithStatus(dataSetStatus)
-                .Generate();
+                .WithStatus(dataSetStatus);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 

@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixture
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Azure.Documents.SystemFunctions;
 using Moq;
 using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
@@ -115,15 +114,14 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var publicationId = Guid.NewGuid();
 
-            var dataSet = DataFixture
+            DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
-                .WithPublicationId(publicationId)
-                .Generate();
+                .WithPublicationId(publicationId);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var publication = DataFixture
+            PublicationSearchResultViewModel publication = DataFixture
                 .Generator<PublicationSearchResultViewModel>()
                 .ForInstance(s => s
                     .SetDefault(p => p.Title)
@@ -132,8 +130,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     .SetDefault(p => p.Theme)
                     .Set(p => p.Published, p => p.Date.Past())
                     .Set(p => p.Type, ReleaseType.OfficialStatistics)
-                    .Set(p => p.Id, publicationId))
-                .Generate();
+                    .Set(p => p.Id, publicationId));
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
@@ -290,15 +287,14 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         [Fact]
         public async Task PublicationExists_Returns200()
         {
-            var publication = DataFixture
+            PublishedPublicationSummaryViewModel publication = DataFixture
                 .Generator<PublishedPublicationSummaryViewModel>()
                 .ForInstance(s => s
                     .SetDefault(f => f.Id)
                     .SetDefault(f => f.Title)
                     .SetDefault(f => f.Slug)
                     .SetDefault(f => f.Summary)
-                    .Set(f => f.Published, f => f.Date.Past()))
-                .Generate();
+                    .Set(f => f.Published, f => f.Date.Past()));
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
@@ -397,8 +393,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             return DataFixture
                 .DefaultDataSet()
                 .WithStatus(DataSetStatus.Published)
-                .WithPublicationId(publicationId)
-                .Generate();
+                .WithPublicationId(publicationId);
         }
 
         private static async Task<HttpResponseMessage> GetPublication(HttpClient client, Guid publicationId)
@@ -502,15 +497,14 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var publicationId = Guid.NewGuid();
 
-            var dataSet = DataFixture
+            DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatus(dataSetStatus)
-                .WithPublicationId(publicationId)
-                .Generate();
+                .WithPublicationId(publicationId);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var dataSetVersion = DataFixture
+            DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -518,8 +512,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv)
-                .Generate();
+                .FinishWith(dsv => dataSet.LatestVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -576,22 +569,20 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             var publicationId1 = Guid.NewGuid();
             var publicationId2 = Guid.NewGuid();
 
-            var publication1DataSet = DataFixture
+            DataSet publication1DataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
-                .WithPublicationId(publicationId1)
-                .Generate();
+                .WithPublicationId(publicationId1);
 
-            var publication2DataSet = DataFixture
+            DataSet publication2DataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
-                .WithPublicationId(publicationId2)
-                .Generate();
+                .WithPublicationId(publicationId2);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSets.AddRange(publication1DataSet, publication2DataSet));
 
-            var publication1DataSetVersion = DataFixture
+            DataSetVersion publication1DataSetVersion = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -599,10 +590,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication1DataSet)
-                .FinishWith(dsv => publication1DataSet.LatestVersion = dsv)
-                .Generate();
+                .FinishWith(dsv => publication1DataSet.LatestVersion = dsv);
 
-            var publication2DataSetVersion = DataFixture
+            DataSetVersion publication2DataSetVersion = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -610,8 +600,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication2DataSet)
-                .FinishWith(dsv => publication2DataSet.LatestVersion = dsv)
-                .Generate();
+                .FinishWith(dsv => publication2DataSet.LatestVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -644,15 +633,14 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var publicationId = Guid.NewGuid();
 
-            var dataSet = DataFixture
+            DataSet dataSet = DataFixture
                 .DefaultDataSet()
                 .WithStatus(dataSetStatus)
-                .WithPublicationId(publicationId)
-                .Generate();
+                .WithPublicationId(publicationId);
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var dataSetVersion = DataFixture
+            DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion(
                     filters: 1,
                     indicators: 1,
@@ -660,8 +648,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv)
-                .Generate();
+                .FinishWith(dsv => dataSet.LatestVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {

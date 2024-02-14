@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -52,16 +53,12 @@ internal class DataSetService : IDataSetService
 
     private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
     {
-        var dataSet = await _publicDataDbContext.DataSets
+        return await _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.Id == dataSetId)
             .Where(ds => ds.Status == DataSetStatus.Published
                 || ds.Status == DataSetStatus.Deprecated)
-            .SingleOrDefaultAsync();
-
-        return dataSet is null
-            ? new NotFoundResult()
-            : dataSet;
+            .SingleOrNotFound();
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
