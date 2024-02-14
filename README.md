@@ -608,7 +608,7 @@ buildable state (rather than be completely broken).
 
 ## Backend development
 
-### Code Style Formatting
+### Code Style & Formatting
 
 .NET coding styles are imposed and managed by the Solution itself by way of a [Editor Config (.editorconfig) file.](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options)
 
