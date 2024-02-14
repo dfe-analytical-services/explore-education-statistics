@@ -610,13 +610,27 @@ buildable state (rather than be completely broken).
 
 ### Code Style & Formatting
 
-.NET coding styles are imposed and managed by the Solution itself by way of a [Editor Config (.editorconfig) file.](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options)
+.NET code style and formatting rules are imposed by [dotnet format](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format) because it is IDE and platform agnostic, and natively included in the .NET SDK. Rule are dictated by an [.editorconfig file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/code-style-rule-options).
 
 The warnings and errors about violations of these rules are surfaced at build time by enabling [Enforce Code Style In Build (<EnforceCodeStyleInBuild>)](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#enforcecodestyleinbuild) in each `.csproj` file.
 
 To that end - regardless of your IDE of choice - if your solution builds without warnings then your changes should not have caused any style violations. 
 
 *NOTE* We currently have a large number of warnings, many of which we're present before introducing an `.editorconfig` file, and many more of which have been created by imposing style rules we previously weren't. Once the work has been done to resolve these warnings, we can turn on `TreatWarningsAsErrors` to make the build itself fail if there are style violations. 
+
+#### How do I configure my IDE? 
+
+Because the `.editorconfig` file is attached to the solution, both Rider and Visual Studio should automatically use its rules in place of their own defaults.
+
+- on Visual Studio, you may need to visit `Analyze -> Code Cleanup -> Configure Code Cleanup`, then change your default profile to include only the `Fix all warnings and errors set in EditorConfig` step.
+- on Rider, you may need to visit `Settings -> Editor -> Inspection Settings` then ensure `Read settings from editorconfig, project settings and rule sets` is ticked.
+
+#### How do I format only one file?
+
+The easiest way is probably through an IDE, configured as per the step above. Most IDEs can format single files if you right-click it in the explorer.
+Failing that, the faffier harder way is to pass an `--include <PATH>` argument to `dotnet format` on the command line, providing it the files you want it to format.
+
+#### How do I run the formatter manually?
 
 You can perform the same check as the pre-commit hooks / GitHubs actions do and receive a report by running the following command from the repository root:
 
@@ -633,6 +647,12 @@ dotnet format src/GovUk.Education.ExploreEducationStatistics.sln
 ```
 
 If you want to run it against one or more specific directories in the solution (or indeed exclude one or more), these can be specified through the `--include <PATH>` and `--exclude <PATH>` arguments. 
+
+If you want to see only errors, or include suggestions, pass a new value to the severity argument (accepted values are `error`, `warn`, and `info`):
+
+```bash
+dotnet format src/GovUk.Education.ExploreEducationStatistics.sln --severity <SEVERITY>
+```
 
 See the [docs](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format) for more on this.
 
