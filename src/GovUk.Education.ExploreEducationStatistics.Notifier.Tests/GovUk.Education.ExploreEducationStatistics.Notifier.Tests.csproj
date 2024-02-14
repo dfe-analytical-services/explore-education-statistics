@@ -8,6 +8,12 @@
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
         <PackageReference Include="Moq" Version="4.20.69" />

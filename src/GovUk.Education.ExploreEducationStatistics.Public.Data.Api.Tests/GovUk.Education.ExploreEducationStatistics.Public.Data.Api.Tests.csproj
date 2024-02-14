@@ -11,6 +11,12 @@
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests</RootNamespace>
     </PropertyGroup>
 
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />

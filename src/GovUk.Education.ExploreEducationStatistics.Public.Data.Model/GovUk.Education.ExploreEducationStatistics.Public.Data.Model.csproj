@@ -8,6 +8,12 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
         <PackageReference Include="linq2db.EntityFrameworkCore" Version="8.0.0" />

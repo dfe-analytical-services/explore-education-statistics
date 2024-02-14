@@ -6,6 +6,12 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+  
     <ItemGroup>
         <PackageReference Include="AngleSharp" Version="1.0.4" />
         <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />

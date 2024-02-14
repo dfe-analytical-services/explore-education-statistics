@@ -7,6 +7,12 @@
         <Nullable>enable</Nullable>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
+  
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="DuckDB.NET.Data.Full" Version="0.9.2" />
         <PackageReference Include="FluentValidation" Version="11.9.0" />

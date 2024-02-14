@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <Content Include="Migrations\ContentMigrations\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

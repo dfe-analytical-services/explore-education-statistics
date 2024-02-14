@@ -7,6 +7,12 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
+
+  <ItemGroup>
+      <CompilerVisibleProperty Include="RootNamespace" />
+      <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Data.ViewModels.csproj" />
