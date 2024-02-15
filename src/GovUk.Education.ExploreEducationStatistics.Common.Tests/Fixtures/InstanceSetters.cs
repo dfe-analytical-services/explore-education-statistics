@@ -116,6 +116,13 @@ public class InstanceSetters<T> where T : class
                 .Take(faker.Random.Int(2, 5))
                 .ToList());
 
+    public InstanceSetters<T> SetDefault<TEnum>(Expression<Func<T, ISet<TEnum>>> property) where TEnum : Enum
+        => Set(
+            property,
+            faker => EnumUtil.GetEnumValues<TEnum>()
+                .Take(faker.Random.Int(2, 5))
+                .ToHashSet());
+
     public InstanceSetters<T> SetDefault(Expression<Func<T, int?>> property, int? offset = 0)
     {
         return Set(

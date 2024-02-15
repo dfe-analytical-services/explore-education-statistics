@@ -82,7 +82,9 @@ internal class DataSetService : IDataSetService
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary.TimePeriodRange),
-            GeographicLevels = latestVersion.MetaSummary.GeographicLevels,
+            GeographicLevels = latestVersion.MetaSummary.GeographicLevels
+                .OrderBy(e => e.ToString())
+                .ToList(),
             Filters = latestVersion.MetaSummary.Filters,
             Indicators = latestVersion.MetaSummary.Indicators,
         };

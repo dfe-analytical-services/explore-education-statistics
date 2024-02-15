@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
@@ -17,7 +16,7 @@ public static class GeographicLevelUtilTests
         {
             var columns = GeographicLevel.Country.CsvColumns();
 
-            Assert.Equal("country_code", columns.Code);
+            Assert.Equal(new[] { "country_code" }, columns.Codes);
             Assert.Equal("country_name", columns.Name);
         }
 
@@ -30,16 +29,7 @@ public static class GeographicLevelUtilTests
         [Fact]
         public void CsvCodeColumn()
         {
-            Assert.Equal("country_code", GeographicLevel.Country.CsvCodeColumn());
-        }
-
-        [Fact]
-        public void CsvOtherColumns()
-        {
-            var columns = GeographicLevel.LocalAuthority.CsvOtherColumns();
-
-            Assert.Single(columns);
-            Assert.Equal("old_la_code", columns[0]);
+            Assert.Equal(new[] { "country_code" }, GeographicLevel.Country.CsvCodeColumns());
         }
 
         [Theory]
@@ -55,9 +45,7 @@ public static class GeographicLevelUtilTests
                 .SelectMany(
                     level =>
                     {
-                        var columns = new List<string> { level.CsvCodeColumn(), level.CsvNameColumn() };
-
-                        columns.AddRange(level.CsvOtherColumns());
+                        var columns = new List<string>(level.CsvCodeColumns()) { level.CsvNameColumn() };
 
                         return columns.Select(column => new object[] { column, level });
                     }

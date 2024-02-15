@@ -25,11 +25,19 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required string Notes { get; set; }
 
+    public long TotalResults { get; set; }
+
     public required DataSetVersionMetaSummary MetaSummary { get; set; }
 
-    public DataSetMeta Meta { get; set; } = null!;
+    public GeographicLevelMeta GeographicLevelMeta  { get; set; } = null!;
 
-    public long TotalResults { get; set; }
+    public List<LocationMeta> LocationMetas  { get; set; } = [];
+
+    public List<FilterMeta> FilterMetas  { get; set; } = [];
+
+    public IndicatorMeta IndicatorMeta  { get; set; } = null!;
+
+    public TimePeriodMeta TimePeriodMeta  { get; set; } = null!;
 
     public List<ChangeSetFilters> FilterChanges { get; set; } = [];
 
@@ -72,6 +80,21 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                     });
                 });
             });
+
+            builder
+                .HasOne(v => v.GeographicLevelMeta)
+                .WithOne(m => m.DataSetVersion)
+                .HasForeignKey<GeographicLevelMeta>(m => m.DataSetVersionId);
+
+            builder
+                .HasOne(v => v.IndicatorMeta)
+                .WithOne(m => m.DataSetVersion)
+                .HasForeignKey<IndicatorMeta>(m => m.DataSetVersionId);
+
+            builder
+                .HasOne(v => v.TimePeriodMeta)
+                .WithOne(m => m.DataSetVersion)
+                .HasForeignKey<TimePeriodMeta>(m => m.DataSetVersionId);
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();
         }

@@ -26,7 +26,11 @@ public class PublicDataDbContext : DbContext
 
     public DbSet<DataSet> DataSets { get; init; } = null!;
     public DbSet<DataSetVersion> DataSetVersions { get; init; } = null!;
-    public DbSet<DataSetMeta> DataSetMeta { get; init; } = null!;
+    public DbSet<GeographicLevelMeta> GeographicLevelMetas { get; init; } = null!;
+    public DbSet<LocationMeta> LocationMetas { get; init; } = null!;
+    public DbSet<FilterMeta> FilterMetas { get; init; } = null!;
+    public DbSet<IndicatorMeta> IndicatorMetas { get; init; } = null!;
+    public DbSet<TimePeriodMeta> TimePeriodMetas { get; init; } = null!;
     public DbSet<ChangeSetFilters> ChangeSetFilters { get; init; } = null!;
     public DbSet<ChangeSetFilterOptions> ChangeSetFilterOptions { get; init; } = null!;
     public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;

@@ -1,12 +1,43 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public class FilterMeta
+public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
-    public required string Identifier { get; set; }
+    public Guid Id { get; set; }
+
+    public required Guid DataSetVersionId { get; set; }
+
+    public DataSetVersion DataSetVersion { get; set; } = null!;
+
+    public required string PublicId { get; set; }
 
     public required string Label { get; set; }
 
     public string Hint { get; set; } = string.Empty;
 
     public required List<FilterOptionMeta> Options { get; set; } = [];
+
+    public DateTimeOffset Created { get; set; }
+
+    public DateTimeOffset? Updated { get; set; }
+
+    internal class Config : IEntityTypeConfiguration<FilterMeta>
+    {
+        public void Configure(EntityTypeBuilder<FilterMeta> builder)
+        {
+            builder.OwnsMany(m => m.Options, mo =>
+            {
+                mo.ToJson();
+            });
+
+            builder.Property(m => m.PublicId).HasMaxLength(100);
+
+            builder
+                .HasIndex(m => new {m.DataSetVersionId, m.PublicId})
+                .IsUnique();
+        }
+    }
 }
