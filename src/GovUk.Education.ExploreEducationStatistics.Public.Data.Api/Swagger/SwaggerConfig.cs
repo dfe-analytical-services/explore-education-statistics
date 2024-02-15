@@ -12,6 +12,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
         options.OperationFilter<DefaultValuesOperationFilter>();
         options.SchemaFilter<JsonConverterSchemaFilter>();
         options.SchemaFilter<DataSetStatusSchemaFilter>();
+        options.SchemaFilter<DataSetVersionStatusSchemaFilter>();
 
         var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
         var filePath = Path.Combine(AppContext.BaseDirectory, fileName);

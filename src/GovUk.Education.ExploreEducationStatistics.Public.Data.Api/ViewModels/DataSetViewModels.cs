@@ -136,6 +136,7 @@ public class DataSetVersionViewModel
     /// 
     /// Minor versions should not cause issues in the functionality of existing code.
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 
     /// <summary>
