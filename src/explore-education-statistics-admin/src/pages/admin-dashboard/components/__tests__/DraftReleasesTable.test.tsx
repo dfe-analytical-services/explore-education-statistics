@@ -170,7 +170,7 @@ describe('DraftReleasesTable', () => {
   ];
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    // jest.useFakeTimers();
 
     releaseService.getReleaseChecklist.mockResolvedValue({
       errors: [
@@ -349,7 +349,9 @@ describe('DraftReleasesTable', () => {
     expect(within(row3cells[0]).getByText('Release 1')).toBeInTheDocument();
     expect(within(row3cells[1]).getByText('Draft')).toBeInTheDocument();
     expect(
-      within(row3cells[2]).getByRole('button', { name: 'View issues (3)' }),
+      await within(row3cells[2]).findByRole('button', {
+        name: 'View issues (3)',
+      }),
     ).toBeInTheDocument();
     expect(
       within(row3cells[3]).getByRole('link', { name: 'Edit Release 1' }),
@@ -558,27 +560,27 @@ describe('DraftReleasesTable', () => {
     const rows = screen.getAllByRole('row');
     const row6cells = within(rows[5]).getAllByRole('cell');
 
-    userEvent.click(
+    await userEvent.click(
       within(row6cells[2]).getByRole('button', {
         name: 'Cancel amendment for Release 2',
       }),
     );
 
-    await waitFor(() => {
-      expect(releaseService.getDeleteReleasePlan).toHaveBeenCalledWith(
-        'release-2',
-      );
-    });
+    expect(
+      await screen.findByText(
+        'Confirm you want to cancel this amended release',
+      ),
+    ).toBeInTheDocument();
+
+    expect(releaseService.getDeleteReleasePlan).toHaveBeenCalledWith(
+      'release-2',
+    );
 
     const modal = within(screen.getByRole('dialog'));
-
-    expect(
-      modal.getByText('Confirm you want to cancel this amended release'),
-    ).toBeInTheDocument();
     expect(modal.getByText('Methodology 1')).toBeInTheDocument();
     expect(modal.getByText('Methodology 2')).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       modal.getByRole('button', {
         name: 'Confirm',
       }),

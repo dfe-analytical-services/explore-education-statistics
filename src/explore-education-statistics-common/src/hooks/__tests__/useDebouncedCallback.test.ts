@@ -1,5 +1,5 @@
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 describe('useDebouncedCallback', () => {
   beforeEach(() => {

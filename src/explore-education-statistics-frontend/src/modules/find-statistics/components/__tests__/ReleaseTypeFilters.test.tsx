@@ -60,13 +60,13 @@ describe('ReleaseTypeFilters', () => {
     expect(screen.getByLabelText('Management information')).toBeChecked();
   });
 
-  test('calls onChange when a theme is selected', () => {
+  test('calls onChange when a theme is selected', async () => {
     const handleChange = jest.fn();
     render(<ReleaseTypeFilters onChange={handleChange} />);
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByLabelText('Official statistics'));
+    await userEvent.click(screen.getByLabelText('Official statistics'));
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'releaseType',
@@ -74,7 +74,7 @@ describe('ReleaseTypeFilters', () => {
     });
   });
 
-  test('shows the guidance modal', () => {
+  test('shows the guidance modal', async () => {
     render(
       <ReleaseTypeFilters
         releaseType="ManagementInformation"
@@ -82,7 +82,7 @@ describe('ReleaseTypeFilters', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'What are release types?' }),
     );
 

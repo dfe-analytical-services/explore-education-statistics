@@ -214,7 +214,7 @@ describe('MapBlockInternal', () => {
     expect(locationOptions[2]).toHaveTextContent('Location 2');
   });
 
-  test('calls `onChangeDataSet` when select a data set', () => {
+  test('calls `onChangeDataSet` when select a data set', async () => {
     const handleChangeDataSet = jest.fn();
     render(
       <MapControls
@@ -228,14 +228,14 @@ describe('MapBlockInternal', () => {
     );
 
     expect(handleChangeDataSet).not.toHaveBeenCalled();
-    userEvent.selectOptions(
+    await userEvent.selectOptions(
       screen.getByLabelText('1. Select data to view'),
       'Data set 2',
     );
     expect(handleChangeDataSet).toHaveBeenCalledWith('data-set-2');
   });
 
-  test('calls `onChangeLocation` when select a data set', () => {
+  test('calls `onChangeLocation` when select a data set', async () => {
     const handleChangeLocation = jest.fn();
     render(
       <MapControls
@@ -249,7 +249,7 @@ describe('MapBlockInternal', () => {
     );
 
     expect(handleChangeLocation).not.toHaveBeenCalled();
-    userEvent.selectOptions(
+    await userEvent.selectOptions(
       screen.getByLabelText('2. Select a Local Authority'),
       'Location 2',
     );
@@ -258,7 +258,7 @@ describe('MapBlockInternal', () => {
     );
   });
 
-  test('selects the location from the initial value', () => {
+  test('selects the location from the initial value', async () => {
     render(
       <MapControls
         dataSetCategories={testDataSetCategories}

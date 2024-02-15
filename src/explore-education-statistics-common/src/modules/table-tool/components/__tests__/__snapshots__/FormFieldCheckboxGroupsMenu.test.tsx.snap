@@ -10,7 +10,6 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
   >
     Choose options
   </legend>
-  
   <button
     aria-disabled="false"
     class="button noUnderline govuk-!-margin-bottom-4"
@@ -184,7 +183,6 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
   >
     Choose options
   </legend>
-  
   <label
     class="govuk-label"
     for="test-search"
@@ -264,7 +262,6 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
   >
     Choose options
   </legend>
-  
   <div
     aria-live="assertive"
     class="optionsContainer"

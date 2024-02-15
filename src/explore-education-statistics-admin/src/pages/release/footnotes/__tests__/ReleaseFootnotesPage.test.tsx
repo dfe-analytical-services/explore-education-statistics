@@ -126,7 +126,7 @@ describe('ReleaseFootnotesPage', () => {
         screen.getByRole('link', { name: 'Create footnote' }),
       ).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Reorder footnotes' }),
       );
 
@@ -171,13 +171,13 @@ describe('ReleaseFootnotesPage', () => {
         expect(screen.getByText('Footnotes')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Reorder footnotes' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Save order')).toBeInTheDocument();
       });
-      userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
 
       expect(footnoteService.updateFootnotesOrder).toHaveBeenCalledWith(
         'release-1',

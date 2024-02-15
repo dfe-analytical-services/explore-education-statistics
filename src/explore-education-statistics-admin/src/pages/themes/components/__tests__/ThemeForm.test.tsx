@@ -10,8 +10,8 @@ describe('ThemeForm', () => {
   test('shows validation error when there is no title', async () => {
     render(<ThemeForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -25,8 +25,8 @@ describe('ThemeForm', () => {
   test('shows validation error when there is no summary', async () => {
     render(<ThemeForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Summary'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Summary'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -44,7 +44,7 @@ describe('ThemeForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('ThemeForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -99,7 +99,7 @@ describe('ThemeForm', () => {
       await userEvent.clear(screen.getByLabelText('Title'));
       await userEvent.clear(screen.getByLabelText('Summary'));
 
-      userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
 
       await waitFor(() => {
         expect(handleSubmit).not.toHaveBeenCalled();
@@ -116,7 +116,7 @@ describe('ThemeForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith({

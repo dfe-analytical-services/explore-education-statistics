@@ -540,6 +540,8 @@ describe('ReleaseContentPage', () => {
 
       expect(contentAccordionSections).toHaveLength(2);
 
+      expect(await screen.findByText('Show all sections')).toBeInTheDocument();
+
       expect(
         within(contentAccordionSections[0]).getByRole('button', {
           name: /Section 1/,
@@ -596,7 +598,7 @@ describe('ReleaseContentPage', () => {
         expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('Preview release page'));
+      await userEvent.click(screen.getByLabelText('Preview release page'));
 
       expect(
         screen.getByRole('heading', { name: 'Publication 1' }),
@@ -695,7 +697,7 @@ describe('ReleaseContentPage', () => {
         expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('Preview release page'));
+      await userEvent.click(screen.getByLabelText('Preview release page'));
 
       expect(
         screen.queryByRole('link', {
@@ -703,7 +705,7 @@ describe('ReleaseContentPage', () => {
         }),
       ).not.toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'featured table link' }),
       );
 
@@ -751,7 +753,7 @@ describe('ReleaseContentPage', () => {
         expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('Preview release page'));
+      await userEvent.click(screen.getByLabelText('Preview release page'));
 
       expect(
         screen.queryByRole('link', {
@@ -759,7 +761,7 @@ describe('ReleaseContentPage', () => {
         }),
       ).not.toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'featured table link' }),
       );
 
@@ -828,7 +830,7 @@ describe('ReleaseContentPage', () => {
         expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('Preview table tool'));
+      await userEvent.click(screen.getByLabelText('Preview table tool'));
 
       await waitFor(() => {
         expect(screen.getByText('Table tool')).toBeInTheDocument();

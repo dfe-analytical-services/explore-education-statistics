@@ -120,8 +120,8 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('Invite new users by email'));
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('Invite new users by email'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -133,6 +133,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when the number of email lines exceeds the upper limit', async () => {
+      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -145,8 +146,8 @@ describe('PreReleaseUserAccessForm', () => {
 
       const emailsTextarea = screen.getByLabelText('Invite new users by email');
       // type values up to but not exceeding the limit of lines
-      await userEvent.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
-      userEvent.tab();
+      await user.type(emailsTextarea, `test@test.com{Enter}`.repeat(50));
+      await user.tab();
 
       await waitFor(() => {
         expect(
@@ -157,8 +158,8 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       // now exceed the limit
-      await userEvent.type(emailsTextarea, `{enter}test@test.com`);
-      userEvent.tab();
+      await user.type(emailsTextarea, `{Enter}test@test.com`);
+      await user.tab();
 
       await waitFor(() => {
         expect(
@@ -170,6 +171,7 @@ describe('PreReleaseUserAccessForm', () => {
     });
 
     test('shows validation message when emails contains invalid values', async () => {
+      const user = userEvent.setup();
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -180,11 +182,17 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      await user.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@test.com{enter}invalid-1{enter}invalid-2',
+        'test@test.com{Enter}invalid-1{Enter}invalid-2',
       );
-      userEvent.tab();
+      await user.tab();
+
+      // await userEvent.type(
+      //   screen.getByLabelText('Invite new users by email'),
+      //   'test@test.com{enter}invalid-1{enter}invalid-2',
+      // );
+      // await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -210,7 +218,7 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByLabelText('Invite new users by email'),
         'test@test.com@test',
       );
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -239,7 +247,7 @@ describe('PreReleaseUserAccessForm', () => {
         screen.getByLabelText('Invite new users by email'),
         'test@test.',
       );
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -261,7 +269,9 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -288,7 +298,9 @@ describe('PreReleaseUserAccessForm', () => {
         'test@test.com{enter}invalid-1{enter}invalid-2',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -315,7 +327,9 @@ describe('PreReleaseUserAccessForm', () => {
         ' {enter} {enter} test1@test.com {enter} {enter} test2@test.com {enter} {enter} test3@test.com {enter} ',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
@@ -345,9 +359,11 @@ describe('PreReleaseUserAccessForm', () => {
           'test@education.gov.uk{enter}' +
           'test@gov.wales',
       );
-      userEvent.tab();
+      await userEvent.tab();
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
@@ -392,7 +408,9 @@ describe('PreReleaseUserAccessForm', () => {
         invitable: ['test1@test.com', 'test2@test.com', 'test3@test.com'],
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
@@ -476,7 +494,9 @@ describe('PreReleaseUserAccessForm', () => {
         alreadyInvited: [],
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -486,7 +506,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       const modal = within(screen.getByRole('dialog'));
 
-      userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -521,7 +541,9 @@ describe('PreReleaseUserAccessForm', () => {
         alreadyInvited: [],
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       await waitFor(() => {
         expect(
@@ -558,7 +580,9 @@ describe('PreReleaseUserAccessForm', () => {
         alreadyInvited: [],
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Invite new users' }),
+      );
 
       preReleaseUserService.inviteUsers.mockResolvedValue([
         { email: 'test3@test.com' },
@@ -574,7 +598,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       const modal = within(screen.getByRole('dialog'));
 
-      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(preReleaseUserService.inviteUsers).toHaveBeenCalledWith(
@@ -629,7 +653,9 @@ describe('PreReleaseUserAccessForm', () => {
       let rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(3);
 
-      userEvent.click(within(rows[2]).getByRole('button', { name: 'Remove' }));
+      await userEvent.click(
+        within(rows[2]).getByRole('button', { name: 'Remove' }),
+      );
 
       await waitFor(() => {
         expect(preReleaseUserService.removeUser).toHaveBeenCalledWith(

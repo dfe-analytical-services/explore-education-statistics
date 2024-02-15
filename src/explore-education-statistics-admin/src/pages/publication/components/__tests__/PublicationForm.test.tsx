@@ -18,8 +18,8 @@ describe('PublicationForm', () => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByLabelText('Publication title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Publication title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -37,8 +37,8 @@ describe('PublicationForm', () => {
       expect(screen.getByLabelText('Publication summary')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByLabelText('Publication summary'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Publication summary'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -56,17 +56,19 @@ describe('PublicationForm', () => {
       expect(screen.getByLabelText('Team name')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByLabelText('Team name'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Team name'));
+    await userEvent.tab();
 
-    userEvent.click(screen.getByLabelText('Team email address'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Team email address'));
+    await userEvent.tab();
 
-    userEvent.click(screen.getByLabelText('Contact name'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Contact name'));
+    await userEvent.tab();
 
-    userEvent.click(screen.getByLabelText('Contact telephone (optional)'));
-    userEvent.tab();
+    await userEvent.click(
+      screen.getByLabelText('Contact telephone (optional)'),
+    );
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -106,7 +108,7 @@ describe('PublicationForm', () => {
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -141,7 +143,7 @@ describe('PublicationForm', () => {
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -171,7 +173,7 @@ describe('PublicationForm', () => {
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -194,7 +196,7 @@ describe('PublicationForm', () => {
       screen.getByLabelText('Team email address'),
       'not a valid email',
     );
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -218,7 +220,9 @@ describe('PublicationForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save publication' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -257,7 +261,9 @@ describe('PublicationForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save publication' }),
+    );
 
     await waitFor(() => {
       expect(publicationService.createPublication).toHaveBeenCalledWith({
@@ -302,7 +308,9 @@ describe('PublicationForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save publication' }),
+    );
 
     await waitFor(() => {
       expect(publicationService.createPublication).toHaveBeenCalledWith({

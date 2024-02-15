@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { flushSync } from 'react-dom';
 
 export interface AsyncState<T> {
   isLoading: boolean;

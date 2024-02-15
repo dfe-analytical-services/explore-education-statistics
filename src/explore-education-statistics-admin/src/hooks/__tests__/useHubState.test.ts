@@ -1,8 +1,7 @@
 import useHubState from '@admin/hooks/useHubState';
 import Hub from '@admin/services/hubs/utils/Hub';
 import { HubConnectionState } from '@microsoft/signalr';
-import { waitFor } from '@testing-library/react';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { mock } from 'jest-mock-extended';
 
 describe('useHubState', () => {
@@ -27,9 +26,7 @@ describe('useHubState', () => {
 
     mockHub.status.mockReturnValue(HubConnectionState.Disconnected);
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useHubState(() => mockHub),
-    );
+    const { result } = renderHook(() => useHubState(() => mockHub));
 
     expect(result.current.status).toBe(HubConnectionState.Disconnected);
 
@@ -37,9 +34,9 @@ describe('useHubState', () => {
 
     jest.runOnlyPendingTimers();
 
-    await waitForNextUpdate();
-
-    expect(result.current.status).toBe(HubConnectionState.Connected);
+    await waitFor(() => {
+      expect(result.current.status).toBe(HubConnectionState.Connected);
+    });
   });
 
   test('calls `stop` on hub when unmounted', () => {

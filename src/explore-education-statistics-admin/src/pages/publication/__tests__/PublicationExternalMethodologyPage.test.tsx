@@ -29,17 +29,15 @@ describe('PublicationExternalMethodologyPage', () => {
 
     renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(publicationService.getExternalMethodology).toBeCalledWith(
-        testPublication.id,
-      );
-    });
-
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Link to an externally hosted methodology',
       }),
     ).toBeInTheDocument();
+
+    expect(publicationService.getExternalMethodology).toHaveBeenCalledWith(
+      testPublication.id,
+    );
 
     expect(screen.getByText('Link title')).toBeInTheDocument();
 
@@ -56,17 +54,15 @@ describe('PublicationExternalMethodologyPage', () => {
 
     renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(publicationService.getExternalMethodology).toBeCalledWith(
-        testPublication.id,
-      );
-    });
-
     expect(
-      screen.getByRole('heading', {
+      await screen.findByRole('heading', {
         name: 'Edit external methodology link',
       }),
     ).toBeInTheDocument();
+
+    expect(publicationService.getExternalMethodology).toHaveBeenCalledWith(
+      testPublication.id,
+    );
 
     expect(screen.getByLabelText('Link title')).toHaveValue(
       'External methodology title',
@@ -96,17 +92,17 @@ describe('PublicationExternalMethodologyPage', () => {
       </Router>,
     );
 
-    await waitFor(() => {
-      expect(publicationService.getExternalMethodology).toBeCalledWith(
-        testPublication.id,
-      );
-    });
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Link to an externally hosted methodology',
+      }),
+    ).toBeInTheDocument();
 
-    userEvent.type(screen.getByLabelText('Link title'), 'The link title');
+    await userEvent.type(screen.getByLabelText('Link title'), 'The link title');
 
-    userEvent.type(screen.getByLabelText('URL'), 'test.com');
+    await userEvent.type(screen.getByLabelText('URL'), 'test.com');
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(publicationService.updateExternalMethodology).toHaveBeenCalledWith(
@@ -142,13 +138,13 @@ describe('PublicationExternalMethodologyPage', () => {
       </Router>,
     );
 
-    await waitFor(() => {
-      expect(publicationService.getExternalMethodology).toBeCalledWith(
-        testPublication.id,
-      );
-    });
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Edit external methodology link',
+      }),
+    ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
 

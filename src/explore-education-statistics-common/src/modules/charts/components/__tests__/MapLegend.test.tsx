@@ -6,7 +6,7 @@ import React from 'react';
 describe('MapLegend', () => {
   const testLegendDataGroups: LegendDataGroup[] = [
     {
-      colour: 'rgba(128, 128, 128, 1)',
+      colour: 'rgb(128, 128, 128)',
       decimalPlaces: 0,
       max: '3',
       maxRaw: 3,
@@ -14,7 +14,7 @@ describe('MapLegend', () => {
       minRaw: 1,
     },
     {
-      colour: 'rgba(0, 0, 0, 1)',
+      colour: 'rgb(0, 0, 0)',
       decimalPlaces: 0,
       max: '5',
       maxRaw: 5,
@@ -41,5 +41,11 @@ describe('MapLegend', () => {
     expect(listItems).toHaveLength(2);
     expect(listItems[0]).toHaveTextContent('1 to 3');
     expect(listItems[1]).toHaveTextContent('4 to 5');
+
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
+
+    expect(legendColours).toHaveLength(2);
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(128, 128, 128)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(0, 0, 0)');
   });
 });

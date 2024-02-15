@@ -177,9 +177,9 @@ describe('PublicationAdoptMethodologyPage', () => {
       ).toBeInTheDocument(),
     );
 
-    userEvent.click(screen.getByLabelText('Methodology 2'));
+    await userEvent.click(screen.getByLabelText('Methodology 2'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(publicationService.adoptMethodology).toHaveBeenCalledWith(
@@ -216,7 +216,7 @@ describe('PublicationAdoptMethodologyPage', () => {
       ).toBeInTheDocument(),
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(publicationService.adoptMethodology).not.toHaveBeenCalled();
 

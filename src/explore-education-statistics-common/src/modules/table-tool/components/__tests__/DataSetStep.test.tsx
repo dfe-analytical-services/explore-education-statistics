@@ -195,11 +195,11 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Subject 1'));
+    await userEvent.click(screen.getByLabelText('Subject 1'));
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     const expected: DataSetFormValues = {
       subjectId: 'subject-1',
@@ -310,7 +310,7 @@ describe('DataSetStep', () => {
     expect(radios[1]).toEqual(screen.getByLabelText('Subject 2'));
   });
 
-  test('clicking `view all featured tables` shows all featured tables for the release', () => {
+  test('clicking `view all featured tables` shows all featured tables for the release', async () => {
     render(
       <DataSetStep
         {...wizardProps}
@@ -321,7 +321,7 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('View all featured tables'));
+    await userEvent.click(screen.getByLabelText('View all featured tables'));
 
     expect(
       screen.getByRole('heading', {
@@ -376,14 +376,17 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('View all featured tables'));
+    await userEvent.click(screen.getByLabelText('View all featured tables'));
 
     expect(
       within(screen.getByTestId('featuredTables')).getAllByRole('listitem'),
     ).toHaveLength(3);
 
-    userEvent.type(screen.getByLabelText('Search featured tables'), 'find me');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(
+      screen.getByLabelText('Search featured tables'),
+      'find me',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
     await waitFor(() => {
       expect(screen.getByText('Clear search')).toBeInTheDocument();
@@ -416,14 +419,17 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('View all featured tables'));
+    await userEvent.click(screen.getByLabelText('View all featured tables'));
 
     expect(
       within(screen.getByTestId('featuredTables')).getAllByRole('listitem'),
     ).toHaveLength(3);
 
-    userEvent.type(screen.getByLabelText('Search featured tables'), 'find me');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(
+      screen.getByLabelText('Search featured tables'),
+      'find me',
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
     await waitFor(() => {
       expect(screen.getByText('Clear search')).toBeInTheDocument();
@@ -433,7 +439,7 @@ describe('DataSetStep', () => {
       within(screen.getByTestId('featuredTables')).getAllByRole('listitem'),
     ).toHaveLength(1);
 
-    userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Clear search' }));
 
     await waitFor(() => {
       expect(screen.queryByText('Clear search')).not.toBeInTheDocument();
@@ -444,7 +450,7 @@ describe('DataSetStep', () => {
     ).toHaveLength(3);
   });
 
-  test('selecting a data set shows the details and featured tables', () => {
+  test('selecting a data set shows the details and featured tables', async () => {
     render(
       <DataSetStep
         {...wizardProps}
@@ -456,7 +462,7 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Subject 1'));
+    await userEvent.click(screen.getByLabelText('Subject 1'));
 
     expect(
       screen.getByRole('heading', { name: 'Data set details' }),
@@ -526,7 +532,7 @@ describe('DataSetStep', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('featured tables are not shown if none are related to the selected data set', () => {
+  test('featured tables are not shown if none are related to the selected data set', async () => {
     render(
       <DataSetStep
         {...wizardProps}
@@ -538,7 +544,7 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Subject 2'));
+    await userEvent.click(screen.getByLabelText('Subject 2'));
 
     expect(
       screen.queryByRole('heading', { name: 'View our featured tables' }),
@@ -603,11 +609,11 @@ describe('DataSetStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Subject 1'));
+    await userEvent.click(screen.getByLabelText('Subject 1'));
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Create your own table' }),
     );
 

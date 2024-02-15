@@ -42,10 +42,6 @@ describe('ReleaseFileUploadsSection', () => {
     },
   ];
 
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
   function renderPage() {
     return render(
       <MemoryRouter>
@@ -143,7 +139,7 @@ describe('ReleaseFileUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete file',
         }),
@@ -161,7 +157,10 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('confirming deletion removes the file section', async () => {
-      releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
+      releaseAncillaryFileService.listFiles.mockResolvedValueOnce(testFiles);
+      releaseAncillaryFileService.listFiles.mockResolvedValueOnce([
+        testFiles[0],
+      ]);
 
       renderPage();
 
@@ -169,15 +168,11 @@ describe('ReleaseFileUploadsSection', () => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
 
+      expect(releaseAncillaryFileService.listFiles).toHaveBeenCalledTimes(1);
+
       const sections = screen.getAllByTestId('accordionSection');
 
-      expect(
-        within(sections[1]).getByRole('button', {
-          name: 'Delete file',
-        }),
-      ).toBeInTheDocument();
-
-      userEvent.click(
+      await userEvent.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete file',
         }),
@@ -189,25 +184,29 @@ describe('ReleaseFileUploadsSection', () => {
         ).toBeInTheDocument();
       });
 
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(await screen.findByRole('dialog')).toBeInTheDocument();
 
       expect(releaseAncillaryFileService.deleteFile).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
       );
 
-      releaseAncillaryFileService.listFiles.mockResolvedValue([testFiles[0]]);
-
       await waitFor(() => {
         expect(releaseAncillaryFileService.deleteFile).toHaveBeenCalledWith<
           Parameters<typeof releaseAncillaryFileService.deleteFile>
         >('release-1', 'file-2');
-
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
       });
+
+      await waitFor(() => {
+        expect(releaseAncillaryFileService.listFiles).toHaveBeenCalledTimes(2);
+      });
+
+      await waitFor(() =>
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
+      );
 
       const updatedSections = screen.getAllByTestId('accordionSection');
 
@@ -227,13 +226,13 @@ describe('ReleaseFileUploadsSection', () => {
     test('shows validation message when no `file` selected', async () => {
       renderPage();
 
-      userEvent.click(screen.getByLabelText('Upload file'));
+      await userEvent.click(screen.getByLabelText('Upload file'));
       fireEvent.change(screen.getByLabelText('Upload file'), {
         target: {
           value: null,
         },
       });
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(
         () => {
@@ -253,11 +252,11 @@ describe('ReleaseFileUploadsSection', () => {
     test('shows validation message when `file` uploaded is an empty file', async () => {
       renderPage();
 
-      userEvent.upload(
+      await userEvent.upload(
         screen.getByLabelText('Upload file'),
         new File([''], 'test.txt'),
       );
-      userEvent.click(screen.getByRole('button', { name: 'Add file' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
 
       await waitFor(() => {
         expect(
@@ -271,7 +270,7 @@ describe('ReleaseFileUploadsSection', () => {
     test('cannot submit with invalid values', async () => {
       renderPage();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),
@@ -321,8 +320,8 @@ describe('ReleaseFileUploadsSection', () => {
       await userEvent.type(screen.getByLabelText('Title'), 'Test title');
       await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
-      userEvent.upload(screen.getByLabelText('Upload file'), file);
-      userEvent.click(
+      await userEvent.upload(screen.getByLabelText('Upload file'), file);
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),
@@ -353,6 +352,12 @@ describe('ReleaseFileUploadsSection', () => {
         created: '2021-05-25T00:00:00',
       };
       releaseAncillaryFileService.createFile.mockResolvedValue(newTestFile);
+      releaseAncillaryFileService.listFiles.mockResolvedValueOnce(testFiles);
+      releaseAncillaryFileService.listFiles.mockResolvedValueOnce(testFiles);
+      releaseAncillaryFileService.listFiles.mockResolvedValueOnce([
+        ...testFiles,
+        newTestFile,
+      ]);
 
       renderPage();
 
@@ -360,18 +365,13 @@ describe('ReleaseFileUploadsSection', () => {
 
       await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
       await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
-      userEvent.upload(screen.getByLabelText('Upload file'), file);
+      await userEvent.upload(screen.getByLabelText('Upload file'), file);
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Add file',
         }),
       );
-
-      releaseAncillaryFileService.listFiles.mockResolvedValue([
-        ...testFiles,
-        newTestFile,
-      ]);
 
       await waitFor(() => {
         expect(releaseAncillaryFileService.createFile).toHaveBeenCalledWith<
@@ -381,9 +381,11 @@ describe('ReleaseFileUploadsSection', () => {
           summary: 'Test summary 3',
           file,
         });
-
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
       });
+
+      await waitFor(() =>
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3),
+      );
 
       const sections = screen.getAllByTestId('accordionSection');
 

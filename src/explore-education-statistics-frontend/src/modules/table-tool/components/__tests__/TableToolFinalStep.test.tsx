@@ -120,7 +120,7 @@ describe('TableToolFinalStep', () => {
       screen.queryByRole('button', { name: 'Update and view reordered table' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(reorderRevealButton);
+    await userEvent.click(reorderRevealButton);
 
     await waitFor(() =>
       expect(

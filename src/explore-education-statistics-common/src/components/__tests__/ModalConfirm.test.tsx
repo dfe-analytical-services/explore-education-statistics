@@ -1,20 +1,18 @@
 import flushPromises from '@common-test/flushPromises';
 import ModalConfirm from '@common/components/ModalConfirm';
 import delay from '@common/utils/delay';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 describe('ModalConfirm', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
   describe('confirming', () => {
-    test('clicking Confirm button disables all buttons', () => {
+    test('clicking Confirm button disables all buttons', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
-      const handleConfirm = jest.fn();
+      const handleConfirm = jest.fn(async () => {
+        await delay(100);
+      });
 
       render(
         <ModalConfirm
@@ -27,10 +25,16 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      expect(
+        await screen.findByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
 
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      // await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+      // });
     });
 
     test('clicking Confirm button prevents closing modal using Esc', async () => {
@@ -49,9 +53,9 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Esc' });
+      await userEvent.keyboard('[Escape]');
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -75,8 +79,10 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-      userEvent.click(baseElement.querySelector('.underlay') as HTMLElement);
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(
+        baseElement.querySelector('.underlay') as HTMLElement,
+      );
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -87,7 +93,7 @@ describe('ModalConfirm', () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
-        await delay(500);
+        await delay(100);
       });
 
       render(
@@ -101,14 +107,10 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-
-      jest.advanceTimersByTime(500);
-
-      await flushPromises();
 
       await waitFor(() => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -133,7 +135,7 @@ describe('ModalConfirm', () => {
 
       expect(handleExit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(handleExit).toHaveBeenCalledTimes(1);
@@ -159,7 +161,7 @@ describe('ModalConfirm', () => {
       expect(handleCancel).not.toHaveBeenCalled();
       expect(handleExit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(handleCancel).toHaveBeenCalledTimes(1);
@@ -167,9 +169,11 @@ describe('ModalConfirm', () => {
       });
     });
 
-    test('clicking Cancel button disables all buttons', () => {
+    test('clicking Cancel button disables all buttons', async () => {
       const handleExit = jest.fn();
-      const handleCancel = jest.fn();
+      const handleCancel = jest.fn(async () => {
+        await delay(100);
+      });
       const handleConfirm = jest.fn();
 
       render(
@@ -183,7 +187,7 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
@@ -205,12 +209,9 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      fireEvent.keyDown(screen.getByRole('dialog'), {
-        key: 'Escape',
-      });
-
+      await userEvent.keyboard('[Escape]');
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
       });
@@ -233,8 +234,10 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-      userEvent.click(baseElement.querySelector('.underlay') as HTMLElement);
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(
+        baseElement.querySelector('.underlay') as HTMLElement,
+      );
 
       await waitFor(() => {
         expect(handleExit).not.toHaveBeenCalled();
@@ -244,7 +247,7 @@ describe('ModalConfirm', () => {
     test('closes the modal once `onCancel` has completed', async () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
-        await delay(500);
+        await delay(100);
       });
       const handleConfirm = jest.fn();
 
@@ -259,12 +262,10 @@ describe('ModalConfirm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-
-      jest.advanceTimersByTime(500);
 
       await flushPromises();
 

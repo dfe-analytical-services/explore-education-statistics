@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 describe('Tooltip', () => {
-  test('renders correctly', () => {
+  test('renders correctly', async () => {
     render(
       <Tooltip text="Test tooltip" id="test-tooltip">
         {({ ref }) => (
@@ -21,7 +21,7 @@ describe('Tooltip', () => {
     expect(tooltip).toHaveAttribute('id', 'test-tooltip');
   });
 
-  test('does not render if there is no text', () => {
+  test('does not render if there is no text', async () => {
     render(
       <Tooltip text="" id="test-tooltip">
         {({ ref }) => (
@@ -35,7 +35,7 @@ describe('Tooltip', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  test('does not render if `enabled = false`', () => {
+  test('does not render if `enabled = false`', async () => {
     render(
       <Tooltip text="Test tooltip" id="test-tooltip" enabled={false}>
         {({ ref }) => (
@@ -49,7 +49,7 @@ describe('Tooltip', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  test('links reference element to tooltip via `aria-describedby`', () => {
+  test('links reference element to tooltip via `aria-describedby`', async () => {
     render(
       <Tooltip text="Test tooltip" id="test-tooltip">
         {({ ref }) => (
@@ -70,7 +70,7 @@ describe('Tooltip', () => {
     );
   });
 
-  test('links reference element with existing `aria-describedby` to tooltip', () => {
+  test('links reference element with existing `aria-describedby` to tooltip', async () => {
     render(
       <Tooltip text="Test tooltip" id="test-tooltip">
         {({ ref }) => (
@@ -91,7 +91,7 @@ describe('Tooltip', () => {
     );
   });
 
-  test('clicking reference element makes tooltip visible', () => {
+  test('clicking reference element makes tooltip visible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ ref }) => (
@@ -104,12 +104,12 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Test button' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Test button' }));
 
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
-  test('hovering reference element makes tooltip visible', () => {
+  test('hovering reference element makes tooltip visible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ ref }) => (
@@ -122,12 +122,12 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.hover(screen.getByRole('button', { name: 'Test button' }));
+    await userEvent.hover(screen.getByRole('button', { name: 'Test button' }));
 
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
-  test('unhovering reference element makes tooltip invisible', () => {
+  test('unhovering reference element makes tooltip invisible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ ref }) => (
@@ -142,13 +142,13 @@ describe('Tooltip', () => {
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
-    userEvent.hover(button);
-    userEvent.unhover(button);
+    await userEvent.hover(button);
+    await userEvent.unhover(button);
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  test('focusing reference element makes tooltip visible', () => {
+  test('focusing reference element makes tooltip visible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ ref }) => (
@@ -161,13 +161,13 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.tab();
+    await userEvent.tab();
 
     expect(screen.getByRole('button', { name: 'Test button' })).toHaveFocus();
     expect(screen.getByRole('tooltip')).toBeVisible();
   });
 
-  test('blurring reference element makes tooltip invisible', () => {
+  test('blurring reference element makes tooltip invisible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ ref }) => (
@@ -180,8 +180,8 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     expect(
       screen.getByRole('button', { name: 'Test button' }),
@@ -189,7 +189,7 @@ describe('Tooltip', () => {
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });
 
-  test('calling `show` render prop makes tooltip visible', () => {
+  test('calling `show` render prop makes tooltip visible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ show }) => (
@@ -202,12 +202,12 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Show button' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Show button' }));
 
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
-  test('calling `hide` render prop makes tooltip invisible', () => {
+  test('calling `hide` render prop makes tooltip invisible', async () => {
     render(
       <Tooltip text="Test tooltip">
         {({ show, hide }) => (
@@ -225,8 +225,8 @@ describe('Tooltip', () => {
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Show button' }));
-    userEvent.click(screen.getByRole('button', { name: 'Hide button' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Show button' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Hide button' }));
 
     expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
   });

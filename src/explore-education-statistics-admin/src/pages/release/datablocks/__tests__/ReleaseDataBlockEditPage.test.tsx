@@ -179,12 +179,12 @@ describe('ReleaseDataBlockEditPage', () => {
   test('renders page elements correctly', async () => {
     renderPage();
 
-    await waitFor(() => {
-      expect(screen.getByText('Edit data block')).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('heading', { name: 'Edit data block' }),
+    ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('heading', { name: 'Edit data block' }),
+      await screen.findByRole('heading', { name: 'Test name 1' }),
     ).toBeInTheDocument();
 
     const tabs = screen.getAllByRole('tab');
@@ -278,7 +278,7 @@ describe('ReleaseDataBlockEditPage', () => {
       expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Delete this data block' }),
     );
 
@@ -315,7 +315,7 @@ describe('ReleaseDataBlockEditPage', () => {
       expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Delete this data block' }),
     );
 
@@ -329,7 +329,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
-    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
     expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
     expect(dataBlockService.deleteDataBlock).toHaveBeenCalledWith(
@@ -356,7 +356,7 @@ describe('ReleaseDataBlockEditPage', () => {
       expect(screen.getByText('Delete this data block')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Delete this data block' }),
     );
 
@@ -370,7 +370,7 @@ describe('ReleaseDataBlockEditPage', () => {
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
-    userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
 
     await waitFor(() => {
       expect(screen.queryByText('Delete data block')).not.toBeInTheDocument();
@@ -389,13 +389,19 @@ describe('ReleaseDataBlockEditPage', () => {
 
       renderPage();
 
-      await waitFor(() => {
-        expect(screen.getByText('View data block')).toBeInTheDocument();
-      });
+      expect(
+        await screen.findByRole('heading', { name: 'View data block' }),
+      ).toBeInTheDocument();
+
+      expect(
+        await screen.findByRole('heading', { name: 'Test name 1' }),
+      ).toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: 'Delete this data block' }),
       ).not.toBeInTheDocument();
+
+      expect(await screen.findByText('Test title 1')).toBeInTheDocument();
 
       const tabs = screen.getAllByRole('tab');
 
@@ -506,7 +512,7 @@ describe('ReleaseDataBlockEditPage', () => {
       });
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
-      userEvent.click(screen.getByRole('tab', { name: 'Chart' }));
+      await userEvent.click(screen.getByRole('tab', { name: 'Chart' }));
 
       await waitFor(() => {
         const tabPanel = screen.getByRole('tabpanel');

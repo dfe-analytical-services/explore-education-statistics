@@ -91,8 +91,8 @@ describe('PublicationReleaseContributorsForm', () => {
     expect(checkboxes[3].checked).toBe(false);
     expect(checkboxes[3]).toHaveAttribute('value', undefined);
 
-    userEvent.click(checkboxes[0]);
-    userEvent.click(checkboxes[1]);
+    await userEvent.click(checkboxes[0]);
+    await userEvent.click(checkboxes[1]);
 
     await waitFor(() => {
       expect(checkboxes[0].checked).toBe(false);
@@ -105,7 +105,7 @@ describe('PublicationReleaseContributorsForm', () => {
       _releasePermissionService.updateReleaseContributors,
     ).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update contributors' }),
     );
 

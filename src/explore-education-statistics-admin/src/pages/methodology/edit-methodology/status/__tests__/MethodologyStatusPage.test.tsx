@@ -267,7 +267,7 @@ describe('MethodologyStatusPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit status' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Edit status' }));
 
     await waitFor(() => {
       expect(screen.getByText('Edit methodology status')).toBeInTheDocument();

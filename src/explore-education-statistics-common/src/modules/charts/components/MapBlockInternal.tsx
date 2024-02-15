@@ -3,13 +3,12 @@ import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import createMapDataSetCategories, {
   MapDataSetCategory,
 } from '@common/modules/charts/components/utils/createMapDataSetCategories';
-import generateLegendDataGroups, {
-  LegendDataGroup,
-} from '@common/modules/charts/components/utils/generateLegendDataGroups';
+import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
 import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
 import MapControls from '@common/modules/charts/components/MapControls';
 import MapLegend from '@common/modules/charts/components/MapLegend';
 import MapSelectedItem from '@common/modules/charts/components/MapSelectedItem';
+import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
 import {
   AxisConfiguration,
   ChartProps,
@@ -23,7 +22,6 @@ import getDataSetCategoryConfigs, {
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import generateHslColour from '@common/utils/colour/generateHslColour';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, Polyline } from 'leaflet';
@@ -226,86 +224,4 @@ export default function MapBlockInternal({
       </div>
     </>
   );
-}
-
-function generateFeaturesAndDataGroups({
-  dataSetCategories,
-  selectedDataSetConfig,
-}: {
-  dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: DataSetCategoryConfig;
-}): {
-  features: MapFeatureCollection;
-  dataGroups: LegendDataGroup[];
-} {
-  const selectedDataSetKey = selectedDataSetConfig.dataKey;
-  const { unit, decimalPlaces } = selectedDataSetConfig.dataSet.indicator;
-
-  const colour =
-    selectedDataSetConfig.config.colour ??
-    generateHslColour(selectedDataSetConfig.dataKey);
-
-  // Extract only the numeric values out of relevant data sets
-  const values = dataSetCategories.reduce<number[]>((acc, category) => {
-    const value = category.dataSets[selectedDataSetKey]?.value;
-
-    if (Number.isFinite(value)) {
-      acc.push(value);
-    }
-
-    return acc;
-  }, []);
-
-  const dataGroups = generateLegendDataGroups({
-    colour,
-    dataGrouping: selectedDataSetConfig.dataGrouping,
-    decimalPlaces,
-    values,
-    unit,
-  });
-
-  // Default to white for areas not covered by custom data sets
-  // to make it clearer which aren't covered by the groups.
-  const defaultColour =
-    selectedDataSetConfig.dataGrouping?.type === 'Custom'
-      ? 'rgba(255, 255, 255, 1)'
-      : 'rgba(0,0,0,0)';
-
-  const features: MapFeatureCollection = {
-    type: 'FeatureCollection',
-    features: dataSetCategories.reduce<MapFeature[]>(
-      (acc, { dataSets, filter, geoJson }) => {
-        const value = dataSets?.[selectedDataSetKey]?.value;
-
-        const matchingDataGroup = Number.isFinite(value)
-          ? dataGroups.find(dataClass => {
-              const roundedValue = Number(
-                value.toFixed(dataClass.decimalPlaces),
-              );
-              return (
-                dataClass.minRaw <= roundedValue &&
-                roundedValue <= dataClass.maxRaw
-              );
-            })
-          : undefined;
-
-        acc.push({
-          ...geoJson,
-          id: filter.id,
-          properties: {
-            ...geoJson.properties,
-            dataSets,
-            // Default to transparent if no match
-            colour: matchingDataGroup?.colour ?? defaultColour,
-            data: value,
-          },
-        });
-
-        return acc;
-      },
-      [],
-    ),
-  };
-
-  return { features, dataGroups };
 }

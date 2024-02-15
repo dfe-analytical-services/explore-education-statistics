@@ -56,7 +56,7 @@ describe('Details', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('clicking the summary reveals the content', () => {
+  test('clicking the summary reveals the content', async () => {
     render(
       <Details summary="Test summary" id="test-details">
         Test content
@@ -70,13 +70,13 @@ describe('Details', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getByText('Test content')).not.toBeVisible();
 
-    userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('Test content')).toBeVisible();
   });
 
-  test('clicking the summary collapses the content when `open` is true', () => {
+  test('clicking the summary collapses the content when `open` is true', async () => {
     render(
       <Details summary="Test summary" id="test-details" open>
         Test content
@@ -90,7 +90,7 @@ describe('Details', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('Test content')).toBeVisible();
 
-    userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(screen.getByText('Test content')).not.toBeVisible();
@@ -144,7 +144,7 @@ describe('Details', () => {
     expect(screen.getByText('Test content')).not.toBeVisible();
   });
 
-  test('onToggle handler returns true when expanded', () => {
+  test('onToggle handler returns true when expanded', async () => {
     const handleToggle = jest.fn();
 
     render(
@@ -159,13 +159,13 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
-    userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(handleToggle).toHaveBeenCalledWith(true);
   });
 
-  test('onToggle handler returns false when collapsed', () => {
+  test('onToggle handler returns false when collapsed', async () => {
     const handleToggle = jest.fn();
 
     render(
@@ -178,8 +178,8 @@ describe('Details', () => {
       name: 'Test summary',
     });
 
-    userEvent.click(summary);
-    userEvent.click(summary);
+    await userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(handleToggle).toHaveBeenNthCalledWith(1, true);
     expect(handleToggle).toHaveBeenNthCalledWith(2, false);

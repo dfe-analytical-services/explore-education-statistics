@@ -136,7 +136,9 @@ const LocationFiltersForm = ({
         'required',
         'Select at least one location',
         (value: Dictionary<string[]>) =>
-          Object.values(value).some(groupOptions => groupOptions.length > 0),
+          Object.values(value).some(
+            groupOptions => groupOptions && groupOptions.length > 0,
+          ),
       ),
     });
   }, []);

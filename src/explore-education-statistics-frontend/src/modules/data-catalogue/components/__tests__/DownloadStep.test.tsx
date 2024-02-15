@@ -243,7 +243,7 @@ describe('DownloadStep', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Download selected files' }),
     );
 
@@ -268,10 +268,10 @@ describe('DownloadStep', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('checkbox', { name: 'Subject 1 (csv, 10 Mb)' }),
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Download selected files' }),
     );
 

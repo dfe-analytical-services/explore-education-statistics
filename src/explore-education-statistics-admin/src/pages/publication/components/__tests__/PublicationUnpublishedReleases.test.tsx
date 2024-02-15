@@ -268,7 +268,7 @@ describe('PublicationUnpublishedReleases', () => {
       ).not.toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Cancel amendment for Release 3' }),
     );
 
@@ -282,7 +282,7 @@ describe('PublicationUnpublishedReleases', () => {
 
     expect(handleAmendmentDelete).not.toHaveBeenCalled();
 
-    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(handleAmendmentDelete).toHaveBeenCalled();

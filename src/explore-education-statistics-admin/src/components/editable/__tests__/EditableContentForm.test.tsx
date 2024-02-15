@@ -79,7 +79,7 @@ describe('EditableContentForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(
@@ -105,7 +105,7 @@ describe('EditableContentForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith('Test content');
@@ -135,7 +135,7 @@ describe('EditableContentForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith(formattedContentWithLinks);
@@ -161,7 +161,7 @@ describe('EditableContentForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith(testContentWithLinks);
@@ -182,7 +182,7 @@ describe('EditableContentForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(
@@ -195,7 +195,7 @@ describe('EditableContentForm', () => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
 
-    test('calls `onAction` handler when user performs action within form', () => {
+    test('calls `onAction` handler when user performs action within form', async () => {
       const handleAction = jest.fn();
 
       render(
@@ -211,13 +211,14 @@ describe('EditableContentForm', () => {
 
       expect(handleAction).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('textbox'));
+      await userEvent.click(screen.getByRole('textbox'));
 
       expect(handleAction).toHaveBeenCalledTimes(1);
     });
 
     test('calls `onAction` handler only once within the `actionThrottle` time', async () => {
       jest.useFakeTimers();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
       const handleAction = jest.fn();
 
@@ -237,12 +238,12 @@ describe('EditableContentForm', () => {
 
       const textbox = screen.getByRole('textbox');
 
-      userEvent.click(textbox);
+      await user.click(textbox);
       expect(handleAction).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(500);
 
-      await userEvent.type(textbox, 'Test');
+      await user.type(textbox, 'Test');
       expect(handleAction).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(500);
@@ -375,7 +376,7 @@ describe('EditableContentForm', () => {
         screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
-      userEvent.click(
+      await userEvent.click(
         within(unresolvedComments[0]).getByRole('button', {
           name: 'Delete',
         }),
@@ -424,14 +425,14 @@ describe('EditableContentForm', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
-      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      await userEvent.clear(comment.getByRole('textbox'));
       await userEvent.type(
         comment.getByRole('textbox'),
         'Test updated content',
       );
 
-      userEvent.click(comment.getByRole('button', { name: 'Update' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Update' }));
 
       await waitFor(() => {
         expect(handleUpdate).toHaveBeenCalledTimes(1);
@@ -479,7 +480,7 @@ describe('EditableContentForm', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
 
       await waitFor(() => {
         expect(handleUpdate).toHaveBeenCalledTimes(1);
@@ -527,7 +528,7 @@ describe('EditableContentForm', () => {
 
       const comment = within(resolvedComments[0]);
 
-      userEvent.click(
+      await userEvent.click(
         comment.getByRole('button', { name: 'Unresolve', hidden: true }),
       );
 

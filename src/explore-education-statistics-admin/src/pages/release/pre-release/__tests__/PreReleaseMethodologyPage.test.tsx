@@ -329,7 +329,7 @@ describe('PreReleaseMethodologyPage', () => {
         expect(screen.getByText('Pupil absence statistics: methodology'));
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'See all notes (3)' }),
       );
 

@@ -65,7 +65,7 @@ const PublicationMethodologiesPage = () => {
     return <LoadingSpinner />;
   }
 
-  const { externalMethodology, methodologyVersions } = model;
+  const { externalMethodology, methodologyVersions = [] } = model;
 
   return (
     <>

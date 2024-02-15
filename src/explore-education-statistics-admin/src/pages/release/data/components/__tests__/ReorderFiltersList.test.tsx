@@ -189,7 +189,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[1],
@@ -219,7 +219,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[1],
@@ -266,7 +266,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[1],
@@ -277,7 +277,7 @@ describe('ReorderFiltersList', () => {
     });
 
     expect(within(filtersList).getByRole('list'));
-    userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.queryByText('Category 1 Group 2')).not.toBeInTheDocument();
     expect(within(filtersList).queryByRole('list')).not.toBeInTheDocument();
   });
@@ -296,7 +296,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[1],
@@ -308,7 +308,7 @@ describe('ReorderFiltersList', () => {
     const buttons = within(within(filtersList).getByRole('list')).getAllByRole(
       'button',
     );
-    userEvent.click(
+    await userEvent.click(
       within(buttons[0]).getByRole('button', {
         name: 'Reorder options within this group',
       }),
@@ -334,7 +334,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[1],
@@ -347,7 +347,7 @@ describe('ReorderFiltersList', () => {
     const groupsList = within(filtersList).getByRole('list');
     const groups = within(groupsList).getAllByRole('button');
 
-    userEvent.click(
+    await userEvent.click(
       within(groups[0]).getByRole('button', {
         name: 'Reorder options within this group',
       }),
@@ -363,7 +363,9 @@ describe('ReorderFiltersList', () => {
       expect(within(groups[0]).getByText('Done')).toBeInTheDocument();
     });
 
-    userEvent.click(within(groups[0]).getByRole('button', { name: 'Done' }));
+    await userEvent.click(
+      within(groups[0]).getByRole('button', { name: 'Done' }),
+    );
 
     expect(
       screen.queryByText('Category 1 Group 2 Item 1'),
@@ -384,7 +386,7 @@ describe('ReorderFiltersList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const filtersList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[0],
@@ -414,7 +416,7 @@ describe('ReorderFiltersList', () => {
     await waitFor(() => {
       expect(screen.getByTestId('reorder-list'));
     });
-    userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
 
     const expectedRequest = [
       {

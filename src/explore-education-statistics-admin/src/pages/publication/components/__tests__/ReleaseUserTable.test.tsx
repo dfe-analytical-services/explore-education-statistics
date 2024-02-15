@@ -133,7 +133,7 @@ describe('ReleaseUserTable', () => {
       within(row1Cells[2]).getByRole('button', { name: 'Remove User 1' }),
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[1]).getByRole('button', { name: 'Remove User 1' }),
     );
 
@@ -152,7 +152,9 @@ describe('ReleaseUserTable', () => {
     expect(onUserRemove).not.toBeCalled();
     expect(onUserInvitesRemove).not.toBeCalled();
 
-    userEvent.click(within(modal).getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(
+      within(modal).getByRole('button', { name: 'Confirm' }),
+    );
 
     await waitFor(() => {
       expect(onUserRemove).toHaveBeenCalledTimes(1);
@@ -181,7 +183,7 @@ describe('ReleaseUserTable', () => {
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[1]).getByRole('button', {
         name: 'Cancel invite for user4@test.com',
       }),
@@ -202,7 +204,9 @@ describe('ReleaseUserTable', () => {
     expect(onUserRemove).not.toBeCalled();
     expect(onUserInvitesRemove).not.toBeCalled();
 
-    userEvent.click(within(modal).getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(
+      within(modal).getByRole('button', { name: 'Confirm' }),
+    );
 
     await waitFor(() => {
       expect(onUserInvitesRemove).toHaveBeenCalledTimes(1);

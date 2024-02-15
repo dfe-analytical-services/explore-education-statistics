@@ -148,7 +148,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
     );
   });
 
-  test('checking option checks it', () => {
+  test('checking option checks it', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -172,12 +172,12 @@ describe('RHFFormFieldCheckboxGroup', () => {
 
     expect(checkbox).not.toBeChecked();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox).toBeChecked();
   });
 
-  test('un-checking option un-checks it', () => {
+  test('un-checking option un-checks it', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -201,12 +201,12 @@ describe('RHFFormFieldCheckboxGroup', () => {
 
     expect(checkbox).toBeChecked();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
   });
 
-  test('clicking `Select all 3 options` button checks all values', () => {
+  test('clicking `Select all 3 options` button checks all values', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -235,14 +235,14 @@ describe('RHFFormFieldCheckboxGroup', () => {
     expect(checkbox2).not.toBeChecked();
     expect(checkbox3).not.toBeChecked();
 
-    userEvent.click(screen.getByText('Select all 3 options'));
+    await userEvent.click(screen.getByText('Select all 3 options'));
 
     expect(checkbox1).toBeChecked();
     expect(checkbox2).toBeChecked();
     expect(checkbox3).toBeChecked();
   });
 
-  test('clicking `Unselect all 3 options` button un-checks all values', () => {
+  test('clicking `Unselect all 3 options` button un-checks all values', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -271,7 +271,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
     expect(checkbox2).toBeChecked();
     expect(checkbox3).toBeChecked();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     );
 
@@ -280,7 +280,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
     expect(checkbox3).not.toBeChecked();
   });
 
-  test('checking all options renders the `Unselect all 3 options` button', () => {
+  test('checking all options renders the `Unselect all 3 options` button', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -313,9 +313,9 @@ describe('RHFFormFieldCheckboxGroup', () => {
       screen.queryByRole('button', { name: 'Unselect all 3 options' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(checkbox1);
-    userEvent.click(checkbox2);
-    userEvent.click(checkbox3);
+    await userEvent.click(checkbox1);
+    await userEvent.click(checkbox2);
+    await userEvent.click(checkbox3);
 
     expect(checkbox1).toBeChecked();
     expect(checkbox2).toBeChecked();
@@ -328,7 +328,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
     ).toBeInTheDocument();
   });
 
-  test('un-checking any options renders the `Select all 3 options` button', () => {
+  test('un-checking any options renders the `Select all 3 options` button', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -359,7 +359,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     ).toBeInTheDocument();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox).not.toBeChecked();
     expect(
@@ -435,7 +435,7 @@ describe('RHFFormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
@@ -467,8 +467,8 @@ describe('RHFFormFieldCheckboxGroup', () => {
         </FormProvider>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -508,11 +508,11 @@ describe('RHFFormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(checkbox).not.toBeChecked();
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -553,11 +553,11 @@ describe('RHFFormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(checkbox).not.toBeChecked();
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(

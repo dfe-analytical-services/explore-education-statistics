@@ -64,19 +64,19 @@ describe('ReleaseAncillaryFilePage', () => {
 
     const title = screen.getByLabelText('Title');
 
-    userEvent.clear(title);
+    await userEvent.clear(title);
     await userEvent.type(title, 'Updated test title');
 
     const summary = screen.getByLabelText('Summary');
 
-    userEvent.clear(summary);
+    await userEvent.clear(summary);
     await userEvent.type(summary, 'Updated test summary');
 
     const file = new File(['test'], 'test.txt');
 
-    userEvent.upload(screen.getByLabelText('Upload new file'), file);
+    await userEvent.upload(screen.getByLabelText('Upload new file'), file);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(releaseAncillaryFileService.updateFile).toHaveBeenCalledWith<
@@ -97,7 +97,7 @@ describe('ReleaseAncillaryFilePage', () => {
 
     await renderPage(history);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(

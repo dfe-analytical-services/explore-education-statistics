@@ -159,7 +159,7 @@ describe('MethodologyNotesSection', () => {
         </EditingContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add note' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add note' }));
 
       await waitFor(() => {
         expect(
@@ -167,8 +167,8 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByLabelText('New methodology note'));
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('New methodology note'));
+      await userEvent.tab();
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
@@ -178,7 +178,7 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Save note' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save note' }));
       expect(methodologyNoteService.create).not.toHaveBeenCalled();
     });
 
@@ -202,7 +202,7 @@ describe('MethodologyNotesSection', () => {
         </EditingContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add note' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add note' }));
 
       await waitFor(() => {
         expect(
@@ -214,7 +214,7 @@ describe('MethodologyNotesSection', () => {
         screen.getByLabelText('New methodology note'),
         'New note',
       );
-      userEvent.click(screen.getByRole('button', { name: 'Save note' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save note' }));
 
       await waitFor(() => {
         expect(methodologyNoteService.create).toHaveBeenCalledWith(
@@ -252,7 +252,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      userEvent.click(
+      await userEvent.click(
         within(notes[0]).getByRole('button', { name: 'Edit note' }),
       );
 
@@ -262,8 +262,8 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Edit methodology note'));
-      userEvent.tab();
+      await userEvent.clear(screen.getByLabelText('Edit methodology note'));
+      await userEvent.tab();
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
         expect(
@@ -273,11 +273,11 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Day'));
-      userEvent.clear(screen.getByLabelText('Month'));
-      userEvent.clear(screen.getByLabelText('Year'));
+      await userEvent.clear(screen.getByLabelText('Day'));
+      await userEvent.clear(screen.getByLabelText('Month'));
+      await userEvent.clear(screen.getByLabelText('Year'));
 
-      userEvent.tab();
+      await userEvent.tab();
       await waitFor(() => {
         expect(
           screen.getByRole('link', {
@@ -286,7 +286,9 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Update note' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update note' }),
+      );
 
       expect(methodologyNoteService.edit).not.toHaveBeenCalled();
     });
@@ -309,7 +311,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      userEvent.click(
+      await userEvent.click(
         within(notes[0]).getByRole('button', { name: 'Edit note' }),
       );
 
@@ -323,14 +325,16 @@ describe('MethodologyNotesSection', () => {
         screen.getByLabelText('Edit methodology note'),
         ' edited',
       );
-      userEvent.clear(screen.getByLabelText('Day'));
+      await userEvent.clear(screen.getByLabelText('Day'));
       await userEvent.type(screen.getByLabelText('Day'), '31');
-      userEvent.clear(screen.getByLabelText('Month'));
+      await userEvent.clear(screen.getByLabelText('Month'));
       await userEvent.type(screen.getByLabelText('Month'), '12');
-      userEvent.clear(screen.getByLabelText('Year'));
+      await userEvent.clear(screen.getByLabelText('Year'));
       await userEvent.type(screen.getByLabelText('Year'), '2022');
 
-      userEvent.click(screen.getByRole('button', { name: 'Update note' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update note' }),
+      );
       await waitFor(() => {
         expect(methodologyNoteService.edit).toHaveBeenCalledWith(
           'note-1',
@@ -357,7 +361,7 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      userEvent.click(
+      await userEvent.click(
         within(notes[0]).getByRole('button', { name: 'Remove note' }),
       );
 
@@ -387,11 +391,11 @@ describe('MethodologyNotesSection', () => {
       );
 
       const notes = screen.getAllByRole('listitem');
-      userEvent.click(
+      await userEvent.click(
         within(notes[0]).getByRole('button', { name: 'Remove note' }),
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
       await waitFor(() => {
         expect(methodologyNoteService.delete).toHaveBeenCalledWith(
           'note-1',

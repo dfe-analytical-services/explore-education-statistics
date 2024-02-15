@@ -201,6 +201,7 @@ const PageSearchForm = ({
             className={styles.resultsLabel}
             aria-live="polite"
             aria-atomic
+            data-testid="results-label"
           >
             Found <strong>{searchResults.length}</strong>
             {` ${searchResults.length === 1 ? 'result' : 'results'}`}

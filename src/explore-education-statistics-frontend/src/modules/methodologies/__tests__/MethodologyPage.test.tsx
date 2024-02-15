@@ -162,10 +162,10 @@ describe('MethodologyPage', () => {
       );
     });
 
-    test(`renders the list of all notes`, () => {
+    test(`renders the list of all notes`, async () => {
       render(<MethodologyPage data={testMethodology} />);
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'See all notes (3)' }),
       );
 

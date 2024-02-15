@@ -1,6 +1,6 @@
-import flushPromises from '@common-test/flushPromises';
+import delay from '@common/utils/delay';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -74,16 +74,13 @@ describe('WizardStepFormActions', () => {
 
     expect(goToPreviousStep).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByText('Previous step'));
+    await userEvent.click(screen.getByText('Previous step'));
 
-    await flushPromises();
     expect(goToPreviousStep).toHaveBeenCalled();
   });
 
   test('clicking `Previous step` button does not call `goToPreviousStep` until `onPreviousStep` completes', async () => {
-    jest.useFakeTimers();
-
-    const handlePreviousStep = () => Promise.resolve();
+    const handlePreviousStep = jest.fn(async () => delay(100));
 
     const goToPreviousStep = jest.fn();
 
@@ -98,13 +95,11 @@ describe('WizardStepFormActions', () => {
 
     expect(goToPreviousStep).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByText('Previous step'));
+    await userEvent.click(screen.getByText('Previous step'));
 
     expect(goToPreviousStep).not.toHaveBeenCalled();
 
-    await flushPromises();
-
-    expect(goToPreviousStep).toHaveBeenCalled();
+    await waitFor(() => expect(goToPreviousStep).toHaveBeenCalled());
   });
 
   test('preventing default `Previous step` button event does not call `goToPreviousStep` handler', async () => {
@@ -121,9 +116,8 @@ describe('WizardStepFormActions', () => {
 
     expect(goToPreviousStep).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByText('Previous step'));
+    await userEvent.click(screen.getByText('Previous step'));
 
-    await flushPromises();
     expect(goToPreviousStep).not.toHaveBeenCalled();
   });
 });

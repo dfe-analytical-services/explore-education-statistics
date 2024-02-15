@@ -43,8 +43,8 @@ describe('EditableEmbedForm', () => {
   test('shows a validation error when no title is set', async () => {
     render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -59,8 +59,8 @@ describe('EditableEmbedForm', () => {
   test('shows a validation error when no url is set', async () => {
     render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('URL'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('URL'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -75,8 +75,8 @@ describe('EditableEmbedForm', () => {
   test('shows a validation error when the url is invalid', async () => {
     render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
 
-    userEvent.type(screen.getByLabelText('URL'), 'Not a url');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('URL'), 'Not a url');
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -91,8 +91,8 @@ describe('EditableEmbedForm', () => {
   test('shows a validation error when the url is not from an allowed domain', async () => {
     render(<EditableEmbedForm onCancel={noop} onSubmit={noop} />);
 
-    userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -107,12 +107,12 @@ describe('EditableEmbedForm', () => {
     const handleSubmit = jest.fn();
     render(<EditableEmbedForm onCancel={noop} onSubmit={handleSubmit} />);
 
-    userEvent.type(screen.getByLabelText('Title'), 'Dashboard title');
-    userEvent.type(
+    await userEvent.type(screen.getByLabelText('Title'), 'Dashboard title');
+    await userEvent.type(
       screen.getByLabelText('URL'),
       'https://department-for-education.shinyapps.io/test-dashboard',
     );
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith(

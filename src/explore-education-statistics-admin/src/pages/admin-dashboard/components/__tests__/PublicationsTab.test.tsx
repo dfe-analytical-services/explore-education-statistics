@@ -501,7 +501,10 @@ describe('PublicationsTab', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.selectOptions(screen.getByLabelText('Select theme'), 'theme-2');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Select theme'),
+        'theme-2',
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Theme 2 / Topic 3'));
@@ -534,7 +537,10 @@ describe('PublicationsTab', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.selectOptions(screen.getByLabelText('Select theme'), 'theme-2');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Select theme'),
+        'theme-2',
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Topic 4', { selector: 'option' })).toHaveValue(
@@ -542,7 +548,10 @@ describe('PublicationsTab', () => {
         );
       });
 
-      userEvent.selectOptions(screen.getByLabelText('Select topic'), 'topic-4');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Select topic'),
+        'topic-4',
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Theme 2 / Topic 4'));
@@ -576,7 +585,10 @@ describe('PublicationsTab', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.selectOptions(screen.getByLabelText('Select theme'), 'theme-2');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Select theme'),
+        'theme-2',
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Topic 4', { selector: 'option' })).toHaveValue(
@@ -584,7 +596,10 @@ describe('PublicationsTab', () => {
         );
       });
 
-      userEvent.selectOptions(screen.getByLabelText('Select topic'), 'topic-4');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Select topic'),
+        'topic-4',
+      );
 
       await waitFor(() => {
         expect(history.location.search).toBe(

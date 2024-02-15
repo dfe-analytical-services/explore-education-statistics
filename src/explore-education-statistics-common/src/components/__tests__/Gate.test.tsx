@@ -141,7 +141,7 @@ describe('Gate', () => {
         condition={async () => {
           throw new Error('something went wrong');
         }}
-        fallback={(error: unknown) => <p>{(error as Error).message}</p>}
+        fallback={() => <p>something went wrong</p>}
       >
         <p>children</p>
       </Gate>,

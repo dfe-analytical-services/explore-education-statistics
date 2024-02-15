@@ -7,7 +7,7 @@ import { Route, Router } from 'react-router';
 import { Link } from 'react-router-dom';
 
 describe('RouteLeavingGuard', () => {
-  test('shows modal when route change is blocked on clicking link', () => {
+  test('shows modal when route change is blocked on clicking link', async () => {
     const history = createMemoryHistory();
 
     render(
@@ -25,7 +25,7 @@ describe('RouteLeavingGuard', () => {
       </Router>,
     );
 
-    userEvent.click(screen.getByRole('link', { name: 'Change route' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
 
     expect(history.location.pathname).toBe('/');
 
@@ -73,7 +73,7 @@ describe('RouteLeavingGuard', () => {
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();
   });
 
-  test('clicking confirm goes to the next route', () => {
+  test('clicking confirm goes to the next route', async () => {
     const history = createMemoryHistory();
 
     render(
@@ -91,14 +91,14 @@ describe('RouteLeavingGuard', () => {
       </Router>,
     );
 
-    userEvent.click(screen.getByRole('link', { name: 'Change route' }));
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(history.location.pathname).toBe('/other');
     expect(screen.getByText('Other route')).toBeInTheDocument();
   });
 
-  test('clicking cancel does not change route', () => {
+  test('clicking cancel does not change route', async () => {
     const history = createMemoryHistory();
 
     render(
@@ -116,8 +116,8 @@ describe('RouteLeavingGuard', () => {
       </Router>,
     );
 
-    userEvent.click(screen.getByRole('link', { name: 'Change route' }));
-    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(history.location.pathname).toBe('/');
 
@@ -125,7 +125,7 @@ describe('RouteLeavingGuard', () => {
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();
   });
 
-  test('does not show the modal when route change is not blocked', () => {
+  test('does not show the modal when route change is not blocked', async () => {
     const history = createMemoryHistory();
 
     render(
@@ -143,7 +143,7 @@ describe('RouteLeavingGuard', () => {
       </Router>,
     );
 
-    userEvent.click(screen.getByRole('link', { name: 'Change route' }));
+    await userEvent.click(screen.getByRole('link', { name: 'Change route' }));
 
     expect(history.location.pathname).toBe('/other');
 

@@ -16,7 +16,7 @@ describe('ExternalMethodologyForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -29,8 +29,8 @@ describe('ExternalMethodologyForm', () => {
   test('show validation errors when no external methodology link title', async () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
-    userEvent.click(screen.getByLabelText('Link title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Link title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -45,7 +45,7 @@ describe('ExternalMethodologyForm', () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
     await userEvent.clear(screen.getByLabelText('URL'));
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -60,7 +60,7 @@ describe('ExternalMethodologyForm', () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
     await userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(

@@ -328,7 +328,7 @@ describe('LocationFiltersForm', () => {
 
     const searchInput = screen.getByLabelText(/Search options/);
 
-    userEvent.type(searchInput, 'school');
+    await userEvent.type(searchInput, 'school');
 
     await waitFor(() => {
       expect(screen.getByText('Select all 3 options')).toBeInTheDocument();
@@ -374,7 +374,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes[2]).not.toBeChecked();
   });
 
-  test('selecting options shows the number of selected options for each location group', () => {
+  test('selecting options shows the number of selected options for each location group', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -383,7 +383,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 2'));
 
     expect(
       screen.getByRole('button', {
@@ -391,9 +391,9 @@ describe('LocationFiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Region 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Region 2'));
 
     expect(
       screen.getByRole('button', {
@@ -414,7 +414,7 @@ describe('LocationFiltersForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('selecting options shows the number of selected options for each location group (with nested groups)', () => {
+  test('selecting options shows the number of selected options for each location group (with nested groups)', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -423,7 +423,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 2'));
 
     expect(
       screen.getByRole('button', {
@@ -431,8 +431,8 @@ describe('LocationFiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
 
     expect(
       screen.getByRole('button', {
@@ -456,7 +456,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Next step',
       }),
@@ -606,9 +606,9 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Region 1'));
-    userEvent.click(screen.getByLabelText('Region 2'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Region 1'));
+    await userEvent.click(screen.getByLabelText('Region 2'));
 
     await rerender(
       <LocationFiltersForm
@@ -646,9 +646,9 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Local authority 1'));
-    userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
 
     await rerender(
       <LocationFiltersForm
@@ -687,10 +687,10 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Region 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Region 1'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     const expected = {
       locationIds: ['local-authority-3', 'region-1'],
@@ -712,11 +712,11 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 1'));
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     const expected = {
       locationIds: ['country-1', 'local-authority-1', 'local-authority-3'],

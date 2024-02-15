@@ -111,7 +111,7 @@ describe('RHFFormFieldRadioSearchGroup', () => {
 
     expect(radio.checked).toBe(false);
 
-    userEvent.click(radio);
+    await userEvent.click(radio);
 
     expect(radio.checked).toBe(true);
   });
@@ -144,7 +144,7 @@ describe('RHFFormFieldRadioSearchGroup', () => {
     expect(radio2.checked).toBe(false);
     expect(radio3.checked).toBe(false);
 
-    userEvent.click(radio2);
+    await userEvent.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
@@ -181,7 +181,7 @@ describe('RHFFormFieldRadioSearchGroup', () => {
 
       expect(screen.queryByText('Select an option')).toBeNull();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
@@ -213,9 +213,9 @@ describe('RHFFormFieldRadioSearchGroup', () => {
         </FormProvider>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
@@ -258,7 +258,7 @@ describe('RHFFormFieldRadioSearchGroup', () => {
             test: Yup.string().required('Select an option'),
           })}
         >
-          <RHFForm id="testForm" onSubmit={noop}>
+          <RHFForm id="testForm" showErrorSummary={false} onSubmit={noop}>
             <RHFFormFieldRadioSearchGroup
               id="test-group"
               name="test"
@@ -279,20 +279,16 @@ describe('RHFFormFieldRadioSearchGroup', () => {
       const radio = screen.getByLabelText('Radio 1') as HTMLInputElement;
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       expect(radio.checked).toBe(false);
-      expect(screen.queryByText('Select an option')).toBeNull();
+      expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
     });
   });
 
   describe('search', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
     test('providing a search term filters the radios', async () => {
       render(
         <FormProvider
@@ -318,7 +314,10 @@ describe('RHFFormFieldRadioSearchGroup', () => {
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() =>
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),
+      );
+
       const radios = screen.getAllByRole('radio');
       expect(radios).toHaveLength(2);
       expect(radios[0]).toHaveAttribute('value', '2');
@@ -350,12 +349,15 @@ describe('RHFFormFieldRadioSearchGroup', () => {
       const radio1 = screen.getByLabelText('Radio 1') as HTMLInputElement;
       const radio2 = screen.getByLabelText('Radio 2') as HTMLInputElement;
 
-      userEvent.click(radio1);
+      await userEvent.click(radio1);
       expect(radio1.checked).toBe(true);
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() =>
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument(),
+      );
+
       expect(screen.getAllByRole('radio')).toHaveLength(2);
       expect(radio1.checked).toBe(true);
       expect(radio2.checked).toBe(false);
