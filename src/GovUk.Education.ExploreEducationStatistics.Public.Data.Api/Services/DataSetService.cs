@@ -51,6 +51,14 @@ internal class DataSetService : IDataSetService
         return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
     }
 
+    public async Task<Either<ActionResult, DataSetVersionViewModel>> GetVersion(
+        Guid dataSetId, 
+        string dataSetVersion)
+    {
+        return await CheckVersionExists(dataSetId, dataSetVersion)
+            .OnSuccess(MapDataSetVersion);
+    }
+
     public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
         int page,
         int pageSize,
@@ -97,6 +105,19 @@ internal class DataSetService : IDataSetService
             LatestVersion = MapLatestVersion(dataSet.LatestVersion!),
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
         };
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
+        Guid dataSetId,
+        string dataSetVersion)
+    {
+        return await _publicDataDbContext.DataSetVersions
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.Version == dataSetVersion)
+            .Where(ds => ds.Status == DataSetVersionStatus.Published
+                || ds.Status == DataSetVersionStatus.Unpublished
+                || ds.Status == DataSetVersionStatus.Deprecated)
+            .SingleOrNotFound();
     }
 
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)

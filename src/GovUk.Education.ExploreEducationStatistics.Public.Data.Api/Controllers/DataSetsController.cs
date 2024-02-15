@@ -39,6 +39,25 @@ public class DataSetsController : ControllerBase
     }
 
     /// <summary>
+    /// Get a data set version
+    /// </summary>
+    /// <remarks>
+    /// Get a data set version, including a full list of its changes.
+    /// </remarks>
+    [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [SwaggerResponse(404)]
+    public async Task<ActionResult<DataSetVersionViewModel>> GetVersion(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The data set version.")] string dataSetVersion)
+    {
+        return await _dataSetService
+            .GetVersion(dataSetId, dataSetVersion)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
     /// List a data set’s versions
     /// </summary>
     /// <remarks>
