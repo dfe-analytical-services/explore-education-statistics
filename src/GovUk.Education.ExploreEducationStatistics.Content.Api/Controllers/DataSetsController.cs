@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -35,7 +35,7 @@ public class DataSetsController : ControllerBase
                 themeId: request.ThemeId,
                 publicationId: request.PublicationId,
                 releaseId: request.ReleaseId,
-                request.Latest,
+                request.LatestOnly,
                 request.SearchTerm,
                 request.OrderBy,
                 request.Sort,

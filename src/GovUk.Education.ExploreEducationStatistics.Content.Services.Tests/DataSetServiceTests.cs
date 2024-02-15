@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -225,7 +225,7 @@ public class DataSetServiceTests
                 var service = BuildService(contentDbContext);
 
                 var exception = await Assert.ThrowsAsync<NotSupportedException>(
-                    async () => { await service.ListDataSets(latest: false); }
+                    async () => { await service.ListDataSets(latestOnly: false); }
                 );
 
                 Assert.Equal("Querying by non-latest data is not yet supported", exception.Message);

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +34,7 @@ public class DataSetService : IDataSetService
         Guid? themeId = null,
         Guid? publicationId = null,
         Guid? releaseId = null,
-        bool? latest = true,
+        bool? latestOnly = true,
         string? searchTerm = null,
         DataSetsListRequestOrderBy? orderBy = null,
         SortOrder? sort = null,
@@ -49,7 +49,7 @@ public class DataSetService : IDataSetService
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
-            .HavingReleaseIdOrLatestReleases(releaseId, latest)
+            .HavingReleaseIdOrLatestReleases(releaseId, latestOnly)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
         var results = await query
@@ -191,7 +191,7 @@ internal static class ReleaseFileQueryableExtensions
     internal static IQueryable<ReleaseFile> HavingReleaseIdOrLatestReleases(
         this IQueryable<ReleaseFile> query,
         Guid? releaseId,
-        bool? latest)
+        bool? latestOnly)
     {
         if (releaseId.HasValue)
         {
@@ -201,7 +201,7 @@ internal static class ReleaseFileQueryableExtensions
             return query.Where(rf => rf.Release.Publication.LatestPublishedReleaseId == releaseId.Value);
         }
 
-        if (!latest.HasValue || latest.Value)
+        if (!latestOnly.HasValue || latestOnly.Value)
         {
             // Restrict data set files to be for the latest published release version by time series in a publication
             return query.Where(rf => rf.Release.Publication.LatestPublishedReleaseId == rf.ReleaseId);

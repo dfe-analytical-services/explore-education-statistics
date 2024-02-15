@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -7,7 +7,7 @@ public record DataSetsListRequest(
     Guid? ThemeId = null,
     Guid? PublicationId = null,
     Guid? ReleaseId = null,
-    bool? Latest = null,
+    bool? LatestOnly = null,
     string? SearchTerm = null,
     DataSetsListRequestOrderBy? OrderBy = null,
     SortOrder? Sort = null,

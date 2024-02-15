@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1209,7 +1209,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 { "themeId", request.ThemeId?.ToString() },
                 { "publicationId", request.PublicationId?.ToString() },
                 { "releaseId", request.ReleaseId?.ToString() },
-                { "latest", request.Latest?.ToString() },
+                { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
                 { "orderBy", request.OrderBy?.ToString() },
                 { "sort", request.Sort?.ToString() },

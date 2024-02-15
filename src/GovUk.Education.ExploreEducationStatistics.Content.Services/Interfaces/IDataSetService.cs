@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -15,7 +15,7 @@ public interface IDataSetService
         Guid? themeId = null,
         Guid? publicationId = null,
         Guid? releaseId = null,
-        bool? latest = true,
+        bool? latestOnly = true,
         string? searchTerm = null,
         DataSetsListRequestOrderBy? orderBy = null,
         SortOrder? sort = null,

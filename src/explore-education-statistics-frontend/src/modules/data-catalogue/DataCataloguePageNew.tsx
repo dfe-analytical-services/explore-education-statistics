@@ -42,7 +42,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 
 export interface DataCataloguePageQuery {
-  latest?: string;
+  latestOnly?: string;
   orderBy?: DataSetOrderOption;
   page?: number;
   publicationId?: string;
@@ -57,7 +57,7 @@ export default function DataCataloguePageNew() {
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const { latest, orderBy, publicationId, releaseId, searchTerm, themeId } =
+  const { latestOnly, orderBy, publicationId, releaseId, searchTerm, themeId } =
     getParamsFromQuery(router.query);
 
   const {
@@ -288,7 +288,7 @@ export default function DataCataloguePageNew() {
           {!isMobileMedia && (
             <LoadingSpinner loading={isLoadingThemes}>
               <Filters
-                latest={latest}
+                latestOnly={latestOnly}
                 publicationId={publicationId}
                 publications={publications}
                 releaseId={releaseId}
@@ -396,7 +396,7 @@ export default function DataCataloguePageNew() {
                 totalResults={totalResults}
               >
                 <Filters
-                  latest={latest}
+                  latestOnly={latestOnly}
                   publicationId={publicationId}
                   publications={publications}
                   releaseId={releaseId}

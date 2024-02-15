@@ -105,13 +105,13 @@ describe('getUpdatedQueryParams', () => {
       });
     });
 
-    test('keeps the latest param when changing theme', async () => {
+    test('keeps the latestOnly param when changing theme', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'themeId',
         nextValue: 'selected-theme-id',
         orderBy: 'newest',
         query: {
-          latest: 'false',
+          latestOnly: 'false',
           page: '4',
           publicationId: 'publication-id',
           releaseId: 'release-id',
@@ -120,7 +120,7 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        latest: 'false',
+        latestOnly: 'false',
         orderBy: 'newest',
         themeId: 'selected-theme-id',
       });
@@ -200,7 +200,7 @@ describe('getUpdatedQueryParams', () => {
       });
     });
 
-    test('removes latest param when selecting a publication', async () => {
+    test('removes latestOnly param when selecting a publication', async () => {
       const handleFetchReleases = jest.fn().mockResolvedValue(testReleases);
 
       const result = await getUpdatedQueryParams({
@@ -208,7 +208,7 @@ describe('getUpdatedQueryParams', () => {
         nextValue: 'selected-publication-id',
         orderBy: 'newest',
         query: {
-          latest: 'false',
+          latestOnly: 'false',
           themeId: 'theme-id',
         },
         onFetchReleases: handleFetchReleases,
@@ -246,7 +246,7 @@ describe('getUpdatedQueryParams', () => {
       });
     });
 
-    test('removes the release param and sets latest to false when changing to all releases from a specific release', async () => {
+    test('removes the release param and sets latestOnly to false when changing to all releases from a specific release', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'all',
@@ -261,14 +261,14 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        latest: 'false',
+        latestOnly: 'false',
         publicationId: 'publication-id',
         orderBy: 'newest',
         themeId: 'theme-id',
       });
     });
 
-    test('sets latest to false when changing to all releases', async () => {
+    test('sets latestOnly to false when changing to all releases', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'all',
@@ -277,11 +277,11 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        latest: 'false',
+        latestOnly: 'false',
         orderBy: 'newest',
       });
     });
-    test('sets latest to true when changing from all to latest releases', async () => {
+    test('sets latestOnly to true when changing from all to latest releases', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'latest',
@@ -290,7 +290,7 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        latest: 'true',
+        latestOnly: 'true',
         orderBy: 'newest',
       });
     });
@@ -311,13 +311,13 @@ describe('getUpdatedQueryParams', () => {
       });
     });
 
-    test('keeps the latest, theme, publication and release params when search', async () => {
+    test('keeps the latestOnly, theme, publication and release params when search', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'searchTerm',
         nextValue: 'find me',
         orderBy: 'newest',
         query: {
-          latest: 'false',
+          latestOnly: 'false',
           orderBy: 'newest',
           publicationId: 'publication-id',
           releaseId: 'release-id',
@@ -326,7 +326,7 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        latest: 'false',
+        latestOnly: 'false',
         orderBy: 'relevance',
         publicationId: 'publication-id',
         releaseId: 'release-id',
