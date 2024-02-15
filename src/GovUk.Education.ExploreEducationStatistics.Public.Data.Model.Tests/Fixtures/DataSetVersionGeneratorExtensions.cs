@@ -18,7 +18,7 @@ public static class DataSetVersionGeneratorExtensions
         => fixture
             .Generator<DataSetVersion>()
             .WithDefaults()
-            .WithMeta(
+            .WithMeta(() =>
                 fixture.DefaultDataSetMeta(
                     filters: filters,
                     indicators: indicators,
@@ -37,6 +37,11 @@ public static class DataSetVersionGeneratorExtensions
         DataSet dataSet)
         => generator.ForInstance(s => s.SetDataSet(dataSet));
 
+    public static Generator<DataSetVersion> WithDataSetId(
+        this Generator<DataSetVersion> generator,
+        Guid dataSetId)
+        => generator.ForInstance(s => s.SetDataSetId(dataSetId));
+
     public static Generator<DataSetVersion> WithCsvFileId(
         this Generator<DataSetVersion> generator,
         Guid csvFileId)
@@ -52,6 +57,16 @@ public static class DataSetVersionGeneratorExtensions
         int major,
         int minor)
         => generator.ForInstance(s => s.SetVersionNumber(major, minor));
+
+    public static Generator<DataSetVersion> WithPublished(
+        this Generator<DataSetVersion> generator,
+        DateTimeOffset publishedDate)
+        => generator.ForInstance(s => s.SetPublished(publishedDate));
+
+    public static Generator<DataSetVersion> WithUnpublished(
+        this Generator<DataSetVersion> generator,
+        DateTimeOffset unpublishedDate)
+        => generator.ForInstance(s => s.SetUnpublished(unpublishedDate));
 
     public static Generator<DataSetVersion> WithStatus(
         this Generator<DataSetVersion> generator,
@@ -74,8 +89,13 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithMeta(
         this Generator<DataSetVersion> generator,
-        DataSetMeta meta)
-        => generator.ForInstance(s => s.SetMeta(meta));
+        DataSetMeta dataSetMeta)
+        => generator.ForInstance(s => s.SetMeta(dataSetMeta));
+
+    public static Generator<DataSetVersion> WithMeta(
+        this Generator<DataSetVersion> generator,
+        Func<DataSetMeta> dataSetMeta)
+        => generator.ForInstance(s => s.SetMeta(dataSetMeta));
 
     public static Generator<DataSetVersion> WithTotalResults(
         this Generator<DataSetVersion> generator,
@@ -131,6 +151,11 @@ public static class DataSetVersionGeneratorExtensions
             .Set(dsv => dsv.DataSet, dataSet)
             .Set(dsv => dsv.DataSetId, dataSet.Id);
 
+    public static InstanceSetters<DataSetVersion> SetDataSetId(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Guid dataSetId)
+        => instanceSetter.Set(dsv => dsv.DataSetId, dataSetId);
+
     public static InstanceSetters<DataSetVersion> SetCsvFileId(
         this InstanceSetters<DataSetVersion> instanceSetter,
         Guid csvFileId)
@@ -170,9 +195,9 @@ public static class DataSetVersionGeneratorExtensions
     public static InstanceSetters<DataSetVersion> SetStatusUnpublished(
         this InstanceSetters<DataSetVersion> instanceSetter)
         => instanceSetter
-            .SetStatus(DataSetVersionStatus.Published)
+            .SetStatus(DataSetVersionStatus.Unpublished)
             .SetUnpublished(DateTimeOffset.UtcNow)
-            .SetPublished(null);
+            .SetPublished(DateTimeOffset.UtcNow);
 
     public static InstanceSetters<DataSetVersion> SetPublished(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -191,10 +216,17 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetMeta(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        DataSetMeta meta)
+        DataSetMeta dataSetMeta)
+        => instanceSetter.SetMeta(() => dataSetMeta);
+
+    public static InstanceSetters<DataSetVersion> SetMeta(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<DataSetMeta> dataSetMeta)
         => instanceSetter.Set(
             (_, dsv) =>
             {
+                var meta = dataSetMeta();
+
                 dsv.Meta = meta;
                 dsv.MetaSummary = meta.ToSummary();
 

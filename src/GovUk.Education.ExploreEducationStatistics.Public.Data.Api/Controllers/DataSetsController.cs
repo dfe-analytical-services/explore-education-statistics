@@ -52,7 +52,7 @@ public class DataSetsController : ControllerBase
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListVersions(
         [FromQuery] DataSetVersionListRequest request,
-        [SwaggerParameter("The ID of the data-set.")] Guid dataSetId)
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
     {
         return await _dataSetService
             .ListVersions(
