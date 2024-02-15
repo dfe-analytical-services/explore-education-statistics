@@ -35,9 +35,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public List<FilterMeta> FilterMetas  { get; set; } = [];
 
-    public IndicatorMeta IndicatorMeta  { get; set; } = null!;
+    public List<IndicatorMeta> IndicatorMetas  { get; set; } = [];
 
-    public TimePeriodMeta TimePeriodMeta  { get; set; } = null!;
+    public List<TimePeriodMeta> TimePeriodMetas  { get; set; } = [];
 
     public List<ChangeSetFilters> FilterChanges { get; set; } = [];
 
@@ -85,16 +85,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                 .HasOne(v => v.GeographicLevelMeta)
                 .WithOne(m => m.DataSetVersion)
                 .HasForeignKey<GeographicLevelMeta>(m => m.DataSetVersionId);
-
-            builder
-                .HasOne(v => v.IndicatorMeta)
-                .WithOne(m => m.DataSetVersion)
-                .HasForeignKey<IndicatorMeta>(m => m.DataSetVersionId);
-
-            builder
-                .HasOne(v => v.TimePeriodMeta)
-                .WithOne(m => m.DataSetVersion)
-                .HasForeignKey<TimePeriodMeta>(m => m.DataSetVersionId);
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();
         }

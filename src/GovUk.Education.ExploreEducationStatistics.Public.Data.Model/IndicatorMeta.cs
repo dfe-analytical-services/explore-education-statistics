@@ -7,13 +7,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class IndicatorMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     public required Guid DataSetVersionId { get; set; }
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public List<IndicatorOptionMeta> Options { get; set; } = [];
+    public required string PublicId { get; set; }
+
+    public required string Label { get; set; }
+
+    public IndicatorUnit? Unit { get; set; }
+
+    public byte? DecimalPlaces { get; set; }
 
     public DateTimeOffset Created { get; set; }
 
@@ -23,12 +29,13 @@ public class IndicatorMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeO
     {
         public void Configure(EntityTypeBuilder<IndicatorMeta> builder)
         {
-            builder.OwnsMany(m => m.Options, m =>
-            {
-                m.ToJson();
-                m.Property(o => o.Identifier).HasJsonPropertyName("Id");
-                m.Property(o => o.Unit).HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
-            });
+            builder.Property(m => m.PublicId)
+                .HasMaxLength(100);
+
+            builder.Property(m => m.Unit)
+                .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
+
+            builder.HasIndex(m => m.PublicId);
         }
     }
 }

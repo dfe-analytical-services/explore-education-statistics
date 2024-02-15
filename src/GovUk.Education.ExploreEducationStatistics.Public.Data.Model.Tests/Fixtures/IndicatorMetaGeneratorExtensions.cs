@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -7,11 +8,6 @@ public static class IndicatorMetaGeneratorExtensions
     public static Generator<IndicatorMeta> DefaultIndicatorMeta(this DataFixture fixture)
         => fixture.Generator<IndicatorMeta>().WithDefaults();
 
-    public static Generator<IndicatorMeta> DefaultIndicatorMeta(this DataFixture fixture, int options)
-        => fixture.Generator<IndicatorMeta>()
-            .WithDefaults()
-            .WithOptions(fixture.DefaultIndicatorOptionMeta().Generate(options));
-
     public static Generator<IndicatorMeta> WithDefaults(this Generator<IndicatorMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
@@ -20,14 +16,31 @@ public static class IndicatorMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
-    public static Generator<IndicatorMeta> WithOptions(
+    public static Generator<IndicatorMeta> WithLabel(this Generator<IndicatorMeta> generator, string label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
+    public static Generator<IndicatorMeta> WithUnit(this Generator<IndicatorMeta> generator, IndicatorUnit? unit)
+        => generator.ForInstance(s => s.SetUnit(unit));
+
+    public static Generator<IndicatorMeta> WithDecimalPlaces(
         this Generator<IndicatorMeta> generator,
-        IEnumerable<IndicatorOptionMeta> options)
-        => generator.ForInstance(s => s.SetOptions(options));
+        byte? decimalPlaces)
+        => generator.ForInstance(s => s.SetDecimalPlaces(decimalPlaces));
+
 
     public static InstanceSetters<IndicatorMeta> SetDefaults(this InstanceSetters<IndicatorMeta> setters)
         => setters
-            .SetDefault(m => m.Id);
+            .SetDefault(m => m.Id)
+            .SetDefault(m => m.Label)
+            .SetDefault(m => m.Unit)
+            .Set(
+                m => m.DecimalPlaces,
+                (f, im) => im switch
+                {
+                    { Unit: IndicatorUnit.PercentagePoint or IndicatorUnit.Percent } => f.Random.Byte(0, 3),
+                    _ => (byte)0
+                }
+            );
 
     public static InstanceSetters<IndicatorMeta> SetDataSetVersion(
         this InstanceSetters<IndicatorMeta> setters,
@@ -36,8 +49,18 @@ public static class IndicatorMetaGeneratorExtensions
             .Set(m => m.DataSetVersion, dataSetVersion)
             .Set(m => m.DataSetVersionId, dataSetVersion.Id);
 
-    public static InstanceSetters<IndicatorMeta> SetOptions(
+    public static InstanceSetters<IndicatorMeta> SetLabel(
         this InstanceSetters<IndicatorMeta> setters,
-        IEnumerable<IndicatorOptionMeta> options)
-        => setters.Set(m => m.Options, options);
+        string label)
+        => setters.Set(m => m.Label, label);
+
+    public static InstanceSetters<IndicatorMeta> SetUnit(
+        this InstanceSetters<IndicatorMeta> setters,
+        IndicatorUnit? unit)
+        => setters.Set(m => m.Unit, unit);
+
+    public static InstanceSetters<IndicatorMeta> SetDecimalPlaces(
+        this InstanceSetters<IndicatorMeta> setters,
+        byte? decimalPlaces)
+        => setters.Set(m => m.DecimalPlaces, decimalPlaces);
 }

@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     public required Guid DataSetVersionId { get; set; }
 
@@ -18,7 +18,9 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
 
     public string Hint { get; set; } = string.Empty;
 
-    public required List<FilterOptionMeta> Options { get; set; } = [];
+    public List<FilterOptionMeta> Options { get; set; } = [];
+
+    public List<FilterOptionMetaLink> OptionLinks { get; set; } = [];
 
     public DateTimeOffset Created { get; set; }
 
@@ -28,16 +30,23 @@ public class FilterMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffs
     {
         public void Configure(EntityTypeBuilder<FilterMeta> builder)
         {
-            builder.OwnsMany(m => m.Options, mo =>
-            {
-                mo.ToJson();
-            });
-
             builder.Property(m => m.PublicId).HasMaxLength(100);
 
-            builder
-                .HasIndex(m => new {m.DataSetVersionId, m.PublicId})
+            builder.HasIndex(m => new {m.DataSetVersionId, m.PublicId})
                 .IsUnique();
+
+            builder.HasMany<FilterOptionMeta>(m => m.Options)
+                .WithMany(o => o.Metas)
+                .UsingEntity<FilterOptionMetaLink>(
+                    b => b
+                        .HasOne<FilterOptionMeta>(l => l.Option)
+                        .WithMany(o => o.MetaLinks)
+                        .HasForeignKey(l => l.OptionId),
+                    b => b
+                        .HasOne<FilterMeta>(l => l.Meta)
+                        .WithMany(m => m.OptionLinks)
+                        .HasForeignKey(l => l.MetaId)
+                );
         }
     }
 }

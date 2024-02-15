@@ -236,9 +236,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -268,6 +270,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsUnique();
 
                     b.ToTable("FilterMetas");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool?>("IsAggregate")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FilterOptionMetas");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaLink", b =>
+                {
+                    b.Property<int>("MetaId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("OptionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("PublicId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PublicId"));
+
+                    b.HasKey("MetaId", "OptionId");
+
+                    b.HasIndex("OptionId");
+
+                    b.HasIndex("PublicId");
+
+                    b.ToTable("FilterOptionMetaLinks");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", b =>
@@ -300,9 +345,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -310,22 +357,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
+                    b.Property<byte?>("DecimalPlaces")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSetVersionId")
-                        .IsUnique();
+                    b.HasIndex("DataSetVersionId");
+
+                    b.HasIndex("PublicId");
 
                     b.ToTable("IndicatorMetas");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -338,11 +403,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
@@ -353,20 +413,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasIndex("Level", "DataSetVersionId")
                         .IsUnique();
 
-                    b.HasIndex("Type", "DataSetVersionId");
-
                     b.ToTable("LocationMetas");
+                });
 
-                    b.HasDiscriminator<string>("Type").HasValue("LocationMeta");
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("LocationOptionMetas");
+
+                    b.HasDiscriminator<string>("Type").HasValue("LocationOptionMeta");
 
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaLink", b =>
+                {
+                    b.Property<int>("MetaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OptionId")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("PublicId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PublicId"));
+
+                    b.HasKey("MetaId", "OptionId");
+
+                    b.HasIndex("OptionId");
+
+                    b.HasIndex("PublicId");
+
+                    b.ToTable("LocationOptionMetaLinks");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -377,47 +489,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSetVersionId")
+                    b.HasIndex("DataSetVersionId", "Code", "Year")
                         .IsUnique();
 
                     b.ToTable("TimePeriodMetas");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationDefaultMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationCodedOptionMeta", b =>
                 {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta");
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
 
-                    b.HasDiscriminator().HasValue("Default");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("Code");
+
+                    b.HasDiscriminator().HasValue("Coded");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLocalAuthorityMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationProviderOptionMeta", b =>
                 {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta");
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
 
-                    b.HasDiscriminator().HasValue("LocalAuthority");
+                    b.Property<string>("Ukprn")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("Ukprn");
+
+                    b.HasDiscriminator().HasValue("PROV");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationProviderMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationRscRegionOptionMeta", b =>
                 {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta");
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
 
-                    b.HasDiscriminator().HasValue("Provider");
+                    b.HasDiscriminator().HasValue("RSC");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationRscRegionMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationSchoolOptionMeta", b =>
                 {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta");
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta");
 
-                    b.HasDiscriminator().HasValue("RscRegion");
+                    b.Property<string>("LaEstab")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Urn")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("LaEstab");
+
+                    b.HasIndex("Urn");
+
+                    b.HasDiscriminator().HasValue("SCH");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationSchoolMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLocalAuthorityOptionMeta", b =>
                 {
-                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta");
+                    b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationCodedOptionMeta");
 
-                    b.HasDiscriminator().HasValue("School");
+                    b.Property<string>("OldCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasIndex("OldCode");
+
+                    b.HasDiscriminator().HasValue("LA");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.ChangeSetFilterOptions", b =>
@@ -998,7 +1143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                     b2.WithOwner()
                                         .HasForeignKey("DataSetVersionMetaSummaryDataSetVersionId");
 
-                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodOptionMeta", "End", b3 =>
+                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodRangeBound", "End", b3 =>
                                         {
                                             b3.Property<Guid>("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId")
                                                 .HasColumnType("uuid");
@@ -1018,7 +1163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .HasForeignKey("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId");
                                         });
 
-                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodOptionMeta", "Start", b3 =>
+                                    b2.OwnsOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodRangeBound", "Start", b3 =>
                                         {
                                             b3.Property<Guid>("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId")
                                                 .HasColumnType("uuid");
@@ -1061,42 +1206,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("FilterMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<bool?>("IsAggregate")
-                                .HasColumnType("boolean");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("FilterMetaId", "Id");
-
-                            b1.ToTable("FilterMetas");
-
-                            b1.ToJson("Options");
-
-                            b1.WithOwner()
-                                .HasForeignKey("FilterMetaId");
-                        });
-
                     b.Navigation("DataSetVersion");
+                });
 
-                    b.Navigation("Options");
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMetaLink", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", "Meta")
+                        .WithMany("OptionLinks")
+                        .HasForeignKey("MetaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", "Option")
+                        .WithMany("MetaLinks")
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Meta");
+
+                    b.Navigation("Option");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", b =>
@@ -1113,48 +1242,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithOne("IndicatorMeta")
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", "DataSetVersionId")
+                        .WithMany("IndicatorMetas")
+                        .HasForeignKey("DataSetVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("IndicatorMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<byte?>("DecimalPlaces")
-                                .HasColumnType("smallint");
-
-                            b1.Property<string>("Identifier")
-                                .IsRequired()
-                                .HasColumnType("text")
-                                .HasAnnotation("Relational:JsonPropertyName", "Id");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Unit")
-                                .HasColumnType("text");
-
-                            b1.HasKey("IndicatorMetaId", "Id");
-
-                            b1.ToTable("IndicatorMetas");
-
-                            b1.ToJson("Options");
-
-                            b1.WithOwner()
-                                .HasForeignKey("IndicatorMetaId");
-                        });
-
                     b.Navigation("DataSetVersion");
-
-                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", b =>
@@ -1168,242 +1261,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("DataSetVersion");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMetaLink", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
-                        .WithOne("TimePeriodMeta")
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", "DataSetVersionId")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", "Meta")
+                        .WithMany("OptionLinks")
+                        .HasForeignKey("MetaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("TimePeriodMetaId")
-                                .HasColumnType("uuid");
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", "Option")
+                        .WithMany("MetaLinks")
+                        .HasForeignKey("OptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
+                    b.Navigation("Meta");
 
-                            b1.Property<string>("Code")
-                                .IsRequired()
-                                .HasColumnType("text");
+                    b.Navigation("Option");
+                });
 
-                            b1.Property<int>("Year")
-                                .HasColumnType("integer");
-
-                            b1.HasKey("TimePeriodMetaId", "Id");
-
-                            b1.ToTable("TimePeriodMetas");
-
-                            b1.ToJson("Options");
-
-                            b1.WithOwner()
-                                .HasForeignKey("TimePeriodMetaId");
-                        });
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.TimePeriodMeta", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("TimePeriodMetas")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("DataSetVersion");
-
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationDefaultMeta", b =>
-                {
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("LocationDefaultMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Code")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("LocationDefaultMetaId", "Id");
-
-                            b1.ToTable("LocationMetas");
-
-                            b1.ToJson("Options");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationDefaultMetaId");
-                        });
-
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLocalAuthorityMeta", b =>
-                {
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationLocalAuthorityOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("LocationLocalAuthorityMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Code")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("OldCode")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("LocationLocalAuthorityMetaId", "Id");
-
-                            b1.ToTable("LocationMetas");
-
-                            b1.ToJson("LocalAuthorityOptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationLocalAuthorityMetaId");
-                        });
-
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationProviderMeta", b =>
-                {
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationProviderOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("LocationProviderMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Ukprn")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("LocationProviderMetaId", "Id");
-
-                            b1.ToTable("LocationMetas");
-
-                            b1.ToJson("ProviderOptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationProviderMetaId");
-                        });
-
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationRscRegionMeta", b =>
-                {
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationRscRegionOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("LocationRscRegionMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("LocationRscRegionMetaId", "Id");
-
-                            b1.ToTable("LocationMetas");
-
-                            b1.ToJson("RscRegionOptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationRscRegionMetaId");
-                        });
-
-                    b.Navigation("Options");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationSchoolMeta", b =>
-                {
-                    b.OwnsMany("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationSchoolOptionMeta", "Options", b1 =>
-                        {
-                            b1.Property<Guid>("LocationSchoolMetaId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("LaEstab")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Label")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<int>("PrivateId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Urn")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("LocationSchoolMetaId", "Id");
-
-                            b1.ToTable("LocationMetas");
-
-                            b1.ToJson("SchoolOptions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("LocationSchoolMetaId");
-                        });
-
-                    b.Navigation("Options");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
@@ -1427,8 +1312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("IndicatorChanges");
 
-                    b.Navigation("IndicatorMeta")
-                        .IsRequired();
+                    b.Navigation("IndicatorMetas");
 
                     b.Navigation("LocationChanges");
 
@@ -1436,8 +1320,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("TimePeriodChanges");
 
-                    b.Navigation("TimePeriodMeta")
-                        .IsRequired();
+                    b.Navigation("TimePeriodMetas");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
+                {
+                    b.Navigation("OptionLinks");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterOptionMeta", b =>
+                {
+                    b.Navigation("MetaLinks");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationMeta", b =>
+                {
+                    b.Navigation("OptionLinks");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.LocationOptionMeta", b =>
+                {
+                    b.Navigation("MetaLinks");
                 });
 #pragma warning restore 612, 618
         }

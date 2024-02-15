@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -11,6 +12,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "FilterOptionMetas",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Label = table.Column<string>(type: "text", nullable: false),
+                    IsAggregate = table.Column<bool>(type: "boolean", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilterOptionMetas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LocationOptionMetas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Label = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
+                    Code = table.Column<string>(type: "text", nullable: true),
+                    OldCode = table.Column<string>(type: "text", nullable: true),
+                    Ukprn = table.Column<string>(type: "text", nullable: true),
+                    Urn = table.Column<string>(type: "text", nullable: true),
+                    LaEstab = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocationOptionMetas", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "ChangeSetFilterOptions",
                 columns: table => new
@@ -146,14 +180,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "FilterMetas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     PublicId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Label = table.Column<string>(type: "text", nullable: false),
                     Hint = table.Column<string>(type: "text", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Options = table.Column<string>(type: "jsonb", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -191,11 +225,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IndicatorMetas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PublicId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Label = table.Column<string>(type: "text", nullable: false),
+                    Unit = table.Column<string>(type: "text", nullable: true),
+                    DecimalPlaces = table.Column<byte>(type: "smallint", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Options = table.Column<string>(type: "jsonb", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -212,17 +250,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "LocationMetas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Level = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    LocalAuthorityOptions = table.Column<string>(type: "jsonb", nullable: true),
-                    Options = table.Column<string>(type: "jsonb", nullable: true),
-                    ProviderOptions = table.Column<string>(type: "jsonb", nullable: true),
-                    RscRegionOptions = table.Column<string>(type: "jsonb", nullable: true),
-                    SchoolOptions = table.Column<string>(type: "jsonb", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -239,11 +272,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "TimePeriodMetas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Year = table.Column<int>(type: "integer", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Options = table.Column<string>(type: "jsonb", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -252,6 +287,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         name: "FK_TimePeriodMetas_DataSetVersions_DataSetVersionId",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FilterOptionMetaLinks",
+                columns: table => new
+                {
+                    MetaId = table.Column<int>(type: "integer", nullable: false),
+                    OptionId = table.Column<long>(type: "bigint", nullable: false),
+                    PublicId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilterOptionMetaLinks", x => new { x.MetaId, x.OptionId });
+                    table.ForeignKey(
+                        name: "FK_FilterOptionMetaLinks_FilterMetas_MetaId",
+                        column: x => x.MetaId,
+                        principalTable: "FilterMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FilterOptionMetaLinks_FilterOptionMetas_OptionId",
+                        column: x => x.OptionId,
+                        principalTable: "FilterOptionMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LocationOptionMetaLinks",
+                columns: table => new
+                {
+                    MetaId = table.Column<int>(type: "integer", nullable: false),
+                    OptionId = table.Column<int>(type: "integer", nullable: false),
+                    PublicId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LocationOptionMetaLinks", x => new { x.MetaId, x.OptionId });
+                    table.ForeignKey(
+                        name: "FK_LocationOptionMetaLinks_LocationMetas_MetaId",
+                        column: x => x.MetaId,
+                        principalTable: "LocationMetas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LocationOptionMetaLinks_LocationOptionMetas_OptionId",
+                        column: x => x.OptionId,
+                        principalTable: "LocationOptionMetas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -304,6 +391,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_FilterOptionMetaLinks_OptionId",
+                table: "FilterOptionMetaLinks",
+                column: "OptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FilterOptionMetaLinks_PublicId",
+                table: "FilterOptionMetaLinks",
+                column: "PublicId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GeographicLevelMetas_DataSetVersionId",
                 table: "GeographicLevelMetas",
                 column: "DataSetVersionId",
@@ -312,8 +409,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             migrationBuilder.CreateIndex(
                 name: "IX_IndicatorMetas_DataSetVersionId",
                 table: "IndicatorMetas",
-                column: "DataSetVersionId",
-                unique: true);
+                column: "DataSetVersionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_IndicatorMetas_PublicId",
+                table: "IndicatorMetas",
+                column: "PublicId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LocationMetas_DataSetVersionId",
@@ -327,14 +428,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationMetas_Type_DataSetVersionId",
-                table: "LocationMetas",
-                columns: new[] { "Type", "DataSetVersionId" });
+                name: "IX_LocationOptionMetaLinks_OptionId",
+                table: "LocationOptionMetaLinks",
+                column: "OptionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimePeriodMetas_DataSetVersionId",
+                name: "IX_LocationOptionMetaLinks_PublicId",
+                table: "LocationOptionMetaLinks",
+                column: "PublicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_Code",
+                table: "LocationOptionMetas",
+                column: "Code");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_LaEstab",
+                table: "LocationOptionMetas",
+                column: "LaEstab");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_OldCode",
+                table: "LocationOptionMetas",
+                column: "OldCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_Type",
+                table: "LocationOptionMetas",
+                column: "Type");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_Ukprn",
+                table: "LocationOptionMetas",
+                column: "Ukprn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationOptionMetas_Urn",
+                table: "LocationOptionMetas",
+                column: "Urn");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TimePeriodMetas_DataSetVersionId_Code_Year",
                 table: "TimePeriodMetas",
-                column: "DataSetVersionId",
+                columns: new[] { "DataSetVersionId", "Code", "Year" },
                 unique: true);
 
             migrationBuilder.AddForeignKey(
@@ -408,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "ChangeSetTimePeriods");
 
             migrationBuilder.DropTable(
-                name: "FilterMetas");
+                name: "FilterOptionMetaLinks");
 
             migrationBuilder.DropTable(
                 name: "GeographicLevelMetas");
@@ -417,10 +553,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 name: "IndicatorMetas");
 
             migrationBuilder.DropTable(
-                name: "LocationMetas");
+                name: "LocationOptionMetaLinks");
 
             migrationBuilder.DropTable(
                 name: "TimePeriodMetas");
+
+            migrationBuilder.DropTable(
+                name: "FilterMetas");
+
+            migrationBuilder.DropTable(
+                name: "FilterOptionMetas");
+
+            migrationBuilder.DropTable(
+                name: "LocationMetas");
+
+            migrationBuilder.DropTable(
+                name: "LocationOptionMetas");
 
             migrationBuilder.DropTable(
                 name: "DataSetVersions");

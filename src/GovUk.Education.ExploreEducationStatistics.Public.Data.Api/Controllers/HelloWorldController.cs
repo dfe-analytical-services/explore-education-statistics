@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -37,19 +38,23 @@ public class HelloWorldController : ControllerBase
     {
         var codes = new HashSet<string> { code1, code2 };
 
-        // var meta = await _publicDataDbContext.LocationMetas
-        //     .Where(m => m.Id == metaId)
-        //     .FirstAsync();
-
         var meta = await _publicDataDbContext.LocationMetas
-            .AsNoTracking()
-            .Where(m => m.DataSetVersionId == dataSetVersionId && (m is LocationSchoolMeta && EF.Functions.JsonContains(
-                ((LocationSchoolMeta)m).Options,
-                $$"""
-                  {"Urn": "102842"}
-                  """))
-            )
-            .AnyAsync();
+            .Include(m => m.Options)
+            .Where(m => m.DataSetVersionId == dataSetVersionId && m.Level == GeographicLevel.School)
+            .SelectMany(m  => m.Options
+                .Cast<LocationSchoolOptionMeta>()
+                .Where(o => o.Urn == "102842" || o.LaEstab == "2042155"))
+            .ToListAsync();
+
+//         var meta = await _publicDataDbContext.LocationMetas
+//             .AsNoTracking()
+//             .Where(m => m.DataSetVersionId == dataSetVersionId && (m is LocationSchoolMeta && EF.Functions.JsonContains(
+//                 ((LocationSchoolMeta)m).Options,
+//                 $$"""
+//                   {"Urn": "102842"}
+//                   """))
+//             )
+//             .AnyAsync();
 
         return Ok(meta);
 

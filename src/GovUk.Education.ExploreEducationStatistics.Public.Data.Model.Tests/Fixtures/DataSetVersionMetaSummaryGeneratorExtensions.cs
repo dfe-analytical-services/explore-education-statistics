@@ -75,12 +75,12 @@ public static class DataSetVersionMetaSummaryGeneratorExtensions
 
         return new TimePeriodRange
         {
-            Start = new TimePeriodOptionMeta
+            Start = new TimePeriodRangeBound
             {
                 Code = code,
                 Year = startYear
             },
-            End = new TimePeriodOptionMeta
+            End = new TimePeriodRangeBound
             {
                 Code = code,
                 Year = endYear

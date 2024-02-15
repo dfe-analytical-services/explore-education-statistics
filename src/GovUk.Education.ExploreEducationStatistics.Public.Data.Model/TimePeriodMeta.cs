@@ -7,13 +7,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     public required Guid DataSetVersionId { get; set; }
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public required List<TimePeriodOptionMeta> Options { get; set; } = [];
+    public required TimeIdentifier Code { get; set; }
+
+    public required int Year { get; set; }
 
     public DateTimeOffset Created { get; set; }
 
@@ -23,12 +25,12 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     {
         public void Configure(EntityTypeBuilder<TimePeriodMeta> builder)
         {
-            builder.OwnsMany(m => m.Options, m =>
-            {
-                m.ToJson();
+            builder.Property(o => o.Code)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
+                .HasMaxLength(10);
 
-                m.Property(o => o.Code).HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
-            });
+            builder.HasIndex(o => new {o.DataSetVersionId, o.Code, o.Year})
+                .IsUnique();
         }
     }
 }
