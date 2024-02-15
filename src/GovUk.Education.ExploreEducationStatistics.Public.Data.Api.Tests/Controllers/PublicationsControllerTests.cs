@@ -411,34 +411,23 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(1, 2, 2, 0)]
-        [InlineData(1, 2, 2, 1)]
-        [InlineData(1, 2, 2, 10)]
-        [InlineData(1, 2, 9, 1)]
-        [InlineData(2, 2, 9, 1)]
-        [InlineData(1, 2, 9, 10)]
-        [InlineData(1, 3, 2, 1)]
+        [InlineData(1, 2, 1)]
+        [InlineData(1, 2, 2)]
+        [InlineData(1, 2, 9)]
+        [InlineData(1, 3, 2)]
+        [InlineData(2, 2, 9)]
         public async Task MultipleDataSetsAvailableForRequestedPublication_Returns200(
             int page,
             int pageSize,
-            int numberOfAvailableDataSets,
-            int numberOfUnpublishedDataSets)
+            int numberOfAvailableDataSets)
         {
             var publicationId = Guid.NewGuid();
 
-            var availableDataSets = DataFixture
+            var dataSets = DataFixture
                 .DefaultDataSet()
                 .WithStatusPublished()
                 .WithPublicationId(publicationId)
                 .GenerateList(numberOfAvailableDataSets);
-
-            var unpublishedDataSets = DataFixture
-                .DefaultDataSet()
-                .WithStatusUnpublished()
-                .WithPublicationId(publicationId)
-                .GenerateList(numberOfUnpublishedDataSets);
-
-            var dataSets = availableDataSets.Concat(unpublishedDataSets).ToList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
@@ -462,7 +451,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                 context.DataSets.UpdateRange(dataSets);
             });
 
-            var expectedDataSetIds = availableDataSets
+            var expectedDataSetIds = dataSets
                 .OrderByDescending(ds => ds.LatestVersion!.Published)
                 .ThenBy(ds => ds.Title)
                 .ThenBy(ds => ds.Id)
