@@ -1,12 +1,6 @@
 //Environment Params -------------------------------------------------------------------
-@description('Base domain name for Public API')
-param domain string
-
-@description('Subscription Name e.g. s101. Used as a prefix for created resources')
+@description('Subscription Name e.g. s101d01. Used as a prefix for created resources')
 param subscription string
-
-@description('Environment Name Used as a prefix for created resources')
-param environment string = 'ees'
 
 @description('Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -73,15 +67,6 @@ param dbStorageSizeGB int = 32
 @description('Database : Azure Database for PostgreSQL Autogrow setting')
 param dbAutoGrowStatus string = 'Disabled'
 
-//Container Registry Params ----------------------------------------------------------------
-@minLength(5)
-@maxLength(50)
-@description('Registry : Name of the azure container registry (must be globally unique)')
-param containerRegistryName string
-
-@description('Deploy the Container Registry if you are not using an existing registry')
-param deployRegistry bool
-
 //Container App Params -------------------------------------------------------------------
 @minLength(2)
 @maxLength(32)
@@ -120,8 +105,11 @@ param functionAppName string = 'processor'
 //---------------------------------------------------------------------------------------------------------------
 // Variables and created data
 //---------------------------------------------------------------------------------------------------------------
-var resourcePrefix = '${subscription}-${environment}'
+var project string = 'ees'
+var resourcePrefix = '${subscription}-${project}'
 var reducedResourcePrefix = '${subscription}-api'
+var containerRegistryName = 'eesacr'
+var deploySubnets = true
 
 
 //---------------------------------------------------------------------------------------------------------------
@@ -133,7 +121,7 @@ module vnetModule 'components/network.bicep' = {
   name: 'virtualNetworkDeploy'
   params: {
     subscription: subscription
-    environment: environment
+    environment: project
     location: location
     deploySubnets: deploySubnets
     tagValues: tagValues
@@ -210,15 +198,11 @@ module databaseModule 'components/postgresqlDatabase.bicep' = {
   ]
 }
 
-//Deploy Container Registry 
+//Deploy Container Registry
 module containerRegistryModule 'components/containerRegistry.bicep' = {
   name: 'acrDeploy'
   params: {
-    resourcePrefix: resourcePrefix
-    location: location
     containerRegistryName: containerRegistryName
-    deployRegistry: deployRegistry
-    tagValues: tagValues
   }
 }
 
