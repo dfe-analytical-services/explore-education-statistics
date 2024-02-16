@@ -472,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                 .ReturnsAsync(latestRelease);
 
             var client = SetupApp(
@@ -550,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                 .ReturnsAsync(latestRelease);
 
             var client = SetupApp(

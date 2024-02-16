@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync((Release?) null);
 
             subjectRepository
@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync(release);
 
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
