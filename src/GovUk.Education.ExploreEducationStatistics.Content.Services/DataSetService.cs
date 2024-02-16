@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -39,7 +40,8 @@ public class DataSetService : IDataSetService
         DataSetsListRequestOrderBy? orderBy = null,
         SortOrder? sort = null,
         int page = 1,
-        int pageSize = 10)
+        int pageSize = 10,
+        CancellationToken cancellationToken = default)
     {
         orderBy ??= searchTerm == null ? Title : Relevance;
         sort ??= orderBy is Title or Natural ? Asc : Desc;
@@ -56,12 +58,12 @@ public class DataSetService : IDataSetService
             .OrderBy(orderBy.Value, sort.Value)
             .Paginate(page: page, pageSize: pageSize)
             .Select(BuildResultViewModel())
-            .ToListAsync();
+            .ToListAsync(cancellationToken: cancellationToken);
 
         return new PaginatedListViewModel<DataSetListViewModel>(
             // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
             await ChangeSummaryHtmlToText(results),
-            totalResults: await query.CountAsync(),
+            totalResults: await query.CountAsync(cancellationToken: cancellationToken),
             page,
             pageSize);
     }

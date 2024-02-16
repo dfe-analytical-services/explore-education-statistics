@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -20,5 +21,6 @@ public interface IDataSetService
         DataSetsListRequestOrderBy? orderBy = null,
         SortOrder? sort = null,
         int page = 1,
-        int pageSize = 10);
+        int pageSize = 10,
+        CancellationToken cancellationToken = default);
 }

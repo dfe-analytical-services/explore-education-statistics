@@ -1,5 +1,6 @@
 #nullable enable
 using System.Net.Mime;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -28,7 +29,8 @@ public class DataSetsController : ControllerBase
     [HttpGet]
     [MemoryCache(typeof(ListDataSetsCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
     public async Task<ActionResult<PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
-        [FromQuery] DataSetsListRequest request)
+        [FromQuery] DataSetsListRequest request,
+        CancellationToken cancellationToken = default)
     {
         return await _dataSetService
             .ListDataSets(
@@ -40,7 +42,8 @@ public class DataSetsController : ControllerBase
                 request.OrderBy,
                 request.Sort,
                 page: request.Page,
-                pageSize: request.PageSize)
+                pageSize: request.PageSize,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

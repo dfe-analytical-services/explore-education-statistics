@@ -99,7 +99,8 @@ public class DataSetsControllerCachingTests
                     _query.OrderBy,
                     _query.Sort,
                     _query.Page,
-                    _query.PageSize))
+                    _query.PageSize,
+                    default))
                 .ReturnsAsync(_dataSets);
 
             var controller = BuildController(dataSetService.Object);
