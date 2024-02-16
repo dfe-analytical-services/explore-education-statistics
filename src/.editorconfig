@@ -152,7 +152,7 @@ dotnet_style_prefer_compound_assignment = true:suggestion
 ## IDE0071 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0071)
 dotnet_style_prefer_simplified_interpolation = true:warning
 ## IDE0130 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0130)
-dotnet_style_namespace_match_folder = true:warning ## TODO: Add <ItemGroup> mentioned in docs
+dotnet_style_namespace_match_folder = true:warning
 ## IDE0016 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0016)
 csharp_style_throw_expression = true:suggestion
 ## IDE0150 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0150)

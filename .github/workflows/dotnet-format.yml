@@ -16,11 +16,6 @@ jobs:
             6.0.x
             8.0.x
 
-      # This shouldn't be necessary when using SDK V6 or later
-      # TODO: uncomment if doesn't work, remove if does
-      # - name: Install dotnet-format tool
-      #  run: dotnet tool install -g dotnet-format
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
