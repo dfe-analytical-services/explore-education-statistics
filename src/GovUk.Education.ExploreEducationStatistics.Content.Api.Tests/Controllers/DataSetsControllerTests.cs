@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -475,7 +476,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     freeTextRanks);
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: "aaa");
@@ -515,7 +518,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     release1Version1Files);
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: "aaa");
@@ -1065,7 +1070,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     freeTextRanks);
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest
@@ -1122,7 +1129,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     freeTextRanks);
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest
@@ -1409,7 +1418,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: searchTerm);
@@ -1486,7 +1497,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                        dataSetService: new DataSetService(
+                            contentDbContext.Object,
+                            new ReleaseRepository(contentDbContext.Object)))
                     .CreateClient();
 
                 var query = new DataSetsListRequest(
@@ -1644,14 +1657,17 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp(IDataSetService? dataSetService = null)
+    private WebApplicationFactory<TestStartup> BuildApp(
+        IDataSetService? dataSetService = null)
     {
         return TestApp
             .ResetDbContexts()
             .ConfigureServices(services =>
             {
                 services.AddTransient(
-                    s => dataSetService ?? new DataSetService(s.GetRequiredService<ContentDbContext>()));
+                    s => dataSetService ?? new DataSetService(
+                        s.GetRequiredService<ContentDbContext>(),
+                        new ReleaseRepository(s.GetRequiredService<ContentDbContext>())));
             });
     }
 }

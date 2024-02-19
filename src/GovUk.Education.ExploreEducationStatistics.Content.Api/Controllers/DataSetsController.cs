@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -15,7 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedul
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 
 [ApiController]
-[Route("api/data-sets")]
+[Route("api")]
 [Produces(MediaTypeNames.Application.Json)]
 public class DataSetsController : ControllerBase
 {
@@ -26,7 +28,7 @@ public class DataSetsController : ControllerBase
         _dataSetService = dataSetService;
     }
 
-    [HttpGet]
+    [HttpGet("data-sets")]
     [MemoryCache(typeof(ListDataSetsCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
     public async Task<ActionResult<PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
         [FromQuery] DataSetsListRequest request,
@@ -44,6 +46,16 @@ public class DataSetsController : ControllerBase
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpGet("releases/{releaseId}/data-sets/{fileId}")]
+    public async Task<ActionResult<DataSetDetailsViewModel>> GetDataSet(
+        Guid releaseId,
+        Guid fileId)
+    {
+        return await _dataSetService
+            .GetDataSet(releaseId: releaseId, fileId: fileId)
             .HandleFailuresOrOk();
     }
 }
