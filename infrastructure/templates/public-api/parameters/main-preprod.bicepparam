@@ -12,7 +12,6 @@ param dbStorageSizeGB = 32
 param dbAutoGrowStatus = 'Disabled'
 
 //Container App Params -------------------------------------------------------------------
-param containerAppName = 'eesapi'
 param containerAppImageName = 'azuredocs/aci-helloworld'
 param containerAppTargetPort = 80
 param useDummyImage = true

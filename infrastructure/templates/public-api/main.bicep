@@ -22,9 +22,6 @@ param tagValues object = {
 }
 
 //Networking Params --------------------------------------------------------------------------
-@description('Networking : Deploy subnets for networking')
-param deploySubnets bool = false
-
 @description('Networking : Included whitelist')
 param storageFirewallRules array = ['0.0.0.0/0']
 
@@ -68,11 +65,6 @@ param dbStorageSizeGB int = 32
 param dbAutoGrowStatus string = 'Disabled'
 
 //Container App Params -------------------------------------------------------------------
-@minLength(2)
-@maxLength(32)
-@description('Specifies the name of the container app.')
-param containerAppName string
-
 @description('Specifies the name of the container app environment.')
 param containerAppEnvName string = 'publicapi'
 
@@ -105,11 +97,11 @@ param functionAppName string = 'processor'
 //---------------------------------------------------------------------------------------------------------------
 // Variables and created data
 //---------------------------------------------------------------------------------------------------------------
-var project string = 'ees'
+var project = 'ees'
 var resourcePrefix = '${subscription}-${project}'
-var reducedResourcePrefix = '${subscription}-api'
 var containerRegistryName = 'eesacr'
 var deploySubnets = true
+var containerAppName = 'eesapi'
 
 
 //---------------------------------------------------------------------------------------------------------------
@@ -132,7 +124,7 @@ module vnetModule 'components/network.bicep' = {
 module keyVaultModule 'components/keyVault.bicep' = {
   name: 'keyVaultDeploy'
   params: {
-    resourcePrefix: reducedResourcePrefix
+    resourcePrefix: resourcePrefix
     location: location
     tenantId: az.subscription().tenantId
     tagValues: tagValues
@@ -148,7 +140,7 @@ resource eesKeyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 module storageAccountModule 'components/storageAccount.bicep' = {
   name: 'storageAccountDeploy'
   params: {
-    resourcePrefix: reducedResourcePrefix
+    resourcePrefix: '${subscription}${project}'
     location: location
     storageAccountName: storageAccountName
     storageSubnetRules: [vnetModule.outputs.adminSubnetRef, vnetModule.outputs.importerSubnetRef, vnetModule.outputs.publisherSubnetRef]

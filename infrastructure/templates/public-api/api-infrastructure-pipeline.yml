@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - main
+    - master
     - dev
   paths:
     include:
@@ -27,7 +27,7 @@ parameters:
 
 variables:
   isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   vmImageName: 'ubuntu-latest'
   templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/public-api
   templateFile: $(templateDirectory)/main.bicep
@@ -129,7 +129,7 @@ stages:
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
-  condition: and(succeeded(), eq(variables.isMain, 'true'))
+  condition: and(succeeded(), eq(variables.isMaster, 'true'))
   dependsOn: Build
   jobs:
   - deployment: Deploy
@@ -156,7 +156,7 @@ stages:
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
-  condition: and(succeeded(), eq(variables.isMain, 'true'))
+  condition: and(succeeded(), eq(variables.isMaster, 'true'))
   dependsOn: DeployPreProd
   jobs:
   - deployment: Deploy
