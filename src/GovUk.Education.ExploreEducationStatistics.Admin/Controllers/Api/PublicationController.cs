@@ -131,17 +131,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        /// Partially update the publication's legacy releases.
-        /// Only legacy releases with matching ids will be updated,
-        /// and only non-null fields will be updated.
-        /// This is useful for bulk updates e.g. re-ordering.
-        [HttpPatch("api/publications/{publicationId:guid}/legacy-releases")]
-        public async Task<ActionResult<List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
+        [HttpPatch("api/publications/{publicationId:guid}/combined-releases")]
+        public async Task<ActionResult<List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
             Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> legacyReleases)
+            List<CombinedReleaseUpdateOrderViewModel> combinedReleases)
         {
             return await _publicationService
-                .PartialUpdateLegacyReleases(publicationId, legacyReleases)
+                .UpdateCombinedReleaseOrder(publicationId, combinedReleases)
                 .HandleFailuresOrOk();
         }
 

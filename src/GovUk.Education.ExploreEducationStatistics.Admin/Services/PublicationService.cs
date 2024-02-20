@@ -1,10 +1,7 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -19,13 +16,16 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -41,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _releaseRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IRedirectsCacheService _redirectsCacheService;
 
@@ -53,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository releaseRepository,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
+            IPublicationReleaseOrderService publicationReleaseOrderService,
             IMethodologyCacheService methodologyCacheService,
             IRedirectsCacheService redirectsCacheService)
         {
@@ -64,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseRepository = releaseRepository;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
+            _publicationReleaseOrderService = publicationReleaseOrderService;
             _methodologyCacheService = methodologyCacheService;
             _redirectsCacheService = redirectsCacheService;
         }
@@ -439,47 +442,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
+        public async Task<Either<ActionResult, List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
             Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases)
+            List<CombinedReleaseUpdateOrderViewModel> updatedReleases)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(
                     publicationId,
-                    publication => publication.Include(p => p.LegacyReleases)
+                    publication => publication
+                        .Include(p => p.LegacyReleases)
+                        .Include(p => p.Releases)
                 )
                 .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
-                    publication.LegacyReleases.ForEach(legacyRelease =>
-                    {
-                        var updateLegacyRelease = updatedLegacyReleases
-                            .Find(release => release.Id == legacyRelease.Id);
+                    await _publicationReleaseOrderService.UpdateForUpdateCombinedReleaseOrder(
+                        publicationId,
+                        updatedReleases);
 
-                        if (updateLegacyRelease == null)
-                        {
-                            return;
-                        }
-
-                        legacyRelease.Description = updateLegacyRelease.Description ?? legacyRelease.Description;
-                        legacyRelease.Url = updateLegacyRelease.Url ?? legacyRelease.Url;
-
-                        // Don't shift other orders around as its unreliable when doing
-                        // a bulk update like this. It's easier to let the consumer
-                        // decide what all the orders should be.
-                        legacyRelease.Order = updateLegacyRelease.Order ?? legacyRelease.Order;
-
-                        _context.Update(legacyRelease);
-                    });
-
-                    _context.Update(publication);
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return _mapper.Map<List<LegacyReleaseViewModel>>(
-                        publication.LegacyReleases.OrderByDescending(release => release.Order)
-                    );
+                    return _mapper
+                        .Map<List<CombinedReleaseUpdateOrderViewModel>>(publication.ReleaseOrders)
+                        .OrderBy(r => r.Order)
+                        .ToList();
                 });
         }
 
@@ -559,6 +547,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
+
+            var publication = await _context.Publications.FindAsync(release.Publication.Id)
+                ?? throw new ArgumentException($"Publication with ID {release.Publication.Id} not found");
+
+            viewModel.Order = publication.ReleaseOrders.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0;
+            viewModel.IsDraft = !release.Live;
 
             if (includePermissions)
             {

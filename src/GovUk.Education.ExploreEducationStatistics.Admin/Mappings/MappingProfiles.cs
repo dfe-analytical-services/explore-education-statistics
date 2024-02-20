@@ -178,6 +178,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
+            CreateMap<ReleaseOrder, CombinedReleaseUpdateOrderViewModel>()
+                .ForMember(
+                    dest => dest.Id,
+                    m => m.MapFrom(ro => ro.ReleaseId));
+
             CreateMap<Comment, CommentViewModel>()
                 .ForMember(dest => dest.CreatedBy,
                     m => m.MapFrom(comment =>

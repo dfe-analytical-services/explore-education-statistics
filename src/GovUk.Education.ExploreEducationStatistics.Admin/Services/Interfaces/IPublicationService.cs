@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using ExternalMethodologyViewModel =
-    GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -28,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid publicationId,
             PublicationSaveRequest updatedPublication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions);
+        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions = false);
 
         Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
 
@@ -55,8 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases);
+        Task<Either<ActionResult, List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
+           Guid publicationId,
+           List<CombinedReleaseUpdateOrderViewModel> updatedReleases);
     }
 }

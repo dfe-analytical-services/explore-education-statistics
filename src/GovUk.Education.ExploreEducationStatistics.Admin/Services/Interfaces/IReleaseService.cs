@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest release);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
         Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId);
 

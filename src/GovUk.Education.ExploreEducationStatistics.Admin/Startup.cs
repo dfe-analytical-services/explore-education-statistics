@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -304,8 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<PreReleaseOptions>(Configuration);
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
-            services.Configure<ReleaseApprovalOptions>(
-                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
+            services.Configure<ReleaseApprovalOptions>(Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
@@ -365,6 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IPublicationReleaseOrderService, PublicationReleaseOrderService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();

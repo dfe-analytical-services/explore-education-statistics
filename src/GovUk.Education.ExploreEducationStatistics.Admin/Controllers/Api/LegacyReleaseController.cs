@@ -16,7 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly ILegacyReleaseService _legacyReleaseService;
 
-        public LegacyReleaseController(ILegacyReleaseService legacyReleaseService)
+        public LegacyReleaseController(
+            ILegacyReleaseService legacyReleaseService,
+            IPublicationService publicationService)
         {
             _legacyReleaseService = legacyReleaseService;
         }
@@ -26,6 +28,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _legacyReleaseService
                 .ListLegacyReleases(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("publications/{publicationId:guid}/combined-releases")]
+        public async Task<ActionResult<List<CombinedReleaseViewModel>>> ListCombinedReleases(Guid publicationId)
+        {
+            return await _legacyReleaseService
+                .ListCombinedReleases(publicationId)
                 .HandleFailuresOrOk();
         }
 

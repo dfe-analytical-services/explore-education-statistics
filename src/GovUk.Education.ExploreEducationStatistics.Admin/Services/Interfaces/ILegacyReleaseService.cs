@@ -14,13 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId);
 
+        Task<Either<ActionResult, List<CombinedReleaseViewModel>>> ListCombinedReleases(Guid publicationId);
+
         Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
             LegacyReleaseCreateViewModel legacyRelease
         );
 
         Task<Either<ActionResult, LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id,
-            LegacyReleaseUpdateViewModel legacyRelease
+            LegacyReleaseUpdateViewModel legacyReleaseUpdate
         );
 
         Task<Either<ActionResult, bool>> DeleteLegacyRelease(Guid id);

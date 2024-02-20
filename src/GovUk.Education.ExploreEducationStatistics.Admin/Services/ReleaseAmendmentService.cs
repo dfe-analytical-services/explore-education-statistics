@@ -1,9 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -18,6 +13,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -32,17 +32,20 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IUserService _userService;
+    private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
 
     public ReleaseAmendmentService(
         ContentDbContext context,
         IUserService userService,
         IFootnoteRepository footnoteRepository,
-        StatisticsDbContext statisticsDbContext)
+        StatisticsDbContext statisticsDbContext,
+        IPublicationReleaseOrderService publicationReleaseOrderService)
     {
         _context = context;
         _userService = userService;
         _footnoteRepository = footnoteRepository;
         _statisticsDbContext = statisticsDbContext;
+        _publicationReleaseOrderService = publicationReleaseOrderService;
     }
 
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseId)
@@ -112,9 +115,14 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             Updates = CopyUpdates(originalRelease, releaseAmendmentId, createdDate, createdByUserId)
         };
 
+        await _context.Releases.AddAsync(amendment);
+
+        await _publicationReleaseOrderService.CreateForAmendRelease(
+            originalRelease.PublicationId,
+            releaseAmendmentId);
+
         // What to do about ReleaseStatuses?
 
-        await _context.Releases.AddAsync(amendment);
         await _context.SaveChangesAsync();
         return amendment;
     }

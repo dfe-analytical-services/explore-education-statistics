@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -25,4 +26,6 @@ public record PublicationCacheViewModel
     public ContactViewModel Contact { get; init; } = null!;
 
     public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
+
+    public List<ReleaseOrder> ReleaseOrders { get; set; } = new();
 }

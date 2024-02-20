@@ -1,15 +1,16 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -17,12 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseRepository _releaseRepository;
+        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
 
-        public ReleaseService(ContentDbContext contentDbContext,
-            IReleaseRepository releaseRepository)
+        public ReleaseService(
+            ContentDbContext contentDbContext,
+            IReleaseRepository releaseRepository,
+            IPublicationReleaseOrderService publicationReleaseOrderService)
         {
             _contentDbContext = contentDbContext;
             _releaseRepository = releaseRepository;
+            _publicationReleaseOrderService = publicationReleaseOrderService;
         }
 
         public async Task<Release> Get(Guid id)
@@ -85,6 +90,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             _contentDbContext.Releases.Update(release);
             release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
+
+            await _publicationReleaseOrderService.UpdateForPublishRelease(
+                release.PublicationId,
+                releaseId);
 
             await UpdatePublishedDataBlockVersions(release);
 

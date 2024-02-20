@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,6 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
 
@@ -202,7 +202,6 @@ public class PublicationService : IPublicationService
             Title = publication.Title,
             Slug = publication.Slug,
             LegacyReleases = publication.LegacyReleases
-                .OrderByDescending(legacyRelease => legacyRelease.Order)
                 .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
                 .ToList(),
             Topic = topic,
@@ -221,13 +220,11 @@ public class PublicationService : IPublicationService
                 }
                 : null,
             Releases = releases
-                .Select(release => new ReleaseTitleViewModel
-                {
-                    Id = release.Id,
-                    Slug = release.Slug,
-                    Title = release.Title
-                })
-                .ToList()
+                .Where(r => r.Published.HasValue)
+                .GroupBy(r => r.ReleaseName).Select(grouping => grouping.OrderByDescending(r => r.Version).First())
+                .Select(release => new ReleaseTitleViewModel(release))
+                .ToList(),
+            ReleaseOrders = publication.ReleaseOrders
         };
     }
 

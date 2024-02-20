@@ -1,8 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -27,10 +23,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
+        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -74,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator,
-            IBlobCacheService cacheService)
+            IBlobCacheService cacheService,
+            IPublicationReleaseOrderService publicationReleaseOrderService)
         {
             _context = context;
             _statisticsDbContext = statisticsDbContext;
@@ -92,6 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
+            _publicationReleaseOrderService = publicationReleaseOrderService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
@@ -101,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _mapper
                     .Map<ReleaseViewModel>(release) with
-                    {
-                        PreReleaseUsersOrInvitesAdded = _context
+                {
+                    PreReleaseUsersOrInvitesAdded = _context
                             .UserReleaseRoles
                             .Any(role => role.ReleaseId == id
                                          && role.Role == ReleaseRole.PrereleaseViewer) ||
@@ -110,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .UserReleaseInvites
                             .Any(role => role.ReleaseId == id
                                          && role.Role == ReleaseRole.PrereleaseViewer)
-                    });
+                });
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -162,6 +165,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     newRelease.CreatedById = _userService.GetUserId();
 
                     await _context.Releases.AddAsync(newRelease);
+
+                    await _publicationReleaseOrderService.CreateForCreateRelease(
+                        releaseCreate.PublicationId,
+                        newRelease.Id);
+
                     await _context.SaveChangesAsync();
                     return await GetRelease(newRelease.Id);
                 });
@@ -231,6 +239,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
 
                     _context.UpdateRange(methodologiesScheduledWithRelease);
+
+                    await _publicationReleaseOrderService.DeleteForDeleteRelease(
+                        release.PublicationId,
+                        release.Id);
 
                     await _context.SaveChangesAsync();
 
