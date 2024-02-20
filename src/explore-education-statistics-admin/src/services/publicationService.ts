@@ -1,6 +1,7 @@
 import {
   LegacyRelease,
-  UpdateLegacyRelease,
+  CreateLegacyRelease,
+  UpdateCombinedRelease,
 } from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
@@ -88,7 +89,7 @@ export interface ListReleasesParams {
 }
 
 export type UpdatePublicationLegacyRelease = Partial<
-  OmitStrict<UpdateLegacyRelease, 'publicationId'>
+  OmitStrict<CreateLegacyRelease, 'publicationId'>
 >;
 
 const publicationService = {
@@ -205,12 +206,12 @@ const publicationService = {
     );
   },
 
-  partialUpdateLegacyReleases(
+  updateCombinedReleaseOrder(
     publicationId: string,
-    legacyReleases: UpdatePublicationLegacyRelease[],
+    legacyReleases: UpdateCombinedRelease[],
   ): Promise<LegacyRelease> {
     return client.patch(
-      `/publications/${publicationId}/legacy-releases`,
+      `/publications/${publicationId}/combined-releases`,
       legacyReleases,
     );
   },

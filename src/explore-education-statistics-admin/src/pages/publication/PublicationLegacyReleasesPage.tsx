@@ -1,7 +1,7 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import legacyReleaseService, {
-  LegacyRelease,
+  CombinedRelease,
 } from '@admin/services/legacyReleaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -10,10 +10,10 @@ import React from 'react';
 const PublicationLegacyReleasesPage = () => {
   const { publicationId, publication } = usePublicationContext();
 
-  const { value: legacyReleases = [], isLoading } = useAsyncHandledRetry<
-    LegacyRelease[]
+  const { value: combinedReleases = [], isLoading } = useAsyncHandledRetry<
+    CombinedRelease[]
   >(
-    async () => legacyReleaseService.listLegacyReleases(publicationId),
+    async () => legacyReleaseService.listCombinedReleases(publicationId),
     [publicationId],
   );
 
@@ -28,7 +28,7 @@ const PublicationLegacyReleasesPage = () => {
         canManageLegacyReleases={
           publication.permissions.canManageLegacyReleases
         }
-        legacyReleases={legacyReleases}
+        combinedReleases={combinedReleases}
         publicationId={publicationId}
       />
     </>

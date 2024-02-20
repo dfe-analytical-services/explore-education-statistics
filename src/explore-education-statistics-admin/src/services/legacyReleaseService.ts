@@ -4,7 +4,13 @@ export interface LegacyRelease {
   id: string;
   description: string;
   url: string;
+}
+
+export interface CombinedRelease extends LegacyRelease {
   order: number;
+  isLegacy: boolean;
+  isDraft: boolean;
+  isAmendment: boolean;
 }
 
 export interface CreateLegacyRelease {
@@ -13,8 +19,17 @@ export interface CreateLegacyRelease {
   publicationId: string;
 }
 
-export interface UpdateLegacyRelease extends CreateLegacyRelease {
+export interface UpdateLegacyRelease {
+  description: string;
+  url: string;
+  publicationId: string;
+}
+
+export interface UpdateCombinedRelease {
+  id: string;
   order: number;
+  isLegacy: boolean;
+  isAmendment: boolean;
 }
 
 const legacyReleaseService = {
@@ -23,6 +38,9 @@ const legacyReleaseService = {
   },
   listLegacyReleases(publicationId: string): Promise<LegacyRelease[]> {
     return client.get(`/publications/${publicationId}/legacy-releases`);
+  },
+  listCombinedReleases(publicationId: string): Promise<CombinedRelease[]> {
+    return client.get(`/publications/${publicationId}/combined-releases`);
   },
   createLegacyRelease(data: CreateLegacyRelease): Promise<LegacyRelease> {
     return client.post('/legacy-releases', data);

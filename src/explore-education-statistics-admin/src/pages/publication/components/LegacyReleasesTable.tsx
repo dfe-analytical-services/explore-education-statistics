@@ -7,7 +7,7 @@ import {
   PublicationEditLegacyReleaseRouteParams,
 } from '@admin/routes/publicationRoutes';
 import legacyReleaseService, {
-  LegacyRelease,
+  CombinedRelease,
 } from '@admin/services/legacyReleaseService';
 import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -27,174 +27,28 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface Props {
   canManageLegacyReleases: boolean;
-  legacyReleases: LegacyRelease[];
+  combinedReleases: CombinedRelease[];
   publicationId: string;
 }
 const LegacyReleasesTable = ({
   canManageLegacyReleases,
-  legacyReleases: initialLegacyReleases,
+  combinedReleases: initialCombinedReleases,
   publicationId,
 }: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
-  const [legacyReleases, setLegacyReleases] = useState(initialLegacyReleases);
+  const [combinedReleases, setCombinedReleases] = useState(
+    initialCombinedReleases,
+  );
 
   return (
     <>
+      <p>Releases will be shown in the order below on the publication.</p>
       <p>
-        Legacy releases will be displayed in descending order on the
-        publication.
+        Non-legacy releases can also be reordered, including those in draft
+        status or with a draft amendment, but cannot be edited or deleted. Only
+        releases with a published version will be shown on the publication.
       </p>
-
-      {legacyReleases.length > 0 ? (
-        <DragDropContext
-          onDragEnd={result => {
-            if (!result.destination) {
-              return;
-            }
-
-            const nextLegacyReleases = reorder(
-              legacyReleases,
-              result.source.index,
-              result.destination.index,
-            ).map((release, index) => ({
-              ...release,
-              order: legacyReleases.length - index,
-            }));
-            setLegacyReleases(nextLegacyReleases);
-          }}
-        >
-          <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
-            {(droppableProvided, droppableSnapshot) => (
-              <table
-                ref={droppableProvided.innerRef}
-                className={classNames({
-                  [styles.tableDraggingOver]: droppableSnapshot.isDraggingOver,
-                })}
-              >
-                <thead>
-                  <tr>
-                    {isReordering && <th>Sort</th>}
-                    <th>Order</th>
-                    <th>Description</th>
-                    <th>URL</th>
-                    {canManageLegacyReleases && !isReordering && (
-                      <th>Actions</th>
-                    )}
-                  </tr>
-                </thead>
-                <DroppableArea
-                  droppableProvided={droppableProvided}
-                  droppableSnapshot={droppableSnapshot}
-                  tag="tbody"
-                >
-                  {legacyReleases.map((release, index) => (
-                    <DraggableItem
-                      hideDragHandle
-                      id={release.id}
-                      index={index}
-                      isReordering={isReordering}
-                      key={release.id}
-                      tag="tr"
-                    >
-                      {isReordering && <td className={styles.dragHandle}>⬍</td>}
-
-                      <td>{release.order}</td>
-
-                      <td>{release.description}</td>
-                      <td
-                        className={classNames({
-                          'govuk-!-width-one-half': isReordering,
-                        })}
-                      >
-                        <a
-                          className="govuk-link--no-visited-state"
-                          href={release.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          tabIndex={isReordering ? -1 : undefined}
-                        >
-                          {release.url}
-                        </a>
-                      </td>
-
-                      {canManageLegacyReleases && !isReordering && (
-                        <td>
-                          <ButtonGroup className="govuk-!-margin-bottom-0">
-                            <ModalConfirm
-                              confirmText="OK"
-                              title="Edit legacy release"
-                              triggerButton={
-                                <ButtonText>
-                                  Edit
-                                  <VisuallyHidden>
-                                    {` ${release.description}`}
-                                  </VisuallyHidden>
-                                </ButtonText>
-                              }
-                              onConfirm={() => {
-                                history.push(
-                                  generatePath<PublicationEditLegacyReleaseRouteParams>(
-                                    publicationEditLegacyReleaseRoute.path,
-                                    {
-                                      publicationId,
-                                      legacyReleaseId: release.id,
-                                    },
-                                  ),
-                                );
-                              }}
-                            >
-                              <WarningMessage>
-                                All changes made to legacy releases appear
-                                immediately on the public website.
-                              </WarningMessage>
-                            </ModalConfirm>
-
-                            <ModalConfirm
-                              title="Delete legacy release"
-                              triggerButton={
-                                <ButtonText variant="warning">
-                                  Delete
-                                  <VisuallyHidden>
-                                    {` ${release.description}`}
-                                  </VisuallyHidden>
-                                </ButtonText>
-                              }
-                              onConfirm={async () => {
-                                await legacyReleaseService.deleteLegacyRelease(
-                                  release?.id,
-                                );
-
-                                const nextLegacyReleases =
-                                  legacyReleases.filter(
-                                    legacyRelease =>
-                                      legacyRelease.id !== release.id,
-                                  );
-                                setLegacyReleases(nextLegacyReleases);
-                              }}
-                            >
-                              <p>
-                                Are you sure you want to delete this legacy
-                                release?
-                              </p>
-                              <p>
-                                All changes made to legacy releases appear
-                                immediately on the public website.
-                              </p>
-                            </ModalConfirm>
-                          </ButtonGroup>
-                        </td>
-                      )}
-                    </DraggableItem>
-                  ))}
-                </DroppableArea>
-              </table>
-            )}
-          </Droppable>
-        </DragDropContext>
-      ) : (
-        <p>No legacy releases for this publication.</p>
-      )}
 
       {canManageLegacyReleases && !isReordering && (
         <ButtonGroup>
@@ -219,33 +73,191 @@ const LegacyReleasesTable = ({
             </WarningMessage>
           </ModalConfirm>
 
-          {legacyReleases.length > 0 && (
+          {combinedReleases.length > 0 && (
             <ModalConfirm
               confirmText="OK"
-              title="Reorder legacy releases"
+              title="Reorder releases"
               triggerButton={
-                <Button variant="secondary">Reorder legacy releases</Button>
+                <Button variant="secondary">Reorder releases</Button>
               }
               onConfirm={toggleReordering.on}
             >
               <WarningMessage>
-                All changes made to legacy releases appear immediately on the
-                public website.
+                All changes made to releases appear immediately on the public
+                website.
               </WarningMessage>
             </ModalConfirm>
           )}
         </ButtonGroup>
       )}
 
+      {combinedReleases.length > 0 ? (
+        <DragDropContext
+          onDragEnd={result => {
+            if (!result.destination) {
+              return;
+            }
+
+            const nextCombinedReleases = reorder(
+              combinedReleases,
+              result.source.index,
+              result.destination.index,
+            ).map((release, index) => ({
+              ...release,
+              order: combinedReleases.length - index,
+            }));
+            setCombinedReleases(nextCombinedReleases);
+          }}
+        >
+          <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
+            {(droppableProvided, droppableSnapshot) => (
+              <table
+                ref={droppableProvided.innerRef}
+                className={classNames({
+                  [styles.tableDraggingOver]: droppableSnapshot.isDraggingOver,
+                })}
+              >
+                <thead>
+                  <tr>
+                    {isReordering && <th>Sort</th>}
+                    <th>Description</th>
+                    <th>URL</th>
+                    {canManageLegacyReleases && !isReordering && (
+                      <th>Actions</th>
+                    )}
+                  </tr>
+                </thead>
+                <DroppableArea
+                  droppableProvided={droppableProvided}
+                  droppableSnapshot={droppableSnapshot}
+                  tag="tbody"
+                >
+                  {combinedReleases.map((release, index) => (
+                    <DraggableItem
+                      hideDragHandle
+                      id={release.id}
+                      index={index}
+                      isReordering={isReordering}
+                      key={release.id}
+                      tag="tr"
+                    >
+                      {isReordering && <td className={styles.dragHandle}>⬍</td>}
+
+                      <td>
+                        {release.isDraft && (
+                          <span className="govuk-tag govuk-!-margin-right-1">
+                            DRAFT {release.isAmendment && ' AMENDMENT'}
+                          </span>
+                        )}
+                        {release.description}
+                      </td>
+                      <td
+                        className={classNames({
+                          'govuk-!-width-one-half': isReordering,
+                        })}
+                      >
+                        <a
+                          className="govuk-link--no-visited-state"
+                          href={release.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          tabIndex={isReordering ? -1 : undefined}
+                        >
+                          {release.url}
+                        </a>
+                      </td>
+
+                      {canManageLegacyReleases && !isReordering && (
+                        <td>
+                          {release.isLegacy && (
+                            <ButtonGroup className="govuk-!-margin-bottom-0">
+                              <ModalConfirm
+                                confirmText="OK"
+                                title="Edit legacy release"
+                                triggerButton={
+                                  <ButtonText>
+                                    Edit
+                                    <VisuallyHidden>
+                                      {` ${release.description}`}
+                                    </VisuallyHidden>
+                                  </ButtonText>
+                                }
+                                onConfirm={() => {
+                                  history.push(
+                                    generatePath<PublicationEditLegacyReleaseRouteParams>(
+                                      publicationEditLegacyReleaseRoute.path,
+                                      {
+                                        publicationId,
+                                        legacyReleaseId: release.id,
+                                      },
+                                    ),
+                                  );
+                                }}
+                              >
+                                <WarningMessage>
+                                  All changes made to legacy releases appear
+                                  immediately on the public website.
+                                </WarningMessage>
+                              </ModalConfirm>
+
+                              <ModalConfirm
+                                title="Delete legacy release"
+                                triggerButton={
+                                  <ButtonText variant="warning">
+                                    Delete
+                                    <VisuallyHidden>
+                                      {` ${release.description}`}
+                                    </VisuallyHidden>
+                                  </ButtonText>
+                                }
+                                onConfirm={async () => {
+                                  await legacyReleaseService.deleteLegacyRelease(
+                                    release?.id,
+                                  );
+
+                                  const nextCombinedReleases =
+                                    combinedReleases.filter(
+                                      legacyRelease =>
+                                        legacyRelease.id !== release.id,
+                                    );
+                                  setCombinedReleases(nextCombinedReleases);
+                                }}
+                              >
+                                <p>
+                                  Are you sure you want to delete this legacy
+                                  release?
+                                </p>
+                                <p>
+                                  All changes made to legacy releases appear
+                                  immediately on the public website.
+                                </p>
+                              </ModalConfirm>
+                            </ButtonGroup>
+                          )}
+                        </td>
+                      )}
+                    </DraggableItem>
+                  ))}
+                </DroppableArea>
+              </table>
+            )}
+          </Droppable>
+        </DragDropContext>
+      ) : (
+        <p>No releases for this publication.</p>
+      )}
+
       {isReordering && (
         <ButtonGroup>
           <Button
             onClick={async () => {
-              await publicationService.partialUpdateLegacyReleases(
+              await publicationService.updateCombinedReleaseOrder(
                 publicationId,
-                legacyReleases.map(release => ({
+                combinedReleases.map(release => ({
                   id: release.id,
                   order: release.order,
+                  isLegacy: release.isLegacy,
+                  isAmendment: release.isAmendment,
                 })),
               );
 
@@ -257,7 +269,7 @@ const LegacyReleasesTable = ({
           <Button
             variant="secondary"
             onClick={() => {
-              setLegacyReleases(legacyReleases);
+              setCombinedReleases(combinedReleases);
               toggleReordering.off();
             }}
           >

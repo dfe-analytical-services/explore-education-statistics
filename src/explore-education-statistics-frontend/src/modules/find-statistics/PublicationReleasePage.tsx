@@ -35,13 +35,41 @@ interface Props {
   release: Release;
 }
 
+interface CombinedRelease {
+  id: string;
+  title: string;
+  url: string;
+  order: number;
+  isLegacy: boolean;
+}
+
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   const otherPublicationReleases = release.publication.releases.filter(
     r => r.id !== release.id,
   );
-  const otherReleasesCount =
-    otherPublicationReleases.length + release.publication.legacyReleases.length;
 
+  let combinedReleases: CombinedRelease[] = [];
+  otherPublicationReleases.forEach(opr => {
+    combinedReleases.push({
+      id: opr.id,
+      title: opr.title,
+      url: opr.slug,
+      order: opr.order,
+      isLegacy: false,
+    });
+  });
+
+  release.publication.legacyReleases.forEach(lr => {
+    combinedReleases.push({
+      id: lr.id,
+      title: lr.description,
+      url: lr.url,
+      order: lr.order,
+      isLegacy: true,
+    });
+  });
+
+  combinedReleases = orderBy(combinedReleases, cr => cr.order, 'desc');
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
@@ -312,7 +340,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <a href="#contact-us">Contact us</a>
               </li>
             </ul>
-            {!!otherReleasesCount && (
+            {!!combinedReleases.length && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
@@ -320,7 +348,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View releases (${otherReleasesCount})`}
+                  summary={`View releases (${combinedReleases.length})`}
                   hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
@@ -334,21 +362,18 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...otherPublicationReleases.map(
-                          ({ id, slug, title }) => (
+                        ...combinedReleases.map(
+                          ({ id, url, title, isLegacy }) => (
                             <li key={id} data-testid="other-release-item">
-                              <Link
-                                to={`/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <a href={url}>{description}</a>
+                              {isLegacy ? (
+                                <a href={url}>{title}</a>
+                              ) : (
+                                <Link
+                                  to={`/find-statistics/${release.publication.slug}/${url}`}
+                                >
+                                  {title}
+                                </Link>
+                              )}
                             </li>
                           ),
                         ),

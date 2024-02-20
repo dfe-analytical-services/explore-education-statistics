@@ -37,7 +37,6 @@ const PublicationLegacyReleaseEditPage = ({
           initialValues={{
             description: legacyRelease.description,
             url: legacyRelease.url,
-            order: legacyRelease.order,
           }}
           cancelButton={
             <Link unvisited to={publicationEditPath}>
@@ -47,7 +46,6 @@ const PublicationLegacyReleaseEditPage = ({
           onSubmit={async values => {
             await legacyReleaseService.updateLegacyRelease(legacyReleaseId, {
               ...values,
-              order: values?.order ?? legacyRelease?.order,
               publicationId,
             });
 

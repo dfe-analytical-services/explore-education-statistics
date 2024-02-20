@@ -23,11 +23,13 @@ export interface Publication {
     id: string;
     slug: string;
     title: string;
+    order: number;
   }[];
   legacyReleases: {
     id: string;
     description: string;
     url: string;
+    order: number;
   }[];
   topic: {
     theme: {
