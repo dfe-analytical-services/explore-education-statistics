@@ -639,7 +639,38 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [Fact]
         public async Task VersionDoesNotExist_Returns404()
         {
-            var response = await GetVersion(Guid.NewGuid(), "1.0");
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await GetVersion(dataSet.Id, "1.0");
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetVersion(Guid.NewGuid(), dataSetVersion.Version);
 
             response.AssertNotFound();
         }
