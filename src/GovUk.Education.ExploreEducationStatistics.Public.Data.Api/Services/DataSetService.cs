@@ -111,13 +111,17 @@ internal class DataSetService : IDataSetService
         Guid dataSetId,
         string dataSetVersion)
     {
-        return await _publicDataDbContext.DataSetVersions
+        var dataSetVersions = await _publicDataDbContext.DataSetVersions
             .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.Version == dataSetVersion)
             .Where(ds => ds.Status == DataSetVersionStatus.Published
                 || ds.Status == DataSetVersionStatus.Unpublished
                 || ds.Status == DataSetVersionStatus.Deprecated)
-            .SingleOrNotFound();
+            .ToListAsync();
+
+        return await dataSetVersions
+            .Where(dsv => dsv.Version == dataSetVersion)
+            .SingleOrDefault()
+            .OrNotFound();
     }
 
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)

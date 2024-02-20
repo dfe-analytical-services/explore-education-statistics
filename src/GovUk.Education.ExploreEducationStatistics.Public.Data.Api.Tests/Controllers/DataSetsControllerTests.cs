@@ -308,7 +308,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 .DefaultDataSet()
                 .WithStatusPublished();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => 
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSets.AddRange(dataSet1, dataSet2));
 
             DataSetVersion dataSet1Version = DataFixture
@@ -331,7 +331,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 .WithVersionNumber(2, 2)
                 .WithDataSetId(dataSet2.Id);
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => 
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version));
 
             var response = await ListVersions(
@@ -513,6 +513,142 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/versions", query);
 
             var client = TestApp.CreateClient();
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class GetVersionTests : DataSetsControllerTests
+    {
+        public GetVersionTests(TestApplicationFactory testApp) : base(testApp)
+        {
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Published)]
+        [InlineData(DataSetVersionStatus.Unpublished)]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        public async Task VersionIsAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+
+            var content = response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(dataSetVersion.Version, content.Number);
+            Assert.Equal(dataSetVersion.VersionType(), content.Type);
+            Assert.Equal(dataSetVersion.Status, content.Status);
+            Assert.Equal(
+                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
+                content.Published.ToUnixTimeSeconds()
+            );
+            Assert.Equal(
+                dataSetVersion.Unpublished?.ToUnixTimeSeconds(),
+                content.Unpublished?.ToUnixTimeSeconds()
+            );
+            Assert.Equal(dataSetVersion.Notes, content.Notes);
+            Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
+            Assert.Equal(
+                TimePeriodFormatter.Format(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
+                content.TimePeriods.Start);
+            Assert.Equal(
+                TimePeriodFormatter.Format(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
+                content.TimePeriods.End);
+            Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.GeographicLevels);
+            Assert.Equal(dataSetVersion.MetaSummary.Filters, content.Filters);
+            Assert.Equal(dataSetVersion.MetaSummary.Indicators, content.Indicators);
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Staged)]
+        public async Task VersionNotAvailable_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task VersionExistsForOtherDataSet_Returns404()
+        {
+            DataSet dataSet1 = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            DataSet dataSet2 = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet1, dataSet2));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet1.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetVersion(dataSet2.Id, dataSetVersion.Version);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task VersionDoesNotExist_Returns404()
+        {
+            var response = await GetVersion(Guid.NewGuid(), "1.0");
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetVersion(Guid dataSetId, string dataSetVersion)
+        {
+            var client = TestApp.CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
 
             return await client.GetAsync(uri);
         }
