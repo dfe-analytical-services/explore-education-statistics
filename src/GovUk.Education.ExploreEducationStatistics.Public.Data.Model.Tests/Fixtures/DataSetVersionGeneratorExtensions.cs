@@ -197,7 +197,7 @@ public static class DataSetVersionGeneratorExtensions
         => instanceSetter
             .SetStatus(DataSetVersionStatus.Unpublished)
             .SetUnpublished(DateTimeOffset.UtcNow)
-            .SetPublished(DateTimeOffset.UtcNow);
+            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-1));
 
     public static InstanceSetters<DataSetVersion> SetPublished(
         this InstanceSetters<DataSetVersion> instanceSetter,
