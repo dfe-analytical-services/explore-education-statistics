@@ -25,7 +25,7 @@ export default function RHFFormFieldCheckboxSearchGroup<
   ...props
 }: RHFFormFieldCheckboxSearchGroupProps<TFormValues>) {
   const {
-    formState: { errors, submitCount },
+    formState: { errors },
     register,
     setValue,
     trigger,
@@ -58,7 +58,6 @@ export default function RHFFormFieldCheckboxSearchGroup<
           options,
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}

@@ -14,11 +14,12 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
+import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
 interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
   id: string;
+  initialTouched?: Path<TFormValues>[];
   submitId?: string;
   showErrorSummary?: boolean;
   visuallyHiddenErrorSummary?: boolean;
@@ -45,6 +46,7 @@ interface Props<TFormValues extends FieldValues> {
 export default function RHFForm<TFormValues extends FieldValues>({
   children,
   id,
+  initialTouched,
   submitId = `${id}-submit`,
   showErrorSummary = true,
   visuallyHiddenErrorSummary = false,
@@ -63,8 +65,9 @@ export default function RHFForm<TFormValues extends FieldValues>({
 
   const { getAllErrors } = createRHFErrorHelper({
     errors,
-    touchedFields,
+    initialTouched,
     isSubmitted,
+    touchedFields,
   });
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
 

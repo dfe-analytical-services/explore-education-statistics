@@ -2,7 +2,7 @@ import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMo
 import FiltersForm, {
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
-import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import { testWizardStepProps } from '@common/modules/table-tool/components/__tests__/__data__/testWizardStepProps';
 import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -249,18 +249,6 @@ describe('FiltersForm', () => {
         order: 0,
       },
     },
-  };
-
-  const testWizardStepProps: InjectedWizardProps = {
-    currentStep: 1,
-    isActive: true,
-    isEnabled: true,
-    isLoading: false,
-    stepNumber: 1,
-    setCurrentStep: (step, task) => task?.(),
-    goToNextStep: task => task?.(),
-    goToPreviousStep: task => task?.(),
-    shouldScroll: false,
   };
 
   const testSubject = {

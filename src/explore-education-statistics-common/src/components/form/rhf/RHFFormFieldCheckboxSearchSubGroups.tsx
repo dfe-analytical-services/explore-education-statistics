@@ -27,7 +27,7 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
   ...props
 }: RHFFormFieldCheckboxSearchSubGroupsProps<TFormValues>) {
   const {
-    formState: { errors, submitCount },
+    formState: { errors },
     register,
     setValue,
     trigger,
@@ -83,7 +83,6 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
           options: options.flatMap(group => group.options),
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}
@@ -103,7 +102,6 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
           options: groupOptions,
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}
