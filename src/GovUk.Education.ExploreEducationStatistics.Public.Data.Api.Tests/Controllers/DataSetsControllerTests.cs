@@ -554,7 +554,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             Assert.NotNull(content);
             Assert.Equal(dataSetVersion.Version, content.Number);
-            Assert.Equal(dataSetVersion.VersionType(), content.Type);
+            Assert.Equal(dataSetVersion.VersionType, content.Type);
             Assert.Equal(dataSetVersion.Status, content.Status);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
