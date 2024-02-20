@@ -959,7 +959,7 @@ describe('DataCataloguePage', () => {
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
           query: {
-            latest: 'false',
+            latestOnly: 'false',
           },
         });
 
@@ -972,7 +972,7 @@ describe('DataCataloguePage', () => {
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
           query: {
-            latest: 'true',
+            latestOnly: 'true',
           },
         });
       });

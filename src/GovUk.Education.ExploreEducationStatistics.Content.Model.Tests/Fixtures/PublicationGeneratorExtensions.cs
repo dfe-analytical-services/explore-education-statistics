@@ -154,7 +154,8 @@ public static class PublicationGeneratorExtensions
                     .OrderByDescending(release => release.Year)
                     .ThenByDescending(release => release.TimePeriodCoverage)
                     .FirstOrDefault();
-            });
+            })
+            .Set(p => p.LatestPublishedReleaseId, (_, publication, _) => publication.LatestPublishedRelease?.Id);
 
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,

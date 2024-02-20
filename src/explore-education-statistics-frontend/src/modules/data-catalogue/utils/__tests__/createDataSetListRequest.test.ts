@@ -8,7 +8,7 @@ describe('createDataSetListRequest', () => {
 
   test('returns the request with query params', () => {
     const result = createDataSetListRequest({
-      latest: 'true',
+      latestOnly: 'true',
       orderBy: 'relevance',
       page: 4,
       publicationId: 'publication-id',
@@ -17,7 +17,7 @@ describe('createDataSetListRequest', () => {
       themeId: 'theme-id',
     });
     expect(result).toEqual({
-      latest: 'true',
+      latestOnly: 'true',
       orderBy: 'relevance',
       page: 4,
       publicationId: 'publication-id',

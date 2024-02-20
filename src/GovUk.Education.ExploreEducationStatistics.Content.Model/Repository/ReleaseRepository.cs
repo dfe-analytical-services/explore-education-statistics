@@ -1,9 +1,11 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,142 +53,143 @@ public class ReleaseRepository : IReleaseRepository
         return release.PreviousVersion.Published.Value;
     }
 
-    public async Task<Release?> GetLatestPublishedReleaseVersion(Guid publicationId)
+    public async Task<Release?> GetLatestPublishedReleaseVersion(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return (await GetLatestReleaseVersionsQueryable(publicationId, publishedOnly: true)
-                .ToListAsync())
+        return (await _contentDbContext.Releases.LatestReleaseVersions(publicationId, publishedOnly: true)
+                .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .FirstOrDefault();
     }
 
-    public async Task<Release?> GetLatestReleaseVersion(Guid publicationId)
+    public async Task<Release?> GetLatestReleaseVersion(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return (await GetLatestReleaseVersionsQueryable(publicationId)
-                .ToListAsync())
+        return (await _contentDbContext.Releases.LatestReleaseVersions(publicationId)
+                .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .FirstOrDefault();
     }
 
-    public async Task<Release?> GetLatestPublishedReleaseVersion(Guid publicationId, string releaseSlug)
+    public async Task<Release?> GetLatestPublishedReleaseVersion(
+        Guid publicationId,
+        string releaseSlug,
+        CancellationToken cancellationToken = default)
     {
         // There should only ever be one latest published release version with a given slug
-        return await GetLatestReleaseVersionsQueryable(publicationId, releaseSlug, publishedOnly: true)
-            .FirstOrDefaultAsync();
+        return await _contentDbContext.Releases.LatestReleaseVersions(publicationId, releaseSlug, publishedOnly: true)
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<bool> IsLatestPublishedReleaseVersion(Guid releaseId)
+    public async Task<bool> IsLatestPublishedReleaseVersion(
+        Guid releaseId,
+        CancellationToken cancellationToken = default)
     {
-        return await IsLatestReleaseVersion(releaseId, publishedOnly: true);
+        return await IsLatestReleaseVersion(releaseId,
+            publishedOnly: true,
+            cancellationToken: cancellationToken);
     }
 
-    public async Task<bool> IsLatestReleaseVersion(Guid releaseId)
+    public async Task<bool> IsLatestReleaseVersion(
+        Guid releaseId,
+        CancellationToken cancellationToken = default)
     {
-        return await IsLatestReleaseVersion(releaseId, publishedOnly: false);
+        return await IsLatestReleaseVersion(releaseId,
+            publishedOnly: false,
+            cancellationToken: cancellationToken);
     }
 
     // TODO EES-4336 Remove this
-    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds()
+    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(CancellationToken cancellationToken = default)
     {
-        return await GetLatestReleaseVersionIdsQueryable(publishedOnly: true)
-            .ToListAsync();
+        return await _contentDbContext.Releases.LatestReleaseVersions(publishedOnly: true)
+            .Select(r => r.Id)
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<List<Release>> ListLatestPublishedReleaseVersions(Guid publicationId)
+    public async Task<List<Release>> ListLatestPublishedReleaseVersions(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return (await GetLatestReleaseVersionsQueryable(publicationId, publishedOnly: true)
-                .ToListAsync())
+        return (await _contentDbContext.Releases.LatestReleaseVersions(publicationId, publishedOnly: true)
+                .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .ToList();
     }
 
-    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(Guid publicationId)
+    public async Task<List<Guid>> ListLatestPublishedReleaseVersionIds(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return await GetLatestReleaseVersionIdsQueryable(publicationId, publishedOnly: true)
-            .ToListAsync();
+        return await _contentDbContext.Releases.LatestReleaseVersions(publicationId, publishedOnly: true)
+            .Select(r => r.Id)
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<List<Guid>> ListLatestReleaseVersionIds(Guid publicationId)
+    public async Task<List<Guid>> ListLatestReleaseVersionIds(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return await GetLatestReleaseVersionIdsQueryable(publicationId)
-            .ToListAsync();
+        return await _contentDbContext.Releases.LatestReleaseVersions(publicationId)
+            .Select(r => r.Id)
+            .ToListAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<List<Release>> ListLatestReleaseVersions()
+    public async Task<List<Release>> ListLatestReleaseVersions(CancellationToken cancellationToken = default)
     {
-        return (await GetLatestReleaseVersionsQueryable()
-                .ToListAsync())
+        return (await _contentDbContext.Releases.LatestReleaseVersions()
+                .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .ToList();
     }
 
-    public async Task<List<Release>> ListLatestReleaseVersions(Guid publicationId)
+    public async Task<List<Release>> ListLatestReleaseVersions(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return (await GetLatestReleaseVersionsQueryable(publicationId)
-                .ToListAsync())
+        return (await _contentDbContext.Releases.LatestReleaseVersions(publicationId)
+                .ToListAsync(cancellationToken: cancellationToken))
             .OrderByReverseChronologicalOrder()
             .ToList();
     }
 
-    private IQueryable<Guid> GetLatestReleaseVersionIdsQueryable(Guid? publicationId = null,
-        bool publishedOnly = false)
+    private async Task<bool> IsLatestReleaseVersion(
+        Guid releaseId,
+        bool publishedOnly,
+        CancellationToken cancellationToken = default)
     {
-        return GetLatestReleaseVersionsQueryable(publicationId, publishedOnly: publishedOnly)
-            .Select(release => release.Id);
-    }
-
-    private IQueryable<Release> GetLatestReleaseVersionsQueryable(Guid? publicationId = null,
-        string? releaseSlug = null,
-        bool publishedOnly = false)
-    {
-        if (releaseSlug != null && publicationId == null)
-        {
-            throw new ArgumentException("Cannot filter by release slug without a publication id");
-        }
-
-        var maxVersionsQueryable = _contentDbContext.Releases
-            .Where(release => publicationId == null || release.PublicationId == publicationId)
-            .Where(release => releaseSlug == null || release.Slug == releaseSlug)
-            .Where(release => !publishedOnly || release.Published.HasValue)
-            .GroupBy(release => release.ReleaseParentId)
-            .Select(groupedReleases =>
-                new
-                {
-                    ReleaseParentId = groupedReleases.Key, Version = groupedReleases.Max(release => release.Version)
-                });
-
-        return _contentDbContext.Releases
-            .Join(maxVersionsQueryable,
-                release => new { release.ReleaseParentId, release.Version },
-                maxVersion => maxVersion,
-                (release, _) => release);
-    }
-
-    private async Task<bool> IsLatestReleaseVersion(Guid releaseId, bool publishedOnly)
-    {
-        var release = await GetReleaseParentIdAndVersion(releaseId);
+        var release = await GetReleaseParentIdAndVersion(releaseId, cancellationToken);
 
         if (release == null)
         {
             return false;
         }
 
-        return await GetMaxVersionNumber(release.ReleaseParentId, publishedOnly) == release.Version;
+        return await GetMaxVersionNumber(release.ReleaseParentId, publishedOnly, cancellationToken) == release.Version;
     }
 
-    private async Task<int?> GetMaxVersionNumber(Guid releaseParentId, bool publishedOnly = false)
+    private async Task<int?> GetMaxVersionNumber(
+        Guid releaseParentId,
+        bool publishedOnly = false,
+        CancellationToken cancellationToken = default)
     {
         return await _contentDbContext.Releases
             .Where(r => r.ReleaseParentId == releaseParentId)
             .Where(r => !publishedOnly || r.Published.HasValue)
-            .MaxAsync(r => (int?) r.Version);
+            .MaxAsync(r => (int?) r.Version,
+                cancellationToken: cancellationToken);
     }
 
-    private async Task<ParentIdVersion?> GetReleaseParentIdAndVersion(Guid releaseId)
+    private async Task<ParentIdVersion?> GetReleaseParentIdAndVersion(
+        Guid releaseId,
+        CancellationToken cancellationToken = default)
     {
         return await _contentDbContext.Releases
             .Where(r => r.Id == releaseId)
             .Select(r => new ParentIdVersion(r.ReleaseParentId, r.Version))
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     private record ParentIdVersion(Guid ReleaseParentId, int Version);

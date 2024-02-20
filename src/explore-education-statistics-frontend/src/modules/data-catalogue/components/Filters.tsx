@@ -10,7 +10,7 @@ import styles from '@frontend/modules/data-catalogue/components/Filters.module.s
 import React from 'react';
 
 interface Props {
-  latest?: string;
+  latestOnly?: string;
   publicationId?: string;
   publications?: PublicationTreeSummary[];
   releaseId?: string;
@@ -27,7 +27,7 @@ interface Props {
 }
 
 export default function Filters({
-  latest = 'true',
+  latestOnly = 'true',
   publications = [],
   publicationId,
   releaseId,
@@ -36,7 +36,7 @@ export default function Filters({
   themes,
   onChange,
 }: Props) {
-  const latestValue = latest === 'true' ? 'latest' : 'all';
+  const latestValue = latestOnly === 'true' ? 'latest' : 'all';
   return (
     <form className={styles.form} id="filters-form">
       <FormFieldset
