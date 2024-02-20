@@ -1,16 +1,14 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Utils.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests;
 
-public abstract class DataSetVersionExtensionsTests
+public abstract class DataSetVersionTests
 {
     protected readonly DataFixture DataFixture = new();
 
-    public class VersionTypeTests : DataSetVersionExtensionsTests
+    public class VersionTypeTests : DataSetVersionTests
     {
         [Theory]
         [InlineData(1, 0)]
@@ -21,7 +19,7 @@ public abstract class DataSetVersionExtensionsTests
                 .DefaultDataSetVersion()
                 .WithVersionNumber(majorVersion, minorVersion);
 
-            var versionType = dataSetVersion.VersionType();
+            var versionType = dataSetVersion.VersionType;
 
             Assert.Equal(DataSetVersionType.Major, versionType);
         }
@@ -37,9 +35,26 @@ public abstract class DataSetVersionExtensionsTests
                 .DefaultDataSetVersion()
                 .WithVersionNumber(majorVersion, minorVersion);
 
-            var versionType = dataSetVersion.VersionType();
+            var versionType = dataSetVersion.VersionType;
 
             Assert.Equal(DataSetVersionType.Minor, versionType);
+        }
+    }
+
+    public class VersionTests : DataSetVersionTests
+    {
+        [Theory]
+        [InlineData(1, 0, "1.0")]
+        [InlineData(1, 1, "1.1")]
+        [InlineData(2, 0, "2.0")]
+        [InlineData(2, 1, "2.1")]
+        public void FormatsCorrectly(int majorVersion, int minorVersion, string formattedVersion)
+        {
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithVersionNumber(majorVersion, minorVersion);
+
+            Assert.Equal(formattedVersion, dataSetVersion.Version);
         }
     }
 }

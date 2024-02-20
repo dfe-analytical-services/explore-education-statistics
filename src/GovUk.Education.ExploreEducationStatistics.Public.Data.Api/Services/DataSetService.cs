@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -128,7 +127,7 @@ internal class DataSetService : IDataSetService
         return new DataSetVersionViewModel
         {
             Number = dataSetVersion.Version,
-            Type = dataSetVersion.VersionType(),
+            Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,
             Unpublished = dataSetVersion.Unpublished,

@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -128,7 +127,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(1, 2, 9)]
         [InlineData(1, 3, 2)]
         [InlineData(2, 2, 9)]
-        public async Task MultipleDataSetVersionsAvailableForRequestedDataSet_Returns200_PaginatedCorrectly(
+        public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_PaginatedCorrectly(
            int page,
            int pageSize,
            int numberOfAvailableDataSetVersions)
@@ -174,7 +173,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task MultipleDataSetVersionsAvailableForRequestedDataSet_Returns200_OrderedCorrectly()
+        public async Task MultipleAvailableVersionsForRequestedDataSet_Returns200_OrderedCorrectly()
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -192,16 +191,10 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 .WithDataSetId(dataSet.Id)
                 .ForIndex(0, dsv => dsv.SetVersionNumber(1, 0))
                 .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
-                .ForIndex(2, dsv => dsv.SetVersionNumber(1, 2))
-                .ForIndex(3, dsv => dsv.SetVersionNumber(3, 5))
-                .ForIndex(4, dsv => dsv.SetVersionNumber(3, 4))
-                .ForIndex(5, dsv => dsv.SetVersionNumber(3, 3))
-                .ForIndex(6, dsv => dsv.SetVersionNumber(3, 2))
-                .ForIndex(7, dsv => dsv.SetVersionNumber(3, 1))
-                .ForIndex(8, dsv => dsv.SetVersionNumber(3, 0))
-                .ForIndex(9, dsv => dsv.SetVersionNumber(2, 0))
-                .ForIndex(10, dsv => dsv.SetVersionNumber(2, 1))
-                .ForIndex(11, dsv => dsv.SetVersionNumber(2, 2))
+                .ForIndex(2, dsv => dsv.SetVersionNumber(3, 1))
+                .ForIndex(3, dsv => dsv.SetVersionNumber(3, 0))
+                .ForIndex(4, dsv => dsv.SetVersionNumber(2, 0))
+                .ForIndex(5, dsv => dsv.SetVersionNumber(2, 1))
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -209,24 +202,29 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 context.DataSetVersions.AddRange(dataSetVersions);
             });
 
-            var response = await ListVersions(
+            var page1Response = await ListVersions(
+                dataSetId: dataSet.Id,
+                page: 1,
+                pageSize: 3);
+
+            var page1Content = page1Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+
+            Assert.Equal(3, page1Content.Results.Count);
+            Assert.Equal("3.1", page1Content.Results[0].Number);
+            Assert.Equal("3.0", page1Content.Results[1].Number);
+            Assert.Equal("2.1", page1Content.Results[2].Number);
+
+            var page2Response = await ListVersions(
                 dataSetId: dataSet.Id,
                 page: 2,
-                pageSize: 5);
+                pageSize: 3);
 
-            var content = response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
+            var page2Content = page2Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
 
-            Assert.NotNull(content);
-            Assert.Equal(2, content.Paging.Page);
-            Assert.Equal(5, content.Paging.PageSize);
-            Assert.Equal(12, content.Paging.TotalResults);
-            Assert.Equal(5, content.Results.Count);
-
-            Assert.Equal("3.0", content.Results[0].Number);
-            Assert.Equal("2.2", content.Results[1].Number);
-            Assert.Equal("2.1", content.Results[2].Number);
-            Assert.Equal("2.0", content.Results[3].Number);
-            Assert.Equal("1.2", content.Results[4].Number);
+            Assert.Equal(3, page2Content.Results.Count);
+            Assert.Equal("2.0", page2Content.Results[0].Number);
+            Assert.Equal("1.1", page2Content.Results[1].Number);
+            Assert.Equal("1.0", page2Content.Results[2].Number);
         }
 
         [Theory]
@@ -272,7 +270,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             var result = Assert.Single(content.Results);
 
             Assert.Equal(dataSetVersion.Version, result.Number);
-            Assert.Equal(dataSetVersion.VersionType(), result.Type);
+            Assert.Equal(dataSetVersion.VersionType, result.Type);
             Assert.Equal(dataSetVersion.Status, result.Status);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
@@ -300,7 +298,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Fact]
-        public async Task DataSetVersionAvailableForOtherDataSet_Returns200_OnlyVersionForRequestedDataSet()
+        public async Task AvailableVersionForOtherDataSet_Returns200_OnlyVersionForRequestedDataSet()
         {
             DataSet dataSet1 = DataFixture
                 .DefaultDataSet()

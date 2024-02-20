@@ -51,6 +51,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
 
+    public DataSetVersionType VersionType 
+        => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
+
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
     {
         public void Configure(EntityTypeBuilder<DataSetVersion> builder)

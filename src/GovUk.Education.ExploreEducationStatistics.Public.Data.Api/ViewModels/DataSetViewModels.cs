@@ -112,12 +112,6 @@ public record DataSetPaginatedListViewModel : PaginatedListViewModel<DataSetView
     }
 }
 
-public enum DataSetVersionType
-{
-    Major,
-    Minor
-}
-
 public class DataSetVersionViewModel
 {
     /// <summary>
