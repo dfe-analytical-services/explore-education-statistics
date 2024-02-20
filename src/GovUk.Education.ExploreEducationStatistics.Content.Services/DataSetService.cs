@@ -33,18 +33,18 @@ public class DataSetService : IDataSetService
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
-        Guid? themeId = null,
-        Guid? publicationId = null,
-        Guid? releaseId = null,
-        bool? latestOnly = true,
-        string? searchTerm = null,
-        DataSetsListRequestOrderBy? orderBy = null,
-        SortOrder? sort = null,
-        int page = 1,
-        int pageSize = 10,
+        Guid? themeId,
+        Guid? publicationId,
+        Guid? releaseId,
+        bool? latestOnly,
+        string? searchTerm,
+        DataSetsListRequestOrderBy? orderBy,
+        SortOrder? sort,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default)
     {
-        // If latestOnly is not specified default it to true except when a releaseId is specified
+        // If latestOnly is null default it to true except when a releaseId is provided
         latestOnly ??= !releaseId.HasValue;
 
         orderBy ??= searchTerm == null ? Title : Relevance;

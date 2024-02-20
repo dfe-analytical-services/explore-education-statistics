@@ -13,14 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 public interface IDataSetService
 {
     Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
-        Guid? themeId = null,
-        Guid? publicationId = null,
-        Guid? releaseId = null,
-        bool? latestOnly = true,
-        string? searchTerm = null,
-        DataSetsListRequestOrderBy? orderBy = null,
-        SortOrder? sort = null,
-        int page = 1,
-        int pageSize = 10,
+        Guid? themeId,
+        Guid? publicationId,
+        Guid? releaseId,
+        bool? latestOnly,
+        string? searchTerm,
+        DataSetsListRequestOrderBy? orderBy,
+        SortOrder? sort,
+        int page,
+        int pageSize,
         CancellationToken cancellationToken = default);
 }
