@@ -2,6 +2,7 @@ import React, {
   createContext,
   ReactElement,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -38,7 +39,7 @@ export const AuthContext = createContext<AuthContextState | undefined>(
 
 interface Props {
   children?: ReactNode;
-  verboseLogging: boolean;
+  verboseLogging?: boolean;
 }
 
 interface State {
@@ -122,11 +123,14 @@ export const AuthContextProvider = ({
   const history = useHistory();
   const location = useLocation();
 
-  function log(message: string) {
-    if (verboseLogging) {
-      logger.info(message);
-    }
-  }
+  const log = useCallback(
+    (message: string) => {
+      if (verboseLogging) {
+        logger.info(message);
+      }
+    },
+    [verboseLogging],
+  );
 
   // Register a listener for the post-login callback when returning from
   // the external Identity Provider login. This will allow us to access the
@@ -166,10 +170,10 @@ export const AuthContextProvider = ({
       log(`AuthContext: redirecting to ${state.redirect}.`);
       history.push(state.redirect);
     }
-  }, [history, state.redirect]);
+  }, [history, state.redirect, log]);
 
   useEffect(() => {
-    const populateAuthenticationState = async () => {
+    (async () => {
       function setUnauthenticated() {
         setState({
           user: undefined,
@@ -363,9 +367,7 @@ export const AuthContextProvider = ({
         ...previousState,
         readyToRenderChildren: true,
       }));
-    };
-
-    populateAuthenticationState();
+    })();
   }, [
     msalInstance,
     accounts,

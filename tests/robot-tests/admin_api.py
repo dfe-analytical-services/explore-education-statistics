@@ -72,7 +72,7 @@ def send_authenticated_api_request(session, method, endpoint, body):
 
 def send_request_with_retry_on_auth_failure(session, method, endpoint, body, fail_on_reauthenticate=True):
     """
-    This method makes an request to the given Admin API endpoint.
+    This method makes a request to the given Admin API endpoint.
 
     If no prior authentication tokens are available when this method is called, they will
     be obtained using the BAU user's credentials.

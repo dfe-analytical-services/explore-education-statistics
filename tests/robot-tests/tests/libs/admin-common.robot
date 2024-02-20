@@ -62,11 +62,11 @@ user switches to analyst1 browser
     user switches browser    ${ANALYST1_BROWSER}
 
 user changes to bau1
-    user clicks link    Sign out    css:#navigation
+    user clicks button    Sign out    css:#navigation
     user signs in as bau1    False
 
 user changes to analyst1
-    user clicks link    Sign out    css:#navigation
+    user clicks button    Sign out    css:#navigation
     user signs in as analyst1    False
 
 user selects dashboard theme and topic if possible

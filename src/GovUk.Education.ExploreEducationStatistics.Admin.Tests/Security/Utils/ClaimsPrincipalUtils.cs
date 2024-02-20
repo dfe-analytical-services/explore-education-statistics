@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         {
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
-                ScopeClaim("access-admin-api"));
+                ScopeClaim(SecurityScopes.AccessAdminApiScope));
         }
 
         public static ClaimsPrincipal AuthenticatedUser()
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
                 SecurityClaim(ApplicationAccessGranted),
-                ScopeClaim("access-admin-api"));
+                ScopeClaim(SecurityScopes.AccessAdminApiScope));
         }
 
         public static ClaimsPrincipal BauUser()
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             var claims =
                 ListOf(RoleClaim(RoleNames.BauUser))
                 .Concat(EnumUtil.GetEnumValues<SecurityClaimTypes>().Select(SecurityClaim))
-                .Append(ScopeClaim("access-admin-api"));
+                .Append(ScopeClaim(SecurityScopes.AccessAdminApiScope));
 
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 SecurityClaim(AnalystPagesAccessGranted),
                 SecurityClaim(PrereleasePagesAccessGranted),
                 SecurityClaim(CanViewPrereleaseContacts),
-                ScopeClaim("access-admin-api"));
+                ScopeClaim(SecurityScopes.AccessAdminApiScope));
         }
 
         public static ClaimsPrincipal PreReleaseUser()
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 RoleClaim(PrereleaseUser),
                 SecurityClaim(ApplicationAccessGranted),
                 SecurityClaim(PrereleasePagesAccessGranted),
-                ScopeClaim("access-admin-api"));
+                ScopeClaim(SecurityScopes.AccessAdminApiScope));
         }
 
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)

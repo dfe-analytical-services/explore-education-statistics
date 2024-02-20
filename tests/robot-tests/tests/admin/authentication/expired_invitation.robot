@@ -11,6 +11,7 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Invite user to the service with an unexpired invite via the API
+    delete test user    %{EXPIRED_INVITE_USER_EMAIL}
     user adds user invite via api
     ...    %{EXPIRED_INVITE_USER_EMAIL}
     ...    Analyst

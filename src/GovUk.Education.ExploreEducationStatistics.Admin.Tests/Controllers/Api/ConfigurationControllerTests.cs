@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Equal("ees-admin-client", viewModel.Oidc.ClientId);
             Assert.Equal(realm, viewModel.Oidc.Authority);
             Assert.Equal(new [] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
-            Assert.Equal("access-admin-api", viewModel.Oidc.AdminApiScope);
+            Assert.Equal(SecurityScopes.AccessAdminApiScope, viewModel.Oidc.AdminApiScope);
 
             var authorityMetadata = viewModel.Oidc.AuthorityMetadata!;
             Assert.Equal($"{realm}/protocol/openid-connect/auth", authorityMetadata.AuthorizationEndpoint);
