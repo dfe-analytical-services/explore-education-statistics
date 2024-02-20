@@ -44,5 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid? LatestPublishedReleaseId { get; set; }
 
         public Release? LatestPublishedRelease { get; set; }
+
+        public List<ReleaseOrder> ReleaseOrders { get; set; } = new();
     }
 }
