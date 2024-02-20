@@ -76,7 +76,7 @@ public class LegacyReleaseServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        var mock = MockPersistenceHelper<ContentDbContext, Release>();
+        var mock = MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
         SetupCall(mock, _legacyRelease.Id, _legacyRelease);
         SetupCall(mock, _publication.Id, _publication);
 

@@ -17,7 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -52,12 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataBlockService = dataBlockService;
         }
 
-        public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseId)
+        public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
         {
             return await _contentDbContext
-                .Releases
+                .ReleaseVersions
                 .HydrateReleaseForChecklist()
-                .SingleOrNotFoundAsync(r => r.Id == releaseId)
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(
                     async release => new ReleaseChecklistViewModel(
@@ -67,61 +67,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<List<ReleaseChecklistIssue>> GetErrors(Release release)
+        public async Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion)
         {
             var errors = new List<ReleaseChecklistIssue>();
 
-            if (await _dataImportService.HasIncompleteImports(release.Id))
+            if (await _dataImportService.HasIncompleteImports(releaseVersion.Id))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileImportsMustBeCompleted));
             }
 
-            var replacementDataFiles = await _fileRepository.ListReplacementDataFiles(release.Id);
+            var replacementDataFiles = await _fileRepository.ListReplacementDataFiles(releaseVersion.Id);
 
             if (replacementDataFiles.Any())
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(release.Id);
+            var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(releaseVersion.Id);
 
             if (isDataGuidanceValid.IsLeft)
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.PublicDataGuidanceRequired));
             }
 
-            if (release.Amendment
-                && !release.Updates.Any(update => update.Created > release.Created))
+            if (releaseVersion.Amendment
+                && !releaseVersion.Updates.Any(update => update.Created > releaseVersion.Created))
             {
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
 
-            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.ReleaseSummary))
+            if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.ReleaseSummary))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.SummarySectionContainsEmptyHtmlBlock));
             }
 
-            if (await ReleaseHasEmptySection(release.Id, ContentSectionType.Generic))
+            if (await ReleaseHasEmptySection(releaseVersion.Id, ContentSectionType.Generic))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.EmptyContentSectionExists));
             }
 
-            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.Generic))
+            if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.Generic))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
             }
 
-            if (!(await ReleaseHasKeyStatistic(release.Id) ||
-                  await ReleaseSectionHasNonEmptyHtmlBlock(release.Id, ContentSectionType.Headlines)))
+            if (!(await ReleaseHasKeyStatistic(releaseVersion.Id) ||
+                  await ReleaseSectionHasNonEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.Headlines)))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
             }
 
-            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.RelatedDashboards))
+            if (await ReleaseSectionHasEmptyHtmlBlock(releaseVersion.Id, ContentSectionType.RelatedDashboards))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
@@ -130,48 +130,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return errors;
         }
 
-        private async Task<bool> ReleaseHasKeyStatistic(Guid releaseId)
+        private async Task<bool> ReleaseHasKeyStatistic(Guid releaseVersionId)
         {
             return await _contentDbContext.KeyStatistics
-                .AnyAsync(ks => ks.ReleaseId == releaseId);
+                .AnyAsync(ks => ks.ReleaseVersionId == releaseVersionId);
         }
 
-        private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
+        private async Task<bool> ReleaseHasEmptySection(Guid releaseVersionId, ContentSectionType sectionType)
         {
             return await _contentDbContext
                 .ContentSections
                 .Where(cs =>
-                    cs.ReleaseId == releaseId &&
+                    cs.ReleaseVersionId == releaseVersionId &&
                     cs.Type == sectionType)
                 .AnyAsync(cs => cs.Content.Count == 0);
         }
 
-        private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
+        private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(Guid releaseVersionId, ContentSectionType sectionType)
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseVersionId == releaseVersionId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
         }
 
-        private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
+        private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(Guid releaseVersionId, ContentSectionType sectionType)
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseVersionId == releaseVersionId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
         }
 
-        public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)
+        public async Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion)
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
             var methodologies = await _methodologyVersionRepository
-                .GetLatestVersionByPublication(release.PublicationId);
+                .GetLatestVersionByPublication(releaseVersion.PublicationId);
 
             if (!methodologies.Any())
             {
@@ -188,12 +188,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     new MethodologyNotApprovedWarning(m.Id)));
             }
 
-            if (release.NextReleaseDate == null)
+            if (releaseVersion.NextReleaseDate == null)
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoNextReleaseDate));
             }
 
-            var dataFiles = await _fileRepository.ListDataFiles(release.Id);
+            var dataFiles = await _fileRepository.ListDataFiles(releaseVersion.Id);
 
             if (!dataFiles.Any())
             {
@@ -201,20 +201,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
             else
             {
-                var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(release, dataFiles);
+                var subjectsWithNoFootnotes = await GetSubjectsWithNoFootnotes(releaseVersion, dataFiles);
 
                 if (subjectsWithNoFootnotes.Any())
                 {
                     warnings.Add(new NoFootnotesOnSubjectsWarning(subjectsWithNoFootnotes.Count));
                 }
 
-                if (!await HasFeaturedTable(release.Id))
+                if (!await HasFeaturedTable(releaseVersion.Id))
                 {
                     warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoFeaturedTables));
                 }
             }
 
-            if (string.IsNullOrEmpty(release.PreReleaseAccessList))
+            if (string.IsNullOrEmpty(releaseVersion.PreReleaseAccessList))
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
             }
@@ -223,21 +223,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<List<Subject>> GetSubjectsWithNoFootnotes(
-            Release release,
+            ReleaseVersion releaseVersion,
             IEnumerable<File> dataFiles)
         {
             var allowedSubjectIds = dataFiles
                 .Where(dataFile => dataFile.SubjectId.HasValue)
                 .Select(dataFile => dataFile.SubjectId!.Value);
 
-            return (await _footnoteRepository.GetSubjectsWithNoFootnotes(release.Id))
+            return (await _footnoteRepository.GetSubjectsWithNoFootnotes(releaseVersion.Id))
                 .Where(subject => allowedSubjectIds.Contains(subject.Id))
                 .ToList();
         }
 
-        private async Task<bool> HasFeaturedTable(Guid releaseId)
+        private async Task<bool> HasFeaturedTable(Guid releaseVersionId)
         {
-            var dataBlocks = await _dataBlockService.ListDataBlocks(releaseId);
+            var dataBlocks = await _dataBlockService.ListDataBlocks(releaseVersionId);
             var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
             return await _contentDbContext.FeaturedTables
                 .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
@@ -246,10 +246,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public static class ReleaseChecklistQueryableExtensions
     {
-        public static IQueryable<Release> HydrateReleaseForChecklist(this IQueryable<Release> query)
+        public static IQueryable<ReleaseVersion> HydrateReleaseForChecklist(this IQueryable<ReleaseVersion> query)
         {
-            return query.Include(r => r.Publication)
-                .Include(r => r.Updates);
+            return query.Include(rv => rv.Publication)
+                .Include(rv => rv.Updates);
         }
     }
 }

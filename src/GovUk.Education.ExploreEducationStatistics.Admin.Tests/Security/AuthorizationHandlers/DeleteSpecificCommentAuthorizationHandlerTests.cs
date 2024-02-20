@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Id = Guid.NewGuid(),
             };
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
@@ -43,9 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             };
 
             await AssertHandlerOnlySucceedsWithReleaseRoles<DeleteSpecificCommentRequirement, Comment>(
-                release.Id,
+                releaseVersion.Id,
                 comment,
-                contentDbContext => contentDbContext.Add(release),
+                contentDbContext => contentDbContext.Add(releaseVersion),
                 contentDbContext => new DeleteSpecificCommentAuthorizationHandler(
                     contentDbContext,
                     new AuthorizationHandlerService(

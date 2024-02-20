@@ -114,7 +114,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -123,9 +123,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -263,7 +263,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -272,9 +272,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -376,7 +376,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -385,9 +385,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -476,7 +476,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -485,9 +485,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -584,7 +584,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -593,9 +593,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -671,7 +671,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups),
@@ -679,9 +679,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -771,7 +771,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -780,9 +780,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -834,7 +834,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -947,7 +947,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -956,9 +956,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -1013,7 +1013,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -1094,7 +1094,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -1103,9 +1103,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -1149,7 +1149,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -1220,7 +1220,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -1229,9 +1229,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -1273,7 +1273,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -1342,7 +1342,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -1351,9 +1351,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -1398,7 +1398,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -1474,21 +1474,21 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
                 .WithObservations(observations),
         };
 
-        var release = new Content.Model.Release
+        var releaseVersion = new Content.Model.ReleaseVersion
         {
-            Id = releaseSubject.Release.Id
+            Id = releaseSubject.ReleaseVersion.Id
         };
 
         var releaseDataFile = new ReleaseFile
         {
-            Release = release,
+            ReleaseVersion = releaseVersion,
             File = new File
             {
                 SubjectId = releaseSubject.Subject.Id,
@@ -1499,7 +1499,7 @@ public class SubjectCsvMetaServiceTests
         // Create a file for the subject and release which is not a data file
         var releaseMetadataFile = new ReleaseFile
         {
-            Release = release,
+            ReleaseVersion = releaseVersion,
             File = new File
             {
                 SubjectId = releaseSubject.Subject.Id,
@@ -1510,7 +1510,7 @@ public class SubjectCsvMetaServiceTests
         // Create a data file for the subject but for a different release
         var releaseDataFileOtherRelease = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
                 Id = Guid.NewGuid()
             },
@@ -1526,8 +1526,8 @@ public class SubjectCsvMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await contentDbContext.Releases.AddRangeAsync(release);
-            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseDataFile,
+            contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+            contentDbContext.ReleaseFiles.AddRange(releaseDataFile,
                 releaseMetadataFile,
                 releaseDataFileOtherRelease);
             await contentDbContext.SaveChangesAsync();
@@ -1567,7 +1567,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseId == releaseDataFile.ReleaseId
+                            rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseVersionId == releaseDataFile.ReleaseVersionId
                         ),
                         null,
                         default
@@ -1651,7 +1651,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -1742,7 +1742,7 @@ public class SubjectCsvMetaServiceTests
 
         var releaseSubject = new ReleaseSubject
         {
-            Release = _fixture.DefaultStatsRelease(),
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
             Subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .WithIndicatorGroups(indicatorGroups)
@@ -1751,9 +1751,9 @@ public class SubjectCsvMetaServiceTests
 
         var releaseFile = new ReleaseFile
         {
-            Release = new Content.Model.Release
+            ReleaseVersion = new Content.Model.ReleaseVersion
             {
-                Id = releaseSubject.Release.Id,
+                Id = releaseSubject.ReleaseVersion.Id,
             },
             File = new File
             {
@@ -1785,7 +1785,7 @@ public class SubjectCsvMetaServiceTests
                 .Setup(
                     s => s.StreamBlob(
                         It.Is<ReleaseFile>(
-                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseVersionId == releaseFile.ReleaseVersionId
                         ),
                         null,
                         default

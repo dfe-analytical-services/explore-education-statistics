@@ -63,12 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> InviteContributor(string email, Guid publicationId,
-            List<Guid> releaseIds)
+            List<Guid> releaseVersionIds)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccessDo(publication => _userService.CheckCanUpdateReleaseRole(publication, Contributor))
-                .OnSuccessDo(() => ValidateReleaseIds(publicationId, releaseIds))
+                .OnSuccessDo(() => ValidateReleaseVersionIds(publicationId, releaseVersionIds))
                 .OnSuccess(async publication =>
                 {
                     var sanitisedEmail = email.Trim();
@@ -76,10 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var user = await _userRepository.FindByEmail(sanitisedEmail);
                     if (user == null)
                     {
-                        return await CreateNewUserContributorInvite(releaseIds, sanitisedEmail, publication.Title);
+                        return await CreateNewUserContributorInvite(releaseVersionIds, sanitisedEmail, publication.Title);
                     }
 
-                    return await CreateExistingUserContributorInvite(releaseIds, user.Id, sanitisedEmail, publication.Title);
+                    return await CreateExistingUserContributorInvite(releaseVersionIds, user.Id, sanitisedEmail, publication.Title);
                 });
         }
 
@@ -100,11 +100,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseIds,
+        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseVersionIds,
             string email, string publicationTitle)
         {
             if (await _userReleaseInviteRepository.UserHasInvites(
-                    releaseIds: releaseIds,
+                    releaseVersionIds: releaseVersionIds,
                     email: email,
                     role: Contributor))
             {
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailResult = await SendContributorInviteEmail(
                 publicationTitle: publicationTitle,
-                releaseIds: releaseIds,
+                releaseVersionIds: releaseVersionIds,
                 email: email);
             if (emailResult.IsLeft)
             {
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 createdById: _userService.GetUserId());
 
             await _userReleaseInviteRepository.CreateManyIfNotExists(
-                releaseIds: releaseIds,
+                releaseVersionIds: releaseVersionIds,
                 email: email,
                 releaseRole: Contributor,
                 emailSent: true,
@@ -137,31 +137,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateExistingUserContributorInvite(List<Guid> releaseIds,
+        private async Task<Either<ActionResult, Unit>> CreateExistingUserContributorInvite(List<Guid> releaseVersionIds,
             Guid userId, string email, string publicationTitle)
         {
             // check the user doesn't already have the user release roles
-            var existingReleaseRoleReleaseIds = _contentDbContext.UserReleaseRoles
+            var existingReleaseRoleReleaseVersionIds = _contentDbContext.UserReleaseRoles
                 .AsQueryable()
                 .Where(urr =>
-                    releaseIds.Contains(urr.ReleaseId)
+                    releaseVersionIds.Contains(urr.ReleaseVersionId)
                     && urr.Role == Contributor
                     && urr.UserId == userId)
-                .Select(urr => urr.ReleaseId)
+                .Select(urr => urr.ReleaseVersionId)
                 .ToList();
 
-            var missingReleaseRoleReleaseIds = releaseIds
-                .Except(existingReleaseRoleReleaseIds)
+            var missingReleaseRoleReleaseVersionIds = releaseVersionIds
+                .Except(existingReleaseRoleReleaseVersionIds)
                 .ToList();
 
-            if (!missingReleaseRoleReleaseIds.Any())
+            if (!missingReleaseRoleReleaseVersionIds.Any())
             {
                 return ValidationActionResult(UserAlreadyHasReleaseRoles);
             }
 
             var emailResult = await SendContributorInviteEmail(
                 publicationTitle: publicationTitle,
-                releaseIds: missingReleaseRoleReleaseIds,
+                releaseVersionIds: missingReleaseRoleReleaseVersionIds,
                 email: email);
             if (emailResult.IsLeft)
             {
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _userReleaseRoleRepository.CreateManyIfNotExists(
                 userId: userId,
-                releaseIds: missingReleaseRoleReleaseIds,
+                releaseVersionIds: missingReleaseRoleReleaseVersionIds,
                 role: Contributor,
                 createdById: _userService.GetUserId()
             );
@@ -180,18 +180,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseIds(Guid publicationId,
-            List<Guid> releaseIds)
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(Guid publicationId,
+            List<Guid> releaseVersionIds)
         {
-            var distinctReleaseIds = releaseIds.Distinct().ToList();
-            if (distinctReleaseIds.Count != releaseIds.Count)
+            var distinctReleaseIds = releaseVersionIds.Distinct().ToList();
+            if (distinctReleaseIds.Count != releaseVersionIds.Count)
             {
-                throw new ArgumentException($"{nameof(releaseIds)} should not contain duplicates",
-                    nameof(releaseIds));
+                throw new ArgumentException($"{nameof(releaseVersionIds)} should not contain duplicates",
+                    nameof(releaseVersionIds));
             }
 
             var publicationReleaseIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
-            if (!releaseIds.All(publicationReleaseIds.Contains))
+            if (!releaseVersionIds.All(publicationReleaseIds.Contains))
             {
                 return ValidationActionResult(NotAllReleasesBelongToPublication);
             }
@@ -200,25 +200,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
-            string publicationTitle, List<Guid> releaseIds, string email)
+            string publicationTitle,
+            List<Guid> releaseVersionIds,
+            string email)
         {
-            if (releaseIds.IsNullOrEmpty())
+            if (releaseVersionIds.IsNullOrEmpty())
             {
-                throw new ArgumentException("List of releases cannot be empty");
+                throw new ArgumentException("List of release versions cannot be empty");
             }
 
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyContributorTemplateId");
 
-            var releases = await _contentDbContext.Releases
+            var releaseVersions = await _contentDbContext.ReleaseVersions
                 .AsQueryable()
-                .Where(r => releaseIds.Contains(r.Id))
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
                 .ToListAsync();
 
-            var releaseList = releases
-                .OrderBy(r => r.Year)
-                .ThenBy(r => r.TimePeriodCoverage)
-                .Select(r => $"* {r.Title}")
+            var releaseList = releaseVersions
+                .OrderBy(rv => rv.Year)
+                .ThenBy(rv => rv.TimePeriodCoverage)
+                .Select(rv => $"* {rv.Title}")
                 .ToList()
                 .JoinToString("\n");
 

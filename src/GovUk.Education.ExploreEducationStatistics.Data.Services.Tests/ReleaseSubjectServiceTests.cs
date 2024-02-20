@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using ContentRelease = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
@@ -19,7 +19,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubject = new ReleaseSubject
         {
             Subject = new Subject(),
-            Release = new Release()
+            ReleaseVersion = new ReleaseVersion()
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -37,10 +37,10 @@ public class ReleaseSubjectServiceTests
 
             var result = await service.Find(
                 subjectId: releaseSubject.SubjectId,
-                releaseId: releaseSubject.ReleaseId);
+                releaseVersionId: releaseSubject.ReleaseVersionId);
 
             var actualReleaseSubject = result.AssertRight();
-            Assert.Equal(releaseSubject.ReleaseId, actualReleaseSubject.ReleaseId);
+            Assert.Equal(releaseSubject.ReleaseVersionId, actualReleaseSubject.ReleaseVersionId);
             Assert.Equal(releaseSubject.SubjectId, actualReleaseSubject.SubjectId);
         }
     }
@@ -50,21 +50,21 @@ public class ReleaseSubjectServiceTests
     {
         var subject = new Subject();
 
-        var previousReleaseVersion = new ContentRelease
+        var previousReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-2),
             Version = 0
         };
 
-        var latestReleaseVersion = new ContentRelease
+        var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-1),
             Version = 1
         };
 
-        var futureReleaseVersion = new ContentRelease
+        var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(1),
@@ -74,7 +74,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectPreviousRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = previousReleaseVersion.Id,
             }
@@ -83,7 +83,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectLatestRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = latestReleaseVersion.Id
             }
@@ -94,7 +94,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = futureReleaseVersion.Id
             }
@@ -105,14 +105,14 @@ public class ReleaseSubjectServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await statisticsDbContext.Subject.AddAsync(subject);
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(
+            statisticsDbContext.Subject.Add(subject);
+            statisticsDbContext.ReleaseSubject.AddRange(
                 releaseSubjectLatestRelease,
                 releaseSubjectFutureRelease,
                 releaseSubjectPreviousRelease);
             await statisticsDbContext.SaveChangesAsync();
 
-            await contentDbContext.Releases.AddRangeAsync(
+            contentDbContext.ReleaseVersions.AddRange(
                 latestReleaseVersion,
                 futureReleaseVersion,
                 previousReleaseVersion);
@@ -128,7 +128,7 @@ public class ReleaseSubjectServiceTests
             var result = await service.Find(subject.Id);
 
             var actualReleaseSubject = result.AssertRight();
-            Assert.Equal(releaseSubjectLatestRelease.ReleaseId, actualReleaseSubject.ReleaseId);
+            Assert.Equal(releaseSubjectLatestRelease.ReleaseVersionId, actualReleaseSubject.ReleaseVersionId);
             Assert.Equal(releaseSubjectLatestRelease.SubjectId, actualReleaseSubject.SubjectId);
         }
     }
@@ -138,21 +138,21 @@ public class ReleaseSubjectServiceTests
     {
         var subject = new Subject();
 
-        var previousReleaseVersion = new ContentRelease
+        var previousReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-2),
             Version = 0
         };
 
-        var latestReleaseVersion = new ContentRelease
+        var latestReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(-1),
             Version = 1
         };
 
-        var futureReleaseVersion = new ContentRelease
+        var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(1),
@@ -162,7 +162,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectPreviousRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = previousReleaseVersion.Id,
             }
@@ -171,7 +171,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectLatestRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = latestReleaseVersion.Id
             }
@@ -182,7 +182,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = subject,
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = futureReleaseVersion.Id
             }
@@ -193,14 +193,14 @@ public class ReleaseSubjectServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await statisticsDbContext.Subject.AddAsync(subject);
-            await statisticsDbContext.ReleaseSubject.AddRangeAsync(
+            statisticsDbContext.Subject.Add(subject);
+            statisticsDbContext.ReleaseSubject.AddRange(
                 releaseSubjectLatestRelease,
                 releaseSubjectFutureRelease,
                 releaseSubjectPreviousRelease);
             await statisticsDbContext.SaveChangesAsync();
 
-            await contentDbContext.Releases.AddRangeAsync(
+            contentDbContext.ReleaseVersions.AddRange(
                 latestReleaseVersion,
                 futureReleaseVersion,
                 previousReleaseVersion);
@@ -216,7 +216,7 @@ public class ReleaseSubjectServiceTests
             var result = await service.FindForLatestPublishedVersion(subject.Id);
 
             Assert.NotNull(result);
-            Assert.Equal(releaseSubjectLatestRelease.ReleaseId, result!.ReleaseId);
+            Assert.Equal(releaseSubjectLatestRelease.ReleaseVersionId, result!.ReleaseVersionId);
             Assert.Equal(releaseSubjectLatestRelease.SubjectId, result.SubjectId);
         }
     }
@@ -245,7 +245,7 @@ public class ReleaseSubjectServiceTests
     [Fact]
     public async Task FindForLatestPublishedVersion_NoPublishedReleases()
     {
-        var futureReleaseVersion = new ContentRelease
+        var futureReleaseVersion = new Content.Model.ReleaseVersion
         {
             Id = Guid.NewGuid(),
             Published = DateTime.UtcNow.AddDays(1)
@@ -255,7 +255,7 @@ public class ReleaseSubjectServiceTests
         var releaseSubjectFutureRelease = new ReleaseSubject
         {
             Subject = new Subject(),
-            Release = new Release
+            ReleaseVersion = new ReleaseVersion
             {
                 Id = futureReleaseVersion.Id
             }
@@ -266,10 +266,10 @@ public class ReleaseSubjectServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubjectFutureRelease);
+            statisticsDbContext.ReleaseSubject.Add(releaseSubjectFutureRelease);
             await statisticsDbContext.SaveChangesAsync();
 
-            await contentDbContext.Releases.AddRangeAsync(futureReleaseVersion);
+            contentDbContext.ReleaseVersions.AddRange(futureReleaseVersion);
             await contentDbContext.SaveChangesAsync();
         }
 

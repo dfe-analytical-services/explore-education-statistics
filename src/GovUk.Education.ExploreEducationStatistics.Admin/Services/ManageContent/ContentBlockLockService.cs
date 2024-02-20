@@ -87,14 +87,14 @@ public class ContentBlockLockService : IContentBlockLockService
         var viewModel = new ContentBlockLockViewModel(
             Id: block.Id,
             SectionId: block.ContentSection!.Id,
-            ReleaseId: block.ContentSection!.ReleaseId,
+            ReleaseVersionId: block.ContentSection!.ReleaseVersionId,
             Locked: now,
             LockedUntil: block.LockedUntil!.Value,
             LockedBy: new UserDetailsViewModel(user)
         );
 
         await _hubContext.Clients
-            .Group(viewModel.ReleaseId.ToString())
+            .Group(viewModel.ReleaseVersionId.ToString())
             .ContentBlockLocked(viewModel);
 
         return viewModel;
@@ -125,11 +125,11 @@ public class ContentBlockLockService : IContentBlockLockService
                     var viewModel = new ContentBlockUnlockViewModel(
                         Id: block.Id,
                         SectionId: block.ContentSection!.Id,
-                        ReleaseId: block.ContentSection!.ReleaseId
+                        ReleaseVersionId: block.ContentSection!.ReleaseVersionId
                     );
 
                     await _hubContext.Clients
-                        .Group(viewModel.ReleaseId.ToString())
+                        .Group(viewModel.ReleaseVersionId.ToString())
                         .ContentBlockUnlocked(viewModel);
                 }
             );
@@ -141,20 +141,20 @@ public class ContentBlockLockService : IContentBlockLockService
             contentBlockId,
             q =>
                 q.Include(block => block.ContentSection)
-                 .Include(contentBlock => contentBlock.Release)
+                 .Include(contentBlock => contentBlock.ReleaseVersion)
                  .Include(block => block.LockedBy)
         );
     }
 
     private async Task<Either<ActionResult, Unit>> CheckCanUpdateBlock(ContentBlock contentBlock)
     {
-        if (contentBlock.ContentSection?.Release is null)
+        if (contentBlock.ContentSection?.ReleaseVersion is null)
         {
             return new ForbidResult();
         }
 
         return await _userService
-            .CheckCanUpdateRelease(contentBlock.ContentSection.Release)
+            .CheckCanUpdateRelease(contentBlock.ContentSection.ReleaseVersion)
             .OnSuccessVoid();
     }
 
@@ -187,7 +187,7 @@ public class ContentBlockLockService : IContentBlockLockService
         conflictingLock = new ContentBlockLockViewModel(
             Id: contentBlock.Id,
             SectionId: contentBlock.ContentSection!.Id,
-            ReleaseId: contentBlock.ContentSection!.ReleaseId,
+            ReleaseVersionId: contentBlock.ContentSection!.ReleaseVersionId,
             Locked: contentBlock.Locked.Value,
             LockedUntil: contentBlock.LockedUntil!.Value,
             LockedBy: new UserDetailsViewModel(contentBlock.LockedBy!)

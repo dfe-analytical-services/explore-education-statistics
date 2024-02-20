@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var service = BuildService(statisticsDbContext);
 
             var result = await service.GetSubjectMeta(
-                releaseId: Guid.NewGuid(),
+                releaseVersionId: Guid.NewGuid(),
                 query,
                 new List<Observation>());
 
@@ -89,16 +89,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var release = publication.Releases[0];
+            var releaseVersion = publication.Releases[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
 
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithRelease(_dataFixture
-                    .DefaultStatsRelease()
-                    .WithId(release.Id)
+                .WithReleaseVersion(_dataFixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(subject);
 
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    release.Id,
+                    releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
                 .ReturnsAsync(releaseFile);
 
             timePeriodService
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    release.Id,
+                    releaseVersion.Id,
                     query,
                     observations);
 
@@ -210,16 +210,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var release = publication.Releases[0];
+            var releaseVersion = publication.Releases[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
 
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithRelease(_dataFixture
-                    .DefaultStatsRelease()
-                    .WithId(release.Id)
+                .WithReleaseVersion(_dataFixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(subject);
 
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    release.Id,
+                    releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             timePeriodService
@@ -352,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    release.Id,
+                    releaseVersion.Id,
                     query,
                     observations);
 
@@ -387,16 +387,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var release = publication.Releases[0];
+            var releaseVersion = publication.Releases[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
 
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithRelease(_dataFixture
-                    .DefaultStatsRelease()
-                    .WithId(release.Id)
+                .WithReleaseVersion(_dataFixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(subject);
 
@@ -543,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    release.Id,
+                    releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -552,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             timePeriodService
@@ -575,7 +575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    release.Id,
+                    releaseVersion.Id,
                     query,
                     observations);
 
@@ -679,16 +679,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var release = publication.Releases[0];
+            var releaseVersion = publication.Releases[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
 
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithRelease(_dataFixture
-                    .DefaultStatsRelease()
-                    .WithId(release.Id)
+                .WithReleaseVersion(_dataFixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(subject);
 
@@ -781,7 +781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    release.Id,
+                    releaseVersion.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -812,7 +812,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseVersion.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             timePeriodService
@@ -836,7 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    release.Id,
+                    releaseVersion.Id,
                     query,
                     observations);
 

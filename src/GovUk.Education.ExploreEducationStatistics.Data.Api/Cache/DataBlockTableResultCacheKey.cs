@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -15,11 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
 
         // ReSharper disable once UnusedMember.Global
         public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion) : this(
-            publicationSlug: dataBlockVersion.Release.Publication.Slug,
-            releaseSlug: dataBlockVersion.Release.Slug,
+            publicationSlug: dataBlockVersion.ReleaseVersion.Publication.Slug,
+            releaseSlug: dataBlockVersion.ReleaseVersion.Slug,
             dataBlockParentId: dataBlockVersion.DataBlockParentId)
-        {}
-        
+        {
+        }
+
         public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockParentId)
         {
             PublicationSlug = publicationSlug;

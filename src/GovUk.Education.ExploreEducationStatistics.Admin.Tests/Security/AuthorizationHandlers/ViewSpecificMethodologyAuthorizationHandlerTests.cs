@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseRepository.Setup(s =>
                                 s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((Release?) null);
+                            .ReturnsAsync((ReleaseVersion?) null);
 
                         userPublicationRoleRepository
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         releaseRepository
                             .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((Release?) null);
+                            .ReturnsAsync((ReleaseVersion?) null);
                     }
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseRepository
                             .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                            .ReturnsAsync((Release?) null);
+                            .ReturnsAsync((ReleaseVersion?) null);
                     }
 
                     userPublicationRoleRepository
@@ -218,8 +218,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PrereleaseViewersOnAnyPublicationsLatestReleaseCanViewMethodology()
             {
-                // Setup an approved but unpublished release that can be in prerelease
-                var preReleaseForConnectedPublication = new Release
+                // Setup an approved but unpublished release version that can be in prerelease
+                var preReleaseForConnectedPublication = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid(),
@@ -262,10 +262,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ReleaseRole.PrereleaseViewer))
                     .ReturnsAsync(true);
 
-                // Set up the release to be within the prerelease window
+                // Set up the release version to be within the prerelease window
                 preReleaseService
                     .Setup(s => s.GetPreReleaseWindowStatus(
-                        It.Is<Release>(r => r.Id == preReleaseForConnectedPublication.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
                         It.IsAny<DateTime>()))
                     .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
@@ -294,8 +294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreOutsideWindow()
             {
-                // Setup an approved but unpublished release that can be in prerelease
-                var preReleaseForConnectedPublication = new Release
+                // Setup an approved but unpublished release version that can be in prerelease
+                var preReleaseForConnectedPublication = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid(),
@@ -338,10 +338,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ReleaseRole.PrereleaseViewer))
                     .ReturnsAsync(true);
 
-                // Set up the release to be outside the prerelease window
+                // Set up the release version to be outside the prerelease window
                 preReleaseService
                     .Setup(s => s.GetPreReleaseWindowStatus(
-                        It.Is<Release>(r => r.Id == preReleaseForConnectedPublication.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == preReleaseForConnectedPublication.Id),
                         It.IsAny<DateTime>()))
                     .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Before });
 
@@ -370,8 +370,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesAreDraft()
             {
-                // Setup a draft release that cannot be in prerelease
-                var latestRelease = new Release
+                // Setup a draft release version that cannot be in prerelease
+                var latestReleaseVersion = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid(),
@@ -401,11 +401,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 methodologyRepository.Setup(s =>
                         s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(new List<Guid> { latestRelease.PublicationId });
+                    .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId, default))
-                    .ReturnsAsync(latestRelease);
+                    .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
+                    .ReturnsAsync(latestReleaseVersion);
 
                 var user = CreateClaimsPrincipal(UserId);
 
@@ -431,8 +431,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 PrereleaseViewersOnAnyPublicationsLatestReleaseCannotViewMethodology_AllReleasesArePublished()
             {
-                // Setup a published release that cannot be in prerelease
-                var latestRelease = new Release
+                // Setup a published release version that cannot be in prerelease
+                var latestReleaseVersion = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid(),
@@ -463,11 +463,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 methodologyRepository.Setup(s =>
                         s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(new List<Guid> { latestRelease.PublicationId });
+                    .ReturnsAsync(new List<Guid> { latestReleaseVersion.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId, default))
-                    .ReturnsAsync(latestRelease);
+                    .Setup(s => s.GetLatestReleaseVersion(latestReleaseVersion.PublicationId, default))
+                    .ReturnsAsync(latestReleaseVersion);
 
                 var user = CreateClaimsPrincipal(UserId);
 
@@ -519,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 releaseRepository
                     .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                    .ReturnsAsync((Release?) null);
+                    .ReturnsAsync((ReleaseVersion?) null);
 
                 var user = CreateClaimsPrincipal(UserId);
 
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 releaseRepository
                     .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
-                    .ReturnsAsync((Release?) null);
+                    .ReturnsAsync((ReleaseVersion?) null);
 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext =

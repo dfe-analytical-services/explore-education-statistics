@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -59,13 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task AddReleaseRole()
         {
             var userId = Guid.NewGuid();
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
-                    release,
+                    releaseVersion,
                 }
             };
 
@@ -86,7 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupUserRoleService(contentDbContext: contentDbContext,
                             userService: userService.Object);
-                        return await service.AddReleaseRole(userId, release.Id, Contributor);
+                        return await service.AddReleaseRole(userId: userId,
+                            releaseVersionId: releaseVersion.Id,
+                            Contributor);
                     }
                 });
         }
@@ -185,18 +187,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
-                    release,
+                    releaseVersion,
                 }
             };
             var userReleaseRole = new UserReleaseRole
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = Contributor,
                 User = new User(),
             };

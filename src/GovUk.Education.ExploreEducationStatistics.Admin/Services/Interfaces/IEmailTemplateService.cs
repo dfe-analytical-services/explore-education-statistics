@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -21,10 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Either<ActionResult, Unit> SendReleaseRoleEmail(
             string email,
-            Release release,
+            ReleaseVersion releaseVersion,
             ReleaseRole role);
 
-        Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, Release release);
+        Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
+            ReleaseVersion releaseVersion);
 
         Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
             string email,

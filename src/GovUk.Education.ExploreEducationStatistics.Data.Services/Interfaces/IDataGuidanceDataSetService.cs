@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface IDataGuidanceDataSetService
 {
-    Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseId,
+    Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseVersionId,
         IList<Guid>? dataFileIds = null,
         CancellationToken cancellationToken = default);
 

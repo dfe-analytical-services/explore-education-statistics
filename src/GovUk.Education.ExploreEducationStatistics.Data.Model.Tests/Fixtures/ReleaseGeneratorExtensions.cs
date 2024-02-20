@@ -6,26 +6,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
 public static class ReleaseGeneratorExtensions
 {
-    public static Generator<Release> DefaultStatsRelease(this DataFixture fixture)
-        => fixture.Generator<Release>().WithDefaults();
+    public static Generator<ReleaseVersion> DefaultStatsReleaseVersion(this DataFixture fixture)
+        => fixture.Generator<ReleaseVersion>().WithDefaults();
 
-    public static Generator<Release> WithDefaults(this Generator<Release> generator)
+    public static Generator<ReleaseVersion> WithDefaults(this Generator<ReleaseVersion> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<Release> WithId(this Generator<Release> generator, Guid id)
+    public static Generator<ReleaseVersion> WithId(this Generator<ReleaseVersion> generator, Guid id)
         => generator.ForInstance(s => s.SetId(id));
 
-    public static Generator<Release> WithPublicationId(this Generator<Release> generator, Guid publicationId)
+    public static Generator<ReleaseVersion> WithPublicationId(this Generator<ReleaseVersion> generator,
+        Guid publicationId)
         => generator.ForInstance(s => s.SetPublicationId(publicationId));
 
-    public static InstanceSetters<Release> SetDefaults(this InstanceSetters<Release> setters)
+    public static InstanceSetters<ReleaseVersion> SetDefaults(this InstanceSetters<ReleaseVersion> setters)
         => setters
-            .SetDefault(r => r.Id)
-            .SetDefault(r => r.PublicationId);
+            .SetDefault(rv => rv.Id)
+            .SetDefault(rv => rv.PublicationId);
 
-    public static InstanceSetters<Release> SetId(this InstanceSetters<Release> setters, Guid id)
-        => setters.Set(r => r.Id, id);
+    public static InstanceSetters<ReleaseVersion> SetId(this InstanceSetters<ReleaseVersion> setters, Guid id)
+        => setters.Set(rv => rv.Id, id);
 
-    public static InstanceSetters<Release> SetPublicationId(this InstanceSetters<Release> setters, Guid publicationId)
-        => setters.Set(r => r.PublicationId, publicationId);
+    public static InstanceSetters<ReleaseVersion> SetPublicationId(this InstanceSetters<ReleaseVersion> setters,
+        Guid publicationId)
+        => setters.Set(rv => rv.PublicationId, publicationId);
 }

@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -31,7 +32,7 @@ public class FileRepository : IFileRepository
     }
 
     public async Task<File> Create(
-        Guid releaseId,
+        Guid releaseVersionId,
         string filename,
         long contentLength,
         string contentType,
@@ -42,7 +43,7 @@ public class FileRepository : IFileRepository
         var file = new File
         {
             Id = newFileId ?? Guid.NewGuid(),
-            RootPath = releaseId,
+            RootPath = releaseVersionId,
             Filename = filename,
             ContentLength = contentLength,
             ContentType = contentType,

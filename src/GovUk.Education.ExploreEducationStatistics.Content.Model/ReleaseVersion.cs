@@ -13,7 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.PartialDate
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class Release : ICreatedTimestamp<DateTime>
+    public class ReleaseVersion : ICreatedTimestamp<DateTime>
     {
         public Guid Id { get; set; }
 
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool UpdatePublishedDate { get; set; }
 
-        public Release? PreviousVersion { get; set; }
+        public ReleaseVersion? PreviousVersion { get; set; }
 
         public Guid? PreviousVersionId { get; set; }
 

@@ -26,12 +26,13 @@ public class ReleaseSubjectService : IReleaseSubjectService
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId, Guid? releaseId = null)
+    public async Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId,
+        Guid? releaseVersionId = null)
     {
         return await (
-                releaseId.HasValue
+                releaseVersionId.HasValue
                     ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(
-                        rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId
+                        rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId
                     )
                     : FindForLatestPublishedVersion(subjectId)
             )
@@ -47,20 +48,20 @@ public class ReleaseSubjectService : IReleaseSubjectService
             .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
             .ToListAsync();
 
-        var releaseIdsLinkedToSubject = releaseSubjects
-            .Select(releaseSubject => releaseSubject.ReleaseId)
+        var releaseVersionIdsLinkedToSubject = releaseSubjects
+            .Select(releaseSubject => releaseSubject.ReleaseVersionId)
             .ToList();
 
         // Find all versions of the Release that this Subject is linked to that are currently live
         // or in the past have been live before being amended. Order them by Version to get the latest
         // Live one at the end of the list.
         var latestLiveReleaseVersionLinkedToSubject = _contentDbContext
-            .Releases
+            .ReleaseVersions
             .AsNoTracking()
-            .Where(release => releaseIdsLinkedToSubject.Contains(release.Id))
+            .Where(releaseVersion => releaseVersionIdsLinkedToSubject.Contains(releaseVersion.Id))
             .ToList()
-            .Where(release => release.Live)
-            .MaxBy(release => release.Version);
+            .Where(releaseVersion => releaseVersion.Live)
+            .MaxBy(releaseVersion => releaseVersion.Version);
 
         if (latestLiveReleaseVersionLinkedToSubject == null)
         {
@@ -69,7 +70,7 @@ public class ReleaseSubjectService : IReleaseSubjectService
 
         // Finally, now that we have identified the latest Release version linked to this Subject, return the
         // appropriate ReleaseSubject record.
-        return releaseSubjects
-            .SingleOrDefault(releaseSubject => releaseSubject.ReleaseId == latestLiveReleaseVersionLinkedToSubject.Id);
+        return releaseSubjects.SingleOrDefault(releaseSubject =>
+            releaseSubject.ReleaseVersionId == latestLiveReleaseVersionLinkedToSubject.Id);
     }
 }

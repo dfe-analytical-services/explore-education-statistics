@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         private static readonly Guid ContentSectionId = Guid.NewGuid();
         private static readonly Guid ContentBlockId = Guid.NewGuid();
 
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Content = ListOf(
@@ -52,13 +52,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AddContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.AddContentBlock(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             new ContentBlockAddRequest());
                     }
@@ -69,13 +69,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AddContentSection()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.AddContentSectionAsync(
-                            _release.Id,
+                            _releaseVersion.Id,
                             new ContentSectionAddRequest());
                     }
                 );
@@ -85,13 +85,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AttachDataBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.AttachDataBlock(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             new DataBlockAttachRequest());
                     }
@@ -102,12 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task GetContentBlocks()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
-                        return service.GetContentBlocks<HtmlBlock>(_release.Id);
+                        return service.GetContentBlocks<HtmlBlock>(_releaseVersion.Id);
                     }
                 );
         }
@@ -116,13 +116,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task RemoveContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.RemoveContentBlock(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             ContentBlockId);
                     }
@@ -133,13 +133,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task RemoveContentSection()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.RemoveContentSection(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId);
                     }
                 );
@@ -149,13 +149,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task ReorderContentBlocks()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.ReorderContentBlocks(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             new Dictionary<Guid, int>());
                     }
@@ -166,13 +166,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task ReorderContentSections()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.ReorderContentSections(
-                            _release.Id,
+                            _releaseVersion.Id,
                             new Dictionary<Guid, int>());
                     }
                 );
@@ -182,13 +182,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task UpdateContentSectionHeading()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.UpdateContentSectionHeading(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             "");
                     }
@@ -199,13 +199,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task UpdateTextBasedContentBlock()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupContentService(userService: userService.Object);
                         return service.UpdateTextBasedContentBlock(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             ContentBlockId,
                             new ContentBlockUpdateRequest());
@@ -236,8 +236,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
             return mock;
         }
     }

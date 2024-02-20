@@ -1,13 +1,14 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
     public class StageReleaseContentMessage
     {
-        public IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> Releases;
+        public IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> Releases;
 
-        public StageReleaseContentMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        public StageReleaseContentMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases)
         {
             Releases = releases;
         }

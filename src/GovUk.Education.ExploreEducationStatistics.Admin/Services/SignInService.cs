@@ -156,7 +156,7 @@ public class SignInService : ISignInService
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(invite => _releaseRoleRepository.Create(
                     userId: newInternalUser.Id,
-                    releaseId: invite.ReleaseId,
+                    releaseVersionId: invite.ReleaseVersionId,
                     role: invite.Role,
                     createdById: invite.CreatedById));
 

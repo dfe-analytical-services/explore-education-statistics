@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 {
     public class RelatedInformationServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.AddRelatedInformationAsync(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new CreateUpdateLinkRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -37,8 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.DeleteRelatedInformationAsync(
-                        _release.Id,
-                        Guid.NewGuid()),
+                        releaseVersionId: _releaseVersion.Id,
+                        relatedInformationId: Guid.NewGuid()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.UpdateRelatedInformationAsync(
-                        _release.Id,
-                        Guid.NewGuid(),
+                        releaseVersionId: _releaseVersion.Id,
+                        relatedInformationId: Guid.NewGuid(),
                         new CreateUpdateLinkRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var service = new RelatedInformationService(contentDbContext.Object, releaseHelper.Object, userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
+            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _releaseVersion, userService, service, policies);
         }
 
         private (
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             return (
                 new Mock<ContentDbContext>(),
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
                 new Mock<IUserService>());
         }
     }

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Authorize(Roles = RoleNames.BauUser)]
         public async Task<ActionResult<List<DataBlockQuerySizeReport>>> QuerySizeReport()
         {
-            var publishedReleaseIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds();
+            var publishedReleaseVersionIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds();
 
             var publishedDataBlocks = await _contentDbContext
                 .ContentBlocks
-                .Where(block => publishedReleaseIds.Contains(block.ReleaseId))
+                .Where(block => publishedReleaseVersionIds.Contains(block.ReleaseVersionId))
                 .OfType<DataBlock>()
                 .ToListAsync();
 

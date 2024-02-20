@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,9 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificCommentRequirement requirement,
             Comment resource)
         {
-            var release = GetRelease(_contentDbContext, resource);
+            var releaseVersion = GetReleaseVersion(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
-                new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
+                new[] { new UpdateSpecificReleaseRequirement() }, context.User, releaseVersion);
             await new UpdateSpecificReleaseAuthorizationHandler(
                     _authorizationHandlerService)
                 .HandleAsync(updateSpecificReleaseContext);
@@ -42,14 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        private static Release? GetRelease(ContentDbContext context, Comment comment)
+        private static ReleaseVersion? GetReleaseVersion(ContentDbContext context, Comment comment)
         {
             var contentBlock = context.ContentBlocks
                 .Include(block => block.ContentSection)
-                .ThenInclude(contentSection => contentSection!.Release)
+                .ThenInclude(contentSection => contentSection!.ReleaseVersion)
                 .First(block => block.Id == comment.ContentBlockId);
 
-            return contentBlock.ContentSection?.Release;
+            return contentBlock.ContentSection?.ReleaseVersion;
         }
     }
 }

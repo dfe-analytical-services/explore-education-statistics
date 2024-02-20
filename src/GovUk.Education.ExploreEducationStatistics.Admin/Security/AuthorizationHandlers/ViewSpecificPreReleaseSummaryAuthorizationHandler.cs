@@ -15,7 +15,7 @@ public class ViewSpecificPreReleaseSummaryRequirement : IAuthorizationRequiremen
 }
 
 public class ViewSpecificPreReleaseSummaryAuthorizationHandler
-    : AuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, Release>
+    : AuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, ReleaseVersion>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
@@ -30,7 +30,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
         ViewSpecificPreReleaseSummaryRequirement requirement,
-        Release release)
+        ReleaseVersion releaseVersion)
     {
         if (SecurityUtils.HasClaim(context.User, AccessAllReleases))
         {
@@ -41,8 +41,8 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
         if (await _authorizationHandlerService
                 .HasRolesOnPublicationOrRelease(
                     context.User.GetUserId(),
-                    release.PublicationId,
-                    release.Id,
+                    releaseVersion.PublicationId,
+                    releaseVersion.Id,
                     ListOf(PublicationRole.Owner, PublicationRole.Approver),
                     UnrestrictedReleaseViewerAndPrereleaseViewerRoles))
         {

@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -55,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             // If the user has any ReleaseRoles on any of the Publication's Releases, they can see it.
             if (await _contentDbContext
                     .UserReleaseRoles
-                    .Include(r => r.Release)
+                    .Include(r => r.ReleaseVersion)
                     .Where(r => r.UserId == context.User.GetUserId())
-                    .AnyAsync(r => r.Release.PublicationId == publication.Id))
+                    .AnyAsync(r => r.ReleaseVersion.PublicationId == publication.Id))
             {
                 context.Succeed(requirement);
             }

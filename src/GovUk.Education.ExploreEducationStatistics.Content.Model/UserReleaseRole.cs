@@ -3,15 +3,15 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class UserReleaseRole : ResourceRole<ReleaseRole, Release>
+public class UserReleaseRole : ResourceRole<ReleaseRole, ReleaseVersion>
 {
-    public Release Release
+    public ReleaseVersion ReleaseVersion
     {
         get => Resource;
         set => Resource = value;
     }
 
-    public Guid ReleaseId
+    public Guid ReleaseVersionId
     {
         get => ResourceId;
         set => ResourceId = value;

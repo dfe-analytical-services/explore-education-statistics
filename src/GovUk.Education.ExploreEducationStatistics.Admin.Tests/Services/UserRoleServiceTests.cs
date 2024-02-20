@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -759,7 +759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.AddAsync(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -767,7 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             emailTemplateService.Setup(mock =>
                     mock.SendReleaseRoleEmail(user.Email,
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         Contributor))
                 .Returns(Unit.Instance);
 
@@ -785,7 +785,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: userId,
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 VerifyAllMocks(emailTemplateService, userManager);
 
@@ -793,7 +795,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 emailTemplateService.Verify(mock =>
                         mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<Release>(p => p.Id == release.Id),
+                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
                             Contributor),
                     Times.Once);
             }
@@ -808,7 +810,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotEqual(Guid.Empty, assignedRole.Id);
                 Assert.Equal(userId, assignedRole.UserId);
-                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(releaseVersion.Id, assignedRole.ReleaseVersionId);
                 Assert.Equal(Contributor, assignedRole.Role);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
@@ -824,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -832,7 +834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 UserId = userId,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = Contributor,
                 CreatedById = _user.Id
             };
@@ -846,8 +848,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.AddAsync(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.UserReleaseRoles.Add(userReleaseRole);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -857,7 +859,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: userId,
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 result.AssertBadRequest(UserAlreadyHasResourceRole);
             }
@@ -872,7 +876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotEqual(Guid.Empty, assignedRole.Id);
                 Assert.Equal(userId, assignedRole.UserId);
-                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(releaseVersion.Id, assignedRole.ReleaseVersionId);
                 Assert.Equal(Contributor, assignedRole.Role);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
@@ -881,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddReleaseRole_NoUser()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -891,7 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -901,7 +905,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.AddReleaseRole(Guid.NewGuid(), release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: Guid.NewGuid(),
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 result.AssertNotFound();
             }
@@ -966,7 +972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -980,7 +986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.AddAsync(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -988,7 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             emailTemplateService.Setup(mock =>
                     mock.SendReleaseRoleEmail(user.Email,
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         Contributor))
                 .Returns(Unit.Instance);
 
@@ -1011,11 +1017,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: userId,
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 emailTemplateService.Verify(mock =>
                         mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<Release>(p => p.Id == release.Id),
+                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
                             Contributor),
                     Times.Once);
                 VerifyAllMocks(emailTemplateService, userManager);
@@ -1033,7 +1041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotEqual(Guid.Empty, assignedRole.Id);
                 Assert.Equal(userId, assignedRole.UserId);
-                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(releaseVersion.Id, assignedRole.ReleaseVersionId);
                 Assert.Equal(Contributor, assignedRole.Role);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
@@ -1049,7 +1057,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -1063,7 +1071,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.AddAsync(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1071,7 +1079,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             emailTemplateService.Setup(mock =>
                     mock.SendReleaseRoleEmail(user.Email,
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         Contributor))
                 .Returns(Unit.Instance);
 
@@ -1101,13 +1109,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: userId,
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 VerifyAllMocks(emailTemplateService, userManager);
 
                 emailTemplateService.Verify(mock =>
                         mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<Release>(p => p.Id == release.Id),
+                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
                             Contributor),
                     Times.Once);
 
@@ -1124,7 +1134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotEqual(Guid.Empty, assignedRole.Id);
                 Assert.Equal(userId, assignedRole.UserId);
-                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(releaseVersion.Id, assignedRole.ReleaseVersionId);
                 Assert.Equal(Contributor, assignedRole.Role);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
@@ -1140,7 +1150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = userId.ToString()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -1154,7 +1164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.AddAsync(user);
                 await userAndRolesDbContext.SaveChangesAsync();
 
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1162,7 +1172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             emailTemplateService.Setup(mock =>
                     mock.SendReleaseRoleEmail(user.Email,
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         Contributor))
                 .Returns(Unit.Instance);
 
@@ -1183,11 +1193,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     emailTemplateService: emailTemplateService.Object,
                     userManager: userManager.Object);
 
-                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                var result = await service.AddReleaseRole(userId: userId,
+                    releaseVersionId: releaseVersion.Id,
+                    Contributor);
 
                 emailTemplateService.Verify(mock =>
                         mock.SendReleaseRoleEmail(user.Email,
-                            It.Is<Release>(p => p.Id == release.Id),
+                            It.Is<ReleaseVersion>(p => p.Id == releaseVersion.Id),
                             Contributor),
                     Times.Once);
                 VerifyAllMocks(emailTemplateService, userManager);
@@ -1205,7 +1217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotEqual(Guid.Empty, assignedRole.Id);
                 Assert.Equal(userId, assignedRole.UserId);
-                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(releaseVersion.Id, assignedRole.ReleaseVersionId);
                 Assert.Equal(Contributor, assignedRole.Role);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
@@ -1667,7 +1679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = user,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     Publication = publication,
                     ReleaseName = "2020",
@@ -1679,7 +1691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = user,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     Publication = publication,
                     ReleaseName = "2021",
@@ -1692,7 +1704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole3 = new UserReleaseRole
             {
                 User = new User(),
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     Publication = publication,
                     ReleaseName = "2022",
@@ -2139,7 +2151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2160,7 +2172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
@@ -2218,7 +2230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_RemoveAssociatedUserReleaseInvite()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2240,13 +2252,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var userReleaseInvite = new UserReleaseInvite
             {
-                Release = userReleaseRole.Release,
+                ReleaseVersion = userReleaseRole.ReleaseVersion,
                 Email = userReleaseRole.User.Email,
                 Role = userReleaseRole.Role
             };
@@ -2324,7 +2336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_HasHigherGlobalRoleThanAnalyst()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2345,7 +2357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
@@ -2400,7 +2412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherReleases()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2421,14 +2433,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var anotherUserReleaseRole = new UserReleaseRole
             {
                 User = user,
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = ReleaseRole.Approver
             };
 
@@ -2478,14 +2490,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 var remainingReleaseRole = Assert.Single(userReleaseRoles);
-                Assert.Equal(anotherUserReleaseRole.ReleaseId, remainingReleaseRole.ReleaseId);
+                Assert.Equal(anotherUserReleaseRole.ReleaseVersionId, remainingReleaseRole.ReleaseVersionId);
             }
         }
 
         [Fact]
         public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherPublications()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2518,7 +2530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
@@ -2599,7 +2611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_DowngradeToPrereleaseRole()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2607,7 +2619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var anotherRelease = new Release
+            var anotherReleaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2628,14 +2640,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var prereleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = anotherRelease,
+                ReleaseVersion = anotherReleaseVersion,
                 Role = PrereleaseViewer
             };
 
@@ -2693,14 +2705,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 var releaseRole = Assert.Single(userReleaseRoles);
-                Assert.Equal(prereleaseRole.ReleaseId, releaseRole.ReleaseId);
+                Assert.Equal(prereleaseRole.ReleaseVersionId, releaseRole.ReleaseVersionId);
             }
         }
 
         [Fact]
         public async Task RemoveUserReleaseRoleAsPrerelease_AnalystRoleRetained()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2721,14 +2733,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var approverRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var prereleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = PrereleaseViewer
             };
 
@@ -2777,14 +2789,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 var releaseRole = Assert.Single(userPublicationRoles);
-                Assert.Equal(approverRole.ReleaseId, releaseRole.ReleaseId);
+                Assert.Equal(approverRole.ReleaseVersionId, releaseRole.ReleaseVersionId);
             }
         }
 
         [Fact]
         public async Task RemoveAllUserResourceRoles()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -2805,14 +2817,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var userPublicationRole = new UserPublicationRole
             {
                 User = user,
-                Publication = release.Publication,
+                Publication = releaseVersion.Publication,
                 Role = PublicationRole.Approver
             };
 
@@ -2829,14 +2841,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userTwoReleaseRole = new UserReleaseRole
             {
                 User = userTwo,
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver
             };
 
             var userTwoPublicationRole = new UserPublicationRole
             {
                 User = userTwo,
-                Publication = release.Publication,
+                Publication = releaseVersion.Publication,
                 Role = PublicationRole.Approver
             };
 

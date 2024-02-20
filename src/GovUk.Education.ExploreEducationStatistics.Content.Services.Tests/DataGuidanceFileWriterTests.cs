@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_ListDataSetsReturnsNotFound()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -77,19 +77,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(new NotFoundResult());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext,
@@ -100,10 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await using var stream = File.OpenWrite(path);
 
                 var exception = await Assert.ThrowsAsync<ArgumentException>(
-                    async () => { await writer.WriteToStream(stream, release); }
+                    async () => { await writer.WriteToStream(stream, releaseVersion); }
                 );
 
-                Assert.Equal($"Could not find data sets for release: {release.Id}", exception.Message);
+                Assert.Equal($"Could not find data sets for release version: {releaseVersion.Id}", exception.Message);
             }
 
             VerifyAllMocks(dataGuidanceDataSetService);
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_MultipleDataSets()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -190,19 +190,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_SingleDataSet()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -270,19 +270,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -302,7 +302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task WriteToStream_NoDataGuidance()
         {
             // Release has no data guidance (aka data guidance)
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -345,19 +345,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -365,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_EmptyDataSets()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -392,19 +392,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -423,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithSingleProperties()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -462,19 +462,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -482,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -493,7 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyProperties()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -518,19 +518,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -538,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -549,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyTimePeriodStart()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -578,19 +578,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -598,7 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -609,7 +609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyTimePeriodEnd()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -635,19 +635,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -655,7 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -666,7 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyVariable()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -696,19 +696,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -716,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -727,7 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithOverTenFootnotesAndMultiline()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -780,19 +780,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -800,7 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -811,7 +811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithHtmlFootnotes()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -850,19 +850,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -870,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -881,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileWithEmptyFootnote()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -917,19 +917,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -937,7 +937,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
                 await using var stream = new MemoryStream();
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -948,7 +948,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task WriteToStream_FileStream()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -964,19 +964,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService
-                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .Setup(s => s.ListDataSets(releaseVersion.Id, null, default))
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.Entry(release).ReloadAsync();
+                await contentDbContext.Entry(releaseVersion).ReloadAsync();
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
@@ -986,7 +986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var path = GenerateFilePath();
                 await using var stream = File.OpenWrite(path);
 
-                await writer.WriteToStream(stream, release);
+                await writer.WriteToStream(stream, releaseVersion);
 
                 var text = await File.ReadAllTextAsync(path);
 

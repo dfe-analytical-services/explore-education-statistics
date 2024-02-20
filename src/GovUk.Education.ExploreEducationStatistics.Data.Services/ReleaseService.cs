@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -46,20 +46,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
         }
 
-        public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseId)
+        public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseVersionId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
-                    var subjectsToInclude = GetPublishedSubjectIds(releaseId);
+                    var subjectsToInclude = GetPublishedSubjectIds(releaseVersionId);
 
-                    return await GetSubjects(releaseId, subjectsToInclude);
+                    return await GetSubjects(releaseVersionId, subjectsToInclude);
                 });
         }
 
-        private async Task<List<SubjectViewModel>> GetSubjects(Guid releaseId, List<Guid> subjectsToInclude)
+        private async Task<List<SubjectViewModel>> GetSubjects(Guid releaseVersionId, List<Guid> subjectsToInclude)
         {
             if (subjectsToInclude.Count == 0)
             {
@@ -69,10 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var releaseSubjects = await _statisticsDbContext
                 .ReleaseSubject
                 .AsQueryable()
-                .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
+                .Where(rs => rs.ReleaseVersionId == releaseVersionId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();
 
-            var releaseFiles = await QueryReleaseDataFiles(releaseId)
+            var releaseFiles = await QueryReleaseDataFiles(releaseVersionId)
                 .Where(rf => rf.File.SubjectId.HasValue
                              && subjectsToInclude.Contains(rf.File.SubjectId.Value))
                 .ToListAsync();
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
         {
-            var unorderedIndicators= await _statisticsDbContext.Indicator
+            var unorderedIndicators = await _statisticsDbContext.Indicator
                 .Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
                 .ToListAsync();
 
@@ -152,13 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
 
-        public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
+        public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId)
         {
-            var publishedSubjectIds = GetPublishedSubjectIds(releaseId);
+            var publishedSubjectIds = GetPublishedSubjectIds(releaseVersionId);
 
             var releaseDataBlockList = (await _contentDbContext
                     .ContentBlocks
-                    .Where(block => block.ReleaseId == releaseId)
+                    .Where(block => block.ReleaseVersionId == releaseVersionId)
                     .OfType<DataBlock>()
                     .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
                 .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
@@ -179,9 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private List<Guid> GetPublishedSubjectIds(Guid releaseId)
+        private List<Guid> GetPublishedSubjectIds(Guid releaseVersionId)
         {
-            return QueryReleaseDataFiles(releaseId)
+            return QueryReleaseDataFiles(releaseVersionId)
                 .Join(
                     _contentDbContext.DataImports,
                     releaseFile => releaseFile.File,
@@ -197,12 +197,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private IQueryable<ReleaseFile> QueryReleaseDataFiles(Guid releaseId)
+        private IQueryable<ReleaseFile> QueryReleaseDataFiles(Guid releaseVersionId)
         {
             return _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(
-                    rf => rf.ReleaseId == releaseId
+                    rf => rf.ReleaseVersionId == releaseVersionId
                           && rf.File.Type == FileType.Data
                           // Exclude files that are replacements in progress
                           && !rf.File.ReplacingId.HasValue

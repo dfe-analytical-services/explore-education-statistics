@@ -16,7 +16,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 UserId = userId,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = userId,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Approved,
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Single(result);
-                Assert.Equal(userReleaseRole1.ReleaseId, result[0].Id);
+                Assert.Equal(userReleaseRole1.ReleaseVersionId, result[0].Id);
             }
         }
 
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 UserId = userId,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole2 = new UserReleaseRole
             {
                 UserId = userId,
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ApprovalStatus = ReleaseApprovalStatus.Draft,
                     TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<Release>
+                    Releases = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<Release>
+                    Releases = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<Release>
+                    Releases = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -294,15 +294,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task StatsReleaseDoesNotExist_CreatesStatsReleaseAndReleaseSubject()
             {
-                Release release = _fixture
-                    .DefaultRelease()
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
                     .WithPublication(_fixture
                         .DefaultPublication());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    contentDbContext.Releases.Add(release);
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
                     await contentDbContext.SaveChangesAsync();
                 }
 
@@ -312,19 +312,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
                     var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
-                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(release.Id);
+                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
                 }
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var statsRelease = Assert.Single(statisticsDbContext.Release);
+                    var statsReleaseVersion = Assert.Single(statisticsDbContext.ReleaseVersion);
 
-                    Assert.Equal(release.Id, statsRelease.Id);
-                    Assert.Equal(release.PublicationId, statsRelease.PublicationId);
+                    Assert.Equal(releaseVersion.Id, statsReleaseVersion.Id);
+                    Assert.Equal(releaseVersion.PublicationId, statsReleaseVersion.PublicationId);
 
                     var releaseSubject = Assert.Single(statisticsDbContext.ReleaseSubject);
 
-                    Assert.Equal(release.Id, releaseSubject.ReleaseId);
+                    Assert.Equal(releaseVersion.Id, releaseSubject.ReleaseVersionId);
                     Assert.Equal(createdSubjectId, releaseSubject.SubjectId);
                 }
             }
@@ -332,33 +332,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task StatsReleaseExists_CreatesReleaseSubject()
             {
-                Release release = _fixture
-                    .DefaultRelease()
+                ReleaseVersion releaseVersion = _fixture
+                    .DefaultReleaseVersion()
                     .WithPublication(_fixture
                         .DefaultPublication());
 
-                Data.Model.Release existingStatsRelease = _fixture
-                    .DefaultStatsRelease()
-                    .WithId(release.Id)
-                    .WithPublicationId(release.PublicationId);
+                Data.Model.ReleaseVersion existingStatsReleaseVersion = _fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(releaseVersion.Id)
+                    .WithPublicationId(releaseVersion.PublicationId);
 
                 ReleaseSubject existingReleaseSubject = _fixture
                     .DefaultReleaseSubject()
-                    .WithRelease(existingStatsRelease)
+                    .WithReleaseVersion(existingStatsReleaseVersion)
                     .WithSubject(_fixture
                         .DefaultSubject());
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    contentDbContext.Releases.Add(release);
+                    contentDbContext.ReleaseVersions.Add(releaseVersion);
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 var statisticsDbContextId = Guid.NewGuid().ToString();
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    statisticsDbContext.Release.Add(existingStatsRelease);
+                    statisticsDbContext.ReleaseVersion.Add(existingStatsReleaseVersion);
                     statisticsDbContext.ReleaseSubject.Add(existingReleaseSubject);
                     await statisticsDbContext.SaveChangesAsync();
                 }
@@ -368,24 +368,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
                     var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
-                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(release.Id);
+                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
                 }
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var statsRelease = Assert.Single(statisticsDbContext.Release);
+                    var statsReleaseVersion = Assert.Single(statisticsDbContext.ReleaseVersion);
 
-                    Assert.Equal(release.Id, statsRelease.Id);
-                    Assert.Equal(release.PublicationId, statsRelease.PublicationId);
+                    Assert.Equal(releaseVersion.Id, statsReleaseVersion.Id);
+                    Assert.Equal(releaseVersion.PublicationId, statsReleaseVersion.PublicationId);
 
                     Assert.Equal(2, await statisticsDbContext.ReleaseSubject.CountAsync());
 
                     Assert.True(await statisticsDbContext.ReleaseSubject
-                        .AnyAsync(rs => rs.ReleaseId == release.Id
+                        .AnyAsync(rs => rs.ReleaseVersionId == releaseVersion.Id
                                         && rs.SubjectId == existingReleaseSubject.SubjectId));
 
                     Assert.True(await statisticsDbContext.ReleaseSubject
-                        .AnyAsync(rs => rs.ReleaseId == release.Id
+                        .AnyAsync(rs => rs.ReleaseVersionId == releaseVersion.Id
                                         && rs.SubjectId == createdSubjectId));
                 }
             }

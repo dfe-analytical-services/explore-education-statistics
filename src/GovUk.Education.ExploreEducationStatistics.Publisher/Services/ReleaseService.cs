@@ -25,77 +25,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseRepository = releaseRepository;
         }
 
-        public async Task<Release> Get(Guid id)
+        public async Task<ReleaseVersion> Get(Guid releaseVersionId)
         {
-            return await _contentDbContext.Releases
-                .SingleAsync(release => release.Id == id);
+            return await _contentDbContext.ReleaseVersions
+                .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
         }
 
-        public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
+        public async Task<IEnumerable<ReleaseVersion>> List(IEnumerable<Guid> releaseVersionIds)
         {
-            return await _contentDbContext.Releases
-                .AsQueryable()
-                .Where(release => ids.Contains(release.Id))
-                .Include(release => release.Publication)
-                .Include(release => release.PreviousVersion)
+            return await _contentDbContext.ReleaseVersions
+                .Where(rv => releaseVersionIds.Contains(rv.Id))
+                .Include(rv => rv.Publication)
+                .Include(rv => rv.PreviousVersion)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds)
+        public async Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds)
         {
-            return await _contentDbContext.Releases
-                .Include(r => r.PreviousVersion)
-                .Include(r => r.Publication)
-                .Where(r => releaseIds.Contains(r.Id) && r.PreviousVersionId != null)
+            return await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.PreviousVersion)
+                .Include(rv => rv.Publication)
+                .Where(rv => releaseVersionIds.Contains(rv.Id) && rv.PreviousVersionId != null)
                 .ToListAsync();
         }
 
-        public async Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
+        public async Task<ReleaseVersion> GetLatestReleaseVersion(Guid publicationId,
+            IEnumerable<Guid> includedReleaseVersionIds)
         {
-            var releases = await _contentDbContext.Releases
-                .Include(r => r.Publication)
-                .Where(release => release.PublicationId == publicationId)
+            var releases = await _contentDbContext.ReleaseVersions
+                .Include(rv => rv.Publication)
+                .Where(rv => rv.PublicationId == publicationId)
                 .ToListAsync();
 
             return releases
-                .Where(release => release.IsReleasePublished(includedReleaseIds))
-                .OrderBy(release => release.Year)
-                .ThenBy(release => release.TimePeriodCoverage)
+                .Where(rv => rv.IsReleasePublished(includedReleaseVersionIds))
+                .OrderBy(rv => rv.Year)
+                .ThenBy(rv => rv.TimePeriodCoverage)
                 .Last();
         }
 
-        public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)
+        public async Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types)
         {
             return await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                 .Select(rf => rf.File)
                 .Where(file => types.Contains(file.Type))
                 .ToListAsync();
         }
 
-        public async Task CompletePublishing(Guid releaseId, DateTime actualPublishedDate)
+        public async Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate)
         {
-            var release = await _contentDbContext
-                .Releases
-                .Include(release => release.DataBlockVersions)
+            var releaseVersion = await _contentDbContext
+                .ReleaseVersions
+                .Include(rv => rv.DataBlockVersions)
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .SingleAsync(r => r.Id == releaseId);
+                .SingleAsync(rv => rv.Id == releaseVersionId);
 
-            _contentDbContext.Releases.Update(release);
-            release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
+            _contentDbContext.ReleaseVersions.Update(releaseVersion);
+            releaseVersion.Published =
+                await _releaseRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
 
-            await UpdatePublishedDataBlockVersions(release);
+            await UpdatePublishedDataBlockVersions(releaseVersion);
 
             await _contentDbContext.SaveChangesAsync();
         }
 
-        private async Task UpdatePublishedDataBlockVersions(Release release)
+        private async Task UpdatePublishedDataBlockVersions(ReleaseVersion releaseVersion)
         {
             // Update all of the DataBlockParents to point their "LatestPublishedVersions" to the "latest" versions
             // on the Release. Mark the "latest" version as null until a Release Amendment is created.
-            var latestDataBlockParents = release
+            var latestDataBlockParents = releaseVersion
                 .DataBlockVersions
                 .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToList();
@@ -114,13 +115,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             // Find all DataBlockVersions that were part of the previously published Release, if any, and update them
             // to no longer have a Published version.
-            if (release.PreviousVersionId != null)
+            if (releaseVersion.PreviousVersionId != null)
             {
                 var latestDataBlockParentIds = latestDataBlockParents.Select(dataBlockParent => dataBlockParent.Id);
 
                 var removedDataBlockVersions = await _contentDbContext
                     .DataBlockVersions
-                    .Where(dataBlockVersion => dataBlockVersion.ReleaseId == release.PreviousVersionId &&
+                    .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersion.PreviousVersionId &&
                                                !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId))
                     .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
                     .ToListAsync();

@@ -13,9 +13,9 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public Guid Id { get; set; }
 
-    public Guid ReleaseId { get; set; }
+    public Guid ReleaseVersionId { get; set; }
 
-    public Release Release { get; set; } = null!;
+    public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
     public string? Trend { get; set; }
 

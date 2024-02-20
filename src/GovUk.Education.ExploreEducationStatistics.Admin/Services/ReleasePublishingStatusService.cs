@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -37,16 +38,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(Guid releaseId)
+        public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
+            Guid releaseVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
                     var query = new TableQuery<ReleasePublishingStatus>()
                         .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                            QueryComparisons.Equal, releaseId.ToString()));
+                            QueryComparisons.Equal, releaseVersionId.ToString()));
 
                     var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
                     var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();

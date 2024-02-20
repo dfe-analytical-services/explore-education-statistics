@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,24 +12,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 public interface IKeyStatisticService
 {
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
-        Guid releaseId, KeyStatisticDataBlockCreateRequest request);
+        Guid releaseVersionId,
+        KeyStatisticDataBlockCreateRequest request);
 
     Task<Either<ActionResult, KeyStatisticTextViewModel>> CreateKeyStatisticText(
-        Guid releaseId, KeyStatisticTextCreateRequest request);
+        Guid releaseVersionId,
+        KeyStatisticTextCreateRequest request);
 
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid keyStatisticId,
         KeyStatisticDataBlockUpdateRequest request);
 
     Task<Either<ActionResult, KeyStatisticTextViewModel>> UpdateKeyStatisticText(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid keyStatisticId,
         KeyStatisticTextUpdateRequest request);
 
-    Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid keyStatisticId);
+    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+        Guid keyStatisticId);
 
     Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
-        Guid releaseId,
+        Guid releaseVersionId,
         List<Guid> newOrder);
 }

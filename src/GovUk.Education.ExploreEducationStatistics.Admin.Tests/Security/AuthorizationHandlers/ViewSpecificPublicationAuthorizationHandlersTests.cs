@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHan
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -13,10 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static Moq.MockBehavior;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
@@ -56,13 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task HasRoleOnAnyChildReleaseAuthorizationHandler_NoReleasesOnThisPublicationForThisUser()
         {
-            var releaseOnAnotherPublication = new Release
+            var releaseVersionOnAnotherPublication = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid()
             };
 
-            var releaseOnThisPublication = new Release
+            var releaseVersionOnThisPublication = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publication.Id
@@ -71,13 +68,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var releaseRoleForDifferentPublication = new UserReleaseRole
             {
                 UserId = _userId,
-                Release = releaseOnAnotherPublication
+                ReleaseVersion = releaseVersionOnAnotherPublication
             };
 
             var releaseRoleForDifferentUser = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
-                Release = releaseOnThisPublication
+                ReleaseVersion = releaseVersionOnThisPublication
             };
 
             await AssertHasRoleOnAnyChildReleaseHandlesOk(
@@ -89,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task HasRoleOnAnyChildReleaseAuthorizationHandler_HasRoleOnAReleaseOfThisPublication()
         {
-            var releaseOnThisPublication = new Release
+            var releaseVersionOnThisPublication = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publication.Id
@@ -98,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var roleOnThisPublication = new UserReleaseRole
             {
                 UserId = _userId,
-                Release = releaseOnThisPublication
+                ReleaseVersion = releaseVersionOnThisPublication
             };
 
             await AssertHasRoleOnAnyChildReleaseHandlesOk(true, roleOnThisPublication);

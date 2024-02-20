@@ -4,61 +4,61 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 {
-    public class ReleaseTests
+    public class ReleaseVersionTests
     {
         [Fact]
         public void Live_True()
         {
-            var releasePublished = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Published = DateTime.Now.AddDays(-1)
             };
 
-            Assert.True(releasePublished.Live);
+            Assert.True(releaseVersion.Live);
         }
 
         [Fact]
         public void Live_False_PublishedIsNull()
         {
-            var releaseNoPublishedDate = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Published = null
             };
 
-            Assert.False(releaseNoPublishedDate.Live);
+            Assert.False(releaseVersion.Live);
         }
 
         [Fact]
         public void Live_False_PublishedInFuture()
         {
             // Note that this should not happen, but we test the edge case.
-            var releasePublishedDateInFuture = new Release
+            var releaseVersion = new ReleaseVersion()
             {
                 Published = DateTime.Now.AddDays(1)
             };
 
-            Assert.False(releasePublishedDateInFuture.Live);
+            Assert.False(releaseVersion.Live);
         }
 
         [Fact]
         public void NextReleaseDate_Ok()
         {
-            var releaseDate = new PartialDate {Year = "2021", Month = "1"};
-            var release = new Release
+            var releaseDate = new PartialDate { Year = "2021", Month = "1" };
+            var releaseVersion = new ReleaseVersion
             {
                 NextReleaseDate = releaseDate
             };
 
-            Assert.Equal(releaseDate, release.NextReleaseDate);
+            Assert.Equal(releaseDate, releaseVersion.NextReleaseDate);
         }
 
         [Fact]
         public void NextReleaseDate_InvalidDate()
         {
             Assert.Throws<FormatException>(
-                () => new Release
+                () => new ReleaseVersion
                 {
-                    NextReleaseDate = new PartialDate {Day = "45"}
+                    NextReleaseDate = new PartialDate { Day = "45" }
                 }
             );
         }
@@ -67,30 +67,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         public void ReleaseName_Ok()
         {
             // None should throw
-            new Release {ReleaseName = "1990"};
-            new Release {ReleaseName = "2011"};
-            new Release {ReleaseName = "3000"};
-            new Release {ReleaseName = ""}; // considered not set
-            new Release {ReleaseName = null}; // considered not set
+            new ReleaseVersion { ReleaseName = "1990" };
+            new ReleaseVersion { ReleaseName = "2011" };
+            new ReleaseVersion { ReleaseName = "3000" };
+            new ReleaseVersion { ReleaseName = "" }; // considered not set
+            new ReleaseVersion { ReleaseName = null }; // considered not set
         }
 
         [Fact]
         public void ReleaseName_InvalidFormats()
         {
             Assert.Throws<FormatException>(
-                () => new Release {ReleaseName = "Hello"}
+                () => new ReleaseVersion { ReleaseName = "Hello" }
             );
 
             Assert.Throws<FormatException>(
-                () => new Release {ReleaseName = "190"}
+                () => new ReleaseVersion { ReleaseName = "190" }
             );
 
             Assert.Throws<FormatException>(
-                () => new Release {ReleaseName = "ABC123"}
+                () => new ReleaseVersion { ReleaseName = "ABC123" }
             );
 
             Assert.Throws<FormatException>(
-                () => new Release {ReleaseName = "20000"}
+                () => new ReleaseVersion { ReleaseName = "20000" }
             );
         }
     }

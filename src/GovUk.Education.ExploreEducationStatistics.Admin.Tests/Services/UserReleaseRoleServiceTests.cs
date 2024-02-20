@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -32,38 +32,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
             };
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
             };
             var userReleaseRole3 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publication.Releases[1],
+                ReleaseVersion = publication.Releases[1],
                 Role = Contributor,
             };
             var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Lead,
             };
             var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
             var userReleaseRoleIgnored3 = new UserReleaseRole // Ignored due to release under different publication
             {
                 User = new User { Id = Guid.NewGuid() },
-                Release = publicationIgnored.Releases[0],
+                ReleaseVersion = publicationIgnored.Releases[0],
                 Role = Contributor,
             };
 
@@ -87,17 +87,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(userReleaseRole1.Id, userReleaseRoles[0].Id);
                 Assert.Equal(userReleaseRole1.UserId, userReleaseRoles[0].UserId);
-                Assert.Equal(userReleaseRole1.ReleaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(userReleaseRole1.ReleaseVersionId, userReleaseRoles[0].ReleaseVersionId);
                 Assert.Equal(userReleaseRole1.Role, userReleaseRoles[0].Role);
 
                 Assert.Equal(userReleaseRole2.Id, userReleaseRoles[1].Id);
                 Assert.Equal(userReleaseRole2.UserId, userReleaseRoles[1].UserId);
-                Assert.Equal(userReleaseRole2.ReleaseId, userReleaseRoles[1].ReleaseId);
+                Assert.Equal(userReleaseRole2.ReleaseVersionId, userReleaseRoles[1].ReleaseVersionId);
                 Assert.Equal(userReleaseRole2.Role, userReleaseRoles[1].Role);
 
                 Assert.Equal(userReleaseRole3.Id, userReleaseRoles[2].Id);
                 Assert.Equal(userReleaseRole3.UserId, userReleaseRoles[2].UserId);
-                Assert.Equal(userReleaseRole3.ReleaseId, userReleaseRoles[2].ReleaseId);
+                Assert.Equal(userReleaseRole3.ReleaseVersionId, userReleaseRoles[2].ReleaseVersionId);
                 Assert.Equal(userReleaseRole3.Role, userReleaseRoles[2].Role);
             }
         }

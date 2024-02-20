@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseId = release.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = Guid.NewGuid()
                 }
             };
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseId = release.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = Guid.NewGuid(),
                 }
             };
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 LatestPublishedVersion = new DataBlockVersion
                 {
-                    ReleaseId = release.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     Id = inContentDataBlockVersionId,
                     ContentBlock = new DataBlock
                     {
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            release.KeyStatistics = new List<KeyStatistic>
+            releaseVersion.KeyStatistics = new List<KeyStatistic>
             {
                 new KeyStatisticText {Order = 1},
                 new KeyStatisticDataBlock
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var otherRelease = new Release
+            var otherReleaseVersion = new ReleaseVersion
             {
                 NextReleaseDate = new PartialDate {Day = "8", Month = "8", Year = "2040"},
                 Publication = publication,
@@ -204,35 +204,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     },
                     inContentDataBlockParent.LatestPublishedVersion!.ContentBlock
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release, otherRelease);
-                await contentDbContext.DataBlockParents.AddRangeAsync(
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
+                contentDbContext.DataBlockParents.AddRange(
                     unattachedDataBlockParent, keyStatDataBlockParent, inContentDataBlockParent);
-                await contentDbContext.ContentSections.AddRangeAsync(
+                contentDbContext.ContentSections.AddRange(
                     new ContentSection
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.Headlines
                     },
                     new ContentSection
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.KeyStatisticsSecondary
                     },
                     new ContentSection
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.ReleaseSummary
                     },
                     new ContentSection
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         Type = ContentSectionType.RelatedDashboards
                     },
                     genericContentSection);
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetUnattachedDataBlocks(release.Id))
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(unattachedDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 .ReturnsAsync(methodologies);
 
             releaseFileService.Setup(mock =>
-                    mock.ListAll(release.Id, Ancillary, FileType.Data))
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
                 .ReturnsAsync(files);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -263,44 +263,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
-                var result = await service.GetManageContentPageViewModel(release.Id);
+                var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
 
                 var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
-                    mock.GetUnattachedDataBlocks(release.Id), Times.Once);
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
-                    mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data), Times.Once);
 
                 Assert.Equal(unattachedDataBlocks, viewModel.UnattachedDataBlocks);
 
                 var contentRelease = viewModel.Release;
 
                 Assert.NotNull(contentRelease);
-                Assert.Equal(release.Id, contentRelease.Id);
+                Assert.Equal(releaseVersion.Id, contentRelease.Id);
                 Assert.Equal("Academic year", contentRelease.CoverageTitle);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
 
                 Assert.Equal(2, contentRelease.KeyStatistics.Count);
-                Assert.Equal(release.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
+                Assert.Equal(releaseVersion.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
                 Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
-                var originalKeyStatDataBlock = (release.KeyStatistics[1] as KeyStatisticDataBlock)!;
+                var originalKeyStatDataBlock = (releaseVersion.KeyStatistics[1] as KeyStatisticDataBlock)!;
                 var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
                 Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
                 Assert.Equal(
                     keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
                     keyStatDataBlockViewModel.DataBlockParentId);
 
-                Assert.Equal(release.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
+                Assert.Equal(releaseVersion.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
                 Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
                 Assert.IsType<KeyStatisticTextViewModel>(contentRelease.KeyStatistics[1]);
 
-                Assert.Equal(release.KeyStatisticsSecondarySection.Id,
+                Assert.Equal(releaseVersion.KeyStatisticsSecondarySection.Id,
                     contentRelease.KeyStatisticsSecondarySection.Id);
-                Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
-                Assert.Equal(release.RelatedDashboardsSection.Id,
+                Assert.Equal(releaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
+                Assert.Equal(releaseVersion.RelatedDashboardsSection.Id,
                     contentRelease.RelatedDashboardsSection.Id);
                 Assert.False(contentRelease.LatestRelease);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Day);
@@ -311,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
                 Assert.Equal(DateTime.Parse("2020-09-09T00:00:00.00"), contentRelease.PublishScheduled);
                 Assert.Equal("2020-21", contentRelease.Slug);
-                Assert.Equal(release.SummarySection.Id, contentRelease.SummarySection.Id);
+                Assert.Equal(releaseVersion.SummarySection.Id, contentRelease.SummarySection.Id);
                 Assert.Equal("Academic year 2020/21", contentRelease.Title);
                 Assert.Equal(ReleaseType.OfficialStatistics, contentRelease.Type);
                 Assert.Equal("2020/21", contentRelease.YearTitle);
@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 var contentPublicationReleases = contentPublication.Releases;
                 Assert.Single(contentPublicationReleases);
-                Assert.Equal(otherRelease.Id, contentPublicationReleases[0].Id);
+                Assert.Equal(otherReleaseVersion.Id, contentPublicationReleases[0].Id);
                 Assert.Equal("2019-20", contentPublicationReleases[0].Slug);
                 Assert.Equal("Academic year 2019/20", contentPublicationReleases[0].Title);
 
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
                 PreReleaseAccessList = "Test access list",
@@ -461,34 +461,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.MethodologyVersions.AddRangeAsync(methodologyVersions);
-                await contentDbContext.ContentSections.AddRangeAsync(
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.MethodologyVersions.AddRange(methodologyVersions);
+                contentDbContext.ContentSections.AddRange(
                     new()
                     {
                         Type = ContentSectionType.Headlines,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new()
                     {
                         Type = ContentSectionType.KeyStatisticsSecondary,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new()
                     {
                         Type = ContentSectionType.ReleaseSummary,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new()
                     {
                         Type = ContentSectionType.RelatedDashboards,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new()
                     {
                         Type = ContentSectionType.Generic,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -498,7 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetUnattachedDataBlocks(release.Id))
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(new List<DataBlockViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 .ReturnsAsync(methodologyVersions);
 
             releaseFileService.Setup(mock =>
-                    mock.ListAll(release.Id, Ancillary, FileType.Data))
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
                 .ReturnsAsync(new List<FileInfo>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -517,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     releaseFileService: releaseFileService.Object);
 
                 var result = await service.GetManageContentPageViewModel(
-                    release.Id, isPrerelease: true);
+                    releaseVersion.Id, isPrerelease: true);
 
                 var viewModel = result.AssertRight();
 
@@ -574,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -586,7 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var summaryContentSection = new ContentSection
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Type = ContentSectionType.ReleaseSummary,
                 Content = new List<ContentBlock>
                 {
@@ -614,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             };
             var genericContentSection = new ContentSection
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Heading = "Test section 1",
                 Type = ContentSectionType.Generic,
                 Content = new List<ContentBlock>
@@ -632,10 +632,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.ContentSections.AddRangeAsync(
-                    summaryContentSection, genericContentSection);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ContentSections.AddRange(summaryContentSection, genericContentSection);
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -645,7 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetUnattachedDataBlocks(release.Id))
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(new List<DataBlockViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
@@ -653,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 .ReturnsAsync(new List<MethodologyVersion>());
 
             releaseFileService.Setup(mock =>
-                    mock.ListAll(release.Id, Ancillary, FileType.Data))
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data))
                 .ReturnsAsync(new Either<ActionResult, IEnumerable<FileInfo>>(new List<FileInfo>()));
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -664,15 +663,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
-                var result = await service.GetManageContentPageViewModel(release.Id);
+                var result = await service.GetManageContentPageViewModel(releaseVersion.Id);
 
                 var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
-                    mock.GetUnattachedDataBlocks(release.Id), Times.Once);
+                    mock.GetUnattachedDataBlocks(releaseVersion.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
-                    mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
+                    mock.ListAll(releaseVersion.Id, Ancillary, FileType.Data), Times.Once);
 
                 var contentRelease = viewModel.Release;
 

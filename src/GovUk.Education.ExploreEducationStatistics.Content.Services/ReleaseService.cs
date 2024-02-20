@@ -68,25 +68,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     return await _releaseRepository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug)
                         .OrNotFound();
                 })
-                .OnSuccess(release => GetRelease(release.Id));
+                .OnSuccess(releaseVersion => GetRelease(releaseVersion.Id));
         }
 
-        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId,
+        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseVersionId,
             DateTime? expectedPublishDate = null)
         {
-            // Note this method is allowed to return an unpublished Release so that Publisher can use it
-            // to cache a release in advance of it going live.
+            // Note this method is allowed to return a view model for an unpublished release version so that Publisher
+            // can use it to cache a release version in advance of it going live.
 
-            var release = _contentDbContext
-                .Releases
-                .Include(release => release.Content)
+            var releaseVersion = _contentDbContext
+                .ReleaseVersions
+                .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
-                .Include(r => r.Updates)
-                .Include(r => r.KeyStatistics)
-                .Single(r => r.Id == releaseId);
+                .Include(rv => rv.Updates)
+                .Include(rv => rv.KeyStatistics)
+                .Single(rv => rv.Id == releaseVersionId);
 
-            var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(release);
+            var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(releaseVersion);
 
             // Filter content blocks to remove any non-public or unnecessary information
             releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
@@ -95,11 +95,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
 
-            releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
+            releaseViewModel.DownloadFiles = await GetDownloadFiles(releaseVersion);
 
             // If the view model has no mapped published date because it's not published, set a date
             // based on what we expect it to be when publishing completes
-            releaseViewModel.Published ??= await _releaseRepository.GetPublishedDate(release.Id,
+            releaseViewModel.Published ??= await _releaseRepository.GetPublishedDate(releaseVersion.Id,
                 expectedPublishDate ?? DateTime.UtcNow);
 
             return releaseViewModel;
@@ -114,11 +114,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(async publication =>
                 {
-                    var publishedReleases =
+                    var publishedReleaseVersions =
                         await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
-                    return publishedReleases
-                        .Select(release => new ReleaseSummaryViewModel(release,
-                            latestPublishedRelease: release.Id == publication.LatestPublishedReleaseId))
+                    return publishedReleaseVersions
+                        .Select(releaseVersion => new ReleaseSummaryViewModel(releaseVersion,
+                            latestPublishedRelease: releaseVersion.Id == publication.LatestPublishedReleaseVersionId))
                         .ToList();
                 });
         }
@@ -137,9 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             }
         }
 
-        private async Task<List<FileInfo>> GetDownloadFiles(Release release)
+        private async Task<List<FileInfo>> GetDownloadFiles(ReleaseVersion releaseVersion)
         {
-            var files = await _releaseFileRepository.GetByFileType(release.Id, FileType.Ancillary, FileType.Data);
+            var files = await _releaseFileRepository.GetByFileType(releaseVersion.Id, FileType.Ancillary,
+                FileType.Data);
             return files
                 .Select(rf => rf.ToPublicFileInfo())
                 .OrderBy(file => file.Name)

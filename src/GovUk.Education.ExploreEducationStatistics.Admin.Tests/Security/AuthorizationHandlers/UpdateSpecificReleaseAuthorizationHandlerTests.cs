@@ -39,15 +39,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             ApprovalStatus = status
                         };
 
-                        await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
-                            HandlerSupplier(release),
-                            release,
+                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseRequirement>(
+                            HandlerSupplier(releaseVersion),
+                            releaseVersion,
                             SecurityClaimTypes.UpdateAllReleases
                         );
                     });
@@ -57,15 +57,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task AllClaimsFailIfApproved()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     ApprovalStatus = Approved
                 };
 
-                await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
-                    HandlerSupplier(release),
-                    release,
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, UpdateSpecificReleaseRequirement>(
+                    HandlerSupplier(releaseVersion),
+                    releaseVersion,
                     claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>());
             }
         }
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -96,9 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // state other than Admin
                             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                 UpdateSpecificReleaseRequirement>(
-                                HandlerSupplier(release),
-                                release,
-                                rolesExpectedToSucceed: new []
+                                HandlerSupplier(releaseVersion),
+                                releaseVersion,
+                                rolesExpectedToSucceed: new[]
                                 {
                                     PublicationRole.Owner,
                                     PublicationRole.Approver
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task NoRolesCanUpdateApprovedRelease()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Publication = new Publication
@@ -124,8 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that no Publication Role can update the Release if it is Approved.
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                     UpdateSpecificReleaseRequirement>(
-                    HandlerSupplier(release),
-                    release,
+                    HandlerSupplier(releaseVersion),
+                    releaseVersion,
                     rolesExpectedToSucceed: Array.Empty<PublicationRole>());
             }
         }
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -156,8 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             // in any approval state other than Approved.
                             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                                 UpdateSpecificReleaseRequirement>(
-                                HandlerSupplier(release),
-                                release,
+                                HandlerSupplier(releaseVersion),
+                                releaseVersion,
                                 rolesExpectedToSucceed: new[]
                                 {
                                     ReleaseRole.Contributor,
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task NoRolesCanUpdateApprovedRelease()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Publication = new Publication
@@ -185,21 +185,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that no Publication Role can update the Release if it is Approved.
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                     UpdateSpecificReleaseRequirement>(
-                    HandlerSupplier(release),
-                    release,
+                    HandlerSupplier(releaseVersion),
+                    releaseVersion,
                     rolesExpectedToSucceed: Array.Empty<ReleaseRole>());
             }
         }
 
         private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
-            Release release,
+            ReleaseVersion releaseVersion,
             List<ReleasePublishingStatus>? publishingStatuses = null)
         {
             var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
 
             releaseStatusRepository.Setup(
                     s => s.GetAllByOverallStage(
-                        release.Id,
+                        releaseVersion.Id,
                         Started,
                         Complete
                     )
@@ -208,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             return contentDbContext =>
             {
-                contentDbContext.Add(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 contentDbContext.SaveChanges();
 
                 return new UpdateSpecificReleaseAuthorizationHandler(

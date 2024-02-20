@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
 {
-    public class ReleaseExtensionTests
+    public class ReleaseVersionExtensionTests
     {
         [Fact]
         public void AllFilesZipPath()
@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             const string releaseSlug = "release-slug";
             const string publicationSlug = "publication-slug";
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Slug = releaseSlug,
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            Assert.Equal($"{release.Id}/zip/{publicationSlug}_{releaseSlug}.zip", release.AllFilesZipPath());
+            Assert.Equal($"{releaseVersion.Id}/zip/{publicationSlug}_{releaseSlug}.zip", releaseVersion.AllFilesZipPath());
         }
     }
 }

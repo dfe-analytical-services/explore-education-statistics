@@ -20,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
-            var release = await _contentDbContext
-                .Releases
-                .Include(release => release.Publication)
-                .SingleAsync(release => release.Id == releaseId);
+            var releaseVersion = await _contentDbContext
+                .ReleaseVersions
+                .Include(rv => rv.Publication)
+                .SingleAsync(rv => rv.Id == releaseVersionId);
 
-            return new ReleaseSubjectsCacheKey(release.Publication.Slug, release.Slug, release.Id);
+            return new ReleaseSubjectsCacheKey(releaseVersion.Publication.Slug, releaseVersion.Slug, releaseVersion.Id);
         }
     }
 }

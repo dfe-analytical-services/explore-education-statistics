@@ -27,11 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<UserReleaseRole>> ListUserReleaseRolesByPublication(ReleaseRole role,
             Guid publicationId)
         {
-            var releaseIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
+            var releaseVersionIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
             return await _contentDbContext.UserReleaseRoles
                 .Include(releaseRole => releaseRole.User)
                 .Where(userReleaseRole =>
-                    releaseIds.Contains(userReleaseRole.ReleaseId)
+                    releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId)
                     && userReleaseRole.Role == role)
                 .ToListAsync();
         }

@@ -24,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions
             return userService.CheckPolicy(publication, CanViewSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewRelease(
             this IUserService userService,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, CanViewSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, CanViewSpecificRelease);
         }
     }
 }

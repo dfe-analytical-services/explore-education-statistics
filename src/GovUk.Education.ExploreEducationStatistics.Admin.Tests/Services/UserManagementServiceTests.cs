@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication(),
             };
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "test@test.com",
                         It.Is<List<UserReleaseInvite>>(invites =>
                             invites.Count == 1
-                            && invites[0].ReleaseId == release.Id
+                            && invites[0].ReleaseVersionId == releaseVersion.Id
                             && invites[0].Role == ReleaseRole.Approver),
                         It.Is<List<UserPublicationInvite>>(invites =>
                             invites.Count == 1
@@ -243,8 +243,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.Publications.AddRangeAsync(publication);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.Publications.AddRange(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RoleId = role.Id,
                     UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                     {
-                        ReleaseId = release.Id,
+                        ReleaseId = releaseVersion.Id,
                         ReleaseRole = ReleaseRole.Approver,
                     }),
                     UserPublicationRoles = ListOf(new UserPublicationRoleCreateRequest
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 var userReleaseInvite = Assert.Single(userReleaseInvites);
                 Assert.Equal("test@test.com", userReleaseInvite.Email);
-                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(releaseVersion.Id, userReleaseInvite.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Approver, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);
@@ -335,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication(),
             };
@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "test@test.com",
                         It.Is<List<UserReleaseInvite>>(invites =>
                             invites.Count == 1
-                            && invites[0].ReleaseId == release.Id
+                            && invites[0].ReleaseVersionId == releaseVersion.Id
                             && invites[0].Role == ReleaseRole.Approver),
                         It.Is<List<UserPublicationInvite>>(invites =>
                             invites.Count == 1
@@ -359,8 +359,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.Publications.AddRangeAsync(publication);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.Publications.AddRange(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -378,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RoleId = role.Id,
                     UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                     {
-                        ReleaseId = release.Id,
+                        ReleaseId = releaseVersion.Id,
                         ReleaseRole = ReleaseRole.Approver,
                     }),
                     UserPublicationRoles = ListOf(new UserPublicationRoleCreateRequest
@@ -415,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 var userReleaseInvite = Assert.Single(userReleaseInvites);
                 Assert.Equal("test@test.com", userReleaseInvite.Email);
-                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(releaseVersion.Id, userReleaseInvite.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Approver, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.Equal(createdDate, userReleaseInvite.Created);
@@ -449,11 +449,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
-            var release1 = new Release
+            var releaseVersion1 = new ReleaseVersion
             {
                 Publication = new Publication(),
             };
-            var release2 = new Release
+            var releaseVersion2 = new ReleaseVersion
             {
                 Publication = new Publication(),
             };
@@ -467,9 +467,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "test@test.com",
                         It.Is<List<UserReleaseInvite>>(invites =>
                             invites.Count == 2
-                            && invites[0].ReleaseId == release1.Id
+                            && invites[0].ReleaseVersionId == releaseVersion1.Id
                             && invites[0].Role == ReleaseRole.Approver
-                            && invites[1].ReleaseId == release2.Id
+                            && invites[1].ReleaseVersionId == releaseVersion2.Id
                             && invites[1].Role == ReleaseRole.Contributor),
                         It.Is<List<UserPublicationInvite>>(invites =>
                             invites.Count == 2
@@ -482,8 +482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release1, release2);
-                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2);
+                contentDbContext.Publications.AddRange(publication1, publication2);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -501,12 +501,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RoleId = role.Id,
                     UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                         {
-                            ReleaseId = release1.Id,
+                            ReleaseId = releaseVersion1.Id,
                             ReleaseRole = ReleaseRole.Approver,
                         },
                         new UserReleaseRoleCreateRequest
                         {
-                            ReleaseId = release2.Id,
+                            ReleaseId = releaseVersion2.Id,
                             ReleaseRole = ReleaseRole.Contributor,
                         }),
                     UserPublicationRoles = ListOf(
@@ -550,14 +550,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseInvites.Count);
 
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(releaseVersion1.Id, userReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Approver, userReleaseInvites[0].Role);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
-                Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(releaseVersion2.Id, userReleaseInvites[1].ReleaseVersionId);
                 Assert.Equal(ReleaseRole.Contributor, userReleaseInvites[1].Role);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
@@ -601,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(new Release());
+                contentDbContext.ReleaseVersions.AddRange(new ReleaseVersion());
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var release1 = new Release
+            var releaseVersion1 = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication1
@@ -722,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var release2 = new Release
+            var releaseVersion2 = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication2
@@ -761,24 +761,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release1, release2);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion1, releaseVersion2);
 
-                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                contentDbContext.Publications.AddRange(publication1, publication2);
 
-                await contentDbContext.UserReleaseInvites.AddRangeAsync(
+                contentDbContext.UserReleaseInvites.AddRange(
                     new UserReleaseInvite
                     {
-                        ReleaseId = release1.Id,
+                        ReleaseVersionId = releaseVersion1.Id,
                         Email = "test@test.com",
                         Role = ReleaseRole.Approver,
                     },
                     new UserReleaseInvite
                     {
-                        ReleaseId = release1.Id,
+                        ReleaseVersionId = releaseVersion1.Id,
                         Email = "test@test.com",
                         Role = ReleaseRole.Contributor
                     });
-                await contentDbContext.UserPublicationInvites.AddRangeAsync(
+                contentDbContext.UserPublicationInvites.AddRange(
                     new UserPublicationInvite
                     {
                         PublicationId = publication1.Id,
@@ -796,7 +796,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "test@test.com",
                         It.Is<List<UserReleaseInvite>>(invites =>
                             invites.Count == 1
-                            && invites[0].ReleaseId == release2.Id
+                            && invites[0].ReleaseVersionId == releaseVersion2.Id
                             && invites[0].Role == ReleaseRole.PrereleaseViewer),
                         It.Is<List<UserPublicationInvite>>(invites =>
                             invites.Count == 1
@@ -818,7 +818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     RoleId = role2.Id,
                     UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                     {
-                        ReleaseId = release2.Id,
+                        ReleaseId = releaseVersion2.Id,
                         ReleaseRole = ReleaseRole.PrereleaseViewer
                     }),
                     UserPublicationRoles = ListOf(new UserPublicationRoleCreateRequest
@@ -854,7 +854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 var userReleaseInvite = Assert.Single(userReleaseInvites);
                 Assert.Equal("test@test.com", userReleaseInvite.Email);
-                Assert.Equal(release2.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(releaseVersion2.Id, userReleaseInvite.ReleaseVersionId);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);

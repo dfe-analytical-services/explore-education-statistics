@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         }
 
         public async Task<File> Create(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             string filename,
             long contentLength,
@@ -50,13 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             var releaseFile = new ReleaseFile
             {
-                ReleaseId = releaseId,
+                ReleaseVersionId = releaseVersionId,
                 Name = name,
                 Order = order,
                 File = new File
                 {
                     CreatedById = createdById,
-                    RootPath = releaseId,
+                    RootPath = releaseVersionId,
                     SubjectId = subjectId,
                     Filename = filename,
                     ContentLength = contentLength,
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return created.File;
         }
 
-        public async Task<File> CreateZip(Guid releaseId,
+        public async Task<File> CreateZip(Guid releaseVersionId,
             string filename,
             long contentLength,
             string contentType,
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
                 CreatedById = createdById,
-                RootPath = releaseId,
+                RootPath = releaseVersionId,
                 Filename = filename,
                 ContentLength = contentLength,
                 ContentType = contentType,
@@ -98,24 +98,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return file;
         }
 
-        public async Task<IList<File>> ListDataFiles(Guid releaseId)
+        public async Task<IList<File>> ListDataFiles(Guid releaseVersionId)
         {
-            return await ListDataFilesQuery(releaseId).ToListAsync();
+            return await ListDataFilesQuery(releaseVersionId).ToListAsync();
         }
 
-        public async Task<bool> HasAnyDataFiles(Guid releaseId)
+        public async Task<bool> HasAnyDataFiles(Guid releaseVersionId)
         {
-            return await ListDataFilesQuery(releaseId).AnyAsync();
+            return await ListDataFilesQuery(releaseVersionId).AnyAsync();
         }
 
-        public async Task<IList<File>> ListReplacementDataFiles(Guid releaseId)
+        public async Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId)
         {
             return await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(
-                    rf => rf.ReleaseId == releaseId
-                          && rf.File.Type == FileType.Data
+                    rf => rf.ReleaseVersionId == releaseVersionId
+                          && rf.File.Type == Data
                           && rf.File.ReplacingId != null
                           && rf.File.SubjectId.HasValue
                 )
@@ -123,24 +123,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToListAsync();
         }
 
-        public async Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId)
+        public async Task<ReleaseFile> GetBySubject(Guid releaseVersionId, Guid subjectId)
         {
             return await _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .SingleAsync(rf =>
-                    rf.ReleaseId == releaseId
+                    rf.ReleaseVersionId == releaseVersionId
                     && rf.File.SubjectId == subjectId
                     && rf.File.Type == Data);
         }
 
-        private IQueryable<File> ListDataFilesQuery(Guid releaseId)
+        private IQueryable<File> ListDataFilesQuery(Guid releaseVersionId)
         {
             return _contentDbContext
                 .ReleaseFiles
                 .Include(rf => rf.File)
                 .Where(
-                    rf => rf.ReleaseId == releaseId
+                    rf => rf.ReleaseVersionId == releaseVersionId
                           && rf.File.Type == Data
                           && rf.File.ReplacingId == null
                 )

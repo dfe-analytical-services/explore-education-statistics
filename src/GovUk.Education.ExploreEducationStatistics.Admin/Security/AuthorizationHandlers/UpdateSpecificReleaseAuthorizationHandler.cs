@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class UpdateSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
+        : AuthorizationHandler<UpdateSpecificReleaseRequirement, ReleaseVersion>
     {
         private readonly AuthorizationHandlerService _authorizationHandlerService;
 
@@ -26,9 +26,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             UpdateSpecificReleaseRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
-            if (release.ApprovalStatus == Approved)
+            if (releaseVersion.ApprovalStatus == Approved)
             {
                 return;
             }
@@ -45,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
-                        release.PublicationId,
-                        release.Id,
+                        releaseVersion.PublicationId,
+                        releaseVersion.Id,
                         allowedPublicationRoles,
                         allowedReleaseRoles))
             {

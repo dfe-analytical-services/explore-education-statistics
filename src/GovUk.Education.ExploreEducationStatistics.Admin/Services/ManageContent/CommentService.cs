@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,11 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, List<CommentViewModel>>> GetComments(Guid releaseId,
+        public async Task<Either<ActionResult, List<CommentViewModel>>> GetComments(Guid releaseVersionId,
             Guid contentSectionId,
             Guid contentBlockId)
         {
-            return await CheckContentBlockExists(releaseId, contentSectionId, contentBlockId)
+            return await CheckContentBlockExists(releaseVersionId, contentSectionId, contentBlockId)
                 .OnSuccess(async () =>
                     {
                         var comments = await _context.Comment
@@ -56,14 +56,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 );
         }
 
-        public Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseId,
+        public Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseVersionId,
             Guid contentSectionId,
             Guid contentBlockId,
             CommentSaveRequest saveRequest)
         {
-            return _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            return _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccessDo(_userService.CheckCanUpdateRelease)
-                .OnSuccessDo(() => CheckContentBlockExists(releaseId, contentSectionId, contentBlockId))
+                .OnSuccessDo(() => CheckContentBlockExists(releaseVersionId, contentSectionId, contentBlockId))
                 .OnSuccess(async () =>
                     {
                         var saved = await _context.Comment.AddAsync(new Comment
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         private async Task<Either<ActionResult, Unit>> CheckContentBlockExists(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid contentSectionId,
             Guid contentBlockId)
         {
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .AnyAsync(cb =>
                         cb.Id == contentBlockId &&
                         cb.ContentSection!.Id == contentSectionId &&
-                        cb.ContentSection!.ReleaseId == releaseId))
+                        cb.ContentSection!.ReleaseVersionId == releaseVersionId))
             {
                 return Unit.Instance;
             }

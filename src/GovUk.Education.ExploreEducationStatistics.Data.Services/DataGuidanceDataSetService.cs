@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +39,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _timePeriodService = timePeriodService;
         }
 
-        public async Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseId,
+        public async Task<Either<ActionResult, List<DataGuidanceDataSetViewModel>>> ListDataSets(Guid releaseVersionId,
             IList<Guid>? dataFileIds = null,
             CancellationToken cancellationToken = default)
         {
-            return await _contentDbContext.Releases
-                .FirstOrNotFoundAsync(release => release.Id == releaseId, cancellationToken)
+            return await _contentDbContext.ReleaseVersions
+                .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
                 .OnSuccess(async () =>
                 {
                     var releaseFilesQueryable = _contentDbContext.ReleaseFiles
                         .Include(rf => rf.File)
-                        .Where(rf => rf.ReleaseId == releaseId 
+                        .Where(rf => rf.ReleaseVersionId == releaseVersionId 
                             && rf.File.Type == FileType.Data
                             && rf.File.ReplacingId == null);
 
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             var geographicLevels = await ListGeographicLevels(subjectId, cancellationToken);
                             var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
                             var variables = await ListVariables(subjectId, cancellationToken);
-                            var footnotes = await ListFootnotes(releaseId: releaseId,
+                            var footnotes = await ListFootnotes(releaseVersionId: releaseVersionId,
                                 subjectId: subjectId);
 
                             return BuildDataGuidanceDataSetViewModel(releaseFile,
@@ -114,9 +114,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private async Task<List<FootnoteViewModel>> ListFootnotes(Guid releaseId, Guid subjectId)
+        private async Task<List<FootnoteViewModel>> ListFootnotes(Guid releaseVersionId, Guid subjectId)
         {
-            var footnotes = await _footnoteRepository.GetFootnotes(releaseId, subjectId);
+            var footnotes = await _footnoteRepository.GetFootnotes(releaseVersionId: releaseVersionId,
+                subjectId: subjectId);
             return FootnotesViewModelBuilder.BuildFootnotes(footnotes);
         }
 

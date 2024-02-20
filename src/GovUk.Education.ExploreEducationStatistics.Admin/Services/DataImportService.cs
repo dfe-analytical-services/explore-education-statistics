@@ -45,9 +45,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _dataImportRepository.GetByFileId(fileId);
         }
 
-        public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
+            Guid fileId)
         {
-            return await _releaseFileService.CheckFileExists(releaseId, fileId, FileType.Data)
+            return await _releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
+                    fileId: fileId,
+                    FileType.Data)
                 .OnSuccess(_userService.CheckCanCancelFileImport)
                 .OnSuccessVoid(async file =>
                 {
@@ -64,11 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _dataImportRepository.DeleteByFileId(fileId);
         }
 
-        public async Task<bool> HasIncompleteImports(Guid releaseId)
+        public async Task<bool> HasIncompleteImports(Guid releaseVersionId)
         {
             return await _contentDbContext.ReleaseFiles
                 .AsQueryable()
-                .Where(rf => rf.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                 .Join(_contentDbContext.DataImports,
                     rf => rf.FileId,
                     i => i.FileId,

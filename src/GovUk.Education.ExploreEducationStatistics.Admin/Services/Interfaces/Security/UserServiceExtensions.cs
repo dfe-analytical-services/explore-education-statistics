@@ -198,102 +198,117 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanViewSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanViewRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, ContentSecurityPolicies.CanViewSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanUpdateSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanUpdateSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanUpdateRelease(
-            this IUserService userService, Release release, bool ignoreCheck)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion,
+            bool ignoreCheck)
         {
             return ignoreCheck
-                ? Task.FromResult(new Either<ActionResult, Release>(release))
-                : userService.CheckCanUpdateRelease(release);
+                ? Task.FromResult(new Either<ActionResult, ReleaseVersion>(releaseVersion))
+                : userService.CheckCanUpdateRelease(releaseVersion);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanDeleteRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanDeleteRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanDeleteSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanViewReleaseStatusHistory(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseStatusHistory(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanViewReleaseStatusHistory);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanViewReleaseStatusHistory);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanUpdateReleaseStatus(
-            this IUserService userService, Release release, ReleaseApprovalStatus approvalStatus)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseStatus(
+            this IUserService userService,
+            ReleaseVersion releaseVersion,
+            ReleaseApprovalStatus approvalStatus)
         {
             switch (approvalStatus)
             {
                 case ReleaseApprovalStatus.Draft:
                 {
-                    return userService.CheckCanMarkReleaseAsDraft(release);
+                    return userService.CheckCanMarkReleaseAsDraft(releaseVersion);
                 }
                 case ReleaseApprovalStatus.HigherLevelReview:
                 {
-                    return userService.CheckCanSubmitReleaseForHigherReview(release);
+                    return userService.CheckCanSubmitReleaseForHigherReview(releaseVersion);
                 }
                 case ReleaseApprovalStatus.Approved:
                 {
-                    return userService.CheckCanApproveRelease(release);
+                    return userService.CheckCanApproveRelease(releaseVersion);
                 }
                 default:
                 {
-                    return Task.FromResult(new Either<ActionResult, Release>(release));
+                    return Task.FromResult(new Either<ActionResult, ReleaseVersion>(releaseVersion));
                 }
             }
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanMarkReleaseAsDraft(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMarkReleaseAsDraft(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanMarkSpecificReleaseAsDraft);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMarkSpecificReleaseAsDraft);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanSubmitReleaseForHigherReview(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanSubmitReleaseForHigherReview(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanApproveRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanApproveRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanApproveSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanApproveSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanMakeAmendmentOfRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMakeAmendmentOfRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanAssignPrereleaseContactsToRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPrereleaseContactsToRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanViewPreReleaseSummary(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewPreReleaseSummary(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanViewSpecificPreReleaseSummary);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanViewSpecificPreReleaseSummary);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanPublishRelease(
-            this IUserService userService, Release release)
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanPublishRelease(
+            this IUserService userService,
+            ReleaseVersion releaseVersion)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanPublishSpecificRelease);
+            return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanPublishSpecificRelease);
         }
 
         public static Task<Either<ActionResult, Comment>> CheckCanResolveComment(

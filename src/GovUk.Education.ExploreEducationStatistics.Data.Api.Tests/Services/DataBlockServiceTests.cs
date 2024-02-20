@@ -29,15 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = _fixture
-                .DefaultRelease()
+            var releaseVersion = _fixture
+                .DefaultReleaseVersion()
                 .Generate();
 
             var dataBlockParent = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithSubjectId(subjectId)
                     .Generate())
                 .Generate();
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .Setup(
                         s =>
                             s.Query(
-                                dataBlockVersion.ReleaseId,
+                                dataBlockVersion.ReleaseVersionId,
                                 It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
                                 default
                             )
@@ -76,8 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ReturnsAsync(tableBuilderResults);
 
                 var result = (await service.GetDataBlockTableResult(
-                    dataBlockVersion.ReleaseId,
-                    dataBlockVersion.Id)).AssertRight();
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersionId: dataBlockVersion.Id)).AssertRight();
 
                 VerifyAllMocks(tableBuilderService);
 
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var htmlBlock = new HtmlBlock
             {
-                Release = new Release()
+                ReleaseVersion = new ReleaseVersion()
             };
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -105,8 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 var (service, _) = BuildServiceAndDependencies(contentDbContext);
 
                 var result = await service.GetDataBlockTableResult(
-                    htmlBlock.ReleaseId,
-                    htmlBlock.Id);
+                    releaseVersionId: htmlBlock.ReleaseVersionId,
+                    dataBlockVersionId: htmlBlock.Id);
 
                 result.AssertNotFound();
             }

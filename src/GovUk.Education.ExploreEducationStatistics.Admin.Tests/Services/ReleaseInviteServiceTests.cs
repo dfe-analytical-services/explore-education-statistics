@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id,
+                    releaseVersionIds: ListOf(publication.Releases[0].Id,
                         publication.Releases[1].Id));
 
                 emailService.Verify(
@@ -121,14 +121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseInvites.Count);
 
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(publication.Releases[0].Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(publication.Releases[0].Id, userReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
-                Assert.Equal(publication.Releases[1].Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(publication.Releases[1].Id, userReleaseInvites[1].ReleaseVersionId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
                 Assert.True(userReleaseInvites[1].EmailSent);
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var existingUserReleaseRole = new UserReleaseRole
             {
                 User = user,
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id,
+                    releaseVersionIds: ListOf(publication.Releases[0].Id,
                         publication.Releases[1].Id));
 
                 emailService.Verify(
@@ -234,13 +234,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseRoles.Count); // as user already exists, create missing UserReleaseRoles
 
                 Assert.Equal(existingUserReleaseRole.UserId, userReleaseRoles[0].UserId);
-                Assert.Equal(existingUserReleaseRole.ReleaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(existingUserReleaseRole.ReleaseVersionId, userReleaseRoles[0].ReleaseVersionId);
                 Assert.Equal(existingUserReleaseRole.Role, userReleaseRoles[0].Role);
                 Assert.Equal(existingUserReleaseRole.Created, userReleaseRoles[0].Created);
                 Assert.Equal(existingUserReleaseRole.CreatedById, userReleaseRoles[0].CreatedById);
 
                 Assert.Equal(user.Id, userReleaseRoles[1].UserId);
-                Assert.Equal(publication.Releases[1].Id, userReleaseRoles[1].ReleaseId);
+                Assert.Equal(publication.Releases[1].Id, userReleaseRoles[1].ReleaseVersionId);
                 Assert.Equal(Contributor, userReleaseRoles[1].Role);
                 Assert.Equal(CreatedById, userReleaseRoles[1].CreatedById);
                 userReleaseRoles[1].Created.AssertUtcNow();
@@ -265,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userRelease1Invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userRelease2Invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = publication.Releases[1],
+                ReleaseVersion = publication.Releases[1],
                 Role = Contributor,
                 Created = new DateTime(2001, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id,
+                    releaseVersionIds: ListOf(publication.Releases[0].Id,
                         publication.Releases[1].Id));
 
                 result.AssertBadRequest(UserAlreadyHasReleaseRoleInvites);
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userRelease1Role = new UserReleaseRole
             {
                 User = user,
-                Release = publication.Releases[0],
+                ReleaseVersion = publication.Releases[0],
                 Role = Contributor,
                 Created = new DateTime(2000, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userRelease2Role = new UserReleaseRole
             {
                 User = user,
-                Release = publication.Releases[1],
+                ReleaseVersion = publication.Releases[1],
                 Role = Contributor,
                 Created = new DateTime(2001, 1, 1),
                 CreatedById = Guid.NewGuid(),
@@ -382,7 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id,
+                    releaseVersionIds: ListOf(publication.Releases[0].Id,
                         publication.Releases[1].Id));
 
                 result.AssertBadRequest(UserAlreadyHasReleaseRoles);
@@ -452,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id));
+                    releaseVersionIds: ListOf(publication.Releases[0].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -534,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseIds: ListOf(publication.Releases[0].Id));
+                    releaseVersionIds: ListOf(publication.Releases[0].Id));
 
                 emailService.Verify(
                     s => s.SendEmail(
@@ -602,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.InviteContributor(
                     email: "test@test.com",
                     publicationId: publication1.Id,
-                    releaseIds: ListOf(publication1.Releases[0].Id,
+                    releaseVersionIds: ListOf(publication1.Releases[0].Id,
                         publication2.Releases[0].Id));
 
                 result.AssertBadRequest(NotAllReleasesBelongToPublication);
@@ -634,12 +634,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveByPublication()
         {
-            var release1 = new Release()
+            var release1Version1 = new ReleaseVersion
             {
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 ReleaseName = "2000",
             };
-            var release2 = new Release()
+            var release2Version1 = new ReleaseVersion
             {
                 TimePeriodCoverage = TimeIdentifier.April,
                 ReleaseName = "2001",
@@ -647,10 +647,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "Publication title",
-                Releases = ListOf(release1, release2)
+                Releases = ListOf(release1Version1, release2Version1)
             };
 
-            var release3 = new Release()
+            var release3Version1 = new ReleaseVersion()
             {
                 TimePeriodCoverage = TimeIdentifier.January,
                 ReleaseName = "2222",
@@ -658,37 +658,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication2 = new Publication
             {
                 Title = "Ignored publication title",
-                Releases = ListOf(release3),
+                Releases = ListOf(release3Version1),
             };
 
             var invite1 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release1,
+                ReleaseVersion = release1Version1,
                 Role = Contributor,
             };
             var invite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release2,
+                ReleaseVersion = release2Version1,
                 Role = Contributor,
             };
             var notRemoveInvite1 = new UserReleaseInvite
             {
                 Email = "notRemoved@test.com", // different email
-                Release = release1,
+                ReleaseVersion = release1Version1,
                 Role = Contributor,
             };
             var notRemoveInvite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release3, // release under different publication
+                ReleaseVersion = release3Version1, // release under different publication
                 Role = Contributor,
             };
             var notRemoveInvite3 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release1,
+                ReleaseVersion = release1Version1,
                 Role = Lead, // different role
             };
 
@@ -721,15 +721,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, userReleaseInvites.Count);
 
                 Assert.Equal("notRemoved@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(release1Version1.Id, userReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
-                Assert.Equal(release3.Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(release3Version1.Id, userReleaseInvites[1].ReleaseVersionId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
 
                 Assert.Equal("test@test.com", userReleaseInvites[2].Email);
-                Assert.Equal(release1.Id, userReleaseInvites[2].ReleaseId);
+                Assert.Equal(release1Version1.Id, userReleaseInvites[2].ReleaseVersionId);
                 Assert.Equal(Lead, userReleaseInvites[2].Role);
             }
         }
@@ -740,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Role = Contributor,
             };
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -771,7 +771,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(userReleaseInvites);
 
                 Assert.Equal(invite.Email, userReleaseInvites[0].Email);
-                Assert.Equal(invite.ReleaseId, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(invite.ReleaseVersionId, userReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal(invite.Role, userReleaseInvites[0].Role);
             }
         }

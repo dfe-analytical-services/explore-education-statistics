@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -23,7 +23,7 @@ public class DataBlockServicePermissionTests
         Id = Guid.NewGuid()
     };
 
-    private readonly Release _release = new()
+    private readonly ReleaseVersion _releaseVersion = new()
     {
         Id = Guid.NewGuid()
     };
@@ -32,20 +32,20 @@ public class DataBlockServicePermissionTests
     public async Task GetDataBlockTableResult()
     {
         await PolicyCheckBuilder<ContentSecurityPolicies>()
-            .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = BuildService(
                         userService: userService.Object);
-                    return service.GetDataBlockTableResult(_release.Id, _dataBlock.Id);
+                    return service.GetDataBlockTableResult(_releaseVersion.Id, _dataBlock.Id);
                 });
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-        MockUtils.SetupCall(mock, _release.Id, _release);
+        var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+        MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
         return mock;
     }
 

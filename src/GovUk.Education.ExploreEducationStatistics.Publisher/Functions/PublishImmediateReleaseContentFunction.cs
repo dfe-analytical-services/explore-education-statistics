@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -53,19 +53,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
-                await _contentService.UpdateContent(message.ReleaseId);
-                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Complete);
+                await UpdateContentStage(releaseVersionId: message.ReleaseVersionId,
+                    releaseStatusId: message.ReleaseStatusId,
+                    Started);
+                await _contentService.UpdateContent(message.ReleaseVersionId);
+                await UpdateContentStage(releaseVersionId: message.ReleaseVersionId,
+                    releaseStatusId: message.ReleaseStatusId,
+                    Complete);
 
                 await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    ListOf((message.ReleaseId, message.ReleaseStatusId)));
+                    ListOf((message.ReleaseVersionId, message.ReleaseStatusId)));
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
 
-                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Failed,
+                await UpdateContentStage(message.ReleaseVersionId, message.ReleaseStatusId, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception publishing Release Content immediately: {e.Message}"));
             }
 
@@ -73,12 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid releaseStatusId,
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, state, logMessage);
+            await _releasePublishingStatusService.UpdateContentStageAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId,
+                state,
+                logMessage);
         }
     }
 }

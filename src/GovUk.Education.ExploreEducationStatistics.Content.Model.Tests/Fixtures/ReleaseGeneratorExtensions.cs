@@ -10,19 +10,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixture
 
 public static class ReleaseGeneratorExtensions
 {
-    public static Generator<Release> DefaultRelease(this DataFixture fixture)
-        => fixture.Generator<Release>().WithDefaults();
+    public static Generator<ReleaseVersion> DefaultReleaseVersion(this DataFixture fixture)
+        => fixture.Generator<ReleaseVersion>().WithDefaults();
 
-    public static Generator<Release> WithDefaults(this Generator<Release> generator)
-        => generator.ForInstance(release => release.SetDefaults());
+    public static Generator<ReleaseVersion> WithDefaults(this Generator<ReleaseVersion> generator)
+        => generator.ForInstance(releaseVersion => releaseVersion.SetDefaults());
 
-    public static Generator<Release> WithId(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithId(
+        this Generator<ReleaseVersion> generator,
         Guid id)
-        => generator.ForInstance(release => release.SetId(id));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetId(id));
 
-    public static Generator<Release> WithIds(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithIds(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<Guid> ids)
     {
         ids.ForEach((id, index) =>
@@ -31,42 +31,42 @@ public static class ReleaseGeneratorExtensions
         return generator;
     }
 
-    public static Generator<Release> WithPublication(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPublication(
+        this Generator<ReleaseVersion> generator,
         Publication publication)
         => generator.ForInstance(s => s.SetPublication(publication));
 
-    public static Generator<Release> WithPublications(this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPublications(this Generator<ReleaseVersion> generator,
         IEnumerable<Publication> publications)
     {
         publications.ForEach((publication, index) =>
-            generator.ForIndex(index, release => release.SetPublication(publication)));
+            generator.ForIndex(index, releaseVersion => releaseVersion.SetPublication(publication)));
 
         return generator;
     }
 
-    public static Generator<Release> WithReleaseParent(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithReleaseParent(
+        this Generator<ReleaseVersion> generator,
         ReleaseParent releaseParent)
         => generator.ForInstance(s => s.SetReleaseParent(releaseParent));
 
-    public static Generator<Release> WithApprovalStatus(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithApprovalStatus(
+        this Generator<ReleaseVersion> generator,
         ReleaseApprovalStatus status)
-        => generator.ForInstance(release => release.SetApprovalStatus(status));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetApprovalStatus(status));
 
-    public static Generator<Release> WithPublished(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPublished(
+        this Generator<ReleaseVersion> generator,
         DateTime published)
-        => generator.ForInstance(release => release.SetPublished(published));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPublished(published));
 
-    public static Generator<Release> WithPublishScheduled(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPublishScheduled(
+        this Generator<ReleaseVersion> generator,
         DateTime publishScheduled)
-        => generator.ForInstance(release => release.SetPublishScheduled(publishScheduled));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPublishScheduled(publishScheduled));
 
-    public static Generator<Release> WithApprovalStatuses(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithApprovalStatuses(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ReleaseApprovalStatus> statuses)
     {
         statuses.ForEach((status, index) =>
@@ -75,120 +75,120 @@ public static class ReleaseGeneratorExtensions
         return generator;
     }
 
-    public static Generator<Release> WithDataBlockVersions(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithDataBlockVersions(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<DataBlockVersion> dataBlockVersions)
-        => generator.ForInstance(release => release.SetDataBlockVersions(dataBlockVersions));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetDataBlockVersions(dataBlockVersions));
 
-    public static Generator<Release> WithContent(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithContent(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ContentSection> content)
-        => generator.ForInstance(release => release.SetContentBlocks(content));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetContentBlocks(content));
 
-    public static Generator<Release> WithReleaseStatuses(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithReleaseStatuses(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ReleaseStatus> status)
-        => generator.ForInstance(release => release.SetReleaseStatuses(status));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetReleaseStatuses(status));
 
-    public static Generator<Release> WithCreated(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithCreated(
+        this Generator<ReleaseVersion> generator,
         DateTime? created = null,
         Guid? createdById = null)
     {
-        return generator.ForInstance(r => r.SetCreated(created, createdById));
+        return generator.ForInstance(releaseVersion => releaseVersion.SetCreated(created, createdById));
     }
 
-    public static Generator<Release> WithNextReleaseDate(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithNextReleaseDate(
+        this Generator<ReleaseVersion> generator,
         PartialDate nextReleaseDate)
-        => generator.ForInstance(release => release.SetNextReleaseDate(nextReleaseDate));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetNextReleaseDate(nextReleaseDate));
 
-    public static Generator<Release> WithPreviousVersion(
-        this Generator<Release> generator,
-        Release previousVersion)
-        => generator.ForInstance(release => release.SetPreviousVersion(previousVersion));
+    public static Generator<ReleaseVersion> WithPreviousVersion(
+        this Generator<ReleaseVersion> generator,
+        ReleaseVersion previousVersion)
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPreviousVersion(previousVersion));
 
-    public static Generator<Release> WithPreviousVersionId(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPreviousVersionId(
+        this Generator<ReleaseVersion> generator,
         Guid previousVersionId)
-        => generator.ForInstance(release => release.SetPreviousVersionId(previousVersionId));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPreviousVersionId(previousVersionId));
 
-    public static Generator<Release> WithYear(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithYear(
+        this Generator<ReleaseVersion> generator,
         int year)
-        => generator.ForInstance(release => release.SetYear(year));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetYear(year));
 
-    public static Generator<Release> WithType(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithType(
+        this Generator<ReleaseVersion> generator,
         ReleaseType type)
-        => generator.ForInstance(release => release.SetType(type));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetType(type));
 
-    public static Generator<Release> WithVersion(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithVersion(
+        this Generator<ReleaseVersion> generator,
         int version)
-        => generator.ForInstance(release => release.SetVersion(version));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetVersion(version));
 
-    public static Generator<Release> WithNotifiedOn(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithNotifiedOn(
+        this Generator<ReleaseVersion> generator,
         DateTime notifiedOn)
-        => generator.ForInstance(release => release.SetNotifiedOn(notifiedOn));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetNotifiedOn(notifiedOn));
 
-    public static Generator<Release> WithTimePeriodCoverage(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithTimePeriodCoverage(
+        this Generator<ReleaseVersion> generator,
         TimeIdentifier timePeriodCoverage)
-        => generator.ForInstance(release => release.SetTimePeriodCoverage(timePeriodCoverage));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetTimePeriodCoverage(timePeriodCoverage));
 
-    public static Generator<Release> WithNotifySubscribers(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithNotifySubscribers(
+        this Generator<ReleaseVersion> generator,
         bool notifySubscribers)
-        => generator.ForInstance(release => release.SetNotifySubscribers(notifySubscribers));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetNotifySubscribers(notifySubscribers));
 
-    public static Generator<Release> WithUpdatePublishedDate(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithUpdatePublishedDate(
+        this Generator<ReleaseVersion> generator,
         bool updatePublishedDate)
-        => generator.ForInstance(release => release.SetUpdatePublishedDate(updatePublishedDate));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetUpdatePublishedDate(updatePublishedDate));
 
-    public static Generator<Release> WithPreReleaseAccessList(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithPreReleaseAccessList(
+        this Generator<ReleaseVersion> generator,
         string preReleaseAccessList)
-        => generator.ForInstance(release => release.SetPreReleaseAccessList(preReleaseAccessList));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetPreReleaseAccessList(preReleaseAccessList));
 
-    public static Generator<Release> WithRelatedInformation(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithRelatedInformation(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<Link> relatedInformation)
-        => generator.ForInstance(release => release.SetRelatedInformation(relatedInformation));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetRelatedInformation(relatedInformation));
 
-    public static Generator<Release> WithUpdates(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithUpdates(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<Update> updates)
-        => generator.ForInstance(release => release.SetUpdates(updates));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetUpdates(updates));
 
-    public static Generator<Release> WithKeyStatistics(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithKeyStatistics(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<KeyStatistic> keyStatistics)
-        => generator.ForInstance(release => release.SetKeyStatistics(keyStatistics));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetKeyStatistics(keyStatistics));
 
-    public static Generator<Release> WithReleaseSummaryContent(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithReleaseSummaryContent(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content)
-        => generator.ForInstance(release => release.SetReleaseSummaryContent(content));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetReleaseSummaryContent(content));
 
-    public static Generator<Release> WithHeadlinesContent(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithHeadlinesContent(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content)
-        => generator.ForInstance(release => release.SetHeadlinesSectionContent(content));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetHeadlinesSectionContent(content));
 
-    public static Generator<Release> WithRelatedDashboardContent(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithRelatedDashboardContent(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<ContentBlock> content)
-        => generator.ForInstance(release => release.SetRelatedDashboardsContent(content));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetRelatedDashboardsContent(content));
 
-    public static Generator<Release> WithFeaturedTables(
-        this Generator<Release> generator,
+    public static Generator<ReleaseVersion> WithFeaturedTables(
+        this Generator<ReleaseVersion> generator,
         IEnumerable<FeaturedTable> featuredTables)
-        => generator.ForInstance(release => release.SetFeaturedTables(featuredTables));
+        => generator.ForInstance(releaseVersion => releaseVersion.SetFeaturedTables(featuredTables));
 
-    public static InstanceSetters<Release> SetDefaults(this InstanceSetters<Release> setters)
+    public static InstanceSetters<ReleaseVersion> SetDefaults(this InstanceSetters<ReleaseVersion> setters)
         => setters
             .SetDefault(p => p.Id)
             .SetDefault(p => p.Slug)
@@ -202,83 +202,83 @@ public static class ReleaseGeneratorExtensions
                 Day = "1", Month = "1", Year = $"{2000 + context.Index}"
             });
 
-    public static InstanceSetters<Release> SetId(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetId(
+        this InstanceSetters<ReleaseVersion> setters,
         Guid id)
-        => setters.Set(r => r.Id, id);
+        => setters.Set(releaseVersion => releaseVersion.Id, id);
 
-    public static InstanceSetters<Release> SetPublication(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetPublication(
+        this InstanceSetters<ReleaseVersion> setters,
         Publication publication)
-        => setters.Set((_, release, _) =>
+        => setters.Set((_, releaseVersion, _) =>
         {
-            release.Publication = publication;
-            release.PublicationId = publication.Id;
+            releaseVersion.Publication = publication;
+            releaseVersion.PublicationId = publication.Id;
         });
 
-    public static InstanceSetters<Release> SetReleaseParent(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetReleaseParent(
+        this InstanceSetters<ReleaseVersion> setters,
         ReleaseParent releaseParent)
-        => setters.Set(r => r.ReleaseParent, releaseParent)
+        => setters.Set(releaseVersion => releaseVersion.ReleaseParent, releaseParent)
             .SetReleaseParentId(releaseParent.Id);
 
-    public static InstanceSetters<Release> SetReleaseParentId(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetReleaseParentId(
+        this InstanceSetters<ReleaseVersion> setters,
         Guid releaseParentId)
-        => setters.Set(r => r.ReleaseParentId, releaseParentId);
+        => setters.Set(releaseVersion => releaseVersion.ReleaseParentId, releaseParentId);
 
-    public static InstanceSetters<Release> SetApprovalStatus(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetApprovalStatus(
+        this InstanceSetters<ReleaseVersion> setters,
         ReleaseApprovalStatus status)
-        => setters.Set(release => release.ApprovalStatus, status);
+        => setters.Set(releaseVersion => releaseVersion.ApprovalStatus, status);
 
-    public static InstanceSetters<Release> SetReleaseStatuses(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetReleaseStatuses(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ReleaseStatus> releaseStatuses)
-        => setters.Set(release => release.ReleaseStatuses, releaseStatuses.ToList());
+        => setters.Set(releaseVersion => releaseVersion.ReleaseStatuses, releaseStatuses.ToList());
 
 
-    public static InstanceSetters<Release> SetDataBlockVersions(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetDataBlockVersions(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<DataBlockVersion> dataBlockVersions)
     {
         var dataBlockVersionsList = dataBlockVersions.ToList();
         return setters
-            .Set(release => release.DataBlockVersions, dataBlockVersionsList.ToList())
-            .Set((_, release, _) =>
+            .Set(releaseVersion => releaseVersion.DataBlockVersions, dataBlockVersionsList.ToList())
+            .Set((_, releaseVersion, _) =>
             {
                 dataBlockVersionsList.ForEach(dataBlockVersion =>
                 {
-                    dataBlockVersion.Release = release;
-                    dataBlockVersion.ReleaseId = release.Id;
-                    dataBlockVersion.ContentBlock.Release = release;
-                    dataBlockVersion.ContentBlock.ReleaseId = release.Id;
+                    dataBlockVersion.ReleaseVersion = releaseVersion;
+                    dataBlockVersion.ReleaseVersionId = releaseVersion.Id;
+                    dataBlockVersion.ContentBlock.ReleaseVersion = releaseVersion;
+                    dataBlockVersion.ContentBlock.ReleaseVersionId = releaseVersion.Id;
                 });
             });
     }
 
-    public static InstanceSetters<Release> SetContentBlocks(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetContentBlocks(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentSection> content)
-        => setters.Set(release => release.Content, content.ToList());
+        => setters.Set(releaseVersion => releaseVersion.Content, content.ToList());
 
-    public static InstanceSetters<Release> SetPublished(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetPublished(
+        this InstanceSetters<ReleaseVersion> setters,
         DateTime published)
-        => setters.Set(release => release.Published, published);
+        => setters.Set(releaseVersion => releaseVersion.Published, published);
 
-    public static InstanceSetters<Release> SetPublishScheduled(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetPublishScheduled(
+        this InstanceSetters<ReleaseVersion> setters,
         DateTime publishScheduled)
-        => setters.Set(release => release.PublishScheduled, publishScheduled);
+        => setters.Set(releaseVersion => releaseVersion.PublishScheduled, publishScheduled);
 
-    public static InstanceSetters<Release> SetNextReleaseDate(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetNextReleaseDate(
+        this InstanceSetters<ReleaseVersion> setters,
         PartialDate nextReleaseDate)
-        => setters.Set(release => release.NextReleaseDate, nextReleaseDate);
+        => setters.Set(releaseVersion => releaseVersion.NextReleaseDate, nextReleaseDate);
 
-    public static InstanceSetters<Release> SetCreated(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetCreated(
+        this InstanceSetters<ReleaseVersion> setters,
         DateTime? created = null,
         Guid? createdById = null)
     {
@@ -295,129 +295,129 @@ public static class ReleaseGeneratorExtensions
         return setters;
     }
 
-    public static InstanceSetters<Release> SetPreviousVersion(
-        this InstanceSetters<Release> setters,
-        Release? previousVersion)
-        => setters.Set(release => release.PreviousVersion, previousVersion)
+    public static InstanceSetters<ReleaseVersion> SetPreviousVersion(
+        this InstanceSetters<ReleaseVersion> setters,
+        ReleaseVersion? previousVersion)
+        => setters.Set(releaseVersion => releaseVersion.PreviousVersion, previousVersion)
             .SetPreviousVersionId(previousVersion?.Id);
 
-    public static InstanceSetters<Release> SetPreviousVersionId(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetPreviousVersionId(
+        this InstanceSetters<ReleaseVersion> setters,
         Guid? previousVersionId)
-        => setters.Set(release => release.PreviousVersionId, previousVersionId);
+        => setters.Set(releaseVersion => releaseVersion.PreviousVersionId, previousVersionId);
 
-    public static InstanceSetters<Release> SetYear(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetYear(
+        this InstanceSetters<ReleaseVersion> setters,
         int year)
-        => setters.Set(release => release.ReleaseName, year.ToString());
+        => setters.Set(releaseVersion => releaseVersion.ReleaseName, year.ToString());
 
-    public static InstanceSetters<Release> SetType(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetType(
+        this InstanceSetters<ReleaseVersion> setters,
         ReleaseType type)
-        => setters.Set(release => release.Type, type);
+        => setters.Set(releaseVersion => releaseVersion.Type, type);
 
-    public static InstanceSetters<Release> SetVersion(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetVersion(
+        this InstanceSetters<ReleaseVersion> setters,
         int version)
-        => setters.Set(release => release.Version, version);
+        => setters.Set(releaseVersion => releaseVersion.Version, version);
 
-    public static InstanceSetters<Release> SetTimePeriodCoverage(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetTimePeriodCoverage(
+        this InstanceSetters<ReleaseVersion> setters,
         TimeIdentifier timePeriodCoverage)
-        => setters.Set(release => release.TimePeriodCoverage, timePeriodCoverage);
+        => setters.Set(releaseVersion => releaseVersion.TimePeriodCoverage, timePeriodCoverage);
 
-    public static InstanceSetters<Release> SetNotifySubscribers(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetNotifySubscribers(
+        this InstanceSetters<ReleaseVersion> setters,
         bool notifySubscribers)
-        => setters.Set(release => release.NotifySubscribers, notifySubscribers);
+        => setters.Set(releaseVersion => releaseVersion.NotifySubscribers, notifySubscribers);
 
-    public static InstanceSetters<Release> SetNotifiedOn(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetNotifiedOn(
+        this InstanceSetters<ReleaseVersion> setters,
         DateTime notifiedOn)
-        => setters.Set(release => release.NotifiedOn, notifiedOn);
+        => setters.Set(releaseVersion => releaseVersion.NotifiedOn, notifiedOn);
 
-    public static InstanceSetters<Release> SetUpdatePublishedDate(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetUpdatePublishedDate(
+        this InstanceSetters<ReleaseVersion> setters,
         bool updatePublishedDate)
-        => setters.Set(release => release.UpdatePublishedDate, updatePublishedDate);
+        => setters.Set(releaseVersion => releaseVersion.UpdatePublishedDate, updatePublishedDate);
 
-    public static InstanceSetters<Release> SetPreReleaseAccessList(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetPreReleaseAccessList(
+        this InstanceSetters<ReleaseVersion> setters,
         string preReleaseAccessList)
-        => setters.Set(release => release.PreReleaseAccessList, preReleaseAccessList);
+        => setters.Set(releaseVersion => releaseVersion.PreReleaseAccessList, preReleaseAccessList);
 
-    public static InstanceSetters<Release> SetRelatedInformation(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetRelatedInformation(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<Link> relatedInformation)
-        => setters.Set(release => release.RelatedInformation, relatedInformation.ToList());
+        => setters.Set(releaseVersion => releaseVersion.RelatedInformation, relatedInformation.ToList());
 
-    public static InstanceSetters<Release> SetUpdates(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetUpdates(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<Update> updates)
     {
         var updatesList = updates.ToList();
         return setters
-            .Set(release => release.Updates, updatesList.ToList())
-            .Set((_, release, _) => updatesList.ForEach(r =>
+            .Set(releaseVersion => releaseVersion.Updates, updatesList.ToList())
+            .Set((_, releaseVersion, _) => updatesList.ForEach(update =>
             {
-                r.Release = release;
-                r.ReleaseId = release.Id;
+                update.ReleaseVersion = releaseVersion;
+                update.ReleaseVersionId = releaseVersion.Id;
             }));
     }
 
-    public static InstanceSetters<Release> SetKeyStatistics(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetKeyStatistics(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<KeyStatistic> keyStatistics)
     {
         var keyStatisticsList = keyStatistics.ToList();
         return setters
-            .Set(release => release.KeyStatistics, keyStatisticsList.ToList())
-            .Set(release => release.KeyStatisticsSecondarySection, new ContentSection
+            .Set(releaseVersion => releaseVersion.KeyStatistics, keyStatisticsList.ToList())
+            .Set(releaseVersion => releaseVersion.KeyStatisticsSecondarySection, new ContentSection
             {
                 Type = ContentSectionType.KeyStatisticsSecondary
             })
-            .Set((_, release, _) => keyStatisticsList.ForEach(r =>
+            .Set((_, releaseVersion, _) => keyStatisticsList.ForEach(keyStatistic =>
             {
-                r.Release = release;
-                r.ReleaseId = release.Id;
+                keyStatistic.ReleaseVersion = releaseVersion;
+                keyStatistic.ReleaseVersionId = releaseVersion.Id;
             }));
     }
 
-    public static InstanceSetters<Release> SetReleaseSummaryContent(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetReleaseSummaryContent(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentBlock> content)
         => setters.SetTopLevelContentSection(
-            release => release.HeadlinesSection, ContentSectionType.ReleaseSummary, content);
+            releaseVersion => releaseVersion.HeadlinesSection, ContentSectionType.ReleaseSummary, content);
 
-    public static InstanceSetters<Release> SetHeadlinesSectionContent(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetHeadlinesSectionContent(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentBlock> content)
         => setters.SetTopLevelContentSection(
-            release => release.HeadlinesSection, ContentSectionType.Headlines, content);
+            releaseVersion => releaseVersion.HeadlinesSection, ContentSectionType.Headlines, content);
 
-    public static InstanceSetters<Release> SetRelatedDashboardsContent(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetRelatedDashboardsContent(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<ContentBlock> content)
         => setters.SetTopLevelContentSection(
-            release => release.RelatedDashboardsSection, ContentSectionType.RelatedDashboards, content);
+            releaseVersion => releaseVersion.RelatedDashboardsSection, ContentSectionType.RelatedDashboards, content);
 
-    public static InstanceSetters<Release> SetFeaturedTables(
-        this InstanceSetters<Release> setters,
+    public static InstanceSetters<ReleaseVersion> SetFeaturedTables(
+        this InstanceSetters<ReleaseVersion> setters,
         IEnumerable<FeaturedTable> featuredTables)
     {
         var featuredTablesList = featuredTables.ToList();
         return setters
-            .Set(release => release.FeaturedTables, featuredTablesList)
-            .Set((_, release, _) => featuredTablesList.ForEach(featuredTable =>
+            .Set(releaseVersion => releaseVersion.FeaturedTables, featuredTablesList)
+            .Set((_, releaseVersion, _) => featuredTablesList.ForEach(featuredTable =>
             {
-                featuredTable.Release = release;
-                featuredTable.ReleaseId = release.Id;
+                featuredTable.ReleaseVersion = releaseVersion;
+                featuredTable.ReleaseVersionId = releaseVersion.Id;
             }));
     }
 
-    private static InstanceSetters<Release> SetTopLevelContentSection(
-        this InstanceSetters<Release> setters,
-        Expression<Func<Release, ContentSection>> field,
+    private static InstanceSetters<ReleaseVersion> SetTopLevelContentSection(
+        this InstanceSetters<ReleaseVersion> setters,
+        Expression<Func<ReleaseVersion, ContentSection>> field,
         ContentSectionType type,
         IEnumerable<ContentBlock> content)
     {
@@ -427,10 +427,10 @@ public static class ReleaseGeneratorExtensions
             {
                 Type = type
             })
-            .Set((_, release, _) => contentList.ForEach(contentBlock =>
+            .Set((_, releaseVersion, _) => contentList.ForEach(contentBlock =>
             {
-                contentBlock.Release = release;
-                contentBlock.ReleaseId = release.Id;
+                contentBlock.ReleaseVersion = releaseVersion;
+                contentBlock.ReleaseVersionId = releaseVersion.Id;
             }));
     }
 }

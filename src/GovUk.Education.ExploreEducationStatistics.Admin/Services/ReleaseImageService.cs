@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.IO;
 using System.Linq;
@@ -46,12 +46,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseFile>(q => q
                     .Include(rf => rf.File)
-                    .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId))
+                    .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId))
                 .OnSuccessCombineWith(rf =>
                     _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, rf.Path(), new MemoryStream()))
                 .OnSuccess(releaseFileAndStream =>
@@ -64,28 +64,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid releaseId, IFormFile formFile)
+        public Task<Either<ActionResult, ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile formFile)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
-                    releaseId,
+                    releaseVersionId,
                     Image,
                     formFile))
-                .OnSuccess(releaseFile => new ImageFileViewModel($"/api/releases/{releaseId}/images/{releaseFile.File.Id}")
+                .OnSuccess(releaseFile => new ImageFileViewModel($"/api/releases/{releaseVersionId}/images/{releaseFile.File.Id}")
                 {
                     // TODO EES-1922 Add support for resizing the image
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseFile>> Upload(Guid releaseId,
+        private async Task<Either<ActionResult, ReleaseFile>> Upload(Guid releaseVersionId,
             FileType type,
             IFormFile formFile)
         {
             var releaseFile = await _releaseFileRepository.Create(
-                releaseId: releaseId,
+                releaseVersionId: releaseVersionId,
                 filename: formFile.FileName,
                 contentLength: formFile.Length,
                 contentType: formFile.ContentType,

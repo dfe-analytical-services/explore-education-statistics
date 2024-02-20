@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PreReleaseSummaryServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -26,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetPreReleaseSummaryViewModelAsync()
         {
             AssertSecurityPoliciesChecked(service =>
-                    service.GetPreReleaseSummaryViewModelAsync(_release.Id),
-                _release,
+                    service.GetPreReleaseSummaryViewModelAsync(_releaseVersion.Id),
+                _releaseVersion,
                 CanViewSpecificPreReleaseSummary);
         }
 
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
+            MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
 
             return (persistenceHelper,
                 MockUtils.AlwaysTrueUserService());

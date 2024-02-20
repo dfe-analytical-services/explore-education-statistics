@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class ReleaseServicePermissionTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -26,12 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task ListSubjects()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseMetaService(userService: userService.Object);
-                        return service.ListSubjects(_release.Id);
+                        return service.ListSubjects(_releaseVersion.Id);
                     }
                 );
         }
@@ -56,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
             return mock;
         }
     }

@@ -93,7 +93,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                 claimsIdentity.AddClaim(new Claim(EesClaimTypes.Name, combinedNameClaimValue));
             }
 
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
             // Set up scenario and test data.
@@ -126,21 +126,21 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                 })
                 .AddContentDbTestData(context =>
                 {
-                    var release = new Release
+                    var releaseVersion = new ReleaseVersion
                     {
-                        Id = releaseId,
+                        Id = releaseVersionId,
                         Publication = new Publication
                         {
                             Id = publicationId
                         }
                     };
 
-                    context.Releases.Add(release);
+                    context.ReleaseVersions.Add(releaseVersion);
 
                     // Add a release role invite for an unrelated user.
                     context.UserReleaseInvites.Add(new UserReleaseInvite
                     {
-                        ReleaseId = releaseId,
+                        ReleaseVersionId = releaseVersionId,
                         Email = unrelatedUserEmail,
                         Role = ReleaseRole.Approver,
                         Created = DateTime.Now.AddDays(-1),
@@ -151,7 +151,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         // Add a release role invite for this user.
                         context.UserReleaseInvites.Add(new UserReleaseInvite
                         {
-                            ReleaseId = releaseId,
+                            ReleaseVersionId = releaseVersionId,
                             Email = email.ToLower(),
                             Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
                             Created = DateTime.Now.AddDays(-1),
@@ -172,7 +172,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         // Add a publication role invite for this user.
                         context.UserPublicationInvites.Add(new UserPublicationInvite
                         {
-                            PublicationId = release.Publication.Id,
+                            PublicationId = releaseVersion.Publication.Id,
                             Email = email.ToLower(),
                             Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
                             Created = DateTime.Now.AddDays(-1),
@@ -230,7 +230,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                 {
                     // Verify that the user received the desired role on the Release they were invited to.
                     var releaseRoleAssignment = context.UserReleaseRoles.Single();
-                    Assert.Equal(releaseId, releaseRoleAssignment.ReleaseId);
+                    Assert.Equal(releaseVersionId, releaseRoleAssignment.ReleaseVersionId);
                     Assert.Equal(releaseRoleInInvite, releaseRoleAssignment.Role.ToString());
                     Assert.Equal(userProfile.Id, releaseRoleAssignment.UserId);
                 }
@@ -259,7 +259,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
             claimsIdentity.AddClaim(new Claim(EesClaimTypes.Name, "FirstName LastName"));
 
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
             // Set up scenario and test data.
@@ -283,21 +283,21 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                 })
                 .AddContentDbTestData(context =>
                 {
-                    var release = new Release
+                    var releaseVersion = new ReleaseVersion
                     {
-                        Id = releaseId,
+                        Id = releaseVersionId,
                         Publication = new Publication
                         {
                             Id = publicationId
                         }
                     };
 
-                    context.Releases.Add(release);
+                    context.ReleaseVersions.Add(releaseVersion);
 
                     // Add a release role invite for this user.
                     context.UserReleaseInvites.Add(new UserReleaseInvite
                     {
-                        ReleaseId = releaseId,
+                        ReleaseVersionId = releaseVersionId,
                         Email = email.ToLower(),
                         Role = ReleaseRole.Approver,
                         Created = DateTime.Now.AddDays(-1),
@@ -306,7 +306,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                     // Add a publication role invite for this user.
                     context.UserPublicationInvites.Add(new UserPublicationInvite
                     {
-                        PublicationId = release.Publication.Id,
+                        PublicationId = releaseVersion.Publication.Id,
                         Email = email.ToLower(),
                         Role = PublicationRole.Approver,
                         Created = DateTime.Now.AddDays(-1),
@@ -360,7 +360,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
             claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
             claimsIdentity.AddClaim(new Claim(EesClaimTypes.Name, "FirstName LastName"));
 
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
             // Set up scenario and test data.
@@ -384,21 +384,21 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                 })
                 .AddContentDbTestData(context =>
                 {
-                    var release = new Release
+                    var releaseVersion = new ReleaseVersion
                     {
-                        Id = releaseId,
+                        Id = releaseVersionId,
                         Publication = new Publication
                         {
                             Id = publicationId
                         }
                     };
 
-                    context.Releases.Add(release);
+                    context.ReleaseVersions.Add(releaseVersion);
 
                     // Add a release role invite for this user, but without a global invite, this should have no effect.
                     context.UserReleaseInvites.Add(new UserReleaseInvite
                     {
-                        ReleaseId = releaseId,
+                        ReleaseVersionId = releaseVersionId,
                         Email = email.ToLower(),
                         Role = ReleaseRole.Approver,
                         Created = DateTime.Now.AddDays(-1),
@@ -407,7 +407,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                     // Add a publication role invite for this user.
                     context.UserPublicationInvites.Add(new UserPublicationInvite
                     {
-                        PublicationId = release.Publication.Id,
+                        PublicationId = releaseVersion.Publication.Id,
                         Email = email.ToLower(),
                         Role = PublicationRole.Approver,
                         Created = DateTime.Now.AddDays(-1),

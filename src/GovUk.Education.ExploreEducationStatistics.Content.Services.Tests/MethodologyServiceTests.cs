@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-title",
                 Title = "Publication title",
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-a",
                 Title = "Publication A",
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-b",
                 Title = "Publication B",
-                LatestPublishedReleaseId = null,
+                LatestPublishedReleaseVersionId = null,
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()

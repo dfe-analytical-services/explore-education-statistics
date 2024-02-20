@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = _fixture.DefaultStatsRelease(),
+                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
                 Subject = subject
             };
 
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
             footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject.ReleaseId, releaseSubject.SubjectId))
+                    releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var service = BuildReleaseSubjectRepository(statisticsDbContext,
                     footnoteRepository: footnoteRepository.Object);
 
-                await service.DeleteReleaseSubject(releaseId: releaseSubject.ReleaseId,
+                await service.DeleteReleaseSubject(releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId);
 
                 MockUtils.VerifyAllMocks(footnoteRepository);
@@ -74,13 +74,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = _fixture.DefaultStatsRelease(),
+                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
                 Subject = subject
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = _fixture.DefaultStatsRelease(),
+                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
                 Subject = subject
             };
 
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
             footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject2.ReleaseId, releaseSubject2.SubjectId))
+                    releaseSubject2.ReleaseVersionId, releaseSubject2.SubjectId))
                 .Returns(Task.CompletedTask);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var service = BuildReleaseSubjectRepository(statisticsDbContext,
                     footnoteRepository: footnoteRepository.Object);
 
-                await service.DeleteReleaseSubject(releaseId: releaseSubject2.ReleaseId,
+                await service.DeleteReleaseSubject(releaseVersionId: releaseSubject2.ReleaseVersionId,
                     subjectId: releaseSubject2.SubjectId);
 
                 MockUtils.VerifyAllMocks(footnoteRepository);
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             {
                 var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
                 Assert.Single(releaseSubjects);
-                Assert.Equal(releaseSubject1.ReleaseId, releaseSubjects[0].ReleaseId);
+                Assert.Equal(releaseSubject1.ReleaseVersionId, releaseSubjects[0].ReleaseVersionId);
                 Assert.Equal(subject.Id, releaseSubjects[0].SubjectId);
 
                 var subjects = statisticsDbContext.Subject.ToList();
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = _fixture.DefaultStatsRelease(),
+                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
                 Subject = subject
             };
 
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
             footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject.ReleaseId,
+                    releaseSubject.ReleaseVersionId,
                     releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     subjectDeleter: subjectDeleter.Object);
 
                 await service.DeleteReleaseSubject(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     softDeleteOrphanedSubject: false);
 
@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = _fixture.DefaultStatsRelease(),
+                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
                 Subject = subject
             };
 
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     footnoteRepository: footnoteRepository.Object);
 
                 // Try to delete non-existing ReleaseSubject
-                await service.DeleteReleaseSubject(releaseId: Guid.NewGuid(),
+                await service.DeleteReleaseSubject(releaseVersionId: Guid.NewGuid(),
                     subjectId: Guid.NewGuid());
 
                 MockUtils.VerifyAllMocks(footnoteRepository);
@@ -235,17 +235,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteAllReleaseSubjects()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = _fixture.DefaultSubject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = _fixture.DefaultSubject()
             };
 
@@ -253,14 +253,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Release.AddRangeAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+                statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
+                statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var service = BuildReleaseSubjectRepository(statisticsDbContext,
                     footnoteRepository: footnoteRepository.Object);
 
-                await service.DeleteAllReleaseSubjects(releaseId: release.Id);
+                await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(footnoteRepository);
             }
@@ -291,17 +291,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task DeleteAllReleaseSubjects_SoftDeleteFalse()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
+            var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = _fixture.DefaultSubject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = _fixture.DefaultSubject()
             };
 
@@ -309,14 +309,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Release.AddRangeAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+                statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
+                statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     footnoteRepository: footnoteRepository.Object,
                     subjectDeleter: subjectDeleter.Object);
 
-                await service.DeleteAllReleaseSubjects(releaseId: release.Id,
+                await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id,
                     softDeleteOrphanedSubjects: false);
 
                 MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);

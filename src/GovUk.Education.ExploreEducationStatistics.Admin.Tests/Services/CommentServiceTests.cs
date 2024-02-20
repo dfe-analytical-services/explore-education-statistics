@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddComment()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -55,9 +55,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupCommentService(contentDbContext: contentDbContext);
 
                 var result = await service.AddComment(
-                    release.Id,
-                    release.Content[0].Id,
-                    release.Content[0].Content[0].Id,
+                    releaseVersion.Id,
+                    releaseVersion.Content[0].Id,
+                    releaseVersion.Content[0].Content[0].Id,
                     new CommentSaveRequest
                     {
                         Content = "New comment"
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupCommentService(contentDbContext: contentDbContext);
 
                 var result = await service.AddComment(
-                    releaseId: Guid.NewGuid(),
+                    releaseVersionId: Guid.NewGuid(),
                     contentSectionId: Guid.NewGuid(),
                     contentBlockId: Guid.NewGuid(),
                     new CommentSaveRequest
@@ -100,12 +100,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddComment_NoContentSection()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupCommentService(contentDbContext: contentDbContext);
 
                 var result = await service.AddComment(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     contentSectionId: Guid.NewGuid(),
                     contentBlockId: Guid.NewGuid(),
                     new CommentSaveRequest
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddComment_NoContentBlock()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -153,8 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupCommentService(contentDbContext: contentDbContext);
 
                 var result = await service.AddComment(
-                    releaseId: release.Id,
-                    contentSectionId: release.Content[0].Id,
+                    releaseVersionId: releaseVersion.Id,
+                    contentSectionId: releaseVersion.Content[0].Id,
                     contentBlockId: Guid.NewGuid(),
                     new CommentSaveRequest
                     {
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Content = "Existing comment",
                 CreatedById = Guid.NewGuid(),
             };
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Resolved = DateTime.UtcNow,
                 ResolvedById = Guid.NewGuid(),
             };
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Content = "Existing comment",
                 CreatedById = Guid.NewGuid(),
             };
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -313,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -381,7 +381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Content = "Comment 3",
                 CreatedById = Guid.NewGuid(),
             };
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 

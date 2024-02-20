@@ -13,15 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
 public static class PermissionsUtils
 {
-    public static async Task<ReleasePermissions> GetReleasePermissions(IUserService userService, Release release)
+    public static async Task<ReleasePermissions> GetReleasePermissions(IUserService userService,
+        ReleaseVersion releaseVersion)
     {
         return new ReleasePermissions
         {
-            CanAddPrereleaseUsers = await userService.CheckCanAssignPrereleaseContactsToRelease(release).IsRight(),
-            CanViewRelease = await userService.CheckCanViewRelease(release).IsRight(),
-            CanUpdateRelease = await userService.CheckCanUpdateRelease(release).IsRight(),
-            CanDeleteRelease = await userService.CheckCanDeleteRelease(release).IsRight(),
-            CanMakeAmendmentOfRelease = await userService.CheckCanMakeAmendmentOfRelease(release).IsRight()
+            CanAddPrereleaseUsers =
+                await userService.CheckCanAssignPrereleaseContactsToRelease(releaseVersion).IsRight(),
+            CanViewRelease = await userService.CheckCanViewRelease(releaseVersion).IsRight(),
+            CanUpdateRelease = await userService.CheckCanUpdateRelease(releaseVersion).IsRight(),
+            CanDeleteRelease = await userService.CheckCanDeleteRelease(releaseVersion).IsRight(),
+            CanMakeAmendmentOfRelease = await userService.CheckCanMakeAmendmentOfRelease(releaseVersion).IsRight()
         };
     }
 
@@ -42,7 +44,7 @@ public static class PermissionsUtils
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
             CanUpdateContributorReleaseRole =
                 await userService.CheckCanUpdateReleaseRole(publication, Contributor).IsRight(),
-            CanViewReleaseTeamAccess = 
+            CanViewReleaseTeamAccess =
                 await userService.CheckCanViewReleaseTeamAccess(publication).IsRight()
         };
     }

@@ -19,14 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseFileServicePermissionTests
     {
-        private static readonly Release Release = new()
+        private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
 
         private static readonly ReleaseFile ReleaseFile = new()
         {
-            Release = Release,
+            ReleaseVersion = ReleaseVersion,
             File = new File(),
         };
 
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task StreamFile()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseFile.Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             userService: userService.Object,
                             persistenceHelper: persistenceHelper.Object
                         );
-                        return service.StreamFile(ReleaseFile.ReleaseId, ReleaseFile.FileId);
+                        return service.StreamFile(releaseVersionId: ReleaseFile.ReleaseVersionId,
+                            fileId: ReleaseFile.FileId);
                     }
                 );
         }
@@ -54,13 +55,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task ZipFilesToStream()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseFileService(userService: userService.Object);
                         return service.ZipFilesToStream(
-                            releaseId: Release.Id,
+                            releaseVersionId: ReleaseVersion.Id,
                             outputStream: Stream.Null,
                             fileIds: ListOf(Guid.NewGuid())
                         );
@@ -86,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release);
+            return MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     {
         private readonly DataFixture _fixture = new();
 
-        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
         private static readonly Guid DataBlockId = Guid.NewGuid();
 
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
-                    .WithReleaseId(ReleaseId)
+                    .WithReleaseVersionId(ReleaseVersionId)
                     .WithQuery(Query))
                 .Generate();
 
@@ -88,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .ReturnsAsync(null!);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseId, dataBlockVersion.Id))
+                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseVersionId, dataBlockVersion.Id))
                 .ReturnsAsync(dataBlockVersion);
 
             tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
-                            ReleaseId,
+                            ReleaseVersionId,
                             It.Is<ObservationQueryContext>(
                                 q => q.SubjectId == Query.SubjectId
                             ),
@@ -110,7 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     TableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            var result = await controller.QueryForDataBlock(ReleaseId, dataBlockVersion.Id, cancellationToken);
+            var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
+                dataBlockVersion.Id,
+                cancellationToken);
             VerifyAllMocks(dataBlockService, tableBuilderService);
 
             result.AssertOkResult(TableBuilderResults);
@@ -122,12 +124,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             dataBlockService
-                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseId, DataBlockId))
+                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseVersionId, DataBlockId))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = BuildController(dataBlockService: dataBlockService.Object);
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
+            var result = await controller.QueryForDataBlock(releaseVersionId: ReleaseVersionId,
+                dataBlockParentId: DataBlockId);
             VerifyAllMocks(dataBlockService);
 
             result.AssertNotFoundResult();

@@ -40,7 +40,7 @@ public class DataSetService : IDataSetService
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
         Guid? themeId,
         Guid? publicationId,
-        Guid? releaseId,
+        Guid? releaseVersionId,
         bool? latestOnly,
         string? searchTerm,
         DataSetsListRequestOrderBy? orderBy,
@@ -49,21 +49,21 @@ public class DataSetService : IDataSetService
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        // If latestOnly is null default it to true except when a releaseId is provided
-        latestOnly ??= !releaseId.HasValue;
+        // If latestOnly is null default it to true except when a releaseVersionId is provided
+        latestOnly ??= !releaseVersionId.HasValue;
 
         orderBy ??= searchTerm == null ? Title : Relevance;
         sort ??= orderBy is Title or Natural ? Asc : Desc;
 
         var latestPublishedReleaseVersions =
-            _contentDbContext.Releases.LatestReleaseVersions(publicationId, publishedOnly: true);
+            _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
-            .HavingReleaseId(releaseId)
+            .HavingReleaseVersionId(releaseVersionId)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
@@ -94,21 +94,22 @@ public class DataSetService : IDataSetService
                 Content = result.Value.Summary ?? "",
                 Theme = new IdTitleViewModel
                 {
-                    Id = result.Value.Release.Publication.Topic.ThemeId,
-                    Title = result.Value.Release.Publication.Topic.Theme.Title
+                    Id = result.Value.ReleaseVersion.Publication.Topic.ThemeId,
+                    Title = result.Value.ReleaseVersion.Publication.Topic.Theme.Title
                 },
                 Publication = new IdTitleViewModel
                 {
-                    Id = result.Value.Release.PublicationId,
-                    Title = result.Value.Release.Publication.Title
+                    Id = result.Value.ReleaseVersion.PublicationId,
+                    Title = result.Value.ReleaseVersion.Publication.Title
                 },
                 Release = new IdTitleViewModel
                 {
-                    Id = result.Value.ReleaseId,
-                    Title = result.Value.Release.Title
+                    Id = result.Value.ReleaseVersionId,
+                    Title = result.Value.ReleaseVersion.Title
                 },
-                LatestData = result.Value.ReleaseId == result.Value.Release.Publication.LatestPublishedReleaseId,
-                Published = result.Value.Release.Published!.Value
+                LatestData = result.Value.ReleaseVersionId ==
+                             result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
+                Published = result.Value.ReleaseVersion.Published!.Value
             };
     }
 
@@ -125,11 +126,11 @@ public class DataSetService : IDataSetService
     }
 
     public async Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid fileId)
     {
         // WARN: This prevents public uses from seeing data sets they shouldn't!
-        if (!await _releaseRepository.IsLatestPublishedReleaseVersion(releaseId))
+        if (!await _releaseRepository.IsLatestPublishedReleaseVersion(releaseVersionId))
         {
             return new NotFoundResult();
         }
@@ -137,26 +138,27 @@ public class DataSetService : IDataSetService
         return await _contentDbContext.ReleaseFiles
             .Where(rf =>
                 rf.FileId == fileId
-                && rf.ReleaseId == releaseId)
+                && rf.ReleaseVersionId == releaseVersionId)
             .Select(releaseFile => new DataSetDetailsViewModel
             {
                 Title = releaseFile.Name ?? string.Empty,
                 Summary = releaseFile.Summary ?? string.Empty,
                 Release = new DataSetDetailsReleaseViewModel
                 {
-                    Id = releaseFile.ReleaseId,
-                    Title = releaseFile.Release.Title,
-                    Slug = releaseFile.Release.Slug,
-                    Type = releaseFile.Release.Type,
+                    Id = releaseFile.ReleaseVersionId,
+                    Title = releaseFile.ReleaseVersion.Title,
+                    Slug = releaseFile.ReleaseVersion.Slug,
+                    Type = releaseFile.ReleaseVersion.Type,
                     IsLatestPublishedRelease =
-                        releaseFile.Release.Publication.LatestPublishedReleaseId == releaseFile.ReleaseId,
-                    Published = releaseFile.Release.Published!.Value,
+                        releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
+                        releaseFile.ReleaseVersionId,
+                    Published = releaseFile.ReleaseVersion.Published!.Value,
                     Publication = new DataSetDetailsPublicationViewModel
                     {
-                        Id = releaseFile.Release.PublicationId,
-                        Title = releaseFile.Release.Publication.Title,
-                        Slug = releaseFile.Release.Publication.Slug,
-                        ThemeTitle = releaseFile.Release.Publication.Topic.Theme.Title,
+                        Id = releaseFile.ReleaseVersion.PublicationId,
+                        Title = releaseFile.ReleaseVersion.Publication.Title,
+                        Slug = releaseFile.ReleaseVersion.Publication.Slug,
+                        ThemeTitle = releaseFile.ReleaseVersion.Publication.Topic.Theme.Title,
                     },
                 },
                 File = new DataSetDetailsFileViewModel
@@ -185,8 +187,8 @@ internal static class FreeTextReleaseFileValueResultQueryableExtensions
                     : query.OrderByDescending(result => result.Value.Order),
             Published =>
                 sort == Asc
-                    ? query.OrderBy(result => result.Value.Release.Published)
-                    : query.OrderByDescending(result => result.Value.Release.Published),
+                    ? query.OrderBy(result => result.Value.ReleaseVersion.Published)
+                    : query.OrderByDescending(result => result.Value.ReleaseVersion.Published),
             Relevance =>
                 sort == Asc
                     ? query.OrderBy(result => result.Rank)
@@ -222,7 +224,9 @@ internal static class ReleaseFileQueryableExtensions
         this IQueryable<ReleaseFile> query,
         Guid? themeId)
     {
-        return themeId.HasValue ? query.Where(rf => rf.Release.Publication.Topic.ThemeId == themeId.Value) : query;
+        return themeId.HasValue
+            ? query.Where(rf => rf.ReleaseVersion.Publication.Topic.ThemeId == themeId.Value)
+            : query;
     }
 
     internal static IQueryable<ReleaseFile> HavingPublicationIdOrNoSupersededPublication(
@@ -238,26 +242,28 @@ internal static class ReleaseFileQueryableExtensions
         this IQueryable<ReleaseFile> query,
         Guid? publicationId)
     {
-        return publicationId.HasValue ? query.Where(rf => rf.Release.PublicationId == publicationId.Value) : query;
+        return publicationId.HasValue
+            ? query.Where(rf => rf.ReleaseVersion.PublicationId == publicationId.Value)
+            : query;
     }
 
     private static IQueryable<ReleaseFile> HavingNoSupersededPublication(
         this IQueryable<ReleaseFile> query)
     {
-        return query.Where(rf => rf.Release.Publication.SupersededById == null ||
-                                 !rf.Release.Publication.SupersededBy!.LatestPublishedReleaseId.HasValue);
+        return query.Where(rf => rf.ReleaseVersion.Publication.SupersededById == null ||
+                                 !rf.ReleaseVersion.Publication.SupersededBy!.LatestPublishedReleaseVersionId.HasValue);
     }
 
-    internal static IQueryable<ReleaseFile> HavingReleaseId(
+    internal static IQueryable<ReleaseFile> HavingReleaseVersionId(
         this IQueryable<ReleaseFile> query,
-        Guid? releaseId)
+        Guid? releaseVersionId)
     {
-        return releaseId.HasValue ? query.Where(rf => rf.ReleaseId == releaseId.Value) : query;
+        return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
     }
 
     internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(
         this IQueryable<ReleaseFile> query,
-        IQueryable<Release> latestPublishedReleaseVersions,
+        IQueryable<ReleaseVersion> latestPublishedReleaseVersions,
         bool latestOnly)
     {
         // Data set files must only ever be those associated with a latest published release version.
@@ -266,13 +272,14 @@ internal static class ReleaseFileQueryableExtensions
         if (latestOnly)
         {
             // Restrict data set files to be from the latest published release version of the publication
-            return query.Where(rf => rf.ReleaseId == rf.Release.Publication.LatestPublishedReleaseId);
+            return query.Where(rf =>
+                rf.ReleaseVersionId == rf.ReleaseVersion.Publication.LatestPublishedReleaseVersionId);
         }
 
         // Restrict data set files to be for *any* latest published release version
         return query.Join(latestPublishedReleaseVersions,
-            rf => rf.ReleaseId,
-            r => r.Id,
+            rf => rf.ReleaseVersionId,
+            rv => rv.Id,
             (rf, _) => rf);
     }
 }

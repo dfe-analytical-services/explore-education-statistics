@@ -556,13 +556,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationCreateViewModel;
         }
 
-        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)
+        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(ReleaseVersion releaseVersion,
+            bool includePermissions)
         {
-            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
+            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
 
             if (includePermissions)
             {
-                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
+                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
             }
 
             return viewModel;

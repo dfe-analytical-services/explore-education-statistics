@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Auth
             ViewSubjectDataRequirement requirement,
             ReleaseSubject releaseSubject)
         {
-            if (await _releaseRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseId))
+            if (await _releaseRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseVersionId))
             {
                 authContext.Succeed(requirement);
             }

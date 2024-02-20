@@ -15,14 +15,14 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class TableBuilderServicePermissionTests
     {
         private static readonly Guid PublicationId = Guid.NewGuid();
-        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
         private readonly Subject _subject = new()
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private readonly ReleaseSubject _releaseSubject = new()
         {
-            ReleaseId = ReleaseId,
+            ReleaseVersionId = ReleaseVersionId,
             SubjectId = SubjectId,
         };
 
@@ -58,9 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                         releaseRepository
                             .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
-                            .ReturnsAsync(new Release
+                            .ReturnsAsync(new ReleaseVersion
                             {
-                                Id = ReleaseId
+                                Id = ReleaseVersionId
                             });
 
                         var service = BuildTableBuilderService(
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             statisticsPersistenceHelper: statisticsPersistenceHelper.Object
                         );
                         return await service.Query(
-                            ReleaseId,
+                            ReleaseVersionId,
                             new ObservationQueryContext
                             {
                                 SubjectId = _subject.Id

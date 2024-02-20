@@ -26,23 +26,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _statisticsDbContext = statisticsDbContext;
         }
 
-        public async Task<List<Content.Model.Release>> ListReleases(
+        public async Task<List<Content.Model.ReleaseVersion>> ListReleases(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await
-                HydrateRelease(_contentDbContext.Releases)
-                .Where(r => releaseApprovalStatuses.Contains(r.ApprovalStatus))
-                .ToListAsync();
+                HydrateReleaseVersion(_contentDbContext.ReleaseVersions)
+                    .Where(rv => releaseApprovalStatuses.Contains(rv.ApprovalStatus))
+                    .ToListAsync();
         }
 
-        public async Task<List<Content.Model.Release>> ListReleasesForUser(Guid userId,
+        public async Task<List<Content.Model.ReleaseVersion>> ListReleasesForUser(Guid userId,
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
-            var userReleaseIds = await _contentDbContext
+            var userReleaseVersionIds = await _contentDbContext
                 .UserReleaseRoles
                 .AsQueryable()
                 .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
-                .Select(r => r.ReleaseId)
+                .Select(r => r.ReleaseVersionId)
                 .ToListAsync();
 
             var userPublicationIds = await _contentDbContext
@@ -53,41 +53,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             var userPublicationRoleReleaseIds = await _contentDbContext
-                .Releases
+                .ReleaseVersions
                 .AsQueryable()
-                .Where(r => userPublicationIds.Contains(r.PublicationId))
-                .Select(r => r.Id)
+                .Where(rv => userPublicationIds.Contains(rv.PublicationId))
+                .Select(rv => rv.Id)
                 .ToListAsync();
 
-            userReleaseIds.AddRange(userPublicationRoleReleaseIds);
-            userReleaseIds = userReleaseIds.Distinct().ToList();
+            userReleaseVersionIds.AddRange(userPublicationRoleReleaseIds);
+            userReleaseVersionIds = userReleaseVersionIds.Distinct().ToList();
 
             return await
-                HydrateRelease(_contentDbContext.Releases)
-                .Where(r => userReleaseIds.Contains(r.Id) && releaseApprovalStatuses.Contains(r.ApprovalStatus))
-                .ToListAsync();
+                HydrateReleaseVersion(_contentDbContext.ReleaseVersions)
+                    .Where(rv =>
+                        userReleaseVersionIds.Contains(rv.Id) && releaseApprovalStatuses.Contains(rv.ApprovalStatus))
+                    .ToListAsync();
         }
 
-        public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId)
+        public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId)
         {
-            var release = await _contentDbContext.Releases
-                .FirstAsync(r => r.Id == releaseId);
+            var releaseVersion = await _contentDbContext.ReleaseVersions
+                .FirstAsync(rv => rv.Id == releaseVersionId);
 
-            var existingStatsRelease = await _statisticsDbContext.Release
-                .FirstOrDefaultAsync(r => r.Id == releaseId);
+            var existingStatsReleaseVersion = await _statisticsDbContext.ReleaseVersion
+                .FirstOrDefaultAsync(rv => rv.Id == releaseVersionId);
 
-            if (existingStatsRelease == null)
+            if (existingStatsReleaseVersion == null)
             {
-                _statisticsDbContext.Release.Add(new Data.Model.Release
+                _statisticsDbContext.ReleaseVersion.Add(new Data.Model.ReleaseVersion
                 {
-                    Id = releaseId,
-                    PublicationId = release.PublicationId
+                    Id = releaseVersionId,
+                    PublicationId = releaseVersion.PublicationId
                 });
             }
 
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseId = release.Id,
+                ReleaseVersionId = releaseVersion.Id,
                 Subject = new Subject()
             };
 

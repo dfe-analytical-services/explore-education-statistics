@@ -8,12 +8,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseRepository
     {
-        Task<List<Release>> ListReleases(
+        Task<List<ReleaseVersion>> ListReleases(
             params ReleaseApprovalStatus[] releaseStatuses);
 
-        Task<List<Release>> ListReleasesForUser(Guid userId,
+        Task<List<ReleaseVersion>> ListReleasesForUser(Guid userId,
             params ReleaseApprovalStatus[] releaseApprovalStatuses);
 
-        Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId);
+        Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseVersionId);
     }
 }

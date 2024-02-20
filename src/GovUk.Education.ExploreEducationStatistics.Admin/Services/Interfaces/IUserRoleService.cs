@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,7 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
-        Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role);
+        Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId,
+            Guid releaseVersionId,
+            ReleaseRole role);
 
         Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
 
@@ -36,8 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 
         Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId);
-        
+
         Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId);
-        
     }
 }

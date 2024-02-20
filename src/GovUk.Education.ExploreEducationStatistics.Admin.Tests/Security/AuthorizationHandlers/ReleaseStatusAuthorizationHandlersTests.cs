@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -93,12 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     ReleaseRole.Contributor,
                                     ReleaseRole.Lead,
                                     ReleaseRole.Approver
@@ -112,12 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     ReleaseRole.Approver
                                 );
                             }
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -162,12 +162,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     Owner, Approver
                                 );
                             }
@@ -180,12 +180,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     Approver
                                 );
                             }
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -284,12 +284,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     ReleaseRole.Contributor,
                                     ReleaseRole.Lead,
                                     ReleaseRole.Approver
@@ -303,12 +303,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     ReleaseRole.Approver
                                 );
                             }
@@ -324,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -353,12 +353,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     Owner,
                                     Approver
                                 );
@@ -371,12 +371,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
                                     {
-                                        context.Add(release);
+                                        context.ReleaseVersions.Add(releaseVersion);
                                         context.SaveChanges();
 
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release,
+                                    releaseVersion,
                                     Approver
                                 );
                             }
@@ -446,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -460,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -472,12 +472,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MarkReleaseAsApprovedRequirement>(
                                 context =>
                                 {
-                                    context.Add(release);
+                                    context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
                                     return CreateHandler(releaseStatusRepository, context);
                                 },
-                                release,
+                                releaseVersion,
                                 ReleaseRole.Approver
                             );
                         }
@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            var release = new Release
+                            var releaseVersion = new ReleaseVersion
                             {
                                 Id = Guid.NewGuid(),
                                 Publication = new Publication
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
-                                        release.Id,
+                                        releaseVersion.Id,
                                         ReleasePublishingStatusOverallStage.Started,
                                         ReleasePublishingStatusOverallStage.Complete
                                     )
@@ -519,12 +519,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 MarkReleaseAsApprovedRequirement>(
                                 context =>
                                 {
-                                    context.Add(release);
+                                    context.ReleaseVersions.Add(releaseVersion);
                                     context.SaveChanges();
 
                                     return CreateHandler(releaseStatusRepository, context);
                                 },
-                                release,
+                                releaseVersion,
                                 Approver
                             );
                         }
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ForEachAwaitAsync(
                     async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             Publication = new Publication
@@ -584,16 +584,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that users with the specified claims can update the
                         // Release status if it has not started publishing
-                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release,
+                            releaseVersion,
                             claims
                         );
                     }
@@ -610,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ForEachAwaitAsync(
                     async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             Publication = new Publication
@@ -624,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
-                                    release.Id,
+                                    releaseVersion.Id,
                                     ReleasePublishingStatusOverallStage.Started,
                                     ReleasePublishingStatusOverallStage.Complete
                                 )
@@ -637,16 +637,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             );
 
                         // Assert that no users can update a Release status once it has started publishing
-                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
                     }
                 );
@@ -662,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ForEachAwaitAsync(
                     async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             Publication = new Publication
@@ -677,7 +677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
-                                    release.Id,
+                                    releaseVersion.Id,
                                     ReleasePublishingStatusOverallStage.Started,
                                     ReleasePublishingStatusOverallStage.Complete
                                 )
@@ -685,16 +685,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that no users can update a Release status once it has been published
-                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
                     }
                 );
@@ -710,7 +710,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ForEachAwaitAsync(
                     async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             Publication = new Publication
@@ -724,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
-                                    release.Id,
+                                    releaseVersion.Id,
                                     ReleasePublishingStatusOverallStage.Started,
                                     ReleasePublishingStatusOverallStage.Complete
                                 )
@@ -739,27 +739,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         // Assert that no user release roles allow updating a Release status once it has started publishing
                         await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
 
                         // Assert that no user publication roles allow updating a Release status once it has started publishing
                         await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
                     }
                 );
@@ -775,7 +775,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .ForEachAwaitAsync(
                     async status =>
                     {
-                        var release = new Release
+                        var releaseVersion = new ReleaseVersion
                         {
                             Id = Guid.NewGuid(),
                             Publication = new Publication
@@ -790,7 +790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         releaseStatusRepository.Setup(
                                 s => s.GetAllByOverallStage(
-                                    release.Id,
+                                    releaseVersion.Id,
                                     ReleasePublishingStatusOverallStage.Started,
                                     ReleasePublishingStatusOverallStage.Complete
                                 )
@@ -800,27 +800,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         // Assert that no user release roles allow updating a Release status once it has been published
                         await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
 
                         // Assert that no user publication roles allow updating a Release status once it has started publishing
                         await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(context =>
                             {
-                                context.Add(release);
+                                context.ReleaseVersions.Add(releaseVersion);
                                 context.SaveChanges();
 
                                 return authorizationHandler(releaseStatusRepository.Object,
                                     new UserPublicationRoleRepository(context),
                                     new UserReleaseRoleRepository(context));
                             },
-                            release
+                            releaseVersion
                         );
                     }
                 );

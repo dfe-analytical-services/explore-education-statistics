@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
         public ReleasePublishingStatus(string publicationSlug,
             DateTime? publish,
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid releaseStatusId,
             string releaseSlug,
             ReleasePublishingStatusState state,
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
             RowKey = releaseStatusId.ToString();
-            PartitionKey = releaseId.ToString();
+            PartitionKey = releaseVersionId.ToString();
             Created = DateTime.UtcNow;
             PublicationSlug = publicationSlug;
             Publish = publish;
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         }
 
         public Guid Id => Guid.Parse(RowKey);
-        public Guid ReleaseId => Guid.Parse(PartitionKey);
+        public Guid ReleaseVersionId => Guid.Parse(PartitionKey);
 
         public ReleasePublishingStatusState State
         {

@@ -12,15 +12,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IReleasePermissionService
     {
         Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-            ListReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude);
+            ListReleaseRoles(Guid releaseVersionId,
+                ReleaseRole[]? rolesToInclude);
 
         Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
-            ListReleaseInvites(Guid releaseId, ReleaseRole[]? rolesToInclude = null);
+            ListReleaseInvites(Guid releaseVersionId,
+                ReleaseRole[]? rolesToInclude = null);
 
         Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-            ListPublicationContributors(Guid releaseId);
+            ListPublicationContributors(Guid releaseVersionId);
 
-        Task<Either<ActionResult, Unit>> UpdateReleaseContributors(Guid releaseId,
+        Task<Either<ActionResult, Unit>> UpdateReleaseContributors(Guid releaseVersionId,
             List<Guid> userIds);
 
         Task<Either<ActionResult, Unit>> RemoveAllUserContributorPermissionsForPublication(

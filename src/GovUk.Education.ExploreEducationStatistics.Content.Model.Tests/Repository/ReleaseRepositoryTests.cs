@@ -42,7 +42,7 @@ public class ReleaseRepositoryTests
             // Expect the result to be the latest published version taken from releases of the specified publication in
             // reverse chronological order
             var expectedReleaseVersion = publications[0].Releases
-                .Single(r => r is { Published: not null, Year: 2021, Version: 1 });
+                .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
 
             Assert.NotNull(result);
             Assert.Equal(expectedReleaseVersion.Id, result.Id);
@@ -125,7 +125,7 @@ public class ReleaseRepositoryTests
 
             // Expect the result to be the latest published version for the 2021-22 release of the specified publication
             var expectedReleaseVersion = publications[0].Releases
-                .Single(r => r is { Published: not null, Year: 2021, Version: 1 });
+                .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
 
             Assert.NotNull(result);
             Assert.Equal(expectedReleaseVersion.Id, result.Id);
@@ -230,7 +230,7 @@ public class ReleaseRepositoryTests
             // Expect the result to be the latest version taken from releases of the specified publication in
             // reverse chronological order
             var expectedReleaseVersion = publications[0].Releases
-                .Single(r => r is { Year: 2022, Version: 0 });
+                .Single(rv => rv is { Year: 2022, Version: 0 });
 
             Assert.NotNull(result);
             Assert.Equal(expectedReleaseVersion.Id, result.Id);
@@ -734,10 +734,10 @@ public class ReleaseRepositoryTests
     }
 
     private static void AssertIdsAreEqualIgnoringOrder(IReadOnlyCollection<Guid> expectedIds,
-        IReadOnlyCollection<Release> actualReleases)
+        IReadOnlyCollection<ReleaseVersion> actualReleaseVersions)
     {
-        Assert.Equal(expectedIds.Count, actualReleases.Count);
-        Assert.True(SequencesAreEqualIgnoringOrder(expectedIds, actualReleases.Select(r => r.Id)));
+        Assert.Equal(expectedIds.Count, actualReleaseVersions.Count);
+        Assert.True(SequencesAreEqualIgnoringOrder(expectedIds, actualReleaseVersions.Select(rv => rv.Id)));
     }
 
     private static void AssertIdsAreEqualIgnoringOrder(IReadOnlyCollection<Guid> expectedIds,

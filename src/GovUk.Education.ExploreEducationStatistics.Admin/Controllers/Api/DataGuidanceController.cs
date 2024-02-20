@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -22,18 +22,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataGuidanceService = dataGuidanceService;
         }
 
-        [HttpGet("release/{releaseId:guid}/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/data-guidance")]
+        public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(Guid releaseVersionId)
         {
-            return await _dataGuidanceService.GetDataGuidance(releaseId)
+            return await _dataGuidanceService.GetDataGuidance(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("release/{releaseId:guid}/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> UpdateReleaseDataGuidance(Guid releaseId,
+        [HttpPatch("release/{releaseVersionId:guid}/data-guidance")]
+        public async Task<ActionResult<DataGuidanceViewModel>> UpdateReleaseDataGuidance(Guid releaseVersionId,
             DataGuidanceUpdateRequest request)
         {
-            return await _dataGuidanceService.UpdateDataGuidance(releaseId, request)
+            return await _dataGuidanceService.UpdateDataGuidance(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
     }

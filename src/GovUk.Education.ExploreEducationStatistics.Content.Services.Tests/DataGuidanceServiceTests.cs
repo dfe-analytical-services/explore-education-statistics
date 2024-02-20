@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task GetDataGuidance()
         {
             var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
 
             const string publicationSlug = "test-publication";
             const string releaseSlug = "2016-17";
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             releaseCacheService.Setup(mock => mock.GetRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
-                    new ReleaseCacheViewModel(releaseId)
+                    new ReleaseCacheViewModel(releaseVersionId)
                     {
                         Title = "2016-17",
                         Slug = "2016-17",
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
             dataGuidanceDataSetService.Setup(
-                    mock => mock.ListDataSets(releaseId, null, default)
+                    mock => mock.ListDataSets(releaseVersionId, null, default)
                 )
                 .ReturnsAsync(DataGuidanceDataSets);
 
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var viewModel = result.AssertRight();
 
-            Assert.Equal(releaseId, viewModel.Id);
+            Assert.Equal(releaseVersionId, viewModel.Id);
             Assert.Equal("2016-17", viewModel.Title);
             Assert.Equal("2016-17", viewModel.Slug);
             Assert.Equal("Release Guidance", viewModel.DataGuidance);
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
                 .ReturnsAsync(new NotFoundResult());
 
-            var result = await service.GetDataGuidance( publicationSlug, releaseSlug);
+            var result = await service.GetDataGuidance(publicationSlug, releaseSlug);
 
             VerifyAllMocks(publicationCacheService);
 

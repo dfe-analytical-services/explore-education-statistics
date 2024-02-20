@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 return methodologyVersionToUpdate;
             }
 
-            return await 
+            return await
                 _userService.CheckCanUpdateMethodologyVersionStatus(methodologyVersionToUpdate, request.Status)
                     .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
                     .OnSuccessDo(RemoveUnusedImages)
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         methodologyVersion.Status = request.Status;
                         methodologyVersion.PublishingStrategy = request.PublishingStrategy;
-                        methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
+                        methodologyVersion.ScheduledWithReleaseVersionId = WithRelease == request.PublishingStrategy
                             ? request.WithReleaseId
                             : null;
 
@@ -196,8 +196,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             // Check that this release exists, that it's not already published, and that it's using the methodology
             return await _persistenceHelper
-                .CheckEntityExists<Release>(request.WithReleaseId.Value)
-                .OnSuccess<ActionResult, Release, Unit>(async release =>
+                .CheckEntityExists<ReleaseVersion>(request.WithReleaseId.Value)
+                .OnSuccess<ActionResult, ReleaseVersion, Unit>(async release =>
                 {
                     if (release.Live)
                     {

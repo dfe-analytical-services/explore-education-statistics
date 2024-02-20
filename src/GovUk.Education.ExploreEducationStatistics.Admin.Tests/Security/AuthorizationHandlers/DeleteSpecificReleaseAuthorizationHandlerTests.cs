@@ -27,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
             {
-                // Assert that no users can delete a non-amendment release
-                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
+                // Assert that no users can delete the first version of a release
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 0
@@ -40,10 +40,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
             {
-                // Assert that no users can delete an amendment release that is approved
-                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
+                // Assert that no users can delete an amendment release version that is approved
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved,
                         Version = 1
@@ -53,11 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
             {
-                // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release that is not
-                // yet approved
-                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
+                // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release version that is not yet approved
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
                         Version = 1
@@ -71,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Publication = new Publication
                     {
@@ -81,16 +80,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Version = 0
                 };
 
-                // Assert that no User Publication roles will allow a Release to be deleted that is not an Amendment
+                // Assert that no User Publication roles will allow deleting the first version of a release
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    release);
+                    releaseVersion);
             }
 
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Publication = new Publication
                     {
@@ -100,16 +99,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Version = 1
                 };
 
-                // Assert that no User Publication roles will allow an Amendment to be deleted when it is Approved
+                // Assert that no User Publication roles will allow deleting an amendment release version when it is Approved
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    release);
+                    releaseVersion);
             }
 
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Publication = new Publication
                     {
@@ -119,16 +118,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Version = 1
                 };
 
-                // Assert that users with the Publication Owner role on the Release amendment can delete if it is not yet approved
+                // Assert that users with the Publication Owner role on an amendment release version can delete if it is not yet approved
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Add(release);
+                        contentDbContext.Add(releaseVersion);
                         contentDbContext.SaveChanges();
 
                         return CreateHandler(contentDbContext);
                     },
-                    release,
+                    releaseVersion,
                     Owner);
             }
         }
@@ -138,10 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
             {
-                // Assert that no User Release roles will allow a Release to be deleted that is not an Amendment
+                // Assert that no User Release roles will allow deleting the first version of a release
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         Publication = new Publication
                         {
@@ -155,10 +154,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
             {
-                // Assert that no User Release roles will allow an Amendment to be deleted when it is Approved
+                // Assert that no User Release roles will allow deleting an amendment release version when it is Approved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         Publication = new Publication
                         {
@@ -172,10 +171,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task DeleteSpecificReleaseAuthorizationHandler_UnapprovedAmendment()
             {
-                // Assert that no User Release roles will allow an Amendment to be deleted if it is not yet approved
+                // Assert that no User Release roles will allow an amendment release version to be deleted if it is not yet approved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         Publication = new Publication
                         {

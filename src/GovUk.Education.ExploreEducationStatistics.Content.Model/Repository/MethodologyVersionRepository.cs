@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             }
 
             await _contentDbContext.Entry(methodologyVersion)
-                .Reference(m => m.ScheduledWithRelease)
+                .Reference(m => m.ScheduledWithReleaseVersion)
                 .LoadAsync();
             return methodologyVersion.ScheduledForPublishingWithPublishedRelease;
         }

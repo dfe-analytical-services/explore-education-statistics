@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
@@ -37,37 +37,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseFileService = releaseFileService;
         }
 
-        [HttpDelete("release/{releaseId:guid}/ancillary/{id:guid}")]
+        [HttpDelete("release/{releaseVersionId:guid}/ancillary/{fileId:guid}")]
         public async Task<ActionResult> DeleteFile(
-            Guid releaseId, Guid id)
+            Guid releaseVersionId,
+            Guid fileId)
         {
             return await _releaseFileService
-                .Delete(releaseId, id)
+                .Delete(releaseVersionId: releaseVersionId, fileId: fileId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpDelete("release/{releaseId:guid}/chart/{id:guid}")]
+        [HttpDelete("release/{releaseVersionId:guid}/chart/{fileId:guid}")]
         public async Task<ActionResult> DeleteChartFile(
-            Guid releaseId, Guid id)
+            Guid releaseVersionId,
+            Guid fileId)
         {
-            return await _dataBlockService.RemoveChartFile(releaseId, id)
+            return await _dataBlockService.RemoveChartFile(releaseVersionId, fileId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId:guid}/files")]
+        [HttpGet("release/{releaseVersionId:guid}/files")]
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task StreamFilesToZip(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromQuery] IList<Guid>? fileIds = null)
         {
-            await _persistenceHelper.CheckEntityExists<Release>(
-                    releaseId,
-                    q => q.Include(r => r.Publication)
+            await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+                    releaseVersionId,
+                    q => q.Include(rv => rv.Publication)
                 )
                 .OnSuccess(
-                    async release =>
+                    async releaseVersion =>
                     {
-                        var filename = $"{release.Publication.Slug}_{release.Slug}.zip";
+                        var filename = $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
                         Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
@@ -77,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                         // This is more efficient and means the user doesn't have
                         // to spend time waiting for the download to initiate.
                         return await _releaseFileService.ZipFilesToStream(
-                            releaseId: releaseId,
+                            releaseVersionId: releaseVersionId,
                             outputStream: Response.BodyWriter.AsStream(),
                             fileIds: fileIds,
                             cancellationToken: HttpContext.RequestAborted
@@ -99,83 +101,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 );
         }
 
-        [HttpGet("release/{releaseId:guid}/file/{fileId:guid}")]
-        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}")]
+        public async Task<ActionResult<FileInfo>> GetFile(Guid releaseVersionId,
+            Guid fileId)
         {
             return await _releaseFileService
-                .GetFile(releaseId, fileId)
+                .GetFile(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/file/{fileId:guid}/download")]
-        public async Task<ActionResult> Stream(Guid releaseId, Guid fileId)
+        [HttpGet("release/{releaseVersionId:guid}/file/{fileId:guid}/download")]
+        public async Task<ActionResult> Stream(Guid releaseVersionId,
+            Guid fileId)
         {
             return await _releaseFileService
-                .Stream(releaseId: releaseId, fileId: fileId)
+                .Stream(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailures();
         }
 
-        [HttpPatch("release/{releaseId:guid}/data/{fileId:guid}")]
+        [HttpPatch("release/{releaseVersionId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult<Unit>> UpdateDataFileDetails(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid fileId,
             ReleaseDataFileUpdateRequest update)
         {
             return await _releaseFileService
-                .UpdateDataFileDetails(releaseId: releaseId, fileId: fileId, update: update)
+                .UpdateDataFileDetails(releaseVersionId: releaseVersionId,
+                    fileId: fileId,
+                    update: update)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId:guid}/ancillary")]
-        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/ancillary")]
+        public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseVersionId)
         {
             return await _releaseFileService
-                .GetAncillaryFiles(releaseId)
+                .GetAncillaryFiles(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/ancillary")]
+        [HttpPost("release/{releaseVersionId:guid}/ancillary")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadAncillary(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromForm] ReleaseAncillaryFileUploadRequest upload)
         {
             return await _releaseFileService
-                .UploadAncillary(releaseId, upload)
+                .UploadAncillary(releaseVersionId, upload)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/ancillary/{fileId:guid}")]
+        [HttpPut("release/{releaseVersionId:guid}/ancillary/{fileId:guid}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UpdateAncillary(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid fileId,
             [FromForm] ReleaseAncillaryFileUpdateRequest request)
         {
             return await _releaseFileService
-                .UpdateAncillary(releaseId, fileId, request)
+                .UpdateAncillary(releaseVersionId: releaseVersionId,
+                    fileId: fileId,
+                    request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/chart/{id:guid}")]
+        [HttpPut("release/{releaseVersionId:guid}/chart/{fileId:guid}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> UpdateChartFile(Guid releaseId, Guid id, IFormFile file)
+        public async Task<ActionResult<FileInfo>> UpdateChartFile(Guid releaseVersionId,
+            Guid fileId,
+            IFormFile file)
         {
             return await _releaseFileService
-                .UploadChart(releaseId, file, replacingId: id)
+                .UploadChart(releaseVersionId: releaseVersionId,
+                    file,
+                    replacingId: fileId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/chart")]
+        [HttpPost("release/{releaseVersionId:guid}/chart")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> UploadChart(Guid releaseId, IFormFile file)
+        public async Task<ActionResult<FileInfo>> UploadChart(Guid releaseVersionId, IFormFile file)
         {
             return await _releaseFileService
-                .UploadChart(releaseId, file)
+                .UploadChart(releaseVersionId, file)
                 .HandleFailuresOrOk();
         }
     }

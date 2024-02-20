@@ -1,15 +1,15 @@
+#nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
+
+public class ReleaseFootnote
 {
-    public class ReleaseFootnote
-    {
-        public Footnote Footnote { get; set; }
-        
-        public Guid FootnoteId { get; set; }
-        
-        public Release Release { get; set; }
-        
-        public Guid ReleaseId { get; set; }
-    }
+    public Footnote Footnote { get; set; } = null!;
+
+    public Guid FootnoteId { get; set; }
+
+    public ReleaseVersion ReleaseVersion { get; set; } = null!;
+
+    public Guid ReleaseVersionId { get; set; }
 }

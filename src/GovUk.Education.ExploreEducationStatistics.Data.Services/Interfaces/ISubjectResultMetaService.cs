@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 public interface ISubjectResultMetaService
 {
     Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
-        Guid releaseId,
+        Guid releaseVersionId,
         ObservationQueryContext query,
         IList<Observation> observations);
 }

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,22 +53,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
-            Guid releaseId, bool isPrerelease = false)
+            Guid releaseVersionId,
+            bool isPrerelease = false)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseId))
+                .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseVersionId))
                 .OnSuccessCombineWith(_ => _releaseFileService.ListAll(
-                    releaseId,
+                    releaseVersionId,
                     Ancillary,
                     FileType.Data))
-                .OnSuccess(async releaseBlocksAndFiles =>
+                .OnSuccess(async releaseVersionBlocksAndFiles =>
                 {
-                    var (release, unattachedDataBlocks, files) = releaseBlocksAndFiles;
+                    var (releaseVersion, unattachedDataBlocks, files) = releaseVersionBlocksAndFiles;
 
                     var methodologyVersions =
-                        await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+                        await _methodologyVersionRepository.GetLatestVersionByPublication(releaseVersion.PublicationId);
 
                     if (isPrerelease)
                     {
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             .ToListAsync();
                     }
 
-                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
+                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
@@ -125,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        private IQueryable<Release> HydrateReleaseQuery(IQueryable<Release> queryable)
+        private IQueryable<ReleaseVersion> HydrateReleaseQuery(IQueryable<ReleaseVersion> queryable)
         {
             // Using `AsSplitQuery` as the generated SQL without it is incredibly
             // inefficient. Previously, we had dealt with this by splitting out
@@ -134,26 +135,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             // performant as running individual queries, and revert this if required.
             return queryable
                 .AsSplitQuery()
-                .Include(r => r.Publication)
+                .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Publication)
+                .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.Releases)
-                .Include(r => r.Publication)
+                .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
-                .Include(r => r.Publication)
+                .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.Topic.Theme)
-                .Include(r => r.Content)
+                .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(content => content.Comments)
                 .ThenInclude(comment => comment.CreatedBy)
-                .Include(r => r.Content)
+                .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(content => content.LockedBy)
-                .Include(r => r.Content)
+                .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
-                .Include(r => r.KeyStatistics)
-                .Include(r => r.Updates);
+                .Include(rv => rv.KeyStatistics)
+                .Include(rv => rv.Updates);
         }
     }
 }

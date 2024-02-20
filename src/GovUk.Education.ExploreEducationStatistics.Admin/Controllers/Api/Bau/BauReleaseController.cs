@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -23,13 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         /// <summary>
         /// Retry a combination of the Content and Publishing stages of the publishing workflow.
         /// </summary>
-        /// <param name="releaseId"></param>
+        /// <param name="releaseVersionId"></param>
         /// <returns></returns>
-        [HttpPut("bau/release/{releaseId:guid}/publish/content")]
-        public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseId)
+        [HttpPut("bau/release/{releaseVersionId:guid}/publish/content")]
+        public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseVersionId)
         {
             return await _publishingService
-                .RetryReleasePublishing(releaseId)
+                .RetryReleasePublishing(releaseVersionId)
                 .HandleFailuresOrOk();
         }
     }

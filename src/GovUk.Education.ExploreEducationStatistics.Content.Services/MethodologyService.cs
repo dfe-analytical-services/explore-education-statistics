@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(pm => pm.Publication)
                 .ThenInclude(p => p.Contact)
                 .Where(pm => pm.MethodologyId == methodologyId
-                             && pm.Publication.LatestPublishedReleaseId != null)
+                             && pm.Publication.LatestPublishedReleaseVersionId != null)
                 .Select(pm => new PublicationSummaryViewModel()
                 {
                     Id = pm.PublicationId,

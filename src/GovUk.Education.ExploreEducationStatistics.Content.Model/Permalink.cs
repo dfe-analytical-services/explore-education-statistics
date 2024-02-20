@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
@@ -12,7 +12,7 @@ public class Permalink : ICreatedTimestamp<DateTime>
 
     public string DataSetTitle { get; init; } = string.Empty;
 
-    public Guid? ReleaseId { get; init; }
+    public Guid? ReleaseVersionId { get; init; }
 
     public Guid SubjectId { get; init; }
 

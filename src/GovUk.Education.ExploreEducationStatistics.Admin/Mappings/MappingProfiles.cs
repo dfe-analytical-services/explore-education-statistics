@@ -41,23 +41,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
         {
             CreateMap<User, UserDetailsViewModel>();
 
-            CreateMap<Release, ReleaseViewModel>()
+            CreateMap<ReleaseVersion, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestPublishedReleaseId == r.Id))
+                    m => m.MapFrom(rv => rv.Publication.LatestPublishedReleaseVersionId == rv.Id))
                 .ForMember(dest => dest.PublicationTitle,
-                    m => m.MapFrom(r => r.Publication.Title))
+                    m => m.MapFrom(rv => rv.Publication.Title))
                 .ForMember(dest => dest.PublicationId,
-                    m => m.MapFrom(r => r.Publication.Id))
+                    m => m.MapFrom(rv => rv.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
-                    m => m.MapFrom(r => r.Publication.Slug))
+                    m => m.MapFrom(rv => rv.Publication.Slug))
                 .ForMember(model => model.PublishScheduled,
-                    m => m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
+                    m => m.MapFrom(rv =>
+                        rv.PublishScheduled.HasValue
+                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?)null));
 
-            CreateMap<Release, ReleaseSummaryViewModel>()
+            CreateMap<ReleaseVersion, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
@@ -109,41 +109,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
-            CreateMap<Release, ManageContentPageViewModel.ReleaseViewModel>()
+            CreateMap<ReleaseVersion, ManageContentPageViewModel.ReleaseViewModel>()
                 .ForMember(dest => dest.Content,
-                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
+                    m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
                 .ForMember(dest => dest.KeyStatistics,
-                    m => m.MapFrom(r => r.KeyStatistics.OrderBy(ks => ks.Order)))
+                    m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)))
                 .ForMember(
                     dest => dest.Updates,
-                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
+                    m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
                 .ForMember(dest => dest.Publication,
-                    m => m.MapFrom(r => new ManageContentPageViewModel.PublicationViewModel
+                    m => m.MapFrom(rv => new ManageContentPageViewModel.PublicationViewModel
                     {
-                        Id = r.Publication.Id,
-                        Title = r.Publication.Title,
-                        Slug = r.Publication.Slug,
-                        Contact = r.Publication.Contact,
+                        Id = rv.Publication.Id,
+                        Title = rv.Publication.Title,
+                        Slug = rv.Publication.Slug,
+                        Contact = rv.Publication.Contact,
                         Topic = new ManageContentPageViewModel.TopicViewModel
                         {
                             Theme = new ManageContentPageViewModel.ThemeViewModel
                             {
-                                Title = r.Publication.Topic.Theme.Title
+                                Title = rv.Publication.Topic.Theme.Title
                             }
                         },
-                        Releases = r.Publication.Releases
-                            .FindAll(otherRelease => r.Id != otherRelease.Id &&
-                                                     IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))
-                            .OrderByDescending(otherRelease => otherRelease.Year)
-                            .ThenByDescending(otherRelease => otherRelease.TimePeriodCoverage)
-                            .Select(otherRelease => new PreviousReleaseViewModel
+                        Releases = rv.Publication.Releases
+                            .FindAll(otherReleaseVersion => rv.Id != otherReleaseVersion.Id &&
+                                                     IsLatestVersionOfRelease(rv.Publication.Releases, otherReleaseVersion.Id))
+                            .OrderByDescending(otherReleaseVersion => otherReleaseVersion.Year)
+                            .ThenByDescending(otherReleaseVersion => otherReleaseVersion.TimePeriodCoverage)
+                            .Select(otherReleaseVersion => new PreviousReleaseViewModel
                             {
-                                Id = otherRelease.Id,
-                                Slug = otherRelease.Slug,
-                                Title = otherRelease.Title,
+                                Id = otherReleaseVersion.Id,
+                                Slug = otherReleaseVersion.Slug,
+                                Title = otherReleaseVersion.Title,
                             })
                             .ToList(),
-                        LegacyReleases = r.Publication.LegacyReleases
+                        LegacyReleases = rv.Publication.LegacyReleases
                             .OrderByDescending(legacyRelease => legacyRelease.Order)
                             .Select(legacy => new ManageContentPageViewModel.LegacyReleaseViewModel
                             {
@@ -152,26 +152,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Url = legacy.Url,
                             })
                             .ToList(),
-                        ExternalMethodology = r.Publication.ExternalMethodology != null
+                        ExternalMethodology = rv.Publication.ExternalMethodology != null
                             ? new ExternalMethodology
                             {
-                                Title = r.Publication.ExternalMethodology.Title,
-                                Url = r.Publication.ExternalMethodology.Url
+                                Title = rv.Publication.ExternalMethodology.Title,
+                                Url = rv.Publication.ExternalMethodology.Url
                             }
                             : null
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestPublishedReleaseId == r.Id))
+                    m => m.MapFrom(rv => rv.Publication.LatestPublishedReleaseVersionId == rv.Id))
                 .ForMember(dest => dest.CoverageTitle,
-                    m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()))
+                    m => m.MapFrom(rv => rv.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(
                     dest => dest.HasPreReleaseAccessList,
-                    m => m.MapFrom(r => !r.PreReleaseAccessList.IsNullOrEmpty()))
+                    m => m.MapFrom(rv => !rv.PreReleaseAccessList.IsNullOrEmpty()))
                 .ForMember(model => model.PublishScheduled,
-                    m => m.MapFrom(model =>
-                        model.PublishScheduled.HasValue
-                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
+                    m => m.MapFrom(rv =>
+                        rv.PublishScheduled.HasValue
+                            ? rv.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null));
 
             CreateMap<Update, ReleaseNoteViewModel>();
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(methodologyVersion =>
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
-            CreateMap<Release, ReleasePublicationStatusViewModel>();
+            CreateMap<ReleaseVersion, ReleasePublicationStatusViewModel>();
         }
 
         private void CreateContentBlockMap()
@@ -239,9 +239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
         }
 
-        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        private static bool IsLatestVersionOfRelease(IEnumerable<ReleaseVersion> releaseVersions, Guid releaseVersionId)
         {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+            return !releaseVersions.Any(rv => rv.PreviousVersionId == releaseVersionId && rv.Id != releaseVersionId);
         }
     }
 }

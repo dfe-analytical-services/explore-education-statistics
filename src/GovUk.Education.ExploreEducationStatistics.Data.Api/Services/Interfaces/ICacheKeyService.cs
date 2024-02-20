@@ -9,5 +9,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface ICacheKeyService
 {
-    Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(Guid releaseId);
+    Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(Guid releaseVersionId);
 }

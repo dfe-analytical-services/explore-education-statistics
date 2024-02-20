@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class MakeAmendmentOfSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
+        : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>
     {
         private readonly AuthorizationHandlerService _authorizationHandlerService;
         private readonly IReleaseRepository _releaseRepository;
@@ -30,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             MakeAmendmentOfSpecificReleaseRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
-            if (!release.Live)
+            if (!releaseVersion.Live)
             {
                 return;
             }
 
-            if (!await _releaseRepository.IsLatestReleaseVersion(release.Id))
+            if (!await _releaseRepository.IsLatestReleaseVersion(releaseVersion.Id))
             {
                 return;
             }
@@ -47,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-            
+
             if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
-                        release.PublicationId,
+                        releaseVersion.PublicationId,
                         Owner))
             {
                 context.Succeed(requirement);

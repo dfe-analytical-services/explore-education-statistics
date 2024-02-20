@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,19 +31,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseRoles()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Original = new Release
+            var release2Original = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Amendment = new Release
+            var release2Amendment = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -72,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release2Amendment,
+                ReleaseVersion = release2Amendment,
                 Role = Contributor,
             };
             var user2ReleaseRole2 = new UserReleaseRole
             {
                 User = user2,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -91,19 +91,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
             {
                 User = user3,
-                Release = new Release { Publication = new Publication() },
+                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
                 Role = Contributor,
             };
             var user3ReleaseRole = new UserReleaseRole
             {
                 User = user3,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = PrereleaseViewer,
             };
             var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
             {
                 User = user3,
-                Release = release2Original,
+                ReleaseVersion = release2Original,
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
@@ -111,8 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
                     user3ReleaseRoleIgnored1, user3ReleaseRole, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -147,19 +147,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseRoles_ContributorsOnly()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Original = new Release
+            var release2Original = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Amendment = new Release
+            var release2Amendment = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -188,13 +188,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release2Amendment,
+                ReleaseVersion = release2Amendment,
                 Role = Contributor,
             };
             var user2ReleaseRole2 = new UserReleaseRole
             {
                 User = user2,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -202,19 +202,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
             {
                 User = user3,
-                Release = new Release { Publication = new Publication() },
+                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
                 Role = Contributor,
             };
             var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = PrereleaseViewer,
             };
             var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
             {
                 User = user3,
-                Release = release2Original,
+                ReleaseVersion = release2Original,
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
@@ -222,8 +222,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
                     user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseRoles(release1.Id, new [] { Contributor });
+                var result = await service.ListReleaseRoles(release1.Id, new[] { Contributor });
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseRoles_NoUserReleaseRoles()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 ReleaseName = "2000",
                 Publication = publication,
@@ -313,19 +313,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseInvites()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Original = new Release
+            var release2Original = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Amendment = new Release
+            var release2Amendment = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
@@ -336,36 +336,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseInvite = new UserReleaseInvite
             {
                 Email = "user1@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
             var user2ReleaseInviteIgnored = new UserReleaseInvite
             {
                 Email = "user2@test.com",
-                Release = release2Amendment, // ignored because not release1
+                ReleaseVersion = release2Amendment, // ignored because not release1
                 Role = Contributor,
             };
 
             var user3ReleaseInvite = new UserReleaseInvite
             {
                 Email = "user3@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
             var user4ReleaseInviteIgnored = new UserReleaseInvite
             {
                 Email = "user4@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Lead
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseInvite, user2ReleaseInviteIgnored, user3ReleaseInvite,
+                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+                contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
+                    user3ReleaseInvite,
                     user4ReleaseInviteIgnored);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -394,19 +395,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseInvites_ContributorsOnly()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Original = new Release
+            var release2Original = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Amendment = new Release
+            var release2Amendment = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
@@ -417,36 +418,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseInvite = new UserReleaseInvite
             {
                 Email = "user1@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
             var user2ReleaseInviteIgnored = new UserReleaseInvite
             {
                 Email = "user2@test.com",
-                Release = release2Amendment, // ignored because not release1
+                ReleaseVersion = release2Amendment, // ignored because not release1
                 Role = Contributor,
             };
 
             var user3ReleaseInvite = new UserReleaseInvite
             {
                 Email = "user3@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
             var user3ReleaseInviteIgnored = new UserReleaseInvite
             {
                 Email = "user4@test.com",
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Lead, // ignored because not a Contributor
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseInvite, user2ReleaseInviteIgnored, user3ReleaseInvite,
+                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+                contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
+                    user3ReleaseInvite,
                     user3ReleaseInviteIgnored);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -455,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseInvites(release1.Id, new [] { Contributor });
+                var result = await service.ListReleaseInvites(release1.Id, new[] { Contributor });
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
@@ -503,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseInvites_NoUserReleaseInvites()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 ReleaseName = "2000",
                 Publication = publication,
@@ -550,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = releaseParent1.Releases[0],
+                ReleaseVersion = releaseParent1.Versions[0],
                 Role = Contributor,
             };
 
@@ -563,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = releaseParent2.Releases[1],
+                ReleaseVersion = releaseParent2.Versions[1],
                 Role = Contributor,
             };
 
@@ -571,19 +573,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
             {
                 User = user3,
-                Release = new Release { Publication = new Publication() },
+                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
                 Role = Contributor,
             };
             var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
-                Release = releaseParent1.Releases[0],
+                ReleaseVersion = releaseParent1.Versions[0],
                 Role = PrereleaseViewer,
             };
             var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
             {
                 User = user3,
-                Release = releaseParent2.Releases[0],
+                ReleaseVersion = releaseParent2.Versions[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
@@ -659,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListPublicationContributors_NoUserReleaseRoles()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
@@ -689,7 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseContributors()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
@@ -704,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
                 Created = new DateTime(2000, 12, 25),
                 CreatedById = Guid.NewGuid(),
@@ -718,7 +720,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
             var user3 = new User();
@@ -726,7 +728,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, user1ReleaseRole1, user2ReleaseRole1);
+                contentDbContext.ReleaseVersions.Add(release1);
+                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -744,7 +747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userReleaseRoles = await contentDbContext.UserReleaseRoles
                     .AsAsyncEnumerable()
                     .Where(urr =>
-                        urr.ReleaseId == release1.Id
+                        urr.ReleaseVersionId == release1.Id
                         && urr.Role == Contributor)
                     .ToListAsync();
 
@@ -767,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseContributors_RemoveAllContributorsFromRelease()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
@@ -783,7 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -796,14 +799,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, user1ReleaseRole1, user2ReleaseRole1);
+                contentDbContext.ReleaseVersions.Add(release1);
+                contentDbContext.AddRange(user1ReleaseRole1, user2ReleaseRole1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -821,7 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userReleaseRoles = await contentDbContext.UserReleaseRoles
                     .AsAsyncEnumerable()
                     .Where(urr =>
-                        urr.ReleaseId == release1.Id
+                        urr.ReleaseVersionId == release1.Id
                         && urr.Role == Contributor)
                     .ToListAsync();
 
@@ -833,19 +837,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveAllUserContributorPermissionForPublication()
         {
             var publication = new Publication();
-            var release1 = new Release
+            var release1 = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Original = new Release
+            var release2Original = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
             };
-            var release2Amendment = new Release
+            var release2Amendment = new ReleaseVersion
             {
                 Publication = publication,
                 ReleaseName = "2001",
@@ -861,7 +865,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -874,13 +878,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release2Amendment,
+                ReleaseVersion = release2Amendment,
                 Role = Contributor,
             };
             var user2ReleaseRole2 = new UserReleaseRole
             {
                 User = user2,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
 
@@ -893,29 +897,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRole1 = new UserReleaseRole
             {
                 User = user3,
-                Release = release2Amendment,
+                ReleaseVersion = release2Amendment,
                 Role = Contributor,
             };
 
             var user1Release1Invite = new UserReleaseInvite
             {
                 Email = user1.Email,
-                Release = release1,
+                ReleaseVersion = release1,
                 Role = Contributor,
             };
             var user2Release2Invite = new UserReleaseInvite
             {
                 Email = user2.Email,
-                Release = release2Original,
+                ReleaseVersion = release2Original,
                 Role = Contributor,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2, user3ReleaseRole1,
-                    user1Release1Invite, user2Release2Invite);
+                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                    user3ReleaseRole1);
+                contentDbContext.UserReleaseInvites.AddRange(user1Release1Invite, user2Release2Invite);
                 await contentDbContext.SaveChangesAsync();
             }
 

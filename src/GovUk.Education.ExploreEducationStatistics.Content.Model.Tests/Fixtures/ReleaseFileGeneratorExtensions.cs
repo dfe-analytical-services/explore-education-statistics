@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -49,24 +49,24 @@ public static class ReleaseFileGeneratorExtensions
         int order)
         => generator.ForInstance(s => s.SetOrder(order));
 
-    public static Generator<ReleaseFile> WithRelease(
+    public static Generator<ReleaseFile> WithReleaseVersion(
         this Generator<ReleaseFile> generator,
-        Release release)
-        => generator.ForInstance(s => s.SetRelease(release));
+        ReleaseVersion releaseVersion)
+        => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
 
-    public static Generator<ReleaseFile> WithReleases(this Generator<ReleaseFile> generator,
-        IEnumerable<Release> releases)
+    public static Generator<ReleaseFile> WithReleaseVersions(this Generator<ReleaseFile> generator,
+        IEnumerable<ReleaseVersion> releaseVersions)
     {
-        releases.ForEach((release, index) =>
-            generator.ForIndex(index, s => s.SetRelease(release)));
+        releaseVersions.ForEach((releaseVersion, index) =>
+            generator.ForIndex(index, s => s.SetReleaseVersion(releaseVersion)));
 
         return generator;
     }
 
-    public static Generator<ReleaseFile> WithReleaseId(
+    public static Generator<ReleaseFile> WithReleaseVersionId(
         this Generator<ReleaseFile> generator,
-        Guid releaseId)
-        => generator.ForInstance(s => s.SetReleaseId(releaseId));
+        Guid releaseVersionId)
+        => generator.ForInstance(s => s.SetReleaseVersionId(releaseVersionId));
 
     public static Generator<ReleaseFile> WithSummary(
         this Generator<ReleaseFile> generator,
@@ -94,16 +94,16 @@ public static class ReleaseFileGeneratorExtensions
         int order)
         => setters.Set(rf => rf.Order, order);
 
-    public static InstanceSetters<ReleaseFile> SetRelease(
+    public static InstanceSetters<ReleaseFile> SetReleaseVersion(
         this InstanceSetters<ReleaseFile> setters,
-        Release release)
-        => setters.Set(rf => rf.Release, release)
-            .SetReleaseId(release.Id);
+        ReleaseVersion releaseVersion)
+        => setters.Set(rf => rf.ReleaseVersion, releaseVersion)
+            .SetReleaseVersionId(releaseVersion.Id);
 
-    public static InstanceSetters<ReleaseFile> SetReleaseId(
+    public static InstanceSetters<ReleaseFile> SetReleaseVersionId(
         this InstanceSetters<ReleaseFile> setters,
-        Guid releaseId)
-        => setters.Set(rf => rf.ReleaseId, releaseId);
+        Guid releaseVersionId)
+        => setters.Set(rf => rf.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<ReleaseFile> SetSummary(
         this InstanceSetters<ReleaseFile> setters,

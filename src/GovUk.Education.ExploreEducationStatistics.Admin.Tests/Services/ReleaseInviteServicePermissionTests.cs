@@ -28,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(release),
+                Releases = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService: userService.Object);
                         return await service.InviteContributor("test@test.com",
                             publication.Id,
-                            ListOf(release.Id));
+                            ListOf(releaseVersion.Id));
                     }
                 });
         }
@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveByPublication()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(release),
+                Releases = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
