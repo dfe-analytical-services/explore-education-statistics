@@ -98,6 +98,7 @@ const defaultPublication: Publication = {
       id: 'previous-release-id',
       slug: 'previous-release-slug',
       title: 'Previous release title',
+      order: 1,
     },
   ],
   slug: 'publication-slug',

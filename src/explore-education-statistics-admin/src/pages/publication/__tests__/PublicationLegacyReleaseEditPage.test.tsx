@@ -25,7 +25,6 @@ describe('PublicationLegacyReleaseEditPage', () => {
   const testLegacyRelease: LegacyRelease = {
     description: 'Legacy release 1',
     id: 'legacy-release-1',
-    order: 1,
     url: 'http://gov.uk/1',
   };
 
@@ -43,7 +42,6 @@ describe('PublicationLegacyReleaseEditPage', () => {
       'Legacy release 1',
     );
     expect(screen.getByLabelText('URL')).toHaveValue('http://gov.uk/1');
-    expect(screen.getByLabelText('Order')).toHaveValue(1);
     expect(
       screen.getByRole('button', { name: 'Save legacy release' }),
     ).toBeInTheDocument();
@@ -72,7 +70,6 @@ describe('PublicationLegacyReleaseEditPage', () => {
         'legacy-1',
         {
           description: 'Legacy release 1 edited',
-          order: 1,
           publicationId: 'publication-1',
           url: 'http://gov.uk/1/edit',
         },

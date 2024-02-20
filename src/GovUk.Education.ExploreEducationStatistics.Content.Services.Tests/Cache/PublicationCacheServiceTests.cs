@@ -61,6 +61,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
+        ReleaseOrders = new()
+        {
+            new()
+            {
+                ReleaseId = Guid.NewGuid(),
+                Order = 1
+            }
+        },
         Topic = new TopicViewModel(new ThemeViewModel(
             Guid.NewGuid(),
             Slug: "",

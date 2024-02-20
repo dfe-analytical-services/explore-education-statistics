@@ -1,12 +1,9 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -14,16 +11,17 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -551,23 +549,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
-        [Fact]
-        public void PartialUpdateLegacyReleases()
-        {
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.PartialUpdateLegacyReleases(_publication.Id,
-                        new List<LegacyReleasePartialUpdateViewModel>()),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanManageLegacyReleases);
-        }
-
         private static PublicationService BuildPublicationService(
             ContentDbContext? context = null,
             IUserService? userService = null,
@@ -575,6 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseRepository? releaseRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
+            IPublicationReleaseOrderService? publicationReleaseOrderService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IRedirectsCacheService? redirectsCacheService = null)
         {
@@ -589,6 +571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }

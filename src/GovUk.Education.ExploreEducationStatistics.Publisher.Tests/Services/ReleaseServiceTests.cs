@@ -1,23 +1,24 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -216,9 +217,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CompletePublishing_FirstVersion()
         {
+            // Arrange
             var release = _fixture
                 .DefaultRelease()
                 .Generate();
+
+            var releaseOrder = new ReleaseOrder
+            {
+                ReleaseId = release.Id,
+                Order = 1
+            };
+
+            var publication = new Publication
+            {
+                Releases = new() { release },
+                ReleaseOrders = new() { releaseOrder }
+            };
 
             var originalDataBlockParents = _fixture
                 .DefaultDataBlockParent()
@@ -234,14 +248,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
+                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+
+                // Act
                 await service.CompletePublishing(release.Id, actualPublishedDate);
+
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -285,6 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CompletePublishing_AmendedRelease()
         {
+            // Arrange
             var previousRelease = new Release
             {
                 Id = Guid.NewGuid(),
@@ -295,8 +323,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var release = new Release
             {
+                Id = Guid.NewGuid(),
                 PreviousVersionId = previousRelease.Id,
                 Version = 1
+            };
+
+            var releaseOrder = new ReleaseOrder
+            {
+                ReleaseId = release.Id,
+                Order = 1
+            };
+
+            var publication = new Publication
+            {
+                Releases = new() { previousRelease, release },
+                ReleaseOrders = new() { releaseOrder }
             };
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
@@ -316,14 +357,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
+                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+
+                // Act
                 await service.CompletePublishing(release.Id, DateTime.UtcNow);
+
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -370,6 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CompletePublishing_AmendedRelease_DataBlockRemoved()
         {
+            // Arrange
             var previousRelease = new Release
             {
                 Id = Guid.NewGuid(),
@@ -384,6 +439,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Version = 1
             };
 
+            var releaseOrder = new ReleaseOrder
+            {
+                ReleaseId = release.Id,
+                Order = 1
+            };
+
+            var publication = new Publication
+            {
+                Releases = new() { previousRelease, release },
+                ReleaseOrders = new() { releaseOrder }
+            };
+
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
             _fixture
                 .DefaultDataBlockParent()
@@ -393,21 +460,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .Generate())
                 // This time Data Blocks have been removed from the latest Release amendment, and so they now have no
                 // "latest" version.
-                .WithLatestDraftVersion((DataBlockVersion) null!)
+                .WithLatestDraftVersion((DataBlockVersion)null!)
                 .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
+                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+
+                // Act
                 await service.CompletePublishing(release.Id, DateTime.UtcNow);
+
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -431,8 +511,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 // on as a part of this Release / amendment.
                 actualDataBlockParents.ForEach(parent =>
                 {
-                     Assert.Null(parent.LatestPublishedVersionId);
-                     Assert.Null(parent.LatestDraftVersionId);
+                    Assert.Null(parent.LatestPublishedVersionId);
+                    Assert.Null(parent.LatestDraftVersionId);
                 });
             }
         }
@@ -440,6 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task CompletePublishing_AmendedReleaseAndUpdatePublishedDateIsTrue()
         {
+            // Arrange
             var previousRelease = new Release
             {
                 Id = Guid.NewGuid(),
@@ -456,20 +537,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 UpdatePublishedDate = true
             };
 
+            var releaseOrder = new ReleaseOrder
+            {
+                ReleaseId = release.Id,
+                Order = 1
+            };
+
+            var publication = new Publication
+            {
+                Releases = new() { previousRelease, release },
+                ReleaseOrders = new() { releaseOrder }
+            };
+
             var actualPublishedDate = DateTime.UtcNow;
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
+                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+
+                // Act
                 await service.CompletePublishing(release.Id, actualPublishedDate);
+
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -483,14 +589,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        private static ReleaseService BuildReleaseService(
-            ContentDbContext? contentDbContext = null)
+        private static Publisher.Services.ReleaseService BuildReleaseService(
+            ContentDbContext? contentDbContext = null,
+            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
                 contentDbContext,
-                releaseRepository: new ReleaseRepository(contentDbContext)
+                releaseRepository: new Content.Model.Repository.ReleaseRepository(contentDbContext),
+                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict)
             );
         }
     }

@@ -1,14 +1,17 @@
 #nullable enable
-using System;
-using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -61,16 +64,22 @@ public class LegacyReleaseServicePermissionTests
     private LegacyReleaseService SetupService(
         ContentDbContext? contentDbContext = null,
         PersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IPublicationService? publicationService = null,
         IPublicationCacheService? publicationCacheService = null,
+        IPublicationReleaseOrderService? publicationReleaseOrderService = null,
         IUserService? userService = null,
-        IMapper? mapper = null)
+        IMapper? mapper = null,
+        IOptions<EnvironmentOptions>? options = null)
     {
         return new LegacyReleaseService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             mapper ?? AdminMapper(),
             userService ?? Mock.Of<IUserService>(Strict),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+            publicationService ?? Mock.Of<IPublicationService>(Strict),
+            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+            publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict),
+            options ?? Options.Create(new EnvironmentOptions())
         );
     }
 

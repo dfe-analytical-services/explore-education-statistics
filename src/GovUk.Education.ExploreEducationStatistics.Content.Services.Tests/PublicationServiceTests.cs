@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -16,6 +12,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -123,6 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             private readonly LegacyRelease _legacyRelease = new()
             {
+                Id = Guid.NewGuid(),
                 Description = "Legacy release description",
                 Url = "https://legacy.release.com",
                 Order = 0,
@@ -178,15 +179,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion1.Id, publicationViewModel.Releases[0].Id);
                     Assert.Equal(expectedReleaseVersion1.Slug, publicationViewModel.Releases[0].Slug);
                     Assert.Equal(expectedReleaseVersion1.Title, publicationViewModel.Releases[0].Title);
+                    var releaseOrder1 = publicationViewModel.ReleaseOrders.Find(ro => ro.ReleaseId == expectedReleaseVersion1.Id)!;
+                    Assert.False(releaseOrder1.IsAmendment);
+                    Assert.False(releaseOrder1.IsDraft);
+                    Assert.False(releaseOrder1.IsLegacy);
 
                     Assert.Equal(expectedReleaseVersion2.Id, publicationViewModel.Releases[1].Id);
                     Assert.Equal(expectedReleaseVersion2.Slug, publicationViewModel.Releases[1].Slug);
                     Assert.Equal(expectedReleaseVersion2.Title, publicationViewModel.Releases[1].Title);
+                    var releaseOrder2 = publicationViewModel.ReleaseOrders.Find(ro => ro.ReleaseId == expectedReleaseVersion2.Id)!;
+                    Assert.False(releaseOrder2.IsAmendment);
+                    Assert.False(releaseOrder2.IsDraft);
+                    Assert.False(releaseOrder2.IsLegacy);
 
                     Assert.Single(publicationViewModel.LegacyReleases);
                     Assert.Equal(_legacyRelease.Id, publicationViewModel.LegacyReleases[0].Id);
                     Assert.Equal(_legacyRelease.Description, _legacyRelease.Description);
                     Assert.Equal(_legacyRelease.Url, publicationViewModel.LegacyReleases[0].Url);
+                    var releaseOrder3 = publicationViewModel.ReleaseOrders.Find(ro => ro.ReleaseId == _legacyRelease.Id)!;
+                    Assert.False(releaseOrder3.IsAmendment);
+                    Assert.False(releaseOrder3.IsDraft);
+                    Assert.True(releaseOrder3.IsLegacy);
 
                     Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
                     Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);

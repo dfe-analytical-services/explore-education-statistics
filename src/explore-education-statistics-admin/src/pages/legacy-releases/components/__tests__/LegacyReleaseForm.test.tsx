@@ -64,7 +64,6 @@ describe('LegacyReleaseForm', () => {
 
       expect(screen.getByLabelText('Description')).toHaveAttribute('value', '');
       expect(screen.getByLabelText('URL')).toHaveAttribute('value', '');
-      expect(screen.queryByLabelText('Order')).not.toBeInTheDocument();
     });
 
     test('cannot submit with only invalid values', async () => {
@@ -137,7 +136,6 @@ describe('LegacyReleaseForm', () => {
           initialValues={{
             description: 'Test',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={noop}
         />,
@@ -145,7 +143,6 @@ describe('LegacyReleaseForm', () => {
 
       expect(screen.getByLabelText('Description')).toHaveValue('Test');
       expect(screen.getByLabelText('URL')).toHaveValue('http://test.com');
-      expect(screen.getByLabelText('Order')).toHaveValue(1);
     });
 
     test('cannot submit with invalid values', async () => {
@@ -174,7 +171,6 @@ describe('LegacyReleaseForm', () => {
           initialValues={{
             description: 'Test description',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={handleSubmit}
         />,
@@ -190,7 +186,6 @@ describe('LegacyReleaseForm', () => {
         expect(handleSubmit.mock.calls[0][0]).toEqual({
           description: 'Test description',
           url: 'http://test.com',
-          order: 1,
         });
       });
     });
@@ -203,7 +198,6 @@ describe('LegacyReleaseForm', () => {
           initialValues={{
             description: 'Test description',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={handleSubmit}
         />,
@@ -211,7 +205,6 @@ describe('LegacyReleaseForm', () => {
 
       await userEvent.type(screen.getByLabelText('Description'), ' 2');
       await userEvent.type(screen.getByLabelText('URL'), '/updated');
-      await userEvent.type(screen.getByLabelText('Order'), '0');
 
       userEvent.click(
         screen.getByRole('button', {
@@ -223,7 +216,6 @@ describe('LegacyReleaseForm', () => {
         expect(handleSubmit.mock.calls[0][0]).toEqual({
           description: 'Test description 2',
           url: 'http://test.com/updated',
-          order: 10,
         });
       });
     });

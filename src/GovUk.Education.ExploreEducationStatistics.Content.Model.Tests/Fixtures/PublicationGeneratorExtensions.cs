@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 
@@ -118,6 +118,15 @@ public static class PublicationGeneratorExtensions
                     {
                         release.Publication = publication;
                         release.PublicationId = publication.Id;
+
+                        publication.ReleaseOrders.Add(new()
+                        {
+                            ReleaseId = release.Id,
+                            IsAmendment = release.Amendment,
+                            IsDraft = !release.Published.HasValue,
+                            IsLegacy = false,
+                            Order = publication.ReleaseOrders.Count + 1,
+                        });
                     });
 
                     return releases;
@@ -190,7 +199,28 @@ public static class PublicationGeneratorExtensions
     private static InstanceSetters<Publication> SetLegacyReleases(
         this InstanceSetters<Publication> setters,
         IEnumerable<LegacyRelease> legacyReleases)
-        => setters.Set(p => p.LegacyReleases, legacyReleases);
+        => setters.Set(
+                p => p.LegacyReleases,
+                (_, publication, context) =>
+                {
+                    legacyReleases.ForEach(legacyRelease =>
+                    {
+                        legacyRelease.Publication = publication;
+                        legacyRelease.PublicationId = publication.Id;
+
+                        publication.ReleaseOrders.Add(new()
+                        {
+                            ReleaseId = legacyRelease.Id,
+                            IsAmendment = false,
+                            IsDraft = false,
+                            IsLegacy = true,
+                            Order = publication.ReleaseOrders.Count + 1,
+                        });
+                    });
+
+                    return legacyReleases;
+                }
+            );
 
     public static InstanceSetters<Publication> SetSupersededBy(
         this InstanceSetters<Publication> setters,

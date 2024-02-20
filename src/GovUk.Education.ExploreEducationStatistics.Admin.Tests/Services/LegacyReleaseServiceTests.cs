@@ -1,11 +1,10 @@
 #nullable enable
-using System.Collections.Generic;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -13,7 +12,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -68,26 +73,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListLegacyReleases()
         {
+            var release1Id = Guid.NewGuid();
+            var release2Id = Guid.NewGuid();
+            var release3Id = Guid.NewGuid();
+
             var publication = new Publication
             {
-                LegacyReleases = new List<LegacyRelease>
+                LegacyReleases = new()
                 {
                     new()
                     {
+                        Id = release1Id,
                         Description = "Release 1",
                         Url = "https://test-1.com",
+                    },
+                    new()
+                    {
+                        Id = release3Id,
+                        Description = "Release 3",
+                        Url = "https://test-3.com",
+                    },
+                    new()
+                    {
+                        Id = release2Id,
+                        Description = "Release 2",
+                        Url = "https://test-2.com",
+                    }
+                },
+                ReleaseOrders = new()
+                {
+                    new()
+                    {
+                        ReleaseId = release1Id,
+                        IsDraft = false,
+                        IsLegacy = true,
                         Order = 1
                     },
                     new()
                     {
-                        Description = "Release 3",
-                        Url = "https://test-3.com",
+                        ReleaseId = release3Id,
+                        IsDraft = false,
+                        IsLegacy = true,
                         Order = 3
                     },
                     new()
                     {
-                        Description = "Release 2",
-                        Url = "https://test-2.com",
+                        ReleaseId = release2Id,
+                        IsDraft = false,
+                        IsLegacy = true,
                         Order = 2
                     }
                 }
@@ -108,41 +141,220 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ListLegacyReleases(publication.Id);
                 var viewModels = result.AssertRight();
 
+                var releaseOrders = contentDbContext.Publications
+                    .Find(publication.Id)!.ReleaseOrders
+                    .OrderByDescending(ro => ro.Order)
+                    .ToList();
+
                 Assert.Equal(3, viewModels.Count);
 
                 Assert.Equal("Release 3", viewModels[0].Description);
                 Assert.Equal("https://test-3.com", viewModels[0].Url);
                 Assert.Equal(3, viewModels[0].Order);
+                Assert.Equal(publication.LegacyReleases[1].Id, releaseOrders[0].ReleaseId);
+                Assert.Equal(3, releaseOrders[0].Order);
+                Assert.True(releaseOrders[0].IsLegacy);
+                Assert.False(releaseOrders[0].IsDraft);
 
                 Assert.Equal("Release 2", viewModels[1].Description);
                 Assert.Equal("https://test-2.com", viewModels[1].Url);
                 Assert.Equal(2, viewModels[1].Order);
+                Assert.Equal(publication.LegacyReleases[2].Id, releaseOrders[1].ReleaseId);
+                Assert.Equal(2, releaseOrders[1].Order);
+                Assert.True(releaseOrders[1].IsLegacy);
+                Assert.False(releaseOrders[1].IsDraft);
 
                 Assert.Equal("Release 1", viewModels[2].Description);
                 Assert.Equal("https://test-1.com", viewModels[2].Url);
                 Assert.Equal(1, viewModels[2].Order);
+                Assert.Equal(publication.LegacyReleases[0].Id, releaseOrders[2].ReleaseId);
+                Assert.Equal(1, releaseOrders[2].Order);
+                Assert.True(releaseOrders[2].IsLegacy);
+                Assert.False(releaseOrders[2].IsDraft);
+            }
+        }
+
+        [Fact]
+        public async Task ListCombinedReleases()
+        {
+            // Arrange
+            var publicationId = Guid.NewGuid();
+            var legacyRelease1Id = Guid.NewGuid();
+            var legacyRelease2Id = Guid.NewGuid();
+            var eesRelease1Id = Guid.NewGuid();
+            var eesRelease2Id = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                Id = publicationId,
+                Slug = "Test publication",
+                LegacyReleases = new()
+                {
+                    new()
+                    {
+                        Id = legacyRelease1Id,
+                        Description = "Legacy Release 1",
+                        Url = "https://test-1.com",
+                    },
+                    new()
+                    {
+                        Id = legacyRelease2Id,
+                        Description = "Legacy Release 2",
+                        Url = "https://test-2.com",
+                    }
+                },
+                Releases = new()
+                {
+                    new()
+                    {
+                        Id = eesRelease1Id,
+                        ReleaseName = "2022",
+                        Slug = "2022",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    },
+                    new()
+                    {
+                        Id = eesRelease2Id,
+                        ReleaseName = "2023",
+                        Slug = "2023",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    },
+                },
+                ReleaseOrders = new()
+                {
+                    new()
+                    {
+                        ReleaseId = eesRelease2Id,
+                        IsDraft = false,
+                        IsLegacy = false,
+                        Order = 4
+                    },
+                    new()
+                    {
+                        ReleaseId = eesRelease1Id,
+                        IsDraft = false,
+                        IsLegacy = false,
+                        Order = 3
+                    },
+                    new()
+                    {
+                        ReleaseId = legacyRelease2Id,
+                        IsDraft = false,
+                        IsLegacy = true,
+                        Order = 2
+                    },
+                    new()
+                    {
+                        ReleaseId = legacyRelease1Id,
+                        IsDraft = false,
+                        IsLegacy = true,
+                        Order = 1
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var publicationService = new Mock<IPublicationService>(Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var eesReleaseVms = new List<ViewModels.ReleaseSummaryViewModel>
+                {
+                    new()
+                    {
+                        Id = eesRelease1Id,
+                        IsDraft = false,
+                        Order = 3,
+                        Title = "2022",
+                        Slug = "2022",
+                    },
+                    new()
+                    {
+                        Id = eesRelease2Id,
+                        IsDraft = false,
+                        Order = 4,
+                        Title = "2023",
+                        Slug = "2023",
+                    }
+                };
+
+                publicationService
+                    .Setup(ps => ps.ListLatestReleaseVersions(
+                        publicationId,
+                        It.IsAny<bool?>(),
+                        It.IsAny<bool>()))
+                    .ReturnsAsync(new Either<ActionResult, List<ViewModels.ReleaseSummaryViewModel>>(
+                        new List<ViewModels.ReleaseSummaryViewModel>(eesReleaseVms)));
+
+                var releaseService = BuildLegacyReleaseService(
+                    contentDbContext,
+                    publicationService: publicationService.Object);
+
+
+                // Act
+                var result = await releaseService.ListCombinedReleases(publication.Id);
+
+                // Assert
+                VerifyAllMocks(publicationService);
+                var viewModels = result.AssertRight();
+
+                Assert.Equal(4, viewModels.Count);
+
+                Assert.Equal("2023", viewModels[0].Description);
+                Assert.Equal(eesRelease2Id, viewModels[0].Id);
+                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2023", viewModels[0].Url);
+                Assert.Equal(4, viewModels[0].Order);
+
+                Assert.Equal("2022", viewModels[1].Description);
+                Assert.Equal(eesRelease1Id, viewModels[1].Id);
+                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2022", viewModels[1].Url);
+                Assert.Equal(3, viewModels[1].Order);
+
+                Assert.Equal("Legacy Release 2", viewModels[2].Description);
+                Assert.Equal(publication.LegacyReleases[1].Id, viewModels[2].Id);
+                Assert.Equal("https://test-2.com", viewModels[2].Url);
+                Assert.Equal(2, viewModels[2].Order);
+
+                Assert.Equal("Legacy Release 1", viewModels[3].Description);
+                Assert.Equal(publication.LegacyReleases[0].Id, viewModels[3].Id);
+                Assert.Equal("https://test-1.com", viewModels[3].Url);
+                Assert.Equal(1, viewModels[3].Order);
             }
         }
 
         [Fact]
         public async Task CreateLegacyRelease()
         {
+            // Arrange
             var publicationId = Guid.NewGuid();
-
             var contentDbContextId = Guid.NewGuid().ToString();
+            var publication = new Publication
+            {
+                Id = publicationId,
+                Slug = PublicationSlug
+            };
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Slug = PublicationSlug
-                });
+                context.Add(publication);
 
                 await context.SaveChangesAsync();
             }
 
+            var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+
+            publicationReleaseOrderService.Setup(s => s.CreateForCreateLegacyRelease(
+                publicationId,
+                It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
                 .ReturnsAsync(new PublicationCacheViewModel());
@@ -151,9 +363,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object,
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Service method under test
+                // Act
                 var result = await legacyReleaseService.CreateLegacyRelease(
                     new LegacyReleaseCreateViewModel
                     {
@@ -162,78 +375,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId
                     });
 
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
                 VerifyAllMocks(publicationCacheService);
 
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("https://test.com", result.Right.Url);
-                Assert.Equal(1, result.Right.Order);
+                Assert.Equal(0, result.Right.Order); // No longer set (ordering moved to Publication.ReleaseOrders)
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Test description", savedLegacyRelease.Description);
                 Assert.Equal("https://test.com", savedLegacyRelease.Url);
-                Assert.Equal(1, savedLegacyRelease.Order);
+                Assert.Equal(0, savedLegacyRelease.Order); // No longer set (ordering moved to Publication.ReleaseOrders)
                 Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
-            }
-        }
-
-        [Fact]
-        public async Task CreateLegacyRelease_WithExisting()
-        {
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Slug = PublicationSlug,
-                    LegacyReleases = new List<LegacyRelease>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Description = "Test description 1",
-                            Url = "https://test1.com",
-                            Order = 1,
-                            PublicationId = publicationId,
-                        }
-                    }
-                });
-
-                await context.SaveChangesAsync();
-            }
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var legacyReleaseService = BuildLegacyReleaseService(
-                    context: context,
-                    publicationCacheService: publicationCacheService.Object);
-
-                // Service method under test
-                var result = await legacyReleaseService.CreateLegacyRelease(
-                    new LegacyReleaseCreateViewModel
-                    {
-                        Description = "Test description 2",
-                        Url = "https://test2.com",
-                        PublicationId = publicationId
-                    });
-
-                VerifyAllMocks(publicationCacheService);
-
-                var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
-
-                Assert.Equal("Test description 2", legacyRelease.Description);
-                Assert.Equal("https://test2.com", legacyRelease.Url);
-                Assert.Equal(2, legacyRelease.Order);
-                Assert.Equal(publicationId, legacyRelease.PublicationId);
             }
         }
 
@@ -258,7 +413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Id = id,
                             Description = "Test description",
                             Url = "https://test.com",
-                            Order = 2,
                         },
                     }
                 });
@@ -284,7 +438,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Description = "Updated test description",
                         Url = "https://updated-test.com",
-                        Order = 1,
                         PublicationId = publicationId,
                     });
 
@@ -292,179 +445,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Updated test description", result.Right.Description);
                 Assert.Equal("https://updated-test.com", result.Right.Url);
-                Assert.Equal(1, result.Right.Order);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Updated test description", savedLegacyRelease.Description);
                 Assert.Equal("https://updated-test.com", savedLegacyRelease.Url);
-                Assert.Equal(1, savedLegacyRelease.Order);
                 Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateLegacyRelease_ReordersWithExisting()
-        {
-            var id = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Slug = PublicationSlug,
-                    LegacyReleases = new List<LegacyRelease>
-                    {
-                        new()
-                        {
-                            Description = "Test description 1",
-                            Url = "https://test1.com",
-                            Order = 1,
-                        },
-                        new()
-                        {
-                            Description = "Test description 2",
-                            Url = "https://test2.com",
-                            Order = 2,
-                        },
-                        new()
-                        {
-                            Id = id,
-                            Description = "Test description 3",
-                            Url = "https://test3.com",
-                            Order = 3,
-                        }
-                    }
-                });
-
-                await context.SaveChangesAsync();
-            }
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var legacyReleaseService = BuildLegacyReleaseService(
-                    context: context,
-                    publicationCacheService: publicationCacheService.Object);
-
-                // Service method under test
-                await legacyReleaseService.UpdateLegacyRelease(
-                    id,
-                    new LegacyReleaseUpdateViewModel
-                    {
-                        Description = "Updated test description 3",
-                        Url = "https://updated-test3.com",
-                        Order = 1,
-                        PublicationId = publicationId,
-                    });
-
-                VerifyAllMocks(publicationCacheService);
-
-                var legacyReleases = context.LegacyReleases
-                    .AsQueryable()
-                    .OrderBy(release => release.Order)
-                    .ToList();
-
-                Assert.Equal("Updated test description 3", legacyReleases[0].Description);
-                Assert.Equal(1, legacyReleases[0].Order);
-
-                Assert.Equal("Test description 1", legacyReleases[1].Description);
-                Assert.Equal(2, legacyReleases[1].Order);
-
-                Assert.Equal("Test description 2", legacyReleases[2].Description);
-                Assert.Equal(3, legacyReleases[2].Order);
-            }
-        }
-
-        /// Test that we do not leave gaps in the order values when
-        /// updating a legacy release with an `Order` larger than
-        /// the number of legacy releases.
-        [Fact]
-        public async Task UpdateLegacyRelease_ReordersWithoutGaps()
-        {
-            var id = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Slug = PublicationSlug,
-                    LegacyReleases = new List<LegacyRelease>
-                    {
-                        new()
-                        {
-                            Id = id,
-                            Description = "Test description 1",
-                            Url = "https://test1.com",
-                            Order = 1,
-                        },
-                        new()
-                        {
-                            Description = "Test description 2",
-                            Url = "https://test2.com",
-                            Order = 2,
-                        },
-                        new()
-                        {
-                            Description = "Test description 3",
-                            Url = "https://test3.com",
-                            Order = 3,
-                        }
-                    }
-                });
-
-                await context.SaveChangesAsync();
-            }
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var legacyReleaseService = BuildLegacyReleaseService(
-                    context: context,
-                    publicationCacheService: publicationCacheService.Object);
-
-                // Service method under test
-                await legacyReleaseService.UpdateLegacyRelease(
-                    id,
-                    new LegacyReleaseUpdateViewModel()
-                    {
-                        Description = "Updated test description 1",
-                        Url = "https://updated-test1.com",
-                        Order = 5,
-                        PublicationId = publicationId,
-                    });
-
-                VerifyAllMocks(publicationCacheService);
-
-                var legacyReleases = context.LegacyReleases
-                    .AsQueryable()
-                    .OrderBy(release => release.Order)
-                    .ToList();
-
-                Assert.Equal("Test description 2", legacyReleases[0].Description);
-                Assert.Equal(1, legacyReleases[0].Order);
-
-                Assert.Equal("Test description 3", legacyReleases[1].Description);
-                Assert.Equal(2, legacyReleases[1].Order);
-
-                Assert.Equal("Updated test description 1", legacyReleases[2].Description);
-                Assert.Equal(3, legacyReleases[2].Order);
             }
         }
 
@@ -489,75 +475,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Id = id,
                             Description = "Test description",
                             Url = "https://test.com",
-                            Order = 2,
-                        },
-                    }
-                });
-
-                await context.SaveChangesAsync();
-            }
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationCacheViewModel());
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var legacyReleaseService = BuildLegacyReleaseService(
-                    context: context,
-                    publicationCacheService: publicationCacheService.Object);
-
-                // Service method under test
-                await legacyReleaseService.DeleteLegacyRelease(id);
-
-                VerifyAllMocks(publicationCacheService);
-
-                Assert.Empty(context.LegacyReleases);
-                Assert.Empty(
-                    context.Publications
-                        .Single(publication => publication.Id == publicationId)
-                        .LegacyReleases
-                );
-            }
-        }
-
-        [Fact]
-        public async Task DeleteLegacyRelease_ReordersWithExisting()
-        {
-            var id = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                context.Add(new Publication
-                {
-                    Id = publicationId,
-                    Slug = PublicationSlug,
-                    LegacyReleases = new List<LegacyRelease>
+                        }
+                    },
+                    ReleaseOrders = new()
                     {
                         new()
                         {
-                            Id = id,
-                            Description = "Test description 1",
-                            Url = "https://test1.com",
+                            ReleaseId = id,
                             Order = 1,
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Description = "Test description 2",
-                            Url = "https://test2.com",
-                            Order = 2,
-                        },
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Description = "Test description 3",
-                            Url = "https://test3.com",
-                            Order = 3,
+                            IsLegacy = true
                         }
                     }
                 });
@@ -565,55 +491,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationReleaseOrderService.Setup(s => s.DeleteForDeleteLegacyRelease(
+                publicationId,
+                It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
+
+            publicationCacheService
+                .Setup(s => s.UpdatePublication(PublicationSlug))
                 .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object,
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Service method under test
+                // Act
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
                 VerifyAllMocks(publicationCacheService);
 
-                var legacyReleases = context.LegacyReleases
-                    .AsQueryable()
-                    .OrderBy(release => release.Order)
-                    .ToList();
-
-                Assert.Equal(2, legacyReleases.Count);
-                Assert.Equal(2,
-                    context.Publications
+                Assert.Empty(context.Publications
                         .Single(publication => publication.Id == publicationId)
-                        .LegacyReleases
-                        .Count
-                );
-
-                Assert.Equal("Test description 2", legacyReleases[0].Description);
-                Assert.Equal(1, legacyReleases[0].Order);
-
-                Assert.Equal("Test description 3", legacyReleases[1].Description);
-                Assert.Equal(2, legacyReleases[1].Order);
+                        .LegacyReleases);
             }
         }
 
-        private LegacyReleaseService BuildLegacyReleaseService(
+        private static IOptions<EnvironmentOptions> DefaultEnvironmentOptions()
+        {
+            return Options.Create(new EnvironmentOptions
+            {
+                BaseUrl = "https://test.com"
+            });
+        }
+
+        private static LegacyReleaseService BuildLegacyReleaseService(
             ContentDbContext context,
             IMapper? mapper = null,
             IUserService? userService = null,
-            IPublicationCacheService? publicationCacheService = null)
+            IPublicationService? publicationService = null,
+            IPublicationCacheService? publicationCacheService = null,
+            IPublicationReleaseOrderService? publicationReleaseOrderService = null,
+            IOptions<EnvironmentOptions>? options = null)
         {
             return new LegacyReleaseService(
                 context,
                 mapper ?? AdminMapper(),
                 userService ?? AlwaysTrueUserService().Object,
                 new PersistenceHelper<ContentDbContext>(context),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+                publicationService ?? Mock.Of<IPublicationService>(Strict),
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict),
+                options ?? DefaultEnvironmentOptions()
             );
         }
     }

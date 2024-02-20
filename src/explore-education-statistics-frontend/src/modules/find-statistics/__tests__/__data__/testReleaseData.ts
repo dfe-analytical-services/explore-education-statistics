@@ -5,25 +5,43 @@ export const testPublication: Publication = {
   title: 'Pupil absence in schools in England',
   slug: 'pupil-absence-in-schools-in-england',
   releases: [
-    { id: 'release-3', slug: '2018-19', title: 'Academic year 2018/19' },
-    { id: 'release-2', slug: '2017-18', title: 'Academic year 2017/18' },
-    { id: 'release-1', slug: '2016-17', title: 'Academic year 2016/17' },
+    {
+      id: 'release-3',
+      slug: '2018-19',
+      title: 'Academic year 2018/19',
+      order: 5,
+    },
+    {
+      id: 'release-2',
+      slug: '2017-18',
+      title: 'Academic year 2017/18',
+      order: 2,
+    },
+    {
+      id: 'release-1',
+      slug: '2016-17',
+      title: 'Academic year 2016/17',
+      order: 3,
+    },
   ],
   legacyReleases: [
     {
       id: 'legacy-release-3',
       description: 'Academic year 2014/15',
       url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+      order: 4,
     },
     {
       id: 'legacy-release-2',
       description: 'Academic year 2013/14',
       url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
+      order: 1,
     },
     {
       id: 'legacy-release-1',
       description: 'Academic year 2012/13',
       url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
+      order: 0,
     },
   ],
   topic: {

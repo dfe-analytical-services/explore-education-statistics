@@ -1,9 +1,6 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -18,12 +15,17 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseSubject = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject;
 
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseAmendment()
         {
+            // Arrange
             var originalCreatedBy = new User
             {
                 Id = Guid.NewGuid()
@@ -68,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
                 .WithPublishScheduled(DateTime.Now.AddDays(1))
-                .WithNextReleaseDate(new PartialDate {Day = "1", Month = "1", Year = "2040"})
+                .WithNextReleaseDate(new PartialDate { Day = "1", Month = "1", Year = "2040" })
                 .WithPublished(DateTime.UtcNow.AddDays(-1))
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
@@ -96,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Description = "Link 2",
                         Url = "URL 2"
                     }))
-                .WithUpdates(ListOf<Update>(new ()
+                .WithUpdates(ListOf<Update>(
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.AddDays(-4),
@@ -367,14 +371,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.CreateForAmendRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
-                    statisticsDbContext);
+                    statisticsDbContext,
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Method under test
+                // Act
                 var result = await releaseAmendmentService.CreateReleaseAmendment(originalRelease.Id);
-                var viewModel = result.AssertRight();
 
+                // Assert
+                var viewModel = result.AssertRight();
+                VerifyAllMocks(publicationReleaseOrderService);
                 Assert.NotEqual(Guid.Empty, viewModel.Id);
                 Assert.NotEqual(originalRelease.Id, viewModel.Id);
                 amendmentId = viewModel.Id;
@@ -699,6 +713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task FiltersCommentsFromContent()
         {
+            // Arrange
             var htmlBlock1Body = @"
                 <p>
                     Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
@@ -792,14 +807,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.CreateForAmendRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
-                    statisticsDbContext: InMemoryStatisticsDbContext());
+                    statisticsDbContext: InMemoryStatisticsDbContext(),
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Method under test
+                // Act
                 var result = await releaseAmendmentService.CreateReleaseAmendment(originalRelease.Id);
-                var amendment = result.AssertRight();
 
+                // Assert
+                var amendment = result.AssertRight();
+                VerifyAllMocks(publicationReleaseOrderService);
                 Assert.NotEqual(originalRelease.Id, amendment.Id);
                 amendmentId = amendment.Id;
             }
@@ -830,6 +855,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task NullHtmlBlockBody()
         {
+            // Arrange
             Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
@@ -860,13 +886,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.CreateForAmendRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
-                    statisticsDbContext: InMemoryStatisticsDbContext());
+                    statisticsDbContext: InMemoryStatisticsDbContext(),
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Method under test
+                // Act
                 var result = await releaseAmendmentService.CreateReleaseAmendment(originalRelease.Id);
 
+                // Assert
+                VerifyAllMocks(publicationReleaseOrderService);
                 var amendment = result.AssertRight();
 
                 Assert.NotEqual(originalRelease.Id, amendment.Id);
@@ -883,6 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreatesRelatedDashboardsSectionIfNotOnOriginal()
         {
+            // Arrange
             Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
@@ -906,14 +943,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.CreateForAmendRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
-                    statisticsDbContext: InMemoryStatisticsDbContext());
+                    statisticsDbContext: InMemoryStatisticsDbContext(),
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Method under test
+                // Act
                 var result = await releaseAmendmentService.CreateReleaseAmendment(originalRelease.Id);
-                var amendment = result.AssertRight();
 
+                // Assert
+                var amendment = result.AssertRight();
+                VerifyAllMocks(publicationReleaseOrderService);
                 Assert.NotEqual(originalRelease.Id, amendment.Id);
                 amendmentId = amendment.Id;
             }
@@ -930,6 +977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CopyFootnotes()
         {
+            // Arrange
             Release originalRelease = _fixture
                 .DefaultRelease()
                 .WithPublication(_fixture
@@ -999,14 +1047,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
+                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+
+                publicationReleaseOrderService.Setup(s => s.CreateForAmendRelease(
+                    It.IsAny<Guid>(),
+                    It.IsAny<Guid>()))
+                .Returns(Task.CompletedTask);
+
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
-                    statisticsDbContext);
+                    statisticsDbContext,
+                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
 
-                // Method under test
+                // Act
                 var result = await releaseAmendmentService.CreateReleaseAmendment(originalStatsRelease.Id);
-                var viewModel = result.AssertRight();
 
+                // Assert
+                var viewModel = result.AssertRight();
+                VerifyAllMocks(publicationReleaseOrderService);
                 Assert.NotEqual(Guid.Empty, viewModel.Id);
                 Assert.NotEqual(originalStatsRelease.Id, viewModel.Id);
                 amendmentId = viewModel.Id;
@@ -1187,13 +1245,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseAmendmentService BuildService(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
         {
             return new ReleaseAmendmentService(
                 contentDbContext,
                 userService ?? UserServiceMock().Object,
                 new FootnoteRepository(statisticsDbContext),
-                statisticsDbContext);
+                statisticsDbContext,
+                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict));
         }
     }
 }
