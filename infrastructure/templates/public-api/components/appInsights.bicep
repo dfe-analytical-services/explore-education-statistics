@@ -5,7 +5,7 @@ param resourcePrefix string
 param location string
 
 //Specific parameters for the resources
-@description('Application Insights name')
+@description('Specifies the Application Insights name')
 param appInsightsName string
 
 // Variables and created data

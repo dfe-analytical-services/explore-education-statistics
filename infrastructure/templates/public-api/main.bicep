@@ -82,11 +82,11 @@ param useDummyImage bool
 
 
 //ServiceBus Queue Params -------------------------------------------------------------------
-@description('Name of the Service Bus namespace')
-param namespaceName string = 'processor'
-
-@description('Name of the Queue')
-param queueName string = 'Processorqueue'
+// @description('Name of the Service Bus namespace')
+// param namespaceName string = 'processor'
+//
+// @description('Name of the Queue')
+// param queueName string = 'Processorqueue'
 
 //ETL Function Paramenters ------------------------------------------------------------------
 @description('Specifies the name of the function.')
@@ -212,31 +212,31 @@ module containerAppModule 'components/containerApp.bicep' = {
     containerAppTargetPort: containerAppTargetPort
     useDummyImage: useDummyImage
     dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
-    serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
+//     serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
   }
   dependsOn: [
     keyVaultModule
     databaseModule
-    serviceBusFunctionQueueModule
+//     serviceBusFunctionQueueModule
   ]
 }
 
-//Deploy Service Bus
-module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
-  name: 'serviceBusQueueDeploy'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    namespaceName: namespaceName
-    queueName:queueName
-    keyVaultName: keyVaultModule.outputs.keyVaultName
-    tagValues: tagValues
-  }
-  dependsOn: [
-    keyVaultModule
-  ]
-}
+// //Deploy Service Bus
+// module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
+//   name: 'serviceBusQueueDeploy'
+//   params: {
+//     resourcePrefix: resourcePrefix
+//     location: location
+//     namespaceName: namespaceName
+//     queueName:queueName
+//     keyVaultName: keyVaultModule.outputs.keyVaultName
+//     tagValues: tagValues
+//   }
+//   dependsOn: [
+//     keyVaultModule
+//   ]
+// }
 
 //Deploy ETL Function
 module etlFunctionAppModule 'application/processorFunctionApp.bicep' = {
@@ -247,14 +247,14 @@ module etlFunctionAppModule 'application/processorFunctionApp.bicep' = {
     functionAppName: functionAppName
     storageAccountConnectionString: eesKeyVault.getSecret(storageAccountModule.outputs.connectionStringSecretName)
     dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
-    serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
+//     serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
   }
   dependsOn: [
     keyVaultModule
     databaseModule
     storageAccountModule
-    serviceBusFunctionQueueModule
+//     serviceBusFunctionQueueModule
   ]
 }
 

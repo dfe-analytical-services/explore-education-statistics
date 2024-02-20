@@ -64,9 +64,9 @@ param maxReplica int = 3
 @secure()
 param dbConnectionString string
 
-@description('Specifies the service bus connection string.')
-@secure()
-param serviceBusConnectionString string
+// @description('Specifies the service bus connection string.')
+// @secure()
+// param serviceBusConnectionString string
 
 //Passed in Tags
 param tagValues object
@@ -185,10 +185,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
               name: 'dbConnectionString'
               value: dbConnectionString
             }
-            {
-              name: 'serviceBusConnectionString'
-              value: serviceBusConnectionString
-            }
+//             {
+//               name: 'serviceBusConnectionString'
+//               value: serviceBusConnectionString
+//             }
           ]
           resources: {
             cpu: json(cpuCore)
