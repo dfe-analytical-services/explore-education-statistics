@@ -10,7 +10,7 @@ public static class VersionUtils
             versionString,
             SemVersionStyles.OptionalMinorPatch
                 | SemVersionStyles.AllowWhitespace,
-            out SemVersion sv);
+            out var sv);
 
         version = sv;
 

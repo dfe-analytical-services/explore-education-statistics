@@ -113,7 +113,7 @@ internal class DataSetService : IDataSetService
         Guid dataSetId,
         string dataSetVersion)
     {
-        if (!VersionUtils.TryParse(dataSetVersion, out SemVersion version))
+        if (!VersionUtils.TryParse(dataSetVersion, out var version))
         {
             return new NotFoundResult();
         }

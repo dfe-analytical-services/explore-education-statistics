@@ -20,7 +20,7 @@ public abstract class VersionUtilsTests
         [InlineData("2", 2)]
         public void ValidVersion_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out SemVersion version));
+            Assert.True(VersionUtils.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -33,7 +33,7 @@ public abstract class VersionUtilsTests
         [InlineData(" 1.1.1 ", 1, 1, 1)]
         public void VersionWithEmptySpaces_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out SemVersion version));
+            Assert.True(VersionUtils.TryParse(versionString, out var version));
 
             Assert.Equal(expectedMajor, version.Major);
             Assert.Equal(expectedMinor, version.Minor);
@@ -52,7 +52,7 @@ public abstract class VersionUtilsTests
 
         public void InvalidVersion_FailsToParse(string versionString)
         {
-            Assert.False(VersionUtils.TryParse(versionString, out SemVersion _));
+            Assert.False(VersionUtils.TryParse(versionString, out var _));
         }
     }
 }
