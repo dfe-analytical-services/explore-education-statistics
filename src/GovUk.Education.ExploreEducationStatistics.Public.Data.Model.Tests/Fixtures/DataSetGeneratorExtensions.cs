@@ -60,12 +60,7 @@ public static class DataSetGeneratorExtensions
             .SetDefault(ds => ds.Title)
             .SetDefault(ds => ds.Summary)
             .SetDefault(ds => ds.PublicationId)
-            .Set(ds => ds.Status, DataSetStatus.Staged)
-            .Set(ds => ds.Created, ds => ds.Date.PastOffset())
-            .Set(
-                ds => ds.Updated,
-                (f, ds) => f.Date.SoonOffset(14, ds.Created)
-            );
+            .Set(ds => ds.Status, DataSetStatus.Staged);
 
     public static InstanceSetters<DataSet> SetTitle(
         this InstanceSetters<DataSet> instanceSetter,

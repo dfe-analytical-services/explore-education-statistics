@@ -1,6 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -25,11 +27,17 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required string Notes { get; set; }
 
-    public required DataSetVersionMetaSummary MetaSummary { get; set; }
-
-    public DataSetMeta Meta { get; set; } = null!;
-
     public long TotalResults { get; set; }
+
+    public DataSetVersionMetaSummary? MetaSummary { get; set; }
+
+    public List<LocationMeta> LocationMetas { get; set; } = [];
+
+    public List<FilterMeta> FilterMetas { get; set; } = [];
+
+    public List<IndicatorMeta> IndicatorMetas { get; set; } = [];
+
+    public List<TimePeriodMeta> TimePeriodMetas { get; set; } = [];
 
     public List<ChangeSetFilters> FilterChanges { get; set; } = [];
 
@@ -74,6 +82,21 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                             .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
                     });
                 });
+
+                ms.Property(msb => msb.GeographicLevels)
+                    .HasColumnType("text[]")
+                    .HasConversion(
+                        value => value
+                            .Select(EnumToEnumValueConverter<GeographicLevel>.ToProvider)
+                            .ToList(),
+                        value => value
+                            .Select(EnumToEnumValueConverter<GeographicLevel>.FromProvider)
+                            .ToList(),
+                        new ValueComparer<List<GeographicLevel>>(
+                            (c1, c2) => c1!.SequenceEqual(c2!),
+                            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                            c => c.ToList())
+                    );
             });
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();

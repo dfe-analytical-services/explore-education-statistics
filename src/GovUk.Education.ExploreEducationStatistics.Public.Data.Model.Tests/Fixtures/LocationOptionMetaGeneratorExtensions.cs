@@ -4,52 +4,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 
 public static class LocationOptionMetaGeneratorExtensions
 {
-    public static Generator<LocationOptionMeta> DefaultLocationOptionMeta(this DataFixture fixture)
-        => fixture.Generator<LocationOptionMeta>().WithDefaults();
+    public static Generator<TOptionMeta> WithId<TOptionMeta>(
+        this Generator<TOptionMeta> generator,
+        int id) where TOptionMeta : LocationOptionMeta
+        => generator.ForInstance(s => s.SetId(id));
 
-    public static Generator<LocationOptionMeta> WithDefaults(this Generator<LocationOptionMeta> generator)
-        => generator.ForInstance(s => s.SetDefaults());
-
-    public static Generator<LocationOptionMeta> WithPublicId(
-        this Generator<LocationOptionMeta> generator,
-        string publicId)
-        => generator.ForInstance(s => s.SetPublicId(publicId));
-
-    public static Generator<LocationOptionMeta> WithPrivateId(
-        this Generator<LocationOptionMeta> generator,
-        int privateId)
-        => generator.ForInstance(s => s.SetPrivateId(privateId));
-
-    public static Generator<LocationOptionMeta> WithLabel(this Generator<LocationOptionMeta> generator, string label)
+    public static Generator<TOptionMeta> WithLabel<TOptionMeta>(
+        this Generator<TOptionMeta> generator,
+        string label) where TOptionMeta : LocationOptionMeta
         => generator.ForInstance(s => s.SetLabel(label));
 
-    public static Generator<LocationOptionMeta> WithCode(this Generator<LocationOptionMeta> generator, string code)
-        => generator.ForInstance(s => s.SetLabel(code));
+    public static Generator<TOptionMeta> WithMetas<TOptionMeta>(
+        this Generator<TOptionMeta> generator,
+        Func<IEnumerable<LocationMeta>> metas) where TOptionMeta : LocationOptionMeta
+        => generator.ForInstance(s => s.SetMetas(metas));
 
-    public static InstanceSetters<LocationOptionMeta> SetDefaults(this InstanceSetters<LocationOptionMeta> setters)
-        => setters
-            .SetDefault(m => m.PublicId)
-            .SetDefault(m => m.PrivateId)
-            .SetDefault(m => m.Label)
-            .SetDefault(m => m.Code);
+    public static Generator<TOptionMeta> WithMetaLinks<TOptionMeta>(
+        this Generator<TOptionMeta> generator,
+        Func<IEnumerable<LocationOptionMetaLink>> links) where TOptionMeta : LocationOptionMeta
+        => generator.ForInstance(s => s.SetMetaLinks(links));
 
-    public static InstanceSetters<LocationOptionMeta> SetPublicId(
-        this InstanceSetters<LocationOptionMeta> setters,
-        string publicId)
-        => setters.Set(m => m.PublicId, publicId);
+    public static InstanceSetters<TOptionMeta> SetId<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters,
+        int id) where TOptionMeta : LocationOptionMeta
+        => setters.Set(m => m.Id, id);
 
-    public static InstanceSetters<LocationOptionMeta> SetPrivateId(
-        this InstanceSetters<LocationOptionMeta> setters,
-        int privateId)
-        => setters.Set(m => m.PrivateId, privateId);
-
-    public static InstanceSetters<LocationOptionMeta> SetLabel(
-        this InstanceSetters<LocationOptionMeta> setters,
-        string label)
+    public static InstanceSetters<TOptionMeta> SetLabel<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters,
+        string label) where TOptionMeta : LocationOptionMeta
         => setters.Set(m => m.Label, label);
 
-    public static InstanceSetters<LocationOptionMeta> SetCode(
-        this InstanceSetters<LocationOptionMeta> setters,
-        string code)
-        => setters.Set(m => m.Code, code);
+    public static InstanceSetters<TOptionMeta> SetMetas<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters,
+        Func<IEnumerable<LocationMeta>> metas) where TOptionMeta : LocationOptionMeta
+        => setters.Set(m => m.Metas, metas);
+
+    public static InstanceSetters<TOptionMeta> SetMetaLinks<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters,
+        Func<IEnumerable<LocationOptionMetaLink>> links) where TOptionMeta : LocationOptionMeta
+        => setters.Set(m => m.MetaLinks, links);
 }
