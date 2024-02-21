@@ -4,25 +4,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class VersionUtils
 {
-    public static bool TryParse(string versionString, out int major, out int minor, out int patch)
+    public static bool TryParse(string versionString, out SemVersion version)
     {
-        if (!SemVersion.TryParse(
+        var successful = SemVersion.TryParse(
             versionString,
             SemVersionStyles.OptionalMinorPatch
                 | SemVersionStyles.AllowWhitespace,
-            out SemVersion version))
-        {
-            major = default;
-            minor = default;
-            patch = default;
+            out SemVersion sv);
 
-            return false;
-        }
+        version = sv;
 
-        major = version.Major;
-        minor = version.Minor;
-        patch = version.Patch;
-
-        return true;
+        return successful;
     }
 }

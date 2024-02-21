@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -112,15 +113,15 @@ internal class DataSetService : IDataSetService
         Guid dataSetId,
         string dataSetVersion)
     {
-        if (!VersionUtils.TryParse(dataSetVersion, out int major, out int minor, out int _))
+        if (!VersionUtils.TryParse(dataSetVersion, out SemVersion version))
         {
             return new NotFoundResult();
         }
 
         return await _publicDataDbContext.DataSetVersions
             .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == major)
-            .Where(dsv => dsv.VersionMinor == minor)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
             .Where(ds => ds.Status == DataSetVersionStatus.Published
                 || ds.Status == DataSetVersionStatus.Unpublished
                 || ds.Status == DataSetVersionStatus.Deprecated)

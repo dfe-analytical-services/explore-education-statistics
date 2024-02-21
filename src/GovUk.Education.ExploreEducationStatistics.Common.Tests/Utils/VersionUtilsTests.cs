@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Semver;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -19,11 +20,11 @@ public abstract class VersionUtilsTests
         [InlineData("2", 2)]
         public void ValidVersion_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out int major, out int minor, out int patch));
+            Assert.True(VersionUtils.TryParse(versionString, out SemVersion version));
 
-            Assert.Equal(expectedMajor, major);
-            Assert.Equal(expectedMinor, minor);
-            Assert.Equal(expectedPatch, patch);
+            Assert.Equal(expectedMajor, version.Major);
+            Assert.Equal(expectedMinor, version.Minor);
+            Assert.Equal(expectedPatch, version.Patch);
         }
 
         [Theory]
@@ -32,11 +33,11 @@ public abstract class VersionUtilsTests
         [InlineData(" 1.1.1 ", 1, 1, 1)]
         public void VersionWithEmptySpaces_SuccessfullyParsed(string versionString, int expectedMajor, int expectedMinor = default, int expectedPatch = default)
         {
-            Assert.True(VersionUtils.TryParse(versionString, out int major, out int minor, out int patch));
+            Assert.True(VersionUtils.TryParse(versionString, out SemVersion version));
 
-            Assert.Equal(expectedMajor, major);
-            Assert.Equal(expectedMinor, minor);
-            Assert.Equal(expectedPatch, patch);
+            Assert.Equal(expectedMajor, version.Major);
+            Assert.Equal(expectedMinor, version.Minor);
+            Assert.Equal(expectedPatch, version.Patch);
         }
 
         [Theory]
@@ -51,7 +52,7 @@ public abstract class VersionUtilsTests
 
         public void InvalidVersion_FailsToParse(string versionString)
         {
-            Assert.False(VersionUtils.TryParse(versionString, out int _, out int _, out int _));
+            Assert.False(VersionUtils.TryParse(versionString, out SemVersion _));
         }
     }
 }
