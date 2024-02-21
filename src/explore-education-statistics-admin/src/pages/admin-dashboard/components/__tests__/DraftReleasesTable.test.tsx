@@ -170,8 +170,6 @@ describe('DraftReleasesTable', () => {
   ];
 
   beforeEach(() => {
-    // jest.useFakeTimers();
-
     releaseService.getReleaseChecklist.mockResolvedValue({
       errors: [
         {

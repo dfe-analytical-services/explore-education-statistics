@@ -43,6 +43,7 @@ Create Methodology with some content and images
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
     ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user scrolls down    100
     user adds image to accordion section text block    Methodology content section 1    1    test-infographic.png
     ...    Alt text for the uploaded content image    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
@@ -51,6 +52,7 @@ Create Methodology with some content and images
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 1    1    Adding Methodology annex
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user scrolls down    100
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
@@ -166,6 +168,7 @@ Add a new Content Block to an existing Content Section and include a new image
     user opens accordion section    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user scrolls down    500
     user adds image to accordion section text block    Methodology content section 1    2    gov-uk.png
     ...    Alt text for the uploaded content image 2    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user checks accordion section contains x blocks    Methodology content section 1    2

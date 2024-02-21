@@ -259,7 +259,6 @@ export default function FiltersForm({
                               ariaControls="filterGroups"
                               className="govuk-!-margin-bottom-2"
                               onClick={() => {
-                                console.log('CLICK', allFiltersOpen);
                                 setOpenFilterGroups(
                                   allFiltersOpen ? [] : allFilterKeys,
                                 );
