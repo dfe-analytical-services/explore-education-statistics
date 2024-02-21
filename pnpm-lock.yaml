@@ -318,7 +318,7 @@ importers:
         specifier: ^4.6.4
         version: 4.6.4(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
       react-lazyload:
-        specifier: github:twobin/react-lazyload
+        specifier: github:twobin/react-lazyload#f1faffda816180f39d3ff8cf3d9c2060f8d9d623
         version: github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623(react-dom@18.2.0)(react@18.2.0)
       react-leaflet:
         specifier: ^4.2.1
@@ -706,7 +706,7 @@ importers:
         specifier: 7.43.9
         version: 7.43.9(react@18.2.0)
       react-lazyload:
-        specifier: github:twobin/react-lazyload
+        specifier: github:twobin/react-lazyload#f1faffda816180f39d3ff8cf3d9c2060f8d9d623
         version: github.com/twobin/react-lazyload/f1faffda816180f39d3ff8cf3d9c2060f8d9d623(react-dom@18.2.0)(react@18.2.0)
       react-leaflet:
         specifier: ^4.2.1
