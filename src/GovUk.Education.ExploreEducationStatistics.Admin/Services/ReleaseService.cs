@@ -21,7 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
@@ -40,13 +40,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
         private readonly IReleaseCacheService _releaseCacheService;
         private readonly IReleaseFileRepository _releaseFileRepository;
-        private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IDataImportService _dataImportService;
@@ -60,13 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         // much work and has too many dependencies
         public ReleaseService(
             ContentDbContext context,
+            StatisticsDbContext statisticsDbContext,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IReleaseRepository repository,
             IReleaseCacheService releaseCacheService,
             IReleaseFileRepository releaseFileRepository,
-            ISubjectRepository subjectRepository,
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
@@ -77,13 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IBlobCacheService cacheService)
         {
             _context = context;
+            _statisticsDbContext = statisticsDbContext;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
             _releaseCacheService = releaseCacheService;
             _releaseFileRepository = releaseFileRepository;
-            _subjectRepository = subjectRepository;
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
             _dataImportService = dataImportService;
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Id = _guidGenerator.NewGuid(),
                         ReleaseParent = new ReleaseParent(),
-                        PublicationId =  releaseCreate.PublicationId,
+                        PublicationId = releaseCreate.PublicationId,
                         Slug = releaseCreate.Slug,
                         TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
                         ReleaseName = releaseCreate.Year.ToString(),
@@ -421,23 +421,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            return await _context.Releases
+                .FirstOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(() => CheckFileExists(fileId))
-                .OnSuccess(async file =>
+                .OnSuccessCombineWith(file => _statisticsDbContext.Subject
+                    .FirstOrNotFoundAsync(s => s.Id == file.SubjectId))
+                .OnSuccess(async tuple =>
                 {
-                    var subject = file.SubjectId.HasValue
-                        ? await _subjectRepository.Find(file.SubjectId.Value)
-                        : null;
+                    var (file, subject) = tuple;
 
-                    var footnotes = subject == null
-                        ? new List<Footnote>()
-                        : await _footnoteRepository.GetFootnotes(releaseId, subject.Id);
+                    var footnotes =
+                        await _footnoteRepository.GetFootnotes(releaseId: releaseId, subjectId: file.SubjectId);
 
                     return new DeleteDataFilePlan
                     {
                         ReleaseId = releaseId,
-                        SubjectId = subject?.Id ?? Guid.Empty,
+                        SubjectId = subject.Id,
                         DeleteDataBlockPlan = await _dataBlockService.GetDeletePlan(releaseId, subject),
                         FootnoteIds = footnotes.Select(footnote => footnote.Id).ToList()
                     };
@@ -458,6 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         return await RemoveDataFiles(releaseId, file.ReplacedById.Value);
                     }
+
                     return Unit.Instance;
                 })
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
@@ -472,7 +473,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }
 
-        public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseId,
+            Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -514,7 +516,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AsQueryable()
                 .Where(r => r.PublicationId == publicationId).ToListAsync();
 
-            if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
+            if (releases.Any(release =>
+                    release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
             {
                 return ValidationActionResult(SlugNotUnique);
             }

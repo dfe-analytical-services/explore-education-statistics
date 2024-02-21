@@ -51,13 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
                         subjectRepository
-                            .Setup(s => s.FindPublicationIdForSubject(_subject.Id))
+                            .Setup(s => s.FindPublicationIdForSubject(_subject.Id, default))
                             .ReturnsAsync(PublicationId);
 
                         var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
                         releaseRepository
-                            .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId))
+                            .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                             .ReturnsAsync(new Release
                             {
                                 Id = ReleaseId

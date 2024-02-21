@@ -52,7 +52,6 @@ public class PublicationsController : ControllerBase
     [HttpGet("{publicationId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
-    [SwaggerResponse(400)]
     [SwaggerResponse(404)]
     // add other responses
     public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication([SwaggerParameter("The ID of the publication.")] Guid publicationId)
@@ -72,7 +71,6 @@ public class PublicationsController : ControllerBase
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetPaginatedListViewModel>> ListDataSets(
         [FromQuery] DataSetListRequest request,
         [SwaggerParameter("The ID of the publication.")] Guid publicationId)

@@ -7,10 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -22,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReleasePermissionServiceTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
+
+        private readonly DataFixture _dataFixture = new();
 
         [Fact]
         public async Task ListReleaseRoles()
@@ -138,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(PrereleaseViewer, viewModel[2].Role);
             }
         }
-        
+
         [Fact]
         public async Task ListReleaseRoles_ContributorsOnly()
         {
@@ -374,13 +378,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(3, viewModel.Count);
-                
+
                 Assert.Equal("user1@test.com", viewModel[0].Email);
                 Assert.Equal(Contributor, viewModel[0].Role);
-                
+
                 Assert.Equal("user3@test.com", viewModel[1].Email);
                 Assert.Equal(Contributor, viewModel[1].Role);
-                
+
                 Assert.Equal("user4@test.com", viewModel[2].Email);
                 Assert.Equal(Lead, viewModel[2].Role);
             }
@@ -455,10 +459,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
-                
+
                 Assert.Equal("user1@test.com", viewModel[0].Email);
                 Assert.Equal(Contributor, viewModel[0].Role);
-                
+
                 Assert.Equal("user3@test.com", viewModel[1].Email);
                 Assert.Equal(Contributor, viewModel[1].Role);
             }
@@ -527,26 +531,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationContributors()
         {
-            var publication = new Publication();
-            var release1 = new Release
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new Release
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new Release
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
+            ReleaseParent releaseParent1 = _dataFixture
+                .DefaultReleaseParent(publishedVersions: 1);
+
+            ReleaseParent releaseParent2 = _dataFixture
+                .DefaultReleaseParent(publishedVersions: 1, draftVersion: true);
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(ListOf(releaseParent1, releaseParent2));
+
             var user1 = new User
             {
                 FirstName = "User1",
@@ -556,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                Release = release1,
+                Release = releaseParent1.Releases[0],
                 Role = Contributor,
             };
 
@@ -569,7 +563,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                Release = release2Amendment,
+                Release = releaseParent2.Releases[1],
                 Role = Contributor,
             };
 
@@ -583,13 +577,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
-                Release = release1,
+                Release = releaseParent1.Releases[0],
                 Role = PrereleaseViewer,
             };
             var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
             {
                 User = user3,
-                Release = release2Original,
+                Release = releaseParent2.Releases[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
@@ -597,7 +591,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.UserReleaseRoles.AddRange(
                     user1ReleaseRole1, user2ReleaseRole1,
                     user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();

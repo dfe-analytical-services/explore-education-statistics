@@ -1,54 +1,47 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Security.AuthorizationHandlers;
 
 public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task ReleaseSubjectIsNotPublished()
     {
-        var publication = new Publication();
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleaseParents(_dataFixture
+                .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                .Generate(1));
 
-        var previousVersion = new Release
-        {
-            Id = Guid.NewGuid(),
-            Publication = publication,
-            Published = DateTime.UtcNow,
-            PreviousVersionId = null
-        };
+        var releaseVersion = publication.Releases.Single(r => r is { Published: null, Version: 1 });
 
-        var latestVersion = new Release
-        {
-            Id = Guid.NewGuid(),
-            Publication = publication,
-            Published = null,
-            PreviousVersionId = previousVersion.Id
-        };
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseId = latestVersion.Id,
-            SubjectId = Guid.NewGuid()
-        };
+        ReleaseSubject releaseSubject = _dataFixture
+            .DefaultReleaseSubject()
+            .WithRelease(_dataFixture
+                .DefaultStatsRelease()
+                .WithId(releaseVersion.Id));
 
         var contextId = Guid.NewGuid().ToString();
-
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
+            contentDbContext.Publications.Add(publication);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -70,44 +63,24 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
     [Fact]
     public async Task ReleaseSubjectIsLatestPublishedVersion()
     {
-        var publication = new Publication();
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleaseParents(_dataFixture
+                .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .Generate(1));
 
-        var previousVersion = new Release
-        {
-            Id = Guid.NewGuid(),
-            Publication = publication,
-            Published = DateTime.UtcNow,
-            PreviousVersionId = null
-        };
+        var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 1 });
 
-        var latestPublishedVersion = new Release
-        {
-            Id = Guid.NewGuid(),
-            Publication = publication,
-            Published = DateTime.UtcNow,
-            PreviousVersionId = previousVersion.Id
-        };
-
-        var latestDraftVersion = new Release
-        {
-            Id = Guid.NewGuid(),
-            Publication = publication,
-            Published = null,
-            PreviousVersionId = latestPublishedVersion.Id
-        };
-
-        var releaseSubject = new ReleaseSubject
-        {
-            ReleaseId = latestPublishedVersion.Id,
-            SubjectId = Guid.NewGuid()
-        };
+        ReleaseSubject releaseSubject = _dataFixture
+            .DefaultReleaseSubject()
+            .WithRelease(_dataFixture
+                .DefaultStatsRelease()
+                .WithId(releaseVersion.Id));
 
         var contextId = Guid.NewGuid().ToString();
-
         await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
         {
-            await contentDbContext.Publications.AddAsync(publication);
-            await contentDbContext.Releases.AddRangeAsync(previousVersion, latestPublishedVersion, latestDraftVersion);
+            contentDbContext.Publications.Add(publication);
             await contentDbContext.SaveChangesAsync();
         }
 

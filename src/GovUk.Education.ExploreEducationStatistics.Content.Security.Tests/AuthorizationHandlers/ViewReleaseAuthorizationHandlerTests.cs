@@ -1,37 +1,38 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers
 {
     public class ViewReleaseAuthorizationHandlerTests
     {
-        [Fact]
-        public async Task ReleaseIsLiveAndOnlyVersion()
-        {
-            var release = new Release
-            {
-                Published = new DateTime(2021, 1, 1),
-            };
+        private readonly DataFixture _dataFixture = new();
 
-            var publication = new Publication
-            {
-                Releases = ListOf(release)
-            };
+        [Fact]
+        public async Task OnlyReleaseVersionIsLatestPublishedVersion()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 0 });
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
-                await contentDbContext.AddAsync(publication);
+                contentDbContext.Publications.Add(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(release);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -48,25 +49,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsLiveAndLatestVersion()
+        public async Task ReleaseVersionIsLatestPublishedVersion()
         {
-            var originalRelease = new Release
-            {
-                Published = new DateTime(2020, 1, 1),
-            };
-            var amendedRelease = new Release
-            {
-                Published = new DateTime(2021, 2, 1),
-                PreviousVersion = originalRelease,
-            };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                    .Generate(1));
 
-            var publication = new Publication
-            {
-                Releases = ListOf(originalRelease, amendedRelease)
-            };
+            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
@@ -77,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(amendedRelease);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -86,17 +79,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsNotLive()
+        public async Task ReleaseVersionIsNotPublished()
         {
-            var release = new Release();
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .Generate(1));
 
-            var publication = new Publication
-            {
-                Releases = ListOf(release)
-            };
+            var releaseVersion = publication.Releases.Single(r => r is { Published: null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                var handler = BuildHandler(contentDbContext);
+
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
+
+                await handler.HandleAsync(authContext);
+
+                Assert.False(authContext.HasSucceeded);
+            }
+        }
+
+        [Fact]
+        public async Task ReleaseVersionIsPublishedButNotLatestPublishedVersion()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleaseParents(_dataFixture
+                    .DefaultReleaseParent(publishedVersions: 2)
+                    .Generate(1));
+
+            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 0 });
+
+            var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
@@ -107,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(release);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -116,46 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         }
 
         [Fact]
-        public async Task ReleaseIsLiveButNotLatestVersion()
-        {
-            var originalRelease = new Release
-            {
-                Published = new DateTime(2020, 1, 1),
-            };
-
-            var amendedRelease = new Release
-            {
-                Published = new DateTime(2020, 2, 1),
-                PreviousVersion = originalRelease,
-            };
-
-            var publication = new Publication
-            {
-                Releases = ListOf(originalRelease, amendedRelease)
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var handler = BuildHandler(contentDbContext);
-
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(originalRelease);
-
-                await handler.HandleAsync(authContext);
-
-                Assert.False(authContext.HasSucceeded);
-            }
-        }
-
-        [Fact]
-        public async Task ReleaseNotFound()
+        public async Task ReleaseVersionNotFound()
         {
             await using var contentDbContext = InMemoryContentDbContext();
 

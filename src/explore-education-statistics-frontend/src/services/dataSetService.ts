@@ -55,7 +55,7 @@ export const dataSetFilters = [
 export type DataSetFilter = (typeof dataSetFilters)[number];
 
 export interface DataSetListRequest {
-  latest?: 'true' | 'false';
+  latestOnly?: 'true' | 'false';
   orderBy?: DataSetOrderParam;
   page?: number;
   pageSize?: number;

@@ -52,6 +52,21 @@ public static class PublicationGeneratorExtensions
         Contact contact)
         => generator.ForInstance(p => p.SetContact(contact));
 
+    public static Generator<Publication> WithExternalMethodology(
+        this Generator<Publication> generator,
+        ExternalMethodology externalMethodology)
+        => generator.ForInstance(p => p.SetExternalMethodology(externalMethodology));
+
+    public static Generator<Publication> WithLegacyReleases(
+        this Generator<Publication> generator,
+        IEnumerable<LegacyRelease> legacyReleases)
+        => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
+
+    public static Generator<Publication> WithSupersededBy(
+        this Generator<Publication> generator,
+        Publication? supersededBy)
+        => generator.ForInstance(p => p.SetSupersededBy(supersededBy));
+
     public static Generator<Publication> WithTopicId(
         this Generator<Publication> generator,
         Guid topicId)
@@ -139,7 +154,8 @@ public static class PublicationGeneratorExtensions
                     .OrderByDescending(release => release.Year)
                     .ThenByDescending(release => release.TimePeriodCoverage)
                     .FirstOrDefault();
-            });
+            })
+            .Set(p => p.LatestPublishedReleaseId, (_, publication, _) => publication.LatestPublishedRelease?.Id);
 
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
@@ -165,6 +181,27 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         Contact contact)
         => setters.Set(p => p.Contact, contact);
+
+    private static InstanceSetters<Publication> SetExternalMethodology(
+        this InstanceSetters<Publication> setters,
+        ExternalMethodology externalMethodology)
+        => setters.Set(p => p.ExternalMethodology, externalMethodology);
+
+    private static InstanceSetters<Publication> SetLegacyReleases(
+        this InstanceSetters<Publication> setters,
+        IEnumerable<LegacyRelease> legacyReleases)
+        => setters.Set(p => p.LegacyReleases, legacyReleases);
+
+    public static InstanceSetters<Publication> SetSupersededBy(
+        this InstanceSetters<Publication> setters,
+        Publication? supersededBy)
+        => setters.Set(p => p.SupersededBy, supersededBy)
+            .SetSupersededById(supersededBy?.Id);
+
+    private static InstanceSetters<Publication> SetSupersededById(
+        this InstanceSetters<Publication> setters,
+        Guid? supersededById)
+        => setters.Set(p => p.SupersededById, supersededById);
 
     private static InstanceSetters<Publication> SetTopicId(
         this InstanceSetters<Publication> setters,

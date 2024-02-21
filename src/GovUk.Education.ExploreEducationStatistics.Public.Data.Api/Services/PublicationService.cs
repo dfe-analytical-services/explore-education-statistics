@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.PublicationSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
@@ -74,11 +75,11 @@ internal class PublicationService : IPublicationService
         };
     }
 
-    private Either<ActionResult, Unit> CheckPublicationIsPublished(Guid publicationId)
+    private async Task<Either<ActionResult, Unit>> CheckPublicationIsPublished(Guid publicationId)
     {
-        var publicationIsPublished = _publicDataDbContext.DataSets
+        var publicationIsPublished = await _publicDataDbContext.DataSets
             .Where(ds => ds.PublicationId == publicationId)
-            .Any(ds => ds.Status == DataSetStatus.Published);
+            .AnyAsync(ds => ds.Status == DataSetStatus.Published);
 
         if (publicationIsPublished)
         {

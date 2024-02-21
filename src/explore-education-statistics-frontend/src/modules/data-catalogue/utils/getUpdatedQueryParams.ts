@@ -31,7 +31,7 @@ export default async function getUpdatedQueryParams({
         ...(filterByReleaseId ? ['latest'] : ['releaseId']),
       ]),
       ...(!filterByReleaseId && {
-        latest: nextValue === 'latest' ? 'true' : 'false',
+        latestOnly: nextValue === 'latest' ? 'true' : 'false',
       }),
       ...(filterByReleaseId && { [filterType]: nextValue }),
       orderBy,
@@ -54,7 +54,7 @@ export default async function getUpdatedQueryParams({
     const releaseData = await onFetchReleases?.();
 
     return {
-      ...omit(query, 'page', 'latest'),
+      ...omit(query, 'page', 'latestOnly'),
       [filterType]: nextValue,
       releaseId: releaseData?.find(release =>
         releaseId ? release.id === releaseId : release.latestRelease,

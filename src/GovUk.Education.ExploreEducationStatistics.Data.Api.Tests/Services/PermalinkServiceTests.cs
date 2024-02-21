@@ -82,11 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync((Release?) null);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId))
+                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
             var service = BuildService(releaseRepository: releaseRepository.Object,
@@ -352,13 +352,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
             releaseRepository
-                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId))
+                .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync(release);
 
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id, default))
                 .ReturnsAsync(_publicationId);
 
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);

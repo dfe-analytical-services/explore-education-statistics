@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
                         releaseRepository.Setup(s =>
-                                s.GetLatestReleaseVersion(OwningPublication.Id))
+                                s.GetLatestReleaseVersion(OwningPublication.Id, default))
                             .ReturnsAsync((Release?) null);
 
                         userPublicationRoleRepository
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     if (!expectedToPassByRole)
                     {
                         releaseRepository
-                            .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id))
+                            .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                             .ReturnsAsync((Release?) null);
                     }
 
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
                         releaseRepository
-                            .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id))
+                            .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                             .ReturnsAsync((Release?) null);
                     }
 
@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId))
+                    .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                     .ReturnsAsync(preReleaseForConnectedPublication);
 
                 userReleaseRoleRepository
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<Guid> { preReleaseForConnectedPublication.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId))
+                    .Setup(s => s.GetLatestReleaseVersion(preReleaseForConnectedPublication.PublicationId, default))
                     .ReturnsAsync(preReleaseForConnectedPublication);
 
                 userReleaseRoleRepository
@@ -404,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<Guid> { latestRelease.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId))
+                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId, default))
                     .ReturnsAsync(latestRelease);
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -466,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<Guid> { latestRelease.PublicationId });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId))
+                    .Setup(s => s.GetLatestReleaseVersion(latestRelease.PublicationId, default))
                     .ReturnsAsync(latestRelease);
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id))
+                    .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                     .ReturnsAsync((Release?) null);
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .ReturnsAsync(new List<ReleaseRole>());
 
                 releaseRepository
-                    .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id))
+                    .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                     .ReturnsAsync((Release?) null);
 
                 var user = CreateClaimsPrincipal(UserId);

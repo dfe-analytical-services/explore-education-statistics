@@ -60,6 +60,7 @@ const PublicationDetailsPage = () => {
             topicId: topic.id,
           }}
           publicationId={id}
+          publicationSlug={publication.slug}
           onCancel={toggleReadOnly.on}
           onSubmit={onReload}
         />

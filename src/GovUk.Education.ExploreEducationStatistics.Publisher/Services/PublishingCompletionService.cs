@@ -156,8 +156,9 @@ public class PublishingCompletionService : IPublishingCompletionService
         var publication = await _contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        var publishedReleasesIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds(publicationId);
-        publication.LatestPublishedReleaseId = publishedReleasesIds.First();
+        var latestPublishedReleaseVersion = await _releaseRepository.GetLatestPublishedReleaseVersion(publicationId);
+        publication.LatestPublishedReleaseId = latestPublishedReleaseVersion!.Id;
+
         _contentDbContext.Update(publication);
         await _contentDbContext.SaveChangesAsync();
     }

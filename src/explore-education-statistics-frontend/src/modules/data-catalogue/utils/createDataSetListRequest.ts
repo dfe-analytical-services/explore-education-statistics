@@ -15,7 +15,7 @@ export default function createDataSetListRequest(
   query: DataCataloguePageQuery,
 ): DataSetListRequest {
   const {
-    latest,
+    latestOnly,
     orderBy: orderByParam,
     publicationId,
     releaseId,
@@ -31,7 +31,7 @@ export default function createDataSetListRequest(
 
   return omitBy(
     {
-      latest,
+      latestOnly,
       orderBy,
       page: parseNumber(query.page) ?? 1,
       publicationId,
@@ -74,7 +74,7 @@ function getOrderParams(orderBy: DataSetOrderOption): {
 
 export function getParamsFromQuery(query: DataCataloguePageQuery) {
   return {
-    latest: getFirst(query.latest),
+    latestOnly: getFirst(query.latestOnly),
     orderBy:
       query.orderBy && isOneOf(query.orderBy, dataSetOrderOptions)
         ? query.orderBy
