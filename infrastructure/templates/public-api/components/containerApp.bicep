@@ -71,6 +71,8 @@ param dbConnectionString string
 //Passed in Tags
 param tagValues object
 
+param applicationInsightsKey string
+
 
 //Variables 
 //var containerImageName = '${acrLoginServer}/${acrHostedImageName}'
@@ -79,7 +81,6 @@ var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
 var containerLogName = '${resourcePrefix}-log-${containerAppLogAnalyticsName}'
-var applicationInsightsName ='${resourcePrefix}-ai-${containerAppName}'
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
 
@@ -96,16 +97,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
     }
   }
   tags: tagValues
-}
-
-//Application Insights Deployment
-module applicationInsightsModule '../components/appInsights.bicep' = {
-  name: 'appInsightsDeploy-${containerAppName}'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    appInsightsName: applicationInsightsName
-  }
 }
 
 //Managed Identity
@@ -129,7 +120,7 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: containerEnvName
   location: location
   properties: {
-    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
+    daprAIInstrumentationKey: applicationInsightsKey
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {

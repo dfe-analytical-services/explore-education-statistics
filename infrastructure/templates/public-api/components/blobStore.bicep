@@ -8,7 +8,7 @@ param blobStoreName string = 'default'
 @maxValue(365)
 param deleteRetentionPolicy int = 7
 
-@description(' Name of the Storage Account')
+@description('Name of the Storage Account')
 param storageAccountName string
 
 // Variables and created data

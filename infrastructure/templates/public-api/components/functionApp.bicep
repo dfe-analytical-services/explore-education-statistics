@@ -34,6 +34,8 @@ param settings object
 //Passed in Tags
 param tagValues object
 
+param applicationInsightsKey string
+
 // Variables and created data
 var kind = 'functionapp'
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
@@ -42,15 +44,6 @@ var functionName = '${resourcePrefix}-fa-${functionAppName}'
 
 
 //Resources
-//Application Insights Deployment
-module applicationInsightsModule '../components/appInsights.bicep' = {
-  name: 'appInsightsDeploy-${functionAppName}'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    appInsightsName: functionAppName
-  }
-}
 
 //App Service Plan Deployment
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
@@ -83,9 +76,6 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     reserved: true
   }
   tags: tagValues
-  dependsOn: [
-    applicationInsightsModule
-  ]
 }
 
 resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
@@ -96,7 +86,7 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: storageAccountConnectionString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
     FUNCTIONS_EXTENSION_VERSION: '~4'
-    APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsModule.outputs.applicationInsightsKey
+    APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
     WEBSITE_RUN_FROM_PACKAGE: '1'
   })

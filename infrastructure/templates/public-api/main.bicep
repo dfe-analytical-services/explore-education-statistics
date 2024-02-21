@@ -92,21 +92,30 @@ param useDummyImage bool
 @description('Specifies the name of the function.')
 param functionAppName string = 'processor'
 
-
+@description('Specifies the name of the Azure Container Registry.')
+param containerRegistryName string = 'eesacrdw'
 
 //---------------------------------------------------------------------------------------------------------------
 // Variables and created data
 //---------------------------------------------------------------------------------------------------------------
 var project = 'ees'
 var resourcePrefix = '${subscription}-${project}'
-var containerRegistryName = 'eesacr'
 var deploySubnets = true
-var containerAppName = 'eesapi'
 
 
 //---------------------------------------------------------------------------------------------------------------
 // All resources via modules
 //---------------------------------------------------------------------------------------------------------------
+
+//Application Insights Deployment
+module applicationInsightsModule 'components/appInsights.bicep' = {
+  name: 'appInsightsDeploy-publicapi'
+  params: {
+    resourcePrefix: resourcePrefix
+    location: location
+    appInsightsName: 'publicapi'
+  }
+}
 
 //Deploy Networking
 module vnetModule 'components/network.bicep' = {
@@ -124,6 +133,7 @@ module vnetModule 'components/network.bicep' = {
 module keyVaultModule 'components/keyVault.bicep' = {
   name: 'keyVaultDeploy'
   params: {
+    keyVaultName: 'publicapi'
     resourcePrefix: resourcePrefix
     location: location
     tenantId: az.subscription().tenantId
@@ -204,7 +214,7 @@ module containerAppModule 'components/containerApp.bicep' = {
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: containerAppName
+    containerAppName: 'publicapi'
     containerAppEnvName: containerAppEnvName
     containerAppLogAnalyticsName: containerAppLogAnalyticsName
     acrLoginServer: containerRegistryModule.outputs.containerRegistryLoginServer
@@ -214,10 +224,12 @@ module containerAppModule 'components/containerApp.bicep' = {
     dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
 //     serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
   }
   dependsOn: [
     keyVaultModule
     databaseModule
+    applicationInsightsModule
 //     serviceBusFunctionQueueModule
   ]
 }
@@ -249,11 +261,13 @@ module etlFunctionAppModule 'application/processorFunctionApp.bicep' = {
     dbConnectionString: eesKeyVault.getSecret(databaseModule.outputs.connectionStringSecretName)
 //     serviceBusConnectionString: eesKeyVault.getSecret(serviceBusFunctionQueueModule.outputs.connectionStringSecretName)
     tagValues: tagValues
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
   }
   dependsOn: [
     keyVaultModule
     databaseModule
     storageAccountModule
+    applicationInsightsModule
 //     serviceBusFunctionQueueModule
   ]
 }

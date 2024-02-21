@@ -27,12 +27,11 @@ param skuName string = 'standard'
 //Passed in Tags
 param tagValues object
 
-// Variables and created data
-var keyVaultName = '${resourcePrefix}-kv-api01'
+param keyVaultName string
 
 //Resources
 resource keyvault 'Microsoft.KeyVault/vaults@2022-07-01' = {
-  name: keyVaultName
+  name: '${resourcePrefix}-kv-${keyVaultName}'
   location: location
   properties: {
     enabledForDeployment: enabledForDeployment
