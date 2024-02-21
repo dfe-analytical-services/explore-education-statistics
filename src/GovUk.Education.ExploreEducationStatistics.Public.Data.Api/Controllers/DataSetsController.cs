@@ -42,7 +42,7 @@ public class DataSetsController : ControllerBase
     /// Get a data set version
     /// </summary>
     /// <remarks>
-    /// Get a data set version, including a full list of its changes.
+    /// Get a data set version's summary details.
     /// </remarks>
     [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
     [Produces("application/json")]
@@ -50,7 +50,7 @@ public class DataSetsController : ControllerBase
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetVersionViewModel>> GetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version.")] string dataSetVersion)
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion)
     {
         return await _dataSetService
             .GetVersion(dataSetId, dataSetVersion)
