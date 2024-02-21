@@ -1736,7 +1736,7 @@
         "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectSpaClient:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectSpaClient:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:KnownAuthorities": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:KnownAuthorities:0": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectSpaClient:AdminApiScope": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
         "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
         "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
