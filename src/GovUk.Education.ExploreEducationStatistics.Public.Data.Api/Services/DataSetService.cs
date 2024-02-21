@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -111,17 +112,19 @@ internal class DataSetService : IDataSetService
         Guid dataSetId,
         string dataSetVersion)
     {
-        var dataSetVersions = await _publicDataDbContext.DataSetVersions
+        if (!VersionUtils.TryParse(dataSetVersion, out int major, out int minor, out int _))
+        {
+            return new NotFoundResult();
+        }
+
+        return await _publicDataDbContext.DataSetVersions
             .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == major)
+            .Where(dsv => dsv.VersionMinor == minor)
             .Where(ds => ds.Status == DataSetVersionStatus.Published
                 || ds.Status == DataSetVersionStatus.Unpublished
                 || ds.Status == DataSetVersionStatus.Deprecated)
-            .ToListAsync();
-
-        return await dataSetVersions
-            .Where(dsv => dsv.Version == dataSetVersion)
-            .SingleOrDefault()
-            .OrNotFound();
+            .SingleOrNotFound();
     }
 
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)
