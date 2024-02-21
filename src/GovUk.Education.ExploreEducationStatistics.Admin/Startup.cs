@@ -1,8 +1,8 @@
 #nullable enable
 using System;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;

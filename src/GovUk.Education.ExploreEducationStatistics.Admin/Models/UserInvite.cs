@@ -2,11 +2,10 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using Microsoft.AspNetCore.Identity;
 
-// TODO EES-4814 - move to appropriate folder after the main 4814 PR has gone in.
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class UserInvite
     {

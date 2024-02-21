@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -1571,14 +1571,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "1",
                 Email = "user1@example.com"
             };
-            
+
             var user2 = new User
             {
                 FirstName = "User",
                 LastName = "2",
                 Email = "user2@example.com"
             };
-            
+
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
@@ -2497,7 +2497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid()
             };
-            
+
             var analystGlobalRole = new IdentityRole
             {
                 Id = Guid.NewGuid().ToString(),
@@ -2508,7 +2508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = user.Id.ToString()
             };
-            
+
             var identityUserRole = new IdentityUserRole<string>
             {
                 UserId = identityUser.Id,
@@ -2576,14 +2576,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 Assert.Empty(userReleaseRoles);
-                
+
                 var userPublicationRoles = await contentDbContext
                     .UserPublicationRoles
                     .ToListAsync();
 
                 Assert.Single(userPublicationRoles);
             }
-            
+
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
                 var userGlobalRoles = await userAndRolesDbContext
@@ -2591,7 +2591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToListAsync();
 
                 var globalRole = Assert.Single(userGlobalRoles);
-                
+
                 Assert.Equal(analystGlobalRole.Id, globalRole.RoleId);
             }
         }

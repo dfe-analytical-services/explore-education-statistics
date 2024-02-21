@@ -2,8 +2,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<UserInvite> CreateOrUpdate(
-            string email, 
-            Role role, 
+            string email,
+            Role role,
             Guid createdById,
             DateTime? createdDate = null)
         {
@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<UserInvite> CreateOrUpdate(
-            string email, 
-            string roleId, 
+            string email,
+            string roleId,
             Guid createdById,
             DateTime? createdDate = null)
         {
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 throw new ArgumentException($"{nameof(UserInvite)} created date cannot be a future date " +
                                             $"- {createdDate} is more than {DateTime.UtcNow}");
             }
-            
+
             var existingInvite = await _usersAndRolesDbContext
                 .UserInvites
                 .IgnoreQueryFilters()

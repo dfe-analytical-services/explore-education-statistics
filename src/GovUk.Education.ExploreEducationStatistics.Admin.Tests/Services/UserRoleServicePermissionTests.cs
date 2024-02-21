@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid(),
         };
-        
+
         [Fact]
         public async Task SetGlobalRole()
         {
@@ -149,11 +149,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using var contentDbContext = InMemoryApplicationDbContext();
                     await contentDbContext.AddAsync(_publication);
                     await contentDbContext.SaveChangesAsync();
-                    
+
                     var service = SetupUserRoleService(
                         contentDbContext: contentDbContext,
                         userService: userService.Object);
-                        
+
                     return await service.GetPublicationRolesForPublication(_publication.Id);
                 });
         }
