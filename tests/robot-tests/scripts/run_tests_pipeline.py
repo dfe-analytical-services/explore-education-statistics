@@ -14,6 +14,8 @@ def run_tests_pipeline():
     assert args.admin_pass, "Provide an admin password with an '--admin-pass PASS' argument"
     assert args.analyst_pass, "Provide an analyst password with an '--analyst-pass PASS' argument"
     assert args.expiredinvite_pass, "Provide an expiredinvite password with an '--expiredinvite-pass PASS' argument"
+    assert args.noinvite_pass, "Provide a noinvite password with an '--noinvite-pass PASS' argument"
+    assert args.pendinginvite_pass, "Provide a pendinginvite password with an '--pendinginvite-pass PASS' argument"
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
     assert args.processes, "Provide a number of processes to run with the '--processes NUM' argument"
@@ -28,7 +30,7 @@ def run_tests_pipeline():
     subprocess.check_call("pip install pipenv", shell=True)
     subprocess.check_call("pipenv install", shell=True)
 
-    run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
+    run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --noinvite-pass {args.noinvite_pass} --pendinginvite-pass {args.pendinginvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
 
     if args.rerun_attempts:
         run_tests_command += f" --rerun-attempts {str(args.rerun_attempts)}"
@@ -48,6 +50,12 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--expiredinvite-pass", dest="expiredinvite_pass", help="ExpiredInvite account password", required=True
+    )
+
+    parser.add_argument("--noinvite-pass", dest="noinvite_pass", help="NoInvite account password", required=True)
+
+    parser.add_argument(
+        "--pendinginvite-pass", dest="pendinginvite_pass", help="PendingInvite account password", required=True
     )
 
     parser.add_argument(
