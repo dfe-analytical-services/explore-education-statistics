@@ -29,7 +29,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public long TotalResults { get; set; }
 
-    public DataSetVersionMetaSummary? MetaSummary { get; set; }
+    public required DataSetVersionMetaSummary MetaSummary { get; set; }
 
     public List<LocationMeta> LocationMetas { get; set; } = [];
 

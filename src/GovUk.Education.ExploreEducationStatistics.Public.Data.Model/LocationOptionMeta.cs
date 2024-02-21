@@ -26,6 +26,8 @@ public abstract class LocationOptionMeta
 
     public List<LocationOptionMetaLink> MetaLinks { get; set; } = [];
 
+    public abstract LocationOptionMetaRow ToRow();
+
     internal class Config : IEntityTypeConfiguration<LocationOptionMeta>
     {
         public void Configure(EntityTypeBuilder<LocationOptionMeta> builder)
@@ -92,6 +94,13 @@ public class LocationCodedOptionMeta : LocationOptionMeta
          get => base.Code!;
          set => base.Code = value;
      }
+
+     public override LocationOptionMetaRow ToRow() => new()
+     {
+         Type = TypeValue,
+         Label = Label,
+         Code = Code
+     };
 }
 
 public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
@@ -109,6 +118,14 @@ public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
          get => base.OldCode!;
          set => base.OldCode = value;
      }
+
+     public override LocationOptionMetaRow ToRow() => new()
+     {
+         Type = TypeValue,
+         Label = Label,
+         Code = Code,
+         OldCode = OldCode
+     };
 }
 
 public class LocationProviderOptionMeta : LocationOptionMeta
@@ -120,11 +137,24 @@ public class LocationProviderOptionMeta : LocationOptionMeta
          get => base.Ukprn!;
          set => base.Ukprn = value;
      }
+
+     public override LocationOptionMetaRow ToRow() => new()
+     {
+         Type = TypeValue,
+         Label = Label,
+         Ukprn = Ukprn,
+     };
 }
 
 public class LocationRscRegionOptionMeta : LocationOptionMeta
 {
     public const string TypeValue = "RSC";
+
+    public override LocationOptionMetaRow ToRow() => new()
+    {
+        Type = TypeValue,
+        Label = Label
+    };
 }
 
 public class LocationSchoolOptionMeta : LocationOptionMeta
@@ -142,4 +172,12 @@ public class LocationSchoolOptionMeta : LocationOptionMeta
          get => base.LaEstab!;
          set => base.LaEstab = value;
      }
+
+     public override LocationOptionMetaRow ToRow() => new()
+     {
+         Type = TypeValue,
+         Label = Label,
+         Urn = Urn,
+         LaEstab = LaEstab
+     };
 }
