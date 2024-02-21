@@ -9,7 +9,7 @@ param location string
 param functionAppRuntime string = 'dotnet'
 
 @description('Specifies the name of the function.')
-param functionAppName string = 'publicapi-processor'
+param functionAppName string
 
 @description('Storage Account connection string')
 @secure()
@@ -25,6 +25,8 @@ param dbConnectionString string
 
 //Passed in Tags
 param tagValues object
+
+param applicationInsightsKey string
 
 
 // Variables and created data
@@ -45,6 +47,7 @@ module functionAppModule '../components/functionApp.bicep' = {
     storageAccountConnectionString: storageAccountConnectionString
     location: location
     tagValues: tagValues
+    applicationInsightsKey: applicationInsightsKey
     settings: {
       dbConnectionString: dbConnectionString
 //       serviceBusConnectionString: serviceBusConnectionString
