@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,10 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.
     {
         Guid GetUserId();
 
+        UserProfileFromClaims GetProfileFromClaims();
+
         Task<bool> MatchesPolicy(Enum policy);
 
         Task<bool> MatchesPolicy(object resource, Enum policy);
     }
+
+    public record UserProfileFromClaims(string Email, string FirstName, string LastName);
 
     public static class UserServiceExtensions
     {

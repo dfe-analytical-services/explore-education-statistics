@@ -137,9 +137,9 @@ Tests are occasionally tagged to not run against a given environment (you may se
 
 ## **Authentication**
 
-To run the admin tests, the `run_tests.py` script uses `scripts/get_auth_tokens.py`. The `get_identity_info` function logs in as a user and then returns the relevant local storage and cookies for the authenticated user. This is done so that if an authenticated user is required, a test run only needs to log in once rather than once for each test suite.
+To run the admin tests, the `run_tests.py` script uses `scripts/get_auth_tokens.py`. The `get_identity_info` function logs in as a user and then returns the relevant local storage for the authenticated user. This is done so that if an authenticated user is required, a test run only needs to log in once rather than once for each test suite.
 
-After the user has been logged in by the `run_tests.py` script, the local storage and cookie data for the authenticated user is saved in the `IDENTITY_LOCAL_STORAGE_{USER}.txt` and `IDENTITY_COOKIE_{USER}.txt` files. This is done so that if you're running the tests locally, you don't need to authenticate every time you rerun the tests, as the run_tests.py script will use the data they contain if they exist.
+After the user has been logged in by the `run_tests.py` script, the local storage data for the authenticated user is saved in the `IDENTITY_LOCAL_STORAGE_{USER}.txt` file. This is done so that if you're running the tests locally, you don't need to authenticate every time you rerun the tests, as the run_tests.py script will use the data they contain if they exist.
 
 ## **Webdriver**
 
@@ -246,7 +246,7 @@ Traceback (most recent call last):
   File "run_tests.py", line 234, in setup_authentication
     setup_auth_variables(
   File "C:\Users\Hive\explore-education-statistics\tests\robot-tests\tests\libs\setup_auth_variables.py", line 59, in setup_auth_variables
-    os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+    os.environ[local_storage_name] = get_identity_info(
   File "C:\Users\Hive\explore-education-statistics\tests\robot-tests\scripts\get_auth_tokens.py", line 74, in get_identity_info
     raise AssertionError('Error when entering/submitting password')
 AssertionError: Error when entering/submitting password

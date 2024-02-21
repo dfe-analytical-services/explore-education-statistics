@@ -1,7 +1,5 @@
 // Load app styles first to ensure correct style ordering
 import './styles/_all.scss';
-
-import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
@@ -10,7 +8,8 @@ import {
   useConfig,
 } from '@admin/contexts/ConfigContext';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
-import routes from '@admin/routes/routes';
+import routes, { publicRoutes } from '@admin/routes/routes';
+import { ConfiguredMsalProvider } from '@admin/contexts/ConfiguredMsalProvider';
 import {
   ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -81,8 +80,8 @@ export default function App() {
         <ApplicationInsightsTracking />
 
         <Switch>
-          {Object.entries(apiAuthorizationRouteList).map(([key, authRoute]) => (
-            <Route exact key={key} {...authRoute} />
+          {Object.entries(publicRoutes).map(([key, route]) => (
+            <Route key={key} {...route} />
           ))}
 
           {Object.entries(routes).map(([key, route]) => (
@@ -93,15 +92,11 @@ export default function App() {
           {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
           <ProtectedRoute
             path="/prototypes"
-            protectionAction={user => user.permissions.isBauUser}
+            protectionAction={permissions => permissions.isBauUser}
             component={PrototypesEntry}
           />
 
-          <ProtectedRoute
-            path="*"
-            allowAnonymousUsers
-            component={PageNotFoundPage}
-          />
+          <ProtectedRoute path="*" component={PageNotFoundPage} />
         </Switch>
       </PageErrorBoundary>
     </Providers>
@@ -114,6 +109,7 @@ const Providers = composeProviders(
   BrowserRouter,
   NetworkActivityContextProvider,
   QueryClientProvider,
+  ConfiguredMsalProvider,
   AuthContextProvider,
   LastLocationContextProvider,
 );
@@ -127,7 +123,7 @@ function ApplicationInsightsContextProvider({
 
   return (
     <BaseApplicationInsightsContextProvider
-      instrumentationKey={config.AppInsightsKey}
+      instrumentationKey={config.appInsightsKey}
     >
       {children}
     </BaseApplicationInsightsContextProvider>

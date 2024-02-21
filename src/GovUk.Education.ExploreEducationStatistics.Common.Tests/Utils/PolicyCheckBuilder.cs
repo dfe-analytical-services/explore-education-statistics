@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -87,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             MockUtils.VerifyAllMocks(_userService);
 
             Assert.NotNull(result);
-            Assert.True(result.IsRight);
+            result.AssertRight();
         }
 
         public async Task AssertSuccess<T>(Func<Mock<IUserService>, Task<T>> action)

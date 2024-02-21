@@ -1,10 +1,10 @@
-import authService from '@admin/components/api-authorization/AuthorizeService';
 import { exponentialBackoffPolicy } from '@admin/services/hubs/utils/retryPolicies';
 import {
   HubConnection,
   HubConnectionBuilder,
   IRetryPolicy,
 } from '@microsoft/signalr';
+import { acquireTokenSilent } from '@admin/auth/msal';
 
 export interface CreateConnectionOptions {
   accessToken?: () => string | Promise<string>;
@@ -19,7 +19,10 @@ export default function createConnection(
   options: CreateConnectionOptions = {},
 ): HubConnection {
   const {
-    accessToken = () => authService.getAccessToken(),
+    accessToken = async () => {
+      const authenticationResult = await acquireTokenSilent();
+      return authenticationResult.accessToken;
+    },
     retryPolicy = exponentialBackoffPolicy(),
   } = options;
 

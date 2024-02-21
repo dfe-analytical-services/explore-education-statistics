@@ -60,3 +60,13 @@ $envs: (
     }
   }
 }
+
+.signOutLink {
+  color: govuk-colour('white');
+  font-weight: $govuk-font-weight-bold;
+  text-decoration: none;
+
+  &:hover {
+    color: govuk-colour('white');
+  }
+}

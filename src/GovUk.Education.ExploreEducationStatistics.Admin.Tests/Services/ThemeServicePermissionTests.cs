@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             await PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.CanAccessSystem)
+                .SetupCheck(SecurityPolicies.RegisteredUser)
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy)
                 .AssertSuccess(
                     async userService =>
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             await PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.CanAccessSystem)
+                .SetupCheck(SecurityPolicies.RegisteredUser)
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertSuccess(
                     async userService =>
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void GetMyThemes_NoAccessToSystem()
         {
             PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.CanAccessSystem, false)
+                .SetupCheck(SecurityPolicies.RegisteredUser, false)
                 .AssertForbidden(
                     async userService =>
                     {

@@ -298,7 +298,7 @@ The standard accounts used day to day are:
   * analyst - username `analyst` and password `password`
   * analyst2 - username `analyst2` and password `password`
 
-The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password
+The [Keycloak Admin login](https://ees.local:5031/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
 
 ##### Adding additional users to Keycloak manually
@@ -671,12 +671,18 @@ If wanting to add more users to the standard set of users we use and are using K
 added to Keycloak in the EES realm and then the realm exported. To export the realm you can run:
 
 ```
-docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \ 
+docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.binding.port-offset=100 -Dkeycloak.migration.action=export \
 -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.realmName=ees-realm -Dkeycloak.migration.usersExportStrategy=REALM_FILE -Dkeycloak.migration.file=/tmp/new-ees-realm.json
 ```
 
-Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
-realm configuration.
+Wait for the above process to complete by waiting for the console output `Admin console listening on http://127.0.0.1:10090`, then shut it down. 
+
+Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts 
+of the IdP to use this new realm configuration. From the project root, run:
+
+```bash
+docker cp ees-idp:/tmp/new-ees-realm.json docker/keycloak/keycloak-ees-realm.json
+```
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 

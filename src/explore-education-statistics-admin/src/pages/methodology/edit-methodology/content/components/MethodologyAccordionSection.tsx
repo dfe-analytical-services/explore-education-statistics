@@ -28,7 +28,7 @@ const MethodologyAccordionSection = ({
   ...props
 }: MethodologyAccordionSectionProps) => {
   const { editingMode } = useEditingContext();
-  const { PublicAppUrl } = useConfig();
+  const { publicAppUrl } = useConfig();
 
   const {
     addContentSectionBlock,
@@ -130,7 +130,7 @@ const MethodologyAccordionSection = ({
       anchorLinkIdPrefix={sectionKey}
       anchorLinkUrl={
         editingMode === 'preview'
-          ? id => `${PublicAppUrl}/methodology/${methodologySlug}#${id}`
+          ? id => `${publicAppUrl}/methodology/${methodologySlug}#${id}`
           : undefined
       }
       heading={heading}

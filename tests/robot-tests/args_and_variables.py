@@ -176,6 +176,11 @@ def validate_environment_variables():
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",
         "EXPIRED_INVITE_USER_EMAIL",
+        "EXPIRED_INVITE_USER_PASSWORD",
+        "NO_INVITE_USER_EMAIL",
+        "NO_INVITE_USER_PASSWORD",
+        "PENDING_INVITE_USER_EMAIL",
+        "PENDING_INVITE_USER_PASSWORD",
         "PUBLISHER_FUNCTIONS_URL",
     ]
 

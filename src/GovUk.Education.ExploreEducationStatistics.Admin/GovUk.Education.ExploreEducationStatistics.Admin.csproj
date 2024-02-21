@@ -20,24 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Pupil_Absence_Statistics\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Pupil_Exclusion_Statistics\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Migrations\ContentMigrations\Html\Secondary_And_Primary_School_Applications_And_Offers\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21" PrivateAssets="all" />
     <!-- TODO remove AutoMapper.Extensions.Microsoft.DependencyInjection with AutoMapper v13 -->
@@ -45,15 +27,13 @@
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.52" />
     <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
-    <PackageReference Include="JWT" Version="10.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.21" />
-    <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.32" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.21" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.21" />
+    
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.21.6" />
     <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
@@ -64,6 +44,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="4.5.1" />
     <PackageReference Include="Cronos" Version="0.7.1" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -127,64 +108,13 @@
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
-    <_ContentIncludedByDefault Remove="Views\FileUpload\Upload.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\File\List.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Home\Privacy.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Notifications\NotificationsSent.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Notifications\NotifySubscribers.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publications\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publications\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publications\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publications\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publications\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publishing\PublishReleaseData.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Publishing\ReleaseDataPublished.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Releases\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Releases\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Releases\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Releases\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Releases\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Shared\Error.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Shared\_CookieConsentPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Shared\_Layout.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Shared\_LoginPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Themes\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Themes\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Themes\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Themes\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Themes\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Topics\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Topics\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Topics\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Topics\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\Topics\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\_ViewImports.cshtml" />
-    <_ContentIncludedByDefault Remove="Views\_ViewStart.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Topics\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Create.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Themes\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Releases\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publishing\PublishReleaseData.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publishing\ReleaseDataPublished.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Delete.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Details.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Edit.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Publications\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotificationsSent.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Notifications\NotifySubscribers.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Tools\Views\Home\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Shared\_CookieConsentPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Shared\_LoginPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\_ViewStart.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

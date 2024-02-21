@@ -49,6 +49,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
+        public Task<List<UserPublicationInvite>> ListByEmail(string email)
+        {
+            return _contentDbContext
+                .UserPublicationInvites
+                .Where(invite => invite.Email.ToLower().Equals(email.ToLower()))
+                .ToListAsync();
+        }
+
         private async Task<bool> UserHasInvite(
             Guid publicationId,
             PublicationRole role,

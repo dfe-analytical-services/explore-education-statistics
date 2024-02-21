@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             var rootDir = Path.GetFullPath(Path.Combine(binDir!, ".."));
 
             builder.ConfigurationBuilder
-                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: true);
+                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: false);
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

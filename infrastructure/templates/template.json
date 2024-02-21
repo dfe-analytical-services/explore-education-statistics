@@ -544,29 +544,6 @@
       "type": "bool",
       "defaultValue": false
     },
-    "openIdConnectSpaClientAllowOfflineAccess": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Whether or not this environment's Admin API supports refresh tokens"
-      }
-    },
-    "openIdConnectSpaClientRefreshTokenUsage": {
-      "type": "string",
-      "defaultValue": "OneTimeOnly",
-      "allowedValues": ["ReUse", "OneTimeOnly"],
-      "metadata": {
-        "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
-      }
-    },
-    "openIdConnectSpaClientRefreshTokenExpiration": {
-      "type": "string",
-      "defaultValue": "Absolute",
-      "allowedValues": ["Absolute", "Sliding"],
-      "metadata": {
-        "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
-      }
-    },
     "memoryCacheEnabled": {
       "type": "bool",
       "defaultValue": true,
@@ -1751,12 +1728,14 @@
         "PublicAppUrl": "[variables('publicAppUrl')]",
         "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
         "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
-        "OpenIdConnect:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnect:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectSpaClient:AllowOfflineAccess": "[parameters('openIdConnectSpaClientAllowOfflineAccess')]",
-        "OpenIdConnectSpaClient:RefreshTokenUsage": "[parameters('openIdConnectSpaClientRefreshTokenUsage')]",
-        "OpenIdConnectSpaClient:RefreshTokenExpiration": "[parameters('openIdConnectSpaClientRefreshTokenExpiration')]",
+        "OpenIdConnectIdentityFramework:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:KnownAuthorities": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:AdminApiScope": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
         "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
         "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
         "MemoryCache:ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",

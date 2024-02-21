@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
@@ -51,11 +52,12 @@ public static class WebHostBuilderExtensions
             }
         );
     }
-    
+
     /// <summary>
     /// Register controllers directly within integration tests, allowing them to be non-top-level and non-public
     /// classes. Taken from
-    /// https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/
+    /// https://tpodolak.com/blog/2020/06/22/asp-net-core-adding-controllers-directly-integration-tests/ and
+    /// https://andrewlock.net/controller-activation-and-dependency-injection-in-asp-net-core-mvc/.
     /// </summary>
     public static IWebHostBuilder WithAdditionalControllers(this IWebHostBuilder builder, params Type[] controllers)
     {
@@ -64,7 +66,11 @@ public static class WebHostBuilderExtensions
             {
                 var partManager = GetApplicationPartManager(services);
 
+                // Register each controller with MVC.
                 partManager.FeatureProviders.Add(new ExternalControllersFeatureProvider(controllers));
+
+                // Register each controller with DI.
+                controllers.ForEach(controller => services.TryAddTransient(controller, controller));
             });
     }
 

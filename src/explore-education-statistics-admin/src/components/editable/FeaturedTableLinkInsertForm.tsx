@@ -49,7 +49,7 @@ export default function FeaturedTableLinkInsertForm({
   const handleFormSubmit = (values: FormValues) =>
     onSubmit({
       text: values.text,
-      url: `${config.PublicAppUrl}/data-tables/fast-track/${values.dataBlockParentId}?featuredTable=true`,
+      url: `${config.publicAppUrl}/data-tables/fast-track/${values.dataBlockParentId}?featuredTable=true`,
     });
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {

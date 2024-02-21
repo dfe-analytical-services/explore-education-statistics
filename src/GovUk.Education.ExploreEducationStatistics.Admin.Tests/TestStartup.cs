@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +40,7 @@ public class TestStartup : Startup
     public TestStartup(
         IConfiguration configuration,
         IHostEnvironment hostEnvironment) : base(
-        configuration, 
+        configuration,
         hostEnvironment)
     {
     }
@@ -60,8 +61,8 @@ public class TestStartup : Startup
             .RegisterControllers<Startup>();
 
         services
-            .AddAuthentication(TestAuthHandler.AuthenticationScheme)
-            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(JwtBearerDefaults.AuthenticationScheme, _ => { });
     }
 }
 
@@ -77,7 +78,7 @@ public static class TestStartupExtensions
     /// <param name="user"></param>
     /// <returns></returns>
     public static WebApplicationFactory<TestStartup> SetUser(
-        this WebApplicationFactory<TestStartup> testApp, 
+        this WebApplicationFactory<TestStartup> testApp,
         ClaimsPrincipal user)
     {
         return testApp.WithWebHostBuilder(builder => builder
@@ -87,32 +88,30 @@ public static class TestStartupExtensions
 
 /// <summary>
 /// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
-/// for authentication and authorization mechanisms to use. 
+/// for authentication and authorization mechanisms to use.
 /// </summary>
 internal class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    public const string AuthenticationScheme = "TestAuthenticationScheme";
-
     private readonly ClaimsPrincipal? _claimsPrincipal;
-        
+
     public TestAuthHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options, 
-        ILoggerFactory logger, 
-        UrlEncoder encoder, 
-        ISystemClock clock, 
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder,
+        ISystemClock clock,
         ClaimsPrincipal? claimsPrincipal = null) : base(options, logger, encoder, clock)
     {
         _claimsPrincipal = claimsPrincipal;
     }
- 
+
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         if (_claimsPrincipal == null)
         {
             return Task.FromResult(AuthenticateResult.NoResult());
         }
-            
-        var ticket = new AuthenticationTicket(_claimsPrincipal, AuthenticationScheme);
+
+        var ticket = new AuthenticationTicket(_claimsPrincipal, JwtBearerDefaults.AuthenticationScheme);
         var result = AuthenticateResult.Success(ticket);
         return Task.FromResult(result);
     }

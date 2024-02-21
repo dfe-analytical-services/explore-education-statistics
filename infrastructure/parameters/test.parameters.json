@@ -65,15 +65,6 @@
     "enableThemeDeletion": {
       "value": true
     },
-    "openIdConnectSpaClientAllowOfflineAccess": {
-      "value": true
-    },
-    "openIdConnectSpaClientRefreshTokenUsage": {
-      "value": "ReUse"
-    },
-    "openIdConnectSpaClientRefreshTokenExpiration": {
-      "value": "Sliding"
-    },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
     },

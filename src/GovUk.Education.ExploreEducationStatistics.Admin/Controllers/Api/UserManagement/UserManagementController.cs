@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
                 .RemoveAllUserResourceRoles(userId)
                 .HandleFailuresOrNoContent();
         }
-        
+
         /// <summary>
         /// Provides a list of releases that are available within the service
         /// </summary>
@@ -139,6 +140,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
             return _userRoleService
                 .GetAllResourceRoles()
                 .HandleFailuresOrOk();
+        }
+
+        /// <summary>
+        /// A BAU-only endpoint for deleting test users.
+        /// </summary>
+        [HttpDelete("user/{email}")]
+        [ProducesResponseType(204)]
+        [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]
+        public async Task<ActionResult> DeleteUser(string email)
+        {
+            return await _userManagementService
+                .DeleteUser(email)
+                .HandleFailuresOrNoContent();
         }
     }
 }

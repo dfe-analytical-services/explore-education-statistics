@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     builder.AddJsonFile(
                         idpFile,
                         optional: false,
-                        reloadOnChange: true
+                        reloadOnChange: false
                     );
 
                     var bootstrapUsers = Environment.GetEnvironmentVariable("BootstrapUsers");
@@ -45,14 +45,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         builder.AddJsonFile(
                             $"appsettings.{bootstrapUsers}BootstrapUsers.json",
                             optional: true,
-                            reloadOnChange: true
+                            reloadOnChange: false
                         );
                     }
 
                     builder.AddJsonFile(
                         "appsettings.Local.json",
                         optional: true,
-                        reloadOnChange: true);
+                        reloadOnChange: false);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

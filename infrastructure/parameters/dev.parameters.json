@@ -77,15 +77,6 @@
     "enableThemeDeletion": {
       "value": true
     },
-    "openIdConnectSpaClientAllowOfflineAccess": {
-      "value": true
-    },
-    "openIdConnectSpaClientRefreshTokenUsage": {
-      "value": "ReUse"
-    },
-    "openIdConnectSpaClientRefreshTokenExpiration": {
-      "value": "Sliding"
-    },
     "memoryCacheOverridesDurationInSeconds": {
       "value": 10
     },

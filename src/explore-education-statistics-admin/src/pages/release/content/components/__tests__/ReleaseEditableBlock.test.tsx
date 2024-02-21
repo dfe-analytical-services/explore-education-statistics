@@ -1314,7 +1314,6 @@ describe('ReleaseEditableBlock', () => {
         user={{
           id: testCurrentUser.id,
           name: testCurrentUser.displayName,
-          validToken: true,
           permissions: {} as GlobalPermissions,
         }}
       >

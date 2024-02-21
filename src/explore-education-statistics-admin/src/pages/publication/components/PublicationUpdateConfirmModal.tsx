@@ -26,7 +26,7 @@ export default function PublicationUpdateConfirmModal({
   const titleHasChanged = initialPublicationTitle !== newPublicationTitle;
   const slugHasChanged = initialPublicationSlug !== newPublicationSlug;
 
-  const { PublicAppUrl } = useConfig();
+  const { publicAppUrl } = useConfig();
 
   return (
     <ModalConfirm
@@ -49,12 +49,12 @@ export default function PublicationUpdateConfirmModal({
           <p>The URL for this publication will change from</p>
           <UrlContainer
             data-testid="before-url"
-            url={`${PublicAppUrl}/find-statistics/${initialPublicationSlug}`}
+            url={`${publicAppUrl}/find-statistics/${initialPublicationSlug}`}
           />{' '}
           to{' '}
           <UrlContainer
             data-testid="after-url"
-            url={`${PublicAppUrl}/find-statistics/${newPublicationSlug}`}
+            url={`${publicAppUrl}/find-statistics/${newPublicationSlug}`}
           />
         </>
       )}

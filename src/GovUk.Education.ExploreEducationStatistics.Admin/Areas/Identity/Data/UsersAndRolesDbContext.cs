@@ -5,23 +5,21 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using IdentityServer4.EntityFramework.Options;
-using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
+// TODO EES-4814 - move to appropriate folder after the main 4814 PR has gone in.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {
-    public class UsersAndRolesDbContext : ApiAuthorizationDbContext<ApplicationUser>
+    public class UsersAndRolesDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public DbSet<UserInvite> UserInvites { get; set; } = null!;
 
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions,
-            bool updateTimestamps = true) : base(options, operationalStoreOptions)
+            bool updateTimestamps = true) : base(options)
         {
             Configure(updateTimestamps);
         }
@@ -58,9 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 
             // Note that this logic is also present in UserInvite.Expired.
             // It is implemented here as well because EF is not able to translate the "Expired" computed field for
-            // use in this QueryFilter. 
+            // use in this QueryFilter.
             modelBuilder.Entity<UserInvite>()
-                .HasQueryFilter(invite => invite.Accepted || 
+                .HasQueryFilter(invite => invite.Accepted ||
                                           invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays));
 
             modelBuilder.Entity<IdentityRole>()

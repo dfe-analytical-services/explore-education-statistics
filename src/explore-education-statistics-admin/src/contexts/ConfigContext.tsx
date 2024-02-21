@@ -33,9 +33,21 @@ export function useConfig(): Config {
 // Config provider for testing
 
 const defaultTestConfig: Config = {
-  AppInsightsKey: '',
-  PublicAppUrl: 'http://localhost',
-  PermittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
+  appInsightsKey: '',
+  publicAppUrl: 'http://localhost',
+  permittedEmbedUrlDomains: ['https://department-for-education.shinyapps.io'],
+  oidc: {
+    clientId: '',
+    authority: '',
+    knownAuthorities: [''],
+    adminApiScope: '',
+    authorityMetadata: {
+      authorizationEndpoint: '',
+      tokenEndpoint: '',
+      issuer: '',
+      userInfoEndpoint: '',
+    },
+  },
 };
 
 interface TestConfigContextProps {

@@ -4,10 +4,10 @@ import time
 import requests
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from tests.libs import local_storage_helper
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import sl
 from tests.libs.setup_auth_variables import setup_auth_variables
-from tests.libs.utilities import set_cookie_from_json, set_to_local_storage
 
 logger = get_logger(__name__)
 
@@ -48,8 +48,11 @@ publisher_functions_client = PublisherFunctionsClient()
 
 
 def user_signs_in_as(user: str):
+    admin_url = os.getenv("ADMIN_URL")
+    assert admin_url, "ADMIN_URL env variable must be set"
+
     try:
-        (local_storage_token, cookie_token) = setup_auth_variables(
+        local_storage_json = setup_auth_variables(
             user,
             email=os.getenv(f"{user}_EMAIL"),
             password=os.getenv(f"{user}_PASSWORD"),
@@ -57,15 +60,7 @@ def user_signs_in_as(user: str):
             identity_provider=os.getenv("IDENTITY_PROVIDER"),
         )
 
-        admin_url = os.getenv("ADMIN_URL")
-        assert admin_url
-
-        set_to_local_storage(
-            f"GovUk.Education.ExploreEducationStatistics.Adminuser:{admin_url}:GovUk.Education"
-            f".ExploreEducationStatistics.Admin",
-            local_storage_token,
-        )
-        set_cookie_from_json(cookie_token)
+        local_storage_helper.write_local_storage_json_to_local_storage(local_storage_json, sl().driver)
 
         sl().go_to(admin_url)
     except Exception as e:
