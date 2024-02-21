@@ -127,6 +127,18 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="manually specify the expiredinvite user password",
     )
     parser.add_argument(
+        "--noinvite-pass",
+        dest="noinvite_pass",
+        default=None,
+        help="manually specify the noinvite user password",
+    )
+    parser.add_argument(
+        "--pendinginvite-pass",
+        dest="pendinginvite_pass",
+        default=None,
+        help="manually specify the pendinginvite user password",
+    )
+    parser.add_argument(
         "--reseed",
         dest="reseed",
         action="store_true",
