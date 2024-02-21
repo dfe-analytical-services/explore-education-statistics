@@ -90,3 +90,6 @@ src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUse
 
 ## IdentityServer Developer Signing key
 **/*/tempkey.rsa
+
+## IDE Files (e.g. local Visual Studio configuration)
+*.csproj.user
