@@ -1121,6 +1121,7 @@
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
     "ees-openidconnect-authority": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-authority')]",
+    "ees-openidconnect-valid-audience": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-audience')]",
     "ees-openidconnect-fully-qualified-scope-name": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-fully-qualified-scope-name')]",
     "ees-openidconnect-valid-issuers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-valid-issuers')]",
 
@@ -1732,7 +1733,7 @@
         "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
         "OpenIdConnectIdentityFramework:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectIdentityFramework:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
-        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-fully-qualified-scope-name'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidAudience": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-audience'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectIdentityFramework:TokenValidationParameters:ValidIssuers": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-valid-issuers'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectSpaClient:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnectSpaClient:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
