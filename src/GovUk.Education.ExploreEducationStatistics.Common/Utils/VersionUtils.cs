@@ -1,4 +1,3 @@
-using SemanticVersioning;
 using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -10,8 +9,7 @@ public static class VersionUtils
         if (!SemVersion.TryParse(
             versionString,
             SemVersionStyles.OptionalMinorPatch
-                | SemVersionStyles.AllowWhitespace
-                | SemVersionStyles.AllowLeadingWhitespace,
+                | SemVersionStyles.AllowWhitespace,
             out SemVersion version))
         {
             major = default;
