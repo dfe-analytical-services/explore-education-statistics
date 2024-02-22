@@ -1,6 +1,5 @@
 #nullable enable
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -13,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -354,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("2024", viewModels[0].Description);
                 Assert.Equal(eesRelease3DraftId, viewModels[0].Id);
-                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2024", viewModels[0].Url);
+                Assert.Equal($"{publication.Slug}/2024", viewModels[0].Url);
                 Assert.Equal(5, viewModels[0].Order);
                 Assert.False(viewModels[0].IsLatest);
                 Assert.True(viewModels[0].IsDraft);
@@ -362,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("2023", viewModels[1].Description);
                 Assert.Equal(eesRelease2AmendmentId, viewModels[1].Id);
-                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2023", viewModels[1].Url);
+                Assert.Equal($"{publication.Slug}/2023", viewModels[1].Url);
                 Assert.Equal(4, viewModels[1].Order);
                 Assert.True(viewModels[1].IsLatest);
                 Assert.True(viewModels[1].IsDraft);
@@ -370,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("2022", viewModels[2].Description);
                 Assert.Equal(eesRelease1Id, viewModels[2].Id);
-                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2022", viewModels[2].Url);
+                Assert.Equal($"{publication.Slug}/2022", viewModels[2].Url);
                 Assert.Equal(3, viewModels[2].Order);
                 Assert.False(viewModels[2].IsLatest);
                 Assert.False(viewModels[2].IsDraft);
@@ -590,22 +588,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static IOptions<EnvironmentOptions> DefaultEnvironmentOptions()
-        {
-            return Options.Create(new EnvironmentOptions
-            {
-                BaseUrl = "https://test.com"
-            });
-        }
-
         private static LegacyReleaseService BuildLegacyReleaseService(
             ContentDbContext context,
             IMapper? mapper = null,
             IUserService? userService = null,
             IPublicationService? publicationService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IPublicationReleaseOrderService? publicationReleaseOrderService = null,
-            IOptions<EnvironmentOptions>? options = null)
+            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
         {
             return new LegacyReleaseService(
                 context,
@@ -614,8 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 publicationService ?? Mock.Of<IPublicationService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict),
-                options ?? DefaultEnvironmentOptions()
+                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict)
             );
         }
     }

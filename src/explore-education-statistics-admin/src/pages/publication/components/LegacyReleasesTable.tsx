@@ -1,5 +1,6 @@
 import DraggableItem from '@admin/components/DraggableItem';
 import DroppableArea from '@admin/components/DroppableArea';
+import Link from '@admin/components/Link';
 import {
   publicationCreateLegacyReleaseRoute,
   PublicationRouteParams,
@@ -24,6 +25,7 @@ import { generatePath } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   canManageLegacyReleases: boolean;
@@ -40,6 +42,8 @@ const LegacyReleasesTable = ({
   const [combinedReleases, setCombinedReleases] = useState(
     initialCombinedReleases,
   );
+
+  const config = useConfig();
 
   return (
     <>
@@ -164,15 +168,30 @@ const LegacyReleasesTable = ({
                           'govuk-!-width-one-half': isReordering,
                         })}
                       >
-                        <a
-                          className="govuk-link--no-visited-state"
-                          href={release.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          tabIndex={isReordering ? -1 : undefined}
-                        >
-                          {release.url}
-                        </a>
+                        {release.isLegacy && (
+                          <a
+                            className="govuk-link--no-visited-state"
+                            href={release.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={isReordering ? -1 : undefined}
+                          >
+                            {release.url}
+                          </a>
+                        )}
+
+                        {(!release.isLegacy && !release.isDraft) ||
+                          (!release.isLegacy && release.isAmendment && (
+                            <Link
+                              to={`${config.PublicAppUrl}/find-statistics/${release.url}`}
+                              className="govuk-link--no-visited-state"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              tabIndex={isReordering ? -1 : undefined}
+                            >
+                              {`${config.PublicAppUrl}/find-statistics/${release.url}`}
+                            </Link>
+                          ))}
                       </td>
 
                       {canManageLegacyReleases && !isReordering && (

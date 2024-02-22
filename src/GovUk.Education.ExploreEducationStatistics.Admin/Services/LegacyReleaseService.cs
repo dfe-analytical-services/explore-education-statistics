@@ -1,6 +1,5 @@
 #nullable enable
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -12,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationService _publicationService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
-        private readonly EnvironmentOptions _options;
 
         public LegacyReleaseService(ContentDbContext context,
             IMapper mapper,
@@ -37,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPublicationService publicationService,
             IPublicationCacheService publicationCacheService,
-            IPublicationReleaseOrderService publicationReleaseOrderService,
-            IOptions<EnvironmentOptions> options)
+            IPublicationReleaseOrderService publicationReleaseOrderService)
         {
             _context = context;
             _mapper = mapper;
@@ -47,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publicationService = publicationService;
             _publicationCacheService = publicationCacheService;
             _publicationReleaseOrderService = publicationReleaseOrderService;
-            _options = options.Value;
         }
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> GetLegacyRelease(Guid id)
@@ -114,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             Description = eesRelease.Title,
                             Id = eesRelease.Id,
-                            Url = $"{_options.BaseUrl}/find-statistics/{publication.Slug}/{eesRelease.Slug}",
+                            Url = $"{publication.Slug}/{eesRelease.Slug}",
                             Order = eesRelease.Order,
                             IsDraft = eesRelease.IsDraft,
                             IsAmendment = eesRelease.Amendment,
