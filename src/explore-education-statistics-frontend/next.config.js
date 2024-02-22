@@ -24,25 +24,6 @@ const nextConfig = {
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
   },
-  async redirects() {
-    return [
-      {
-        source: '/download-latest-data',
-        destination: '/data-catalogue',
-        permanent: true,
-      },
-      {
-        source: '/find-statistics/:publication/meta-guidance',
-        destination: '/find-statistics/:publication/data-guidance',
-        permanent: true,
-      },
-      {
-        source: '/find-statistics/:publication/:release/meta-guidance',
-        destination: '/find-statistics/:publication/:release/data-guidance',
-        permanent: true,
-      },
-    ];
-  },
   async headers() {
     return [
       {
