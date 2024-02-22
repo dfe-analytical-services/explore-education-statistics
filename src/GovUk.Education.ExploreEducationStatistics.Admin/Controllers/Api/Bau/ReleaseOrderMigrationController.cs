@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
@@ -26,14 +27,15 @@ public class ReleaseOrderMigrationController : ControllerBase
         _publicationCacheService = publicationCacheService;
     }
 
-    [HttpPatch("migration/combine-ees-legacy-releases")]
+    [HttpPatch("bau/migrate-release-orders")]
     public async Task<ActionResult> MigrateReleaseOrdering(
-        [FromQuery] bool dryRun = true)
+        [FromQuery] bool dryRun = true,
+        CancellationToken cancellationToken = default)
     {
         var publications = await _context.Publications
-            .Include(p => p.Releases.OrderBy(r => r.Published))
+            .Include(p => p.Releases)
             .Include(p => p.LegacyReleases.OrderBy(lr => lr.Order))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var publicationsUpdated = 0;
         var eesReleasesOrdered = 0;
@@ -58,17 +60,60 @@ public class ReleaseOrderMigrationController : ControllerBase
                 legacyReleasesReordered++;
             }
 
-            foreach (var eesRelease in publication.Releases)
-            {
-                publication.ReleaseOrders.Add(new()
-                {
-                    ReleaseId = eesRelease.Id,
-                    Order = ++currentOrder,
-                    IsLegacy = false,
-                    IsDraft = !eesRelease.Published.HasValue
-                });
+            // Get a list of original releases
+            var releases = publication.Releases
+                .OrderByDescending(release => release.Year)
+                .ThenByDescending(release => release.TimePeriodCoverage);
 
-                eesReleasesOrdered++;
+            // Get the latest version of each release
+            var latestReleaseVersions = releases
+                .GroupBy(r => r.ReleaseName)
+                .Select(grouping => grouping
+                    .OrderByDescending(r => r.Version)
+                    .First())
+                .ToList();
+
+            foreach (var latestRelease in latestReleaseVersions)
+            {
+                if (latestRelease.Amendment && latestRelease.PreviousVersionId.HasValue)
+                {
+                    // Add a ReleaseOrder for the original
+                    var originalRelease = releases.First(r => r.Id == latestRelease.PreviousVersionId);
+
+                    publication.ReleaseOrders.Add(
+                        new()
+                        {
+                            ReleaseId = originalRelease.Id,
+                            Order = ++currentOrder,
+                            IsDraft = !originalRelease.Published.HasValue,
+                            IsAmendment = originalRelease.Amendment
+                        });
+
+                    // Followed by a ReleaseOrder for the amendment, with the same Order
+                    publication.ReleaseOrders.Add(
+                        new()
+                        {
+                            ReleaseId = latestRelease.Id,
+                            Order = currentOrder,
+                            IsDraft = true,
+                            IsAmendment = true
+                        });
+
+                    eesReleasesOrdered += 2;
+                }
+                else
+                {
+                    // The release is the only active version, so just add a single ReleaseOrder
+                    publication.ReleaseOrders.Add(
+                        new()
+                        {
+                            ReleaseId = latestRelease.Id,
+                            Order = ++currentOrder,
+                            IsDraft = !latestRelease.Published.HasValue,
+                        });
+
+                    eesReleasesOrdered++;
+                }
             }
 
             publicationsUpdated++;
@@ -76,7 +121,7 @@ public class ReleaseOrderMigrationController : ControllerBase
 
         if (!dryRun)
         {
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             foreach (var publication in publications)
             {
