@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contacts", (string)null);
+                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.FreeTextRank", b =>
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ResolvedById");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock", b =>
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("Type");
 
-                    b.ToTable("ContentSections", (string)null);
+                    b.ToTable("ContentSections");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", b =>
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsUnique()
                         .HasFilter("[ZipFileId] IS NOT NULL");
 
-                    b.ToTable("DataImports", (string)null);
+                    b.ToTable("DataImports");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportError", b =>
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("DataImportId");
 
-                    b.ToTable("DataImportErrors", (string)null);
+                    b.ToTable("DataImportErrors");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.EmbedBlock", b =>
@@ -350,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.ToTable("EmbedBlocks", (string)null);
+                    b.ToTable("EmbedBlocks");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FeaturedTable", b =>
@@ -403,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("FeaturedTables", (string)null);
+                    b.ToTable("FeaturedTables");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.File", b =>
@@ -466,7 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("Type");
 
-                    b.ToTable("Files", (string)null);
+                    b.ToTable("Files");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
@@ -497,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("GlossaryEntries", (string)null);
+                    b.ToTable("GlossaryEntries");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatistic", b =>
@@ -541,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("KeyStatistics", (string)null);
+                    b.ToTable("KeyStatistics");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.LegacyRelease", b =>
@@ -568,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("PublicationId");
 
-                    b.ToTable("LegacyReleases", (string)null);
+                    b.ToTable("LegacyReleases");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>
@@ -594,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsUnique()
                         .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
 
-                    b.ToTable("Methodologies", (string)null);
+                    b.ToTable("Methodologies");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>
@@ -615,7 +615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("MethodologyVersionId");
 
-                    b.ToTable("MethodologyFiles", (string)null);
+                    b.ToTable("MethodologyFiles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyNote", b =>
@@ -654,7 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("UpdatedById");
 
-                    b.ToTable("MethodologyNotes", (string)null);
+                    b.ToTable("MethodologyNotes");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
@@ -670,7 +670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("MethodologyVersionId", "Slug");
 
-                    b.ToTable("MethodologyRedirects", (string)null);
+                    b.ToTable("MethodologyRedirects");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus", b =>
@@ -701,7 +701,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("MethodologyVersionId");
 
-                    b.ToTable("MethodologyStatus", (string)null);
+                    b.ToTable("MethodologyStatus");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", b =>
@@ -758,7 +758,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ScheduledWithReleaseId");
 
-                    b.ToTable("MethodologyVersions", (string)null);
+                    b.ToTable("MethodologyVersions");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersionContent", b =>
@@ -811,7 +811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Permalinks", (string)null);
+                    b.ToTable("Permalinks");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
@@ -864,7 +864,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Publications", (string)null);
+                    b.ToTable("Publications");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationMethodology", b =>
@@ -882,7 +882,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("MethodologyId");
 
-                    b.ToTable("PublicationMethodologies", (string)null);
+                    b.ToTable("PublicationMethodologies");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRedirect", b =>
@@ -898,7 +898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("PublicationId", "Slug");
 
-                    b.ToTable("PublicationRedirects", (string)null);
+                    b.ToTable("PublicationRedirects");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
@@ -987,7 +987,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("PreviousVersionId", "Version");
 
-                    b.ToTable("Releases", (string)null);
+                    b.ToTable("Releases");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseFile", b =>
@@ -1017,7 +1017,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ReleaseFiles", (string)null);
+                    b.ToTable("ReleaseFiles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseParent", b =>
@@ -1065,7 +1065,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ReleaseStatus", (string)null);
+                    b.ToTable("ReleaseStatus");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Theme", b =>
@@ -1086,7 +1086,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.ToTable("Themes", (string)null);
+                    b.ToTable("Themes");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", b =>
@@ -1109,7 +1109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ThemeId");
 
-                    b.ToTable("Topics", (string)null);
+                    b.ToTable("Topics");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Update", b =>
@@ -1140,7 +1140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("Update", (string)null);
+                    b.ToTable("Update");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.User", b =>
@@ -1160,7 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserPublicationInvite", b =>
@@ -1192,7 +1192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("PublicationId");
 
-                    b.ToTable("UserPublicationInvites", (string)null);
+                    b.ToTable("UserPublicationInvites");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserPublicationRole", b =>
@@ -1233,7 +1233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserPublicationRoles", (string)null);
+                    b.ToTable("UserPublicationRoles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserReleaseInvite", b =>
@@ -1274,7 +1274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("UserReleaseInvites", (string)null);
+                    b.ToTable("UserReleaseInvites");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.UserReleaseRole", b =>
@@ -1318,7 +1318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserReleaseRoles", (string)null);
+                    b.ToTable("UserReleaseRoles");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", b =>
@@ -1820,7 +1820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication.ExternalMethodology#GovUk.Education.ExploreEducationStatistics.Content.Model.ExternalMethodology", "ExternalMethodology", b1 =>
+                    b.OwnsOne("GovUk.Education.ExploreEducationStatistics.Content.Model.ExternalMethodology", "ExternalMethodology", b1 =>
                         {
                             b1.Property<Guid>("PublicationId")
                                 .HasColumnType("uniqueidentifier");

@@ -4,14 +4,10 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    public partial class EES4770_AddPublicationReleaseOrdersColumn : Migration
+    public partial class EES4770_AddPublicationReleaseOrderColumn : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Order",
-                table: "Releases");
-
             migrationBuilder.AddColumn<string>(
                 name: "ReleaseOrders",
                 table: "Publications",
@@ -25,13 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             migrationBuilder.DropColumn(
                 name: "ReleaseOrders",
                 table: "Publications");
-
-            migrationBuilder.AddColumn<int>(
-                name: "Order",
-                table: "Releases",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
         }
     }
 }
