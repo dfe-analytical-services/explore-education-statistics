@@ -15,6 +15,7 @@ interface Props {
     externalMethodology: ExternalMethodology,
   ) => ReactNode;
   renderMethodologyLink: (methodology: MethodologySummary) => ReactNode;
+  trackScroll?: boolean;
 }
 
 export default function ReleaseHelpAndSupportSection({
@@ -22,11 +23,12 @@ export default function ReleaseHelpAndSupportSection({
   releaseType,
   renderMethodologyLink,
   renderExternalMethodologyLink,
+  trackScroll = false,
 }: Props) {
   const { externalMethodology, methodologies, contact, title } = publication;
 
   return (
-    <>
+    <div data-scroll={trackScroll ? true : undefined} id="help-section">
       <h2
         className="govuk-!-margin-top-9"
         data-testid="extra-information"
@@ -57,6 +59,6 @@ export default function ReleaseHelpAndSupportSection({
       <ReleaseTypeSection type={releaseType} />
 
       <ContactUsSection publicationContact={contact} publicationTitle={title} />
-    </>
+    </div>
   );
 }

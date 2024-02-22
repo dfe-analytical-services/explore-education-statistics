@@ -10,6 +10,8 @@ import GoToTopLink from './GoToTopLink';
 export type ToggleHandler = (open: boolean, id: string) => void;
 
 export interface AccordionSectionProps {
+  anchorLinkIdPrefix?: string;
+  anchorLinkUrl?: (id: string) => string;
   caption?: string;
   children?:
     | ReactNode
@@ -19,7 +21,6 @@ export interface AccordionSectionProps {
         contentId: string;
       }) => ReactNode);
   className?: string;
-  anchorLinkUrl?: (id: string) => string;
   goToTop?: boolean;
   header?: ReactNode;
   heading: string;
@@ -29,8 +30,9 @@ export interface AccordionSectionProps {
    */
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
-  anchorLinkIdPrefix?: string;
+
   open?: boolean;
+  trackScroll?: boolean;
   onToggle?: ToggleHandler;
 }
 
@@ -46,6 +48,7 @@ const classes = {
 export const accordionSectionClasses = classes;
 
 const AccordionSection = ({
+  anchorLinkIdPrefix = 'section',
   anchorLinkUrl,
   caption,
   className,
@@ -55,8 +58,8 @@ const AccordionSection = ({
   heading,
   headingTag = 'h2',
   id = 'accordionSection',
-  anchorLinkIdPrefix = 'section',
   open = false,
+  trackScroll = false,
   onToggle,
 }: AccordionSectionProps) => {
   const { isMounted } = useMounted();
@@ -93,6 +96,7 @@ const AccordionSection = ({
                 aria-controls={contentId}
                 aria-expanded={open}
                 className={classes.sectionButton}
+                data-scroll={trackScroll ? true : undefined}
                 id={headingId}
                 type="button"
                 onClick={() => {

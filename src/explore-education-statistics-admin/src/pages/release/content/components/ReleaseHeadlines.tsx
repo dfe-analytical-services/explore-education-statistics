@@ -39,7 +39,7 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
 
   const headlinesTab = (
     <TabsSection title="Summary">
-      <section id="releaseHeadlines-keyStatistics">
+      <section data-scroll id="releaseHeadlines-keyStatistics">
         <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
       </section>
       <section id="releaseHeadlines-headlines">
@@ -79,7 +79,11 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
 
   return (
     <section id="releaseHeadlines">
-      <h2 className="dfe-print-break-before">
+      <h2
+        className="dfe-print-break-before"
+        data-scroll
+        id="release-headlines-header"
+      >
         Headline facts and figures - {release.yearTitle}
       </h2>
 
