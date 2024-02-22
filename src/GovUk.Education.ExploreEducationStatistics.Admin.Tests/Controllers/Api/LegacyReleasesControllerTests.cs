@@ -1,7 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -9,6 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -150,12 +150,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         private static LegacyReleaseController BuildController(
-            ILegacyReleaseService? legacyReleaseService = null,
-            IPublicationService? publicationService = null)
+            ILegacyReleaseService? legacyReleaseService = null)
         {
             return new LegacyReleaseController(
-                legacyReleaseService ?? Mock.Of<ILegacyReleaseService>(Strict),
-                publicationService ?? Mock.Of<IPublicationService>(Strict));
+                legacyReleaseService ?? Mock.Of<ILegacyReleaseService>(Strict));
         }
     }
 }

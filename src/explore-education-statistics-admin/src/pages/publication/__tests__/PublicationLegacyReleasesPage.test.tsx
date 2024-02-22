@@ -26,6 +26,7 @@ describe('PublicationLegacyReleasesPage', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'Legacy release 2',
@@ -35,6 +36,7 @@ describe('PublicationLegacyReleasesPage', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'Legacy release 1',
@@ -44,6 +46,7 @@ describe('PublicationLegacyReleasesPage', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
   ];
 

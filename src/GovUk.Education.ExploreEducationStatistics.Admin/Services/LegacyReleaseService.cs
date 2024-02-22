@@ -106,6 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     foreach (var eesRelease in eesReleases)
                     {
+                        var eesReleaseId = eesRelease.Amendment && eesRelease.PreviousVersionId.HasValue
+                            ? eesRelease.PreviousVersionId.Value
+                            : eesRelease.Id;
+
                         combinedReleasesViewModels.Add(new()
                         {
                             Description = eesRelease.Title,
@@ -113,7 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Url = $"{_options.BaseUrl}/find-statistics/{publication.Slug}/{eesRelease.Slug}",
                             Order = eesRelease.Order,
                             IsDraft = eesRelease.IsDraft,
-                            IsAmendment = eesRelease.Amendment
+                            IsAmendment = eesRelease.Amendment,
+                            IsLatest = publication.LatestPublishedReleaseId == eesReleaseId
                         });
                     }
 

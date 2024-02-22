@@ -23,6 +23,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: true,
       isLegacy: false,
       isAmendment: true,
+      isLatest: false,
     },
     {
       description: 'EES release 3',
@@ -32,6 +33,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: false,
       isLegacy: false,
       isAmendment: false,
+      isLatest: true,
     },
     {
       description: 'EES release 2',
@@ -41,6 +43,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: true,
       isLegacy: false,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'EES release 1',
@@ -50,6 +53,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: false,
       isLegacy: false,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'Legacy release 3',
@@ -59,6 +63,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'Legacy release 2',
@@ -68,6 +73,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
     {
       description: 'Legacy release 1',
@@ -77,6 +83,7 @@ describe('LegacyReleasesTable', () => {
       isDraft: false,
       isLegacy: true,
       isAmendment: false,
+      isLatest: false,
     },
   ];
 
@@ -103,7 +110,7 @@ describe('LegacyReleasesTable', () => {
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent(
-      'DRAFT AMENDMENTEES release 3 amendment',
+      'EES release 3 amendmentDraft Amendment',
     );
     expect(row2Cells[1]).toHaveTextContent(
       'http://explore-education-statistics/3a',
@@ -111,14 +118,14 @@ describe('LegacyReleasesTable', () => {
     expect(within(row2Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
-    expect(row3Cells[0]).toHaveTextContent('EES release 3');
+    expect(row3Cells[0]).toHaveTextContent('EES release 3Latest');
     expect(row3Cells[1]).toHaveTextContent(
       'http://explore-education-statistics/3',
     );
     expect(within(row2Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
-    expect(row4Cells[0]).toHaveTextContent('DRAFT EES release 2');
+    expect(row4Cells[0]).toHaveTextContent('EES release 2Draft');
     expect(row4Cells[1]).toHaveTextContent(
       'http://explore-education-statistics/2',
     );
@@ -257,7 +264,7 @@ describe('LegacyReleasesTable', () => {
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells).toHaveLength(2);
     expect(row2Cells[0]).toHaveTextContent(
-      'DRAFT AMENDMENTEES release 3 amendment',
+      'EES release 3 amendmentDraft Amendment',
     );
     expect(row2Cells[1]).toHaveTextContent(
       'http://explore-education-statistics/3a',

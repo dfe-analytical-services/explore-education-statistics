@@ -11,6 +11,7 @@ export interface CombinedRelease extends LegacyRelease {
   isLegacy: boolean;
   isDraft: boolean;
   isAmendment: boolean;
+  isLatest: boolean;
 }
 
 export interface CreateLegacyRelease {
@@ -30,6 +31,7 @@ export interface UpdateCombinedRelease {
   order: number;
   isLegacy: boolean;
   isAmendment: boolean;
+  isLatest: boolean;
 }
 
 const legacyReleaseService = {

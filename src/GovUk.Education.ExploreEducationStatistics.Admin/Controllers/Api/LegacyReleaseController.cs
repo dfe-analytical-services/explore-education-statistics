@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -16,9 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly ILegacyReleaseService _legacyReleaseService;
 
-        public LegacyReleaseController(
-            ILegacyReleaseService legacyReleaseService,
-            IPublicationService publicationService)
+        public LegacyReleaseController(ILegacyReleaseService legacyReleaseService)
         {
             _legacyReleaseService = legacyReleaseService;
         }

@@ -45,9 +45,10 @@ const LegacyReleasesTable = ({
     <>
       <p>Releases will be shown in the order below on the publication.</p>
       <p>
-        Non-legacy releases can also be reordered, including those in draft
-        status or with a draft amendment, but cannot be edited or deleted. Only
-        releases with a published version will be shown on the publication.
+        Explore education statistics releases from this publication can also be
+        reordered, including those in draft status or with a draft amendment,
+        but cannot be edited or deleted. Only releases with a published version
+        will be shown on the publication.
       </p>
 
       {canManageLegacyReleases && !isReordering && (
@@ -144,12 +145,19 @@ const LegacyReleasesTable = ({
                       {isReordering && <td className={styles.dragHandle}>⬍</td>}
 
                       <td>
-                        {release.isDraft && (
-                          <span className="govuk-tag govuk-!-margin-right-1">
-                            DRAFT {release.isAmendment && ' AMENDMENT'}
+                        <span className="govuk-!-display-block">
+                          {release.description}
+                        </span>
+                        {release.isLatest && (
+                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1">
+                            Latest
                           </span>
                         )}
-                        {release.description}
+                        {release.isDraft && (
+                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1">
+                            Draft{release.isAmendment && ' Amendment'}
+                          </span>
+                        )}
                       </td>
                       <td
                         className={classNames({
@@ -258,6 +266,7 @@ const LegacyReleasesTable = ({
                   order: release.order,
                   isLegacy: release.isLegacy,
                   isAmendment: release.isAmendment,
+                  isLatest: release.isLatest,
                 })),
               );
 

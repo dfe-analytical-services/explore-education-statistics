@@ -181,6 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationId = Guid.NewGuid();
             var legacyRelease1Id = Guid.NewGuid();
             var legacyRelease2Id = Guid.NewGuid();
+            var eesRelease2AmendmentId = Guid.NewGuid();
+            var eesRelease3DraftId = Guid.NewGuid();
             var eesRelease1Id = Guid.NewGuid();
             var eesRelease2Id = Guid.NewGuid();
 
@@ -188,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Slug = "Test publication",
+                LatestPublishedReleaseId = eesRelease2Id,
                 LegacyReleases = new()
                 {
                     new()
@@ -219,9 +222,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Slug = "2023",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                     },
+                    new()
+                    {
+                        Id = eesRelease2AmendmentId,
+                        ReleaseName = "2023",
+                        Slug = "2023",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft
+                    },
+                    new()
+                    {
+                        Id = eesRelease3DraftId,
+                        ReleaseName = "2024",
+                        Slug = "2024",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft,
+                    },
                 },
                 ReleaseOrders = new()
                 {
+                    new()
+                    {
+                        ReleaseId = eesRelease3DraftId,
+                        IsDraft = true,
+                        IsLegacy = false,
+                        Order = 5
+                    },
+                    new()
+                    {
+                        ReleaseId = eesRelease2AmendmentId,
+                        IsDraft = true,
+                        IsLegacy = false,
+                        IsAmendment = true,
+                        Order = 4
+                    },
                     new()
                     {
                         ReleaseId = eesRelease2Id,
@@ -277,12 +311,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     },
                     new()
                     {
-                        Id = eesRelease2Id,
-                        IsDraft = false,
+                        Id = eesRelease2AmendmentId,
+                        IsDraft = true,
                         Order = 4,
                         Title = "2023",
                         Slug = "2023",
-                    }
+                        LatestRelease = true,
+                        Amendment = true,
+                        PreviousVersionId = eesRelease2Id,
+                    },
+                    new()
+                    {
+                        Id = eesRelease3DraftId,
+                        IsDraft = true,
+                        Order = 5,
+                        Title = "2024",
+                        Slug = "2024",
+                    },
                 };
 
                 publicationService
@@ -305,27 +350,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(publicationService);
                 var viewModels = result.AssertRight();
 
-                Assert.Equal(4, viewModels.Count);
+                Assert.Equal(5, viewModels.Count);
 
-                Assert.Equal("2023", viewModels[0].Description);
-                Assert.Equal(eesRelease2Id, viewModels[0].Id);
-                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2023", viewModels[0].Url);
-                Assert.Equal(4, viewModels[0].Order);
+                Assert.Equal("2024", viewModels[0].Description);
+                Assert.Equal(eesRelease3DraftId, viewModels[0].Id);
+                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2024", viewModels[0].Url);
+                Assert.Equal(5, viewModels[0].Order);
+                Assert.False(viewModels[0].IsLatest);
+                Assert.True(viewModels[0].IsDraft);
+                Assert.False(viewModels[0].IsAmendment);
 
-                Assert.Equal("2022", viewModels[1].Description);
-                Assert.Equal(eesRelease1Id, viewModels[1].Id);
-                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2022", viewModels[1].Url);
-                Assert.Equal(3, viewModels[1].Order);
+                Assert.Equal("2023", viewModels[1].Description);
+                Assert.Equal(eesRelease2AmendmentId, viewModels[1].Id);
+                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2023", viewModels[1].Url);
+                Assert.Equal(4, viewModels[1].Order);
+                Assert.True(viewModels[1].IsLatest);
+                Assert.True(viewModels[1].IsDraft);
+                Assert.True(viewModels[1].IsAmendment);
 
-                Assert.Equal("Legacy Release 2", viewModels[2].Description);
-                Assert.Equal(publication.LegacyReleases[1].Id, viewModels[2].Id);
-                Assert.Equal("https://test-2.com", viewModels[2].Url);
-                Assert.Equal(2, viewModels[2].Order);
+                Assert.Equal("2022", viewModels[2].Description);
+                Assert.Equal(eesRelease1Id, viewModels[2].Id);
+                Assert.Equal($"https://test.com/find-statistics/{publication.Slug}/2022", viewModels[2].Url);
+                Assert.Equal(3, viewModels[2].Order);
+                Assert.False(viewModels[2].IsLatest);
+                Assert.False(viewModels[2].IsDraft);
+                Assert.False(viewModels[2].IsAmendment);
 
-                Assert.Equal("Legacy Release 1", viewModels[3].Description);
-                Assert.Equal(publication.LegacyReleases[0].Id, viewModels[3].Id);
-                Assert.Equal("https://test-1.com", viewModels[3].Url);
-                Assert.Equal(1, viewModels[3].Order);
+                Assert.Equal("Legacy Release 2", viewModels[3].Description);
+                Assert.Equal(publication.LegacyReleases[1].Id, viewModels[3].Id);
+                Assert.Equal("https://test-2.com", viewModels[3].Url);
+                Assert.Equal(2, viewModels[3].Order);
+                Assert.False(viewModels[3].IsLatest);
+                Assert.False(viewModels[3].IsDraft);
+                Assert.False(viewModels[3].IsAmendment);
+                Assert.True(viewModels[3].IsLegacy);
+
+                Assert.Equal("Legacy Release 1", viewModels[4].Description);
+                Assert.Equal(publication.LegacyReleases[0].Id, viewModels[4].Id);
+                Assert.Equal("https://test-1.com", viewModels[4].Url);
+                Assert.Equal(1, viewModels[4].Order);
+                Assert.False(viewModels[4].IsLatest);
+                Assert.False(viewModels[4].IsDraft);
+                Assert.False(viewModels[4].IsAmendment);
+                Assert.True(viewModels[4].IsLegacy);
             }
         }
 

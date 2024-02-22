@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool IsAmendment { get; set; }
 
+        public bool IsLatest { get; set; }
+
         public string Url { get; set; }
 
         public int Order { get; set; }
