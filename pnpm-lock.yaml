@@ -139,7 +139,7 @@ importers:
         version: 7.18.6(@babel/core@7.20.12)
       '@ckeditor/ckeditor5-react':
         specifier: ^6.1.0
-        version: 6.1.0(@ckeditor/ckeditor5-core@41.0.0)(@ckeditor/ckeditor5-engine@41.0.0)(@ckeditor/ckeditor5-utils@41.0.0)(@ckeditor/ckeditor5-watchdog@40.1.0)(react@17.0.2)
+        version: 6.1.0(@ckeditor/ckeditor5-core@41.0.0)(@ckeditor/ckeditor5-engine@41.0.0)(@ckeditor/ckeditor5-utils@41.0.0)(@ckeditor/ckeditor5-watchdog@41.0.0)(react@17.0.2)
       '@ckeditor/ckeditor5-upload':
         specifier: ^40.1.0
         version: 40.1.0
@@ -234,8 +234,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^4.7.0
-        version: 4.7.0
+        specifier: ^4.8.0
+        version: 4.8.0
       history:
         specifier: ^4.10.1
         version: 4.10.1
@@ -673,8 +673,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       govuk-frontend:
-        specifier: ^4.7.0
-        version: 4.7.0
+        specifier: ^4.8.0
+        version: 4.8.0
       html-react-parser:
         specifier: ^1.3.0
         version: 1.4.14(react@17.0.2)
@@ -923,8 +923,8 @@ importers:
         specifier: ^2.4.2
         version: 2.4.2(react@17.0.2)
       govuk-frontend:
-        specifier: ^4.7.0
-        version: 4.7.0
+        specifier: ^4.8.0
+        version: 4.8.0
       helmet:
         specifier: ^4.1.1
         version: 4.6.0
@@ -4858,7 +4858,7 @@ packages:
       ckeditor5: 41.0.0
     dev: true
 
-  /@ckeditor/ckeditor5-react@6.1.0(@ckeditor/ckeditor5-core@41.0.0)(@ckeditor/ckeditor5-engine@41.0.0)(@ckeditor/ckeditor5-utils@41.0.0)(@ckeditor/ckeditor5-watchdog@40.1.0)(react@17.0.2):
+  /@ckeditor/ckeditor5-react@6.1.0(@ckeditor/ckeditor5-core@41.0.0)(@ckeditor/ckeditor5-engine@41.0.0)(@ckeditor/ckeditor5-utils@41.0.0)(@ckeditor/ckeditor5-watchdog@41.0.0)(react@17.0.2):
     resolution: {integrity: sha512-uwJ89pOJnjlMgfluGJhxatt6zV5ZavuV7AaRvJpxzAU7SjoC3sNumohDRmI0KGDGoyCVPMJO9fgE3ijIb3gHlQ==}
     engines: {node: '>=16.0.0', npm: '>=5.7.1'}
     peerDependencies:
@@ -4871,7 +4871,7 @@ packages:
       '@ckeditor/ckeditor5-core': 41.0.0
       '@ckeditor/ckeditor5-engine': 41.0.0
       '@ckeditor/ckeditor5-utils': 41.0.0
-      '@ckeditor/ckeditor5-watchdog': 40.1.0
+      '@ckeditor/ckeditor5-watchdog': 41.0.0
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -4963,17 +4963,10 @@ packages:
     dependencies:
       lodash-es: 4.17.21
 
-  /@ckeditor/ckeditor5-watchdog@40.1.0:
-    resolution: {integrity: sha512-E8+1zC6dnDR0wQnZD88ligKY7pxBcxz953eUdijHmBcVrbECMKJ4VrORIT37LVgstDUYJhHYgxMOQ0TwO/uSKQ==}
-    dependencies:
-      lodash-es: 4.17.21
-    dev: false
-
   /@ckeditor/ckeditor5-watchdog@41.0.0:
     resolution: {integrity: sha512-S2mP2A+Zil7j7LMZqJhBTXc007gbYJD12xBpa5MQFLcUNLwYR9nj69IM5QmJV50ai0U7znkWQxJai/4BAJvL8Q==}
     dependencies:
       lodash-es: 4.17.21
-    dev: true
 
   /@ckeditor/ckeditor5-widget@41.0.0:
     resolution: {integrity: sha512-pQomiS4wSlDs17muViabmGzcGAWR/cqtUIJswXAqlaQICdbOIX+tfA9XsZDdekrTZZxZxk+1Zh1UJ4WWK4kmSg==}
@@ -11710,8 +11703,8 @@ packages:
     dependencies:
       get-intrinsic: 1.2.0
 
-  /govuk-frontend@4.7.0:
-    resolution: {integrity: sha512-0OsdCusF5qvLWwKziU8zqxiC0nq6WP0ZQuw51ymZ/1V0tO71oIKMlSLN2S9bm8RcEGSoidPt2A34gKxePrLjvg==}
+  /govuk-frontend@4.8.0:
+    resolution: {integrity: sha512-NOmPJxL8IYq1HSNHYKx9XY2LLTxuwb+IFASiGQO4sgJ8K7AG66SlSeqARrcetevV8zOf+i1z+MbJJ2O7//OxAw==}
     engines: {node: '>= 4.2.0'}
     dev: false
 
