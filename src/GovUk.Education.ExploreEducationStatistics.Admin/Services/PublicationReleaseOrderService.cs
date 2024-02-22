@@ -8,219 +8,217 @@ using System.Linq;
 using System.Threading.Tasks;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+public class PublicationReleaseOrderService : IPublicationReleaseOrderService
 {
-    public class PublicationReleaseOrderService : IPublicationReleaseOrderService
+    private readonly ContentDbContext _context;
+
+    public PublicationReleaseOrderService(
+        ContentDbContext context)
     {
-        private readonly ContentDbContext _context;
+        _context = context;
+    }
 
-        public PublicationReleaseOrderService(
-            ContentDbContext context)
+    public async Task CreateForCreateLegacyRelease(Guid publicationId, Guid releaseId)
+    {
+        var publication = await GetPublication(publicationId);
+
+        if (releaseId == Guid.Empty)
         {
-            _context = context;
+            throw new ArgumentNullException(nameof(releaseId));
         }
 
-        public async Task CreateForCreateLegacyRelease(Guid publicationId, Guid releaseId)
+        publication.ReleaseOrders.Add(new()
         {
-            var publication = await GetPublication(publicationId);
+            ReleaseId = releaseId,
+            IsLegacy = true,
+            IsDraft = false,
+            Order = publication.ReleaseOrders.Count + 1 // Add to the top of the list rather than presume the intended position
+        });
 
-            if (releaseId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(releaseId));
-            }
+        _context.Update(publication);
+    }
 
-            publication.ReleaseOrders.Add(new()
-            {
-                ReleaseId = releaseId,
-                IsLegacy = true,
-                IsDraft = false,
-                Order = publication.ReleaseOrders.Count + 1 // Add to the top of the list rather than presume the intended position
-            });
+    public async Task DeleteForDeleteLegacyRelease(Guid publicationId, Guid releaseId)
+    {
+        var publication = await GetPublication(publicationId);
 
-            _context.Update(publication);
+        if (releaseId == Guid.Empty)
+        {
+            throw new ArgumentNullException(nameof(releaseId));
         }
 
-        public async Task DeleteForDeleteLegacyRelease(Guid publicationId, Guid releaseId)
+        var legacyRelease = await _context.LegacyReleases.FindAsync(releaseId)
+            ?? throw new KeyNotFoundException($"No matching {nameof(LegacyRelease)} found with ID {releaseId}");
+
+        var releaseOrders = legacyRelease.Publication.ReleaseOrders;
+
+        var releaseOrder = releaseOrders.Find(ro => ro.ReleaseId == legacyRelease.Id)
+            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
+
+        releaseOrders.Remove(releaseOrder);
+        ResetOrders(releaseOrders);
+
+        _context.Update(publication);
+    }
+
+    public async Task CreateForAmendRelease(Guid publicationId, Guid releaseAmendmentId)
+    {
+        var publication = await GetPublication(publicationId);
+
+        if (releaseAmendmentId == Guid.Empty)
         {
-            var publication = await GetPublication(publicationId);
-
-            if (releaseId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(releaseId));
-            }
-
-            var legacyRelease = await _context.LegacyReleases.FindAsync(releaseId)
-                ?? throw new KeyNotFoundException($"No matching {nameof(LegacyRelease)} found with ID {releaseId}");
-
-            var releaseOrders = legacyRelease.Publication.ReleaseOrders;
-
-            var releaseOrder = releaseOrders.Find(ro => ro.ReleaseId == legacyRelease.Id)
-                ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
-
-            releaseOrders.Remove(releaseOrder);
-            ResetOrders(releaseOrders);
-
-            _context.Update(publication);
+            throw new ArgumentNullException(nameof(releaseAmendmentId));
         }
 
-        public async Task CreateForAmendRelease(Guid publicationId, Guid releaseAmendmentId)
+        var releaseAmendment = publication.Releases.Find(r => r.Id == releaseAmendmentId)
+            ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseAmendmentId} found");
+
+        var originalReleaseOrder = publication.ReleaseOrders.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
+
+        var newReleaseOrder = new ReleaseOrder
         {
-            var publication = await GetPublication(publicationId);
+            ReleaseId = releaseAmendmentId,
+            IsLegacy = false,
+            IsDraft = true,
+            IsAmendment = true,
+            Order = originalReleaseOrder.Order
+        };
 
-            if (releaseAmendmentId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(releaseAmendmentId));
-            }
+        publication.ReleaseOrders.Add(newReleaseOrder);
 
-            var releaseAmendment = publication.Releases.Find(r => r.Id == releaseAmendmentId)
-                ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseAmendmentId} found");
+        _context.Update(publication);
+    }
+
+    public async Task DeleteForDeleteRelease(Guid publicationId, Guid releaseId)
+    {
+        var publication = await GetPublication(publicationId);
+
+        if (releaseId == Guid.Empty)
+        {
+            throw new ArgumentNullException(nameof(releaseId));
+        }
+
+        var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} amendment with ID {releaseId}");
+
+        publication.ReleaseOrders.Remove(releaseOrder);
+        ResetOrders(publication.ReleaseOrders);
+
+        _context.Update(publication);
+    }
+
+    public async Task CreateForCreateRelease(Guid publicationId, Guid releaseId)
+    {
+        var publication = await GetPublication(publicationId);
+
+        if (releaseId == Guid.Empty)
+        {
+            throw new ArgumentNullException(nameof(releaseId));
+        }
+
+        publication.ReleaseOrders.Add(new()
+        {
+            ReleaseId = releaseId,
+            IsLegacy = false,
+            IsDraft = true,
+            Order = publication.ReleaseOrders.Count + 1
+        });
+
+        _context.Update(publication);
+    }
+
+    public async Task UpdateForPublishRelease(Guid publicationId, Guid releaseId)
+    {
+        var publication = await GetPublication(publicationId);
+
+        if (releaseId == Guid.Empty)
+        {
+            throw new ArgumentNullException(nameof(releaseId));
+        }
+
+        var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} with ID {releaseId}");
+
+        if (releaseOrder.IsAmendment)
+        {
+            var releaseAmendment = publication.Releases.Find(r => r.Id == releaseId)
+                ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseId} found");
 
             var originalReleaseOrder = publication.ReleaseOrders.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
                 ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
 
-            var newReleaseOrder = new ReleaseOrder
-            {
-                ReleaseId = releaseAmendmentId,
-                IsLegacy = false,
-                IsDraft = true,
-                IsAmendment = true,
-                Order = originalReleaseOrder.Order
-            };
+            publication.ReleaseOrders.Remove(originalReleaseOrder);
 
-            publication.ReleaseOrders.Add(newReleaseOrder);
-
-            _context.Update(publication);
-        }
-
-        public async Task DeleteForDeleteRelease(Guid publicationId, Guid releaseId)
-        {
-            var publication = await GetPublication(publicationId);
-
-            if (releaseId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(releaseId));
-            }
-
-            var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
-                ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} amendment with ID {releaseId}");
-
-            publication.ReleaseOrders.Remove(releaseOrder);
+            releaseOrder.IsAmendment = false;
             ResetOrders(publication.ReleaseOrders);
-
-            _context.Update(publication);
         }
 
-        public async Task CreateForCreateRelease(Guid publicationId, Guid releaseId)
-        {
-            var publication = await GetPublication(publicationId);
+        releaseOrder.IsDraft = false;
 
-            if (releaseId == Guid.Empty)
+        _context.Update(publication);
+    }
+
+    public async Task UpdateForUpdateCombinedReleaseOrder(
+        Guid publicationId,
+        List<CombinedReleaseUpdateOrderViewModel> releaseOrderUpdates)
+    {
+        var publication = await GetPublication(publicationId);
+
+        foreach (var update in releaseOrderUpdates)
+        {
+            if (update.Id == Guid.Empty)
             {
-                throw new ArgumentNullException(nameof(releaseId));
+                throw new ApplicationException($"Update with order {update.Order} must have a release ID specified");
             }
 
-            publication.ReleaseOrders.Add(new()
+            if (update.Order == 0)
             {
-                ReleaseId = releaseId,
-                IsLegacy = false,
-                IsDraft = true,
-                Order = publication.ReleaseOrders.Count + 1
-            });
-
-            _context.Update(publication);
-        }
-
-        public async Task UpdateForPublishRelease(Guid publicationId, Guid releaseId)
-        {
-            var publication = await GetPublication(publicationId);
-
-            if (releaseId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(releaseId));
+                throw new ApplicationException($"Updated order for release with ID {update.Id} must be greater than 0");
             }
 
-            var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
-                ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} with ID {releaseId}");
-
-            if (releaseOrder.IsAmendment)
+            if (update.IsAmendment)
             {
-                var releaseAmendment = publication.Releases.Find(r => r.Id == releaseId)
-                    ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseId} found");
+                var releaseAmendment = publication.Releases.Find(r => r.Id == update.Id)
+                    ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {update.Id} found");
 
-                var originalReleaseOrder = publication.ReleaseOrders.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
+                var originalReleaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseAmendment.PreviousVersionId)
                     ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
 
-                publication.ReleaseOrders.Remove(originalReleaseOrder);
-
-                releaseOrder.IsAmendment = false;
-                ResetOrders(publication.ReleaseOrders);
+                originalReleaseOrder.Order = update.Order;
             }
 
-            releaseOrder.IsDraft = false;
+            var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == update.Id)
+                ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {(update.IsLegacy ? nameof(LegacyRelease) : nameof(Release))} with ID {update.Id}");
+
+            releaseOrder.Order = update.Order;
 
             _context.Update(publication);
         }
+    }
 
-        public async Task UpdateForUpdateCombinedReleaseOrder(
-            Guid publicationId,
-            List<CombinedReleaseUpdateOrderViewModel> releaseOrderUpdates)
+    private async Task<Publication> GetPublication(
+        Guid publicationId)
+    {
+        if (publicationId == Guid.Empty)
         {
-            var publication = await GetPublication(publicationId);
-
-            foreach (var update in releaseOrderUpdates)
-            {
-                if (update.Id == Guid.Empty)
-                {
-                    throw new ApplicationException($"Update with order {update.Order} must have a release ID specified");
-                }
-
-                if (update.Order == 0)
-                {
-                    throw new ApplicationException($"Updated order for release with ID {update.Id} must be greater than 0");
-                }
-
-                if (update.IsAmendment)
-                {
-                    var releaseAmendment = publication.Releases.Find(r => r.Id == update.Id)
-                        ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {update.Id} found");
-
-                    var originalReleaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseAmendment.PreviousVersionId)
-                        ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
-
-                    originalReleaseOrder.Order = update.Order;
-                }
-
-                var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == update.Id)
-                    ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {(update.IsLegacy ? nameof(LegacyRelease) : nameof(Release))} with ID {update.Id}");
-
-                releaseOrder.Order = update.Order;
-
-                _context.Update(publication);
-            }
+            throw new ArgumentNullException(nameof(publicationId));
         }
 
-        private async Task<Publication> GetPublication(
-            Guid publicationId)
-        {
-            if (publicationId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(publicationId));
-            }
+        return await _context.Publications.FindAsync(publicationId)
+            ?? throw new KeyNotFoundException($"No matching {nameof(Publication)} found with ID {publicationId}");
+    }
 
-            return await _context.Publications.FindAsync(publicationId)
-                ?? throw new KeyNotFoundException($"No matching {nameof(Publication)} found with ID {publicationId}");
-        }
+    /// <summary>
+    /// Reset the order value for each item based on its current position in the ordered list.
+    /// </summary>
+    private static void ResetOrders(List<ReleaseOrder> releaseOrders)
+    {
+        var orderedReleaseOrders = releaseOrders
+            .OrderBy(ro => ro.Order)
+            .ToList();
 
-        /// <summary>
-        /// Reset the order value for each item based on its current position in the ordered list.
-        /// </summary>
-        private static void ResetOrders(List<ReleaseOrder> releaseOrders)
-        {
-            var orderedReleaseOrders = releaseOrders
-                .OrderBy(ro => ro.Order)
-                .ToList();
-
-            orderedReleaseOrders.ForEach(ro => ro.Order = orderedReleaseOrders.IndexOf(ro) + 1);
-        }
+        orderedReleaseOrders.ForEach(ro => ro.Order = orderedReleaseOrders.IndexOf(ro) + 1);
     }
 }
