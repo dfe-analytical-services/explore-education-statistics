@@ -4,6 +4,7 @@ their Tests fails.  If the "fail tests suites fast" option is enabled, this file
 scripts, firstly to record that a test suite is failing, and then again on subsequent Tests starting to see if they
 should continue to run or if they should fail immediately and therefore fail the test suite immediately.
 """
+
 import os.path
 
 from robot.libraries.BuiltIn import BuiltIn
@@ -22,7 +23,7 @@ def _get_current_test_suite() -> str:
 def current_test_suite_failing_fast() -> bool:
     test_suite = _get_current_test_suite()
     failing_suites = get_failing_test_suites()
-    return f"{test_suite}{os.linesep}" in failing_suites
+    return f"{test_suite}" in failing_suites
 
 
 def record_failing_test_suite():
@@ -51,10 +52,11 @@ def get_failing_test_suites() -> []:
         #
         # We therefore explicitly remove any duplicates from the list here.
 
-        file = open(failing_suites_filename, "r")
-        failing_suites = file.readlines()
-        file.close()
-        return list(dict.fromkeys(failing_suites))
+        with open(failing_suites_filename, "r") as file:
+            failing_suites = file.readlines()
+            stripped_suite_names = [failing_suite.strip() for failing_suite in failing_suites]
+            filtered_suite_names = filter(None, stripped_suite_names)
+            return list(dict.fromkeys(filtered_suite_names))
     return []
 
 

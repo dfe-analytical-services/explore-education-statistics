@@ -245,7 +245,7 @@ def run():
         if failing_suites:
             logger.info(f"Number of failing suites: {len(failing_suites)}")
             logger.info(f"Failing suites:")
-            [logger.info(r"  * file://" + suite.strip()) for suite in failing_suites]
+            [logger.info(r"  * file://" + suite) for suite in failing_suites]
         else:
             logger.info("\nAll tests passed!")
 
