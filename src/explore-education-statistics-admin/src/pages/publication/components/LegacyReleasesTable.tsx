@@ -153,12 +153,12 @@ const LegacyReleasesTable = ({
                           {release.description}
                         </span>
                         {release.isLatest && (
-                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1">
+                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1">
                             Latest
                           </span>
                         )}
                         {release.isDraft && (
-                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1">
+                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap">
                             Draft{release.isAmendment && ' Amendment'}
                           </span>
                         )}
@@ -180,18 +180,20 @@ const LegacyReleasesTable = ({
                           </a>
                         )}
 
-                        {(!release.isLegacy && !release.isDraft) ||
-                          (!release.isLegacy && release.isAmendment && (
-                            <Link
-                              to={`${config.PublicAppUrl}/find-statistics/${release.url}`}
-                              className="govuk-link--no-visited-state"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              tabIndex={isReordering ? -1 : undefined}
-                            >
-                              {`${config.PublicAppUrl}/find-statistics/${release.url}`}
-                            </Link>
-                          ))}
+                        {((!release.isLegacy &&
+                          release.isDraft &&
+                          release.isAmendment) ||
+                          (!release.isDraft && !release.isAmendment)) && (
+                          <Link
+                            to={`${config.publicAppUrl}/find-statistics/${release.url}`}
+                            className="govuk-link--no-visited-state"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={isReordering ? -1 : undefined}
+                          >
+                            {`${config.publicAppUrl}/find-statistics/${release.url}`}
+                          </Link>
+                        )}
                       </td>
 
                       {canManageLegacyReleases && !isReordering && (

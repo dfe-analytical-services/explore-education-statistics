@@ -2,6 +2,7 @@ import LegacyReleasesTable from '@admin/pages/publication/components/LegacyRelea
 import _legacyReleaseService, {
   CombinedRelease,
 } from '@admin/services/legacyReleaseService';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
@@ -91,11 +92,13 @@ describe('LegacyReleasesTable', () => {
 
   test('renders the legacy releases table correctly', () => {
     render(
-      <LegacyReleasesTable
-        canManageLegacyReleases
-        combinedReleases={testCombinedReleases}
-        publicationId={testPublicationId}
-      />,
+      <TestConfigContextProvider>
+        <LegacyReleasesTable
+          canManageLegacyReleases
+          combinedReleases={testCombinedReleases}
+          publicationId={testPublicationId}
+        />
+      </TestConfigContextProvider>,
     );
 
     const table = screen.getByRole('table');
@@ -126,9 +129,7 @@ describe('LegacyReleasesTable', () => {
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
     expect(row4Cells[0]).toHaveTextContent('EES release 2Draft');
-    expect(row4Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/2',
-    );
+    expect(row4Cells[1]).toHaveTextContent('');
     expect(within(row4Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row5Cells = within(rows[4]).getAllByRole('cell');
@@ -161,11 +162,13 @@ describe('LegacyReleasesTable', () => {
 
   test('shows a message when there are no legacy releases', () => {
     render(
-      <LegacyReleasesTable
-        canManageLegacyReleases
-        combinedReleases={[]}
-        publicationId={testPublicationId}
-      />,
+      <TestConfigContextProvider>
+        <LegacyReleasesTable
+          canManageLegacyReleases
+          combinedReleases={[]}
+          publicationId={testPublicationId}
+        />
+      </TestConfigContextProvider>,
     );
 
     expect(
@@ -188,11 +191,13 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable
-            canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
-            publicationId={testPublicationId}
-          />
+          <TestConfigContextProvider>
+            <LegacyReleasesTable
+              canManageLegacyReleases
+              combinedReleases={testCombinedReleases}
+              publicationId={testPublicationId}
+            />
+          </TestConfigContextProvider>
         </Router>,
       );
       userEvent.click(
@@ -218,11 +223,13 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable
-            canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
-            publicationId={testPublicationId}
-          />
+          <TestConfigContextProvider>
+            <LegacyReleasesTable
+              canManageLegacyReleases
+              combinedReleases={testCombinedReleases}
+              publicationId={testPublicationId}
+            />
+          </TestConfigContextProvider>
         </Router>,
       );
       userEvent.click(
@@ -244,11 +251,14 @@ describe('LegacyReleasesTable', () => {
 
   test('does not show edit and delete actions when user does not have permission to manage legacy releases', () => {
     render(
-      <LegacyReleasesTable
-        canManageLegacyReleases={false}
-        combinedReleases={testCombinedReleases}
-        publicationId={testPublicationId}
-      />,
+      <TestConfigContextProvider>
+        <LegacyReleasesTable
+          canManageLegacyReleases={false}
+          combinedReleases={testCombinedReleases}
+          publicationId={testPublicationId}
+        />
+        ,
+      </TestConfigContextProvider>,
     );
 
     const table = screen.getByRole('table');
@@ -280,9 +290,7 @@ describe('LegacyReleasesTable', () => {
     const row4Cells = within(rows[3]).getAllByRole('cell');
     expect(row4Cells).toHaveLength(2);
     expect(row4Cells[0]).toHaveTextContent('EES release 2');
-    expect(row4Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/2',
-    );
+    expect(row4Cells[1]).toHaveTextContent('');
 
     const row5Cells = within(rows[4]).getAllByRole('cell');
     expect(row5Cells).toHaveLength(2);
@@ -310,11 +318,13 @@ describe('LegacyReleasesTable', () => {
   describe('deleting', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
       userEvent.click(
         screen.getByRole('button', { name: 'Delete Legacy release 3' }),
@@ -339,11 +349,13 @@ describe('LegacyReleasesTable', () => {
 
     test('sends the delete request and updates the releases table when confirm is clicked', async () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
       userEvent.click(
         screen.getByRole('button', { name: 'Delete Legacy release 3' }),
@@ -376,11 +388,13 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable
-            canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
-            publicationId={testPublicationId}
-          />
+          <TestConfigContextProvider>
+            <LegacyReleasesTable
+              canManageLegacyReleases
+              combinedReleases={testCombinedReleases}
+              publicationId={testPublicationId}
+            />
+          </TestConfigContextProvider>
         </Router>,
       );
       userEvent.click(
@@ -406,11 +420,13 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable
-            canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
-            publicationId={testPublicationId}
-          />
+          <TestConfigContextProvider>
+            <LegacyReleasesTable
+              canManageLegacyReleases
+              combinedReleases={testCombinedReleases}
+              publicationId={testPublicationId}
+            />
+          </TestConfigContextProvider>
         </Router>,
       );
       userEvent.click(
@@ -430,11 +446,13 @@ describe('LegacyReleasesTable', () => {
 
     test('does not show button to create when user does not have permission to manage legacy releases', () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases={false}
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases={false}
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
 
       expect(
@@ -446,11 +464,13 @@ describe('LegacyReleasesTable', () => {
   describe('reordering', () => {
     test('shows a warning modal when the reorder releases button is clicked', async () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
       userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
       await waitFor(() => {
@@ -471,11 +491,13 @@ describe('LegacyReleasesTable', () => {
 
     test('shows the reordering UI when OK is clicked', async () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
       userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
       await waitFor(() => {
@@ -508,11 +530,13 @@ describe('LegacyReleasesTable', () => {
 
     test('does not show button to reorder when user does not have permission to manage legacy releases', () => {
       render(
-        <LegacyReleasesTable
-          canManageLegacyReleases={false}
-          combinedReleases={testCombinedReleases}
-          publicationId={testPublicationId}
-        />,
+        <TestConfigContextProvider>
+          <LegacyReleasesTable
+            canManageLegacyReleases={false}
+            combinedReleases={testCombinedReleases}
+            publicationId={testPublicationId}
+          />
+        </TestConfigContextProvider>,
       );
 
       expect(

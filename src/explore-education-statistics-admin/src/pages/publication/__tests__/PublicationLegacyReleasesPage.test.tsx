@@ -4,6 +4,7 @@ import { testPublication } from '@admin/pages/publication/__data__/testPublicati
 import _legacyReleaseService, {
   CombinedRelease,
 } from '@admin/services/legacyReleaseService';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { PublicationWithPermissions } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -92,13 +93,15 @@ describe('PublicationLegacyReleasesPage', () => {
 function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
-      <PublicationContextProvider
-        publication={publication}
-        onPublicationChange={noop}
-        onReload={noop}
-      >
-        <PublicationLegacyReleasesPage />
-      </PublicationContextProvider>
+      <TestConfigContextProvider>
+        <PublicationContextProvider
+          publication={publication}
+          onPublicationChange={noop}
+          onReload={noop}
+        >
+          <PublicationLegacyReleasesPage />
+        </PublicationContextProvider>
+      </TestConfigContextProvider>
     </MemoryRouter>,
   );
 }
