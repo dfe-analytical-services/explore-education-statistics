@@ -50,8 +50,8 @@ export const signInRoute: PublicRouteProps = {
   exact: true,
 };
 
-export const signOutRoute: PublicRouteProps = {
-  path: '/sign-out',
+export const signedOutRoute: PublicRouteProps = {
+  path: '/signed-out',
   component: SignedOutPage,
   exact: true,
 };
@@ -177,7 +177,7 @@ export const releaseDataGuidanceRoute: ProtectedRouteProps = {
 
 export const publicRoutes = {
   signInRoute,
-  signOutRoute,
+  signedOutRoute,
   expiredInviteRoute,
   noInvitationRoute,
 };

@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Equal($"{realm}/protocol/openid-connect/token", authorityMetadata.TokenEndpoint);
             Assert.Equal(realm, authorityMetadata.Issuer);
             Assert.Equal($"{realm}/protocol/openid-connect/userinfo", authorityMetadata.UserInfoEndpoint);
+            Assert.Equal($"{realm}/protocol/openid-connect/logout", authorityMetadata.EndSessionEndpoint);
         }
 
         private static IConfiguration GetConfiguration()

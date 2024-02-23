@@ -8,6 +8,7 @@ export interface OidcConfig {
     readonly tokenEndpoint: string;
     readonly issuer: string;
     readonly userInfoEndpoint: string;
+    readonly endSessionEndpoint: string;
   };
 }
 
