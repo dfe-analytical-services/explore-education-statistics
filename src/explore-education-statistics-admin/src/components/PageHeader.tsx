@@ -123,15 +123,6 @@ interface LoggedInLinksProps {
 
 const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
   <>
-    {/* EES-2464
-      {user.permissions.canAccessAnalystPages && (
-      <li className="govuk-header__navigation-item">
-        <a className="govuk-header__link" href="/documentation">
-          Administrators' guide
-        </a>
-      </li>
-    )} */}
-
     {user.permissions.isBauUser && (
       <li className="govuk-header__navigation-item">
         <a className="govuk-header__link" href="/administration">
@@ -143,6 +134,7 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
       <ButtonText
         className={`govuk-header__link ${styles.signOutLink}`}
         onClick={() => handleLogout()}
+        testId="header-sign-out-button"
       >
         Sign out
       </ButtonText>

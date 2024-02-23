@@ -3,9 +3,17 @@ import {
   Configuration,
   ProtocolMode,
   PublicClientApplication,
+  LogLevel,
 } from '@azure/msal-browser';
 import { OidcConfig } from '@admin/config';
 import logger from '@common/services/logger';
+import {
+  dashboardRoute,
+  signInRoute,
+  signedOutRoute,
+} from '@admin/routes/routes';
+
+const msalLoggingEnabled = false;
 
 export interface PostLoginState {
   returnUrl?: string;
@@ -21,8 +29,8 @@ export async function createMsalInstance(
     auth: {
       clientId: config.clientId,
       authority: config.authority,
-      redirectUri: '/dashboard',
-      postLogoutRedirectUri: '/signed-out',
+      redirectUri: dashboardRoute.path,
+      postLogoutRedirectUri: signedOutRoute.path,
       knownAuthorities: config.knownAuthorities,
       protocolMode: ProtocolMode.OIDC,
       authorityMetadata:
@@ -33,14 +41,39 @@ export async function createMsalInstance(
           token_endpoint: config.authorityMetadata.tokenEndpoint,
           issuer: config.authorityMetadata.issuer,
           userinfo_endpoint: config.authorityMetadata.userInfoEndpoint,
+          end_session_endpoint: config.authorityMetadata.endSessionEndpoint,
         }),
     },
     cache: {
       cacheLocation: 'localStorage',
       storeAuthStateInCookie: false,
     },
-    // A "loggerCallback" argument is available here if we wish to capture
-    // detailed messages about MSAL lifecycle event processing.
+    system: {
+      loggerOptions: {
+        logLevel: LogLevel.Verbose,
+        loggerCallback: (level, message, containsPii) => {
+          if (!msalLoggingEnabled || containsPii) {
+            return;
+          }
+          switch (level) {
+            case LogLevel.Trace || LogLevel.Verbose:
+              logger.debug(message);
+              break;
+            case LogLevel.Info:
+              logger.info(message);
+              break;
+            case LogLevel.Warning:
+              logger.warn(message);
+              break;
+            case LogLevel.Error:
+              logger.error(message);
+              break;
+            default:
+          }
+        },
+        piiLoggingEnabled: false,
+      },
+    },
   };
 
   adminApiScope = config.adminApiScope;
@@ -68,8 +101,8 @@ export function handleLogin(returnUrl?: string) {
   getMsalInstance()
     .loginRedirect({
       scopes: [adminApiScope],
-      redirectUri: '/dashboard',
-      redirectStartPage: '/dashboard',
+      redirectUri: dashboardRoute.path,
+      redirectStartPage: dashboardRoute.path,
       state: JSON.stringify(postLoginState),
     })
     .catch(error => {
@@ -77,7 +110,7 @@ export function handleLogin(returnUrl?: string) {
         `Error encountered when redirecting to Identity Provider login - ${error}`,
       );
       logger.info('Returning to login page.');
-      window.location.href = '/sign-in';
+      window.location.href = signInRoute.path;
     });
 }
 
@@ -85,7 +118,7 @@ export function handleLogout() {
   getMsalInstance()
     .logoutRedirect({
       account: getMsalInstance().getAllAccounts()[0],
-      postLogoutRedirectUri: '/sign-in',
+      postLogoutRedirectUri: signedOutRoute.path,
     })
     .catch(error => {
       logger.info(
@@ -93,7 +126,7 @@ export function handleLogout() {
         Provider login - ${error}`,
       );
       logger.info('Returning to login page.');
-      window.location.href = '/sign-in';
+      window.location.href = signInRoute.path;
     });
 }
 

@@ -55,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public string TokenEndpoint { get; set; } = null!;
         public string Issuer { get; set; } = null!;
         public string UserInfoEndpoint { get; set; } = null!;
+        public string EndSessionEndpoint { get; set; } = null!;
     }
 
     public class OpenIdConnectSpaClientOptions

@@ -14,7 +14,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
-import { signOutRoute } from '@admin/routes/routes';
+import { handleLogout } from '@admin/auth/msal';
+import ButtonText from '@common/components/ButtonText';
 
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
@@ -66,10 +67,15 @@ const AdminDashboardPage = () => {
           <p className="govuk-body-s">
             {user && (
               <>
-                Logged in as <strong>{user?.name}</strong>. Not you?{' '}
+                Logged in as <strong>{user.name}</strong>. Not you?{' '}
               </>
             )}
-            <Link to={signOutRoute.path}>Sign out</Link>
+            <ButtonText
+              onClick={() => handleLogout()}
+              testId="dashboard-sign-out-button"
+            >
+              Sign out
+            </ButtonText>
           </p>
 
           {isApprover && totalApprovals > 0 && (

@@ -82,6 +82,7 @@ public class ClaimsPrincipalTransformationServiceTests : IntegrationTest<TestSta
             .WithWebHostBuilder(builder => builder
                 .WithAdditionalControllers(typeof(TestController)))
             .SetUser(claimsPrincipal)
+            .ResetUsersAndRolesDbContext()
             .AddUsersAndRolesDbTestData(context =>
             {
                 var globalRoles = GetGlobalRoles();

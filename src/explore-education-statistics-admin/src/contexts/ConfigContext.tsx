@@ -46,6 +46,7 @@ const defaultTestConfig: Config = {
       tokenEndpoint: '',
       issuer: '',
       userInfoEndpoint: '',
+      endSessionEndpoint: '',
     },
   },
 };
