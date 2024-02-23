@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.LegacyReleases.Remove(legacyRelease);
 
                     _context.Remove(legacyRelease);
-                    await _publicationReleaseOrderService.DeleteForDeleteLegacyRelease(publication.Id, id);
+                    await _publicationReleaseOrderService.DeleteForDeleteLegacyRelease(id);
                     _context.Update(publication);
 
                     await _context.SaveChangesAsync();

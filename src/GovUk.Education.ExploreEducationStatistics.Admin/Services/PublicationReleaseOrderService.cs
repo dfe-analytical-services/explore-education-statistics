@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,11 +24,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        if (releaseId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseId));
-        }
-
         publication.ReleaseOrders.Add(new()
         {
             ReleaseId = releaseId,
@@ -39,17 +35,12 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
         _context.Update(publication);
     }
 
-    public async Task DeleteForDeleteLegacyRelease(Guid publicationId, Guid releaseId)
+    public async Task DeleteForDeleteLegacyRelease(Guid legacyReleaseId)
     {
-        var publication = await GetPublication(publicationId);
+        var legacyRelease = await _context.LegacyReleases.FindAsync(legacyReleaseId)
+            ?? throw new KeyNotFoundException($"No matching {nameof(LegacyRelease)} found with ID {legacyReleaseId}");
 
-        if (releaseId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseId));
-        }
-
-        var legacyRelease = await _context.LegacyReleases.FindAsync(releaseId)
-            ?? throw new KeyNotFoundException($"No matching {nameof(LegacyRelease)} found with ID {releaseId}");
+        var publication = await GetPublication(legacyRelease.PublicationId);
 
         var releaseOrders = legacyRelease.Publication.ReleaseOrders;
 
@@ -65,11 +56,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     public async Task CreateForAmendRelease(Guid publicationId, Guid releaseAmendmentId)
     {
         var publication = await GetPublication(publicationId);
-
-        if (releaseAmendmentId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseAmendmentId));
-        }
 
         var releaseAmendment = publication.Releases.Find(r => r.Id == releaseAmendmentId)
             ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseAmendmentId} found");
@@ -95,11 +81,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        if (releaseId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseId));
-        }
-
         var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
             ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} amendment with ID {releaseId}");
 
@@ -112,11 +93,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     public async Task CreateForCreateRelease(Guid publicationId, Guid releaseId)
     {
         var publication = await GetPublication(publicationId);
-
-        if (releaseId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseId));
-        }
 
         publication.ReleaseOrders.Add(new()
         {
@@ -132,11 +108,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     public async Task UpdateForPublishRelease(Guid publicationId, Guid releaseId)
     {
         var publication = await GetPublication(publicationId);
-
-        if (releaseId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(releaseId));
-        }
 
         var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
             ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} with ID {releaseId}");
@@ -168,11 +139,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
 
         foreach (var update in releaseOrderUpdates)
         {
-            if (update.Id == Guid.Empty)
-            {
-                throw new ApplicationException($"Update with order {update.Order} must have a release ID specified");
-            }
-
             if (update.Order == 0)
             {
                 throw new ApplicationException($"Updated order for release with ID {update.Id} must be greater than 0");
@@ -201,11 +167,6 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     private async Task<Publication> GetPublication(
         Guid publicationId)
     {
-        if (publicationId == Guid.Empty)
-        {
-            throw new ArgumentNullException(nameof(publicationId));
-        }
-
         return await _context.Publications.FindAsync(publicationId)
             ?? throw new KeyNotFoundException($"No matching {nameof(Publication)} found with ID {publicationId}");
     }

@@ -22,8 +22,7 @@ public interface IPublicationReleaseOrderService
         Guid releaseId);
 
     Task DeleteForDeleteLegacyRelease(
-        Guid publicationId,
-        Guid releaseId);
+        Guid legacyReleaseId);
 
     Task CreateForCreateRelease(
         Guid publicationId,

@@ -560,7 +560,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationReleaseOrderService.Setup(s => s.DeleteForDeleteLegacyRelease(
-                publicationId,
                 It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
 

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -24,8 +25,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -446,13 +447,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid publicationId,
             List<CombinedReleaseUpdateOrderViewModel> updatedReleases)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(
-                    publicationId,
-                    publication => publication
-                        .Include(p => p.LegacyReleases)
-                        .Include(p => p.Releases)
-                )
+            return await _context.Publications
+                .Include(p => p.LegacyReleases)
+                .Include(p => p.Releases)
+                .FirstOrNotFoundAsync(p => p.Id == publicationId)
                 .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {

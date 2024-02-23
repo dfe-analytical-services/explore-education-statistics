@@ -23,16 +23,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region CreateForCreateLegacyRelease Tests
     [Fact]
-    public async Task CreateForCreateLegacyRelease_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForCreateLegacyRelease(Guid.Empty, Guid.NewGuid()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
-    [Fact]
     public async Task CreateForCreateLegacyRelease_PublicationNotFound_ThrowsException()
     {
         // Arrange
@@ -43,24 +33,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.CreateForCreateLegacyRelease(publicationId, Guid.NewGuid()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task CreateForCreateLegacyRelease_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForCreateLegacyRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseId')", exception.Message);
     }
 
     [Fact]
@@ -92,13 +64,16 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region DeleteForDeleteLegacyRelease Tests
     [Fact]
-    public async Task DeleteForDeleteLegacyRelease_NoPublicationId_ThrowsException()
+    public async Task DeleteForDeleteLegacyRelease_LegacyReleaseNotFound_ThrowsException()
     {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(Guid.Empty, Guid.NewGuid()));
+        // Arrange
+        var legacyReleaseId = Guid.NewGuid();
 
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
+        // Act & Assert
+        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+            async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
+
+        Assert.Equal($"No matching LegacyRelease found with ID {legacyReleaseId}", exception.Message);
     }
 
     [Fact]
@@ -106,49 +81,19 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     {
         // Arrange
         var publicationId = Guid.NewGuid();
+        var legacyReleaseId = Guid.NewGuid();
+
+        _context.LegacyReleases.Add(new()
+        {
+            Id = legacyReleaseId,
+            PublicationId = publicationId,
+        });
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(publicationId, Guid.NewGuid()));
+            async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task DeleteForDeleteLegacyRelease_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseId')", exception.Message);
-    }
-
-    [Fact]
-    public async Task DeleteForDeleteLegacyRelease_LegacyReleaseNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(publicationId, releaseId));
-
-        Assert.Equal($"No matching LegacyRelease found with ID {releaseId}", exception.Message);
     }
 
     [Fact]
@@ -156,20 +101,20 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     {
         // Arrange
         var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+        var legacyReleaseId = Guid.NewGuid();
 
         _context.Publications.Add(new()
         {
             Id = publicationId,
             LegacyReleases = new()
             {
-                new() { Id = releaseId, Description = "Legacy Release 1" }
+                new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
             },
         });
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(publicationId, releaseId));
+            async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
 
         Assert.Equal($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"Legacy Release 1\"", exception.Message);
     }
@@ -179,23 +124,23 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     {
         // Arrange
         var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+        var legacyReleaseId = Guid.NewGuid();
 
         _context.Publications.Add(new()
         {
             Id = publicationId,
             LegacyReleases = new()
             {
-                new() { Id = releaseId, Description = "Legacy Release 1" }
+                new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
             },
             ReleaseOrders = new()
             {
-                new() { ReleaseId = releaseId },
+                new() { ReleaseId = legacyReleaseId },
             },
         });
 
         // Act
-        await _sut.DeleteForDeleteLegacyRelease(publicationId, releaseId);
+        await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId);
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
@@ -208,54 +153,44 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     {
         // Arrange
         var publicationId = Guid.NewGuid();
-        var release1Id = Guid.NewGuid();
-        var release2Id = Guid.NewGuid();
-        var release3Id = Guid.NewGuid();
+        var legacyRelease1Id = Guid.NewGuid();
+        var legacyRelease2Id = Guid.NewGuid();
+        var legacyRelease3Id = Guid.NewGuid();
 
         _context.Publications.Add(new()
         {
             Id = publicationId,
             LegacyReleases = new()
             {
-                new() { Id = release1Id, Description = "Legacy Release 1" },
-                new() { Id = release2Id, Description = "Legacy Release 2" },
-                new() { Id = release3Id, Description = "Legacy Release 3" },
+                new() { Id = legacyRelease1Id, Description = "Legacy Release 1" },
+                new() { Id = legacyRelease2Id, Description = "Legacy Release 2" },
+                new() { Id = legacyRelease3Id, Description = "Legacy Release 3" },
             },
             ReleaseOrders = new()
             {
-                new() { ReleaseId = release1Id, Order = 1 },
-                new() { ReleaseId = release2Id, Order = 2 },
-                new() { ReleaseId = release3Id, Order = 3 },
+                new() { ReleaseId = legacyRelease1Id, Order = 1 },
+                new() { ReleaseId = legacyRelease2Id, Order = 2 },
+                new() { ReleaseId = legacyRelease3Id, Order = 3 },
             }
         });
 
         // Act
-        await _sut.DeleteForDeleteLegacyRelease(publicationId, release2Id);
+        await _sut.DeleteForDeleteLegacyRelease(legacyRelease2Id);
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
         Assert.Equal(2, publication.ReleaseOrders.Count);
 
-        Assert.Equal(release1Id, publication.ReleaseOrders[0].ReleaseId);
+        Assert.Equal(legacyRelease1Id, publication.ReleaseOrders[0].ReleaseId);
         Assert.Equal(1, publication.ReleaseOrders[0].Order);
 
-        Assert.Equal(release3Id, publication.ReleaseOrders[1].ReleaseId);
+        Assert.Equal(legacyRelease3Id, publication.ReleaseOrders[1].ReleaseId);
         Assert.Equal(2, publication.ReleaseOrders[1].Order);
     }
     #endregion DeleteForDeleteLegacyRelease Tests
 
     #region CreateForCreateRelease Tests
-    [Fact]
-    public async Task CreateForCreateRelease_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForCreateRelease(Guid.Empty, Guid.NewGuid()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
     [Fact]
     public async Task CreateForCreateRelease_PublicationNotFound_ThrowsException()
     {
@@ -267,24 +202,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.CreateForCreateRelease(publicationId, Guid.NewGuid()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task CreateForCreateRelease_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForCreateRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseId')", exception.Message);
     }
 
     [Fact]
@@ -316,16 +233,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region UpdateForPublishRelease Tests
     [Fact]
-    public async Task UpdateForPublishRelease_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.UpdateForPublishRelease(Guid.Empty, Guid.NewGuid()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
-    [Fact]
     public async Task UpdateForPublishRelease_PublicationNotFound_ThrowsException()
     {
         // Arrange
@@ -336,24 +243,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.UpdateForPublishRelease(publicationId, Guid.NewGuid()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task UpdateForPublishRelease_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.UpdateForPublishRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseId')", exception.Message);
     }
 
     [Fact]
@@ -506,16 +395,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region UpdateForUpdateCombinedReleaseOrder Tests
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(Guid.Empty, new()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
-    [Fact]
     public async Task UpdateForUpdateCombinedReleaseOrder_PublicationNotFound_ThrowsException()
     {
         // Arrange
@@ -526,29 +405,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, new()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
-        {
-            new(),
-        };
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ApplicationException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates));
-
-        Assert.Equal($"Update with order 0 must have a release ID specified", exception.Message);
     }
 
     [Fact]
@@ -747,16 +603,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region CreateForAmendRelease Tests
     [Fact]
-    public async Task CreateForAmendRelease_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForAmendRelease(Guid.Empty, Guid.NewGuid()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
-    [Fact]
     public async Task CreateForAmendRelease_PublicationNotFound_ThrowsException()
     {
         // Arrange
@@ -767,24 +613,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.CreateForAmendRelease(publicationId, Guid.NewGuid()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task CreateForAmendRelease_NoReleaseAmendmentId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.CreateForAmendRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseAmendmentId')", exception.Message);
     }
 
     [Fact]
@@ -874,16 +702,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
     #region DeleteForDeleteRelease Tests
     [Fact]
-    public async Task DeleteForDeleteRelease_NoPublicationId_ThrowsException()
-    {
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.DeleteForDeleteRelease(Guid.Empty, Guid.NewGuid()));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'publicationId')", exception.Message);
-    }
-
-    [Fact]
     public async Task DeleteForDeleteRelease_PublicationNotFound_ThrowsException()
     {
         // Arrange
@@ -894,24 +712,6 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             async () => await _sut.DeleteForDeleteRelease(publicationId, Guid.NewGuid()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
-    }
-
-    [Fact]
-    public async Task DeleteForDeleteRelease_NoReleaseId_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-        });
-
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ArgumentNullException>(
-            async () => await _sut.DeleteForDeleteRelease(publicationId, Guid.Empty));
-
-        Assert.Equal($"Value cannot be null. (Parameter 'releaseId')", exception.Message);
     }
 
     [Fact]
