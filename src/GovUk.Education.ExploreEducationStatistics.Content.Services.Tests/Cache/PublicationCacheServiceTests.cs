@@ -61,7 +61,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        ReleaseOrders = new()
+        ReleaseSeriesView = new()
         {
             new()
             {

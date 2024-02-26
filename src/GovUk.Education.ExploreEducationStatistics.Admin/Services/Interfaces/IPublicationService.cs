@@ -53,8 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
+        Task<Either<ActionResult, List<ReleaseSeriesItemUpdateViewModel>>> UpdateReleaseSeries(
            Guid publicationId,
-           List<CombinedReleaseUpdateOrderViewModel> updatedReleases);
+           List<ReleaseSeriesItemUpdateViewModel> updatedReleases);
     }
 }

@@ -131,13 +131,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("api/publications/{publicationId:guid}/combined-releases")]
-        public async Task<ActionResult<List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
+        [HttpPatch("api/publications/{publicationId:guid}/release-series-view")]
+        public async Task<ActionResult<List<ReleaseSeriesItemUpdateViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
-            List<CombinedReleaseUpdateOrderViewModel> combinedReleases)
+            List<ReleaseSeriesItemUpdateViewModel> releaseSeries)
         {
             return await _publicationService
-                .UpdateCombinedReleaseOrder(publicationId, combinedReleases)
+                .UpdateReleaseSeries(publicationId, releaseSeries)
                 .HandleFailuresOrOk();
         }
 

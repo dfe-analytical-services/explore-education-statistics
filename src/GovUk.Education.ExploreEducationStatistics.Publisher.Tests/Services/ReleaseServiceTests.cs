@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .DefaultRelease()
                 .Generate();
 
-            var releaseOrder = new ReleaseOrder
+            var releaseSeriesItem = new ReleaseSeriesItem
             {
                 ReleaseId = release.Id,
                 Order = 1
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publication = new Publication
             {
                 Releases = new() { release },
-                ReleaseOrders = new() { releaseOrder }
+                ReleaseSeriesView = new() { releaseSeriesItem }
             };
 
             var originalDataBlockParents = _fixture
@@ -255,20 +255,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
-                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+                var service = BuildReleaseService(contentDbContext, publicationReleaseSeriesViewService.Object);
 
                 // Act
                 await service.CompletePublishing(release.Id, actualPublishedDate);
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Version = 1
             };
 
-            var releaseOrder = new ReleaseOrder
+            var releaseSeriesItem = new ReleaseSeriesItem
             {
                 ReleaseId = release.Id,
                 Order = 1
@@ -337,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publication = new Publication
             {
                 Releases = new() { previousRelease, release },
-                ReleaseOrders = new() { releaseOrder }
+                ReleaseSeriesView = new() { releaseSeriesItem }
             };
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
@@ -364,20 +364,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
-                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+                var service = BuildReleaseService(contentDbContext, publicationReleaseSeriesViewService.Object);
 
                 // Act
                 await service.CompletePublishing(release.Id, DateTime.UtcNow);
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -439,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Version = 1
             };
 
-            var releaseOrder = new ReleaseOrder
+            var releaseSeriesItem = new ReleaseSeriesItem
             {
                 ReleaseId = release.Id,
                 Order = 1
@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publication = new Publication
             {
                 Releases = new() { previousRelease, release },
-                ReleaseOrders = new() { releaseOrder }
+                ReleaseSeriesView = new() { releaseSeriesItem }
             };
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
@@ -474,20 +474,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
-                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+                var service = BuildReleaseService(contentDbContext, publicationReleaseSeriesViewService.Object);
 
                 // Act
                 await service.CompletePublishing(release.Id, DateTime.UtcNow);
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -537,7 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 UpdatePublishedDate = true
             };
 
-            var releaseOrder = new ReleaseOrder
+            var releaseSeriesItem = new ReleaseSeriesItem
             {
                 ReleaseId = release.Id,
                 Order = 1
@@ -546,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publication = new Publication
             {
                 Releases = new() { previousRelease, release },
-                ReleaseOrders = new() { releaseOrder }
+                ReleaseSeriesView = new() { releaseSeriesItem }
             };
 
             var actualPublishedDate = DateTime.UtcNow;
@@ -562,20 +562,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.UpdateForPublishRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
-                var service = BuildReleaseService(contentDbContext, publicationReleaseOrderService.Object);
+                var service = BuildReleaseService(contentDbContext, publicationReleaseSeriesViewService.Object);
 
                 // Act
                 await service.CompletePublishing(release.Id, actualPublishedDate);
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -591,14 +591,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         private static Publisher.Services.ReleaseService BuildReleaseService(
             ContentDbContext? contentDbContext = null,
-            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
+            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
                 contentDbContext,
                 releaseRepository: new Content.Model.Repository.ReleaseRepository(contentDbContext),
-                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict)
+                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
             );
         }
     }

@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseSubjectRepository>(),
                 new SequentialGuidGenerator(),
                 Mock.Of<IBlobCacheService>(),
-                Mock.Of<IPublicationReleaseOrderService>()
+                Mock.Of<IPublicationReleaseSeriesViewService>()
             );
         }
 

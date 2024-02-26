@@ -27,5 +27,5 @@ public record PublicationCacheViewModel
 
     public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
 
-    public List<ReleaseOrder> ReleaseOrders { get; set; } = new();
+    public List<ReleaseSeriesItem> ReleaseSeriesView { get; set; } = new();
 }

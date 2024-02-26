@@ -14,10 +14,10 @@ public record LegacyReleaseViewModel
         Description = legacyRelease.Description;
         Url = legacyRelease.Url;
 
-        var releaseOrder = legacyRelease.Publication.ReleaseOrders.Find(ro => ro.ReleaseId == legacyRelease.Id)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
+        var releaseSeriesItem = legacyRelease.Publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == legacyRelease.Id)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
 
-        Order = releaseOrder.Order;
+        Order = releaseSeriesItem.Order;
     }
 
     public Guid Id { get; init; }

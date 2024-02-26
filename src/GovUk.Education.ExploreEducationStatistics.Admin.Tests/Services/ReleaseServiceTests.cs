@@ -97,16 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.CreateForCreateRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.CreateForCreateRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
                 var releaseService = BuildReleaseService(
                     context,
-                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
+                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
 
                 // Act
                 var result = (await releaseService.CreateRelease(
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 )).AssertRight();
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
                 Assert.Equal("Academic year 2018/19", result.Title);
                 Assert.Equal("2018/19", result.YearTitle);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
@@ -252,16 +252,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+                var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
-                publicationReleaseOrderService.Setup(s => s.CreateForCreateRelease(
+                publicationReleaseSeriesViewService.Setup(s => s.CreateForCreateRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
                 var releaseService = BuildReleaseService(
                     context,
-                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
+                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
 
                 // Act
                 var result = await releaseService.CreateRelease(
@@ -278,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Assert
                 var newRelease = result.AssertRight();
                 newReleaseId = newRelease.Id;
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1251,7 +1251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
-            var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+            var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
@@ -1267,7 +1267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(release.Id))))
                 .Returns(Task.CompletedTask);
 
-            publicationReleaseOrderService.Setup(s => s.DeleteForDeleteRelease(
+            publicationReleaseSeriesViewService.Setup(s => s.DeleteForDeleteRelease(
                     It.IsAny<Guid>(),
                     It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
@@ -1279,7 +1279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     cacheService: cacheService.Object,
-                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
+                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
 
                 var result = await releaseService.DeleteRelease(release.Id);
 
@@ -1293,7 +1293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService,
                     releaseDataFilesService,
                     releaseFileService,
-                    publicationReleaseOrderService
+                    publicationReleaseSeriesViewService
                 );
 
                 result.AssertRight();
@@ -1918,7 +1918,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IBlobCacheService? cacheService = null,
-            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
+            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null)
         {
             var userService = AlwaysTrueUserService();
 
@@ -1943,7 +1943,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
                 new SequentialGuidGenerator(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict),
-                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict)
+                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
             );
         }
     }

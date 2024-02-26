@@ -18,16 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
+        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
             IReleaseRepository releaseRepository,
-            IPublicationReleaseOrderService publicationReleaseOrderService)
+            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
         {
             _contentDbContext = contentDbContext;
             _releaseRepository = releaseRepository;
-            _publicationReleaseOrderService = publicationReleaseOrderService;
+            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
 
         public async Task<Release> Get(Guid id)
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _contentDbContext.Releases.Update(release);
             release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
 
-            await _publicationReleaseOrderService.UpdateForPublishRelease(
+            await _publicationReleaseSeriesViewService.UpdateForPublishRelease(
                 release.PublicationId,
                 releaseId);
 

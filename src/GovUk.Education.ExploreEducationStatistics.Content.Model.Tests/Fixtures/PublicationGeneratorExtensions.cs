@@ -119,13 +119,13 @@ public static class PublicationGeneratorExtensions
                         release.Publication = publication;
                         release.PublicationId = publication.Id;
 
-                        publication.ReleaseOrders.Add(new()
+                        publication.ReleaseSeriesView.Add(new()
                         {
                             ReleaseId = release.Id,
                             IsAmendment = release.Amendment,
                             IsDraft = !release.Published.HasValue,
                             IsLegacy = false,
-                            Order = publication.ReleaseOrders.Count + 1,
+                            Order = publication.ReleaseSeriesView.Count + 1,
                         });
                     });
 
@@ -208,13 +208,13 @@ public static class PublicationGeneratorExtensions
                         legacyRelease.Publication = publication;
                         legacyRelease.PublicationId = publication.Id;
 
-                        publication.ReleaseOrders.Add(new()
+                        publication.ReleaseSeriesView.Add(new()
                         {
                             ReleaseId = legacyRelease.Id,
                             IsAmendment = false,
                             IsDraft = false,
                             IsLegacy = true,
-                            Order = publication.ReleaseOrders.Count + 1,
+                            Order = publication.ReleaseSeriesView.Count + 1,
                         });
                     });
 

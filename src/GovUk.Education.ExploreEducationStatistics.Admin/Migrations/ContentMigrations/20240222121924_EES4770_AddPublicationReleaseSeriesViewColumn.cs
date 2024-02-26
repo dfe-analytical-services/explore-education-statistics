@@ -4,12 +4,12 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    public partial class EES4770_AddPublicationReleaseOrderColumn : Migration
+    public partial class EES4770_AddPublicationReleaseSeriesViewColumn : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "ReleaseOrders",
+                name: "ReleaseSeriesView",
                 table: "Publications",
                 type: "nvarchar(max)",
                 nullable: false,
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ReleaseOrders",
+                name: "ReleaseSeriesView",
                 table: "Publications");
         }
     }

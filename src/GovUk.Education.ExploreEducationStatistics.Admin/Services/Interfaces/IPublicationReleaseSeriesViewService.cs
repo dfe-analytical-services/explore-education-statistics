@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 /// <summary>
-/// Update a publication's ReleaseOrder property whenever an action is performed against a release.
+/// Update a publication's ReleaseSeriesView property whenever an action is performed against a release.
 /// </summary>
 /// <remarks>
 /// Only updates the tracked <see cref="Publication"/> entity, <c>context.SaveChangesAsync()</c> will need to be called after in order to persist changes.
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 /// <exception cref="ApplicationException"></exception>
 /// <exception cref="KeyNotFoundException"></exception>
 /// <exception cref="ArgumentNullException"></exception>
-public interface IPublicationReleaseOrderService
+public interface IPublicationReleaseSeriesViewService
 {
     Task CreateForCreateLegacyRelease(
         Guid publicationId,
@@ -36,9 +36,9 @@ public interface IPublicationReleaseOrderService
         Guid publicationId,
         Guid releaseId);
 
-    Task UpdateForUpdateCombinedReleaseOrder(
+    Task UpdateForUpdateReleaseSeries(
         Guid publicationId,
-        List<CombinedReleaseUpdateOrderViewModel> releaseOrderUpdates);
+        List<ReleaseSeriesItemUpdateViewModel> releaseSeriesUpdate);
 
     Task UpdateForPublishRelease(
         Guid publicationId,

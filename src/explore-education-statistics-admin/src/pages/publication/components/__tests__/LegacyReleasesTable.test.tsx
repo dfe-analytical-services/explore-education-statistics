@@ -1,6 +1,6 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import _legacyReleaseService, {
-  CombinedRelease,
+  ReleaseSeriesItem,
 } from '@admin/services/legacyReleaseService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -15,7 +15,7 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('LegacyReleasesTable', () => {
-  const testCombinedReleases: CombinedRelease[] = [
+  const testReleaseSeries: ReleaseSeriesItem[] = [
     {
       description: 'EES release 3 amendment',
       id: 'ees-release-3a',
@@ -95,7 +95,7 @@ describe('LegacyReleasesTable', () => {
       <TestConfigContextProvider>
         <LegacyReleasesTable
           canManageLegacyReleases
-          combinedReleases={testCombinedReleases}
+          releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
         />
       </TestConfigContextProvider>,
@@ -165,7 +165,7 @@ describe('LegacyReleasesTable', () => {
       <TestConfigContextProvider>
         <LegacyReleasesTable
           canManageLegacyReleases
-          combinedReleases={[]}
+          releaseSeries={[]}
           publicationId={testPublicationId}
         />
       </TestConfigContextProvider>,
@@ -194,7 +194,7 @@ describe('LegacyReleasesTable', () => {
           <TestConfigContextProvider>
             <LegacyReleasesTable
               canManageLegacyReleases
-              combinedReleases={testCombinedReleases}
+              releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
           </TestConfigContextProvider>
@@ -226,7 +226,7 @@ describe('LegacyReleasesTable', () => {
           <TestConfigContextProvider>
             <LegacyReleasesTable
               canManageLegacyReleases
-              combinedReleases={testCombinedReleases}
+              releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
           </TestConfigContextProvider>
@@ -243,7 +243,7 @@ describe('LegacyReleasesTable', () => {
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublicationId}/legacy/${testCombinedReleases[4].id}/edit`,
+          `/publication/${testPublicationId}/legacy/${testReleaseSeries[4].id}/edit`,
         );
       });
     });
@@ -254,7 +254,7 @@ describe('LegacyReleasesTable', () => {
       <TestConfigContextProvider>
         <LegacyReleasesTable
           canManageLegacyReleases={false}
-          combinedReleases={testCombinedReleases}
+          releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
         />
         ,
@@ -321,7 +321,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,
@@ -352,7 +352,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,
@@ -367,7 +367,7 @@ describe('LegacyReleasesTable', () => {
       userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
-        testCombinedReleases[4].id,
+        testReleaseSeries[4].id,
       );
 
       await waitFor(() => {
@@ -391,7 +391,7 @@ describe('LegacyReleasesTable', () => {
           <TestConfigContextProvider>
             <LegacyReleasesTable
               canManageLegacyReleases
-              combinedReleases={testCombinedReleases}
+              releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
           </TestConfigContextProvider>
@@ -423,7 +423,7 @@ describe('LegacyReleasesTable', () => {
           <TestConfigContextProvider>
             <LegacyReleasesTable
               canManageLegacyReleases
-              combinedReleases={testCombinedReleases}
+              releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
           </TestConfigContextProvider>
@@ -449,7 +449,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases={false}
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,
@@ -467,7 +467,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,
@@ -494,7 +494,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,
@@ -533,7 +533,7 @@ describe('LegacyReleasesTable', () => {
         <TestConfigContextProvider>
           <LegacyReleasesTable
             canManageLegacyReleases={false}
-            combinedReleases={testCombinedReleases}
+            releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
         </TestConfigContextProvider>,

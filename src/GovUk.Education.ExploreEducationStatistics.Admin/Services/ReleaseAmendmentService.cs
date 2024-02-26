@@ -32,20 +32,20 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IUserService _userService;
-    private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
+    private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
     public ReleaseAmendmentService(
         ContentDbContext context,
         IUserService userService,
         IFootnoteRepository footnoteRepository,
         StatisticsDbContext statisticsDbContext,
-        IPublicationReleaseOrderService publicationReleaseOrderService)
+        IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
     {
         _context = context;
         _userService = userService;
         _footnoteRepository = footnoteRepository;
         _statisticsDbContext = statisticsDbContext;
-        _publicationReleaseOrderService = publicationReleaseOrderService;
+        _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
     }
 
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseId)
@@ -117,7 +117,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
         await _context.Releases.AddAsync(amendment);
 
-        await _publicationReleaseOrderService.CreateForAmendRelease(
+        await _publicationReleaseSeriesViewService.CreateForAmendRelease(
             originalRelease.PublicationId,
             releaseAmendmentId);
 

@@ -1,7 +1,7 @@
 import {
   LegacyRelease,
   CreateLegacyRelease,
-  UpdateCombinedRelease,
+  UpdateReleaseSeriesItem,
 } from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
@@ -89,6 +89,7 @@ export interface ListReleasesParams {
 }
 
 export type UpdatePublicationLegacyRelease = Partial<
+  // @MarkFix unused?
   OmitStrict<CreateLegacyRelease, 'publicationId'>
 >;
 
@@ -206,12 +207,12 @@ const publicationService = {
     );
   },
 
-  updateCombinedReleaseOrder(
+  updateReleaseSeriesView(
     publicationId: string,
-    legacyReleases: UpdateCombinedRelease[],
+    legacyReleases: UpdateReleaseSeriesItem[],
   ): Promise<LegacyRelease> {
     return client.patch(
-      `/publications/${publicationId}/combined-releases`,
+      `/publications/${publicationId}/release-series-view`,
       legacyReleases,
     );
   },

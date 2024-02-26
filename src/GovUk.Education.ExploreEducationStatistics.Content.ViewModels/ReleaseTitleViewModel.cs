@@ -14,10 +14,10 @@ public record ReleaseTitleViewModel
         Title = release.Title;
         Slug = release.Slug;
 
-        var releaseOrder = release.Publication.ReleaseOrders.Find(ro => ro.ReleaseId == release.Id)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} \"{release.Title}\"");
+        var releaseSeriesItem = release.Publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(Release)} \"{release.Title}\"");
 
-        Order = releaseOrder.Order;
+        Order = releaseSeriesItem.Order;
     }
 
     public Guid Id { get; set; }

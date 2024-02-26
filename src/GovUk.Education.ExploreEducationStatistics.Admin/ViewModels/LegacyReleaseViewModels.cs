@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public int Order { get; set; }
     }
 
-    public record CombinedReleaseViewModel
+    public record ReleaseSeriesItemViewModel
     {
         public Guid Id { get; set; }
 
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid PublicationId { get; set; }
     }
 
-    public class CombinedReleaseUpdateOrderViewModel
+    public class ReleaseSeriesItemUpdateViewModel
     {
         [Required]
         public Guid Id { get; set; }

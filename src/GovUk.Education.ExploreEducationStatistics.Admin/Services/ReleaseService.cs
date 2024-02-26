@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
-        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
+        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator,
             IBlobCacheService cacheService,
-            IPublicationReleaseOrderService publicationReleaseOrderService)
+            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
         {
             _context = context;
             _statisticsDbContext = statisticsDbContext;
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
-            _publicationReleaseOrderService = publicationReleaseOrderService;
+            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.Releases.AddAsync(newRelease);
 
-                    await _publicationReleaseOrderService.CreateForCreateRelease(
+                    await _publicationReleaseSeriesViewService.CreateForCreateRelease(
                         releaseCreate.PublicationId,
                         newRelease.Id);
 
@@ -240,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     _context.UpdateRange(methodologiesScheduledWithRelease);
 
-                    await _publicationReleaseOrderService.DeleteForDeleteRelease(
+                    await _publicationReleaseSeriesViewService.DeleteForDeleteRelease(
                         release.PublicationId,
                         release.Id);
 

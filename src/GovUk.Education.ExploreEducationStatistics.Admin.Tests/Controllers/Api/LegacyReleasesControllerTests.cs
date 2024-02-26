@@ -48,20 +48,20 @@ public class LegacyReleasesControllerTests
     }
 
     [Fact]
-    public async Task ListCombinedReleases_ReturnsOk()
+    public async Task GetReleaseSeriesView_ReturnsOk()
     {
         // Arrange
         var templateReleaseResult =
-            new Either<ActionResult, List<CombinedReleaseViewModel>>(new List<CombinedReleaseViewModel>());
+            new Either<ActionResult, List<ReleaseSeriesItemViewModel>>(new List<ReleaseSeriesItemViewModel>());
 
         _legacyReleaseService
-            .Setup(s => s.ListCombinedReleases(It.Is<Guid>(id => id == _publicationId)))
+            .Setup(s => s.GetReleaseSeriesView(It.Is<Guid>(id => id == _publicationId)))
             .ReturnsAsync(templateReleaseResult);
 
         var controller = BuildController(_legacyReleaseService.Object);
 
         // Act
-        var result = await controller.ListCombinedReleases(_publicationId);
+        var result = await controller.GetReleaseSeriesView(_publicationId);
 
         // Assert
         VerifyAllMocks(_legacyReleaseService);

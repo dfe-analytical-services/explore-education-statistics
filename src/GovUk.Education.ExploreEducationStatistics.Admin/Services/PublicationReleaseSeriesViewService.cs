@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
-public class PublicationReleaseOrderService : IPublicationReleaseOrderService
+public class PublicationReleaseSeriesViewService : IPublicationReleaseSeriesViewService
 {
     private readonly ContentDbContext _context;
 
-    public PublicationReleaseOrderService(
+    public PublicationReleaseSeriesViewService(
         ContentDbContext context)
     {
         _context = context;
@@ -24,12 +24,12 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        publication.ReleaseOrders.Add(new()
+        publication.ReleaseSeriesView.Add(new()
         {
             ReleaseId = releaseId,
             IsLegacy = true,
             IsDraft = false,
-            Order = publication.ReleaseOrders.Count + 1 // Add to the top of the list rather than presume the intended position
+            Order = publication.ReleaseSeriesView.Count + 1 // Add to the top of the list rather than presume the intended position
         });
 
         _context.Update(publication);
@@ -42,13 +42,13 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
 
         var publication = await GetPublication(legacyRelease.PublicationId);
 
-        var releaseOrders = legacyRelease.Publication.ReleaseOrders;
+        var releaseSeries = legacyRelease.Publication.ReleaseSeriesView;
 
-        var releaseOrder = releaseOrders.Find(ro => ro.ReleaseId == legacyRelease.Id)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
+        var releaseSeriesItem = releaseSeries.Find(ro => ro.ReleaseId == legacyRelease.Id)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(LegacyRelease)} \"{legacyRelease.Description}\"");
 
-        releaseOrders.Remove(releaseOrder);
-        ResetOrders(releaseOrders);
+        releaseSeries.Remove(releaseSeriesItem);
+        ResetOrders(releaseSeries);
 
         _context.Update(publication);
     }
@@ -60,19 +60,19 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
         var releaseAmendment = publication.Releases.Find(r => r.Id == releaseAmendmentId)
             ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseAmendmentId} found");
 
-        var originalReleaseOrder = publication.ReleaseOrders.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
+        var originalReleaseSeriesItem = publication.ReleaseSeriesView.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
 
-        var newReleaseOrder = new ReleaseOrder
+        var newReleaseSeriesItem = new ReleaseSeriesItem
         {
             ReleaseId = releaseAmendmentId,
             IsLegacy = false,
             IsDraft = true,
             IsAmendment = true,
-            Order = originalReleaseOrder.Order
+            Order = originalReleaseSeriesItem.Order
         };
 
-        publication.ReleaseOrders.Add(newReleaseOrder);
+        publication.ReleaseSeriesView.Add(newReleaseSeriesItem);
 
         _context.Update(publication);
     }
@@ -81,11 +81,11 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} amendment with ID {releaseId}");
+        var releaseSeriesItem = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == releaseId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(Release)} amendment with ID {releaseId}");
 
-        publication.ReleaseOrders.Remove(releaseOrder);
-        ResetOrders(publication.ReleaseOrders);
+        publication.ReleaseSeriesView.Remove(releaseSeriesItem);
+        ResetOrders(publication.ReleaseSeriesView);
 
         _context.Update(publication);
     }
@@ -94,12 +94,12 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        publication.ReleaseOrders.Add(new()
+        publication.ReleaseSeriesView.Add(new()
         {
             ReleaseId = releaseId,
             IsLegacy = false,
             IsDraft = true,
-            Order = publication.ReleaseOrders.Count + 1
+            Order = publication.ReleaseSeriesView.Count + 1
         });
 
         _context.Update(publication);
@@ -109,35 +109,35 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     {
         var publication = await GetPublication(publicationId);
 
-        var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseId)
-            ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {nameof(Release)} with ID {releaseId}");
+        var releaseSeriesItem = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == releaseId)
+            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(Release)} with ID {releaseId}");
 
-        if (releaseOrder.IsAmendment)
+        if (releaseSeriesItem.IsAmendment)
         {
             var releaseAmendment = publication.Releases.Find(r => r.Id == releaseId)
                 ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {releaseId} found");
 
-            var originalReleaseOrder = publication.ReleaseOrders.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
-                ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
+            var originalReleaseSeriesItem = publication.ReleaseSeriesView.Find(r => r.ReleaseId == releaseAmendment.PreviousVersionId)
+                ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
 
-            publication.ReleaseOrders.Remove(originalReleaseOrder);
+            publication.ReleaseSeriesView.Remove(originalReleaseSeriesItem);
 
-            releaseOrder.IsAmendment = false;
-            ResetOrders(publication.ReleaseOrders);
+            releaseSeriesItem.IsAmendment = false;
+            ResetOrders(publication.ReleaseSeriesView);
         }
 
-        releaseOrder.IsDraft = false;
+        releaseSeriesItem.IsDraft = false;
 
         _context.Update(publication);
     }
 
-    public async Task UpdateForUpdateCombinedReleaseOrder(
+    public async Task UpdateForUpdateReleaseSeries(
         Guid publicationId,
-        List<CombinedReleaseUpdateOrderViewModel> releaseOrderUpdates)
+        List<ReleaseSeriesItemUpdateViewModel> releaseSeriesUpdate)
     {
         var publication = await GetPublication(publicationId);
 
-        foreach (var update in releaseOrderUpdates)
+        foreach (var update in releaseSeriesUpdate)
         {
             if (update.Order == 0)
             {
@@ -149,16 +149,16 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
                 var releaseAmendment = publication.Releases.Find(r => r.Id == update.Id)
                     ?? throw new KeyNotFoundException($"No matching amendment for {nameof(Release)} with ID {update.Id} found");
 
-                var originalReleaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == releaseAmendment.PreviousVersionId)
-                    ?? throw new KeyNotFoundException($"No matching ReleaseOrder for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
+                var originalReleaseSeriesItem = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == releaseAmendment.PreviousVersionId)
+                    ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {releaseAmendment.PreviousVersionId} found");
 
-                originalReleaseOrder.Order = update.Order;
+                originalReleaseSeriesItem.Order = update.Order;
             }
 
-            var releaseOrder = publication.ReleaseOrders.Find(ro => ro.ReleaseId == update.Id)
-                ?? throw new KeyNotFoundException($"No matching ReleaseOrder found for {(update.IsLegacy ? nameof(LegacyRelease) : nameof(Release))} with ID {update.Id}");
+            var releaseSeriesItem = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == update.Id)
+                ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {(update.IsLegacy ? nameof(LegacyRelease) : nameof(Release))} with ID {update.Id}");
 
-            releaseOrder.Order = update.Order;
+            releaseSeriesItem.Order = update.Order;
 
             _context.Update(publication);
         }
@@ -174,12 +174,12 @@ public class PublicationReleaseOrderService : IPublicationReleaseOrderService
     /// <summary>
     /// Reset the order value for each item based on its current position in the ordered list.
     /// </summary>
-    private static void ResetOrders(List<ReleaseOrder> releaseOrders)
+    private static void ResetOrders(List<ReleaseSeriesItem> releaseSeries)
     {
-        var orderedReleaseOrders = releaseOrders
+        var orderedReleaseSeries = releaseSeries
             .OrderBy(ro => ro.Order)
             .ToList();
 
-        orderedReleaseOrders.ForEach(ro => ro.Order = orderedReleaseOrders.IndexOf(ro) + 1);
+        orderedReleaseSeries.ForEach(ro => ro.Order = orderedReleaseSeries.IndexOf(ro) + 1);
     }
 }

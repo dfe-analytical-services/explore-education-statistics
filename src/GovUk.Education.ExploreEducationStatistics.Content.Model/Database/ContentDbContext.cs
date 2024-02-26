@@ -339,10 +339,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .IsRequired(false);
 
             modelBuilder.Entity<Publication>()
-                .Property(p => p.ReleaseOrders)
+                .Property(p => p.ReleaseSeriesView)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<ReleaseOrder>>(v));
+                    v => JsonConvert.DeserializeObject<List<ReleaseSeriesItem>>(v));
         }
 
         private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)

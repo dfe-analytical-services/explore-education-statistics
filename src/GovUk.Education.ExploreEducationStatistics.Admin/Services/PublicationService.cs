@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseRepository _releaseRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
+        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IRedirectsCacheService _redirectsCacheService;
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository releaseRepository,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
-            IPublicationReleaseOrderService publicationReleaseOrderService,
+            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService,
             IMethodologyCacheService methodologyCacheService,
             IRedirectsCacheService redirectsCacheService)
         {
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseRepository = releaseRepository;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
-            _publicationReleaseOrderService = publicationReleaseOrderService;
+            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
             _methodologyCacheService = methodologyCacheService;
             _redirectsCacheService = redirectsCacheService;
         }
@@ -443,9 +443,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<CombinedReleaseUpdateOrderViewModel>>> UpdateCombinedReleaseOrder(
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemUpdateViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
-            List<CombinedReleaseUpdateOrderViewModel> updatedReleases)
+            List<ReleaseSeriesItemUpdateViewModel> updatedReleases)
         {
             return await _context.Publications
                 .Include(p => p.LegacyReleases)
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
-                    await _publicationReleaseOrderService.UpdateForUpdateCombinedReleaseOrder(
+                    await _publicationReleaseSeriesViewService.UpdateForUpdateReleaseSeries(
                         publicationId,
                         updatedReleases);
 
@@ -463,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return _mapper
-                        .Map<List<CombinedReleaseUpdateOrderViewModel>>(publication.ReleaseOrders)
+                        .Map<List<ReleaseSeriesItemUpdateViewModel>>(publication.ReleaseSeriesView)
                         .OrderBy(r => r.Order)
                         .ToList();
                 });
@@ -549,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publication = await _context.Publications.FindAsync(release.Publication.Id)
                 ?? throw new ArgumentException($"Publication with ID {release.Publication.Id} not found");
 
-            viewModel.Order = publication.ReleaseOrders.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0;
+            viewModel.Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0;
             viewModel.IsDraft = !release.Live;
 
             if (includePermissions)

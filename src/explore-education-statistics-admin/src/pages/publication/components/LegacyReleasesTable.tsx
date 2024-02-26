@@ -8,7 +8,7 @@ import {
   PublicationEditLegacyReleaseRouteParams,
 } from '@admin/routes/publicationRoutes';
 import legacyReleaseService, {
-  CombinedRelease,
+  ReleaseSeriesItem,
 } from '@admin/services/legacyReleaseService';
 import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -29,19 +29,17 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   canManageLegacyReleases: boolean;
-  combinedReleases: CombinedRelease[];
+  releaseSeries: ReleaseSeriesItem[];
   publicationId: string;
 }
 const LegacyReleasesTable = ({
   canManageLegacyReleases,
-  combinedReleases: initialCombinedReleases,
+  releaseSeries: initialReleaseSeries,
   publicationId,
 }: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
-  const [combinedReleases, setCombinedReleases] = useState(
-    initialCombinedReleases,
-  );
+  const [releaseSeries, setReleaseSeries] = useState(initialReleaseSeries);
 
   const config = useConfig();
 
@@ -78,7 +76,7 @@ const LegacyReleasesTable = ({
             </WarningMessage>
           </ModalConfirm>
 
-          {combinedReleases.length > 0 && (
+          {releaseSeries.length > 0 && (
             <ModalConfirm
               confirmText="OK"
               title="Reorder releases"
@@ -96,22 +94,22 @@ const LegacyReleasesTable = ({
         </ButtonGroup>
       )}
 
-      {combinedReleases.length > 0 ? (
+      {releaseSeries.length > 0 ? (
         <DragDropContext
           onDragEnd={result => {
             if (!result.destination) {
               return;
             }
 
-            const nextCombinedReleases = reorder(
-              combinedReleases,
+            const nextReleaseSeries = reorder(
+              releaseSeries,
               result.source.index,
               result.destination.index,
             ).map((release, index) => ({
               ...release,
-              order: combinedReleases.length - index,
+              order: releaseSeries.length - index,
             }));
-            setCombinedReleases(nextCombinedReleases);
+            setReleaseSeries(nextReleaseSeries);
           }}
         >
           <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
@@ -137,7 +135,7 @@ const LegacyReleasesTable = ({
                   droppableSnapshot={droppableSnapshot}
                   tag="tbody"
                 >
-                  {combinedReleases.map((release, index) => (
+                  {releaseSeries.map((release, index) => (
                     <DraggableItem
                       hideDragHandle
                       id={release.id}
@@ -244,12 +242,12 @@ const LegacyReleasesTable = ({
                                     release?.id,
                                   );
 
-                                  const nextCombinedReleases =
-                                    combinedReleases.filter(
+                                  const nextReleaseSeries =
+                                    releaseSeries.filter(
                                       legacyRelease =>
                                         legacyRelease.id !== release.id,
                                     );
-                                  setCombinedReleases(nextCombinedReleases);
+                                  setReleaseSeries(nextReleaseSeries);
                                 }}
                               >
                                 <p>
@@ -280,9 +278,9 @@ const LegacyReleasesTable = ({
         <ButtonGroup>
           <Button
             onClick={async () => {
-              await publicationService.updateCombinedReleaseOrder(
+              await publicationService.updateReleaseSeriesView(
                 publicationId,
-                combinedReleases.map(release => ({
+                releaseSeries.map(release => ({
                   id: release.id,
                   order: release.order,
                   isLegacy: release.isLegacy,
@@ -299,7 +297,7 @@ const LegacyReleasesTable = ({
           <Button
             variant="secondary"
             onClick={() => {
-              setCombinedReleases(combinedReleases);
+              setReleaseSeries(releaseSeries);
               toggleReordering.off();
             }}
           >

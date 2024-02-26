@@ -6,7 +6,7 @@ export interface LegacyRelease {
   url: string;
 }
 
-export interface CombinedRelease extends LegacyRelease {
+export interface ReleaseSeriesItem extends LegacyRelease {
   order: number;
   isLegacy: boolean;
   isDraft: boolean;
@@ -26,7 +26,7 @@ export interface UpdateLegacyRelease {
   publicationId: string;
 }
 
-export interface UpdateCombinedRelease {
+export interface UpdateReleaseSeriesItem {
   id: string;
   order: number;
   isLegacy: boolean;
@@ -39,10 +39,11 @@ const legacyReleaseService = {
     return client.get(`/legacy-releases/${id}`);
   },
   listLegacyReleases(publicationId: string): Promise<LegacyRelease[]> {
+    // @MarkFix unused?
     return client.get(`/publications/${publicationId}/legacy-releases`);
   },
-  listCombinedReleases(publicationId: string): Promise<CombinedRelease[]> {
-    return client.get(`/publications/${publicationId}/combined-releases`);
+  getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
+    return client.get(`/publications/${publicationId}/release-series-view`);
   },
   createLegacyRelease(data: CreateLegacyRelease): Promise<LegacyRelease> {
     return client.post('/legacy-releases', data);

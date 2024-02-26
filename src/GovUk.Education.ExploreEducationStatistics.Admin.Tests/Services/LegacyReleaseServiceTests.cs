@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Url = "https://test-2.com",
                     }
                 },
-                ReleaseOrders = new()
+                ReleaseSeriesView = new()
                 {
                     new()
                     {
@@ -139,8 +139,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ListLegacyReleases(publication.Id);
                 var viewModels = result.AssertRight();
 
-                var releaseOrders = contentDbContext.Publications
-                    .Find(publication.Id)!.ReleaseOrders
+                var releaseSeries = contentDbContext.Publications
+                    .Find(publication.Id)!.ReleaseSeriesView
                     .OrderByDescending(ro => ro.Order)
                     .ToList();
 
@@ -149,31 +149,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Release 3", viewModels[0].Description);
                 Assert.Equal("https://test-3.com", viewModels[0].Url);
                 Assert.Equal(3, viewModels[0].Order);
-                Assert.Equal(publication.LegacyReleases[1].Id, releaseOrders[0].ReleaseId);
-                Assert.Equal(3, releaseOrders[0].Order);
-                Assert.True(releaseOrders[0].IsLegacy);
-                Assert.False(releaseOrders[0].IsDraft);
+                Assert.Equal(publication.LegacyReleases[1].Id, releaseSeries[0].ReleaseId);
+                Assert.Equal(3, releaseSeries[0].Order);
+                Assert.True(releaseSeries[0].IsLegacy);
+                Assert.False(releaseSeries[0].IsDraft);
 
                 Assert.Equal("Release 2", viewModels[1].Description);
                 Assert.Equal("https://test-2.com", viewModels[1].Url);
                 Assert.Equal(2, viewModels[1].Order);
-                Assert.Equal(publication.LegacyReleases[2].Id, releaseOrders[1].ReleaseId);
-                Assert.Equal(2, releaseOrders[1].Order);
-                Assert.True(releaseOrders[1].IsLegacy);
-                Assert.False(releaseOrders[1].IsDraft);
+                Assert.Equal(publication.LegacyReleases[2].Id, releaseSeries[1].ReleaseId);
+                Assert.Equal(2, releaseSeries[1].Order);
+                Assert.True(releaseSeries[1].IsLegacy);
+                Assert.False(releaseSeries[1].IsDraft);
 
                 Assert.Equal("Release 1", viewModels[2].Description);
                 Assert.Equal("https://test-1.com", viewModels[2].Url);
                 Assert.Equal(1, viewModels[2].Order);
-                Assert.Equal(publication.LegacyReleases[0].Id, releaseOrders[2].ReleaseId);
-                Assert.Equal(1, releaseOrders[2].Order);
-                Assert.True(releaseOrders[2].IsLegacy);
-                Assert.False(releaseOrders[2].IsDraft);
+                Assert.Equal(publication.LegacyReleases[0].Id, releaseSeries[2].ReleaseId);
+                Assert.Equal(1, releaseSeries[2].Order);
+                Assert.True(releaseSeries[2].IsLegacy);
+                Assert.False(releaseSeries[2].IsDraft);
             }
         }
 
         [Fact]
-        public async Task ListCombinedReleases()
+        public async Task GetReleaseSeriesView()
         {
             // Arrange
             var publicationId = Guid.NewGuid();
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
                     },
                 },
-                ReleaseOrders = new()
+                ReleaseSeriesView = new()
                 {
                     new()
                     {
@@ -342,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
                 // Act
-                var result = await releaseService.ListCombinedReleases(publication.Id);
+                var result = await releaseService.GetReleaseSeriesView(publication.Id);
 
                 // Assert
                 VerifyAllMocks(publicationService);
@@ -413,10 +413,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+            var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            publicationReleaseOrderService.Setup(s => s.CreateForCreateLegacyRelease(
+            publicationReleaseSeriesViewService.Setup(s => s.CreateForCreateLegacyRelease(
                 publicationId,
                 It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
@@ -429,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
                     publicationCacheService: publicationCacheService.Object,
-                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
+                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
 
                 // Act
                 var result = await legacyReleaseService.CreateLegacyRelease(
@@ -441,18 +441,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     });
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
                 VerifyAllMocks(publicationCacheService);
 
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("https://test.com", result.Right.Url);
-                Assert.Equal(0, result.Right.Order); // No longer set (ordering moved to Publication.ReleaseOrders)
+                Assert.Equal(0, result.Right.Order); // No longer set (ordering moved to Publication.ReleaseSeriesView)
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Test description", savedLegacyRelease.Description);
                 Assert.Equal("https://test.com", savedLegacyRelease.Url);
-                Assert.Equal(0, savedLegacyRelease.Order); // No longer set (ordering moved to Publication.ReleaseOrders)
+                Assert.Equal(0, savedLegacyRelease.Order); // No longer set (ordering moved to Publication.ReleaseSeriesView)
                 Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
             }
         }
@@ -542,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Url = "https://test.com",
                         }
                     },
-                    ReleaseOrders = new()
+                    ReleaseSeriesView = new()
                     {
                         new()
                         {
@@ -556,10 +556,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationReleaseOrderService = new Mock<IPublicationReleaseOrderService>(Strict);
+            var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            publicationReleaseOrderService.Setup(s => s.DeleteForDeleteLegacyRelease(
+            publicationReleaseSeriesViewService.Setup(s => s.DeleteForDeleteLegacyRelease(
                 It.IsAny<Guid>()))
             .Returns(Task.CompletedTask);
 
@@ -572,13 +572,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
                     publicationCacheService: publicationCacheService.Object,
-                    publicationReleaseOrderService: publicationReleaseOrderService.Object);
+                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
 
                 // Act
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
                 // Assert
-                VerifyAllMocks(publicationReleaseOrderService);
+                VerifyAllMocks(publicationReleaseSeriesViewService);
                 VerifyAllMocks(publicationCacheService);
 
                 Assert.Empty(context.Publications
@@ -593,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationService? publicationService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IPublicationReleaseOrderService? publicationReleaseOrderService = null)
+            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null)
         {
             return new LegacyReleaseService(
                 context,
@@ -602,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 publicationService ?? Mock.Of<IPublicationService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                publicationReleaseOrderService ?? Mock.Of<IPublicationReleaseOrderService>(Strict)
+                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
             );
         }
     }

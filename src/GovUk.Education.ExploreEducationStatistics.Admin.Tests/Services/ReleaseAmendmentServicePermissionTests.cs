@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService,
                 Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 Mock.Of<StatisticsDbContext>(MockBehavior.Strict),
-                Mock.Of<IPublicationReleaseOrderService>(MockBehavior.Strict));
+                Mock.Of<IPublicationReleaseSeriesViewService>(MockBehavior.Strict));
         }
     }
 }

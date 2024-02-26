@@ -10,12 +10,12 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
-public sealed class PublicationReleaseOrderServiceTests : IDisposable
+public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
 {
     private readonly ContentDbContext _context;
-    private readonly PublicationReleaseOrderService _sut;
+    private readonly PublicationReleaseSeriesViewService _sut;
 
-    public PublicationReleaseOrderServiceTests()
+    public PublicationReleaseSeriesViewServiceTests()
     {
         _context = InMemoryApplicationDbContext();
         _sut = new(_context);
@@ -52,13 +52,13 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseOrder = publication.ReleaseOrders[0];
+        var releaseSeriesItem = publication.ReleaseSeriesView[0];
 
-        Assert.Single(publication.ReleaseOrders);
-        Assert.Equal(releaseId, releaseOrder.ReleaseId);
-        Assert.True(releaseOrder.IsLegacy);
-        Assert.False(releaseOrder.IsDraft);
-        Assert.Equal(1, releaseOrder.Order);
+        Assert.Single(publication.ReleaseSeriesView);
+        Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
+        Assert.True(releaseSeriesItem.IsLegacy);
+        Assert.False(releaseSeriesItem.IsDraft);
+        Assert.Equal(1, releaseSeriesItem.Order);
     }
     #endregion CreateForCreateLegacyRelease Tests
 
@@ -97,7 +97,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteForDeleteLegacyRelease_ReleaseOrderNotFound_ThrowsException()
+    public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -116,7 +116,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
 
-        Assert.Equal($"No matching ReleaseOrder found for {nameof(LegacyRelease)} \"Legacy Release 1\"", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(LegacyRelease)} \"Legacy Release 1\"", exception.Message);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             {
                 new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = legacyReleaseId },
             },
@@ -145,11 +145,11 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Empty(publication.ReleaseOrders);
+        Assert.Empty(publication.ReleaseSeriesView);
     }
 
     [Fact]
-    public async Task DeleteForDeleteLegacyRelease_ReleaseOrdersHaveBeenReset()
+    public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesHasBeenReset()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -166,7 +166,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new() { Id = legacyRelease2Id, Description = "Legacy Release 2" },
                 new() { Id = legacyRelease3Id, Description = "Legacy Release 3" },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = legacyRelease1Id, Order = 1 },
                 new() { ReleaseId = legacyRelease2Id, Order = 2 },
@@ -180,13 +180,13 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Equal(2, publication.ReleaseOrders.Count);
+        Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(legacyRelease1Id, publication.ReleaseOrders[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseOrders[0].Order);
+        Assert.Equal(legacyRelease1Id, publication.ReleaseSeriesView[0].ReleaseId);
+        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
 
-        Assert.Equal(legacyRelease3Id, publication.ReleaseOrders[1].ReleaseId);
-        Assert.Equal(2, publication.ReleaseOrders[1].Order);
+        Assert.Equal(legacyRelease3Id, publication.ReleaseSeriesView[1].ReleaseId);
+        Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
     }
     #endregion DeleteForDeleteLegacyRelease Tests
 
@@ -221,13 +221,13 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseOrder = publication.ReleaseOrders[0];
+        var releaseSeriesItem = publication.ReleaseSeriesView[0];
 
-        Assert.Single(publication.ReleaseOrders);
-        Assert.Equal(releaseId, releaseOrder.ReleaseId);
-        Assert.False(releaseOrder.IsLegacy);
-        Assert.True(releaseOrder.IsDraft);
-        Assert.Equal(1, releaseOrder.Order);
+        Assert.Single(publication.ReleaseSeriesView);
+        Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
+        Assert.False(releaseSeriesItem.IsLegacy);
+        Assert.True(releaseSeriesItem.IsDraft);
+        Assert.Equal(1, releaseSeriesItem.Order);
     }
     #endregion CreateForCreateRelease Tests
 
@@ -246,7 +246,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateForPublishRelease_ReleaseOrderNotFound_ThrowsException()
+    public async Task UpdateForPublishRelease_ReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -261,7 +261,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await _sut.UpdateForPublishRelease(publicationId, releaseId));
 
-        Assert.Equal($"No matching ReleaseOrder found for {nameof(Release)} with ID {releaseId}", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} with ID {releaseId}", exception.Message);
     }
 
     [Fact]
@@ -274,7 +274,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         _context.Publications.Add(new()
         {
             Id = publicationId,
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = releaseId, IsAmendment = true },
             }
@@ -288,7 +288,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task UpdateForPublishRelease_Amendment_OriginalReleaseOrderNotFound_ThrowsException()
+    public async Task UpdateForPublishRelease_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -303,7 +303,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new() { Id = originalReleaseId },
                 new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = releaseAmendmentId, IsAmendment = true },
             }
@@ -313,7 +313,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await _sut.UpdateForPublishRelease(publicationId, releaseAmendmentId));
 
-        Assert.Equal($"No matching ReleaseOrder for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
     }
 
     [Fact]
@@ -334,7 +334,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new() { Id = release2Id },
                 new() { Id = release3Id, PreviousVersionId = release2Id },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = release1Id, Order = 1 },
                 new() { ReleaseId = release2Id, Order = 2 },
@@ -348,15 +348,15 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Equal(2, publication.ReleaseOrders.Count);
+        Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(release1Id, publication.ReleaseOrders[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseOrders[0].Order);
+        Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
+        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
 
-        Assert.Equal(release3Id, publication.ReleaseOrders[1].ReleaseId);
-        Assert.Equal(2, publication.ReleaseOrders[1].Order);
-        Assert.False(publication.ReleaseOrders[1].IsDraft);
-        Assert.False(publication.ReleaseOrders[1].IsAmendment);
+        Assert.Equal(release3Id, publication.ReleaseSeriesView[1].ReleaseId);
+        Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
+        Assert.False(publication.ReleaseSeriesView[1].IsDraft);
+        Assert.False(publication.ReleaseSeriesView[1].IsAmendment);
     }
 
     [Fact]
@@ -373,7 +373,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             {
                 new() { Id = release1Id },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = release1Id, IsDraft = true, Order = 1 },
             }
@@ -385,30 +385,30 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Single(publication.ReleaseOrders);
+        Assert.Single(publication.ReleaseSeriesView);
 
-        Assert.Equal(release1Id, publication.ReleaseOrders[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseOrders[0].Order);
-        Assert.False(publication.ReleaseOrders[0].IsDraft);
+        Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
+        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
+        Assert.False(publication.ReleaseSeriesView[0].IsDraft);
     }
     #endregion UpdateForPublishRelease Tests
 
-    #region UpdateForUpdateCombinedReleaseOrder Tests
+    #region UpdateForUpdateReleaseSeries Tests
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_PublicationNotFound_ThrowsException()
+    public async Task UpdateForUpdateReleaseSeries_PublicationNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, new()));
+            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, new()));
 
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_NewOrderMissing_ThrowsException()
+    public async Task UpdateForUpdateReleaseSeries_NewOrderMissing_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -419,20 +419,20 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = releaseId },
         };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<ApplicationException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates));
+            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
         Assert.Equal($"Updated order for release with ID {releaseId} must be greater than 0", exception.Message);
     }
 
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_AmendmentReleaseNotFound_ThrowsException()
+    public async Task UpdateForUpdateReleaseSeries_AmendmentReleaseNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -443,20 +443,20 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = releaseId, Order = 1, IsAmendment = true },
         };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates));
+            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
         Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseId} found", exception.Message);
     }
 
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_Amendment_OriginalReleaseOrderNotFound_ThrowsException()
+    public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -473,20 +473,20 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             }
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = releaseAmendmentId, Order = 1, IsAmendment = true },
         };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates));
+            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"No matching ReleaseOrder for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
     }
 
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder_Amendment_OriginalReleaseOrderUpdated()
+    public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemUpdated()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -501,36 +501,36 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new() { Id = originalReleaseId },
                 new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = originalReleaseId, Order = 1 },
                 new() { ReleaseId = releaseAmendmentId, Order = 1 },
             }
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = releaseAmendmentId, Order = 5, IsAmendment = true },
         };
 
         // Act
-        await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates);
+        await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseOrders = publication.ReleaseOrders;
-        var originalReleaseOrder = publication.ReleaseOrders[0];
-        var amendmentReleaseOrder = publication.ReleaseOrders[1];
+        var releaseSeries = publication.ReleaseSeriesView;
+        var originalReleaseSeriesItem = publication.ReleaseSeriesView[0];
+        var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(2, releaseOrders.Count);
-        Assert.Equal(5, originalReleaseOrder.Order);
-        Assert.Equal(5, amendmentReleaseOrder.Order);
+        Assert.Equal(2, releaseSeries.Count);
+        Assert.Equal(5, originalReleaseSeriesItem.Order);
+        Assert.Equal(5, amendmentReleaseSeriesItem.Order);
     }
 
     [Theory]
     [InlineData(true, nameof(LegacyRelease))]
     [InlineData(false, nameof(Release))]
-    public async Task UpdateForUpdateCombinedReleaseOrder_ReleaseOrderNotFound_ThrowsException(
+    public async Task UpdateForUpdateReleaseSeries_ReleaseSeriesItemNotFound_ThrowsException(
         bool isLegacy,
         string entityTypeName)
     {
@@ -542,20 +542,20 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = Guid.NewGuid(), Order = 1, IsLegacy = isLegacy },
         };
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates));
+            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"No matching ReleaseOrder found for {entityTypeName} with ID {updates[0].Id}", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem found for {entityTypeName} with ID {updates[0].Id}", exception.Message);
     }
 
     [Fact]
-    public async Task UpdateForUpdateCombinedReleaseOrder()
+    public async Task UpdateForUpdateReleaseSeries()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -573,33 +573,33 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             {
                 new() { Id = eesReleaseId }
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = legacyReleaseId, Order = 1, IsLegacy = true },
                 new() { ReleaseId = eesReleaseId, Order = 2, IsLegacy = false },
             }
         });
 
-        var updates = new List<CombinedReleaseUpdateOrderViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateViewModel>
         {
             new() { Id = legacyReleaseId, Order = 2, IsLegacy = true },
             new() { Id = eesReleaseId, Order = 1, IsLegacy = false },
         };
 
         // Act
-        await _sut.UpdateForUpdateCombinedReleaseOrder(publicationId, updates);
+        await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var legacyReleaseOrder = publication.ReleaseOrders[0];
-        var eesReleaseOrder = publication.ReleaseOrders[1];
+        var legacyReleaseSeriesItem = publication.ReleaseSeriesView[0];
+        var eesReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(2, publication.ReleaseOrders.Count);
+        Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(2, legacyReleaseOrder.Order);
-        Assert.Equal(1, eesReleaseOrder.Order);
+        Assert.Equal(2, legacyReleaseSeriesItem.Order);
+        Assert.Equal(1, eesReleaseSeriesItem.Order);
     }
-    #endregion UpdateForUpdateCombinedReleaseOrder Tests
+    #endregion UpdateForUpdateReleaseSeries Tests
 
     #region CreateForAmendRelease Tests
     [Fact]
@@ -640,7 +640,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateForAmendRelease_OriginalReleaseOrderNotFound_ThrowsException()
+    public async Task CreateForAmendRelease_OriginalReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -660,7 +660,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await _sut.CreateForAmendRelease(publicationId, releaseAmendmentId));
 
-        Assert.Equal($"No matching ReleaseOrder for original {nameof(Release)} with ID {previousVersionId} found", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {previousVersionId} found", exception.Message);
     }
 
     [Fact]
@@ -679,7 +679,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new() { Id = originalReleaseId },
                 new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = originalReleaseId, IsDraft = true, Order = 1 },
             }
@@ -690,13 +690,13 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var amendmentReleaseOrder = publication.ReleaseOrders[1];
+        var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(releaseAmendmentId, amendmentReleaseOrder.ReleaseId);
-        Assert.False(amendmentReleaseOrder.IsLegacy);
-        Assert.True(amendmentReleaseOrder.IsDraft);
-        Assert.True(amendmentReleaseOrder.IsAmendment);
-        Assert.Equal(1, amendmentReleaseOrder.Order);
+        Assert.Equal(releaseAmendmentId, amendmentReleaseSeriesItem.ReleaseId);
+        Assert.False(amendmentReleaseSeriesItem.IsLegacy);
+        Assert.True(amendmentReleaseSeriesItem.IsDraft);
+        Assert.True(amendmentReleaseSeriesItem.IsAmendment);
+        Assert.Equal(1, amendmentReleaseSeriesItem.Order);
     }
     #endregion CreateForAmendRelease Tests
 
@@ -715,7 +715,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task DeleteForDeleteRelease_ReleaseOrderNotFound_ThrowsException()
+    public async Task DeleteForDeleteRelease_ReleaseSeriesItemNotFound_ThrowsException()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -734,11 +734,11 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
             async () => await _sut.DeleteForDeleteRelease(publicationId, releaseId));
 
-        Assert.Equal($"No matching ReleaseOrder found for {nameof(Release)} amendment with ID {releaseId}", exception.Message);
+        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} amendment with ID {releaseId}", exception.Message);
     }
 
     [Fact]
-    public async Task DeleteForDeleteRelease_RemainingReleaseOrderValuesSequential()
+    public async Task DeleteForDeleteRelease_RemainingReleaseSeriesItemValuesSequential()
     {
         // Arrange
         var publicationId = Guid.NewGuid();
@@ -754,7 +754,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
                 new(),
                 new(),
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { Order = 1 },
                 new() { ReleaseId = releaseId, Order = 2 },
@@ -768,12 +768,12 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
 
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseOrders = publication.ReleaseOrders;
+        var releaseSeries = publication.ReleaseSeriesView;
 
-        Assert.Equal(3, publication.ReleaseOrders.Count);
-        Assert.Equal(1, releaseOrders[0].Order);
-        Assert.Equal(2, releaseOrders[1].Order);
-        Assert.Equal(3, releaseOrders[2].Order);
+        Assert.Equal(3, publication.ReleaseSeriesView.Count);
+        Assert.Equal(1, releaseSeries[0].Order);
+        Assert.Equal(2, releaseSeries[1].Order);
+        Assert.Equal(3, releaseSeries[2].Order);
     }
 
     [Fact]
@@ -790,7 +790,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
             {
                 new() { Id = releaseId },
             },
-            ReleaseOrders = new()
+            ReleaseSeriesView = new()
             {
                 new() { ReleaseId = releaseId },
             },
@@ -802,7 +802,7 @@ public sealed class PublicationReleaseOrderServiceTests : IDisposable
         // Assert
         var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Empty(publication.ReleaseOrders);
+        Assert.Empty(publication.ReleaseSeriesView);
     }
     #endregion DeleteForDeleteRelease Tests
 

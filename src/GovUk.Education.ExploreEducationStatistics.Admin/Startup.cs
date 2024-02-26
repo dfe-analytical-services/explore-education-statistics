@@ -368,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>();
-            services.AddTransient<IPublicationReleaseOrderService, PublicationReleaseOrderService>();
+            services.AddTransient<IPublicationReleaseSeriesViewService, PublicationReleaseSeriesViewService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();

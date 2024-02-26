@@ -826,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedReleaseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReleaseOrders")
+                    b.Property<string>("ReleaseSeriesView")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

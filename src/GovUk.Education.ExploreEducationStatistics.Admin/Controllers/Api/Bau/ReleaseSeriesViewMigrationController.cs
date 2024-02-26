@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 [Route("api")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class ReleaseOrderMigrationController : ControllerBase
+public class ReleaseSeriesViewMigrationController : ControllerBase
 {
     private readonly ContentDbContext _context;
     private readonly IPublicationCacheService _publicationCacheService;
 
-    public ReleaseOrderMigrationController(
+    public ReleaseSeriesViewMigrationController(
         ContentDbContext context,
         IPublicationCacheService publicationCacheService)
     {
@@ -27,8 +27,8 @@ public class ReleaseOrderMigrationController : ControllerBase
         _publicationCacheService = publicationCacheService;
     }
 
-    [HttpPatch("bau/migrate-release-orders")]
-    public async Task<ActionResult> MigrateReleaseOrdering(
+    [HttpPatch("bau/migrate-release-series-view")]
+    public async Task<ActionResult> MigrateReleaseSeriesView(
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default)
     {
@@ -46,11 +46,11 @@ public class ReleaseOrderMigrationController : ControllerBase
             if (!publication.Releases.Any() && !publication.LegacyReleases.Any()) continue;
 
             var currentOrder = 0;
-            publication.ReleaseOrders = new();
+            publication.ReleaseSeriesView = new();
 
             foreach (var legacyRelease in publication.LegacyReleases)
             {
-                publication.ReleaseOrders.Add(new()
+                publication.ReleaseSeriesView.Add(new()
                 {
                     ReleaseId = legacyRelease.Id,
                     Order = ++currentOrder, // Reassign counting upwards from 1 (fix any misnumbered, or starting from 0)
@@ -77,10 +77,10 @@ public class ReleaseOrderMigrationController : ControllerBase
             {
                 if (latestRelease.Amendment && latestRelease.PreviousVersionId.HasValue)
                 {
-                    // Add a ReleaseOrder for the original
+                    // Add a ReleaseSeriesItem for the original
                     var originalRelease = releases.First(r => r.Id == latestRelease.PreviousVersionId);
 
-                    publication.ReleaseOrders.Add(
+                    publication.ReleaseSeriesView.Add(
                         new()
                         {
                             ReleaseId = originalRelease.Id,
@@ -89,8 +89,8 @@ public class ReleaseOrderMigrationController : ControllerBase
                             IsAmendment = originalRelease.Amendment
                         });
 
-                    // Followed by a ReleaseOrder for the amendment, with the same Order
-                    publication.ReleaseOrders.Add(
+                    // Followed by a ReleaseSeriesItem for the amendment, with the same Order
+                    publication.ReleaseSeriesView.Add(
                         new()
                         {
                             ReleaseId = latestRelease.Id,
@@ -103,8 +103,8 @@ public class ReleaseOrderMigrationController : ControllerBase
                 }
                 else
                 {
-                    // The release is the only active version, so just add a single ReleaseOrder
-                    publication.ReleaseOrders.Add(
+                    // The release is the only active version, so just add a single ReleaseSeriesItem
+                    publication.ReleaseSeriesView.Add(
                         new()
                         {
                             ReleaseId = latestRelease.Id,

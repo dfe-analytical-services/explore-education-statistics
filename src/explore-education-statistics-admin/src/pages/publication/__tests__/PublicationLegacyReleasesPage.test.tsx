@@ -2,7 +2,7 @@ import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationL
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _legacyReleaseService, {
-  CombinedRelease,
+  ReleaseSeriesItem,
 } from '@admin/services/legacyReleaseService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { PublicationWithPermissions } from '@admin/services/publicationService';
@@ -18,7 +18,7 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('PublicationLegacyReleasesPage', () => {
-  const testCombinedReleases: CombinedRelease[] = [
+  const testReleaseSeries: ReleaseSeriesItem[] = [
     {
       description: 'Legacy release 3',
       id: 'legacy-release-3',
@@ -52,8 +52,8 @@ describe('PublicationLegacyReleasesPage', () => {
   ];
 
   test('renders the legacy releases page', async () => {
-    legacyReleaseService.listCombinedReleases.mockResolvedValue(
-      testCombinedReleases,
+    legacyReleaseService.getReleaseSeriesView.mockResolvedValue(
+      testReleaseSeries,
     );
 
     renderPage(testPublication);

@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IPublicationService _publicationService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationReleaseOrderService _publicationReleaseOrderService;
+        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
         public LegacyReleaseService(ContentDbContext context,
             IMapper mapper,
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IPublicationService publicationService,
             IPublicationCacheService publicationCacheService,
-            IPublicationReleaseOrderService publicationReleaseOrderService)
+            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
         {
             _context = context;
             _mapper = mapper;
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _publicationService = publicationService;
             _publicationCacheService = publicationCacheService;
-            _publicationReleaseOrderService = publicationReleaseOrderService;
+            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> GetLegacyRelease(Guid id)
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             {
                                 Id = legacyRelease.Id,
                                 Description = legacyRelease.Description,
-                                Order = publication.ReleaseOrders.Find(ro => ro.ReleaseId == legacyRelease.Id)?.Order ?? 0,
+                                Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == legacyRelease.Id)?.Order ?? 0,
                                 Url = legacyRelease.Url
                             })
                         .OrderByDescending(lr => lr.Order)
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<CombinedReleaseViewModel>>> ListCombinedReleases(Guid publicationId)
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -85,11 +85,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publicationAndReleases =>
                 {
                     var (publication, legacyReleases, eesReleases) = publicationAndReleases;
-                    var combinedReleasesViewModels = new List<CombinedReleaseViewModel>();
+                    var releaseSeriesItemsViewModels = new List<ReleaseSeriesItemViewModel>();
 
                     foreach (var legacyRelease in legacyReleases)
                     {
-                        combinedReleasesViewModels.Add(new()
+                        releaseSeriesItemsViewModels.Add(new()
                         {
                             Description = legacyRelease.Description,
                             Id = legacyRelease.Id,
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             ? eesRelease.PreviousVersionId.Value
                             : eesRelease.Id;
 
-                        combinedReleasesViewModels.Add(new()
+                        releaseSeriesItemsViewModels.Add(new()
                         {
                             Description = eesRelease.Title,
                             Id = eesRelease.Id,
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         });
                     }
 
-                    return combinedReleasesViewModels
+                    return releaseSeriesItemsViewModels
                         .OrderByDescending(cr => cr.Order)
                         .ToList();
                 });
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         PublicationId = legacyRelease.PublicationId
                     });
 
-                    await _publicationReleaseOrderService.CreateForCreateLegacyRelease(
+                    await _publicationReleaseSeriesViewService.CreateForCreateLegacyRelease(
                         publication.Id,
                         saved.Entity.Id);
 
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.LegacyReleases.Remove(legacyRelease);
 
                     _context.Remove(legacyRelease);
-                    await _publicationReleaseOrderService.DeleteForDeleteLegacyRelease(id);
+                    await _publicationReleaseSeriesViewService.DeleteForDeleteLegacyRelease(id);
                     _context.Update(publication);
 
                     await _context.SaveChangesAsync();
