@@ -23,9 +23,10 @@ user logs in via identity provider
         user clicks element    id:kc-login
     ELSE IF    "%{IDENTITY_PROVIDER}" == "AZURE"
         IF    ${expect_account_selection_page}
+            ${lowercase_email}=    Convert To Lowercase    ${email}
             user waits until page contains    Pick an account
             user clicks element
-            ...    xpath://div[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '${email}')]
+            ...    xpath://div[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '${lowercase_email}')]
         ELSE
             user waits until page contains element    xpath://*[.='Sign in']
             user enters text into element    xpath://*[@name='loginfmt']    ${email}
