@@ -27,27 +27,6 @@ public class LegacyReleasesControllerTests
     }
 
     [Fact]
-    public async Task ListLegacyReleases_ReturnsOk()
-    {
-        // Arrange
-        var templateReleaseResult =
-            new Either<ActionResult, List<LegacyReleaseViewModel>>(new List<LegacyReleaseViewModel>());
-
-        _legacyReleaseService
-            .Setup(s => s.ListLegacyReleases(It.Is<Guid>(id => id == _publicationId)))
-            .ReturnsAsync(templateReleaseResult);
-
-        var controller = BuildController(_legacyReleaseService.Object);
-
-        // Act
-        var result = await controller.ListLegacyReleases(_publicationId);
-
-        // Assert
-        VerifyAllMocks(_legacyReleaseService);
-        result.AssertOkResult();
-    }
-
-    [Fact]
     public async Task GetReleaseSeriesView_ReturnsOk()
     {
         // Arrange

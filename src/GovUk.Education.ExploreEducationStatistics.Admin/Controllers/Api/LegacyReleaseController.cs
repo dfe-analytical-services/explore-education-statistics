@@ -21,14 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _legacyReleaseService = legacyReleaseService;
         }
 
-        [HttpGet("publications/{publicationId:guid}/legacy-releases")]
-        public async Task<ActionResult<List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId)
-        {
-            return await _legacyReleaseService
-                .ListLegacyReleases(publicationId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpGet("publications/{publicationId:guid}/release-series-view")]
         public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
         {

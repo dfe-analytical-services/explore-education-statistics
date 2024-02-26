@@ -38,10 +38,6 @@ const legacyReleaseService = {
   getLegacyRelease(id: string): Promise<LegacyRelease> {
     return client.get(`/legacy-releases/${id}`);
   },
-  listLegacyReleases(publicationId: string): Promise<LegacyRelease[]> {
-    // @MarkFix unused?
-    return client.get(`/publications/${publicationId}/legacy-releases`);
-  },
   getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
     return client.get(`/publications/${publicationId}/release-series-view`);
   },
