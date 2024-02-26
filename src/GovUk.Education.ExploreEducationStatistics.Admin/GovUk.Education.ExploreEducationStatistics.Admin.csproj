@@ -108,13 +108,6 @@
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-important.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer-2x.png" />
     <_ContentIncludedByDefault Remove="wwwroot\assets\images\icon-pointer.png" />
-    <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Shared\_CookieConsentPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Shared\_LoginPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\_ViewImports.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\_ViewStart.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
