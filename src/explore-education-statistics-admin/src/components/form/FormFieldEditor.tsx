@@ -162,11 +162,12 @@ function getInvalidLinks(elements: Element[]) {
       const url = attributes.linkHref as string;
 
       try {
-        // exclude anchor links and localhost as they fail Yup url validation.
+        // exclude anchor links, localhost and emails as they fail Yup url validation.
         if (
           url &&
           !url.startsWith('#') &&
-          !url.startsWith('http://localhost')
+          !url.startsWith('http://localhost') &&
+          !url.startsWith('mailto:')
         ) {
           Yup.string().url().validateSync(url.trim());
         }
