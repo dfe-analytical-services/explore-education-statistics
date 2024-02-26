@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -49,7 +48,7 @@ public class DataSetsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("releases/{releaseId}/data-sets/{fileId}")]
+    [HttpGet("releases/{releaseId:guid}/data-sets/{fileId:guid}")]
     public async Task<ActionResult<DataSetDetailsViewModel>> GetDataSet(
         Guid releaseId,
         Guid fileId)

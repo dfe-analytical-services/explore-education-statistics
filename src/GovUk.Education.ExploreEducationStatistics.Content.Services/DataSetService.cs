@@ -128,20 +128,21 @@ public class DataSetService : IDataSetService
         Guid releaseId,
         Guid fileId)
     {
+        // WARN: This prevents public uses from seeing data sets they shouldn't!
         if (!await _releaseRepository.IsLatestPublishedReleaseVersion(releaseId))
         {
             return new NotFoundResult();
         }
 
-        var viewModel = await _contentDbContext.ReleaseFiles
+        return await _contentDbContext.ReleaseFiles
             .Where(rf =>
                 rf.FileId == fileId
                 && rf.ReleaseId == releaseId)
-            .Select(releaseFile => new DataSetDetailsViewModel()
+            .Select(releaseFile => new DataSetDetailsViewModel
             {
-                Title = releaseFile.Name ?? "No name",
-                Summary = releaseFile.Summary ?? "No summary",
-                Release = new DataSetDetailsReleaseViewModel()
+                Title = releaseFile.Name ?? string.Empty,
+                Summary = releaseFile.Summary ?? string.Empty,
+                Release = new DataSetDetailsReleaseViewModel
                 {
                     Id = releaseFile.ReleaseId,
                     Title = releaseFile.Release.Title,
@@ -150,7 +151,7 @@ public class DataSetService : IDataSetService
                     IsLatestPublishedRelease =
                         releaseFile.Release.Publication.LatestPublishedReleaseId == releaseFile.ReleaseId,
                     Published = releaseFile.Release.Published!.Value,
-                    Publication = new DataSetDetailsPublicationViewModel()
+                    Publication = new DataSetDetailsPublicationViewModel
                     {
                         Id = releaseFile.Release.PublicationId,
                         Title = releaseFile.Release.Publication.Title,
@@ -158,21 +159,14 @@ public class DataSetService : IDataSetService
                         ThemeTitle = releaseFile.Release.Publication.Topic.Theme.Title,
                     },
                 },
-                File = new DataSetDetailsFileViewModel()
+                File = new DataSetDetailsFileViewModel
                 {
                     Id = releaseFile.FileId,
                     Name = releaseFile.File.Filename,
                     Size = releaseFile.File.DisplaySize(),
                 }
             })
-            .FirstOrDefaultAsync();
-
-        if (viewModel == null)
-        {
-            return new NotFoundResult();
-        }
-
-        return viewModel;
+            .FirstOrNotFoundAsync();
     }
 }
 
