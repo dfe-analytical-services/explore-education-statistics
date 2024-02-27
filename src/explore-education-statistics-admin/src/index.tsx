@@ -1,3 +1,5 @@
+// Load app styles first to ensure correct style ordering
+import './styles/_all.scss';
 import '@admin/polyfill';
 import configureAxios from '@admin/services/utils/configureAxios';
 import React from 'react';
