@@ -64,9 +64,8 @@ param maxReplica int = 3
 @secure()
 param dbConnectionString string
 
-// @description('Specifies the service bus connection string.')
-// @secure()
-// param serviceBusConnectionString string
+@description('Specifies the subnet id')
+param subnetId string
 
 //Passed in Tags
 param tagValues object
@@ -75,7 +74,6 @@ param applicationInsightsKey string
 
 
 //Variables 
-//var containerImageName = '${acrLoginServer}/${acrHostedImageName}'
 var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${containerAppImageName}'
 var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
@@ -120,6 +118,9 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: containerEnvName
   location: location
   properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: subnetId
+    }
     daprAIInstrumentationKey: applicationInsightsKey
     appLogsConfiguration: {
       destination: 'log-analytics'
@@ -164,7 +165,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           }
         ]
       }
-
     }
     template: {
       containers: [
@@ -176,10 +176,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
               name: 'dbConnectionString'
               value: dbConnectionString
             }
-//             {
-//               name: 'serviceBusConnectionString'
-//               value: serviceBusConnectionString
-//             }
           ]
           resources: {
             cpu: json(cpuCore)

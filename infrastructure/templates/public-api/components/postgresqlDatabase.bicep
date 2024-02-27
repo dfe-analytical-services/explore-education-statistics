@@ -53,18 +53,44 @@ param geoRedundantBackup string = 'Disabled'
 @description('The name of the Key Vault to store the connection strings')
 param keyVaultName string
 
+@description('Specifies the VNet id')
+param vNetId string
+
+@description('Specifies the subnet id')
+param subnetId string
+
+param databaseNames array
+param firewallRules array
+
 //Passed in Tags
 param tagValues object
 
 // Variables and created data
-var databaseName = '${resourcePrefix}-psql-${serverName}'
-var connectionStringSecretName = '${resourcePrefix}-sql-${serverName}-connectionString'
+var databaseServerName = empty(serverName)
+  ? '${resourcePrefix}-psql2'
+  : '${resourcePrefix}-psql2-${serverName}'
+
+var connectionStringSecretName = '${databaseServerName}-connectionString'
 var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
 
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+    name: '${databaseServerName}.privatedns.postgres.database.azure.com'
+    location: 'global'
+    resource vNetLink 'virtualNetworkLinks' = {
+      name: '${databaseServerName}-vnet-link'
+      location: 'global'
+      properties: {
+        registrationEnabled: false
+        virtualNetwork: {
+          id: vNetId
+        }
+      }
+    }
+}
 
-//Resources 
+//Resources
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
-  name: databaseName
+  name: databaseServerName
   location: location
   sku: {
     name: dbSkuName
@@ -86,7 +112,24 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     highAvailability: {
       mode: 'Disabled'
     }
+    network: {
+      delegatedSubnetResourceId: subnetId
+      privateDnsZoneArmResourceId: privateDnsZone.id
+    }
   }
+
+  resource database 'databases' = [for name in databaseNames: {
+      name: name
+  }]
+
+  resource rules 'firewallRules' = [for rule in firewallRules: {
+    name: '${rule.Name}'
+    properties: {
+      startIpAddress: rule.StartIpAddress
+      endIpAddress: rule.EndIpAddress
+    }
+  }]
+
   tags: tagValues
 }
 
@@ -106,7 +149,7 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
 
 //Outputs
 @description('The fully qualified Azure resource ID of the Database Server.')
-output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseName)
+output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
 
 @description('Connection String Secrets.')
 output connectionStringSecretName string = connectionStringSecretName

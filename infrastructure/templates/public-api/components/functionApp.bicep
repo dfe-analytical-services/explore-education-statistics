@@ -36,6 +36,9 @@ param tagValues object
 
 param applicationInsightsKey string
 
+@description('Specifies the subnet id')
+param subnetId string
+
 // Variables and created data
 var kind = 'functionapp'
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
@@ -89,6 +92,7 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
     WEBSITE_RUN_FROM_PACKAGE: '1'
+    virtualNetworkSubnetId: subnetId
   })
 }
 
