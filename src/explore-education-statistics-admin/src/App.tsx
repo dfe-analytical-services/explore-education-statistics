@@ -1,5 +1,3 @@
-// Load app styles first to ensure correct style ordering
-import './styles/_all.scss';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
