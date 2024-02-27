@@ -13,7 +13,7 @@ param environmentName string = 'Development'
 param fileShareQuota int = 1
 
 @description('Storage: Specifies the full name (minus the subscription) of the pre-existing core Storage Account.')
-param storageAccountName string = 'saeescoredw'
+param storageAccountName string = 'saeescore'
 
 // PostgreSQL Database Params ------------------------------------------------------------------
 @description('Database : administrator login name.')
@@ -58,8 +58,8 @@ var containerAppName = 'api'
 var containerAppImageName = useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
 var containerAppTargetPort = 80
 var rootFileShareFolderName = 'data'
-var containerRegistryName = 'eesacrdw'
-var keyVaultName = 'kv-ees-01dw'
+var containerRegistryName = 'eesacr'
+var keyVaultName = 'kv-ees-01'
 var databaseNames = ['publicapi']
 
 var tagValues = {
