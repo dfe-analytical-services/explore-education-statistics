@@ -19,10 +19,6 @@ param storageAccountConnectionString string
 @secure()
 param dbConnectionString string
 
-// @description('Specifies the service bus connection string.')
-// @secure()
-// param serviceBusConnectionString string
-
 //Passed in Tags
 param tagValues object
 

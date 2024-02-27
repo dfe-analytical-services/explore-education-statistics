@@ -67,25 +67,27 @@ param tagValues object
 
 // Variables and created data
 var databaseServerName = empty(serverName)
-  ? '${resourcePrefix}-psql2'
-  : '${resourcePrefix}-psql2-${serverName}'
+  ? '${resourcePrefix}-psql'
+  : '${resourcePrefix}-psql-${serverName}'
 
 var connectionStringSecretName = '${databaseServerName}-connectionString'
 var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
 
+// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
+// with "postgres.database.azure.com".
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-    name: '${databaseServerName}.privatedns.postgres.database.azure.com'
+  name: '${databaseServerName}.privatedns.postgres.database.azure.com'
+  location: 'global'
+  resource vNetLink 'virtualNetworkLinks' = {
+    name: '${databaseServerName}-vnet-link'
     location: 'global'
-    resource vNetLink 'virtualNetworkLinks' = {
-      name: '${databaseServerName}-vnet-link'
-      location: 'global'
-      properties: {
-        registrationEnabled: false
-        virtualNetwork: {
-          id: vNetId
-        }
+    properties: {
+      registrationEnabled: false
+      virtualNetwork: {
+        id: vNetId
       }
     }
+  }
 }
 
 //Resources
