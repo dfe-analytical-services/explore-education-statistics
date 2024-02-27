@@ -5,7 +5,7 @@ param subscription string
 param resourcePrefix string
 
 // Variables and created data
-var vNetName = '${subscription}-vnet-eesdw'
+var vNetName = '${subscription}-vnet-ees'
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-data-processor'
 var postgreSqlSubnetName = '${resourcePrefix}-snet-psql'
 var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-api'

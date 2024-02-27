@@ -15,7 +15,7 @@ parameters:
   - name: resourceGroupName
     displayName: Resource Group Name
     type: string
-    default: 'dfe-development-dw'
+    default: 's101d01'
   - name: azureSubscription
     displayName: The current Azure subscription 
     type: string
@@ -26,7 +26,7 @@ parameters:
     default: 'change-me'
 
 variables:
-  isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
+  isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   vmImageName: 'ubuntu-latest'
   templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/public-api
@@ -38,8 +38,7 @@ variables:
   prodParamFile: $(paramDirectory)/main-prod.bicepparam
 
 pool:
-#  vmImage: $(vmImageName)
-  name: dfe-development-dw agent pool
+  vmImage: $(vmImageName)
 
 stages:
 - stage: Build
