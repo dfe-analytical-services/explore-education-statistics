@@ -20,14 +20,10 @@ parameters:
     displayName: The current Azure subscription 
     type: string
     default: 'AzureConnection'
-  - name: dbAdminPassword
+  - name: postgreSqlAdminPassword
     displayName: The Postgresql DB Admin Password 
     type: string
-    default: 'postgreSQLAdminPassword'
-  - name: containerRegistryName
-    displayName: Specifies the name of the Azure Container Registry
-    type: string
-    default: 'eesacrdw'
+    default: 'change-me'
 
 variables:
   isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
@@ -44,8 +40,6 @@ variables:
 pool:
 #  vmImage: $(vmImageName)
   name: dfe-development-dw agent pool
-  demands:
-    - agent.name -equals Duncan Desktop
 
 stages:
 - stage: Build
@@ -98,7 +92,7 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -109,7 +103,6 @@ stages:
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
-  condition: and(succeeded(), eq(variables.isDev, 'true'))
   dependsOn: DeployDev
   jobs:
   - deployment: Deploy
@@ -125,7 +118,7 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -137,7 +130,7 @@ stages:
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
   condition: and(succeeded(), eq(variables.isMaster, 'true'))
-  dependsOn: Build
+  dependsOn: DeployDev
   jobs:
   - deployment: Deploy
     displayName: 'Deploy Pre Prod Infrastructure'
@@ -152,7 +145,7 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -179,7 +172,7 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-dbAdminPassword $(dbAdminPassword)'
+              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |

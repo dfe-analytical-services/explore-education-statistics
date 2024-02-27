@@ -35,10 +35,8 @@ param tagValues object
 
 // Variables and created data
 var storageName = replace('${resourcePrefix}sa${storageAccountName}', '-', '')
-var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 var connectionStringSecretName = '${resourcePrefix}-sa-${storageAccountName}-connectionString'
 var endpointSuffix = environment().suffixes.storage
-var key = storageAccount.listKeys().keys[0].value
 
 //Resources 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
@@ -66,6 +64,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   tags: tagValues
 }
+
+var key = storageAccount.listKeys().keys[0].value
+var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${key}'
 
 //store connections string
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {

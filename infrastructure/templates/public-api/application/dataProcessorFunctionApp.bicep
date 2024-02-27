@@ -26,6 +26,9 @@ param dbConnectionString string
 //Passed in Tags
 param tagValues object
 
+@description('Specifies the subnet id')
+param subnetId string
+
 param applicationInsightsKey string
 
 
@@ -48,9 +51,9 @@ module functionAppModule '../components/functionApp.bicep' = {
     location: location
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsKey
+    subnetId: subnetId
     settings: {
       dbConnectionString: dbConnectionString
-//       serviceBusConnectionString: serviceBusConnectionString
     }
     functionAppRuntime: functionAppRuntime
   }
