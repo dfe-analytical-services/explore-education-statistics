@@ -614,9 +614,11 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test.skip('re-renders locked state when current user interacts with block before expiry', async () => {
+  test('re-renders locked state when current user interacts with block before expiry', async () => {
     // Lock is about to expire
     mockDate.set('2022-02-16T12:09:00Z');
+
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
     jest.useFakeTimers({
       doNotFake: ['Date'],
@@ -674,7 +676,7 @@ describe('ReleaseEditableBlock', () => {
     expect(connectionMock.invoke).not.toHaveBeenCalled();
 
     // Interact with textbox
-    await userEvent.type(screen.getByRole('textbox'), 'Test text');
+    await user.type(screen.getByRole('textbox'), 'Test text');
 
     jest.advanceTimersByTime(60_000);
 

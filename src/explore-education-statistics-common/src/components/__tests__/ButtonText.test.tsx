@@ -48,9 +48,7 @@ describe('ButtonText', () => {
   });
 
   test('disabled if current `onClick` handler is processing', async () => {
-    const handleClick = jest.fn(async () => {
-      await delay(100);
-    });
+    const handleClick = jest.fn(async () => delay(100));
 
     render(<ButtonText onClick={handleClick}>Test button</ButtonText>);
 
@@ -68,9 +66,7 @@ describe('ButtonText', () => {
   });
 
   test('enabled if current `onClick` handler is processing and `disableDoubleClick` is false', async () => {
-    const handleClick = jest.fn(async () => {
-      await delay(100);
-    });
+    const handleClick = jest.fn(async () => delay(100));
 
     render(
       <ButtonText disableDoubleClick={false} onClick={handleClick}>
@@ -92,9 +88,7 @@ describe('ButtonText', () => {
   });
 
   test('enabled once the current `onClick` handler has finished', async () => {
-    const handleClick = jest.fn(async () => {
-      await delay(100);
-    });
+    const handleClick = jest.fn(async () => delay(100));
 
     render(<ButtonText onClick={handleClick}>Test button</ButtonText>);
 

@@ -279,7 +279,7 @@ describe('useBlockLock', () => {
     });
   });
 
-  // This test doesn't work with the new version of renderHook.
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('calling `startLock` correctly updates state whilst resolving', async () => {
     MockDate.set('2022-03-21T12:00:00Z');
 

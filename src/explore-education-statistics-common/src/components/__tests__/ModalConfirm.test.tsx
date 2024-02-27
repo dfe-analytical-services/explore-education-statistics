@@ -31,10 +31,8 @@ describe('ModalConfirm', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      // await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
-      // });
     });
 
     test('clicking Confirm button prevents closing modal using Esc', async () => {

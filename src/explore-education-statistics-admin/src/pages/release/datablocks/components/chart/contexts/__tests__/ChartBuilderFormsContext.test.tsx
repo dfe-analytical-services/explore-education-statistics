@@ -63,7 +63,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
-  // Skipped tests are because initialProps are not passed to the wrapper component,
+  // EES-4936 Skipped tests are because initialProps are not passed to the wrapper component,
   // so we can't test updating them using rerender.
   // https://testing-library.com/docs/react-testing-library/api/#renderhook-options-initialprops
   test.skip('has correct state if updated `definition` has legend capability', () => {
@@ -183,6 +183,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('removes correct state if updated `definition` does not have capability', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -293,6 +294,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('has correct state if updated `definition` has major axis', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -358,6 +360,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('has correct state when merging with existing major axis state', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -456,6 +459,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('removes correct state if updated `definition` does not have major axis', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -577,6 +581,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('has correct state if new `definition` has minor axis', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -636,6 +641,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('has correct state when merging with existing minor axis state', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),
@@ -716,6 +722,7 @@ describe('useChartBuilderFormsContext', () => {
     });
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('removes correct state if updated `definition` does not have minor axis', () => {
     const { result, rerender } = renderHook(
       () => useChartBuilderFormsContext(),

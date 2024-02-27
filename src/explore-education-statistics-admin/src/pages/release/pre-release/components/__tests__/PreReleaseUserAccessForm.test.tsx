@@ -188,12 +188,6 @@ describe('PreReleaseUserAccessForm', () => {
       );
       await user.tab();
 
-      // await userEvent.type(
-      //   screen.getByLabelText('Invite new users by email'),
-      //   'test@test.com{enter}invalid-1{enter}invalid-2',
-      // );
-      // await userEvent.tab();
-
       await waitFor(() => {
         expect(
           screen.getByText("'invalid-1' is not a valid email address", {

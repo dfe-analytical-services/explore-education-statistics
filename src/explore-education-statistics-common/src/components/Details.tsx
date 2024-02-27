@@ -100,7 +100,6 @@ const Details = ({
         aria-expanded={onMounted(open)}
         className="govuk-details__summary"
         role={onMounted('button')}
-        // role="button"
         tabIndex={onMounted(0)}
         onClick={event => {
           // preventDefault here to allow the open state to be controlled,

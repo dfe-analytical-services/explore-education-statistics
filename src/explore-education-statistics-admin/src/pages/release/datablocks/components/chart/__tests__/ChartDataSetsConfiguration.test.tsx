@@ -1057,7 +1057,7 @@ describe('ChartDataSetsConfiguration', () => {
                 indicator: 'unauthorised-absence-sessions',
               },
               {
-                filters: ['male'],
+                filters: ['female'],
                 indicator: 'unauthorised-absence-sessions',
               },
             ]}

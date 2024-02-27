@@ -53,7 +53,7 @@ describe('CommentsContext', () => {
     onPendingDeleteUndo: handlePendingDeleteUndo,
   };
 
-  // initialProps are not passed to the wrapper component, so we can't test updating
+  // EES-4936 initialProps are not passed to the wrapper component, so we can't test updating
   // them using rerender.
   // https://testing-library.com/docs/react-testing-library/api/#renderhook-options-initialprops
   test.skip('updating `comments` prop updates the returned comments', async () => {

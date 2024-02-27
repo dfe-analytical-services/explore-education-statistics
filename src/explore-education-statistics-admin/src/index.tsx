@@ -10,8 +10,10 @@ configureAxios();
 
 import('./App').then(({ default: App }) => {
   const container = document.getElementById('root');
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const root = createRoot(container!);
+  if (!container) {
+    throw Error('No container found.');
+  }
+  const root = createRoot(container);
   root.render(<App />);
 });
 

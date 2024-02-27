@@ -16,7 +16,7 @@ describe('useAsyncCallback', () => {
     expect(state.error).toBeUndefined();
   });
 
-  // This test doesn't work with the new version of renderHook.
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('returns correct state when callback invoked', () => {
     const { result } = renderHook(() =>
       useAsyncCallback(() => Promise.resolve('some value')),
@@ -189,6 +189,7 @@ describe('useAsyncCallback', () => {
     expect(state.error).toBeUndefined();
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('setting `keepStaleValue = true` keeps the initial value whilst running for first time', async () => {
     jest.useFakeTimers();
 
@@ -239,6 +240,7 @@ describe('useAsyncCallback', () => {
     jest.useRealTimers();
   });
 
+  // EES-4936 This test doesn't work with the new version of renderHook.
   test.skip('setting `keepStaleValue = true` keeps the last value when re-running', async () => {
     jest.useFakeTimers();
 

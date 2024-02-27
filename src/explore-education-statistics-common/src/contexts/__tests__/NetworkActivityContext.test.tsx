@@ -57,7 +57,7 @@ describe('useNetworkActivityContext', () => {
     });
   });
 
-  // This test previously used `waitForNextUpdate` to check for the state change,
+  // EES-4936 This test previously used `waitForNextUpdate` to check for the state change,
   // this has been removed from the new version of renderHook
   test.skip('toggles status back to `idle` when no more requests within the idle timeout', async () => {
     const client = createTestClient();

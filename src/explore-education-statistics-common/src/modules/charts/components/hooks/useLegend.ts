@@ -8,13 +8,17 @@ export default function useLegend(): [LegendProps | undefined, ContentType] {
 
   const renderLegend: ContentType = useCallback(
     (nextProps: DefaultLegendContentProps) => {
-      const nextLegendProps = omit(nextProps, 'content');
+      const nextLegendProps: LegendProps = {
+        ...omit(nextProps, 'content'),
+        width: nextProps.width ? Number(nextProps.width) : undefined,
+        height: nextProps.height ? Number(nextProps.height) : undefined,
+      };
 
       // Need to do a deep comparison of the props to
       // avoid falling into an infinite rendering loop.
       if (JSON.stringify(legendProps) !== JSON.stringify(nextLegendProps)) {
         setTimeout(() => {
-          setLegendProps(nextLegendProps as LegendProps);
+          setLegendProps(nextLegendProps);
         });
       }
 

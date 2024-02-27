@@ -1606,10 +1606,6 @@ describe('DataCataloguePage', () => {
           }),
         );
 
-        // await waitFor(() => {
-        //   expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        // });
-
         expect(await screen.findByText('30 data sets')).toBeInTheDocument();
 
         expect(mockRouter).toMatchObject({

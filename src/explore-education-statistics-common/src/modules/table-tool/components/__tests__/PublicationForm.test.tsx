@@ -408,13 +408,20 @@ describe('PublicationForm', () => {
   });
 
   test('does not throw error if regex sensitive search term is used', async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ delay: null });
+
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search publications'), '[[');
+    await user.type(screen.getByLabelText('Search publications'), '[[');
 
-    expect(() => {}).not.toThrow();
+    expect(() => {
+      jest.runOnlyPendingTimers();
+    }).not.toThrow();
+
+    jest.useRealTimers();
   });
 
   test('renders empty message when there are no themes', () => {

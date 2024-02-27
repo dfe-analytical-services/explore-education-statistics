@@ -481,19 +481,5 @@ describe('generateFeaturesAndDataGroups', () => {
     ];
 
     expect(result.dataGroups).toEqual(expectedDataGroups);
-
-    // expect(legendColours[0].style.backgroundColor).toBe(
-    //   'rgba(218, 224, 237, 1)',
-    // );
-    // expect(legendColours[1].style.backgroundColor).toBe(
-    //   'rgba(181, 193, 219, 1)',
-    // );
-    // expect(legendColours[2].style.backgroundColor).toBe(
-    //   'rgba(145, 161, 201, 1)',
-    // );
-    // expect(legendColours[3].style.backgroundColor).toBe(
-    //   'rgba(108, 130, 183, 1)',
-    // );
-    // expect(legendColours[4].style.backgroundColor).toBe('rgba(71, 99, 165, 1)');
   });
 });

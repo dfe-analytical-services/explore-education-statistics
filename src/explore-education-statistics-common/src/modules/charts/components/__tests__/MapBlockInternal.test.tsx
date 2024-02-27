@@ -12,7 +12,7 @@ import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 import React from 'react';
 
-// react leaflet now uses ESM so unable to test this currently.
+// EES-4902 react leaflet now uses ESM so unable to test this currently.
 // It's stubbed out in the mocks folder.
 // Tests are skipped or partially commented out when they
 // are testing the maps directly.
