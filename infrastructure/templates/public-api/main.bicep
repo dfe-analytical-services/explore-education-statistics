@@ -1,19 +1,16 @@
 //Environment Params -------------------------------------------------------------------
-@description('Environment: Subscription Name e.g. s101d01. Used as a prefix for created resources.')
+@description('Environment : Subscription Name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = 's101d01'
 
-@description('Environment: Specifies the location in which the Azure resources should be deployed.')
+@description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
 
 //Tagging Params ------------------------------------------------------------------------
-@description('Tagging: Environment Name e.g. Development. Used for tagging Resources for each environment.')
+@description('Tagging : Environment Name e.g. Development. Used for tagging Resources for each environment.')
 param environmentName string = 'Development'
 
 @description('Storage : Size of the file share in GB.')
 param fileShareQuota int = 1
-
-@description('Storage: Specifies the full name (minus the subscription) of the pre-existing core Storage Account.')
-param storageAccountName string = 'saeescore'
 
 // PostgreSQL Database Params ------------------------------------------------------------------
 @description('Database : administrator login name.')
@@ -52,14 +49,14 @@ param now string = utcNow('u')
 //---------------------------------------------------------------------------------------------------------------
 var project = 'ees-publicapi'
 var resourcePrefix = '${subscription}-${project}'
-var storageAccountFullName = '${subscription}${storageAccountName}'
+var storageAccountFullName = '${subscription}saeescore'
+var keyVaultName = 'kv-ees-01'
 var keyVaultFullName = '${subscription}-${keyVaultName}'
 var containerAppName = 'api'
 var containerAppImageName = useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
 var containerAppTargetPort = 80
 var rootFileShareFolderName = 'data'
 var containerRegistryName = 'eesacr'
-var keyVaultName = 'kv-ees-01'
 var databaseNames = ['publicapi']
 
 var tagValues = {
