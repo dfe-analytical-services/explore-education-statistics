@@ -69,13 +69,16 @@ async function startServer() {
   const server = express();
 
   function replaceLastOccurance(input, pattern, replacement) {
-    if (input === undefined || input === null || input.length === 0) {
+    if (
+      input === undefined ||
+      input === null ||
+      input.length === 0 ||
+      !input.endsWith(pattern)
+    ) {
       return input;
     }
 
-    return input.endsWith(pattern)
-      ? `${input.slice(0, -pattern.length)}${replacement}`
-      : input;
+    return `${input.slice(0, -pattern.length)}${replacement}`;
   }
 
   // Redirect URLs with trailing slash to equivalent without slash with 301
@@ -89,7 +92,7 @@ async function startServer() {
       '/data-catalogue',
     );
 
-    if (newUri !== req.url) {
+    if (newUri !== req.url && newUri !== '') {
       return res.redirect(301, newUri);
     }
     nextNotShadowed();
