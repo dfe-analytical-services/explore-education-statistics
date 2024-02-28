@@ -138,6 +138,8 @@ Reorder Gender to be column group
     # Column group needs to be inside the viewport
     user scrolls to element    xpath://button[text()="Update and view reordered table"]
     user clicks button    Move    testId:rowGroups-0
+    user clicks button    Move    testId:rowGroups-0
+    user clicks button    Done    testId:columnGroups-1
 
 Move Gender to be first column group
     # The /.. to get to a focusable element

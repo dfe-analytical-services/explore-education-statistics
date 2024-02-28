@@ -108,6 +108,32 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
     setScreenReaderMessage(message);
   };
 
+  // Move group within axis via button controls
+  const handleMoveGroup = ({
+    groupIndex,
+    sourceId,
+    form,
+    direction,
+  }: {
+    groupIndex: number;
+    sourceId: keyof TableHeadersFormValues;
+    form: UseFormReturn<TableHeadersFormValues>;
+    direction: 'up' | 'down';
+  }) => {
+    const sourceValue = form.getValues(sourceId);
+    const newIndex = direction === 'up' ? groupIndex - 1 : groupIndex + 1;
+    if (
+      (direction === 'up' && groupIndex === 0) ||
+      (direction === 'down' && groupIndex === sourceValue.length - 1)
+    ) {
+      return;
+    }
+    const reordered = reorder(sourceValue, groupIndex, newIndex);
+
+    form.setValue(sourceId, reordered);
+    form.trigger(sourceId);
+  };
+
   const handleDragEnd = ({
     result,
     form,
@@ -262,6 +288,22 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
                             id="columnGroups"
                             legend="Move column headers"
                             name="columnGroups"
+                            onMoveGroupDown={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'columnGroups',
+                                form,
+                                direction: 'down',
+                              });
+                            }}
+                            onMoveGroupUp={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'columnGroups',
+                                form,
+                                direction: 'up',
+                              });
+                            }}
                             onMoveGroupToOtherAxis={groupIndex => {
                               handleMoveGroupToOtherAxis({
                                 groupIndex,
@@ -275,6 +317,22 @@ export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
                             id="rowGroups"
                             legend="Move row headers"
                             name="rowGroups"
+                            onMoveGroupDown={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'rowGroups',
+                                form,
+                                direction: 'down',
+                              });
+                            }}
+                            onMoveGroupUp={groupIndex => {
+                              handleMoveGroup({
+                                groupIndex,
+                                sourceId: 'rowGroups',
+                                form,
+                                direction: 'up',
+                              });
+                            }}
                             onMoveGroupToOtherAxis={groupIndex => {
                               handleMoveGroupToOtherAxis({
                                 groupIndex,

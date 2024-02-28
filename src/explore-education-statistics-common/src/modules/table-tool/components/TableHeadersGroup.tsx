@@ -2,32 +2,43 @@ import styles from '@common/modules/table-tool/components/TableHeadersGroup.modu
 import TableHeadersGroupControls from '@common/modules/table-tool/components/TableHeadersGroupControls';
 import TableHeadersReadOnlyList from '@common/modules/table-tool/components/TableHeadersReadOnlyList';
 import TableHeadersReorderableList from '@common/modules/table-tool/components/TableHeadersReorderableList';
-import getTableHeaderGroupId from '@common/modules/table-tool/components/utils/getTableHeaderGroupId';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
 interface Props {
+  id: string;
   index: number;
+  isLastGroup: boolean;
   legend: string;
   name: string;
   totalItems: number;
   onMoveGroupToOtherAxis: () => void;
+  onMoveGroupDown: () => void;
+  onMoveGroupUp: () => void;
 }
 
 const TableHeadersGroup = ({
+  id,
   index,
+  isLastGroup,
   legend,
   name,
   totalItems,
   onMoveGroupToOtherAxis,
+  onMoveGroupDown,
+  onMoveGroupUp,
 }: Props) => {
-  const { activeGroup, groupDraggingActive, groupDraggingEnabled } =
-    useTableHeadersContext();
+  const {
+    activeGroup,
+    groupDraggingActive,
+    groupDraggingEnabled,
+    moveControlsActive,
+  } = useTableHeadersContext();
   const [focusedGroup, setFocusedGroup] = useState<string>();
-  const groupId = getTableHeaderGroupId(legend);
   const defaultNumberOfItems = 2;
+  const showMovingControls = moveControlsActive.includes(id);
 
   return (
     <Draggable
@@ -48,27 +59,25 @@ const TableHeadersGroup = ({
               draggableSnapshot.isDragging && !draggableSnapshot.draggingOver,
             [styles.dragEnabled]: groupDraggingEnabled,
             [styles.focused]: focusedGroup === name,
+            [styles.groupActive]: activeGroup === id,
+            [styles.showMovingControls]: showMovingControls,
           })}
           ref={draggableProvided.innerRef}
         >
-          {activeGroup === groupId ? (
-            <TableHeadersReorderableList
-              id={groupId}
-              legend={legend}
-              name={name}
-            />
+          {activeGroup === id ? (
+            <TableHeadersReorderableList id={id} legend={legend} name={name} />
           ) : (
             <div
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...draggableProvided.dragHandleProps}
               className={styles.groupDragHandle}
-              data-testid={`draggable-${groupId}`}
+              data-testid={`draggable-${id}`}
               onBlur={() => setFocusedGroup(undefined)}
               onFocus={() => setFocusedGroup(name)}
             >
               <TableHeadersReadOnlyList
                 defaultNumberOfItems={defaultNumberOfItems}
-                id={groupId}
+                id={id}
                 legend={legend}
                 name={name}
               />
@@ -77,10 +86,15 @@ const TableHeadersGroup = ({
           <TableHeadersGroupControls
             defaultNumberOfItems={defaultNumberOfItems}
             groupName={name}
-            id={groupId}
+            id={id}
+            index={index}
+            isLastGroup={isLastGroup}
             legend={legend}
+            showMovingControls={showMovingControls}
             totalItems={totalItems}
-            onMove={onMoveGroupToOtherAxis}
+            onMoveAxis={onMoveGroupToOtherAxis}
+            onMoveDown={onMoveGroupDown}
+            onMoveUp={onMoveGroupUp}
           />
         </div>
       )}

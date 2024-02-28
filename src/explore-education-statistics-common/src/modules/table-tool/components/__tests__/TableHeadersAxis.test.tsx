@@ -90,6 +90,8 @@ function render({ groupDraggingEnabled }: { groupDraggingEnabled: boolean }) {
             id="test-id"
             legend="Test legend"
             name="rowGroups"
+            onMoveGroupDown={noop}
+            onMoveGroupUp={noop}
             onMoveGroupToOtherAxis={noop}
           />
         </DragDropContext>

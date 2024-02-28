@@ -108,7 +108,7 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
     expect(
       columnGroup1.getByRole('button', {
-        name: 'Move Locations to rows',
+        name: 'Move Locations',
       }),
     ).toBeInTheDocument();
 
@@ -130,7 +130,7 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
     expect(
       columnGroup2.getByRole('button', {
-        name: 'Move Category group to rows',
+        name: 'Move Category group',
       }),
     ).toBeInTheDocument();
 
@@ -152,7 +152,7 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
     expect(
       columnGroup3.getByRole('button', {
-        name: 'Move Time periods to rows',
+        name: 'Move Time periods',
       }),
     ).toBeInTheDocument();
   });
@@ -194,7 +194,7 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
     expect(
       rowGroup1.getByRole('button', {
-        name: 'Move Indicators to columns',
+        name: 'Move Indicators',
       }),
     ).toBeInTheDocument();
   });
@@ -216,6 +216,8 @@ describe('TableHeadersForm', () => {
     expect(
       columnAxis.getByRole('heading', { name: 'Locations' }),
     ).toBeInTheDocument();
+
+    userEvent.click(screen.getByRole('button', { name: 'Move Locations' }));
 
     userEvent.click(
       screen.getByRole('button', { name: 'Move Locations to rows' }),
@@ -264,6 +266,8 @@ describe('TableHeadersForm', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
+
+    userEvent.click(screen.getByRole('button', { name: 'Move Locations' }));
 
     userEvent.click(
       screen.getByRole('button', { name: 'Move Locations to rows' }),
@@ -330,7 +334,8 @@ describe('TableHeadersForm', () => {
     const reorderableLocations = screen.getByRole('group', {
       name: 'Locations',
     });
-    const items = within(reorderableLocations).getAllByRole('button');
+    const items =
+      within(reorderableLocations).getAllByTestId('reorderable-item');
     expect(items).toHaveLength(5);
     expect(items[0]).toHaveTextContent('Location 1');
     expect(items[1]).toHaveTextContent('Location 2');
@@ -383,7 +388,7 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
     expect(
       columnGroup2.getByRole('button', {
-        name: 'Move Category group to rows',
+        name: 'Move Category group',
       }),
     ).toBeDisabled();
 
@@ -398,7 +403,7 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
     expect(
       columnGroup3.getByRole('button', {
-        name: 'Move Time periods to rows',
+        name: 'Move Time periods',
       }),
     ).toBeDisabled();
 
@@ -413,7 +418,7 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
     expect(
       rowGroup1.getByRole('button', {
-        name: 'Move Indicators to columns',
+        name: 'Move Indicators',
       }),
     ).toBeDisabled();
   });

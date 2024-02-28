@@ -14,7 +14,7 @@ describe('TableHeadersGroupControls', () => {
         screen.queryByRole('button', { name: 'Reorder items in Locations' }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Move Locations to columns' }),
+        screen.queryByRole('button', { name: 'Move Locations' }),
       ).not.toBeInTheDocument();
     });
 
@@ -28,7 +28,7 @@ describe('TableHeadersGroupControls', () => {
         screen.getByRole('button', { name: 'Reorder items in Locations' }),
       ).toBeDisabled();
       expect(
-        screen.getByRole('button', { name: 'Move Locations to columns' }),
+        screen.getByRole('button', { name: 'Move Locations' }),
       ).toBeDisabled();
     });
   });
@@ -40,7 +40,7 @@ describe('TableHeadersGroupControls', () => {
         screen.getByRole('button', { name: 'Reorder items in Locations' }),
       ).not.toBeDisabled();
       expect(
-        screen.getByRole('button', { name: 'Move Locations to columns' }),
+        screen.getByRole('button', { name: 'Move Locations' }),
       ).not.toBeDisabled();
       expect(
         screen.queryByRole('button', { name: 'Done' }),
@@ -89,15 +89,62 @@ describe('TableHeadersGroupControls', () => {
       ).not.toBeInTheDocument();
     });
   });
+
+  describe('move controls', () => {
+    test('renders the move controls when showMovingControls is true', async () => {
+      render({ showMovingControls: true });
+      expect(
+        screen.queryByRole('button', { name: 'Move Locations' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Move Locations left' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Move Locations right' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Move Locations to columns' }),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
+    });
+
+    test('does not render the move controls when showMovingControls is false', async () => {
+      render({ showMovingControls: false });
+      expect(
+        screen.queryByRole('button', { name: 'Move Locations left' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Move Locations right' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Move Locations to columns' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Done' }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Move Locations' }),
+      ).toBeInTheDocument();
+    });
+  });
 });
 
 function render({
   activeGroup = undefined,
   expandedLists = [],
+  showMovingControls = false,
   totalItems = 2,
 }: {
   activeGroup?: string;
   expandedLists?: string[];
+  showMovingControls?: boolean;
   totalItems?: number;
 }) {
   baseRender(
@@ -109,9 +156,14 @@ function render({
         defaultNumberOfItems={2}
         groupName="rowGroups"
         id="test-id"
+        index={1}
+        isLastGroup={false}
         legend="Locations"
+        showMovingControls={showMovingControls}
         totalItems={totalItems}
-        onMove={noop}
+        onMoveAxis={noop}
+        onMoveDown={noop}
+        onMoveUp={noop}
       />
     </TableHeadersContextProvider>,
   );
