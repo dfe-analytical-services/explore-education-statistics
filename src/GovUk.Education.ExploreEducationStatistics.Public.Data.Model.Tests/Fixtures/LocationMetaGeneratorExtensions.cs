@@ -7,17 +7,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 public static class LocationMetaGeneratorExtensions
 {
     public static Generator<LocationMeta> DefaultLocationMeta(this DataFixture fixture)
-        => fixture.Generator<LocationMeta>().WithDefaults();
+        => fixture.Generator<LocationMeta>()
+            .WithDefaults();
+
+    public static Generator<LocationMeta> DefaultLocationMeta<TOptionMeta>(this DataFixture fixture, int options)
+        where TOptionMeta : LocationOptionMeta
+        => fixture.Generator<LocationMeta>()
+            .WithDefaults()
+            .WithOptions(fixture.Generator<TOptionMeta>().Generate(options));
+
 
     public static Generator<LocationMeta> DefaultLocationMeta(this DataFixture fixture, int options)
         => fixture.Generator<LocationMeta>()
             .WithDefaults()
-            .WithOptions(fixture.DefaultLocationOptionMeta().GenerateList(options));
+            .WithOptions(fixture.DefaultLocationCodedOptionMeta().Generate(options));
 
     public static Generator<LocationMeta> WithDefaults(this Generator<LocationMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<LocationMeta> WithLevel(this Generator<LocationMeta> generator, GeographicLevel level)
+    public static Generator<LocationMeta> WithDataSetVersion(
+        this Generator<LocationMeta> generator,
+        DataSetVersion dataSetVersion)
+        => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
+
+    public static Generator<LocationMeta> WithLevel(
+        this Generator<LocationMeta> generator,
+        GeographicLevel level)
         => generator.ForInstance(s => s.SetLevel(level));
 
     public static Generator<LocationMeta> WithOptions(
@@ -30,13 +45,24 @@ public static class LocationMetaGeneratorExtensions
         Func<IEnumerable<LocationOptionMeta>> options)
         => generator.ForInstance(s => s.SetOptions(options));
 
+    public static Generator<LocationMeta> WithOptionLinks(
+        this Generator<LocationMeta> generator,
+        Func<IEnumerable<LocationOptionMetaLink>> links)
+        => generator.ForInstance(s => s.SetOptionLinks(links));
+
     public static InstanceSetters<LocationMeta> SetDefaults(this InstanceSetters<LocationMeta> setters)
         => setters
             .Set(
                 m => m.Level,
-                (_, _, context) =>
-                    GeographicLevelUtils.Levels[context.Index % GeographicLevelUtils.Levels.Length]
+                (_, _, context) => GeographicLevelUtils.Levels[context.Index % GeographicLevelUtils.Levels.Length]
             );
+
+    public static InstanceSetters<LocationMeta> SetDataSetVersion(
+        this InstanceSetters<LocationMeta> setters,
+        DataSetVersion dataSetVersion)
+        => setters
+            .Set(m => m.DataSetVersion, dataSetVersion)
+            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
 
     public static InstanceSetters<LocationMeta> SetLevel(
         this InstanceSetters<LocationMeta> setters,
@@ -46,10 +72,15 @@ public static class LocationMetaGeneratorExtensions
     public static InstanceSetters<LocationMeta> SetOptions(
         this InstanceSetters<LocationMeta> setters,
         IEnumerable<LocationOptionMeta> options)
-        => setters.Set(m => m.Options, options);
+        => setters.Set(m => m.Options, () => options);
 
     public static InstanceSetters<LocationMeta> SetOptions(
         this InstanceSetters<LocationMeta> setters,
         Func<IEnumerable<LocationOptionMeta>> options)
         => setters.Set(m => m.Options, () => options().ToList());
+    
+    public static InstanceSetters<LocationMeta> SetOptionLinks(
+        this InstanceSetters<LocationMeta> setters,
+        Func<IEnumerable<LocationOptionMetaLink>> links)
+        => setters.Set(m => m.OptionLinks, () => links().ToList());
 }

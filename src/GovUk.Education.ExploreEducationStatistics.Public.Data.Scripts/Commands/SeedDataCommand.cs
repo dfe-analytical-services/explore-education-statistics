@@ -14,9 +14,11 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Utils;
+using LinqToDB;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.GeographicLevelUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Commands;
 
@@ -78,7 +80,6 @@ public class SeedDataCommand : ICommand
     private static async Task<PublicDataDbContext> SetUpPublicDataDbContext(CancellationToken cancellationToken)
     {
         var dataSourceBuilder = new NpgsqlDataSourceBuilder(DbConnectionString);
-        dataSourceBuilder.MapEnum<GeographicLevel>();
 
         var options = new DbContextOptionsBuilder<PublicDataDbContext>()
             .UseNpgsql(dataSourceBuilder.Build())
@@ -89,6 +90,8 @@ public class SeedDataCommand : ICommand
         dbContext.Database.SetCommandTimeout(300);
         await dbContext.Database.MigrateAsync(cancellationToken: cancellationToken);
 
+        LinqToDBForEFTools.Initialize();
+
         var tables = dbContext.Model.GetEntityTypes()
             .Select(type => type.GetTableName())
             .Distinct()
@@ -98,9 +101,12 @@ public class SeedDataCommand : ICommand
         // Clear any tables in case we're re-running the command
         foreach (var table in tables)
         {
+#pragma warning disable EF1002
             await dbContext.Database.ExecuteSqlRawAsync(
+#pragma warning restore EF1002
                 $"""TRUNCATE TABLE "{table}" RESTART IDENTITY CASCADE;""",
-                cancellationToken: cancellationToken);
+                cancellationToken: cancellationToken
+            );
         }
 
         return dbContext;
@@ -108,7 +114,7 @@ public class SeedDataCommand : ICommand
 
     private class Seeder
     {
-        private static int _idSeedNumber;
+        private const string FiltersDuckDbTable = "filters";
 
         private readonly DataSetSeed _seed;
         private readonly PublicDataDbContext _dbContext;
@@ -116,7 +122,6 @@ public class SeedDataCommand : ICommand
         private readonly IConsole _console;
         private readonly CancellationToken _cancellationToken;
 
-        private readonly ShortId _shortId;
         private readonly string _dataFilePath;
         private readonly string _metaFilePath;
 
@@ -132,9 +137,6 @@ public class SeedDataCommand : ICommand
             _duckDb = duckDb;
             _console = console;
             _cancellationToken = cancellationToken;
-
-            _idSeedNumber += 1;
-            _shortId = new ShortId(_idSeedNumber, checkCollisions: true);
 
             _dataFilePath = Path.Combine("SeedFiles", $"{_seed.Filename}.csv");
             _metaFilePath = Path.Combine("SeedFiles", $"{_seed.Filename}.meta.csv");
@@ -181,7 +183,7 @@ public class SeedDataCommand : ICommand
             await _dbContext.DataSets.AddAsync(_seed.DataSet, _cancellationToken);
 
             var dataSetVersion = await CreateDataSetVersion(metaFileRows, allowedColumns);
-            var dataSetMeta = await CreateDataSetMeta(metaFileRows, allowedColumns);
+            await CreateDataSetMeta(metaFileRows, allowedColumns);
 
             _seed.DataSet.LatestVersion = dataSetVersion;
 
@@ -199,11 +201,13 @@ public class SeedDataCommand : ICommand
 
             await _console.Output.WriteLineAsync("=> Started seeding Parquet data");
 
-            await SeedParquetData(dataSetMeta, dataSetVersion.TotalResults);
+            await SeedParquetData();
 
             stopwatch.Stop();
 
-            await _console.Output.WriteLineAsync($"=> Finished seeding Parquet data in {stopwatch.Elapsed.TotalSeconds} seconds");
+            await _console.Output.WriteLineAsync(
+                $"=> Finished seeding Parquet data in {stopwatch.Elapsed.TotalSeconds} seconds"
+            );
         }
 
         private async Task<DataSetVersion> CreateDataSetVersion(
@@ -222,10 +226,12 @@ public class SeedDataCommand : ICommand
                         cancellationToken: _cancellationToken
                     )
                 ))
-                .Select(row => (
-                    Year: row.TimePeriod,
-                    TimeIdentifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
-                ))
+                .Select(
+                    row => (
+                        Year: row.TimePeriod,
+                        TimeIdentifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
+                    )
+                )
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
                 .ToList();
@@ -245,12 +251,12 @@ public class SeedDataCommand : ICommand
                 {
                     TimePeriodRange = new TimePeriodRange
                     {
-                        Start = new TimePeriodMeta
+                        Start = new TimePeriodRangeBound
                         {
                             Year = timePeriods[0].Year,
                             Code = timePeriods[0].TimeIdentifier
                         },
-                        End = new TimePeriodMeta
+                        End = new TimePeriodRangeBound
                         {
                             Year = timePeriods[^1].Year,
                             Code = timePeriods[^1].TimeIdentifier
@@ -281,144 +287,322 @@ public class SeedDataCommand : ICommand
             return dataSetVersion;
         }
 
-        private async Task<DataSetMeta> CreateDataSetMeta(
+        private async Task CreateDataSetMeta(
             IList<MetaFileRow> metaFileRows,
             IReadOnlySet<string> allowedColumns)
         {
-            var geographicLevels = ListGeographicLevels(allowedColumns);
-
-            var dataSetMeta = new DataSetMeta
-            {
-                Id = _seed.DataSetMetaId,
-                DataSetVersionId = _seed.DataSetVersionId,
-                Filters = await ListFilterMeta(metaFileRows, allowedColumns),
-                Indicators = ListIndicatorMeta(metaFileRows, allowedColumns),
-                TimePeriods = await ListTimePeriodMeta(),
-                Locations = await ListLocationMeta(geographicLevels),
-                GeographicLevels = geographicLevels
-            };
-
-            await _dbContext.DataSetMeta.AddAsync(dataSetMeta, _cancellationToken);
-            await _dbContext.SaveChangesAsync(_cancellationToken);
-
-            return dataSetMeta;
+            await CreateFilterMetas(metaFileRows, allowedColumns);
+            await CreateLocationMetas(allowedColumns);
+            await CreateIndicatorMeta(metaFileRows, allowedColumns);
+            await CreateTimePeriodMeta();
         }
 
-        private List<IndicatorMeta> ListIndicatorMeta(
+        private async Task CreateIndicatorMeta(
             IEnumerable<MetaFileRow> metaFileRows,
             IReadOnlySet<string> allowedColumns)
         {
-            return metaFileRows
+            var metas = metaFileRows
                 .Where(row => row.ColType == MetaFileRow.ColumnType.Indicator
                               && allowedColumns.Contains(row.ColName))
                 .OrderBy(row => row.Label)
+                .ToList()
                 .Select(
                     row => new IndicatorMeta
                     {
-                        Identifier = row.ColName,
+                        DataSetVersionId = _seed.DataSetVersionId,
+                        PublicId = row.ColName,
                         Label = row.Label,
                         Unit = row.IndicatorUnit,
                         DecimalPlaces = row.IndicatorDp
                     }
                 )
                 .ToList();
+
+            _dbContext.IndicatorMetas.AddRange(metas);
+            await _dbContext.SaveChangesAsync(_cancellationToken);
         }
 
-        private async Task<List<FilterMeta>> ListFilterMeta(
+        private async Task CreateFilterMetas(
             IEnumerable<MetaFileRow> metaFileRows,
             IReadOnlySet<string> allowedColumns)
         {
-            return await metaFileRows
-                .Where(row => row.ColType == MetaFileRow.ColumnType.Filter
-                              && allowedColumns.Contains(row.ColName))
+            var metas = metaFileRows
+                .Where(
+                    row => row.ColType == MetaFileRow.ColumnType.Filter
+                           && allowedColumns.Contains(row.ColName)
+                )
                 .OrderBy(row => row.Label)
-                .ToAsyncEnumerable()
-                .SelectAwait(async row =>
-                {
-                    var options = (await _duckDb.QueryAsync<string>(
-                            new CommandDefinition(
-                                $"""
-                                 SELECT DISTINCT "{row.ColName}"
-                                 FROM '{_dataFilePath}' AS data
-                                 WHERE "{row.ColName}" != ''
-                                 ORDER BY "{row.ColName}"
-                                 """,
-                                cancellationToken: _cancellationToken
-                            )
-                        ))
-                        .Select(
-                            (label, index) => new FilterOptionMeta
-                            {
-                                PublicId = _shortId.Generate(),
-                                PrivateId = index + 1,
-                                Label = label
-                            }
-                        )
-                        .ToList();
-
-                    return new FilterMeta
+                .Select(
+                    row => new FilterMeta
                     {
-                        Identifier = row.ColName,
+                        PublicId = row.ColName,
+                        DataSetVersionId = _seed.DataSetVersionId,
                         Label = row.Label,
                         Hint = row.FilterHint ?? string.Empty,
-                        Options = options
-                    };
-                })
-                .ToListAsync(_cancellationToken);
-        }
+                    }
+                )
+                .ToList();
 
-        private async Task<List<LocationMeta>> ListLocationMeta(List<GeographicLevel> geographicLevels)
-        {
-            return await geographicLevels
-                .ToAsyncEnumerable()
-                .SelectAwait(async level =>
-                {
-                    var cols = level.CsvColumns();
-                    var options = (await _duckDb.QueryAsync<(string Code, string Name)>(
-                            new CommandDefinition(
-                                $"""
-                                 SELECT {cols.Code}, {cols.Name}
-                                 FROM '{_dataFilePath}'
-                                 WHERE {cols.Name} != ''
-                                 GROUP BY {cols.Code}, {cols.Name}
-                                 ORDER BY {cols.Name}, {cols.Code}
-                                 """,
-                                cancellationToken: _cancellationToken
-                            )
-                        ))
-                        .Select(
-                            (tuple, index) => new LocationOptionMeta
-                            {
-                                PublicId = _shortId.Generate(),
-                                PrivateId = index + 1,
-                                Code = tuple.Code,
-                                Label = tuple.Name
-                            }
+            _dbContext.FilterMetas.AddRange(metas);
+            await _dbContext.SaveChangesAsync(_cancellationToken);
+
+            foreach (var meta in metas)
+            {
+                var options = (await _duckDb.QueryAsync<string>(
+                        new CommandDefinition(
+                            $"""
+                             SELECT DISTINCT "{meta.PublicId}"
+                             FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data
+                             WHERE "{meta.PublicId}" != ''
+                             ORDER BY "{meta.PublicId}"
+                             """,
+                            cancellationToken: _cancellationToken
                         )
+                    ))
+                    .Select(
+                        label => new FilterOptionMeta
+                        {
+                            Label = label,
+                            IsAggregate = label == "Total" ? true : null
+                        }
+                    )
+                    .ToList();
+
+                var optionTable = _dbContext.GetTable<FilterOptionMeta>();
+
+                // Merge to only inserting new filter options
+                // that don't already exist in the table.
+                await optionTable
+                    .Merge()
+                    .Using(options)
+                    .On(
+                        o => new { o.Label, o.IsAggregate },
+                        o => new { o.Label, o.IsAggregate }
+                    )
+                    .InsertWhenNotMatched()
+                    .MergeAsync(_cancellationToken);
+
+                var current = 0;
+                const int batchSize = 1000;
+
+                while (current < options.Count)
+                {
+                    var batch = options
+                        .Skip(current)
+                        .Take(batchSize)
                         .ToList();
 
-                    return new LocationMeta
-                    {
-                        Level = level,
-                        Options = options
-                    };
-                })
-                .ToListAsync(_cancellationToken);
+                    // Although not necessary for filter options, we've adopted the 'row key'
+                    // technique that was used for the location meta. This is more for
+                    // future-proofing if we ever add more columns to the filter options table.
+                    var batchRowKeys = batch
+                        .Select(o => o.Label + ',' + (o.IsAggregate == true ? "True" : ""))
+                        .ToHashSet();
+
+                    var links = await optionTable
+                        .Where(o =>
+                            batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "" )))
+                        .Select(option => new FilterOptionMetaLink
+                        {
+                            MetaId = meta.Id,
+                            OptionId = option.Id
+                        })
+                        .ToListAsync(token: _cancellationToken);
+
+                    _dbContext.FilterOptionMetaLinks.AddRange(links);
+                    await _dbContext.SaveChangesAsync(_cancellationToken);
+
+                    current += batchSize;
+                }
+
+                var insertedLinks = await _dbContext.FilterOptionMetaLinks
+                    .CountAsync(l => l.MetaId == meta.Id,
+                        cancellationToken: _cancellationToken);
+
+                if (insertedLinks != options.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"Inserted incorrect number of filter option meta links for {meta.PublicId}. " +
+                        $"Inserted: {insertedLinks}, expected: {options.Count}");
+                }
+            }
         }
 
-        private static List<GeographicLevel> ListGeographicLevels(IReadOnlySet<string> allowedColumns)
+        private async Task CreateLocationMetas(IReadOnlySet<string> allowedColumns)
+        {
+            var geographicLevels = ListGeographicLevels(allowedColumns);
+
+            var metas = geographicLevels
+                .Select(level => new LocationMeta
+                {
+                    DataSetVersionId = _seed.DataSetVersionId,
+                    Level = level,
+                })
+                .ToList();
+
+            _dbContext.LocationMetas.AddRange(metas);
+            await _dbContext.SaveChangesAsync(_cancellationToken);
+
+            foreach (var meta in metas)
+            {
+                var nameCol = meta.Level.CsvNameColumn();
+                var codeCols = meta.Level.CsvCodeColumns();
+                string[] cols = [..codeCols, nameCol];
+
+                var options = (await _duckDb.QueryAsync(
+                        new CommandDefinition(
+                            $"""
+                             SELECT {cols.JoinToString(", ")}
+                             FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
+                             WHERE {cols.Select(col => $"{col} != ''").JoinToString(" AND ")}
+                             GROUP BY {cols.JoinToString(", ")}
+                             ORDER BY {cols.JoinToString(", ")}
+                             """,
+                            cancellationToken: _cancellationToken
+                        )
+                    ))
+                    .Cast<IDictionary<string, object?>>()
+                    .Select(row => row.ToDictionary(
+                        kv => kv.Key,
+                        kv => (string)kv.Value!
+                    ))
+                    .Select(row => MapLocationOptionMeta(row, meta.Level).ToRow())
+                    .ToList();
+
+                var optionTable = _dbContext
+                    .GetTable<LocationOptionMetaRow>()
+                    .TableName(nameof(PublicDataDbContext.LocationOptionMetas));
+
+                await optionTable
+                    .Merge()
+                    .Using(options)
+                    .On(
+                        o => new { o.Type, o.Label, o.Code, o.OldCode, o.Urn, o.LaEstab, o.Ukprn },
+                        o => new { o.Type, o.Label, o.Code, o.OldCode, o.Urn, o.LaEstab, o.Ukprn }
+                    )
+                    .InsertWhenNotMatched()
+                    .MergeAsync(_cancellationToken);
+
+                var current = 0;
+
+                const int batchSize = 1000;
+
+                while (current < options.Count)
+                {
+                    var batch = options
+                        .Skip(current)
+                        .Take(batchSize)
+                        .ToList();
+
+                    // We create a 'row key' for each option that allows us to quickly
+                    // find the option rows that exist in the database. It's typically
+                    // much slower to have multiple WHERE clauses for each row that check
+                    // against every other row. Out of several such attempts, the 'row key'
+                    // technique was the fastest and simplest way to create the links.
+                    var batchRowKeys = batch
+                        .Select(
+                            o =>
+                                o.Type + ',' +
+                                o.Label + ',' +
+                                (o.Code ?? "null") + ',' +
+                                (o.OldCode ?? "null") + ',' +
+                                (o.Urn ?? "null") + ',' +
+                                (o.LaEstab ?? "null") + ',' +
+                                (o.Ukprn ?? "null")
+                        )
+                        .ToHashSet();
+
+                    var links = await optionTable
+                        .Where(
+                            o => o.Type == batch[0].Type &&
+                                 batchRowKeys.Contains(
+                                     o.Type + ',' +
+                                     o.Label + ',' +
+                                     (o.Code ?? "null") + ',' +
+                                     (o.OldCode ?? "null") + ',' +
+                                     (o.Urn ?? "null") + ',' +
+                                     (o.LaEstab ?? "null") + ',' +
+                                     (o.Ukprn ?? "null")
+                                )
+                        )
+                        .Select(option => new LocationOptionMetaLink
+                        {
+                            MetaId = meta.Id,
+                            OptionId = option.Id
+                        })
+                        .ToListAsync(token: _cancellationToken);
+
+                    _dbContext.LocationOptionMetaLinks.AddRange(links);
+                    await _dbContext.SaveChangesAsync(_cancellationToken);
+
+                    current += batchSize;
+                }
+
+                var insertedLinks = await _dbContext.LocationOptionMetaLinks
+                    .CountAsync(
+                    l => l.MetaId == meta.Id,
+                        cancellationToken: _cancellationToken);
+
+                if (insertedLinks != options.Count)
+                {
+                    throw new InvalidOperationException(
+                        $"Inserted incorrect number of location option meta links for {meta.Level}. " +
+                        $"Inserted: {insertedLinks}, expected: {options.Count}"
+                    );
+                }
+            }
+        }
+
+        private LocationOptionMeta MapLocationOptionMeta(
+            IDictionary<string, string> row,
+            GeographicLevel level)
+        {
+            var cols = level.CsvColumns();
+            var label = row[level.CsvNameColumn()];
+
+            return level switch
+            {
+                GeographicLevel.LocalAuthority => new LocationLocalAuthorityOptionMeta
+                {
+                    Label = label,
+                    Code = row[LocalAuthorityCsvColumns.NewCode],
+                    OldCode = row[LocalAuthorityCsvColumns.OldCode]
+                },
+                GeographicLevel.School => new LocationSchoolOptionMeta
+                {
+                    Label = label, Urn = row[SchoolCsvColumns.Urn],
+                    LaEstab = row[SchoolCsvColumns.LaEstab]
+                },
+                GeographicLevel.Provider => new LocationProviderOptionMeta
+                {
+                    Label = label,
+                    Ukprn = row[ProviderCsvColumns.Ukprn]
+                },
+                GeographicLevel.RscRegion => new LocationRscRegionOptionMeta
+                {
+                    Label = label
+                },
+                _ => new LocationCodedOptionMeta
+                {
+                    Label = label,
+                    Code = row[cols.Codes.First()]
+                }
+            };
+        }
+
+        private List<GeographicLevel> ListGeographicLevels(IReadOnlySet<string> allowedColumns)
         {
             return allowedColumns
-                .Where(col => GeographicLevelUtils.CsvColumnsToGeographicLevel.ContainsKey(col))
-                .Select(col => GeographicLevelUtils.CsvColumnsToGeographicLevel[col])
+                .Where(col => CsvColumnsToGeographicLevel.ContainsKey(col))
+                .Select(col => CsvColumnsToGeographicLevel[col])
                 .Distinct()
                 .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
                 .ToList();
         }
 
-        private async Task<List<TimePeriodMeta>> ListTimePeriodMeta()
+        private async Task CreateTimePeriodMeta()
         {
-            return (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
+            var metas = (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
                          SELECT DISTINCT time_period, time_identifier
@@ -431,6 +615,7 @@ public class SeedDataCommand : ICommand
                 .Select(
                     tuple => new TimePeriodMeta
                     {
+                        DataSetVersionId = _seed.DataSetVersionId,
                         Year = tuple.TimePeriod,
                         Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
                     }
@@ -438,17 +623,30 @@ public class SeedDataCommand : ICommand
                 .OrderBy(meta => meta.Year)
                 .ThenBy(meta => meta.Code)
                 .ToList();
+
+            _dbContext.TimePeriodMetas.AddRange(metas);
+            await _dbContext.SaveChangesAsync(_cancellationToken);
         }
 
-        private async Task SeedParquetData(DataSetMeta meta, long totalRows)
+        private async Task SeedParquetData()
         {
-            await _console.Output.WriteLineAsync($"=> Processing {totalRows} rows");
+            var version = await _dbContext.DataSetVersions
+                .AsSplitQuery()
+                .Include(v => v.FilterMetas)
+                .ThenInclude(m => m.Options)
+                .Include(v => v.IndicatorMetas)
+                .Include(v => v.LocationMetas)
+                .ThenInclude(m => m.Options)
+                .Include(v => v.TimePeriodMetas)
+                .FirstAsync(v => v.Id == _seed.DataSetVersionId, cancellationToken: _cancellationToken);
+
+            await _console.Output.WriteLineAsync($"=> Processing {version.TotalResults} rows");
 
             // Create temporary meta tables in DuckDB to allow us to do data transform
             // in DuckDB itself (i.e. changing all the filters and locations to normalised IDs).
             // Trying to transform the data via using Appender API in C# is slower
             // and seems to regularly cause DuckDB crashes for larger data sets.
-            await CreateDuckDbMetaTables(meta);
+            await CreateDuckDbMetaTables(version);
 
             await _duckDb.ExecuteAsync("CREATE SEQUENCE data_seq START 1");
 
@@ -458,9 +656,9 @@ public class SeedDataCommand : ICommand
                 "time_period VARCHAR",
                 "time_identifier VARCHAR",
                 "geographic_level VARCHAR",
-                ..meta.Locations.Select(location => $"\"{location.Level}\" INTEGER"),
-                ..meta.Filters.Select(filter => $"\"{filter.Identifier}\" INTEGER"),
-                ..meta.Indicators.Select(indicator => $"\"{indicator.Identifier}\" VARCHAR"),
+                ..version.LocationMetas.Select(location => $"{GetDuckDbLocationTableName(location)}_id INTEGER"),
+                ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\" INTEGER"),
+                ..version.IndicatorMetas.Select(indicator => $"\"{indicator.PublicId}\" VARCHAR"),
             ];
 
             await _duckDb.ExecuteAsync($"CREATE TABLE data({columns.JoinToString(",\n")})");
@@ -471,41 +669,58 @@ public class SeedDataCommand : ICommand
                 "data_source.time_period",
                 "data_source.time_identifier",
                 "data_source.geographic_level",
-                ..meta.Locations.Select(location => $"{location.Level}.id AS {location.Level}"),
-                ..meta.Filters.Select(filter => $"{filter.Identifier}.id AS \"{filter.Identifier}\""),
-                ..meta.Indicators.Select(indicator => $"\"{indicator.Identifier}\""),
+                ..version.LocationMetas.Select(
+                    location =>
+                        $"{GetDuckDbLocationTableName(location)}.id AS {GetDuckDbLocationTableName(location)}_id"
+                ),
+                ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\".id AS \"{filter.PublicId}\""),
+                ..version.IndicatorMetas.Select(indicator => $"\"{indicator.PublicId}\""),
             ];
 
             string[] insertJoins =
             [
-                ..meta.Locations.Select(location => $"""
-                     LEFT JOIN locations AS {location.Level}
-                     ON {location.Level}.level = '{location.Level}'
-                     AND {location.Level}.code = data_source.{location.Level.CsvCodeColumn()}
-                     AND {location.Level}.name = data_source.{location.Level.CsvNameColumn()}
-                     """
+                ..version.LocationMetas.Select(
+                    location =>
+                    {
+                        var locationTable = GetDuckDbLocationTableName(location.Level);
+                        var codeColumns = GetDuckDbLocationCodeColumns(location.Level);
+
+                        string[] conditions =
+                        [
+                            ..codeColumns.Select(col => $"{locationTable}.{col.Name} = data_source.{col.CsvName}"),
+                            $"{locationTable}.name = data_source.{location.Level.CsvNameColumn()}"
+                        ];
+
+                        return $"""
+                                LEFT JOIN {locationTable}
+                                ON {conditions.JoinToString(" AND ")}
+                                """;
+                    }
                 ),
-                ..meta.Filters.Select(filter => $"""
-                     LEFT JOIN filters AS "{filter.Identifier}"
-                     ON "{filter.Identifier}".type = '{filter.Identifier}'
-                     AND "{filter.Identifier}".label = data_source."{filter.Identifier}"
-                     """
+                ..version.FilterMetas.Select(
+                    filter => $"""
+                               LEFT JOIN {FiltersDuckDbTable} AS "{filter.PublicId}"
+                               ON "{filter.PublicId}".public_id = '{filter.PublicId}'
+                               AND "{filter.PublicId}".label = data_source."{filter.PublicId}"
+                               """
                 )
             ];
 
-            await _duckDb.ExecuteAsync(new CommandDefinition(
-                $"""
-                 INSERT INTO data
-                 SELECT 
-                    {insertColumns.JoinToString(",\n")}
-                 FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data_source
-                 {insertJoins.JoinToString('\n')}
-                 ORDER BY 
-                     data_source.geographic_level ASC, 
-                     data_source.time_period DESC
-                 """,
-                cancellationToken: _cancellationToken
-            ));
+            await _duckDb.ExecuteAsync(
+                new CommandDefinition(
+                    $"""
+                     INSERT INTO data
+                     SELECT
+                        {insertColumns.JoinToString(",\n")}
+                     FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data_source
+                     {insertJoins.JoinToString('\n')}
+                     ORDER BY
+                         data_source.geographic_level ASC,
+                         data_source.time_period DESC
+                     """,
+                    cancellationToken: _cancellationToken
+                )
+            );
 
             // Finish up by outputting Parquet file
 
@@ -541,67 +756,127 @@ public class SeedDataCommand : ICommand
 
             var outputPath = Path.Combine(versionDir, "data.parquet");
 
-            await _duckDb.ExecuteAsync(new CommandDefinition(
-                $"COPY data TO '{outputPath}' (FORMAT PARQUET, COMPRESSION ZSTD)",
-                cancellationToken: _cancellationToken
-            ));
+            await _duckDb.ExecuteAsync(
+                new CommandDefinition(
+                    $"COPY data TO '{outputPath}' (FORMAT PARQUET, COMPRESSION ZSTD)",
+                    cancellationToken: _cancellationToken
+                )
+            );
         }
 
-        private async Task CreateDuckDbMetaTables(DataSetMeta meta)
+        private async Task CreateDuckDbMetaTables(DataSetVersion version)
         {
-            await _duckDb.ExecuteAsync(
-                """
-                 CREATE TABLE locations(
-                     id INTEGER,
-                     code VARCHAR,
-                     name VARCHAR,
-                     level VARCHAR
-                 )
-                 """
-            );
-
-            foreach (var location in meta.Locations)
+            foreach (var location in version.LocationMetas)
             {
-                using var appender = _duckDb.CreateAppender(table: "locations");
+                var locationTable = GetDuckDbLocationTableName(location.Level);
 
-                foreach (var option in location.Options)
+                string[] locationCols =
+                [
+                    "id INTEGER",
+                    "name VARCHAR",
+                    ..GetDuckDbLocationCodeColumns(location.Level).Select(col => $"{col.Name} VARCHAR")
+                ];
+
+                await _duckDb.ExecuteAsync(
+                    $"""
+                     CREATE TABLE {locationTable}(
+                        {locationCols.JoinToString(",\n")}
+                     )
+                     """
+                );
+
+                using var appender = _duckDb.CreateAppender(table: locationTable);
+
+                var insertRow = appender.CreateRow();
+
+                foreach (var link in location.OptionLinks)
                 {
-                    var insertRow = appender.CreateRow();
+                    insertRow.AppendValue(link.PublicId);
+                    insertRow.AppendValue(link.Option.Label);
 
-                    insertRow.AppendValue(option.PrivateId);
-                    insertRow.AppendValue(option.Code);
-                    insertRow.AppendValue(option.Label);
-                    insertRow.AppendValue(location.Level.ToString());
+                    var option = link.Option;
+
+                    switch (option)
+                    {
+                        case LocationLocalAuthorityOptionMeta laOption:
+                            insertRow.AppendValue(laOption.Code);
+                            insertRow.AppendValue(laOption.OldCode);
+                            break;
+                        case LocationCodedOptionMeta codedOption:
+                            insertRow.AppendValue(codedOption.Code);
+                            break;
+                        case LocationProviderOptionMeta providerOption:
+                            insertRow.AppendValue(providerOption.Ukprn);
+                            break;
+                        case LocationSchoolOptionMeta schoolOption:
+                            insertRow.AppendValue(schoolOption.Urn);
+                            insertRow.AppendValue(schoolOption.LaEstab);
+                            break;
+                    }
 
                     insertRow.EndRow();
                 }
             }
 
             await _duckDb.ExecuteAsync(
+                $"""
+                CREATE TABLE {FiltersDuckDbTable}(
+                    id INTEGER,
+                    label VARCHAR,
+                    public_id VARCHAR
+                )
                 """
-                 CREATE TABLE filters(
-                     id INTEGER,
-                     label VARCHAR,
-                     type VARCHAR
-                 )
-                 """
             );
 
-            foreach (var filter in meta.Filters)
+            foreach (var filter in version.FilterMetas)
             {
-                using var appender = _duckDb.CreateAppender(table: "filters");
+                using var appender = _duckDb.CreateAppender(table: FiltersDuckDbTable);
 
-                foreach (var option in filter.Options)
+                foreach (var link in filter.OptionLinks)
                 {
                     var insertRow = appender.CreateRow();
 
-                    insertRow.AppendValue(option.PrivateId);
-                    insertRow.AppendValue(option.Label);
-                    insertRow.AppendValue(filter.Identifier);
+                    insertRow.AppendValue(link.PublicId);
+                    insertRow.AppendValue(link.Option.Label);
+                    insertRow.AppendValue(filter.PublicId);
 
                     insertRow.EndRow();
                 }
             }
         }
+
+        private LocationColumn[] GetDuckDbLocationCodeColumns(GeographicLevel geographicLevel)
+        {
+            return geographicLevel switch
+            {
+                GeographicLevel.LocalAuthority =>
+                [
+                    new LocationColumn(Name: "code", CsvName: LocalAuthorityCsvColumns.NewCode),
+                    new LocationColumn(Name: "old_code", CsvName: LocalAuthorityCsvColumns.OldCode)
+                ],
+                GeographicLevel.Provider =>
+                [
+                    new LocationColumn(Name: "ukprn", CsvName: ProviderCsvColumns.Ukprn)
+                ],
+                GeographicLevel.RscRegion => [],
+                GeographicLevel.School =>
+                [
+                    new LocationColumn(Name: "urn", CsvName: SchoolCsvColumns.Urn),
+                    new LocationColumn(Name: "laestab", CsvName: SchoolCsvColumns.LaEstab)
+                ],
+                _ =>
+                [
+                    new LocationColumn(Name: "code", CsvName: geographicLevel.CsvCodeColumns().First())
+                ],
+            };
+        }
+
+        private string GetDuckDbLocationTableName(LocationMeta locationMeta)
+            => GetDuckDbLocationTableName(locationMeta.Level);
+
+        private string GetDuckDbLocationTableName(GeographicLevel geographicLevel)
+            => $"locations_{geographicLevel.GetEnumValue().ToLower()}";
+
+        private record LocationColumn(string Name, string CsvName);
     }
 }

@@ -11,8 +11,10 @@ public static class IndicatorMetaGeneratorExtensions
     public static Generator<IndicatorMeta> WithDefaults(this Generator<IndicatorMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
-    public static Generator<IndicatorMeta> WithIdentifier(this Generator<IndicatorMeta> generator, string identifier)
-        => generator.ForInstance(s => s.SetIdentifier(identifier));
+    public static Generator<IndicatorMeta> WithDataSetVersion(
+        this Generator<IndicatorMeta> generator,
+        DataSetVersion dataSetVersion)
+        => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
     public static Generator<IndicatorMeta> WithLabel(this Generator<IndicatorMeta> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
@@ -25,11 +27,12 @@ public static class IndicatorMetaGeneratorExtensions
         byte? decimalPlaces)
         => generator.ForInstance(s => s.SetDecimalPlaces(decimalPlaces));
 
+
     public static InstanceSetters<IndicatorMeta> SetDefaults(this InstanceSetters<IndicatorMeta> setters)
         => setters
-            .SetDefault(m => m.Identifier)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Unit)
+            .SetDefault(m => m.PublicId)
             .Set(
                 m => m.DecimalPlaces,
                 (f, im) => im switch
@@ -39,10 +42,12 @@ public static class IndicatorMetaGeneratorExtensions
                 }
             );
 
-    public static InstanceSetters<IndicatorMeta> SetIdentifier(
+    public static InstanceSetters<IndicatorMeta> SetDataSetVersion(
         this InstanceSetters<IndicatorMeta> setters,
-        string identifier)
-        => setters.Set(m => m.Identifier, identifier);
+        DataSetVersion dataSetVersion)
+        => setters
+            .Set(m => m.DataSetVersion, dataSetVersion)
+            .Set(m => m.DataSetVersionId, dataSetVersion.Id);
 
     public static InstanceSetters<IndicatorMeta> SetLabel(
         this InstanceSetters<IndicatorMeta> setters,
