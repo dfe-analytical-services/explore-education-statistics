@@ -1,0 +1,16 @@
+# Workflow to block auto-squash commits (e.g. fixup, amend)
+# from being merged in via pull requests.
+# https://andrewlock.net/smoother-rebases-with-auto-squashing-git-commits/
+name: Block auto-squash commits
+on: pull_request
+permissions:
+  pull-requests: read
+jobs:
+  block-autosquash:
+    name: Block auto-squash commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block auto-squash commits
+        uses: xt0rted/block-autosquash-commits-action@4a5fe79415b81179e8fd89d4b027196915805cab
+        with:
+          repo-token: ${{ secrets.GH_TOKEN }}
