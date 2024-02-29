@@ -13,12 +13,12 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseSe
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class ReleaseRepository : IReleaseRepository
+    public class ReleaseVersionRepository : IReleaseVersionRepository
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
 
-        public ReleaseRepository(
+        public ReleaseVersionRepository(
             ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext)
         {

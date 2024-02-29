@@ -25,7 +25,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
-            var releaseRepository = new Mock<IReleaseRepository>();
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>();
 
             var list = new List<ReleaseVersion>
             {
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         var service = BuildReleaseService(
                             userService.Object,
-                            releaseRepository: releaseRepository.Object
+                            releaseVersionRepository: releaseVersionRepository.Object
                         );
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
@@ -180,14 +180,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            releaseRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
-            releaseRepository.VerifyNoOtherCalls();
+            releaseVersionRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
+            releaseVersionRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewRelatedReleases()
         {
-            var repository = new Mock<IReleaseRepository>();
+            var repository = new Mock<IReleaseVersionRepository>();
 
             var list = new List<ReleaseVersion>
             {
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         var service = BuildReleaseService(
                             userService.Object,
-                            releaseRepository: repository.Object
+                            releaseVersionRepository: repository.Object
                         );
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseService BuildReleaseService(
             IUserService userService,
             ContentDbContext? context = null,
-            IReleaseRepository? releaseRepository = null)
+            IReleaseVersionRepository? releaseVersionRepository = null)
         {
             return new ReleaseService(
                 context ?? Mock.Of<ContentDbContext>(),
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AdminMapper(),
                 DefaultPersistenceHelperMock().Object,
                 userService,
-                releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
                 Mock.Of<IReleaseCacheService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseDataFileService>(),

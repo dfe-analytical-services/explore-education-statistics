@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IReleaseRepository
+    public interface IReleaseVersionRepository
     {
         Task<List<ReleaseVersion>> ListReleases(
             params ReleaseApprovalStatus[] releaseStatuses);

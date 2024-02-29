@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
-    public class ReleaseRepositoryTests
+    public class ReleaseVersionRepositoryTests
     {
         private readonly DataFixture _fixture = new();
 
@@ -70,9 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildRepository(contentDbContext);
-                var result =
-                    await releaseRepository.ListReleasesForUser(userId,
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Single(result);
                 Assert.Equal(userReleaseRole1.ReleaseVersionId, result[0].Id);
@@ -125,9 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildRepository(contentDbContext);
-                var result =
-                    await releaseRepository.ListReleasesForUser(userId,
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Empty(result);
             }
@@ -181,9 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildRepository(contentDbContext);
-                var result =
-                    await releaseRepository.ListReleasesForUser(userId,
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Single(result);
                 Assert.Equal(userPublicationRole1.Publication.Releases[0].Id, result[0].Id);
@@ -223,9 +220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildRepository(contentDbContext);
-                var result =
-                    await releaseRepository.ListReleasesForUser(userId,
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Empty(result);
             }
@@ -279,9 +275,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var releaseRepository = BuildRepository(contentDbContext);
-                var result =
-                    await releaseRepository.ListReleasesForUser(userId,
+                var repository = BuildRepository(contentDbContext);
+                var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
 
                 var resultRelease = Assert.Single(result);
@@ -289,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        public class CreateStatisticsDbReleaseAndSubjectHierarchy : ReleaseRepositoryTests
+        public class CreateStatisticsDbReleaseVersionAndSubjectHierarchy : ReleaseVersionRepositoryTests
         {
             [Fact]
             public async Task StatsReleaseDoesNotExist_CreatesStatsReleaseAndReleaseSubject()
@@ -311,8 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
-                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
+                    var repository = BuildRepository(contentDbContext, statisticsDbContext);
+                    createdSubjectId = await repository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
                 }
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -367,8 +362,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                 {
-                    var releaseRepository = BuildRepository(contentDbContext, statisticsDbContext);
-                    createdSubjectId = await releaseRepository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
+                    var repository = BuildRepository(contentDbContext, statisticsDbContext);
+                    createdSubjectId = await repository.CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersion.Id);
                 }
 
                 await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -391,12 +386,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static ReleaseRepository BuildRepository(
+        private static ReleaseVersionRepository BuildRepository(
             ContentDbContext? contentDbContext = null,
             StatisticsDbContext? statisticsDbContext = null
         )
         {
-            return new ReleaseRepository(
+            return new ReleaseVersionRepository(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
         }

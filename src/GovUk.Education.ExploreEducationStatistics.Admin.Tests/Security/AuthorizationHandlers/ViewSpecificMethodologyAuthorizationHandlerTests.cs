@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -496,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleRepository,
                     userReleaseRoleRepository,
                     _,
-                    releaseRepository
+                    releaseVersionRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
@@ -515,7 +516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
-                releaseRepository
+                releaseVersionRepository
                     .Setup(s => s.GetLatestReleaseVersion(OwningPublication.Id, default))
                     .ReturnsAsync((ReleaseVersion?) null);
 
@@ -531,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     methodologyRepository,
                     userPublicationRoleRepository,
                     userReleaseRoleRepository,
-                    releaseRepository);
+                    releaseVersionRepository);
 
                 // As there are no latest Releases for the Owning Publication, the user cannot be a Prerelease Viewer
                 // on it.

@@ -31,7 +31,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
-        private readonly IReleaseRepository _repository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IReleaseCacheService _releaseCacheService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
-            IReleaseRepository repository,
+            IReleaseVersionRepository releaseVersionRepository,
             IReleaseCacheService releaseCacheService,
             IReleaseFileRepository releaseFileRepository,
             IReleaseDataFileService releaseDataFileService,
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
-            _repository = repository;
+            _releaseVersionRepository = releaseVersionRepository;
             _releaseCacheService = releaseCacheService;
             _releaseFileRepository = releaseFileRepository;
             _releaseDataFileService = releaseDataFileService;
@@ -344,9 +344,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.ListReleases(releaseApprovalStatuses))
+                        .OnSuccess(() => _releaseVersionRepository.ListReleases(releaseApprovalStatuses))
                         .OrElse(() =>
-                            _repository.ListReleasesForUser(_userService.GetUserId(),
+                            _releaseVersionRepository.ListReleasesForUser(_userService.GetUserId(),
                                 releaseApprovalStatuses));
                 })
                 .OnSuccess(async releases =>
@@ -402,9 +402,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return _userService
                         .CheckCanViewAllReleases()
-                        .OnSuccess(() => _repository.ListReleases(ReleaseApprovalStatus.Approved))
+                        .OnSuccess(() => _releaseVersionRepository.ListReleases(ReleaseApprovalStatus.Approved))
                         .OrElse(() =>
-                            _repository.ListReleasesForUser(_userService.GetUserId(),
+                            _releaseVersionRepository.ListReleasesForUser(_userService.GetUserId(),
                                 ReleaseApprovalStatus.Approved));
                 })
                 .OnSuccess(async releases =>

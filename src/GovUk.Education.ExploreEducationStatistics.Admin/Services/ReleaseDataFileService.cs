@@ -22,7 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IFileRepository _fileRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataArchiveValidationService dataArchiveValidationService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IFileRepository fileRepository,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IReleaseFileRepository releaseFileRepository,
             IReleaseFileService releaseFileService,
             IReleaseDataFileRepository releaseDataFileRepository,
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _dataArchiveValidationService = dataArchiveValidationService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _fileRepository = fileRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _releaseFileRepository = releaseFileRepository;
             _releaseFileService = releaseFileService;
             _releaseDataFileRepository = releaseDataFileRepository;
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var (replacingFile, validSubjectName) = replacingFileAndSubjectName;
 
                             var subjectId =
-                                await _releaseRepository
+                                await _releaseVersionRepository
                                     .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
                             var releaseDataFileOrder = await GetNextDataFileOrder(replacingFile, releaseVersionId);
@@ -334,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                     replacingFile)
                                                 .OnSuccess(async () =>
                                                 {
-                                                    var subjectId = await _releaseRepository
+                                                    var subjectId = await _releaseVersionRepository
                                                         .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseVersionId);
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(

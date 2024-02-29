@@ -35,7 +35,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -1880,7 +1880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IReleaseCacheService? releaseCacheService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
@@ -1903,7 +1903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService.Object,
-                releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
                 releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),

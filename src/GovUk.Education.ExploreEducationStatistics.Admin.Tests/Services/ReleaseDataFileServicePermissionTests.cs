@@ -21,8 +21,8 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataArchiveValidationService? dataArchiveValidationService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null,
             IFileRepository? fileRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>(MockBehavior.Strict).Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(
+                releaseVersionRepository ?? new ReleaseVersionRepository(
                     contentDbContext,
                     statisticsDbContext ?? new Mock<StatisticsDbContext>().Object),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
