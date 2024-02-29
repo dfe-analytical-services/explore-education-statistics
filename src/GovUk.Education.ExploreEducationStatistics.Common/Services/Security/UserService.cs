@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -31,7 +32,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
 
         public Guid GetUserId()
         {
-            return GetUser().GetUserId();
+            var user = GetUser();
+
+            if (user == null)
+            {
+                throw new AuthenticationException("No user was found to get Id from");
+            }
+
+            return user.GetUserId();
+        }
+
+        public UserProfileFromClaims GetProfileFromClaims()
+        {
+            var user = GetUser();
+
+            if (user == null)
+            {
+                throw new AuthenticationException("No user was found to get Claims from");
+            }
+
+            var email = user.GetEmail();
+            var (firstName, lastName) = user.GetNameParts();
+            return new UserProfileFromClaims(Email: email, FirstName: firstName, LastName: lastName);
         }
 
         private ClaimsPrincipal? GetUser()

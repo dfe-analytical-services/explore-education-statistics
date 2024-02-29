@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -27,5 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> CancelInvite(string email);
 
         Task<Either<ActionResult, Unit>> UpdateUser(string userId, string roleId);
+
+        Task<Either<ActionResult, Unit>> DeleteUser(string email);
     }
 }

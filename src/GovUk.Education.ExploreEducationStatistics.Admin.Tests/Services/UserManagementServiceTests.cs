@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -17,9 +16,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -270,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationRole = PublicationRole.Owner,
                     })
                 };
-                
+
                 var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
@@ -313,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(CreatedById, userPublicationInvite.CreatedById);
             }
         }
-        
+
         [Fact]
         public async Task InviteUser_OptionalCreatedDate()
         {
@@ -387,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }),
                     CreatedDate = createdDate
                 };
-                
+
                 var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
@@ -508,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ReleaseId = release2.Id,
                             ReleaseRole = ReleaseRole.Contributor,
                         }),
-                    UserPublicationRoles = ListOf(                        
+                    UserPublicationRoles = ListOf(
                         new UserPublicationRoleCreateRequest
                         {
                             PublicationId = publication1.Id,
@@ -628,7 +629,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     UserReleaseRoles = new List<UserReleaseRoleCreateRequest>(),
                     UserPublicationRoles = new List<UserPublicationRoleCreateRequest>()
                 };
-                
+
                 var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
@@ -651,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(userReleaseInvites);
             }
         }
-        
+
         [Fact]
         public async Task InviteUser_UserAlreadyExists()
         {
@@ -686,7 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 actionResult.AssertValidationProblem(ValidationErrorMessages.UserAlreadyExists);
             }
         }
-        
+
         [Fact]
         public async Task InviteUser_UserAlreadyInvited()
         {
@@ -694,7 +695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await AssertExistingUserInviteOverridden(inviteCreatedDate);
         }
-        
+
         [Fact]
         public async Task InviteUser_UserAlreadyInvitedAndExpired()
         {
@@ -882,7 +883,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 UserReleaseRoles = new List<UserReleaseRoleCreateRequest>(),
                 UserPublicationRoles = new List<UserPublicationRoleCreateRequest>()
             };
-            
+
             var result = await service.InviteUser(inviteRequest);
 
             var actionResult = result.AssertLeft();
@@ -918,7 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Email = "test@test.com",
                         Role = ReleaseRole.Approver,
                         Created = DateTime.UtcNow.AddDays(-1)
-                    },  
+                    },
                     new UserReleaseInvite
                     {
                         Email = "test@test.com",
@@ -1028,7 +1029,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IUserPublicationInviteRepository? userPublicationInviteRepository = null)
+            IUserPublicationInviteRepository? userPublicationInviteRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IConfiguration? configuration = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -1043,7 +1046,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService(CreatedById).Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
-                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext)
+                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
+                userManager ?? MockUserManager().Object,
+                configuration ?? CreateMockConfiguration(TupleOf("enableThemeDeletion", "true")).Object
             );
         }
     }

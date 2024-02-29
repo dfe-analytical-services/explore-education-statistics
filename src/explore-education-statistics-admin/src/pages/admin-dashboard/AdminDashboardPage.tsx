@@ -7,7 +7,6 @@ import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftRelea
 import PublicationsTab from '@admin/pages/admin-dashboard/components/PublicationsTab';
 import ScheduledReleasesTab from '@admin/pages/admin-dashboard/components/ScheduledReleasesTab';
 import releaseQueries from '@admin/queries/releaseQueries';
-import loginService from '@admin/services/loginService';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -15,6 +14,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
+import { handleLogout } from '@admin/auth/msal';
+import ButtonText from '@common/components/ButtonText';
 
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
@@ -66,12 +67,15 @@ const AdminDashboardPage = () => {
           <p className="govuk-body-s">
             {user && (
               <>
-                Logged in as <strong>{user?.name}</strong>. Not you?{' '}
+                Logged in as <strong>{user.name}</strong>. Not you?{' '}
               </>
             )}
-            <Link className="govuk-link" to={loginService.getSignOutLink()}>
+            <ButtonText
+              onClick={() => handleLogout()}
+              testId="dashboard-sign-out-button"
+            >
               Sign out
-            </Link>
+            </ButtonText>
           </p>
 
           {isApprover && totalApprovals > 0 && (

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
     {
         public static Task<Either<ActionResult, Unit>> CheckCanAccessSystem(this IUserService userService)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanAccessSystem);
+            return userService.CheckPolicy(SecurityPolicies.RegisteredUser);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckIsBauUser(this IUserService userService)

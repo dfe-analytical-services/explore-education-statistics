@@ -1,42 +1,30 @@
-import json
 import os
-from pathlib import Path
-from typing import Tuple
 
 import requests
-from scripts.get_auth_tokens import get_identity_info
+from scripts.get_auth_tokens import get_local_storage_identity_json
+from tests.libs import local_storage_helper
 from tests.libs.logger import get_logger
 
 logger = get_logger(__name__)
 
 
-def setup_auth_variables(
-    user, email, password, identity_provider, clear_existing=False, driver=None
-) -> Tuple[str, str]:
+# TODO - this method is nearly line-for-line the same as robot-tests/admin_api.py setup_auth_variables().
+# Can one of them go?
+def setup_auth_variables(user, email, password, identity_provider, clear_existing=False, driver=None) -> str:
     assert user, "user param must be set"
     assert email, "email param must be set"
     assert password, "password param must be set"
 
-    local_storage_name = f"IDENTITY_LOCAL_STORAGE_{user}"
-    cookie_name = f"IDENTITY_COOKIE_{user}"
-
-    local_storage_file = Path(f"{local_storage_name}.json")
-    cookie_file = Path(f"{cookie_name}.json")
-
     if clear_existing:
-        local_storage_file.unlink(True)
-        cookie_file.unlink(True)
+        local_storage_helper.clear_local_storage_file(user)
 
     admin_url = os.getenv("ADMIN_URL")
     assert admin_url, "ADMIN_URL env variable must be set"
 
     authenticated = False
 
-    if local_storage_file.exists() and cookie_file.exists():
+    if local_storage_helper.local_storage_json_file_exists(user):
         logger.info(f"Getting {user} authentication information from local files... ")
-
-        os.environ[local_storage_name] = local_storage_file.read_text()
-        os.environ[cookie_name] = cookie_file.read_text()
 
         requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
         session = requests.Session()
@@ -44,7 +32,7 @@ def setup_auth_variables(
 
         # Checks that the stored authentication information is actually valid.
         # If not, we want to be able to try and authenticate again.
-        jwt_token = json.loads(os.environ[local_storage_name])["access_token"]
+        jwt_token = local_storage_helper.get_access_token_from_file(user)
         response = session.request(
             "GET",
             url=f'{os.getenv("ADMIN_URL")}/api/permissions/access',
@@ -64,21 +52,10 @@ def setup_auth_variables(
 
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")
-
-        os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+        local_storage_json = get_local_storage_identity_json(
             url=admin_url, email=email, password=password, driver=driver, identity_provider=identity_provider
         )
-
-        # Cache auth info to files for efficiency
-        local_storage_file.write_text(os.environ[local_storage_name])
-        cookie_file.write_text(os.environ[cookie_name])
-
+        local_storage_helper.write_local_storage_json_to_file(local_storage_json, user)
         logger.info("Done!")
 
-    local_storage_token = os.getenv(local_storage_name)
-    cookie_token = os.getenv(cookie_name)
-
-    assert local_storage_token, f"{local_storage_name} env variable was not set"
-    assert cookie_token, f"{cookie_name} env variable was not set"
-
-    return local_storage_token, cookie_token
+    return local_storage_helper.read_local_storage_json_from_file(user)

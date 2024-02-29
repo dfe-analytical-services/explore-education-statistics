@@ -7,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using Semver;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -49,6 +51,14 @@ internal class DataSetService : IDataSetService
             .ToList();
 
         return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionViewModel>> GetVersion(
+        Guid dataSetId, 
+        string dataSetVersion)
+    {
+        return await CheckVersionExists(dataSetId, dataSetVersion)
+            .OnSuccess(MapDataSetVersion);
     }
 
     public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
@@ -97,6 +107,25 @@ internal class DataSetService : IDataSetService
             LatestVersion = MapLatestVersion(dataSet.LatestVersion!),
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
         };
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
+        Guid dataSetId,
+        string dataSetVersion)
+    {
+        if (!VersionUtils.TryParse(dataSetVersion, out var version))
+        {
+            return new NotFoundResult();
+        }
+
+        return await _publicDataDbContext.DataSetVersions
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .Where(ds => ds.Status == DataSetVersionStatus.Published
+                || ds.Status == DataSetVersionStatus.Unpublished
+                || ds.Status == DataSetVersionStatus.Deprecated)
+            .SingleOrNotFound();
     }
 
     private static DataSetLatestVersionViewModel MapLatestVersion(DataSetVersion latestVersion)

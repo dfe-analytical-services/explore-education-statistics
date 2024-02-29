@@ -127,6 +127,26 @@ of agreed coding standards to conform to when writing C# code for this repositor
        
 - Generally follow a `Scenario_Result` pattern for test method names
 - Simple happy-path scenario could just be called `Success` for succinctness
+  - When creating nested test classes within integration tests, have the base class extend the appropriate integration test fixture, and have the nested
+    subclasses extend the base class so that they can access the base classes members. An example would look like:
+  - 
+    ```c#
+      public class SignInControllerTests : IntegrationTest<TestStartup>
+      {
+          public SignInControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp) {}
+    
+              public class RegistrationTests : SignInControllerTests
+              {
+                  public RegistrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+                  {
+                  }
+  
+                  [Fact]
+                  public async Task Success()
+                  {
+                      // Do something with the base class's "TestApp" member.
+                      var client = TestApp
+    ```
 
 <a id="s3.1.2"></a>
 #### 3.1.2 Separating common aspects of tests from the main test suites

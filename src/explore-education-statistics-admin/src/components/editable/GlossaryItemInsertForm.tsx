@@ -62,7 +62,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
   const handleFormSubmit = (values: FormValues) =>
     onSubmit({
       text: values.text,
-      url: `${config.PublicAppUrl}/glossary#${values.slug}`,
+      url: `${config.publicAppUrl}/glossary#${values.slug}`,
     });
 
   if (isLoading) {

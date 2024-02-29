@@ -38,7 +38,7 @@ const EditableEmbedForm = ({
   const [previewValues, setPreviewValues] =
     useState<EditableEmbedFormValues>(initialValues);
 
-  const { PermittedEmbedUrlDomains } = useConfig();
+  const { permittedEmbedUrlDomains } = useConfig();
 
   return (
     <Formik<EditableEmbedFormValues>
@@ -54,7 +54,7 @@ const EditableEmbedForm = ({
             test: (value: string) =>
               Boolean(
                 value &&
-                  PermittedEmbedUrlDomains.some(domain =>
+                  permittedEmbedUrlDomains.some(domain =>
                     value.startsWith(domain),
                   ),
               ),

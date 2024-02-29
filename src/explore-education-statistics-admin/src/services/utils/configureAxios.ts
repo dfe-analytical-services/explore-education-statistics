@@ -1,6 +1,6 @@
-import authService from '@admin/components/api-authorization/AuthorizeService';
 import adminApi from '@admin/services/utils/service';
 import { dataApi } from '@common/services/api';
+import { acquireTokenSilent } from '@admin/auth/msal';
 
 export default function configureAxios() {
   dataApi.baseURL = '/api/data';
@@ -10,11 +10,10 @@ export default function configureAxios() {
   clients.forEach(client => {
     client.addRequestInterceptor({
       onRequest: async config => {
-        const token = await authService.getAccessToken();
-
-        if (token) {
+        const { accessToken } = await acquireTokenSilent();
+        if (accessToken) {
           // eslint-disable-next-line no-param-reassign
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers.Authorization = `Bearer ${accessToken}`;
         }
 
         return config;

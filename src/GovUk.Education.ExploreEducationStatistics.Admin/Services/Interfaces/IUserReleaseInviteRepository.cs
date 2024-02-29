@@ -29,5 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<bool> UserHasInvites(List<Guid> releaseIds, string email, ReleaseRole role);
 
         Task RemoveByPublication(Publication publication, string email, ReleaseRole role);
+
+        Task<List<UserReleaseInvite>> ListByEmail(string email);
     }
 }

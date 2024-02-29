@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
@@ -29,17 +31,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public void GetConfig()
         {
-            var controller = new ConfigurationController(GetConfiguration());
+            var mainConfiguration = GetConfiguration();
+            var openIdConnectSpaClientConfig = new OpenIdConnectSpaClientOptions();
+            mainConfiguration.Bind("OpenIdConnectSpaClient", openIdConnectSpaClientConfig);
+            var openIdConnectSpaClientOptions = Options.Create(openIdConnectSpaClientConfig);
+
+            var controller = new ConfigurationController(GetConfiguration(), openIdConnectSpaClientOptions);
             var result = controller.GetConfig();
-            var unboxed = result.AssertOkResult();
+            var viewModel = result.AssertOkResult();
 
-            Assert.Equal(string.Empty, unboxed["AppInsightsKey"]);
-            Assert.Equal("http://localhost:3000", unboxed["PublicAppUrl"]);
+            Assert.Equal(string.Empty, viewModel.AppInsightsKey);
+            Assert.Equal("http://localhost:3000", viewModel.PublicAppUrl);
+            Assert.Equal(
+                new []
+                {
+                    "https://department-for-education.shinyapps.io",
+                    "https://dfe-analytical-services.github.io"
+                },
+                viewModel.PermittedEmbedUrlDomains);
 
-            var permittedEmbedUrlDomains = unboxed["PermittedEmbedUrlDomains"];
-            var expectedDomains = new []{ "https://department-for-education.shinyapps.io", "https://dfe-analytical-services.github.io" };
-            Assert.IsType<string[]>(permittedEmbedUrlDomains);
-            Assert.Equal(expectedDomains, permittedEmbedUrlDomains);
+            const string realm = "https://ees.local:5031/auth/realms/ees-realm";
+            Assert.Equal("ees-admin-client", viewModel.Oidc.ClientId);
+            Assert.Equal(realm, viewModel.Oidc.Authority);
+            Assert.Equal(new [] { realm, "ees.local:5031" }, viewModel.Oidc.KnownAuthorities);
+            Assert.Equal(SecurityScopes.AccessAdminApiScope, viewModel.Oidc.AdminApiScope);
+
+            var authorityMetadata = viewModel.Oidc.AuthorityMetadata!;
+            Assert.Equal($"{realm}/protocol/openid-connect/auth", authorityMetadata.AuthorizationEndpoint);
+            Assert.Equal($"{realm}/protocol/openid-connect/token", authorityMetadata.TokenEndpoint);
+            Assert.Equal(realm, authorityMetadata.Issuer);
+            Assert.Equal($"{realm}/protocol/openid-connect/userinfo", authorityMetadata.UserInfoEndpoint);
+            Assert.Equal($"{realm}/protocol/openid-connect/logout", authorityMetadata.EndSessionEndpoint);
         }
 
         private static IConfiguration GetConfiguration()
@@ -47,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.Development.json", optional: false)
+                .AddJsonFile("appsettings.Keycloak.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();
         }

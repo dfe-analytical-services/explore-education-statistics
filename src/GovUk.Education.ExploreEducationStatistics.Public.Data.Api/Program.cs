@@ -15,7 +15,7 @@ builder.WebHost.ConfigureKestrel(options =>
 builder.Configuration.AddJsonFile(
     path:"appsettings.Local.json",
     optional: true,
-    reloadOnChange: true);
+    reloadOnChange: false);
 
 
 // Logging

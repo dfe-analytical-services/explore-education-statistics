@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
             var rootDir = Path.GetFullPath(Path.Combine(binDir!, ".."));
 
             builder.ConfigurationBuilder
-                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: true);
+                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: false);
         }
 
         private static void HandleRestart(IServiceProvider serviceProvider)

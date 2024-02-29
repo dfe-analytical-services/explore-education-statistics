@@ -127,6 +127,18 @@ def create_argument_parser() -> argparse.ArgumentParser:
         help="manually specify the expiredinvite user password",
     )
     parser.add_argument(
+        "--noinvite-pass",
+        dest="noinvite_pass",
+        default=None,
+        help="manually specify the noinvite user password",
+    )
+    parser.add_argument(
+        "--pendinginvite-pass",
+        dest="pendinginvite_pass",
+        default=None,
+        help="manually specify the pendinginvite user password",
+    )
+    parser.add_argument(
         "--reseed",
         dest="reseed",
         action="store_true",
@@ -147,6 +159,7 @@ def initialise() -> argparse.Namespace:
 
     load_environment_variables(args)
     store_credential_environment_variables(args)
+    validate_environment_variables()
     return args
 
 
@@ -155,8 +168,6 @@ def load_environment_variables(arguments: argparse.Namespace):
         load_dotenv(arguments.custom_env)
     else:
         load_dotenv(".env." + arguments.env)
-
-    validate_environment_variables()
 
 
 def validate_environment_variables():
@@ -175,7 +186,16 @@ def validate_environment_variables():
         "FAIL_TEST_SUITES_FAST",
         "IDENTITY_PROVIDER",
         "WAIT_CACHE_EXPIRY",
+        "ADMIN_EMAIL",
+        "ADMIN_PASSWORD",
+        "ANALYST_EMAIL",
+        "ANALYST_PASSWORD",
         "EXPIRED_INVITE_USER_EMAIL",
+        "EXPIRED_INVITE_USER_PASSWORD",
+        "NO_INVITE_USER_EMAIL",
+        "NO_INVITE_USER_PASSWORD",
+        "PENDING_INVITE_USER_EMAIL",
+        "PENDING_INVITE_USER_PASSWORD",
         "PUBLISHER_FUNCTIONS_URL",
     ]
 
@@ -209,3 +229,7 @@ def store_credential_environment_variables(arguments: argparse.Namespace):
         os.environ["ANALYST_PASSWORD"] = arguments.analyst_pass
     if arguments.expiredinvite_pass:
         os.environ["EXPIRED_INVITE_USER_PASSWORD"] = arguments.expiredinvite_pass
+    if arguments.noinvite_pass:
+        os.environ["NO_INVITE_USER_PASSWORD"] = arguments.noinvite_pass
+    if arguments.pendinginvite_pass:
+        os.environ["PENDING_INVITE_USER_PASSWORD"] = arguments.pendinginvite_pass

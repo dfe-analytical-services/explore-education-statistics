@@ -40,7 +40,7 @@ const ReleaseDataGuidancePage = ({
     };
   }, [releaseId]);
 
-  const { PublicAppUrl } = useConfig();
+  const { publicAppUrl } = useConfig();
 
   return (
     <Page wide={false} backLink={location.state?.backLink} homePath="">
@@ -60,7 +60,7 @@ const ReleaseDataGuidancePage = ({
               renderDataCatalogueLink={
                 model.release.published ? (
                   <Link
-                    to={`${PublicAppUrl}/data-catalogue/${model.release.publicationSlug}/${model.release.slug}`}
+                    to={`${publicAppUrl}/data-catalogue/${model.release.publicationSlug}/${model.release.slug}`}
                   >
                     data catalogue
                   </Link>

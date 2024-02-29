@@ -16,18 +16,16 @@ public static class DataSetVersionGeneratorExtensions
         int maxFilterOptions = 10,
         int maxLocationOptions = 10)
         => fixture
-            .Generator<DataSetVersion>()
-            .WithDefaults()
-            .WithMeta(() =>
-                fixture.DefaultDataSetMeta(
-                    filters: filters,
-                    indicators: indicators,
-                    locations: locations,
-                    timePeriods: timePeriods,
-                    maxFilterOptions: maxFilterOptions,
-                    maxLocationOptions: maxLocationOptions
-                )
-            );
+            .DefaultDataSetVersion()
+            .WithFilterMetas(() => fixture.DefaultFilterMeta()
+                .WithOptions(() => fixture.DefaultFilterOptionMeta().GenerateRandom(maxFilterOptions))
+                .Generate(filters))
+            .WithIndicatorMetas(() => fixture.DefaultIndicatorMeta().Generate(indicators))
+            .WithLocationMetas(() => fixture.DefaultLocationMeta()
+                .WithOptions(() => fixture.DefaultLocationCodedOptionMeta().GenerateRandom(maxLocationOptions))
+                .Generate(locations))
+            .WithTimePeriodMetas(() => fixture.DefaultTimePeriodMeta().Generate(timePeriods))
+            .WithMetaSummary();
 
     public static Generator<DataSetVersion> WithDefaults(this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetDefaults());
@@ -82,25 +80,39 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithStatusUnpublished(this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetStatusUnpublished());
 
+    public static Generator<DataSetVersion> WithTotalResults(
+        this Generator<DataSetVersion> generator,
+        long totalResults)
+        => generator.ForInstance(s => s.SetTotalResults(totalResults));
+
     public static Generator<DataSetVersion> WithMetaSummary(
         this Generator<DataSetVersion> generator,
         DataSetVersionMetaSummary metaSummary)
         => generator.ForInstance(s => s.SetMetaSummary(metaSummary));
 
-    public static Generator<DataSetVersion> WithMeta(
-        this Generator<DataSetVersion> generator,
-        DataSetMeta dataSetMeta)
-        => generator.ForInstance(s => s.SetMeta(dataSetMeta));
+    public static Generator<DataSetVersion> WithMetaSummary(
+        this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetMetaSummary());
 
-    public static Generator<DataSetVersion> WithMeta(
+    public static Generator<DataSetVersion> WithLocationMetas(
         this Generator<DataSetVersion> generator,
-        Func<DataSetMeta> dataSetMeta)
-        => generator.ForInstance(s => s.SetMeta(dataSetMeta));
+        Func<IEnumerable<LocationMeta>> metas)
+        => generator.ForInstance(s => s.SetLocationMetas(metas));
 
-    public static Generator<DataSetVersion> WithTotalResults(
+    public static Generator<DataSetVersion> WithFilterMetas(
         this Generator<DataSetVersion> generator,
-        long totalResults)
-        => generator.ForInstance(s => s.SetTotalResults(totalResults));
+        Func<IEnumerable<FilterMeta>> metas)
+        => generator.ForInstance(s => s.SetFilterMetas(metas));
+
+    public static Generator<DataSetVersion> WithIndicatorMetas(
+        this Generator<DataSetVersion> generator,
+        Func<IEnumerable<IndicatorMeta>> metas)
+        => generator.ForInstance(s => s.SetIndicatorMetas(metas));
+
+    public static Generator<DataSetVersion> WithTimePeriodMetas(
+        this Generator<DataSetVersion> generator,
+        Func<IEnumerable<TimePeriodMeta>> metas)
+        => generator.ForInstance(s => s.SetTimePeriodMetas(metas));
 
     public static Generator<DataSetVersion> WithFilterChanges(
         this Generator<DataSetVersion> generator,
@@ -137,12 +149,7 @@ public static class DataSetVersionGeneratorExtensions
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
             .Set(dsv => dsv.TotalResults, f => f.Random.Long(min: 10000, max: 10_000_000))
-            .Set(dsv => dsv.Status, DataSetVersionStatus.Staged)
-            .Set(dsv => dsv.Created, dsv => dsv.Date.PastOffset())
-            .Set(
-                dsv => dsv.Updated,
-                (f, dataSet) => f.Date.SoonOffset(14, dataSet.Created)
-            );
+            .Set(dsv => dsv.Status, DataSetVersionStatus.Staged);
 
     public static InstanceSetters<DataSetVersion> SetDataSet(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -209,36 +216,87 @@ public static class DataSetVersionGeneratorExtensions
         DateTimeOffset? unpublished)
         => instanceSetter.Set(dsv => dsv.Unpublished, unpublished);
 
+    public static InstanceSetters<DataSetVersion> SetTotalResults(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        long totalResults)
+        => instanceSetter.Set(dsv => dsv.TotalResults, totalResults);
+
     public static InstanceSetters<DataSetVersion> SetMetaSummary(
         this InstanceSetters<DataSetVersion> instanceSetter,
         DataSetVersionMetaSummary metaSummary)
         => instanceSetter.Set(dsv => dsv.MetaSummary, metaSummary);
 
-    public static InstanceSetters<DataSetVersion> SetMeta(
-        this InstanceSetters<DataSetVersion> instanceSetter,
-        DataSetMeta dataSetMeta)
-        => instanceSetter.SetMeta(() => dataSetMeta);
+    public static InstanceSetters<DataSetVersion> SetMetaSummary(
+        this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter.Set(
+            dsv => dsv.MetaSummary,
+            (_, dsv) => DataSetVersionMetaSummary.Create(dsv));
 
-    public static InstanceSetters<DataSetVersion> SetMeta(
+    public static InstanceSetters<DataSetVersion> SetLocationMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        Func<DataSetMeta> dataSetMeta)
+        Func<IEnumerable<LocationMeta>> metas)
         => instanceSetter.Set(
             (_, dsv) =>
             {
-                var meta = dataSetMeta();
+                dsv.LocationMetas = metas().ToList();
 
-                dsv.Meta = meta;
-                dsv.MetaSummary = meta.ToSummary();
+                foreach (var meta in dsv.LocationMetas)
+                {
+                    meta.DataSetVersion = dsv;
+                    meta.DataSetVersionId = dsv.Id;
+                }
 
-                meta.DataSetVersion = dsv;
-                meta.DataSetVersionId = dsv.Id;
             }
         );
 
-    public static InstanceSetters<DataSetVersion> SetTotalResults(
+    public static InstanceSetters<DataSetVersion> SetFilterMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        long totalResults)
-        => instanceSetter.Set(dsv => dsv.TotalResults, totalResults);
+        Func<IEnumerable<FilterMeta>> metas)
+        => instanceSetter.Set(
+            (_, dsv) =>
+            {
+                dsv.FilterMetas = metas().ToList();
+
+                foreach (var meta in dsv.FilterMetas)
+                {
+                    meta.DataSetVersion = dsv;
+                    meta.DataSetVersionId = dsv.Id;
+                }
+
+            }
+        );
+
+    public static InstanceSetters<DataSetVersion> SetIndicatorMetas(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<IEnumerable<IndicatorMeta>> metas)
+        => instanceSetter.Set(
+            (_, dsv) =>
+            {
+                dsv.IndicatorMetas = metas().ToList();
+
+                foreach (var meta in dsv.IndicatorMetas)
+                {
+                    meta.DataSetVersion = dsv;
+                    meta.DataSetVersionId = dsv.Id;
+                }
+            }
+        );
+
+    public static InstanceSetters<DataSetVersion> SetTimePeriodMetas(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<IEnumerable<TimePeriodMeta>> metas)
+        => instanceSetter.Set(
+            (_, dsv) =>
+            {
+                dsv.TimePeriodMetas = metas().ToList();
+
+                foreach (var meta in dsv.TimePeriodMetas)
+                {
+                    meta.DataSetVersion = dsv;
+                    meta.DataSetVersionId = dsv.Id;
+                }
+            }
+        );
 
     public static InstanceSetters<DataSetVersion> SetFilterChanges(
         this InstanceSetters<DataSetVersion> instanceSetter,

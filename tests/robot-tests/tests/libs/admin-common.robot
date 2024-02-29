@@ -11,7 +11,10 @@ ${ANALYST1_BROWSER}=    analyst1
 
 *** Keywords ***
 user logs in via identity provider
-    [Arguments]    ${email}    ${password}
+    [Arguments]
+    ...    ${email}
+    ...    ${password}
+    ...    ${expect_account_selection_page}=False
 
     IF    "%{IDENTITY_PROVIDER}" == "KEYCLOAK"
         user waits until page contains element    xpath://h1[contains(text(), "Sign in to your account")]
@@ -19,9 +22,17 @@ user logs in via identity provider
         user enters text into element    id:password    ${password}
         user clicks element    id:kc-login
     ELSE IF    "%{IDENTITY_PROVIDER}" == "AZURE"
-        user waits until page contains element    xpath://*[.='Sign in']
-        user enters text into element    xpath://*[@name='loginfmt']    ${email}
-        user clicks element    //*[@type='submit']
+        IF    ${expect_account_selection_page}
+            ${lowercase_email}=    Convert To Lowercase    ${email}
+            user waits until page contains    Pick an account
+            user clicks element
+            ...    xpath://div[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '${lowercase_email}')]
+        ELSE
+            user waits until page contains element    xpath://*[.='Sign in']
+            user enters text into element    xpath://*[@name='loginfmt']    ${email}
+            user clicks element    //*[@type='submit']
+        END
+
         user waits until page contains element    xpath://*[@name='passwd']
         user enters text into element    xpath://*[@name='passwd']    ${password}
         user clicks element    xpath://*[@type='submit']
@@ -62,12 +73,20 @@ user switches to analyst1 browser
     user switches browser    ${ANALYST1_BROWSER}
 
 user changes to bau1
-    user clicks link    Sign out    css:#navigation
+    user logs out
     user signs in as bau1    False
 
 user changes to analyst1
-    user clicks link    Sign out    css:#navigation
+    user logs out
     user signs in as analyst1    False
+
+user logs out
+    user clicks element    testid:header-sign-out-button
+    IF    "%{IDENTITY_PROVIDER}" == "KEYCLOAK"
+        user waits until page contains title    Signed out
+    ELSE IF    "%{IDENTITY_PROVIDER}" == "AZURE"
+        user waits until page contains    signed out of your account
+    END
 
 user selects dashboard theme and topic if possible
     [Arguments]

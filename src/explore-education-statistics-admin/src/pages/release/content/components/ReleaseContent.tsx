@@ -308,7 +308,7 @@ const ReleaseContent = ({
                           ({ id, title, slug }) => (
                             <li key={id} data-testid="other-release-item">
                               <Link
-                                to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                                to={`${config?.publicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
                               >
                                 {title}
                               </Link>

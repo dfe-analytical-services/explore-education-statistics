@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
@@ -16,15 +17,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Configure security Policies
          */
-        public static void ConfigureAuthorizationPolicies(IServiceCollection services)
+        public static void ConfigureAuthorizationPolicies(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthorization(options =>
             {
+                // This policy ensures that the user has been issued a valid access token from the Identity Provider
+                // and has consented to the SPA accessing the Admin APIs on their behalf.  This policy does not enforce
+                // that the user has any roles yet.  This policy is useful in cases where protected endpoints can be
+                // called by a user who is not yet fully registered on the service.
+                options.AddPolicy(SecurityPolicies.AuthenticatedByIdentityProvider.ToString(), policy =>
+                    policy.RequireAssertion(context => context.User.HasScope(SecurityScopes.AccessAdminApiScope)));
+
+                // This policy ensures that the user has been issued a valid access token from the Identity Provider
+                // and has consented to the SPA accessing the Admin APIs on their behalf.  It also ensures that the user
+                // has been allocated a role that gives them permission to use the protected pages of the Admin SPA and
+                // the majority of the API endpoints.  This policy is useful for protecting endpoints where we expect
+                // the user to have registered successfully with the service already.
+                options.AddPolicy(SecurityPolicies.RegisteredUser.ToString(), policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(claim => claim.Type == SecurityClaimTypes.ApplicationAccessGranted.ToString()) &&
+                        context.User.HasScope(SecurityScopes.AccessAdminApiScope)));
+
                 /**
                  * General role-based page access
                  */
-                options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
 
                 options.AddPolicy(SecurityPolicies.IsBauUser.ToString(), policy =>
                     policy.RequireRole(RoleNames.BauUser));

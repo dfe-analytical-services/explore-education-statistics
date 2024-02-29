@@ -1,10 +1,8 @@
-import json
 import os
-from pathlib import Path
-from typing import Tuple
 
 import requests
-from scripts.get_auth_tokens import get_identity_info
+from scripts.get_auth_tokens import get_local_storage_identity_json
+from tests.libs import local_storage_helper
 from tests.libs.logger import get_logger
 
 # TODO - there's plenty of duplication between this file and admin_api.py and setup_auth_variables.py in tests/libs.
@@ -57,13 +55,14 @@ def send_authenticated_api_request(session, method, endpoint, body):
     have been fetched prior to being called.
     """
 
-    jwt_token = json.loads(os.getenv("IDENTITY_LOCAL_STORAGE_ADMIN"))["access_token"]
+    jwt = local_storage_helper.get_access_token_from_file("ADMIN")
+
     return session.request(
         method,
         url=f'{os.getenv("ADMIN_URL")}{endpoint}',
         headers={
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {jwt_token}",
+            "Authorization": f"Bearer {jwt}",
         },
         stream=True,
         json=body,
@@ -73,7 +72,7 @@ def send_authenticated_api_request(session, method, endpoint, body):
 
 def send_request_with_retry_on_auth_failure(session, method, endpoint, body, fail_on_reauthenticate=True):
     """
-    This method makes an request to the given Admin API endpoint.
+    This method makes a request to the given Admin API endpoint.
 
     If no prior authentication tokens are available when this method is called, they will
     be obtained using the BAU user's credentials.
@@ -84,7 +83,7 @@ def send_request_with_retry_on_auth_failure(session, method, endpoint, body, fai
     If an error HTTP status code is encountered, an error will be thrown.
     """
 
-    if os.getenv("IDENTITY_LOCAL_STORAGE_ADMIN") is None:
+    if not local_storage_helper.local_storage_json_file_exists("ADMIN"):
         setup_bau_authentication(clear_existing=True)
 
     response = send_authenticated_api_request(session, method, endpoint, body)
@@ -144,8 +143,8 @@ def delete_test_topic():
         send_admin_request("DELETE", f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
 
 
-def setup_bau_authentication(clear_existing=False):
-    setup_auth_variables(
+def setup_bau_authentication(clear_existing=False) -> dict:
+    return setup_auth_variables(
         user="ADMIN",
         email=os.getenv("ADMIN_EMAIL"),
         password=os.getenv("ADMIN_PASSWORD"),
@@ -154,8 +153,8 @@ def setup_bau_authentication(clear_existing=False):
     )
 
 
-def setup_analyst_authentication(clear_existing=False):
-    setup_auth_variables(
+def setup_analyst_authentication(clear_existing=False) -> dict:
+    return setup_auth_variables(
         user="ANALYST",
         email=os.getenv("ANALYST_EMAIL"),
         password=os.getenv("ANALYST_PASSWORD"),
@@ -164,32 +163,20 @@ def setup_analyst_authentication(clear_existing=False):
     )
 
 
-def setup_auth_variables(
-    user, email, password, identity_provider, clear_existing=False, driver=None
-) -> Tuple[str, str]:
+def setup_auth_variables(user, email, password, identity_provider, clear_existing=False, driver=None) -> dict:
     assert user, "user param must be set"
     assert email, "email param must be set"
     assert password, "password param must be set"
 
-    local_storage_name = f"IDENTITY_LOCAL_STORAGE_{user}"
-    cookie_name = f"IDENTITY_COOKIE_{user}"
-
-    local_storage_file = Path(f"{local_storage_name}.json")
-    cookie_file = Path(f"{cookie_name}.json")
-
     if clear_existing:
-        local_storage_file.unlink(True)
-        cookie_file.unlink(True)
+        local_storage_helper.clear_local_storage_file(user)
 
     admin_url = os.getenv("ADMIN_URL")
     assert admin_url, "ADMIN_URL env variable must be set"
 
     authenticated = False
 
-    if local_storage_file.exists() and cookie_file.exists():
-        os.environ[local_storage_name] = local_storage_file.read_text()
-        os.environ[cookie_name] = cookie_file.read_text()
-
+    if local_storage_helper.local_storage_json_file_exists(user):
         response = send_admin_request("GET", "/api/permissions/access", fail_on_reauthenticate=False)
 
         if response.status_code == 200:
@@ -200,21 +187,10 @@ def setup_auth_variables(
 
     if not authenticated:
         logger.info(f"Logging in to obtain {user} authentication information...")
-
-        os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
+        local_storage_json = get_local_storage_identity_json(
             url=admin_url, email=email, password=password, driver=driver, identity_provider=identity_provider
         )
-
-        # Cache auth info to files for efficiency
-        local_storage_file.write_text(os.environ[local_storage_name])
-        cookie_file.write_text(os.environ[cookie_name])
-
+        local_storage_helper.write_local_storage_json_to_file(local_storage_json, user)
         logger.info("Done!")
 
-    local_storage_token = os.getenv(local_storage_name)
-    cookie_token = os.getenv(cookie_name)
-
-    assert local_storage_token, f"{local_storage_name} env variable was not set"
-    assert cookie_token, f"{cookie_name} env variable was not set"
-
-    return local_storage_token, cookie_token
+    return local_storage_helper.read_local_storage_json_from_file(user)

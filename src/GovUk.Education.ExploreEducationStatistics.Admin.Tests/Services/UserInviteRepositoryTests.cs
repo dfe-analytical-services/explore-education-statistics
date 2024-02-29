@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;

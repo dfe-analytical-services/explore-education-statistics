@@ -700,6 +700,13 @@ user checks url equals
     ${current_url}=    get location
     should be equal    ${current_url}    ${expected}
 
+user checks page contains link
+    [Arguments]
+    ...    ${text}
+    ...    ${parent}=css:body
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//a[contains(text(), "${text}")]
+
 user checks page contains link with text and url
     [Arguments]
     ...    ${text}

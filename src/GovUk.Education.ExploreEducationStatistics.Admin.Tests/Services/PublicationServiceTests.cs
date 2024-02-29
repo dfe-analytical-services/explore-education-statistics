@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -278,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(user.Id);
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(user.Id);
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -449,7 +449,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
 
             userService.Setup(s => s.GetUserId()).Returns(user.Id);
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(RegisteredUser)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();

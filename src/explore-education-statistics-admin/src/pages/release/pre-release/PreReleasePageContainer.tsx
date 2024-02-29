@@ -92,7 +92,7 @@ const PreReleasePageContainer = ({
             </p>
 
             <a
-              href={`${config.PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
+              href={`${config.publicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
               rel="noopener noreferrer"
               data-testid="release-url"
             >

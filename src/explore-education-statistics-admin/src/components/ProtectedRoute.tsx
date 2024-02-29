@@ -1,15 +1,14 @@
-import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
-import { useAuthContext, User } from '@admin/contexts/AuthContext';
-import signInService from '@admin/services/loginService';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import appendQuery from '@common/utils/url/appendQuery';
-import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import React from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';
+import { signInRoute } from '@admin/routes/routes';
+import { GlobalPermissions } from '@admin/services/authService';
+import ForbiddenPage from '@admin/pages/errors/ForbiddenPage';
 
 export interface ProtectedRouteProps extends RouteProps {
-  allowAnonymousUsers?: boolean;
   path: string;
-  protectionAction?: (user: User) => boolean;
+  protectionAction?: (permissions: GlobalPermissions) => boolean;
 }
 
 /**
@@ -20,35 +19,23 @@ export interface ProtectedRouteProps extends RouteProps {
  * authorized.
  */
 const ProtectedRoute = ({
-  allowAnonymousUsers = false,
-  protectionAction,
+  protectionAction = permissions => permissions.canAccessSystem,
   ...rest
 }: ProtectedRouteProps) => {
   const { user } = useAuthContext();
 
-  const { errorPages } = useErrorControl();
-
-  let hasAccess = allowAnonymousUsers;
-
-  if (user) {
-    hasAccess = protectionAction
-      ? protectionAction(user)
-      : user.permissions.canAccessSystem;
-  }
-
-  if (!allowAnonymousUsers && !user?.validToken) {
+  if (!user) {
     return (
       <Redirect
-        to={appendQuery(signInService.getSignInLink(), {
-          [QueryParameterNames.ReturnUrl]: encodeURI(window.location.href),
+        to={appendQuery(signInRoute.path, {
+          returnUrl: encodeURI(window.location.pathname),
         })}
       />
     );
   }
 
-  if (!hasAccess) {
-    errorPages.forbidden();
-    return null;
+  if (!protectionAction(user.permissions)) {
+    return <ForbiddenPage />;
   }
 
   return <Route {...rest} />;

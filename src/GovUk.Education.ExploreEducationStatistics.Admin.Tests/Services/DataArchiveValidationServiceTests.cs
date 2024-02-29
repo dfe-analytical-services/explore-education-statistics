@@ -86,6 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileName);
 
+            return CreateFormFileFromResourceWithPath(filePath, fileName);
+        }
+
+        private static IFormFile CreateFormFileFromResourceWithPath(string filePath, string fileName)
+        {
             var formFile = new Mock<IFormFile>();
             formFile
                 .Setup(f => f.OpenReadStream())
@@ -103,12 +108,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + originalFileName);
 
-            var newFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                "Resources" + Path.DirectorySeparatorChar + newFileName);
+            var newFilePath = Path.GetTempPath() +  Path.DirectorySeparatorChar + newFileName;
 
             File.Copy(originalFilePath, newFilePath, true);
 
-            return CreateFormFileFromResource(newFileName);
+            return CreateFormFileFromResourceWithPath(newFilePath, newFileName);
         }
 
         private static DataArchiveValidationService SetupDataArchiveValidationService(

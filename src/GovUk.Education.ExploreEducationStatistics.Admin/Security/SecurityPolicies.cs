@@ -5,9 +5,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
     public enum SecurityPolicies
     {
         /**
+         * Scope access when checking JWTs.
+         */
+        AuthenticatedByIdentityProvider,
+        RegisteredUser,
+
+        /**
          * General role-based page access
          */
-        CanAccessSystem,
         CanAccessAnalystPages,
         CanAccessPrereleasePages,
         CanManageUsersOnSystem,

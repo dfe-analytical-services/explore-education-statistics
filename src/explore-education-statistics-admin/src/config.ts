@@ -1,25 +1,29 @@
-import client from '@admin/services/utils/service';
-import { produce } from 'immer';
+export interface OidcConfig {
+  readonly clientId: string;
+  readonly authority: string;
+  readonly knownAuthorities: string[];
+  readonly adminApiScope: string;
+  readonly authorityMetadata?: {
+    readonly authorizationEndpoint: string;
+    readonly tokenEndpoint: string;
+    readonly issuer: string;
+    readonly userInfoEndpoint: string;
+    readonly endSessionEndpoint: string;
+  };
+}
 
 export interface Config {
-  readonly AppInsightsKey: string;
-  readonly PublicAppUrl: string;
-  readonly PermittedEmbedUrlDomains: string[];
+  readonly appInsightsKey: string;
+  readonly publicAppUrl: string;
+  readonly permittedEmbedUrlDomains: string[];
+  readonly oidc: OidcConfig;
 }
 
 let config: Config;
 
 export async function getConfig(): Promise<Config> {
-  if (config) {
-    return config;
+  if (!config) {
+    config = await fetch('/api/config').then(r => r.json());
   }
-
-  const configResponse = await client.get<Config>('/config');
-
-  config = produce<Config>(
-    undefined as unknown as Config,
-    () => configResponse,
-  );
-
   return config;
 }

@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -15,8 +14,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -36,8 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserInviteRepository _userInviteRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly bool _userDeletionAllowed;
 
-        public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
+        public UserManagementService(
+            UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
@@ -46,7 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IUserInviteRepository userInviteRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
-            IUserPublicationInviteRepository userPublicationInviteRepository)
+            IUserPublicationInviteRepository userPublicationInviteRepository,
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -58,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userInviteRepository = userInviteRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userPublicationInviteRepository = userPublicationInviteRepository;
+            _userManager = userManager;
+            _userDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -303,20 +311,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         roleId: roleId,
                         createdById: _userService.GetUserId(),
                         request.CreatedDate);
-                    
+
                     // Clear out any pre-existing Release or Publication invites prior to adding
                     // new ones.
                     var existingReleaseInvites = _contentDbContext
                         .UserReleaseInvites
                         .Where(invite => invite.Email.ToLower() == sanitisedEmail);
-                    
+
                     var existingPublicationInvites = _contentDbContext
                         .UserPublicationInvites
                         .Where(invite => invite.Email.ToLower() == sanitisedEmail);
 
                     _contentDbContext.RemoveRange(existingReleaseInvites);
                     _contentDbContext.RemoveRange(existingPublicationInvites);
-                    
+
                     foreach (var userReleaseRole in request.UserReleaseRoles)
                     {
                         await _userReleaseInviteRepository.Create(
@@ -406,6 +414,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(() => _userRoleService.SetGlobalRole(userId, roleId));
+        }
+
+        public async Task<Either<ActionResult, Unit>> DeleteUser(string email)
+        {
+            return await CheckCanDeleteUser(email)
+                .OnSuccessDo(async () =>
+                {
+                    // Delete the Identity Framework user, if found.
+                    var identityUser = await _usersAndRolesDbContext
+                        .Users
+                        .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+
+                    if (identityUser != null)
+                    {
+                        await _userManager.DeleteAsync(identityUser);
+                    }
+
+                    var internalUser = await _contentDbContext
+                        .Users
+                        .SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+
+                    var globalInvites = await _usersAndRolesDbContext
+                        .UserInvites
+                        .Where(invite => invite.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+
+                    var releaseInvites = await _contentDbContext
+                        .UserReleaseInvites
+                        .Where(invite => invite.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+
+                    var publicationInvites = await _contentDbContext
+                        .UserPublicationInvites
+                        .Where(invite => invite.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+
+                    // Delete the internal EES user, if found.
+                    if (internalUser != null)
+                    {
+                        _contentDbContext.Users.Remove(internalUser);
+                    }
+
+                    // Delete any invites that they may have had.
+                    _usersAndRolesDbContext.UserInvites.RemoveRange(globalInvites);
+                    _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
+                    _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
+
+                    await _contentDbContext.SaveChangesAsync();
+                    await _usersAndRolesDbContext.SaveChangesAsync();
+                });
+        }
+
+        private async Task<Either<ActionResult, Unit>> CheckCanDeleteUser(string email)
+        {
+            if (!_userDeletionAllowed)
+            {
+                return new ForbidResult();
+            }
+
+            // We currently only allow test users to be deleted.
+            if (!email.ToLower().StartsWith("ees-test."))
+            {
+                return new ForbidResult();
+            }
+
+            return Unit.Instance;
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)

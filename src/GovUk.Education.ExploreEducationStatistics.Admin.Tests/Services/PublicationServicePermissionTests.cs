@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListPublications_NoAccessOfSystem()
         {
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(SecurityPolicies.CanAccessSystem)
+                .ExpectCheckToFail(SecurityPolicies.RegisteredUser)
                 .AssertForbidden(async userService =>
                 {
                     var service = BuildPublicationService(

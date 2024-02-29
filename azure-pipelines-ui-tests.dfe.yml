@@ -41,14 +41,14 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - task: PythonScript@0
     displayName: Public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 4 --rerun-attempts 3
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --noinvite-pass "test" --pendinginvite-pass "test" --env "dev" --file "tests/general_public/" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
@@ -93,7 +93,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -101,7 +101,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 4 --rerun-attempts 3
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/admin_and_public_2" --processes 4 --rerun-attempts 3
     #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
@@ -146,7 +146,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -154,7 +154,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 4 --rerun-attempts 3
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/admin" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
@@ -199,14 +199,14 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - task: PythonScript@0
     displayName: Admin public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 4 --rerun-attempts 3
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/admin_and_public" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)

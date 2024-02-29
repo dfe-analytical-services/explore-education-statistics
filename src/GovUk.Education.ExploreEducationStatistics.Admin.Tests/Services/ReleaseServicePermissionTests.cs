@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupCheck(CanAccessSystem)
+                .SetupCheck(RegisteredUser)
                 .SetupCheck(CanViewAllReleases)
                 .AssertSuccess(
                     async userService =>
@@ -204,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(list);
 
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupCheck(CanAccessSystem)
+                .SetupCheck(RegisteredUser)
                 .ExpectCheckToFail(CanViewAllReleases)
                 .AssertSuccess(
                     async userService =>
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleasesWithStatuses_NoAccessToSystem()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanAccessSystem)
+                .ExpectCheckToFail(RegisteredUser)
                 .AssertForbidden(
                     async userService =>
                     {

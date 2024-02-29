@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -10,33 +11,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ConfigurationController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly OpenIdConnectSpaClientOptions _oidcOptions;
 
-        public ConfigurationController(IConfiguration configuration)
+        public ConfigurationController(
+            IConfiguration configuration,
+            IOptions<OpenIdConnectSpaClientOptions> oidcOptions)
         {
             _configuration = configuration;
+            _oidcOptions = oidcOptions.Value;
         }
 
         [AllowAnonymous]
         [HttpGet("api/config")]
-        public ActionResult<Dictionary<string, object>> GetConfig()
+        public ActionResult<ConfigurationViewModel> GetConfig()
         {
-            return new ActionResult<Dictionary<string, object>>(BuildConfigurationValues());
-        }
-
-        private Dictionary<string, object> BuildConfigurationValues()
-        {
-            return new Dictionary<string, object>
-            {
-                {
-                    ExposedKeys.AppInsightsKey.ToString(), GetValue(GetRootSection("AppInsights"), "InstrumentationKey")
-                },
-                {
-                    ExposedKeys.PublicAppUrl.ToString(), GetRootValue("PublicAppUrl")
-                },
-                {
-                    ExposedKeys.PermittedEmbedUrlDomains.ToString(), EmbedBlockService.PermittedDomains
-                }
-            };
+            return new ConfigurationViewModel(
+                AppInsightsKey: GetValue(GetRootSection("AppInsights"), "InstrumentationKey"),
+                PublicAppUrl: GetRootValue("PublicAppUrl"),
+                PermittedEmbedUrlDomains: EmbedBlockService.PermittedDomains,
+                Oidc: _oidcOptions);
         }
 
         private IConfigurationSection GetRootSection(string key)
@@ -51,14 +44,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         private static string GetValue(IConfiguration configuration, string key)
         {
-            return configuration?.GetValue<string>(key);
-        }
-
-        private enum ExposedKeys
-        {
-            AppInsightsKey,
-            PublicAppUrl,
-            PermittedEmbedUrlDomains
+            return configuration.GetValue<string>(key);
         }
     }
+
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class AuthorityMetadataOptions
+    {
+        public string AuthorizationEndpoint { get; set; } = null!;
+        public string TokenEndpoint { get; set; } = null!;
+        public string Issuer { get; set; } = null!;
+        public string UserInfoEndpoint { get; set; } = null!;
+        public string EndSessionEndpoint { get; set; } = null!;
+    }
+
+    public class OpenIdConnectSpaClientOptions
+    {
+        public const string OpenIdConnectSpaClient = "OpenIdConnectSpaClient";
+
+        public string ClientId { get; set; } = null!;
+        public string Authority { get; set; } = null!;
+        public string[] KnownAuthorities { get; set; } = null!;
+        public string AdminApiScope { get; set; } = null!;
+        public AuthorityMetadataOptions? AuthorityMetadata { get; set; }
+    }
+
+    public record ConfigurationViewModel(
+        string AppInsightsKey,
+        string PublicAppUrl,
+        string[] PermittedEmbedUrlDomains,
+        OpenIdConnectSpaClientOptions Oidc);
 }

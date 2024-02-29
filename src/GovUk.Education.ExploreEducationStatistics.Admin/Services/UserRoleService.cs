@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -21,8 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -359,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToListAsync();
                 });
         }
-        
+
         public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId)
         {
             return await _contentPersistenceHelper

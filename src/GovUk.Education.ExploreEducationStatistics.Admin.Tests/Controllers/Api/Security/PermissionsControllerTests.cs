@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
 public class PermissionsControllerTests : IntegrationTest<TestStartup>
 {
-    public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp) 
+    public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp)
         : base(testApp)
     {}
 
