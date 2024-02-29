@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
-public static class ReleaseGeneratorExtensions
+public static class ReleaseVersionGeneratorExtensions
 {
     public static Generator<ReleaseVersion> DefaultStatsReleaseVersion(this DataFixture fixture)
         => fixture.Generator<ReleaseVersion>().WithDefaults();
