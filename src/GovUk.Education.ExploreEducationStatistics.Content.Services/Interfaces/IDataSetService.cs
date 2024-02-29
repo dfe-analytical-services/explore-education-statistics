@@ -23,4 +23,8 @@ public interface IDataSetService
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
+        Guid releaseId,
+        Guid fileId);
 }

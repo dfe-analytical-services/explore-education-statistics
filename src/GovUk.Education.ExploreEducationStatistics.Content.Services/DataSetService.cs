@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -26,10 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 public class DataSetService : IDataSetService
 {
     private readonly ContentDbContext _contentDbContext;
+    private readonly IReleaseRepository _releaseRepository;
 
-    public DataSetService(ContentDbContext contentDbContext)
+    public DataSetService(
+        ContentDbContext contentDbContext,
+        IReleaseRepository releaseRepository)
     {
         _contentDbContext = contentDbContext;
+        _releaseRepository = releaseRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
@@ -117,6 +122,51 @@ public class DataSetService : IDataSetService
                 Content = await HtmlToTextUtils.HtmlToText(viewModel.Content)
             })
             .ToListAsync();
+    }
+
+    public async Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
+        Guid releaseId,
+        Guid fileId)
+    {
+        // WARN: This prevents public uses from seeing data sets they shouldn't!
+        if (!await _releaseRepository.IsLatestPublishedReleaseVersion(releaseId))
+        {
+            return new NotFoundResult();
+        }
+
+        return await _contentDbContext.ReleaseFiles
+            .Where(rf =>
+                rf.FileId == fileId
+                && rf.ReleaseId == releaseId)
+            .Select(releaseFile => new DataSetDetailsViewModel
+            {
+                Title = releaseFile.Name ?? string.Empty,
+                Summary = releaseFile.Summary ?? string.Empty,
+                Release = new DataSetDetailsReleaseViewModel
+                {
+                    Id = releaseFile.ReleaseId,
+                    Title = releaseFile.Release.Title,
+                    Slug = releaseFile.Release.Slug,
+                    Type = releaseFile.Release.Type,
+                    IsLatestPublishedRelease =
+                        releaseFile.Release.Publication.LatestPublishedReleaseId == releaseFile.ReleaseId,
+                    Published = releaseFile.Release.Published!.Value,
+                    Publication = new DataSetDetailsPublicationViewModel
+                    {
+                        Id = releaseFile.Release.PublicationId,
+                        Title = releaseFile.Release.Publication.Title,
+                        Slug = releaseFile.Release.Publication.Slug,
+                        ThemeTitle = releaseFile.Release.Publication.Topic.Theme.Title,
+                    },
+                },
+                File = new DataSetDetailsFileViewModel
+                {
+                    Id = releaseFile.FileId,
+                    Name = releaseFile.File.Filename,
+                    Size = releaseFile.File.DisplaySize(),
+                }
+            })
+            .FirstOrNotFoundAsync();
     }
 }
 

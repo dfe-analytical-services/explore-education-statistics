@@ -15,6 +15,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
@@ -474,8 +476,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     release1Version1Files,
                     freeTextRanks);
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: "aaa");
@@ -514,8 +515,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     publication.Releases,
                     release1Version1Files);
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: "aaa");
@@ -1064,8 +1064,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     release1Version1Files,
                     freeTextRanks);
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest
@@ -1121,8 +1120,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     release1Version1Files,
                     freeTextRanks);
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest
@@ -1408,8 +1406,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var contentDbContext = ContentDbContextMock();
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest(SearchTerm: searchTerm);
@@ -1485,8 +1482,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var contentDbContext = ContentDbContextMock();
 
-                var client = BuildApp(
-                        dataSetService: new DataSetService(contentDbContext.Object))
+                var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
                 var query = new DataSetsListRequest(
@@ -1644,14 +1640,196 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    private WebApplicationFactory<TestStartup> BuildApp(IDataSetService? dataSetService = null)
+    public class GetDataSetTests : DataSetsControllerTests
+    {
+        public GetDataSetTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        {
+        }
+
+        [Fact]
+        public async Task FetchDataSetDetails_Success()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleaseParents(
+                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[0])
+                .WithFile(_fixture.DefaultFile());
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/releases/{releaseFile.ReleaseId}/data-sets/{releaseFile.FileId}";
+
+            var response = await client.GetAsync(uri);
+            var viewModel = response.AssertOk<DataSetDetailsViewModel>();
+
+            Assert.Equal(releaseFile.Name, viewModel.Title);
+            Assert.Equal(releaseFile.Summary, viewModel.Summary);
+
+            var file = releaseFile.File;
+
+            Assert.Equal(file.Id, viewModel.File.Id);
+            Assert.Equal(file.Filename, viewModel.File.Name);
+            Assert.Equal(file.DisplaySize(), viewModel.File.Size);
+
+            Assert.Equal(releaseFile.ReleaseId, viewModel.Release.Id);
+            Assert.Equal(releaseFile.Release.Title, viewModel.Release.Title);
+            Assert.Equal(releaseFile.Release.Slug, viewModel.Release.Slug);
+            Assert.Equal(releaseFile.Release.Type, viewModel.Release.Type);
+            Assert.True(viewModel.Release.IsLatestPublishedRelease);
+            Assert.Equal(releaseFile.Release.Published, viewModel.Release.Published);
+
+            Assert.Equal(publication.Id, viewModel.Release.Publication.Id);
+            Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
+            Assert.Equal(publication.Slug, viewModel.Release.Publication.Slug);
+            Assert.Equal(publication.Topic.Theme.Title, viewModel.Release.Publication.ThemeTitle);
+        }
+
+        [Fact]
+        public async Task NoRelease_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleaseParents(
+                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[0])
+                .WithFile(_fixture.DefaultFile());
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/releases/{Guid.NewGuid()}/data-sets/{releaseFile.FileId}";
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task NoFile_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleaseParents(
+                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[0])
+                .WithFile(_fixture.DefaultFile());
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/releases/{publication.Releases[0].Id}/data-sets/{Guid.NewGuid()}";
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ReleaseNotPublished_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleaseParents(
+                    _fixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[0])
+                .WithFile(_fixture.DefaultFile());
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile);
+                })
+                .CreateClient();
+
+            var uri = $"/api/releases/{releaseFile.ReleaseId}/data-sets/{releaseFile.FileId}";
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task AmendmentNotPublished_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleaseParents(
+                    _fixture.DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            File file = _fixture.DefaultFile();
+
+            ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[0]) // the previous published version
+                .WithFile(file);
+
+            ReleaseFile releaseFile1 = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[1]) // the latest published version
+                .WithFile(file);
+
+            ReleaseFile releaseFile2 = _fixture.DefaultReleaseFile()
+                .WithRelease(publication.Releases[2]) // the draft version
+                .WithFile(file);
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.AddRange(releaseFile0, releaseFile1, releaseFile2);
+                })
+                .CreateClient();
+
+            var uri = $"/api/releases/{publication.Releases[2].Id}/data-sets/{releaseFile2.FileId}";
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
+        }
+    }
+
+    private WebApplicationFactory<TestStartup> BuildApp(
+        ContentDbContext? contentDbContext = null)
     {
         return TestApp
             .ResetDbContexts()
             .ConfigureServices(services =>
             {
-                services.AddTransient(
-                    s => dataSetService ?? new DataSetService(s.GetRequiredService<ContentDbContext>()));
+                services.AddTransient<IReleaseRepository>(s => new ReleaseRepository(
+                    contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
+                services.AddTransient<IDataSetService>(
+                    s => new DataSetService(
+                        contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
+                        s.GetRequiredService<IReleaseRepository>()));
             });
     }
 }
