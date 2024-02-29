@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             CancellationToken cancellationToken)
         {
             return await _userService
-                .CheckCanViewRelease(dataBlockVersion.ReleaseVersion)
+                .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
                 .OnSuccess(_ => _tableBuilderService.Query(releaseVersionId: dataBlockVersion.ReleaseVersionId,
                     dataBlockVersion.Query,
                     cancellationToken));

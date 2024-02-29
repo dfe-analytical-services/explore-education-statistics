@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     var subjectsToInclude = GetPublishedSubjectIds(releaseVersionId);

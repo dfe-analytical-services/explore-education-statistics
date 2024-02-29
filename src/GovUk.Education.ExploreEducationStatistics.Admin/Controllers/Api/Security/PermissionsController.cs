@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         [HttpGet("permissions/release/{releaseVersionId:guid}/update")]
         public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseVersionId)
         {
-            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanUpdateRelease);
+            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanUpdateReleaseVersion);
         }
 
         public record ReleaseStatusPermissionsViewModel(
@@ -89,11 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(async releaseVersion =>
                 {
                     var canMarkDraft = await _userService
-                        .CheckCanMarkReleaseAsDraft(releaseVersion);
+                        .CheckCanMarkReleaseVersionAsDraft(releaseVersion);
                     var canMarkHigherReview = await _userService
-                        .CheckCanSubmitReleaseForHigherReview(releaseVersion);
+                        .CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
                     var canMarkApproved = await _userService
-                        .CheckCanApproveRelease(releaseVersion);
+                        .CheckCanApproveReleaseVersion(releaseVersion);
 
                     return new ReleaseStatusPermissionsViewModel(
                         CanMarkDraft: canMarkDraft.IsRight,

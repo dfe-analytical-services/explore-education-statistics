@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     _context.Update.Add(new Update
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     var releaseNote = releaseVersion
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersionForUpdates)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     var releaseNote = releaseVersion

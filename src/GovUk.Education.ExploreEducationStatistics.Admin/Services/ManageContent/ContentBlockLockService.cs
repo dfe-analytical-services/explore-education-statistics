@@ -154,7 +154,7 @@ public class ContentBlockLockService : IContentBlockLockService
         }
 
         return await _userService
-            .CheckCanUpdateRelease(contentBlock.ContentSection.ReleaseVersion)
+            .CheckCanUpdateReleaseVersion(contentBlock.ContentSection.ReleaseVersion)
             .OnSuccessVoid();
     }
 

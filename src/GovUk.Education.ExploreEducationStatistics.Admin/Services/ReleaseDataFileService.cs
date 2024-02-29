@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(async releaseVersion => await _userService.CheckCanUpdateRelease(releaseVersion, ignoreCheck: forceDelete))
+                .OnSuccess(async releaseVersion => await _userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
                     await fileIds.Select(fileId => _releaseFileService.CheckFileExists(releaseVersionId: releaseVersionId,
                             fileId: fileId,
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                               && rf.File.Type == FileType.Data
                               && rf.FileId == fileId)
                     .Include(rf => rf.ReleaseVersion))
-                .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.ReleaseVersion))
+                .OnSuccessDo(rf => _userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccess(BuildDataFileViewModel);
         }
 
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async () =>
                 {
                     var files = await _releaseFileRepository.GetByFileType(releaseVersionId, FileType.Data);
@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => _userService.CheckCanUpdateRelease(releaseVersion))
+                .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
                 .OnSuccess(async _ =>
                 {
                     if (fileIds.Distinct().Count() != fileIds.Count)
@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)

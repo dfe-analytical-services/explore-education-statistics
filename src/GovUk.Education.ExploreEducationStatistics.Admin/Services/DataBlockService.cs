@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccessDo(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(releaseVersion => GetDeletePlan(releaseVersionId: releaseVersion.Id,
                     dataBlockVersionId: dataBlockVersionId))
                 .OnSuccessVoid(DeleteDataBlocks);
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, DataBlockViewModel>> Get(Guid dataBlockVersionId)
         {
             return await GetDataBlockVersion(dataBlockVersionId)
-                .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewRelease(dataBlockVersion.ReleaseVersion))
+                .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion))
                 .OnSuccess(async dataBlockVersion =>
                 {
                     var releaseVersionId = dataBlockVersion.ReleaseVersionId;
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                     {
                         var dataBlocks = await ListDataBlocks(releaseVersion.Id);
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlockUpdateViewModel dataBlockUpdate)
         {
             return await GetDataBlockVersion(dataBlockVersionId)
-                .OnSuccessDo(dataBlock => _userService.CheckCanUpdateRelease(dataBlock.ReleaseVersion))
+                .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
                 .OnSuccessDo(async dataBlockVersion =>
                 {
                     // TODO EES-753 Alter this when multiple charts are supported
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId
                                                    && dataBlockVersion.Id == dataBlockVersionId)
                 )
-                .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateRelease(dataBlockVersion.ReleaseVersion))
+                .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateReleaseVersion(dataBlockVersion.ReleaseVersion))
                 .OnSuccess(async dataBlockVersion =>
                     new DeleteDataBlockPlan
                     {
@@ -470,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     return await _context

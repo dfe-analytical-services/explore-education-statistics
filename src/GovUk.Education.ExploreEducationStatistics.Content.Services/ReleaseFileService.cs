@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .ThenInclude(releaseVersion => releaseVersion.Publication)
                     .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.FileId == fileId)
                 )
-                .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.ReleaseVersion))
+                .OnSuccessDo(rf => _userService.CheckCanViewReleaseVersion(rf.ReleaseVersion))
                 .OnSuccessCombineWith(rf =>
                     _publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
                 .OnSuccess(methodologyFileAndStream =>
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     releaseVersionId,
                     q => q.Include(rv => rv.Publication)
                 )
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
                     async release =>
                     {

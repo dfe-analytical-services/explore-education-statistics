@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseVersions
                 .HydrateReleaseForChecklist()
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(
                     async release => new ReleaseChecklistViewModel(
                         await GetErrors(release),

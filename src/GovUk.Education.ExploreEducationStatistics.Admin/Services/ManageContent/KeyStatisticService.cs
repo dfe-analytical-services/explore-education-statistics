@@ -49,7 +49,7 @@ public class KeyStatisticService : IKeyStatisticService
         KeyStatisticDataBlockCreateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
                 query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
                                                 && dataBlockVersion.ReleaseVersionId == releaseVersionId)))
@@ -82,7 +82,7 @@ public class KeyStatisticService : IKeyStatisticService
         KeyStatisticTextCreateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
             {
                 var keyStatisticText = _mapper.Map<KeyStatisticText>(request);
@@ -108,7 +108,7 @@ public class KeyStatisticService : IKeyStatisticService
         KeyStatisticDataBlockUpdateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await _persistenceHelper.CheckEntityExists<KeyStatisticDataBlock>(keyStatisticId, query =>
                     query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)))
@@ -133,7 +133,7 @@ public class KeyStatisticService : IKeyStatisticService
         KeyStatisticTextUpdateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await _persistenceHelper.CheckEntityExists<KeyStatisticText>(keyStatisticId, query =>
                     query.Where(keyStat => keyStat.ReleaseVersionId == releaseVersion.Id)))
@@ -157,7 +157,7 @@ public class KeyStatisticService : IKeyStatisticService
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid keyStatisticId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion =>
                 await _persistenceHelper.CheckEntityExists<KeyStatistic>(query =>
                     query.Where(keyStat => keyStat.Id == keyStatisticId
@@ -174,7 +174,7 @@ public class KeyStatisticService : IKeyStatisticService
         List<Guid> newOrder)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess<ActionResult, ReleaseVersion, List<KeyStatisticViewModel>>(async release =>
             {
                 var keyStatistics = await _context.KeyStatistics

@@ -61,7 +61,7 @@ public class EmbedBlockService : IEmbedBlockService
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<ContentSection>(
                 request.ContentSectionId,
                 query => query.Include(contentSection => contentSection.Content)))
@@ -104,7 +104,7 @@ public class EmbedBlockService : IEmbedBlockService
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<EmbedBlockLink>(
                 contentBlockId,
                 query => query.Include(cb => cb.EmbedBlock)))
@@ -130,7 +130,7 @@ public class EmbedBlockService : IEmbedBlockService
     {
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccessDo(_userService.CheckCanUpdateRelease)
+            .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccessVoid(async releaseVersion =>
             {
                 return await _persistenceHelper

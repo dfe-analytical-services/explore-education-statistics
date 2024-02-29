@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions
             return userService.CheckPolicy(publication, CanViewSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {

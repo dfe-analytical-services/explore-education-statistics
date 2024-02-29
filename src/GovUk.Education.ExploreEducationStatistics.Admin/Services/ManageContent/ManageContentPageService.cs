@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseQuery)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseVersionId))
                 .OnSuccessCombineWith(_ => _releaseFileService.ListAll(
                     releaseVersionId,

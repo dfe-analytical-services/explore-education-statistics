@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(() => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
                     releaseVersionId,
                     subjectIds,
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId))
                 .OnSuccessVoid(async footnote =>
                 {
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
                     releaseVersionId,
                     subjectIds,
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             FootnotesUpdateRequest request)
         {
             return await _contentPersistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => ValidateFootnoteIdsForRelease(releaseVersionId, request.FootnoteIds))
                 .OnSuccessVoid(async _ =>
                 {
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess<ActionResult, ReleaseVersion, Footnote>(async release =>
                     {
                         var footnote = await _footnoteRepository.GetFootnote(footnoteId);
@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseVersionId));
         }
 

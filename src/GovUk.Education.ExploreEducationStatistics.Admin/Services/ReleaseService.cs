@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateReleaseVersion)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion => _mapper
                     .Map<ReleaseViewModel>(releaseVersion) with
                     {
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccess(_ =>
                 {
                     var methodologiesScheduledWithRelease =
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteRelease)
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
                 .OnSuccess(async () => await CheckReleaseExists(releaseVersionId))
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(async releaseVersion =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
                         publicationId: releaseVersion.PublicationId,
@@ -430,7 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _context.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckFileExists(fileId))
                 .OnSuccessCombineWith(file => _statisticsDbContext.Subject
                     .FirstOrNotFoundAsync(s => s.Id == file.SubjectId))
@@ -456,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckFileExists(fileId))
                 .OnSuccessDo(file => CheckCanDeleteDataFiles(releaseVersionId, file))
                 .OnSuccessDo(async file =>
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     // Ensure file is linked to the Release by getting the ReleaseFile first

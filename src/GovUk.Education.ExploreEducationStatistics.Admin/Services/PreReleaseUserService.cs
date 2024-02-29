@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
                 .OnSuccess(
                     async _ =>
                     {
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<string> emails)
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
                 .OnSuccess(_ => EmailValidator.ValidateEmailAddresses(emails))
                 .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
                 {
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<string> emails)
         {
             return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
                 .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseVersionId, emails))
                 .OnSuccess<ActionResult, Tuple<ReleaseVersion, PreReleaseUserInvitePlan>, List<PreReleaseUserViewModel>>(
                     async releaseVersionAndPlan =>
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
+                .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToReleaseVersion)
                 .OnSuccessVoid(
                     async () =>
                     {

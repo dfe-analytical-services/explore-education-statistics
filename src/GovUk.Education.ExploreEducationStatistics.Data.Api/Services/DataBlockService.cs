@@ -40,7 +40,7 @@ public class DataBlockService : IDataBlockService
         Guid dataBlockVersionId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanViewRelease)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
                 dataBlockVersionId: dataBlockVersionId))
             .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query));

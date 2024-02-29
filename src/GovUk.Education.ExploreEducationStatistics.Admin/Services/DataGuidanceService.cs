@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
-                .OnSuccess(releaseVersion => _userService.CheckCanViewRelease(releaseVersion))
+                .OnSuccess(releaseVersion => _userService.CheckCanViewReleaseVersion(releaseVersion))
                 .OnSuccessCombineWith(_ =>
                     _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken))
                 .OnSuccess(releaseVersionAndDataSets =>
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(releaseVersion => releaseVersion.Id == releaseVersionId, cancellationToken)
-                .OnSuccess(releaseVersion => _userService.CheckCanUpdateRelease(releaseVersion))
+                .OnSuccess(releaseVersion => _userService.CheckCanUpdateReleaseVersion(releaseVersion))
                 .OnSuccessDo(releaseVersion => UpdateDataGuidance(releaseVersion, request, cancellationToken))
                 .OnSuccessCombineWith(_ =>
                     _dataGuidanceDataSetService.ListDataSets(releaseVersionId, cancellationToken: cancellationToken))

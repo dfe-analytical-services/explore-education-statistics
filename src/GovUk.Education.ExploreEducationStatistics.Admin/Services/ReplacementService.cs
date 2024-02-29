@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ReleaseVersions
                 .FirstOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(() => CheckReleaseFilesExist(releaseVersionId: releaseVersionId,
                     originalFileId: originalFileId,
                     replacementFileId: replacementFileId))

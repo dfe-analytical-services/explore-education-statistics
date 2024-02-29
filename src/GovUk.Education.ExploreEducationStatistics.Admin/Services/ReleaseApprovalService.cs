@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _context
                 .ReleaseVersions
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
+                .OnSuccess(_userService.CheckCanViewReleaseVersionStatusHistory)
                 .OnSuccess(async releaseVersion =>
                 {
                     return await _context.ReleaseStatus
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ReleaseVersions
                 .HydrateReleaseForChecklist()
                 .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-                .OnSuccessDo(releaseVersion => _userService.CheckCanUpdateReleaseStatus(releaseVersion, request.ApprovalStatus))
+                .OnSuccessDo(releaseVersion => _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
                 .OnSuccess(async releaseVersion =>
                 {

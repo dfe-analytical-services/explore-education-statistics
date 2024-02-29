@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(releaseVersion => _userService.CheckCanPublishRelease(releaseVersion))
+                .OnSuccess(releaseVersion => _userService.CheckCanPublishReleaseVersion(releaseVersion))
                 .OnSuccess(async releaseVersion =>
                 {
                     if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)

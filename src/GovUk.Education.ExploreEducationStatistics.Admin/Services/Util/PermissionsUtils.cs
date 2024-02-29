@@ -19,10 +19,10 @@ public static class PermissionsUtils
         return new ReleasePermissions
         {
             CanAddPrereleaseUsers =
-                await userService.CheckCanAssignPrereleaseContactsToRelease(releaseVersion).IsRight(),
-            CanViewRelease = await userService.CheckCanViewRelease(releaseVersion).IsRight(),
-            CanUpdateRelease = await userService.CheckCanUpdateRelease(releaseVersion).IsRight(),
-            CanDeleteRelease = await userService.CheckCanDeleteRelease(releaseVersion).IsRight(),
+                await userService.CheckCanAssignPrereleaseContactsToReleaseVersion(releaseVersion).IsRight(),
+            CanViewRelease = await userService.CheckCanViewReleaseVersion(releaseVersion).IsRight(),
+            CanUpdateRelease = await userService.CheckCanUpdateReleaseVersion(releaseVersion).IsRight(),
+            CanDeleteRelease = await userService.CheckCanDeleteReleaseVersion(releaseVersion).IsRight(),
             CanMakeAmendmentOfRelease = await userService.CheckCanMakeAmendmentOfRelease(releaseVersion).IsRight()
         };
     }

@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             CommentSaveRequest saveRequest)
         {
             return _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccessDo(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(() => CheckContentBlockExists(releaseVersionId, contentSectionId, contentBlockId))
                 .OnSuccess(async () =>
                     {

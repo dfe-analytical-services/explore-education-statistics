@@ -43,7 +43,7 @@ public class FeaturedTableService : IFeaturedTableService
         Guid dataBlockId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanViewRelease)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
                     query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
@@ -53,7 +53,7 @@ public class FeaturedTableService : IFeaturedTableService
     public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseVersionId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanViewRelease)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
             .OnSuccess(async releaseVersion =>
             {
                 var featuredTableList = await ListFeaturedTables(releaseVersion.Id);
@@ -65,7 +65,7 @@ public class FeaturedTableService : IFeaturedTableService
         FeaturedTableCreateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
             .OnSuccessDo(async dataBlock =>
@@ -113,7 +113,7 @@ public class FeaturedTableService : IFeaturedTableService
         FeaturedTableUpdateRequest request)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
                     query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
@@ -134,7 +134,7 @@ public class FeaturedTableService : IFeaturedTableService
         Guid dataBlockId)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
                     query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseVersionId == releaseVersionId)))
@@ -150,7 +150,7 @@ public class FeaturedTableService : IFeaturedTableService
         List<Guid> newOrder)
     {
         return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
-            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
             .OnSuccess(async releaseVersion => await ListFeaturedTables(releaseVersion.Id))
             .OnSuccess(async featuredTableList =>
             {

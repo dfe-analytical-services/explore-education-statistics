@@ -198,45 +198,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(publication, SecurityPolicies.CanViewSpecificPublication);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanUpdateSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion,
             bool ignoreCheck)
         {
             return ignoreCheck
                 ? Task.FromResult(new Either<ActionResult, ReleaseVersion>(releaseVersion))
-                : userService.CheckCanUpdateRelease(releaseVersion);
+                : userService.CheckCanUpdateReleaseVersion(releaseVersion);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanDeleteRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanDeleteReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanDeleteSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseStatusHistory(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanViewReleaseVersionStatusHistory(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanViewReleaseStatusHistory);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseStatus(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersionStatus(
             this IUserService userService,
             ReleaseVersion releaseVersion,
             ReleaseApprovalStatus approvalStatus)
@@ -245,15 +245,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             {
                 case ReleaseApprovalStatus.Draft:
                 {
-                    return userService.CheckCanMarkReleaseAsDraft(releaseVersion);
+                    return userService.CheckCanMarkReleaseVersionAsDraft(releaseVersion);
                 }
                 case ReleaseApprovalStatus.HigherLevelReview:
                 {
-                    return userService.CheckCanSubmitReleaseForHigherReview(releaseVersion);
+                    return userService.CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
                 }
                 case ReleaseApprovalStatus.Approved:
                 {
-                    return userService.CheckCanApproveRelease(releaseVersion);
+                    return userService.CheckCanApproveReleaseVersion(releaseVersion);
                 }
                 default:
                 {
@@ -262,21 +262,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             }
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMarkReleaseAsDraft(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanMarkReleaseVersionAsDraft(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMarkSpecificReleaseAsDraft);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanSubmitReleaseForHigherReview(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanSubmitReleaseVersionForHigherReview(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanApproveRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanApproveReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPrereleaseContactsToRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanAssignPrereleaseContactsToReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {
@@ -304,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(releaseVersion, SecurityPolicies.CanViewSpecificPreReleaseSummary);
         }
 
-        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanPublishRelease(
+        public static Task<Either<ActionResult, ReleaseVersion>> CheckCanPublishReleaseVersion(
             this IUserService userService,
             ReleaseVersion releaseVersion)
         {

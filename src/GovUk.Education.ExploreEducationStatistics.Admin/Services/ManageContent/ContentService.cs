@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return await _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(releaseVersion => _contentSectionRepository.GetAllContentBlocks<T>(releaseVersion.Id));
         }
 
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     var contentSections = releaseVersion
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async releaseVersion =>
                 {
                     var orderForNewSection = request?.Order ??
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return
                 CheckContentSectionExists(releaseVersionId: releaseVersionId,
                         contentSectionId: contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, sectionToUpdate) = tuple;
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return
                 CheckContentSectionExists(releaseVersionId: releaseVersionId,
                         contentSectionId: contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (releaseVersion, sectionToRemove) = tuple;
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return
                 CheckContentSectionExists(releaseVersionId: releaseVersionId,
                         contentSectionId: contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, section) = tuple;
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return
                 CheckContentSectionExists(releaseVersionId: releaseVersionId,
                         contentSectionId: contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, section) = tuple;
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckContentSectionExists(releaseVersionId: releaseVersionId,
                     contentSectionId: contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckContentSectionExists(releaseVersionId: releaseVersionId,
                     contentSectionId: contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return CheckContentSectionExists(releaseVersionId: releaseVersionId,
                     contentSectionId: contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -436,16 +436,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .OrNotFound());
         }
 
-        private Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateRelease(ReleaseVersion releaseVersion)
+        private Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(ReleaseVersion releaseVersion)
         {
-            return _userService.CheckCanUpdateRelease(releaseVersion);
+            return _userService.CheckCanUpdateReleaseVersion(releaseVersion);
         }
 
-        private Task<Either<ActionResult, Tuple<ReleaseVersion, ContentSection>>> CheckCanUpdateRelease(
+        private Task<Either<ActionResult, Tuple<ReleaseVersion, ContentSection>>> CheckCanUpdateReleaseVersion(
             Tuple<ReleaseVersion, ContentSection> tuple)
         {
             return _userService
-                .CheckCanUpdateRelease(tuple.Item1)
+                .CheckCanUpdateReleaseVersion(tuple.Item1)
                 .OnSuccess(_ => tuple);
         }
     }
