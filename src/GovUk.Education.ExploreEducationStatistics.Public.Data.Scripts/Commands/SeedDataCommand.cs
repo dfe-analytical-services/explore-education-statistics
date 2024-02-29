@@ -3,6 +3,7 @@ using System.Reflection;
 using CliFx;
 using CliFx.Attributes;
 using CliFx.Infrastructure;
+using CliWrap;
 using Dapper;
 using DuckDB.NET.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -22,10 +23,13 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.GeographicL
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Commands;
 
-[Command("seed:data", Description = "Generate seed data for the public API database")]
+[Command("seed:data", Description = "Generate seed data for the public API")]
 public class SeedDataCommand : ICommand
 {
     private const string DbConnectionString = "Host=db;Username=postgres;Password=password;Database=public_data";
+
+    [CommandOption("dump-sql", Description = "Dump seed data SQL to the `data/public-api-db` directory")]
+    public bool DumpSql { get; init; }
 
     public async ValueTask ExecuteAsync(IConsole console)
     {
@@ -74,7 +78,12 @@ public class SeedDataCommand : ICommand
 
         stopwatch.Stop();
 
-        await console.Output.WriteLineAsync($"Done! Finished all seeding in {stopwatch.Elapsed.TotalSeconds} seconds!");
+        await console.Output.WriteLineAsync($"Finished all seeding in {stopwatch.Elapsed.TotalSeconds} seconds!");
+
+        if (DumpSql)
+        {
+            await DumpSqlFile(console);
+        }
     }
 
     private static async Task<PublicDataDbContext> SetUpPublicDataDbContext(CancellationToken cancellationToken)
@@ -110,6 +119,47 @@ public class SeedDataCommand : ICommand
         }
 
         return dbContext;
+    }
+
+    private async Task DumpSqlFile(IConsole console)
+    {
+        await console.Output.WriteLineAsync("Dumping seed data SQL...");
+
+        var pgDumpVersion = await Cli.Wrap("pg_dump")
+            .WithArguments("--version")
+            .WithValidation(CommandResultValidation.None)
+            .ExecuteAsync();
+
+        if (pgDumpVersion.ExitCode != 0)
+        {
+            throw new NotSupportedException("Install `pg_dump` to dump seed data SQL");
+        }
+
+        var outputDir = Path.Combine(PathUtils.ProjectRootPath, "data", "public-api-db");
+
+        if (!Path.Exists(outputDir))
+        {
+            Directory.CreateDirectory(outputDir);
+        }
+
+        var sqlFilePath = Path.Combine(outputDir, "public_data.sql");
+
+        await Cli.Wrap("pg_dump")
+            .WithArguments([
+                "--dbname", "public_data",
+                "--file", sqlFilePath,
+                "--schema", "public",
+                "--username", "postgres",
+                "--host", "db",
+                "--port", "5432"
+            ])
+            .WithEnvironmentVariables(env => env
+                .Set("PGPASSWORD", "password"))
+            .WithStandardOutputPipe(PipeTarget.ToStream(console.Output.BaseStream))
+            .WithStandardErrorPipe(PipeTarget.ToStream(console.Error.BaseStream))
+            .ExecuteAsync();
+
+        await console.Output.WriteLineAsync($"Finished dumping seed data SQL to: {sqlFilePath}");
     }
 
     private class Seeder
