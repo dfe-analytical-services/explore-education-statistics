@@ -132,9 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPatch("api/publications/{publicationId:guid}/release-series-view")]
-        public async Task<ActionResult<List<ReleaseSeriesItemUpdateViewModel>>> UpdateReleaseSeries(
+        public async Task<ActionResult<List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
             Guid publicationId,
-            List<ReleaseSeriesItemUpdateViewModel> releaseSeries)
+            List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {
             return await _publicationService
                 .UpdateReleaseSeries(publicationId, releaseSeries)

@@ -443,9 +443,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemUpdateViewModel>>> UpdateReleaseSeries(
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
             Guid publicationId,
-            List<ReleaseSeriesItemUpdateViewModel> updatedReleases)
+            List<ReleaseSeriesItemUpdateRequest> updatedReleases)
         {
             return await _context.Publications
                 .Include(p => p.LegacyReleases)
@@ -463,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return _mapper
-                        .Map<List<ReleaseSeriesItemUpdateViewModel>>(publication.ReleaseSeriesView)
+                        .Map<List<ReleaseSeriesItemUpdateRequest>>(publication.ReleaseSeriesView)
                         .OrderBy(r => r.Order)
                         .ToList();
                 });

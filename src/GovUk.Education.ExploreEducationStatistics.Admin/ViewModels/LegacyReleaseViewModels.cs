@@ -14,25 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public int Order { get; set; }
     }
 
-    public record ReleaseSeriesItemViewModel
-    {
-        public Guid Id { get; set; }
-
-        public string Description { get; set; }
-
-        public bool IsLegacy { get; set; }
-
-        public bool IsDraft { get; set; }
-
-        public bool IsAmendment { get; set; }
-
-        public bool IsLatest { get; set; }
-
-        public string Url { get; set; }
-
-        public int Order { get; set; }
-    }
-
     public class LegacyReleaseCreateViewModel
     {
         [Required]
@@ -57,18 +38,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required]
         public Guid PublicationId { get; set; }
-    }
-
-    public class ReleaseSeriesItemUpdateViewModel
-    {
-        [Required]
-        public Guid Id { get; set; }
-
-        [Required]
-        public int Order { get; set; }
-
-        public bool IsLegacy { get; set; }
-
-        public bool IsAmendment { get; set; }
     }
 }

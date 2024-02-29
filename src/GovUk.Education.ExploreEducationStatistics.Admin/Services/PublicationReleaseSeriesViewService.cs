@@ -1,12 +1,12 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -133,7 +133,7 @@ public class PublicationReleaseSeriesViewService : IPublicationReleaseSeriesView
 
     public async Task UpdateForUpdateReleaseSeries(
         Guid publicationId,
-        List<ReleaseSeriesItemUpdateViewModel> releaseSeriesUpdate)
+        List<ReleaseSeriesItemUpdateRequest> releaseSeriesUpdate)
     {
         var publication = await GetPublication(publicationId);
 

@@ -1,8 +1,9 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
@@ -38,7 +39,7 @@ public interface IPublicationReleaseSeriesViewService
 
     Task UpdateForUpdateReleaseSeries(
         Guid publicationId,
-        List<ReleaseSeriesItemUpdateViewModel> releaseSeriesUpdate);
+        List<ReleaseSeriesItemUpdateRequest> releaseSeriesUpdate);
 
     Task UpdateForPublishRelease(
         Guid publicationId,

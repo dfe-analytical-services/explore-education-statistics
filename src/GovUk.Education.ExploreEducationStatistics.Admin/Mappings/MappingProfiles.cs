@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
-            CreateMap<ReleaseSeriesItem, ReleaseSeriesItemUpdateViewModel>()
+            CreateMap<ReleaseSeriesItem, ReleaseSeriesItemUpdateRequest>()
                 .ForMember(
                     dest => dest.Id,
                     m => m.MapFrom(ro => ro.ReleaseId));

@@ -1,10 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -419,7 +419,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = releaseId },
         };
@@ -443,7 +443,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = releaseId, Order = 1, IsAmendment = true },
         };
@@ -473,7 +473,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             }
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = releaseAmendmentId, Order = 1, IsAmendment = true },
         };
@@ -508,7 +508,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             }
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = releaseAmendmentId, Order = 5, IsAmendment = true },
         };
@@ -542,7 +542,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             Id = publicationId
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = Guid.NewGuid(), Order = 1, IsLegacy = isLegacy },
         };
@@ -580,7 +580,7 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
             }
         });
 
-        var updates = new List<ReleaseSeriesItemUpdateViewModel>
+        var updates = new List<ReleaseSeriesItemUpdateRequest>
         {
             new() { Id = legacyReleaseId, Order = 2, IsLegacy = true },
             new() { Id = eesReleaseId, Order = 1, IsLegacy = false },
