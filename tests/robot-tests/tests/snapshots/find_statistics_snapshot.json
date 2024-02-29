@@ -35,6 +35,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "Measures the total value-added of the Further Education system in England over time. Includes provision type breakdown and value-added per learner.",
+    "publication_title": "Apprenticeships and 19-plus FE Skills Index",
+    "published": "30 Mar 2023",
+    "release_type": "Official statistics",
+    "theme": "Further education"
+  },
+  {
     "publication_summary": "Apprenticeship starts and achievements by employer sector and size. Experimental statistics including breakdowns by learner and apprenticeship characteristics.",
     "publication_title": "Apprenticeships in England by industry characteristics",
     "published": "28 Apr 2022",
@@ -243,13 +250,6 @@
     "published": "30 Nov 2023",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
-  },
-  {
-    "publication_summary": "Measures the total value-added of the Further Education system in England over time. Includes provision type breakdown and value-added per learner.",
-    "publication_title": "Further education skills index",
-    "published": "30 Mar 2023",
-    "release_type": "Official statistics",
-    "theme": "Further education"
   },
   {
     "publication_summary": "This experimental statistics release includes characteristics and pay of the further education workforce as well as characteristics of governors in England.",
