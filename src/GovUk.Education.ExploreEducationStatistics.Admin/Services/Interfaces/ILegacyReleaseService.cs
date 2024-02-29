@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId);
-
         Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
             LegacyReleaseCreateViewModel legacyRelease
         );

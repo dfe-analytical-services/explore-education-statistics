@@ -62,7 +62,6 @@ public class LegacyReleaseServicePermissionTests
     private LegacyReleaseService SetupService(
         ContentDbContext? contentDbContext = null,
         PersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IPublicationService? publicationService = null,
         IPublicationCacheService? publicationCacheService = null,
         IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null,
         IUserService? userService = null,
@@ -73,7 +72,6 @@ public class LegacyReleaseServicePermissionTests
             mapper ?? AdminMapper(),
             userService ?? Mock.Of<IUserService>(Strict),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            publicationService ?? Mock.Of<IPublicationService>(Strict),
             publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
             publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
         );

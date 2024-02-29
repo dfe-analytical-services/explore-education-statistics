@@ -1,13 +1,12 @@
 import {
   LegacyRelease,
-  CreateLegacyRelease,
   UpdateReleaseSeriesItem,
+  ReleaseSeriesItem,
 } from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
@@ -87,11 +86,6 @@ export interface ListReleasesParams {
   pageSize?: number;
   includePermissions?: boolean;
 }
-
-export type UpdatePublicationLegacyRelease = Partial<
-  // @MarkFix unused?
-  OmitStrict<CreateLegacyRelease, 'publicationId'>
->;
 
 const publicationService = {
   listPublications(topicId?: string): Promise<Publication[]> {
@@ -205,6 +199,10 @@ const publicationService = {
     return client.delete(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );
+  },
+
+  getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
+    return client.get(`/publications/${publicationId}/release-series-view`);
   },
 
   updateReleaseSeriesView(

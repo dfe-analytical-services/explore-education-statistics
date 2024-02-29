@@ -27,6 +27,7 @@ export interface UpdateLegacyRelease {
 }
 
 export interface UpdateReleaseSeriesItem {
+  // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
   id: string;
   order: number;
   isLegacy: boolean;
@@ -37,9 +38,6 @@ export interface UpdateReleaseSeriesItem {
 const legacyReleaseService = {
   getLegacyRelease(id: string): Promise<LegacyRelease> {
     return client.get(`/legacy-releases/${id}`);
-  },
-  getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
-    return client.get(`/publications/${publicationId}/release-series-view`);
   },
   createLegacyRelease(data: CreateLegacyRelease): Promise<LegacyRelease> {
     return client.post('/legacy-releases', data);

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -18,33 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 public class LegacyReleasesControllerTests
 {
     private readonly Guid _releaseId = Guid.NewGuid();
-    private readonly Guid _publicationId = Guid.NewGuid();
     private readonly Mock<ILegacyReleaseService> _legacyReleaseService;
 
     public LegacyReleasesControllerTests()
     {
         _legacyReleaseService = new Mock<ILegacyReleaseService>(Strict);
-    }
-
-    [Fact]
-    public async Task GetReleaseSeriesView_ReturnsOk()
-    {
-        // Arrange
-        var templateReleaseResult =
-            new Either<ActionResult, List<ReleaseSeriesItemViewModel>>(new List<ReleaseSeriesItemViewModel>());
-
-        _legacyReleaseService
-            .Setup(s => s.GetReleaseSeriesView(It.Is<Guid>(id => id == _publicationId)))
-            .ReturnsAsync(templateReleaseResult);
-
-        var controller = BuildController(_legacyReleaseService.Object);
-
-        // Act
-        var result = await controller.GetReleaseSeriesView(_publicationId);
-
-        // Assert
-        VerifyAllMocks(_legacyReleaseService);
-        result.AssertOkResult();
     }
 
     [Fact]

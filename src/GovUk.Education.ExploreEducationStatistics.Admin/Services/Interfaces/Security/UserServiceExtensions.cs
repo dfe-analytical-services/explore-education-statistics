@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(file, SecurityPolicies.CanCancelOngoingImports);
         }
 
-        public static Task<Either<ActionResult, Publication>> CheckCanManageLegacyReleases(
+        public static Task<Either<ActionResult, Publication>> CheckCanManageLegacyReleases( // @MarkFix rename or maybe remove?
             this IUserService userService, Publication publication)
         {
             return userService.CheckPolicy(publication, SecurityPolicies.CanManageLegacyReleases);

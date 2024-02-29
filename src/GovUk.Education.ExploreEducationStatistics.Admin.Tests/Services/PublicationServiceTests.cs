@@ -2693,11 +2693,223 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        //[Fact] // @MarkFix
+        //public async Task GetReleaseSeriesView()
+        //{
+        //    // Arrange
+        //    var publicationId = Guid.NewGuid();
+        //    var legacyRelease1Id = Guid.NewGuid();
+        //    var legacyRelease2Id = Guid.NewGuid();
+        //    var eesRelease2AmendmentId = Guid.NewGuid();
+        //    var eesRelease3DraftId = Guid.NewGuid();
+        //    var eesRelease1Id = Guid.NewGuid();
+        //    var eesRelease2Id = Guid.NewGuid();
+
+        //    var publication = new Publication
+        //    {
+        //        Id = publicationId,
+        //        Slug = "Test publication",
+        //        LatestPublishedReleaseId = eesRelease2Id,
+        //        LegacyReleases = new()
+        //        {
+        //            new()
+        //            {
+        //                Id = legacyRelease1Id,
+        //                Description = "Legacy Release 1",
+        //                Url = "https://test-1.com",
+        //            },
+        //            new()
+        //            {
+        //                Id = legacyRelease2Id,
+        //                Description = "Legacy Release 2",
+        //                Url = "https://test-2.com",
+        //            }
+        //        },
+        //        Releases = new()
+        //        {
+        //            new()
+        //            {
+        //                Id = eesRelease1Id,
+        //                ReleaseName = "2022",
+        //                Slug = "2022",
+        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        //            },
+        //            new()
+        //            {
+        //                Id = eesRelease2Id,
+        //                ReleaseName = "2023",
+        //                Slug = "2023",
+        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        //            },
+        //            new()
+        //            {
+        //                Id = eesRelease2AmendmentId,
+        //                ReleaseName = "2023",
+        //                Slug = "2023",
+        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        //                ApprovalStatus = ReleaseApprovalStatus.Draft
+        //            },
+        //            new()
+        //            {
+        //                Id = eesRelease3DraftId,
+        //                ReleaseName = "2024",
+        //                Slug = "2024",
+        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        //                ApprovalStatus = ReleaseApprovalStatus.Draft,
+        //            },
+        //        },
+        //        ReleaseSeriesView = new()
+        //        {
+        //            new()
+        //            {
+        //                ReleaseId = eesRelease3DraftId,
+        //                IsDraft = true,
+        //                IsLegacy = false,
+        //                Order = 5
+        //            },
+        //            new()
+        //            {
+        //                ReleaseId = eesRelease2AmendmentId,
+        //                IsDraft = true,
+        //                IsLegacy = false,
+        //                IsAmendment = true,
+        //                Order = 4
+        //            },
+        //            new()
+        //            {
+        //                ReleaseId = eesRelease2Id,
+        //                IsDraft = false,
+        //                IsLegacy = false,
+        //                Order = 4
+        //            },
+        //            new()
+        //            {
+        //                ReleaseId = eesRelease1Id,
+        //                IsDraft = false,
+        //                IsLegacy = false,
+        //                Order = 3
+        //            },
+        //            new()
+        //            {
+        //                ReleaseId = legacyRelease2Id,
+        //                IsDraft = false,
+        //                IsLegacy = true,
+        //                Order = 2
+        //            },
+        //            new()
+        //            {
+        //                ReleaseId = legacyRelease1Id,
+        //                IsDraft = false,
+        //                IsLegacy = true,
+        //                Order = 1
+        //            }
+        //        }
+        //    };
+
+        //    // @MarkFix this was previously returned from a mock of publicationService.ListLegacyReleases
+        //    // if this cannot be just deleted, it now needs actual test data to be set up
+        //    var eesReleaseVms = new List<ViewModels.ReleaseSummaryViewModel>
+        //    {
+        //        new()
+        //        {
+        //            Id = eesRelease1Id,
+        //            IsDraft = false,
+        //            Order = 3,
+        //            Title = "2022",
+        //            Slug = "2022",
+        //        },
+        //        new()
+        //        {
+        //            Id = eesRelease2AmendmentId,
+        //            IsDraft = true,
+        //            Order = 4,
+        //            Title = "2023",
+        //            Slug = "2023",
+        //            LatestRelease = true,
+        //            Amendment = true,
+        //            PreviousVersionId = eesRelease2Id,
+        //        },
+        //        new()
+        //        {
+        //            Id = eesRelease3DraftId,
+        //            IsDraft = true,
+        //            Order = 5,
+        //            Title = "2024",
+        //            Slug = "2024",
+        //        },
+        //    };
+
+        //    var contentDbContextId = Guid.NewGuid().ToString();
+        //    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //    {
+        //        contentDbContext.Publications.Add(publication);
+        //        await contentDbContext.SaveChangesAsync();
+        //    }
+
+        //    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        //    {
+        //        var publicationService = BuildPublicationService(contentDbContext);
+
+
+        //        // Act
+        //        var result = await publicationService.GetReleaseSeriesView(publication.Id);
+
+        //        // Assert
+        //        var viewModels = result.AssertRight();
+
+        //        Assert.Equal(5, viewModels.Count);
+
+        //        Assert.Equal("2024", viewModels[0].Description);
+        //        Assert.Equal(eesRelease3DraftId, viewModels[0].Id);
+        //        Assert.Equal($"{publication.Slug}/2024", viewModels[0].Url);
+        //        Assert.Equal(5, viewModels[0].Order);
+        //        Assert.False(viewModels[0].IsLatest);
+        //        Assert.True(viewModels[0].IsDraft);
+        //        Assert.False(viewModels[0].IsAmendment);
+
+        //        Assert.Equal("2023", viewModels[1].Description);
+        //        Assert.Equal(eesRelease2AmendmentId, viewModels[1].Id);
+        //        Assert.Equal($"{publication.Slug}/2023", viewModels[1].Url);
+        //        Assert.Equal(4, viewModels[1].Order);
+        //        Assert.True(viewModels[1].IsLatest);
+        //        Assert.True(viewModels[1].IsDraft);
+        //        Assert.True(viewModels[1].IsAmendment);
+
+        //        Assert.Equal("2022", viewModels[2].Description);
+        //        Assert.Equal(eesRelease1Id, viewModels[2].Id);
+        //        Assert.Equal($"{publication.Slug}/2022", viewModels[2].Url);
+        //        Assert.Equal(3, viewModels[2].Order);
+        //        Assert.False(viewModels[2].IsLatest);
+        //        Assert.False(viewModels[2].IsDraft);
+        //        Assert.False(viewModels[2].IsAmendment);
+
+        //        Assert.Equal("Legacy Release 2", viewModels[3].Description);
+        //        Assert.Equal(publication.LegacyReleases[1].Id, viewModels[3].Id);
+        //        Assert.Equal("https://test-2.com", viewModels[3].Url);
+        //        Assert.Equal(2, viewModels[3].Order);
+        //        Assert.False(viewModels[3].IsLatest);
+        //        Assert.False(viewModels[3].IsDraft);
+        //        Assert.False(viewModels[3].IsAmendment);
+        //        Assert.True(viewModels[3].IsLegacy);
+
+        //        Assert.Equal("Legacy Release 1", viewModels[4].Description);
+        //        Assert.Equal(publication.LegacyReleases[0].Id, viewModels[4].Id);
+        //        Assert.Equal("https://test-1.com", viewModels[4].Url);
+        //        Assert.Equal(1, viewModels[4].Order);
+        //        Assert.False(viewModels[4].IsLatest);
+        //        Assert.False(viewModels[4].IsDraft);
+        //        Assert.False(viewModels[4].IsAmendment);
+        //        Assert.True(viewModels[4].IsLegacy);
+        //    }
+        //}
+
+
         private static PublicationService BuildPublicationService(
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IReleaseRepository? releaseRepository = null,
+            ILegacyReleaseService? legacyReleaseService = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null,
@@ -2711,6 +2923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
                 releaseRepository ?? new ReleaseRepository(context),
+                legacyReleaseService ?? Mock.Of<ILegacyReleaseService>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict),

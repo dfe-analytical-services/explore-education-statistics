@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseRepository _releaseRepository;
+        private readonly ILegacyReleaseService _legacyReleaseService;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
@@ -53,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IReleaseRepository releaseRepository,
+            ILegacyReleaseService legacyReleaseService,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
             IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService,
@@ -65,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _publicationRepository = publicationRepository;
             _releaseRepository = releaseRepository;
+            _legacyReleaseService = legacyReleaseService;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
             _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
@@ -443,9 +446,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+                .OnSuccessCombineWith(async _ => await _legacyReleaseService.ListLegacyReleases(publicationId))
+                .OnSuccessCombineWith(async _ => await ListLatestReleaseVersions(publicationId))
+                .OnSuccess(publicationAndReleases =>
+                {
+                    var (publication, legacyReleases, eesReleases) = publicationAndReleases;
+                    var releaseSeriesItemsViewModels = new List<ReleaseSeriesItemViewModel>();
+
+                    foreach (var legacyRelease in legacyReleases)
+                    {
+                        releaseSeriesItemsViewModels.Add(new()
+                        {
+                            Description = legacyRelease.Description,
+                            Id = legacyRelease.Id,
+                            Url = legacyRelease.Url,
+                            Order = legacyRelease.Order,
+                            IsLegacy = true
+                        });
+                    }
+
+                    foreach (var eesRelease in eesReleases)
+                    {
+                        var eesReleaseId = eesRelease.Amendment && eesRelease.PreviousVersionId.HasValue
+                            ? eesRelease.PreviousVersionId.Value
+                            : eesRelease.Id;
+
+                        releaseSeriesItemsViewModels.Add(new()
+                        {
+                            Description = eesRelease.Title,
+                            Id = eesRelease.Id,
+                            Url = $"{publication.Slug}/{eesRelease.Slug}",
+                            Order = eesRelease.Order,
+                            IsDraft = eesRelease.IsDraft,
+                            IsAmendment = eesRelease.Amendment,
+                            IsLatest = publication.LatestPublishedReleaseId == eesReleaseId
+                        });
+                    }
+
+                    return releaseSeriesItemsViewModels
+                        .OrderByDescending(cr => cr.Order)
+                        .ToList();
+                });
+        }
+
         public async Task<Either<ActionResult, List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
             Guid publicationId,
-            List<ReleaseSeriesItemUpdateRequest> updatedReleases)
+            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
             return await _context.Publications
                 .Include(p => p.LegacyReleases)
@@ -456,7 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     await _publicationReleaseSeriesViewService.UpdateForUpdateReleaseSeries(
                         publicationId,
-                        updatedReleases);
+                        updatedReleaseSeriesItems);
 
                     await _context.SaveChangesAsync();
 

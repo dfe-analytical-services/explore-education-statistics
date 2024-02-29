@@ -280,12 +280,12 @@ const LegacyReleasesTable = ({
             onClick={async () => {
               await publicationService.updateReleaseSeriesView(
                 publicationId,
-                releaseSeries.map(release => ({
-                  id: release.id,
-                  order: release.order,
-                  isLegacy: release.isLegacy,
-                  isAmendment: release.isAmendment,
-                  isLatest: release.isLatest,
+                releaseSeries.map(seriesItem => ({
+                  id: seriesItem.id,
+                  order: seriesItem.order,
+                  isLegacy: seriesItem.isLegacy,
+                  isAmendment: seriesItem.isAmendment,
+                  isLatest: seriesItem.isLatest,
                 })),
               );
 

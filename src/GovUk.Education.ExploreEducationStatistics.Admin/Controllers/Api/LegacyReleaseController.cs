@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
@@ -19,14 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public LegacyReleaseController(ILegacyReleaseService legacyReleaseService)
         {
             _legacyReleaseService = legacyReleaseService;
-        }
-
-        [HttpGet("publications/{publicationId:guid}/release-series-view")]
-        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
-        {
-            return await _legacyReleaseService
-                .GetReleaseSeriesView(publicationId)
-                .HandleFailuresOrOk();
         }
 
         [HttpGet("legacy-releases/{id:guid}")]

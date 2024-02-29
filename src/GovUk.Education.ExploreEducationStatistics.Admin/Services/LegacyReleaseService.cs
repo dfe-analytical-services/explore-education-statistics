@@ -24,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IPublicationService _publicationService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
@@ -32,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublicationService publicationService,
             IPublicationCacheService publicationCacheService,
             IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
         {
@@ -40,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _publicationService = publicationService;
             _publicationCacheService = publicationCacheService;
             _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
@@ -71,54 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Url = legacyRelease.Url
                             })
                         .OrderByDescending(lr => lr.Order)
-                        .ToList();
-                });
-        }
-
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
-                .OnSuccessCombineWith(async _ => await ListLegacyReleases(publicationId))
-                .OnSuccessCombineWith(async _ => await _publicationService.ListLatestReleaseVersions(publicationId))
-                .OnSuccess(publicationAndReleases =>
-                {
-                    var (publication, legacyReleases, eesReleases) = publicationAndReleases;
-                    var releaseSeriesItemsViewModels = new List<ReleaseSeriesItemViewModel>();
-
-                    foreach (var legacyRelease in legacyReleases)
-                    {
-                        releaseSeriesItemsViewModels.Add(new()
-                        {
-                            Description = legacyRelease.Description,
-                            Id = legacyRelease.Id,
-                            Url = legacyRelease.Url,
-                            Order = legacyRelease.Order,
-                            IsLegacy = true
-                        });
-                    }
-
-                    foreach (var eesRelease in eesReleases)
-                    {
-                        var eesReleaseId = eesRelease.Amendment && eesRelease.PreviousVersionId.HasValue
-                            ? eesRelease.PreviousVersionId.Value
-                            : eesRelease.Id;
-
-                        releaseSeriesItemsViewModels.Add(new()
-                        {
-                            Description = eesRelease.Title,
-                            Id = eesRelease.Id,
-                            Url = $"{publication.Slug}/{eesRelease.Slug}",
-                            Order = eesRelease.Order,
-                            IsDraft = eesRelease.IsDraft,
-                            IsAmendment = eesRelease.Amendment,
-                            IsLatest = publication.LatestPublishedReleaseId == eesReleaseId
-                        });
-                    }
-
-                    return releaseSeriesItemsViewModels
-                        .OrderByDescending(cr => cr.Order)
                         .ToList();
                 });
         }

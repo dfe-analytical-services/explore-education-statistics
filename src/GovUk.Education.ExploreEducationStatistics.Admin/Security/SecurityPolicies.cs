@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Legacy release management
          */
-        CanManageLegacyReleases,
+        CanManageLegacyReleases, // @MarkFix rename and move
         CanViewLegacyRelease,
         CanUpdateLegacyRelease,
         CanDeleteLegacyRelease,

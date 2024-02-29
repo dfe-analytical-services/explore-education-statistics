@@ -27,7 +27,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
         _publicationCacheService = publicationCacheService;
     }
 
-    [HttpPatch("bau/migrate-release-series-view")]
+    [HttpPatch("bau/migrate-release-series-view")] // @MarkFix update this after you've done with everything else
     public async Task<ActionResult> MigrateReleaseSeriesView(
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default)

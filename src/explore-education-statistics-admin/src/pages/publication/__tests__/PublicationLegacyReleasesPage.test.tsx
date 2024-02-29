@@ -1,20 +1,20 @@
 import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import _legacyReleaseService, {
-  ReleaseSeriesItem,
-} from '@admin/services/legacyReleaseService';
+import { ReleaseSeriesItem } from '@admin/services/legacyReleaseService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import { PublicationWithPermissions } from '@admin/services/publicationService';
+import _publicationService, {
+  PublicationWithPermissions,
+} from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 
-jest.mock('@admin/services/legacyReleaseService');
+jest.mock('@admin/services/publicationService');
 
-const legacyReleaseService = _legacyReleaseService as jest.Mocked<
-  typeof _legacyReleaseService
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
 describe('PublicationLegacyReleasesPage', () => {
@@ -52,7 +52,7 @@ describe('PublicationLegacyReleasesPage', () => {
   ];
 
   test('renders the legacy releases page', async () => {
-    legacyReleaseService.getReleaseSeriesView.mockResolvedValue(
+    publicationService.getReleaseSeriesView.mockResolvedValue(
       testReleaseSeries,
     );
 
