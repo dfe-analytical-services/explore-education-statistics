@@ -2,7 +2,9 @@ import Link from '@admin/components/Link';
 import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import { publicationLegacyReleasesRoute } from '@admin/routes/publicationRoutes';
-import legacyReleaseService from '@admin/services/legacyReleaseService';
+import legacyReleaseService, {
+  ReleaseSeriesItem,
+} from '@admin/services/legacyReleaseService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 
@@ -28,6 +30,7 @@ const PublicationLegacyReleaseCreatePage = () => {
         }
         onSubmit={async values => {
           await legacyReleaseService.createLegacyRelease({
+            // @MarkFix what to do?
             description: values.description,
             url: values.url,
             publicationId,

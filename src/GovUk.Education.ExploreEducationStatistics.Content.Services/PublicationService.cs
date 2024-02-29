@@ -201,9 +201,9 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            LegacyReleases = publication.LegacyReleases
-                .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
-                .ToList(),
+            //LegacyReleases = publication.LegacyReleases // @MarkFix can remove?
+            //    .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
+            //    .ToList(),
             Topic = topic,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null

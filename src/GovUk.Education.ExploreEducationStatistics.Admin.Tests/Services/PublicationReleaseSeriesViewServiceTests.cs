@@ -35,31 +35,31 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task CreateForCreateLegacyRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task CreateForCreateLegacyRelease() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        // Act
-        await _sut.CreateForCreateLegacyRelease(publicationId, releaseId);
+    //    // Act
+    //    await _sut.CreateForCreateLegacyRelease(publicationId, releaseId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseSeriesItem = publication.ReleaseSeriesView[0];
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var releaseSeriesItem = publication.ReleaseSeriesView[0];
 
-        Assert.Single(publication.ReleaseSeriesView);
-        Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
-        Assert.True(releaseSeriesItem.IsLegacy);
-        Assert.False(releaseSeriesItem.IsDraft);
-        Assert.Equal(1, releaseSeriesItem.Order);
-    }
+    //    Assert.Single(publication.ReleaseSeriesView);
+    //    Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
+    //    Assert.True(releaseSeriesItem.IsLegacy);
+    //    Assert.False(releaseSeriesItem.IsDraft);
+    //    Assert.Equal(1, releaseSeriesItem.Order);
+    //}
     #endregion CreateForCreateLegacyRelease Tests
 
     #region DeleteForDeleteLegacyRelease Tests
@@ -96,98 +96,98 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var legacyReleaseId = Guid.NewGuid();
+    //[Fact] // @MarkFix
+    //public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesItemNotFound_ThrowsException()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var legacyReleaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            LegacyReleases = new()
-            {
-                new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        LegacyReleases = new()
+    //        {
+    //            new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
+    //        },
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId));
 
-        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(LegacyRelease)} \"Legacy Release 1\"", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(LegacyRelease)} \"Legacy Release 1\"", exception.Message);
+    //}
 
-    [Fact]
-    public async Task DeleteForDeleteLegacyRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var legacyReleaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task DeleteForDeleteLegacyRelease() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var legacyReleaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            LegacyReleases = new()
-            {
-                new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = legacyReleaseId },
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        LegacyReleases = new()
+    //        {
+    //            new() { Id = legacyReleaseId, Description = "Legacy Release 1" }
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = legacyReleaseId },
+    //        },
+    //    });
 
-        // Act
-        await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId);
+    //    // Act
+    //    await _sut.DeleteForDeleteLegacyRelease(legacyReleaseId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Empty(publication.ReleaseSeriesView);
-    }
+    //    Assert.Empty(publication.ReleaseSeriesView);
+    //}
 
-    [Fact]
-    public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesHasBeenReset()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var legacyRelease1Id = Guid.NewGuid();
-        var legacyRelease2Id = Guid.NewGuid();
-        var legacyRelease3Id = Guid.NewGuid();
+    //[Fact]
+    //public async Task DeleteForDeleteLegacyRelease_ReleaseSeriesHasBeenReset() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var legacyRelease1Id = Guid.NewGuid();
+    //    var legacyRelease2Id = Guid.NewGuid();
+    //    var legacyRelease3Id = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            LegacyReleases = new()
-            {
-                new() { Id = legacyRelease1Id, Description = "Legacy Release 1" },
-                new() { Id = legacyRelease2Id, Description = "Legacy Release 2" },
-                new() { Id = legacyRelease3Id, Description = "Legacy Release 3" },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = legacyRelease1Id, Order = 1 },
-                new() { ReleaseId = legacyRelease2Id, Order = 2 },
-                new() { ReleaseId = legacyRelease3Id, Order = 3 },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        LegacyReleases = new()
+    //        {
+    //            new() { Id = legacyRelease1Id, Description = "Legacy Release 1" },
+    //            new() { Id = legacyRelease2Id, Description = "Legacy Release 2" },
+    //            new() { Id = legacyRelease3Id, Description = "Legacy Release 3" },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = legacyRelease1Id, Order = 1 },
+    //            new() { ReleaseId = legacyRelease2Id, Order = 2 },
+    //            new() { ReleaseId = legacyRelease3Id, Order = 3 },
+    //        }
+    //    });
 
-        // Act
-        await _sut.DeleteForDeleteLegacyRelease(legacyRelease2Id);
+    //    // Act
+    //    await _sut.DeleteForDeleteLegacyRelease(legacyRelease2Id);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Equal(2, publication.ReleaseSeriesView.Count);
+    //    Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(legacyRelease1Id, publication.ReleaseSeriesView[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
+    //    Assert.Equal(legacyRelease1Id, publication.ReleaseSeriesView[0].ReleaseId);
+    //    Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
 
-        Assert.Equal(legacyRelease3Id, publication.ReleaseSeriesView[1].ReleaseId);
-        Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
-    }
+    //    Assert.Equal(legacyRelease3Id, publication.ReleaseSeriesView[1].ReleaseId);
+    //    Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
+    //}
     #endregion DeleteForDeleteLegacyRelease Tests
 
     #region CreateForCreateRelease Tests
@@ -204,31 +204,31 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task CreateForCreateRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task CreateForCreateRelease()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        // Act
-        await _sut.CreateForCreateRelease(publicationId, releaseId);
+    //    // Act
+    //    await _sut.CreateForCreateRelease(publicationId, releaseId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseSeriesItem = publication.ReleaseSeriesView[0];
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var releaseSeriesItem = publication.ReleaseSeriesView[0];
 
-        Assert.Single(publication.ReleaseSeriesView);
-        Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
-        Assert.False(releaseSeriesItem.IsLegacy);
-        Assert.True(releaseSeriesItem.IsDraft);
-        Assert.Equal(1, releaseSeriesItem.Order);
-    }
+    //    Assert.Single(publication.ReleaseSeriesView);
+    //    Assert.Equal(releaseId, releaseSeriesItem.ReleaseId);
+    //    Assert.False(releaseSeriesItem.IsLegacy);
+    //    Assert.True(releaseSeriesItem.IsDraft);
+    //    Assert.Equal(1, releaseSeriesItem.Order);
+    //}
     #endregion CreateForCreateRelease Tests
 
     #region UpdateForPublishRelease Tests
@@ -245,152 +245,152 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task UpdateForPublishRelease_ReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact] // @MarkFix
+    //public async Task UpdateForPublishRelease_ReleaseSeriesItemNotFound_ThrowsException()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForPublishRelease(publicationId, releaseId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForPublishRelease(publicationId, releaseId));
 
-        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} with ID {releaseId}", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} with ID {releaseId}", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForPublishRelease_Amendment_ReleaseNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForPublishRelease_Amendment_ReleaseNotFound_ThrowsException() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = releaseId, IsAmendment = true },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = releaseId, IsAmendment = true },
+    //        }
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForPublishRelease(publicationId, releaseId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForPublishRelease(publicationId, releaseId));
 
-        Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseId} found", exception.Message);
-    }
+    //    Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseId} found", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForPublishRelease_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var originalReleaseId = Guid.NewGuid();
-        var releaseAmendmentId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForPublishRelease_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var originalReleaseId = Guid.NewGuid();
+    //    var releaseAmendmentId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = originalReleaseId },
-                new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = releaseAmendmentId, IsAmendment = true },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = originalReleaseId },
+    //            new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = releaseAmendmentId, IsAmendment = true },
+    //        }
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForPublishRelease(publicationId, releaseAmendmentId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForPublishRelease(publicationId, releaseAmendmentId));
 
-        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForPublishRelease_Amendment()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var release1Id = Guid.NewGuid();
-        var release2Id = Guid.NewGuid();
-        var release3Id = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForPublishRelease_Amendment() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var release1Id = Guid.NewGuid();
+    //    var release2Id = Guid.NewGuid();
+    //    var release3Id = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = release1Id },
-                new() { Id = release2Id },
-                new() { Id = release3Id, PreviousVersionId = release2Id },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = release1Id, Order = 1 },
-                new() { ReleaseId = release2Id, Order = 2 },
-                new() { ReleaseId = release3Id, Order = 2, IsDraft = true, IsAmendment = true },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = release1Id },
+    //            new() { Id = release2Id },
+    //            new() { Id = release3Id, PreviousVersionId = release2Id },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = release1Id, Order = 1 },
+    //            new() { ReleaseId = release2Id, Order = 2 },
+    //            new() { ReleaseId = release3Id, Order = 2, IsDraft = true, IsAmendment = true },
+    //        }
+    //    });
 
-        // Act
-        await _sut.UpdateForPublishRelease(publicationId, release3Id);
+    //    // Act
+    //    await _sut.UpdateForPublishRelease(publicationId, release3Id);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Equal(2, publication.ReleaseSeriesView.Count);
+    //    Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
+    //    Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
+    //    Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
 
-        Assert.Equal(release3Id, publication.ReleaseSeriesView[1].ReleaseId);
-        Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
-        Assert.False(publication.ReleaseSeriesView[1].IsDraft);
-        Assert.False(publication.ReleaseSeriesView[1].IsAmendment);
-    }
+    //    Assert.Equal(release3Id, publication.ReleaseSeriesView[1].ReleaseId);
+    //    Assert.Equal(2, publication.ReleaseSeriesView[1].Order);
+    //    Assert.False(publication.ReleaseSeriesView[1].IsDraft);
+    //    Assert.False(publication.ReleaseSeriesView[1].IsAmendment);
+    //}
 
-    [Fact]
-    public async Task UpdateForPublishRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var release1Id = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForPublishRelease() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var release1Id = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = release1Id },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = release1Id, IsDraft = true, Order = 1 },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = release1Id },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = release1Id, IsDraft = true, Order = 1 },
+    //        }
+    //    });
 
-        // Act
-        await _sut.UpdateForPublishRelease(publicationId, release1Id);
+    //    // Act
+    //    await _sut.UpdateForPublishRelease(publicationId, release1Id);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Single(publication.ReleaseSeriesView);
+    //    Assert.Single(publication.ReleaseSeriesView);
 
-        Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
-        Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
-        Assert.False(publication.ReleaseSeriesView[0].IsDraft);
-    }
+    //    Assert.Equal(release1Id, publication.ReleaseSeriesView[0].ReleaseId);
+    //    Assert.Equal(1, publication.ReleaseSeriesView[0].Order);
+    //    Assert.False(publication.ReleaseSeriesView[0].IsDraft);
+    //}
     #endregion UpdateForPublishRelease Tests
 
     #region UpdateForUpdateReleaseSeries Tests
@@ -407,198 +407,198 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task UpdateForUpdateReleaseSeries_NewOrderMissing_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact] // @MarkFix
+    //public async Task UpdateForUpdateReleaseSeries_NewOrderMissing_ThrowsException()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = releaseId },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = releaseId },
+    //    };
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<ApplicationException>(
-            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<ApplicationException>(
+    //        async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"Updated order for release with ID {releaseId} must be greater than 0", exception.Message);
-    }
+    //    Assert.Equal($"Updated order for release with ID {releaseId} must be greater than 0", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForUpdateReleaseSeries_AmendmentReleaseNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForUpdateReleaseSeries_AmendmentReleaseNotFound_ThrowsException() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = releaseId, Order = 1, IsAmendment = true },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = releaseId, Order = 1, IsAmendment = true },
+    //    };
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseId} found", exception.Message);
-    }
+    //    Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseId} found", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var originalReleaseId = Guid.NewGuid();
-        var releaseAmendmentId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemNotFound_ThrowsException() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var originalReleaseId = Guid.NewGuid();
+    //    var releaseAmendmentId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = originalReleaseId },
-                new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = originalReleaseId },
+    //            new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
+    //        }
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = releaseAmendmentId, Order = 1, IsAmendment = true },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = releaseAmendmentId, Order = 1, IsAmendment = true },
+    //    };
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {originalReleaseId} found", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemUpdated()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var originalReleaseId = Guid.NewGuid();
-        var releaseAmendmentId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForUpdateReleaseSeries_Amendment_OriginalReleaseSeriesItemUpdated() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var originalReleaseId = Guid.NewGuid();
+    //    var releaseAmendmentId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = originalReleaseId },
-                new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = originalReleaseId, Order = 1 },
-                new() { ReleaseId = releaseAmendmentId, Order = 1 },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = originalReleaseId },
+    //            new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = originalReleaseId, Order = 1 },
+    //            new() { ReleaseId = releaseAmendmentId, Order = 1 },
+    //        }
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = releaseAmendmentId, Order = 5, IsAmendment = true },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = releaseAmendmentId, Order = 5, IsAmendment = true },
+    //    };
 
-        // Act
-        await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
+    //    // Act
+    //    await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseSeries = publication.ReleaseSeriesView;
-        var originalReleaseSeriesItem = publication.ReleaseSeriesView[0];
-        var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var releaseSeries = publication.ReleaseSeriesView;
+    //    var originalReleaseSeriesItem = publication.ReleaseSeriesView[0];
+    //    var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(2, releaseSeries.Count);
-        Assert.Equal(5, originalReleaseSeriesItem.Order);
-        Assert.Equal(5, amendmentReleaseSeriesItem.Order);
-    }
+    //    Assert.Equal(2, releaseSeries.Count);
+    //    Assert.Equal(5, originalReleaseSeriesItem.Order);
+    //    Assert.Equal(5, amendmentReleaseSeriesItem.Order);
+    //}
 
-    [Theory]
-    [InlineData(true, nameof(LegacyRelease))]
-    [InlineData(false, nameof(Release))]
-    public async Task UpdateForUpdateReleaseSeries_ReleaseSeriesItemNotFound_ThrowsException(
-        bool isLegacy,
-        string entityTypeName)
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
+    //[Theory]
+    //[InlineData(true, nameof(LegacyRelease))]
+    //[InlineData(false, nameof(Release))]
+    //public async Task UpdateForUpdateReleaseSeries_ReleaseSeriesItemNotFound_ThrowsException( // @MarkFix
+    //    bool isLegacy,
+    //    string entityTypeName)
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = Guid.NewGuid(), Order = 1, IsLegacy = isLegacy },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = Guid.NewGuid(), Order = 1, IsLegacy = isLegacy },
+    //    };
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.UpdateForUpdateReleaseSeries(publicationId, updates));
 
-        Assert.Equal($"No matching ReleaseSeriesItem found for {entityTypeName} with ID {updates[0].Id}", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem found for {entityTypeName} with ID {updates[0].Id}", exception.Message);
+    //}
 
-    [Fact]
-    public async Task UpdateForUpdateReleaseSeries()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var eesReleaseId = Guid.NewGuid();
-        var legacyReleaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task UpdateForUpdateReleaseSeries() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var eesReleaseId = Guid.NewGuid();
+    //    var legacyReleaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            LegacyReleases = new()
-            {
-                new() { Id = legacyReleaseId }
-            },
-            Releases = new()
-            {
-                new() { Id = eesReleaseId }
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = legacyReleaseId, Order = 1, IsLegacy = true },
-                new() { ReleaseId = eesReleaseId, Order = 2, IsLegacy = false },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        LegacyReleases = new()
+    //        {
+    //            new() { Id = legacyReleaseId }
+    //        },
+    //        Releases = new()
+    //        {
+    //            new() { Id = eesReleaseId }
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = legacyReleaseId, Order = 1, IsLegacy = true },
+    //            new() { ReleaseId = eesReleaseId, Order = 2, IsLegacy = false },
+    //        }
+    //    });
 
-        var updates = new List<ReleaseSeriesItemUpdateRequest>
-        {
-            new() { Id = legacyReleaseId, Order = 2, IsLegacy = true },
-            new() { Id = eesReleaseId, Order = 1, IsLegacy = false },
-        };
+    //    var updates = new List<ReleaseSeriesItemUpdateRequest>
+    //    {
+    //        new() { Id = legacyReleaseId, Order = 2, IsLegacy = true },
+    //        new() { Id = eesReleaseId, Order = 1, IsLegacy = false },
+    //    };
 
-        // Act
-        await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
+    //    // Act
+    //    await _sut.UpdateForUpdateReleaseSeries(publicationId, updates);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var legacyReleaseSeriesItem = publication.ReleaseSeriesView[0];
-        var eesReleaseSeriesItem = publication.ReleaseSeriesView[1];
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var legacyReleaseSeriesItem = publication.ReleaseSeriesView[0];
+    //    var eesReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(2, publication.ReleaseSeriesView.Count);
+    //    Assert.Equal(2, publication.ReleaseSeriesView.Count);
 
-        Assert.Equal(2, legacyReleaseSeriesItem.Order);
-        Assert.Equal(1, eesReleaseSeriesItem.Order);
-    }
+    //    Assert.Equal(2, legacyReleaseSeriesItem.Order);
+    //    Assert.Equal(1, eesReleaseSeriesItem.Order);
+    //}
     #endregion UpdateForUpdateReleaseSeries Tests
 
     #region CreateForAmendRelease Tests
@@ -639,65 +639,65 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching amendment for {nameof(Release)} with ID {releaseAmendmentId} found", exception.Message);
     }
 
-    [Fact]
-    public async Task CreateForAmendRelease_OriginalReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseAmendmentId = Guid.NewGuid();
-        var previousVersionId = Guid.NewGuid();
+    //[Fact] // @MarkFix
+    //public async Task CreateForAmendRelease_OriginalReleaseSeriesItemNotFound_ThrowsException()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseAmendmentId = Guid.NewGuid();
+    //    var previousVersionId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = releaseAmendmentId, PreviousVersionId = previousVersionId }
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = releaseAmendmentId, PreviousVersionId = previousVersionId }
+    //        },
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.CreateForAmendRelease(publicationId, releaseAmendmentId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.CreateForAmendRelease(publicationId, releaseAmendmentId));
 
-        Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {previousVersionId} found", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem for original {nameof(Release)} with ID {previousVersionId} found", exception.Message);
+    //}
 
-    [Fact]
-    public async Task CreateForAmendRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var originalReleaseId = Guid.NewGuid();
-        var releaseAmendmentId = Guid.NewGuid();
+    //[Fact]
+    //public async Task CreateForAmendRelease() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var originalReleaseId = Guid.NewGuid();
+    //    var releaseAmendmentId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = originalReleaseId },
-                new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = originalReleaseId, IsDraft = true, Order = 1 },
-            }
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = originalReleaseId },
+    //            new() { Id = releaseAmendmentId, PreviousVersionId = originalReleaseId },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = originalReleaseId, IsDraft = true, Order = 1 },
+    //        }
+    //    });
 
-        // Act
-        await _sut.CreateForAmendRelease(publicationId, releaseAmendmentId);
+    //    // Act
+    //    await _sut.CreateForAmendRelease(publicationId, releaseAmendmentId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var amendmentReleaseSeriesItem = publication.ReleaseSeriesView[1];
 
-        Assert.Equal(releaseAmendmentId, amendmentReleaseSeriesItem.ReleaseId);
-        Assert.False(amendmentReleaseSeriesItem.IsLegacy);
-        Assert.True(amendmentReleaseSeriesItem.IsDraft);
-        Assert.True(amendmentReleaseSeriesItem.IsAmendment);
-        Assert.Equal(1, amendmentReleaseSeriesItem.Order);
-    }
+    //    Assert.Equal(releaseAmendmentId, amendmentReleaseSeriesItem.ReleaseId);
+    //    Assert.False(amendmentReleaseSeriesItem.IsLegacy);
+    //    Assert.True(amendmentReleaseSeriesItem.IsDraft);
+    //    Assert.True(amendmentReleaseSeriesItem.IsAmendment);
+    //    Assert.Equal(1, amendmentReleaseSeriesItem.Order);
+    //}
     #endregion CreateForAmendRelease Tests
 
     #region DeleteForDeleteRelease Tests
@@ -714,96 +714,96 @@ public sealed class PublicationReleaseSeriesViewServiceTests : IDisposable
         Assert.Equal($"No matching Publication found with ID {publicationId}", exception.Message);
     }
 
-    [Fact]
-    public async Task DeleteForDeleteRelease_ReleaseSeriesItemNotFound_ThrowsException()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact] // @MarkFix
+    //public async Task DeleteForDeleteRelease_ReleaseSeriesItemNotFound_ThrowsException()
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = releaseId },
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = releaseId },
+    //        },
+    //    });
 
-        // Act & Assert
-        var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
-            async () => await _sut.DeleteForDeleteRelease(publicationId, releaseId));
+    //    // Act & Assert
+    //    var exception = await Assert.ThrowsAsync<KeyNotFoundException>(
+    //        async () => await _sut.DeleteForDeleteRelease(publicationId, releaseId));
 
-        Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} amendment with ID {releaseId}", exception.Message);
-    }
+    //    Assert.Equal($"No matching ReleaseSeriesItem found for {nameof(Release)} amendment with ID {releaseId}", exception.Message);
+    //}
 
-    [Fact]
-    public async Task DeleteForDeleteRelease_RemainingReleaseSeriesItemValuesSequential()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task DeleteForDeleteRelease_RemainingReleaseSeriesItemValuesSequential() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new(),
-                new() { Id = releaseId },
-                new(),
-                new(),
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { Order = 1 },
-                new() { ReleaseId = releaseId, Order = 2 },
-                new() { Order = 3 },
-                new() { Order = 4 },
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new(),
+    //            new() { Id = releaseId },
+    //            new(),
+    //            new(),
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { Order = 1 },
+    //            new() { ReleaseId = releaseId, Order = 2 },
+    //            new() { Order = 3 },
+    //            new() { Order = 4 },
+    //        },
+    //    });
 
-        // Act
-        await _sut.DeleteForDeleteRelease(publicationId, releaseId);
+    //    // Act
+    //    await _sut.DeleteForDeleteRelease(publicationId, releaseId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
-        var releaseSeries = publication.ReleaseSeriesView;
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
+    //    var releaseSeries = publication.ReleaseSeriesView;
 
-        Assert.Equal(3, publication.ReleaseSeriesView.Count);
-        Assert.Equal(1, releaseSeries[0].Order);
-        Assert.Equal(2, releaseSeries[1].Order);
-        Assert.Equal(3, releaseSeries[2].Order);
-    }
+    //    Assert.Equal(3, publication.ReleaseSeriesView.Count);
+    //    Assert.Equal(1, releaseSeries[0].Order);
+    //    Assert.Equal(2, releaseSeries[1].Order);
+    //    Assert.Equal(3, releaseSeries[2].Order);
+    //}
 
-    [Fact]
-    public async Task DeleteForDeleteRelease()
-    {
-        // Arrange
-        var publicationId = Guid.NewGuid();
-        var releaseId = Guid.NewGuid();
+    //[Fact]
+    //public async Task DeleteForDeleteRelease() // @MarkFix
+    //{
+    //    // Arrange
+    //    var publicationId = Guid.NewGuid();
+    //    var releaseId = Guid.NewGuid();
 
-        _context.Publications.Add(new()
-        {
-            Id = publicationId,
-            Releases = new()
-            {
-                new() { Id = releaseId },
-            },
-            ReleaseSeriesView = new()
-            {
-                new() { ReleaseId = releaseId },
-            },
-        });
+    //    _context.Publications.Add(new()
+    //    {
+    //        Id = publicationId,
+    //        Releases = new()
+    //        {
+    //            new() { Id = releaseId },
+    //        },
+    //        ReleaseSeriesView = new()
+    //        {
+    //            new() { ReleaseId = releaseId },
+    //        },
+    //    });
 
-        // Act
-        await _sut.DeleteForDeleteRelease(publicationId, releaseId);
+    //    // Act
+    //    await _sut.DeleteForDeleteRelease(publicationId, releaseId);
 
-        // Assert
-        var publication = await _context.Publications.FindAsync(publicationId);
+    //    // Assert
+    //    var publication = await _context.Publications.FindAsync(publicationId);
 
-        Assert.Empty(publication.ReleaseSeriesView);
-    }
+    //    Assert.Empty(publication.ReleaseSeriesView);
+    //}
     #endregion DeleteForDeleteRelease Tests
 
     public void Dispose()

@@ -301,6 +301,7 @@ const ReleaseContent = ({
                   className="govuk-!-margin-bottom-4"
                   summary={`View releases (${releaseCount})`}
                 >
+                  {/* @MarkFix change to use publication.ReleaseSeries */}
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[

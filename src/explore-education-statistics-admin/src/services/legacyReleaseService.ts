@@ -6,21 +6,24 @@ export interface LegacyRelease {
   url: string;
 }
 
-export interface ReleaseSeriesItem extends LegacyRelease {
-  order: number;
-  isLegacy: boolean;
-  isDraft: boolean;
-  isAmendment: boolean;
-  isLatest: boolean;
+export interface ReleaseSeriesItem {
+  id: string;
+  isLegacyLink: boolean;
+  description: string;
+
+  publicationSlug?: string;
+  releaseSlug?: string;
+
+  legacyLinkUrl?: string;
 }
 
-export interface CreateLegacyRelease {
+export interface CreateLegacyRelease { // @MarkFix remove
   description: string;
   url: string;
   publicationId: string;
 }
 
-export interface UpdateLegacyRelease {
+export interface UpdateLegacyRelease { // @MarkFix remove
   description: string;
   url: string;
   publicationId: string;
@@ -28,11 +31,10 @@ export interface UpdateLegacyRelease {
 
 export interface UpdateReleaseSeriesItem {
   // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
-  id: string;
-  order: number;
-  isLegacy: boolean;
-  isAmendment: boolean;
-  isLatest: boolean;
+  releaseParentId?: string;
+
+  legacyLinkDescription?: string;
+  legacyLinkUrl?: string;
 }
 
 const legacyReleaseService = {

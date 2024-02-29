@@ -32,6 +32,8 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default)
     {
+        // @MarkFix sort this function out
+
         var publications = await _context.Publications
             .Include(p => p.Releases)
             .Include(p => p.LegacyReleases.OrderBy(lr => lr.Order))
@@ -50,12 +52,12 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
 
             foreach (var legacyRelease in publication.LegacyReleases)
             {
-                publication.ReleaseSeriesView.Add(new()
-                {
-                    ReleaseId = legacyRelease.Id,
-                    Order = ++currentOrder, // Reassign counting upwards from 1 (fix any misnumbered, or starting from 0)
-                    IsLegacy = true
-                });
+                //publication.ReleaseSeriesView.Add(new() // @MarkFix
+                //{
+                //    ReleaseId = legacyRelease.Id,
+                //    Order = ++currentOrder, // Reassign counting upwards from 1 (fix any misnumbered, or starting from 0)
+                //    IsLegacy = true
+                //});
 
                 legacyReleasesReordered++;
             }
@@ -80,37 +82,37 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                     // Add a ReleaseSeriesItem for the original
                     var originalRelease = releases.First(r => r.Id == latestRelease.PreviousVersionId);
 
-                    publication.ReleaseSeriesView.Add(
-                        new()
-                        {
-                            ReleaseId = originalRelease.Id,
-                            Order = ++currentOrder,
-                            IsDraft = !originalRelease.Published.HasValue,
-                            IsAmendment = originalRelease.Amendment
-                        });
+                    //publication.ReleaseSeriesView.Add( // @MarkFix
+                    //    new()
+                    //    {
+                    //        ReleaseId = originalRelease.Id,
+                    //        Order = ++currentOrder,
+                    //        IsDraft = !originalRelease.Published.HasValue,
+                    //        IsAmendment = originalRelease.Amendment
+                    //    });
 
                     // Followed by a ReleaseSeriesItem for the amendment, with the same Order
-                    publication.ReleaseSeriesView.Add(
-                        new()
-                        {
-                            ReleaseId = latestRelease.Id,
-                            Order = currentOrder,
-                            IsDraft = true,
-                            IsAmendment = true
-                        });
+                    //publication.ReleaseSeriesView.Add( // @MarkFix
+                    //    new()
+                    //    {
+                    //        ReleaseId = latestRelease.Id,
+                    //        Order = currentOrder,
+                    //        IsDraft = true,
+                    //        IsAmendment = true
+                    //    });
 
                     eesReleasesOrdered += 2;
                 }
                 else
                 {
                     // The release is the only active version, so just add a single ReleaseSeriesItem
-                    publication.ReleaseSeriesView.Add(
-                        new()
-                        {
-                            ReleaseId = latestRelease.Id,
-                            Order = ++currentOrder,
-                            IsDraft = !latestRelease.Published.HasValue,
-                        });
+                    //publication.ReleaseSeriesView.Add( // @MarkFix
+                    //    new()
+                    //    {
+                    //        ReleaseId = latestRelease.Id,
+                    //        Order = ++currentOrder,
+                    //        IsDraft = !latestRelease.Published.HasValue,
+                    //    });
 
                     eesReleasesOrdered++;
                 }

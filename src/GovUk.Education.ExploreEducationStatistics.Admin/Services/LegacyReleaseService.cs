@@ -50,27 +50,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<LegacyReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId,
-                    q => q.Include(p => p.LegacyReleases))
-                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
-                .OnSuccess(publication =>
-                {
-                    return publication.LegacyReleases
-                        .Select(legacyRelease =>
-                            new LegacyReleaseViewModel
-                            {
-                                Id = legacyRelease.Id,
-                                Description = legacyRelease.Description,
-                                Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == legacyRelease.Id)?.Order ?? 0,
-                                Url = legacyRelease.Url
-                            })
-                        .OrderByDescending(lr => lr.Order)
-                        .ToList();
-                });
-        }
+        //public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId) // @MarkFix remove
+        //{
+        //    return await _persistenceHelper
+        //        .CheckEntityExists<Publication>(publicationId,
+        //            q => q.Include(p => p.LegacyReleases))
+        //        .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+        //        .OnSuccess(publication =>
+        //        {
+        //            return publication.LegacyReleases
+        //                .Select(legacyRelease =>
+        //                    new LegacyReleaseViewModel
+        //                    {
+        //                        Id = legacyRelease.Id,
+        //                        Description = legacyRelease.Description,
+        //                        Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == legacyRelease.Id)?.Order ?? 0,
+        //                        Url = legacyRelease.Url
+        //                    })
+        //                .OrderByDescending(lr => lr.Order)
+        //                .ToList();
+        //        });
+        //}
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
             LegacyReleaseCreateViewModel legacyRelease)

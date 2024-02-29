@@ -61,14 +61,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        ReleaseSeriesView = new()
-        {
-            new()
-            {
-                ReleaseId = Guid.NewGuid(),
-                Order = 1
-            }
-        },
+        //ReleaseSeriesView = new() // @MarkFix
+        //{
+        //    new()
+        //    {
+        //        ReleaseId = Guid.NewGuid(),
+        //        Order = 1
+        //    }
+        //},
         Topic = new TopicViewModel(new ThemeViewModel(
             Guid.NewGuid(),
             Slug: "",

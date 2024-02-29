@@ -116,9 +116,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ReleasePermissions? Permissions { get; set; }
 
         public PublicationSummaryViewModel? Publication { get; set; }
-
-        public int Order { get; set; }
-
-        public bool IsDraft { get; set; }
     }
 }

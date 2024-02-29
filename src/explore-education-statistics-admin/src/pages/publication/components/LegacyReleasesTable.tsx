@@ -33,6 +33,7 @@ interface Props {
   publicationId: string;
 }
 const LegacyReleasesTable = ({
+  // @MarkFix rename
   canManageLegacyReleases,
   releaseSeries: initialReleaseSeries,
   publicationId,
@@ -96,19 +97,17 @@ const LegacyReleasesTable = ({
 
       {releaseSeries.length > 0 ? (
         <DragDropContext
-          onDragEnd={result => {
-            if (!result.destination) {
+          onDragEnd={seriesItem => {
+            if (!seriesItem.destination) {
               return;
             }
 
             const nextReleaseSeries = reorder(
               releaseSeries,
-              result.source.index,
-              result.destination.index,
-            ).map((release, index) => ({
-              ...release,
-              order: releaseSeries.length - index,
-            }));
+              seriesItem.source.index,
+              seriesItem.destination.index,
+            );
+
             setReleaseSeries(nextReleaseSeries);
           }}
         >
@@ -135,68 +134,68 @@ const LegacyReleasesTable = ({
                   droppableSnapshot={droppableSnapshot}
                   tag="tbody"
                 >
-                  {releaseSeries.map((release, index) => (
+                  {releaseSeries.map((seriesItem, index) => (
                     <DraggableItem
                       hideDragHandle
-                      id={release.id}
+                      id={seriesItem.id}
                       index={index}
                       isReordering={isReordering}
-                      key={release.id}
+                      key={seriesItem.id}
                       tag="tr"
                     >
                       {isReordering && <td className={styles.dragHandle}>⬍</td>}
 
                       <td>
                         <span className="govuk-!-display-block">
-                          {release.description}
+                          {seriesItem.description}
                         </span>
-                        {release.isLatest && (
-                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1">
-                            Latest
-                          </span>
-                        )}
-                        {release.isDraft && (
-                          <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap">
-                            Draft{release.isAmendment && ' Amendment'}
-                          </span>
-                        )}
+                        {/*@MarkFix{seriesItem.isLatest && (*/}
+                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1">*/}
+                        {/*    Latest*/}
+                        {/*  </span>*/}
+                        {/*)}*/}
+                        {/*@MarkFix{seriesItem.isDraft && (*/}
+                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap">*/}
+                        {/*    Draft{seriesItem.isAmendment && ' Amendment'}*/}
+                        {/*  </span>*/}
+                        {/*)}*/}
                       </td>
                       <td
                         className={classNames({
                           'govuk-!-width-one-half': isReordering,
                         })}
                       >
-                        {release.isLegacy && (
+                        {seriesItem.isLegacyLink && (
                           <a
                             className="govuk-link--no-visited-state"
-                            href={release.url}
+                            href={seriesItem.legacyLinkUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isReordering ? -1 : undefined}
                           >
-                            {release.url}
+                            {seriesItem.legacyLinkUrl}
                           </a>
                         )}
 
-                        {((!release.isLegacy &&
-                          release.isDraft &&
-                          release.isAmendment) ||
-                          (!release.isDraft && !release.isAmendment)) && (
+                        {!seriesItem.isLegacyLink && (
+                          // seriesItem.isDraft && // @MarkFix
+                          // seriesItem.isAmendment) ||
+                          // (!seriesItem.isDraft && !seriesItem.isAmendment)) && (
                           <Link
-                            to={`${config.publicAppUrl}/find-statistics/${release.url}`}
+                            to={`${config.publicAppUrl}/find-statistics/${seriesItem.publicationSlug}/${seriesItem.releaseSlug}`}
                             className="govuk-link--no-visited-state"
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isReordering ? -1 : undefined}
                           >
-                            {`${config.publicAppUrl}/find-statistics/${release.url}`}
+                            {`${config.publicAppUrl}/find-statistics/${seriesItem.publicationSlug}/${seriesItem.releaseSlug}`}
                           </Link>
                         )}
                       </td>
 
                       {canManageLegacyReleases && !isReordering && (
                         <td>
-                          {release.isLegacy && (
+                          {seriesItem.isLegacyLink && (
                             <ButtonGroup className="govuk-!-margin-bottom-0">
                               <ModalConfirm
                                 confirmText="OK"
@@ -205,7 +204,7 @@ const LegacyReleasesTable = ({
                                   <ButtonText>
                                     Edit
                                     <VisuallyHidden>
-                                      {` ${release.description}`}
+                                      {` ${seriesItem.description}`}
                                     </VisuallyHidden>
                                   </ButtonText>
                                 }
@@ -215,7 +214,7 @@ const LegacyReleasesTable = ({
                                       publicationEditLegacyReleaseRoute.path,
                                       {
                                         publicationId,
-                                        legacyReleaseId: release.id,
+                                        legacyReleaseId: seriesItem.id,
                                       },
                                     ),
                                   );
@@ -233,19 +232,19 @@ const LegacyReleasesTable = ({
                                   <ButtonText variant="warning">
                                     Delete
                                     <VisuallyHidden>
-                                      {` ${release.description}`}
+                                      {` ${seriesItem.description}`}
                                     </VisuallyHidden>
                                   </ButtonText>
                                 }
                                 onConfirm={async () => {
                                   await legacyReleaseService.deleteLegacyRelease(
-                                    release?.id,
+                                    seriesItem?.id,
                                   );
 
                                   const nextReleaseSeries =
                                     releaseSeries.filter(
                                       legacyRelease =>
-                                        legacyRelease.id !== release.id,
+                                        legacyRelease.id !== seriesItem.id,
                                     );
                                   setReleaseSeries(nextReleaseSeries);
                                 }}
@@ -280,13 +279,7 @@ const LegacyReleasesTable = ({
             onClick={async () => {
               await publicationService.updateReleaseSeriesView(
                 publicationId,
-                releaseSeries.map(seriesItem => ({
-                  id: seriesItem.id,
-                  order: seriesItem.order,
-                  isLegacy: seriesItem.isLegacy,
-                  isAmendment: seriesItem.isAmendment,
-                  isLatest: seriesItem.isLatest,
-                })),
+                releaseSeries,
               );
 
               toggleReordering.off();

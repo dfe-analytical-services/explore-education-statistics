@@ -117,4 +117,6 @@ public interface IReleaseRepository
     Task<List<Release>> ListLatestReleaseVersions(
         Guid publicationId,
         CancellationToken cancellationToken = default);
+
+    Task<Release> GetReleaseParentLatestReleaseVersion(Guid releaseParentId);
 }

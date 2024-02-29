@@ -14,10 +14,10 @@ public record ReleaseTitleViewModel
         Title = release.Title;
         Slug = release.Slug;
 
-        var releaseSeriesItem = release.Publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)
-            ?? throw new KeyNotFoundException($"No matching ReleaseSeriesItem found for {nameof(Release)} \"{release.Title}\"");
+        // @MarkFix check we can remove this
+        //var releaseSeriesItem = release.Publication.ReleaseSeriesView.First(rsi => rsi.ReleaseParentId == release.ReleaseParentId);
 
-        Order = releaseSeriesItem.Order;
+        //Order = releaseSeriesItem.Order;
     }
 
     public Guid Id { get; set; }
@@ -26,5 +26,5 @@ public record ReleaseTitleViewModel
 
     public string Title { get; set; } = string.Empty;
 
-    public int? Order { get; set; }
+    //public int? Order { get; set; } // @MarkFix check we can remove this
 }

@@ -121,8 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
                 .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
-                .OnSuccess(async () =>
+                .OnSuccessDo(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
+                .OnSuccess(async publication =>
                 {
                     var newRelease = new Release
                     {
@@ -166,9 +166,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.Releases.AddAsync(newRelease);
 
-                    await _publicationReleaseSeriesViewService.CreateForCreateRelease(
-                        releaseCreate.PublicationId,
-                        newRelease.Id);
+                    // @MarkFix check this is right
+                    var releaseSeries = publication.ReleaseSeriesView;
+                    releaseSeries.Insert(0, new ReleaseSeriesItem
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseParentId = newRelease.ReleaseParentId,
+                    });
+                    _context.Publications.Update(publication);
 
                     await _context.SaveChangesAsync();
                     return await GetRelease(newRelease.Id);

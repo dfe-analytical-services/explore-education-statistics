@@ -119,14 +119,15 @@ public static class PublicationGeneratorExtensions
                         release.Publication = publication;
                         release.PublicationId = publication.Id;
 
-                        publication.ReleaseSeriesView.Add(new()
-                        {
-                            ReleaseId = release.Id,
-                            IsAmendment = release.Amendment,
-                            IsDraft = !release.Published.HasValue,
-                            IsLegacy = false,
-                            Order = publication.ReleaseSeriesView.Count + 1,
-                        });
+                        // @MarkFix
+                        //publication.ReleaseSeriesView.Add(new()
+                        //{
+                        //    ReleaseId = release.Id,
+                        //    IsAmendment = release.Amendment,
+                        //    IsDraft = !release.Published.HasValue,
+                        //    IsLegacy = false,
+                        //    Order = publication.ReleaseSeriesView.Count + 1,
+                        //});
                     });
 
                     return releases;
@@ -196,7 +197,7 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => setters.Set(p => p.ExternalMethodology, externalMethodology);
 
-    private static InstanceSetters<Publication> SetLegacyReleases(
+    private static InstanceSetters<Publication> SetLegacyReleases( // @MarkFix remove
         this InstanceSetters<Publication> setters,
         IEnumerable<LegacyRelease> legacyReleases)
         => setters.Set(
@@ -208,14 +209,15 @@ public static class PublicationGeneratorExtensions
                         legacyRelease.Publication = publication;
                         legacyRelease.PublicationId = publication.Id;
 
-                        publication.ReleaseSeriesView.Add(new()
-                        {
-                            ReleaseId = legacyRelease.Id,
-                            IsAmendment = false,
-                            IsDraft = false,
-                            IsLegacy = true,
-                            Order = publication.ReleaseSeriesView.Count + 1,
-                        });
+                        // @MarkFix
+                        //publication.ReleaseSeriesView.Add(new()
+                        //{
+                        //    ReleaseId = legacyRelease.Id,
+                        //    IsAmendment = false,
+                        //    IsDraft = false,
+                        //    IsLegacy = true,
+                        //    Order = publication.ReleaseSeriesView.Count + 1,
+                        //});
                     });
 
                     return legacyReleases;

@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -451,46 +452,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
-                .OnSuccessCombineWith(async _ => await _legacyReleaseService.ListLegacyReleases(publicationId))
-                .OnSuccessCombineWith(async _ => await ListLatestReleaseVersions(publicationId))
-                .OnSuccess(publicationAndReleases =>
+                .OnSuccess(async publication =>
                 {
-                    var (publication, legacyReleases, eesReleases) = publicationAndReleases;
-                    var releaseSeriesItemsViewModels = new List<ReleaseSeriesItemViewModel>();
-
-                    foreach (var legacyRelease in legacyReleases)
+                    var result = new List<ReleaseSeriesItemViewModel>();
+                    foreach (var releaseSeriesItem in publication.ReleaseSeriesView)
                     {
-                        releaseSeriesItemsViewModels.Add(new()
+                        if (releaseSeriesItem.ReleaseParentId != null)
                         {
-                            Description = legacyRelease.Description,
-                            Id = legacyRelease.Id,
-                            Url = legacyRelease.Url,
-                            Order = legacyRelease.Order,
-                            IsLegacy = true
-                        });
+                            // @MarkFix on public, we'll want to filter out non-live release parents
+                            var latestReleaseVersion = await _releaseRepository
+                                .GetLatestReleaseVersion(publication.Id);
+
+                            if (latestReleaseVersion == null)
+                            {
+                                throw new InvalidDataException("ReleaseSeriesItem with ReleaseParentId set should have an associated LatestReleaseVersion"); // @MarkFix improve message
+                            }
+
+                            result.Add(new ReleaseSeriesItemViewModel
+                                {
+                                    Id = releaseSeriesItem.Id,
+                                    IsLegacyLink = false,
+                                    Description = latestReleaseVersion.Title,
+                                    PublicationSlug = publication.Slug,
+                                    ReleaseSlug = latestReleaseVersion.Slug,
+                                });
+
+                        }
+                        else // is legacy link
+                        {
+
+                            // @MarkFix check all prod legacy link descriptions/urls are not null/empty
+                            if (releaseSeriesItem.LegacyLinkDescription == null)
+                            {
+                                throw new InvalidDataException(
+                                    "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkDescription should be set"); // @MarkFix improve message?
+                            }
+
+                            if (releaseSeriesItem.LegacyLinkUrl == null)
+                            {
+                                throw new InvalidDataException(
+                                    "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkUrl should be set"); // @MarkFix improve message?
+                            }
+
+                            result.Add(new ReleaseSeriesItemViewModel
+                            {
+                                Id = releaseSeriesItem.Id,
+                                IsLegacyLink = true,
+                                Description = releaseSeriesItem.LegacyLinkDescription,
+                                LegacyLinkUrl = releaseSeriesItem.LegacyLinkUrl,
+                            });
+                        }
                     }
 
-                    foreach (var eesRelease in eesReleases)
-                    {
-                        var eesReleaseId = eesRelease.Amendment && eesRelease.PreviousVersionId.HasValue
-                            ? eesRelease.PreviousVersionId.Value
-                            : eesRelease.Id;
-
-                        releaseSeriesItemsViewModels.Add(new()
-                        {
-                            Description = eesRelease.Title,
-                            Id = eesRelease.Id,
-                            Url = $"{publication.Slug}/{eesRelease.Slug}",
-                            Order = eesRelease.Order,
-                            IsDraft = eesRelease.IsDraft,
-                            IsAmendment = eesRelease.Amendment,
-                            IsLatest = publication.LatestPublishedReleaseId == eesReleaseId
-                        });
-                    }
-
-                    return releaseSeriesItemsViewModels
-                        .OrderByDescending(cr => cr.Order)
-                        .ToList();
+                    return result;
                 });
         }
 
@@ -499,24 +513,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
             return await _context.Publications
-                .Include(p => p.LegacyReleases)
-                .Include(p => p.Releases)
                 .FirstOrNotFoundAsync(p => p.Id == publicationId)
                 .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
-                    await _publicationReleaseSeriesViewService.UpdateForUpdateReleaseSeries(
-                        publicationId,
-                        updatedReleaseSeriesItems);
+                    // @MarkFix check updatedReleaseSeriesItems are legal - i.e. contain all latest release versions
+                    // and whatever else
+
+                    var newReleaseSeries = updatedReleaseSeriesItems
+                        .Select(request => new ReleaseSeriesItem
+                        {
+                            Id = request.Id,
+                            ReleaseParentId = request.ReleaseParentId,
+                            LegacyLinkDescription = request.LegacyLinkDescription,
+                            LegacyLinkUrl = request.LegacyLinkUrl,
+                        }).ToList();
+
+                    publication.ReleaseSeriesView = newReleaseSeries;
+                    _context.Publications.Update(publication);
 
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return _mapper
-                        .Map<List<ReleaseSeriesItemUpdateRequest>>(publication.ReleaseSeriesView)
-                        .OrderBy(r => r.Order)
-                        .ToList();
+                    return updatedReleaseSeriesItems; // @MarkFix do we want to return ReleaseSeriesItemViewModels here?
                 });
         }
 
@@ -600,8 +620,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publication = await _context.Publications.FindAsync(release.Publication.Id)
                 ?? throw new ArgumentException($"Publication with ID {release.Publication.Id} not found");
 
-            viewModel.Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0;
-            viewModel.IsDraft = !release.Live;
+            //viewModel.Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0; // @MarkFix
+            //viewModel.IsDraft = !release.Live;
 
             if (includePermissions)
             {
