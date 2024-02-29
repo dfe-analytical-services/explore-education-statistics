@@ -27,14 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 public class DataSetService : IDataSetService
 {
     private readonly ContentDbContext _contentDbContext;
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
 
     public DataSetService(
         ContentDbContext contentDbContext,
-        IReleaseRepository releaseRepository)
+        IReleaseVersionRepository releaseVersionRepository)
     {
         _contentDbContext = contentDbContext;
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
@@ -130,7 +130,7 @@ public class DataSetService : IDataSetService
         Guid fileId)
     {
         // WARN: This prevents public uses from seeing data sets they shouldn't!
-        if (!await _releaseRepository.IsLatestPublishedReleaseVersion(releaseVersionId))
+        if (!await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersionId))
         {
             return new NotFoundResult();
         }

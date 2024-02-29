@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectCsvMetaService _subjectCsvMetaService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly TableBuilderOptions _options;
 
         public TableBuilderService(
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectCsvMetaService subjectCsvMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IOptions<TableBuilderOptions> options)
         {
             _context = context;
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectCsvMetaService = subjectCsvMetaService;
             _subjectRepository = subjectRepository;
             _userService = userService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _options = options.Value;
         }
 
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId =>
-                    _releaseRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
+                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
                 .OnSuccess(releaseVersion => releaseVersion.Id);
         }
 

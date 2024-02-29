@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
     AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using IReleaseRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -25,20 +25,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IPreReleaseService _preReleaseService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public ViewSpecificMethodologyAuthorizationHandler(
             IMethodologyRepository methodologyRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IPreReleaseService preReleaseService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             AuthorizationHandlerService authorizationHandlerService)
         {
             _methodologyRepository = methodologyRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _preReleaseService = preReleaseService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _authorizationHandlerService = authorizationHandlerService;
         }
 
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
                 foreach (var publicationId in publicationIds)
                 {
-                    var latestReleaseVersion = await _releaseRepository.GetLatestReleaseVersion(publicationId);
+                    var latestReleaseVersion = await _releaseVersionRepository.GetLatestReleaseVersion(publicationId);
 
                     // The publication may have no releases
                     if (latestReleaseVersion == null)

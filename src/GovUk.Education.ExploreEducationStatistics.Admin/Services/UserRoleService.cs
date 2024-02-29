@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IUserService _userService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
             IUserService userService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
             _userService = userService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
@@ -403,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var latestReleaseRoles = await allReleaseRoles
                         .ToAsyncEnumerable()
                         .WhereAwait(async userReleaseRole =>
-                            await _releaseRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
+                            await _releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
                         .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Publication.Title)
                         .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Year)
                         .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.TimePeriodCoverage)

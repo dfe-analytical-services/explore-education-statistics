@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IFrontendService _frontendService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public PermalinkService(
             ContentDbContext contentDbContext,
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IFrontendService frontendService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
-            IReleaseRepository releaseRepository)
+            IReleaseVersionRepository releaseVersionRepository)
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _frontendService = frontendService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId =>
-                    _releaseRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
+                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
                 .OnSuccess(releaseVersion => releaseVersion.Id);
         }
 

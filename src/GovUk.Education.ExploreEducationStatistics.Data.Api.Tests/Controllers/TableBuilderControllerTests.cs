@@ -476,22 +476,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                 .ReturnsAsync(latestReleaseVersion);
 
             var client = SetupApp(
                     dataBlockService: dataBlockService.Object,
-                    releaseRepository: releaseRepository.Object
+                    releaseVersionRepository: releaseVersionRepository.Object
                 )
                 .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
 
-            VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
+            VerifyAllMocks(BlobCacheService, dataBlockService, releaseVersionRepository);
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
             Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
@@ -556,22 +556,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.GetDataBlockTableResult(ReleaseVersionId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                 .ReturnsAsync(latestReleaseVersion);
 
             var client = SetupApp(
                     dataBlockService: dataBlockService.Object,
-                    releaseRepository: releaseRepository.Object
+                    releaseVersionRepository: releaseVersionRepository.Object
                 )
                 .AddContentDbTestData(context => context.DataBlockParents.Add(DataBlockParent))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockParentId}");
 
-            VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
+            VerifyAllMocks(BlobCacheService, dataBlockService, releaseVersionRepository);
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
             Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
@@ -584,7 +584,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private WebApplicationFactory<TestStartup> SetupApp(
             IDataBlockService? dataBlockService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             ITableBuilderService? tableBuilderService = null)
         {
             return TestApp
@@ -593,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     services =>
                     {
                         services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
-                        services.AddTransient(_ => releaseRepository ?? Mock.Of<IReleaseRepository>(Strict));
+                        services.AddTransient(_ => releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict));
                         services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
                     }
                 );

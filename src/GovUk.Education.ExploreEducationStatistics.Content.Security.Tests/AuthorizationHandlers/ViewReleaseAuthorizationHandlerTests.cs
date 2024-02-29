@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         private static ViewReleaseAuthorizationHandler BuildHandler(ContentDbContext contentDbContext)
         {
             return new ViewReleaseAuthorizationHandler(
-                new ReleaseRepository(contentDbContext)
+                new ReleaseVersionRepository(contentDbContext)
             );
         }
     }

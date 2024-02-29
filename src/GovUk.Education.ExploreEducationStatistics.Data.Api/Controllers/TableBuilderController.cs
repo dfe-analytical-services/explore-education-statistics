@@ -31,18 +31,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IDataBlockService _dataBlockService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly ITableBuilderService _tableBuilderService;
 
         public TableBuilderController(
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IDataBlockService dataBlockService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             ITableBuilderService tableBuilderService)
         {
             _contentPersistenceHelper = contentPersistenceHelper;
             _dataBlockService = dataBlockService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _tableBuilderService = tableBuilderService;
         }
 
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
                 .OnSuccessCombineWith(GetDataBlockTableResult)
                 .OnSuccessCombineWith(tuple =>
-                    _releaseRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
+                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
                         .OrNotFound())
                 .OnSuccess(tuple =>
                 {

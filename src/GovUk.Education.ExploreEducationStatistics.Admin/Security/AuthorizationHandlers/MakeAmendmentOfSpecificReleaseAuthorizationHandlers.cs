@@ -17,14 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, ReleaseVersion>
     {
         private readonly AuthorizationHandlerService _authorizationHandlerService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public MakeAmendmentOfSpecificReleaseAuthorizationHandler(
             AuthorizationHandlerService authorizationHandlerService,
-            IReleaseRepository releaseRepository)
+            IReleaseVersionRepository releaseVersionRepository)
         {
             _authorizationHandlerService = authorizationHandlerService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (!await _releaseRepository.IsLatestReleaseVersion(releaseVersion.Id))
+            if (!await _releaseVersionRepository.IsLatestReleaseVersion(releaseVersion.Id))
             {
                 return;
             }

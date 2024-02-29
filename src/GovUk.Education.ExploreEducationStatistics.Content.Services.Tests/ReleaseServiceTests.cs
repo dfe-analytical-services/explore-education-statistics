@@ -844,14 +844,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static ReleaseService SetupReleaseService(
             ContentDbContext contentDbContext,
             IReleaseFileRepository? releaseFileRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserService? userService = null)
         {
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext),
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 MapperUtils.ContentMapper(contentDbContext)
             );

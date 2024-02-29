@@ -103,7 +103,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
         ContentDbContext contentDbContext)
     {
         return new ViewSubjectDataForPublishedReleasesAuthorizationHandler(
-            new ReleaseRepository(contentDbContext)
+            new ReleaseVersionRepository(contentDbContext)
         );
     }
 }

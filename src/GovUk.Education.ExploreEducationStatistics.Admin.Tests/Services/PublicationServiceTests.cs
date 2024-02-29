@@ -32,7 +32,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -2828,7 +2828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
@@ -2840,7 +2840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
-                releaseRepository ?? new ReleaseRepository(context),
+                releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

@@ -11,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 
-public class ReleaseRepository : IReleaseRepository
+public class ReleaseVersionRepository : IReleaseVersionRepository
 {
     private readonly ContentDbContext _contentDbContext;
 
-    public ReleaseRepository(ContentDbContext contentDbContext)
+    public ReleaseVersionRepository(ContentDbContext contentDbContext)
     {
         _contentDbContext = contentDbContext;
     }

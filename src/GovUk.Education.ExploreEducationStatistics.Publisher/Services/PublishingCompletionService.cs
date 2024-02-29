@@ -19,7 +19,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IMethodologyService _methodologyService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
     private readonly IRedirectsCacheService _redirectsCacheService;
@@ -30,7 +30,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService,
         IPublicationCacheService publicationCacheService,
-        IReleaseRepository releaseRepository,
+        IReleaseVersionRepository releaseVersionRepository,
         IReleaseService releaseService,
         IRedirectsCacheService redirectsCacheService)
     {
@@ -40,7 +40,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _notificationsService = notificationsService;
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
         _releaseService = releaseService;
         _redirectsCacheService = redirectsCacheService;
     }
@@ -158,7 +158,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         var publication = await _contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        var latestPublishedReleaseVersion = await _releaseRepository.GetLatestPublishedReleaseVersion(publicationId);
+        var latestPublishedReleaseVersion = await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId);
         publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion!.Id;
 
         _contentDbContext.Update(publication);

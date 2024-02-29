@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -186,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new(
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
                     Mock.Of<IPreReleaseService>(Strict)));

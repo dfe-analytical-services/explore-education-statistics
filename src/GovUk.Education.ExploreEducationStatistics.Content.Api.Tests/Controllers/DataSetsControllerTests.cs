@@ -1825,12 +1825,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             .ResetDbContexts()
             .ConfigureServices(services =>
             {
-                services.AddTransient<IReleaseRepository>(s => new ReleaseRepository(
+                services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
                     contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
                 services.AddTransient<IDataSetService>(
                     s => new DataSetService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
-                        s.GetRequiredService<IReleaseRepository>()));
+                        s.GetRequiredService<IReleaseVersionRepository>()));
             });
     }
 }

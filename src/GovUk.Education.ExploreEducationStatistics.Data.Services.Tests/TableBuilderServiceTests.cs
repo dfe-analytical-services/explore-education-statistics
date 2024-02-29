@@ -1697,7 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
@@ -1709,7 +1709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
                 subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                releaseRepository ?? new ReleaseRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
                 options ?? DefaultOptions()
             );
         }

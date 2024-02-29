@@ -13,11 +13,11 @@ public class ViewReleaseRequirement : IAuthorizationRequirement
 public class ViewReleaseAuthorizationHandler
     : AuthorizationHandler<ViewReleaseRequirement, ReleaseVersion>
 {
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-    public ViewReleaseAuthorizationHandler(IReleaseRepository releaseRepository)
+    public ViewReleaseAuthorizationHandler(IReleaseVersionRepository releaseVersionRepository)
     {
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
     }
 
     protected override async Task HandleRequirementAsync(
@@ -25,7 +25,7 @@ public class ViewReleaseAuthorizationHandler
         ViewReleaseRequirement requirement,
         ReleaseVersion releaseVersion)
     {
-        if (await _releaseRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id))
+        if (await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id))
         {
             authContext.Succeed(requirement);
         }

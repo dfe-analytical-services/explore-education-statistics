@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,11 +13,11 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Repository;
 
-public class ReleaseRepositoryTests
+public class ReleaseVersionRepositoryTests
 {
     private readonly DataFixture _dataFixture = new();
 
-    public class GetLatestPublishedReleaseVersionTests : ReleaseRepositoryTests
+    public class GetLatestPublishedReleaseVersionTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -205,7 +205,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class GetLatestReleaseVersionTests : ReleaseRepositoryTests
+    public class GetLatestReleaseVersionTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -272,7 +272,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class IsLatestPublishedReleaseVersionTests : ReleaseRepositoryTests
+    public class IsLatestPublishedReleaseVersionTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -330,7 +330,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class IsLatestReleaseVersionTests : ReleaseRepositoryTests
+    public class IsLatestReleaseVersionTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -370,7 +370,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class ListLatestPublishedReleaseVersionIdsTests : ReleaseRepositoryTests
+    public class ListLatestPublishedReleaseVersionIdsTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -456,7 +456,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class ListLatestPublishedReleaseVersionsTests : ReleaseRepositoryTests
+    public class ListLatestPublishedReleaseVersionsTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -544,7 +544,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class ListLatestReleaseVersionIdsTests : ReleaseRepositoryTests
+    public class ListLatestReleaseVersionIdsTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task Success()
@@ -611,7 +611,7 @@ public class ReleaseRepositoryTests
         }
     }
 
-    public class ListLatestReleaseVersionsTests : ReleaseRepositoryTests
+    public class ListLatestReleaseVersionsTests : ReleaseVersionRepositoryTests
     {
         [Fact]
         public async Task AllPublications_Success()
@@ -763,10 +763,10 @@ public class ReleaseRepositoryTests
         return contextId;
     }
 
-    private static ReleaseRepository BuildRepository(
+    private static ReleaseVersionRepository BuildRepository(
         ContentDbContext contentDbContext)
     {
-        return new ReleaseRepository(
+        return new ReleaseVersionRepository(
             contentDbContext: contentDbContext
         );
     }

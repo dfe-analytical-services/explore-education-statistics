@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 
-public interface IReleaseRepository
+public interface IReleaseVersionRepository
 {
     Task<DateTime> GetPublishedDate(Guid releaseVersionId,
         DateTime actualPublishedDate);

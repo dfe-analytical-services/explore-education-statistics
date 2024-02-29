@@ -16,7 +16,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new PublishSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(contentDbContext),
+                    new ReleaseVersionRepository(contentDbContext),
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict)));

@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserService _userService;
@@ -30,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleasePermissionService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userService = userService;
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccess(async () =>
                 {
-                    var releaseVersionIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
+                    var releaseVersionIds = await _releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
 
                     var users = await _contentDbContext
                         .UserReleaseRoles

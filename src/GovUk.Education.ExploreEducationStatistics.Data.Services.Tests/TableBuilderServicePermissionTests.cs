@@ -54,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             .Setup(s => s.FindPublicationIdForSubject(_subject.Id, default))
                             .ReturnsAsync(PublicationId);
 
-                        var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+                        var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
 
-                        releaseRepository
+                        releaseVersionRepository
                             .Setup(s => s.GetLatestPublishedReleaseVersion(PublicationId, default))
                             .ReturnsAsync(new ReleaseVersion
                             {
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         var service = BuildTableBuilderService(
                             userService: userService.Object,
                             subjectRepository: subjectRepository.Object,
-                            releaseRepository: releaseRepository.Object,
+                            releaseVersionRepository: releaseVersionRepository.Object,
                             statisticsPersistenceHelper: statisticsPersistenceHelper.Object
                         );
 
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict),
                 options ?? Options.Create(new TableBuilderOptions())
             );
         }

@@ -489,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             return new(
                 contentDbContext,
-                releaseRepository: new ReleaseRepository(contentDbContext)
+                releaseVersionRepository: new ReleaseVersionRepository(contentDbContext)
             );
         }
     }

@@ -12,12 +12,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -960,7 +960,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                new ReleaseRepository(contentDbContext),
+                new ReleaseVersionRepository(contentDbContext),
                 new UserReleaseRoleRepository(contentDbContext),
                 new UserReleaseInviteRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService(UserId).Object

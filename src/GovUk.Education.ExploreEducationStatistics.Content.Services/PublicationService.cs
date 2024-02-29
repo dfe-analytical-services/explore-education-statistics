@@ -25,18 +25,18 @@ public class PublicationService : IPublicationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPublicationRepository _publicationRepository;
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
 
     public PublicationService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IPublicationRepository publicationRepository,
-        IReleaseRepository releaseRepository)
+        IReleaseVersionRepository releaseVersionRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _publicationRepository = publicationRepository;
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
     }
 
     public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetSummary(Guid publicationId)
@@ -82,7 +82,7 @@ public class PublicationService : IPublicationService
                 }
 
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-                var publishedReleases = await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                var publishedReleases = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
                 return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
             });
     }
@@ -275,7 +275,7 @@ public class PublicationService : IPublicationService
         var latestReleaseHasData =
             latestPublishedReleaseVersionId.HasValue && await HasAnyDataFiles(latestPublishedReleaseVersionId.Value);
 
-        var publishedReleaseVersionIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
+        var publishedReleaseVersionIds = await _releaseVersionRepository.ListLatestPublishedReleaseVersionIds(publication.Id);
         var anyLiveReleaseHasData = await publishedReleaseVersionIds
             .ToAsyncEnumerable()
             .AnyAwaitAsync(async id => await HasAnyDataFiles(id));

@@ -77,10 +77,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync((ReleaseVersion?) null);
 
@@ -88,13 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
-            var service = BuildService(releaseRepository: releaseRepository.Object,
+            var service = BuildService(releaseVersionRepository: releaseVersionRepository.Object,
                 subjectRepository: subjectRepository.Object);
 
             var result = await service.CreatePermalink(request);
 
             MockUtils.VerifyAllMocks(
-                releaseRepository,
+                releaseVersionRepository,
                 subjectRepository);
 
             result.AssertNotFound();
@@ -348,9 +348,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(csvMeta);
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
                 .ReturnsAsync(releaseVersion);
 
@@ -383,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
-                    releaseRepository: releaseRepository.Object,
+                    releaseVersionRepository: releaseVersionRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
@@ -393,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService,
-                    releaseRepository,
+                    releaseVersionRepository,
                     subjectRepository,
                     tableBuilderService);
 
@@ -1328,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             IPermalinkCsvMetaService? permalinkCsvMetaService = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IFrontendService? frontendService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             ISubjectRepository? subjectRepository = null,
             IPublicationRepository? publicationRepository = null)
         {
@@ -1342,7 +1342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 frontendService ?? Mock.Of<IFrontendService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict)
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
             );
         }
     }

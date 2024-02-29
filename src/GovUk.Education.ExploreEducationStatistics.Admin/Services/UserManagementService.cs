@@ -21,8 +21,8 @@ using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using IReleaseRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserRoleService userRoleService,
             IUserService userService,
             IUserInviteRepository userInviteRepository,
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    var releaseVersions = await _releaseRepository.ListLatestReleaseVersions();
+                    var releaseVersions = await _releaseVersionRepository.ListLatestReleaseVersions();
                     return await releaseVersions
                         .ToAsyncEnumerable()
                         .SelectAwait(async releaseVersion =>

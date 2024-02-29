@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
@@ -22,7 +23,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -834,7 +834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsDraftAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));
@@ -848,7 +848,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));
@@ -862,7 +862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new MarkReleaseAsApprovedAuthorizationHandler(
                 releasePublishingStatusRepository,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     userReleaseRoleRepository,
                     userPublicationRoleRepository,
                     Mock.Of<IPreReleaseService>(Strict)));

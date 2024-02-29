@@ -9,18 +9,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Auth
     public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : AuthorizationHandler<
         ViewSubjectDataRequirement, ReleaseSubject>
     {
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(IReleaseRepository releaseRepository)
+        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(IReleaseVersionRepository releaseVersionRepository)
         {
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
             ViewSubjectDataRequirement requirement,
             ReleaseSubject releaseSubject)
         {
-            if (await _releaseRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseVersionId))
+            if (await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseSubject.ReleaseVersionId))
             {
                 authContext.Succeed(requirement);
             }

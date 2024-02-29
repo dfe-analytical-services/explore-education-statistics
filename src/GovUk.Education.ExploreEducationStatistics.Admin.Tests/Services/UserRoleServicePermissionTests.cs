@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using Xunit;
@@ -20,7 +21,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminM
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserPublicationRoleRepository? userPublicationRoleRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
@@ -260,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
                 userService ?? Mock.Of<IUserService>(),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
                 userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),

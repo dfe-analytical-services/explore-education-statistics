@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseFileRepository _releaseFileRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
@@ -38,14 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileRepository releaseFileRepository,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserService userService,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _releaseFileRepository = releaseFileRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userService = userService;
             _mapper = mapper;
         }
@@ -60,12 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     // If no release is requested get the latest published release version
                     if (releaseSlug == null)
                     {
-                        return await _releaseRepository.GetLatestPublishedReleaseVersion(publication.Id)
+                        return await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id)
                             .OrNotFound();
                     }
 
                     // Otherwise get the latest published version of the requested release
-                    return await _releaseRepository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug)
+                    return await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publication.Id, releaseSlug)
                         .OrNotFound();
                 })
                 .OnSuccess(releaseVersion => GetRelease(releaseVersion.Id));
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             // If the view model has no mapped published date because it's not published, set a date
             // based on what we expect it to be when publishing completes
-            releaseViewModel.Published ??= await _releaseRepository.GetPublishedDate(releaseVersion.Id,
+            releaseViewModel.Published ??= await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id,
                 expectedPublishDate ?? DateTime.UtcNow);
 
             return releaseViewModel;
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(async publication =>
                 {
                     var publishedReleaseVersions =
-                        await _releaseRepository.ListLatestPublishedReleaseVersions(publication.Id);
+                        await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
                     return publishedReleaseVersions
                         .Select(releaseVersion => new ReleaseSummaryViewModel(releaseVersion,
                             latestPublishedRelease: releaseVersion.Id == publication.LatestPublishedReleaseVersionId))

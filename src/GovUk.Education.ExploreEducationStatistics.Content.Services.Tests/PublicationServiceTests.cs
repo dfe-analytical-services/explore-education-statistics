@@ -2007,7 +2007,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null)
+            IReleaseVersionRepository? releaseVersionRepository = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
@@ -2015,7 +2015,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext)
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext)
             );
         }
     }

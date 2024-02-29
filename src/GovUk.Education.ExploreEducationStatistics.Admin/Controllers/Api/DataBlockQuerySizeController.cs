@@ -40,22 +40,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IFilterItemRepository _filterItemRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public DataBlockQuerySizeController(ContentDbContext contentDbContext,
             IFilterItemRepository filterItemRepository,
-            IReleaseRepository releaseRepository)
+            IReleaseVersionRepository releaseVersionRepository)
         {
             _contentDbContext = contentDbContext;
             _filterItemRepository = filterItemRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         [HttpGet("api/data-blocks/query-size-report")]
         [Authorize(Roles = RoleNames.BauUser)]
         public async Task<ActionResult<List<DataBlockQuerySizeReport>>> QuerySizeReport()
         {
-            var publishedReleaseVersionIds = await _releaseRepository.ListLatestPublishedReleaseVersionIds();
+            var publishedReleaseVersionIds = await _releaseVersionRepository.ListLatestPublishedReleaseVersionIds();
 
             var publishedDataBlocks = await _contentDbContext
                 .ContentBlocks

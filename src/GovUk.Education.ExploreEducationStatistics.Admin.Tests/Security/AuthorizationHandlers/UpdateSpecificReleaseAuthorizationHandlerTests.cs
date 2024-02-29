@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 using Xunit;
@@ -20,7 +21,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 return new UpdateSpecificReleaseAuthorizationHandler(
                     new AuthorizationHandlerService(
-                        new ReleaseRepository(contentDbContext),
+                        new ReleaseVersionRepository(contentDbContext),
                         new UserReleaseRoleRepository(contentDbContext),
                         new UserPublicationRoleRepository(contentDbContext),
                         Mock.Of<IPreReleaseService>(Strict)));

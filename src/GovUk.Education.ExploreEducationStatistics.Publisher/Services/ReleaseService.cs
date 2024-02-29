@@ -16,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public ReleaseService(ContentDbContext contentDbContext,
-            IReleaseRepository releaseRepository)
+            IReleaseVersionRepository releaseVersionRepository)
         {
             _contentDbContext = contentDbContext;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         public async Task<ReleaseVersion> Get(Guid releaseVersionId)
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             _contentDbContext.ReleaseVersions.Update(releaseVersion);
             releaseVersion.Published =
-                await _releaseRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
+                await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
 
             await UpdatePublishedDataBlockVersions(releaseVersion);
 

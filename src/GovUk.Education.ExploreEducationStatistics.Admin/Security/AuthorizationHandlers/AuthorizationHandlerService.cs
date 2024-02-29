@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using IReleaseRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -35,18 +35,18 @@ public class AuthorizationHandlerService
             .Append(ReleaseRole.Approver)
             .ToList();
 
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
     private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
     private readonly IPreReleaseService _preReleaseService;
 
     public AuthorizationHandlerService(
-        IReleaseRepository releaseRepository,
+        IReleaseVersionRepository releaseVersionRepository,
         IUserReleaseRoleRepository userReleaseRoleRepository,
         IUserPublicationRoleRepository userPublicationRoleRepository,
         IPreReleaseService preReleaseService)
     {
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
         _userReleaseRoleRepository = userReleaseRoleRepository;
         _userPublicationRoleRepository = userPublicationRoleRepository;
         _preReleaseService = preReleaseService;
@@ -180,6 +180,6 @@ public class AuthorizationHandlerService
         }
 
         // If the release version is public, anyone can see it.
-        return await _releaseRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id);
+        return await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersion.Id);
     }
 }

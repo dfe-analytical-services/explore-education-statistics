@@ -18,7 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseInviteService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserRepository userRepository,
             IUserService userService,
             IUserRoleService userRoleService,
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userRepository = userRepository;
             _userService = userService;
             _userRoleService = userRoleService;
@@ -183,15 +183,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> ValidateReleaseVersionIds(Guid publicationId,
             List<Guid> releaseVersionIds)
         {
-            var distinctReleaseIds = releaseVersionIds.Distinct().ToList();
-            if (distinctReleaseIds.Count != releaseVersionIds.Count)
+            var distinctReleaseVersionIds = releaseVersionIds.Distinct().ToList();
+            if (distinctReleaseVersionIds.Count != releaseVersionIds.Count)
             {
                 throw new ArgumentException($"{nameof(releaseVersionIds)} should not contain duplicates",
                     nameof(releaseVersionIds));
             }
 
-            var publicationReleaseIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
-            if (!releaseVersionIds.All(publicationReleaseIds.Contains))
+            var publicationReleaseVersionIds = await _releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
+            if (!releaseVersionIds.All(publicationReleaseVersionIds.Contains))
             {
                 return ValidationActionResult(NotAllReleasesBelongToPublication);
             }
