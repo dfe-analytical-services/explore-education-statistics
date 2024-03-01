@@ -82,7 +82,7 @@ async function startServer() {
   }
 
   // Redirect URLs with trailing slash to equivalent without slash with 301
-  server.use((req, res, nextNotShadowed) => {
+  server.use((req, res, nextFunc) => {
     let newUri = req.url;
     newUri = replaceLastOccurance(newUri, '/', '');
     newUri = replaceLastOccurance(newUri, '/meta-guidance', '/data-guidance');
@@ -95,7 +95,7 @@ async function startServer() {
     if (newUri !== req.url && newUri !== '') {
       return res.redirect(301, newUri);
     }
-    nextNotShadowed();
+    nextFunc();
     return undefined;
   });
 
