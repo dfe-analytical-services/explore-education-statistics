@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
