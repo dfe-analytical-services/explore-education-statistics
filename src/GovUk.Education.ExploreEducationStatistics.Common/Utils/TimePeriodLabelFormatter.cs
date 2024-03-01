@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodYearFormat;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 {
     public class TimePeriodLabelFormatter
     {

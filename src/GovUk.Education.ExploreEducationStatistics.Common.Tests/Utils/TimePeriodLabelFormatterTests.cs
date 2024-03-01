@@ -2,10 +2,10 @@ using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.TimePeriodLabelFormatter;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 {
     public class TimePeriodLabelFormatterTests
     {
