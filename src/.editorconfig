@@ -11,18 +11,6 @@ charset = utf-8
 indent_style = space
 indent_size = 2
 
-# XML project files
-[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
-indent_size = 2
-
-# XML config files
-[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
-indent_size = 2
-
-# Code files
-[*.{cs,csx,vb,vbx}]
-indent_size = 4
-
 [*.{cs,vb}]
 ################################################################
 # .NET / C# Whitespace preferences                             #
@@ -32,9 +20,8 @@ indent_size = 4
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 
 # Indentation & spacing
-indent_style = space
-tab_width = 4
 indent_size = 4
+tab_width = 4
 
 # Indentation preferences
 csharp_indent_case_contents = true
@@ -105,9 +92,9 @@ csharp_style_prefer_primary_constructors = true:suggestion
 
 # Expression-bodied members
 ## IDE0021 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0021)
-csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:silent
 ## IDE0022 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0022)
-csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:silent
 ## IDE0023 & IDE0024 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0023-ide0024)
 csharp_style_expression_bodied_operators = when_on_single_line:suggestion
 ## IDE0025 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0025)
@@ -263,9 +250,3 @@ csharp_style_var_elsewhere = true:warning
 ################################################################
 
 ## If we want to enforce anything about naming style of interfaces, classes, vars etc. e.g. camelCase or snake_case, we should do it here.
-
-################################################################
-# Python / robot preferences                                   #
-################################################################
-[*.{py,robot}]
-indent_size = 4
