@@ -23,7 +23,7 @@ const PublicationLegacyReleaseEditPage = ({
   );
 
   let itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
-  if (isLoading || releaseSeries === undefined || itemIndex === undefined || itemIndex === -1) {
+  if (isLoading || releaseSeries === undefined || itemIndex === undefined || itemIndex === -1) { // @MarkFix
     return <LoadingSpinner />;
   }
 

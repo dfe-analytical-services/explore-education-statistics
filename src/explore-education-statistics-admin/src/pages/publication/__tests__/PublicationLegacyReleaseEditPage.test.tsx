@@ -5,35 +5,55 @@ import {
   PublicationEditLegacyReleaseRouteParams,
   publicationEditLegacyReleaseRoute,
 } from '@admin/routes/publicationRoutes';
-import _legacyReleaseService, {
-  LegacyRelease,
-} from '@admin/services/legacyReleaseService';
-import { PublicationWithPermissions } from '@admin/services/publicationService';
+import _publicationService, {
+  PublicationWithPermissions,
+} from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
+import { ReleaseSeriesItem } from '@admin/services/legacyReleaseService';
 
-jest.mock('@admin/services/legacyReleaseService');
-const legacyReleaseService = _legacyReleaseService as jest.Mocked<
-  typeof _legacyReleaseService
+jest.mock('@admin/services/publicationService');
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
 describe('PublicationLegacyReleaseEditPage', () => {
-  const testLegacyRelease: LegacyRelease = {
-    description: 'Legacy release 1',
-    id: 'legacy-release-1',
-    url: 'http://gov.uk/1',
-  };
+  const releaseSeries: ReleaseSeriesItem[] = [
+    {
+      id: 'legacy-release-1',
+      isLegacyLink: true,
+      description: 'Legacy release 1',
+
+      legacyLinkUrl: 'https://gov.uk/1',
+    },
+    {
+      id: 'release-1',
+      isLegacyLink: false,
+      description: 'Academic Year 2000/01',
+
+      releaseParentId: 'release-parent-1',
+      publicationSlug: 'publication-slug',
+      releaseSlug: 'release-slug',
+    },
+    {
+      id: 'legacy-release-2',
+      isLegacyLink: true,
+      description: 'Legacy release 2',
+
+      legacyLinkUrl: 'https://gov.uk/2',
+    },
+  ];
 
   beforeEach(() => {
-    legacyReleaseService.getLegacyRelease.mockResolvedValue(testLegacyRelease);
+    publicationService.getReleaseSeriesView.mockResolvedValue(releaseSeries);
   });
 
   test('renders the edit legacy release page', async () => {
-    renderPage(testPublication);
+    renderPage(testPublication, 'legacy-release-1');
 
     await waitFor(() => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
@@ -41,7 +61,7 @@ describe('PublicationLegacyReleaseEditPage', () => {
     expect(screen.getByLabelText('Description')).toHaveValue(
       'Legacy release 1',
     );
-    expect(screen.getByLabelText('URL')).toHaveValue('http://gov.uk/1');
+    expect(screen.getByLabelText('URL')).toHaveValue('https://gov.uk/1');
     expect(
       screen.getByRole('button', { name: 'Save legacy release' }),
     ).toBeInTheDocument();
@@ -52,7 +72,7 @@ describe('PublicationLegacyReleaseEditPage', () => {
   });
 
   test('handles successfully submitting the form', async () => {
-    renderPage(testPublication);
+    renderPage(testPublication, 'legacy-release-1');
     await waitFor(() => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
     });
@@ -66,19 +86,38 @@ describe('PublicationLegacyReleaseEditPage', () => {
     );
 
     await waitFor(() => {
-      expect(legacyReleaseService.updateLegacyRelease).toHaveBeenCalledWith(
-        'legacy-1',
-        {
-          description: 'Legacy release 1 edited',
-          publicationId: 'publication-1',
-          url: 'http://gov.uk/1/edit',
-        },
+      expect(publicationService.updateReleaseSeriesView).toHaveBeenCalledWith(
+        'publication-1',
+        [
+          {
+            id: 'legacy-release-1',
+
+            legacyLinkDescription: 'Legacy release 1 edited',
+            legacyLinkUrl: 'https://gov.uk/1/edit',
+          },
+          {
+            id: 'release-1',
+
+            releaseParentId: 'release-parent-1',
+          },
+          {
+            id: 'legacy-release-2',
+
+            legacyLinkDescription: 'Legacy release 2',
+            legacyLinkUrl: 'https://gov.uk/2',
+          },
+        ],
       );
     });
   });
 });
 
-function renderPage(publication: PublicationWithPermissions) {
+// @MarkFix more tests
+
+function renderPage(
+  publication: PublicationWithPermissions,
+  legacyReleaseId: string,
+) {
   render(
     <MemoryRouter
       initialEntries={[
@@ -86,7 +125,7 @@ function renderPage(publication: PublicationWithPermissions) {
           publicationEditLegacyReleaseRoute.path,
           {
             publicationId: publication.id,
-            legacyReleaseId: 'legacy-1',
+            legacyReleaseId: legacyReleaseId,
           },
         ),
       ]}

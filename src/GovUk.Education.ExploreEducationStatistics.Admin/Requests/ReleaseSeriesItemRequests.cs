@@ -12,7 +12,7 @@ public class ReleaseSeriesLegacyLinkAddRequest
 
 public class ReleaseSeriesItemUpdateRequest
 {
-    public Guid Id { get; set; } // @MarkFix do we really want this?
+    public Guid Id { get; set; }
     public Guid? ReleaseParentId { get; set; }
 
     public string? LegacyLinkDescription { get; set; }
