@@ -33,6 +33,12 @@ public interface IReleaseRepository
         string releaseSlug,
         CancellationToken cancellationToken = default);
 
+    // @MarkFix <summary> etc.
+    Task<Release?> GetLatestReleaseVersionForParent(
+        Guid publicationId,
+        Guid releaseParentId,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Retrieves the latest version from all releases in reverse chronological order that are associated with a publication.
     /// </summary>

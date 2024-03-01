@@ -455,27 +455,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async publication =>
                 {
                     var result = new List<ReleaseSeriesItemViewModel>();
-                    foreach (var releaseSeriesItem in publication.ReleaseSeriesView)
+                    foreach (var seriesItem in publication.ReleaseSeriesView)
                     {
-                        if (releaseSeriesItem.ReleaseParentId != null)
+                        if (seriesItem.ReleaseParentId != null)
                         {
                             // @MarkFix on public, we'll want to filter out non-live release parents
-                            var latestReleaseVersion = await _releaseRepository
-                                .GetLatestReleaseVersion(publication.Id);
+                            var latestParentVersion = await _releaseRepository
+                                .GetLatestReleaseVersionForParent(
+                                    publication.Id, seriesItem.ReleaseParentId.Value);
 
-                            if (latestReleaseVersion == null)
+                            if (latestParentVersion == null)
                             {
                                 throw new InvalidDataException("ReleaseSeriesItem with ReleaseParentId set should have an associated LatestReleaseVersion"); // @MarkFix improve message
                             }
 
                             result.Add(new ReleaseSeriesItemViewModel
                                 {
-                                    Id = releaseSeriesItem.Id,
+                                    Id = seriesItem.Id,
                                     IsLegacyLink = false,
-                                    Description = latestReleaseVersion.Title,
-                                    ReleaseParentId = latestReleaseVersion.ReleaseParentId,
+                                    Description = latestParentVersion.Title,
+                                    ReleaseParentId = latestParentVersion.ReleaseParentId,
                                     PublicationSlug = publication.Slug,
-                                    ReleaseSlug = latestReleaseVersion.Slug,
+                                    ReleaseSlug = latestParentVersion.Slug,
                                 });
 
                         }
@@ -483,13 +484,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
 
                             // @MarkFix check all prod legacy link descriptions/urls are not null/empty
-                            if (releaseSeriesItem.LegacyLinkDescription == null)
+                            if (seriesItem.LegacyLinkDescription == null)
                             {
                                 throw new InvalidDataException(
                                     "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkDescription should be set"); // @MarkFix improve message?
                             }
 
-                            if (releaseSeriesItem.LegacyLinkUrl == null)
+                            if (seriesItem.LegacyLinkUrl == null)
                             {
                                 throw new InvalidDataException(
                                     "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkUrl should be set"); // @MarkFix improve message?
@@ -497,10 +498,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                             result.Add(new ReleaseSeriesItemViewModel
                             {
-                                Id = releaseSeriesItem.Id,
+                                Id = seriesItem.Id,
                                 IsLegacyLink = true,
-                                Description = releaseSeriesItem.LegacyLinkDescription,
-                                LegacyLinkUrl = releaseSeriesItem.LegacyLinkUrl,
+                                Description = seriesItem.LegacyLinkDescription,
+                                LegacyLinkUrl = seriesItem.LegacyLinkUrl,
                             });
                         }
                     }
@@ -543,8 +544,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
-                    // @MarkFix check updatedReleaseSeriesItems are legal - i.e. contain all latest release versions
-                    // and whatever else
+                    // @MarkFix check updatedReleaseSeriesItems contains sole copy of each releaseParent with correct id
+                    // @MarkFix check each item has nothing else is set when ReleaseParentId is set
 
                     var newReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
