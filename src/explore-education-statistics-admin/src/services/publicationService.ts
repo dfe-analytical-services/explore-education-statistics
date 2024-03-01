@@ -2,6 +2,7 @@ import {
   LegacyRelease,
   UpdateReleaseSeriesItem,
   ReleaseSeriesItem,
+  ReleaseSeriesLegacyLinkAddRequest,
 } from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
@@ -203,6 +204,16 @@ const publicationService = {
 
   getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
     return client.get(`/publications/${publicationId}/release-series-view`);
+  },
+
+  addReleaseSeriesLegacyLink(
+    publicationId: string,
+    newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
+  ): Promise<ReleaseSeriesItem[]> {
+    return client.post(
+      `publications/${publicationId}/release-series-view`,
+      newLegacyLink,
+    );
   },
 
   updateReleaseSeriesView(

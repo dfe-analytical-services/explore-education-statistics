@@ -11,6 +11,7 @@ public record ReleaseSeriesItemViewModel
     public string Description { get; set; } = string.Empty;
 
     // used by EES release series item
+    public Guid? ReleaseParentId { get; set; }
     public string? PublicationSlug { get; set; }
     public string? ReleaseSlug { get; set; }
 

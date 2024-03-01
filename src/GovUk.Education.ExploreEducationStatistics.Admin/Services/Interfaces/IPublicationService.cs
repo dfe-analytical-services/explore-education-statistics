@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
@@ -55,7 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(
             Guid publicationId);
-        
+
+        Task<Either<ActionResult, List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink(
+            Guid publicationId,
+            ReleaseSeriesLegacyLinkAddRequest newLegacyLink);
+
         Task<Either<ActionResult, List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
            Guid publicationId,
            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems);

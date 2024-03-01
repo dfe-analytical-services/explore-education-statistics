@@ -202,7 +202,7 @@ const LegacyReleasesTable = ({
                                 title="Edit legacy release"
                                 triggerButton={
                                   <ButtonText>
-                                    Edit
+                                    Edit{/* @MarkFix editing is broken */}
                                     <VisuallyHidden>
                                       {` ${seriesItem.description}`}
                                     </VisuallyHidden>
@@ -237,15 +237,25 @@ const LegacyReleasesTable = ({
                                   </ButtonText>
                                 }
                                 onConfirm={async () => {
-                                  await legacyReleaseService.deleteLegacyRelease(
-                                    seriesItem?.id,
-                                  );
-
                                   const nextReleaseSeries =
                                     releaseSeries.filter(
-                                      legacyRelease =>
-                                        legacyRelease.id !== seriesItem.id,
+                                      item => item.id !== seriesItem.id,
                                     );
+                                  await publicationService.updateReleaseSeriesView(
+                                    publicationId,
+                                    nextReleaseSeries.map(seriesItem => ({ // @MarkFix abstract this mapping out?
+                                      id: seriesItem.id,
+                                      releaseParentId: !seriesItem.isLegacyLink
+                                        ? seriesItem.releaseParentId
+                                        : undefined,
+                                      legacyLinkDescription: seriesItem.isLegacyLink
+                                        ? seriesItem.description
+                                        : undefined,
+                                      legacyLinkUrl: seriesItem.isLegacyLink
+                                        ? seriesItem.legacyLinkUrl
+                                        : undefined,
+                                    })),
+                                  );
                                   setReleaseSeries(nextReleaseSeries);
                                 }}
                               >
@@ -279,7 +289,18 @@ const LegacyReleasesTable = ({
             onClick={async () => {
               await publicationService.updateReleaseSeriesView(
                 publicationId,
-                releaseSeries,
+                releaseSeries.map(seriesItem => ({
+                  id: seriesItem.id,
+                  releaseParentId: !seriesItem.isLegacyLink
+                    ? seriesItem.releaseParentId
+                    : undefined,
+                  legacyLinkDescription: seriesItem.isLegacyLink
+                    ? seriesItem.description
+                    : undefined,
+                  legacyLinkUrl: seriesItem.isLegacyLink
+                    ? seriesItem.legacyLinkUrl
+                    : undefined,
+                })),
               );
 
               toggleReordering.off();

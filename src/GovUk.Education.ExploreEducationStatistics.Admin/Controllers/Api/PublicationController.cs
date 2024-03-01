@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -135,6 +136,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _publicationService
                 .GetReleaseSeriesView(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("api/publications/{publicationId:guid}/release-series-view")]
+        public async Task<ActionResult<List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink(
+            Guid publicationId,
+            ReleaseSeriesLegacyLinkAddRequest request)
+        {
+            return await _publicationService
+                .AddReleaseSeriesLegacyLink(publicationId, request)
                 .HandleFailuresOrOk();
         }
 

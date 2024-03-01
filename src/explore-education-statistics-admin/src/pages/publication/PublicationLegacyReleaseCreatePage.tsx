@@ -2,14 +2,12 @@ import Link from '@admin/components/Link';
 import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import { publicationLegacyReleasesRoute } from '@admin/routes/publicationRoutes';
-import legacyReleaseService, {
-  ReleaseSeriesItem,
-} from '@admin/services/legacyReleaseService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
+import publicationService from "@admin/services/publicationService";
 
 const PublicationLegacyReleaseCreatePage = () => {
-  const { publicationId } = usePublicationContext();
+  const { publicationId, publication } = usePublicationContext();
   const history = useHistory();
 
   const publicationEditPath = generatePath(
@@ -29,11 +27,10 @@ const PublicationLegacyReleaseCreatePage = () => {
           </Link>
         }
         onSubmit={async values => {
-          await legacyReleaseService.createLegacyRelease({
-            // @MarkFix what to do?
+          // @MarkFix maybe we want to fetch the ReleaseSeries from frontend context and just use UpdateReleaseSeries instead?
+          await publicationService.addReleaseSeriesLegacyLink(publicationId, {
             description: values.description,
             url: values.url,
-            publicationId,
           });
 
           history.push(publicationEditPath);

@@ -41,10 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly ILegacyReleaseService _legacyReleaseService;
+        private readonly ILegacyReleaseService _legacyReleaseService; // @MarkFix
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
+        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService; // @MarkFix
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IRedirectsCacheService _redirectsCacheService;
 
@@ -473,6 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Id = releaseSeriesItem.Id,
                                     IsLegacyLink = false,
                                     Description = latestReleaseVersion.Title,
+                                    ReleaseParentId = latestReleaseVersion.ReleaseParentId,
                                     PublicationSlug = publication.Slug,
                                     ReleaseSlug = latestReleaseVersion.Slug,
                                 });
@@ -505,6 +506,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     return result;
+                });
+        }
+
+        // @MarkFix this needs tests
+        public async Task<Either<ActionResult, List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink( // @MarkFix should return view models?
+            Guid publicationId,
+            ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
+        {
+            return await _context.Publications
+                .FirstOrNotFoundAsync(p => p.Id == publicationId)
+                .OnSuccess(_userService.CheckCanManageLegacyReleases)
+                .OnSuccess(async publication =>
+                {
+                    publication.ReleaseSeriesView.Add(new ReleaseSeriesItem
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseParentId = null,
+                        LegacyLinkDescription = newLegacyLink.Description,
+                        LegacyLinkUrl = newLegacyLink.Url,
+                    });
+
+                    _context.Publications.Update(publication);
+                    await _context.SaveChangesAsync();
+
+                    return publication.ReleaseSeriesView;
                 });
         }
 

@@ -6,11 +6,12 @@ export interface LegacyRelease {
   url: string;
 }
 
-export interface ReleaseSeriesItem {
+export interface ReleaseSeriesItem { // @MarkFix move to publicationService.ts
   id: string;
   isLegacyLink: boolean;
   description: string;
 
+  releaseParentId?: string;
   publicationSlug?: string;
   releaseSlug?: string;
 
@@ -29,8 +30,15 @@ export interface UpdateLegacyRelease { // @MarkFix remove
   publicationId: string;
 }
 
-export interface UpdateReleaseSeriesItem {
+export interface ReleaseSeriesLegacyLinkAddRequest {
+  description: string;
+  url: string;
+}
+
+export interface UpdateReleaseSeriesItem { // @MarkFix move to publicationService.ts
   // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
+  id: string;
+
   releaseParentId?: string;
 
   legacyLinkDescription?: string;
