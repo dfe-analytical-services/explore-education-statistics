@@ -1,8 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
-using System.Text.RegularExpressions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Tests;
 
 public class TimePeriodFormatterTests
 {

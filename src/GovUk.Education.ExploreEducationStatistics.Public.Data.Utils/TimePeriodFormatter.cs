@@ -1,8 +1,8 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 public static partial class TimePeriodFormatter
 {
