@@ -69,17 +69,19 @@ jobs:
         displayName: 'Verify Formatting and Style'
         inputs:
           command: 'custom'
+          custom: 'format style'
           ## TODO: Remove "--severity error" once style formatter has been run across project
-          custom: 'format style src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
-          arguments: '--verify-no-changes --verbosity diagnostic'
+          arguments: '--verify-no-changes --verbosity diagnostic --severity error'
+          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
 
       - task: DotNetCoreCLI@2
         displayName: 'Verify Formatting and Style'
         inputs:
           command: 'custom'
+          custom: 'format analyzers'
           ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-          custom: 'format analyzers src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
-          arguments: '--verify-no-changes --verbosity diagnostic'
+          arguments: '--verify-no-changes --verbosity diagnostic --severity error'
+          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
 
       # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
 
