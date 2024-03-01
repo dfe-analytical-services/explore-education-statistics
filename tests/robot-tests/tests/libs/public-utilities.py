@@ -24,23 +24,6 @@ def cookie_should_have_value(name, value):
     raise_assertion_error(f"Couldn't find cookie {name} with value {value}")
 
 
-def browser_should_be_at_address(expected):
-    actual = sl().driver.current_url
-
-    if actual != expected:
-        raise_assertion_error(f"Browser is at address {actual} but was expected to be at {expected}")
-
-
-def browser_navigates(direction):
-    if direction == "back":
-        sl().driver.back()
-        return
-    if direction == "forward":
-        sl().driver.forward()
-        return
-    raise_assertion_error(f"Browser navigation direction must be 'back' or 'forward'. Received {direction}")
-
-
 def cookie_names_should_be_on_page():
     cookies = sl().driver.get_cookies()
     for cookie in cookies:
