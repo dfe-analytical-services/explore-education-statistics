@@ -491,15 +491,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Year")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSetVersionId", "Code", "Year")
+                    b.HasIndex("DataSetVersionId", "Code", "Period")
                         .IsUnique();
 
                     b.ToTable("TimePeriodMetas");
@@ -1127,8 +1128,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.Property<int>("Year")
-                                                .HasColumnType("integer");
+                                            b3.Property<string>("Period")
+                                                .IsRequired()
+                                                .HasColumnType("text");
 
                                             b3.HasKey("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId");
 
@@ -1147,8 +1149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.Property<int>("Year")
-                                                .HasColumnType("integer");
+                                            b3.Property<string>("Period")
+                                                .IsRequired()
+                                                .HasColumnType("text");
 
                                             b3.HasKey("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId");
 
@@ -1169,7 +1172,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                 .IsRequired();
                         });
 
-                    b.Navigation("MetaSummary");
+                    b.Navigation("MetaSummary")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>

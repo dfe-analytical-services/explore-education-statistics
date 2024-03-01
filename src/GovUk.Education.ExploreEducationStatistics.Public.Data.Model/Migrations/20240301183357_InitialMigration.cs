@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
                     TotalResults = table.Column<long>(type: "bigint", nullable: false),
-                    MetaSummary = table.Column<string>(type: "jsonb", nullable: true),
+                    MetaSummary = table.Column<string>(type: "jsonb", nullable: false),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Code = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Period = table.Column<string>(type: "text", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -451,9 +451,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "Urn");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TimePeriodMetas_DataSetVersionId_Code_Year",
+                name: "IX_TimePeriodMetas_DataSetVersionId_Code_Period",
                 table: "TimePeriodMetas",
-                columns: new[] { "DataSetVersionId", "Code", "Year" },
+                columns: new[] { "DataSetVersionId", "Code", "Period" },
                 unique: true);
 
             migrationBuilder.AddForeignKey(

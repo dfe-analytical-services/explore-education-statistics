@@ -538,13 +538,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.LatestVersion.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 result.LatestVersion.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.LatestVersion.GeographicLevels);

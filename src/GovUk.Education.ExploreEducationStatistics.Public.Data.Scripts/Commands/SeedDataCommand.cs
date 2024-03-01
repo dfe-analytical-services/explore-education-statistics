@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -266,11 +267,11 @@ public class SeedDataCommand : ICommand
         {
             var totalResults = await _duckDb.QuerySingleAsync<int>($"SELECT COUNT(*) FROM '{_dataFilePath}'");
 
-            var timePeriods = (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
+            var timePeriods = (await _duckDb.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
                          SELECT DISTINCT time_period, time_identifier
-                         FROM '{_dataFilePath}'
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
                          ORDER BY time_period
                          """,
                         cancellationToken: _cancellationToken
@@ -278,12 +279,12 @@ public class SeedDataCommand : ICommand
                 ))
                 .Select(
                     row => (
-                        Year: row.TimePeriod,
-                        TimeIdentifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
+                        Period: TimePeriodFormatter.FormatFromCsv(row.TimePeriod),
+                        Identifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
                     )
                 )
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
+                .OrderBy(tuple => tuple.Period)
+                .ThenBy(tuple => tuple.Identifier)
                 .ToList();
 
             var dataSetVersion = new DataSetVersion
@@ -303,13 +304,13 @@ public class SeedDataCommand : ICommand
                     {
                         Start = new TimePeriodRangeBound
                         {
-                            Year = timePeriods[0].Year,
-                            Code = timePeriods[0].TimeIdentifier
+                            Period = timePeriods[0].Period,
+                            Code = timePeriods[0].Identifier
                         },
                         End = new TimePeriodRangeBound
                         {
-                            Year = timePeriods[^1].Year,
-                            Code = timePeriods[^1].TimeIdentifier
+                            Period = timePeriods[^1].Period,
+                            Code = timePeriods[^1].Identifier
                         },
                     },
                     Filters = metaFileRows
@@ -652,11 +653,11 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateTimePeriodMeta()
         {
-            var metas = (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
+            var metas = (await _duckDb.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
                          SELECT DISTINCT time_period, time_identifier
-                         FROM '{_dataFilePath}'
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
                          ORDER BY time_period
                          """,
                         cancellationToken: _cancellationToken
@@ -666,11 +667,11 @@ public class SeedDataCommand : ICommand
                     tuple => new TimePeriodMeta
                     {
                         DataSetVersionId = _seed.DataSetVersionId,
-                        Year = tuple.TimePeriod,
+                        Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
                         Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
                     }
                 )
-                .OrderBy(meta => meta.Year)
+                .OrderBy(meta => meta.Period)
                 .ThenBy(meta => meta.Code)
                 .ToList();
 
