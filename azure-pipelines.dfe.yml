@@ -56,6 +56,33 @@ jobs:
           projects: '**/GovUk.*/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
+      # TODO: Uncomment this step once formatter has been run globally.
+      # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
+      # - task: DotNetCoreCLI@2
+      #     displayName: 'Verify Formatting and Style'
+      #     inputs:
+      #     command: 'custom'
+      #     custom: 'format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
+      #     arguments: '--verify-no-changes --verbosity diagnostic'
+
+      - task: DotNetCoreCLI@2
+          displayName: 'Verify Formatting and Style'
+          inputs:
+          command: 'custom'
+          ## TODO: Remove "--severity error" once style formatter has been run across project
+          custom: 'format style src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
+          arguments: '--verify-no-changes --verbosity diagnostic'
+
+      - task: DotNetCoreCLI@2
+          displayName: 'Verify Formatting and Style'
+          inputs:
+          command: 'custom'
+          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
+          custom: 'format analyzers src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
+          arguments: '--verify-no-changes --verbosity diagnostic'
+
+      # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
         inputs:
