@@ -750,10 +750,14 @@ public class SeedDataCommand : ICommand
                 ..version.FilterMetas.Select(
                     filter => $"""
                                LEFT JOIN {FiltersDuckDbTable} AS "{filter.PublicId}"
-                               ON "{filter.PublicId}".public_id = '{filter.PublicId}'
+                               ON "{filter.PublicId}".column_name = '{filter.PublicId}'
                                AND "{filter.PublicId}".label = data_source."{filter.PublicId}"
                                """
-                )
+                ),
+                """
+                JOIN time_periods ON time_periods.period = data_source.time_period 
+                AND time_periods.identifier = data_source.time_identifier
+                """
             ];
 
             await _duckDb.ExecuteAsync(
@@ -772,8 +776,11 @@ public class SeedDataCommand : ICommand
                 )
             );
 
-            // Finish up by outputting Parquet file
+            await OutputParquetFiles();
+        }
 
+        private async Task OutputParquetFiles()
+        {
             var projectRootPath = PathUtils.ProjectRootPath;
             var parquetDir = Path.Combine(projectRootPath, "data", "public-api-parquet");
 
@@ -804,17 +811,31 @@ public class SeedDataCommand : ICommand
 
             Directory.CreateDirectory(versionDir);
 
-            var outputPath = Path.Combine(versionDir, "data.parquet");
-
             await _duckDb.ExecuteAsync(
                 new CommandDefinition(
-                    $"COPY data TO '{outputPath}' (FORMAT PARQUET, COMPRESSION ZSTD)",
+                    $"EXPORT DATABASE '{versionDir}' (FORMAT PARQUET, CODEC ZSTD)",
                     cancellationToken: _cancellationToken
                 )
             );
+
+            // Convert absolute paths in load.sql to relative paths otherwise
+            // these refer to the machine that the script was ran on.
+
+            var loadSqlFilePath = Path.Combine(versionDir, "load.sql");
+
+            var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, _cancellationToken))
+                .Select(line => line.Replace($"{versionDir}{Path.DirectorySeparatorChar}", ""));
+
+            await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
         }
 
         private async Task CreateDuckDbMetaTables(DataSetVersion version)
+        {
+            await CreateDuckDbLocationMetaTables(version);
+            await CreateDuckDbFilterMetaTable(version);
+        }
+
+        private async Task CreateDuckDbLocationMetaTables(DataSetVersion version)
         {
             foreach (var location in version.LocationMetas)
             {
@@ -822,8 +843,9 @@ public class SeedDataCommand : ICommand
 
                 string[] locationCols =
                 [
-                    "id INTEGER",
+                    "id INTEGER PRIMARY KEY",
                     "name VARCHAR",
+                    "public_id INTEGER",
                     ..GetDuckDbLocationCodeColumns(location.Level).Select(col => $"{col.Name} VARCHAR")
                 ];
 
@@ -838,13 +860,15 @@ public class SeedDataCommand : ICommand
                 using var appender = _duckDb.CreateAppender(table: locationTable);
 
                 var insertRow = appender.CreateRow();
+                var id = 1;
 
-                foreach (var link in location.OptionLinks)
+                foreach (var link in location.OptionLinks.OrderBy(l => l.Option.Label))
                 {
-                    insertRow.AppendValue(link.PublicId);
-                    insertRow.AppendValue(link.Option.Label);
-
                     var option = link.Option;
+
+                    insertRow.AppendValue(id++);
+                    insertRow.AppendValue(option.Label);
+                    insertRow.AppendValue(link.PublicId);
 
                     switch (option)
                     {
@@ -867,27 +891,34 @@ public class SeedDataCommand : ICommand
                     insertRow.EndRow();
                 }
             }
+        }
 
+        private async Task CreateDuckDbFilterMetaTable(DataSetVersion version)
+        {
             await _duckDb.ExecuteAsync(
                 $"""
-                CREATE TABLE {FiltersDuckDbTable}(
-                    id INTEGER,
-                    label VARCHAR,
-                    public_id VARCHAR
-                )
-                """
+                 CREATE TABLE {FiltersDuckDbTable}(
+                     id INTEGER PRIMARY KEY,
+                     label VARCHAR,
+                     public_id INTEGER,
+                     column_name VARCHAR
+                 )
+                 """
             );
+
+            var id = 1;
 
             foreach (var filter in version.FilterMetas)
             {
                 using var appender = _duckDb.CreateAppender(table: FiltersDuckDbTable);
 
-                foreach (var link in filter.OptionLinks)
+                foreach (var link in filter.OptionLinks.OrderBy(l => l.Option.Label))
                 {
                     var insertRow = appender.CreateRow();
 
-                    insertRow.AppendValue(link.PublicId);
+                    insertRow.AppendValue(id++);
                     insertRow.AppendValue(link.Option.Label);
+                    insertRow.AppendValue(link.PublicId);
                     insertRow.AppendValue(filter.PublicId);
 
                     insertRow.EndRow();
