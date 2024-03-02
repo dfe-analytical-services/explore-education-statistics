@@ -166,6 +166,7 @@ public class SeedDataCommand : ICommand
     private class Seeder
     {
         private const string FiltersDuckDbTable = "filters";
+        private const string TimePeriodsDuckDbTable = "time_periods";
 
         private readonly DataSetSeed _seed;
         private readonly PublicDataDbContext _dbContext;
@@ -704,8 +705,7 @@ public class SeedDataCommand : ICommand
             string[] columns =
             [
                 "id UINTEGER PRIMARY KEY",
-                "time_period VARCHAR",
-                "time_identifier VARCHAR",
+                "time_period_id INTEGER",
                 "geographic_level VARCHAR",
                 ..version.LocationMetas.Select(location => $"{GetDuckDbLocationTableName(location)}_id INTEGER"),
                 ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\" INTEGER"),
@@ -717,8 +717,7 @@ public class SeedDataCommand : ICommand
             string[] insertColumns =
             [
                 "nextval('data_seq') AS id",
-                "data_source.time_period",
-                "data_source.time_identifier",
+                "time_periods.id AS time_period_id",
                 "data_source.geographic_level",
                 ..version.LocationMetas.Select(
                     location =>
@@ -769,6 +768,8 @@ public class SeedDataCommand : ICommand
                         {insertColumns.JoinToString(",\n")}
                      FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data_source
                      {insertJoins.JoinToString('\n')}
+                     JOIN time_periods ON time_periods.period = data_source.time_period 
+                         AND time_periods.identifier = data_source.time_identifier
                      ORDER BY
                          data_source.geographic_level ASC,
                          data_source.time_period DESC
@@ -834,6 +835,7 @@ public class SeedDataCommand : ICommand
         {
             await CreateDuckDbLocationMetaTables(version);
             await CreateDuckDbFilterMetaTable(version);
+            await CreateDuckDbTimePeriodMetaTable(version);
         }
 
         private async Task CreateDuckDbLocationMetaTables(DataSetVersion version)
@@ -924,6 +926,37 @@ public class SeedDataCommand : ICommand
 
                     insertRow.EndRow();
                 }
+            }
+        }
+
+        private async Task CreateDuckDbTimePeriodMetaTable(DataSetVersion version)
+        {
+            await _duckDb.ExecuteAsync(
+                $"""
+                 CREATE TABLE {TimePeriodsDuckDbTable}(
+                     id INTEGER PRIMARY KEY,
+                     period VARCHAR,
+                     identifier VARCHAR
+                 )
+                 """
+            );
+
+            using var appender = _duckDb.CreateAppender(table: TimePeriodsDuckDbTable);
+
+            var timePeriods = version.TimePeriodMetas
+                .OrderBy(tp => tp.Period)
+                .ThenBy(tp => tp.Code);
+
+            var id = 1;
+
+            foreach (var timePeriod in timePeriods)
+            {
+                var insertRow = appender.CreateRow();
+
+                insertRow.AppendValue(id++);
+                insertRow.AppendValue(TimePeriodFormatter.FormatToCsv(timePeriod.Period));
+                insertRow.AppendValue(timePeriod.Code.GetEnumLabel());
+                insertRow.EndRow();
             }
         }
 
