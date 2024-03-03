@@ -27,24 +27,27 @@ internal class PublicationService : IPublicationService
         string? search = null)
     {
         return await GetPublishedDataSetPublicationIds()
-            .OnSuccess(async (publicationIds) =>
+            .OnSuccess(async publicationIds =>
                 await _contentApiClient.ListPublications(page, pageSize, search, publicationIds))
-            .OnSuccess((paginatedPublications) =>
+            .OnSuccess(paginatedPublications =>
             {
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
 
-                return new PublicationPaginatedListViewModel(
-                    results: results,
-                    totalResults: paginatedPublications.Paging.TotalResults,
-                    page: paginatedPublications.Paging.Page,
-                    pageSize: paginatedPublications.Paging.PageSize);
+                return new PublicationPaginatedListViewModel
+                {
+                    Results = results,
+                    Paging = new PagingViewModel(
+                        totalResults: paginatedPublications.Paging.TotalResults,
+                        page: paginatedPublications.Paging.Page,
+                        pageSize: paginatedPublications.Paging.PageSize),
+                };
             });
     }
 
     public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId)
     {
         return await CheckPublicationIsPublished(publicationId)
-            .OnSuccess(async (publicationIds) => await _contentApiClient.GetPublication(publicationId))
+            .OnSuccess(async _ => await _contentApiClient.GetPublication(publicationId))
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
                 Id  = publication.Id,
