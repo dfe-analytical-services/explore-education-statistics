@@ -268,6 +268,18 @@ public class SeedDataCommand : ICommand
         {
             var totalResults = await _duckDb.QuerySingleAsync<int>($"SELECT COUNT(*) FROM '{_dataFilePath}'");
 
+            var geographicLevels = (await _duckDb.QueryAsync<string>(
+                    new CommandDefinition(
+                        $"""
+                         SELECT DISTINCT geographic_level
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
+                         """,
+                        cancellationToken: _cancellationToken
+                    )
+                ))
+                .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
+                .ToList();
+
             var timePeriods = (await _duckDb.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
@@ -328,7 +340,12 @@ public class SeedDataCommand : ICommand
                         .OrderBy(row => row.Label)
                         .Select(row => row.Label)
                         .ToList(),
-                    GeographicLevels = ListGeographicLevels(allowedColumns)
+                    GeographicLevels = geographicLevels
+                },
+                GeographicLevelMeta = new GeographicLevelMeta
+                {
+                    DataSetVersionId = _seed.DataSetVersionId,
+                    Levels = geographicLevels
                 },
                 Published = _seed.DataSet.Published,
             };
@@ -482,9 +499,9 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateLocationMetas(IReadOnlySet<string> allowedColumns)
         {
-            var geographicLevels = ListGeographicLevels(allowedColumns);
+            var levels = ListLocationLevels(allowedColumns);
 
-            var metas = geographicLevels
+            var metas = levels
                 .Select(level => new LocationMeta
                 {
                     DataSetVersionId = _seed.DataSetVersionId,
@@ -642,7 +659,7 @@ public class SeedDataCommand : ICommand
             };
         }
 
-        private List<GeographicLevel> ListGeographicLevels(IReadOnlySet<string> allowedColumns)
+        private List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
         {
             return allowedColumns
                 .Where(col => CsvColumnsToGeographicLevel.ContainsKey(col))

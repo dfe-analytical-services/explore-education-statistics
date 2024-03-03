@@ -31,6 +31,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required DataSetVersionMetaSummary MetaSummary { get; set; }
 
+    public required GeographicLevelMeta GeographicLevelMeta { get; set; }
+
     public List<LocationMeta> LocationMetas { get; set; } = [];
 
     public List<FilterMeta> FilterMetas { get; set; } = [];
