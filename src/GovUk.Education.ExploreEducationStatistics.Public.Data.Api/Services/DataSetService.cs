@@ -50,7 +50,11 @@ internal class DataSetService : IDataSetService
             .Select(MapDataSet)
             .ToList();
 
-        return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+        return new DataSetPaginatedListViewModel
+        {
+            Results = dataSets,
+            Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
+        };
     }
 
     public async Task<Either<ActionResult, DataSetVersionViewModel>> GetVersion(
@@ -83,7 +87,11 @@ internal class DataSetService : IDataSetService
             .Select(MapDataSetVersion)
             .ToList();
 
-        return new DataSetVersionPaginatedListViewModel(dataSetVersions, totalResults, page, pageSize);
+        return new DataSetVersionPaginatedListViewModel
+        {
+            Results = dataSetVersions,
+            Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
+        };
     }
 
     private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
