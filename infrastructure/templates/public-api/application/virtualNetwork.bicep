@@ -4,8 +4,7 @@ param subscription string
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
-// Variables and created data
-var vNetName = '${subscription}-vnet-ees'
+var vNetName = '${subscription}-vnet-eesdw'
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-data-processor'
 var postgreSqlSubnetName = '${resourcePrefix}-snet-psql'
 var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-api'
@@ -15,15 +14,11 @@ var dataProcessorSubnetPrefix = '10.0.6.0/24'
 var postgreSqlSubnetPrefix = '10.0.7.0/24'
 var apiContainerAppSubnetPrefix = '10.0.8.0/24'
 
-
-//Resources 
-
 // Reference the existing VNet.
 resource vNet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
   name: vNetName
 }
 
-// Define a subnet for the Data Processor Function App.
 var dataProcessorSubnet = {
   name: dataProcessorSubnetName
   properties: {
@@ -39,7 +34,6 @@ var dataProcessorSubnet = {
   }
 }
 
-// Define a subnet for the PostgreSQL flexible database server.
 var postgreSqlSubnet = {
   name: postgreSqlSubnetName
   properties: {
@@ -54,7 +48,6 @@ var postgreSqlSubnet = {
   }
 }
 
-// Define a subnet for the API Container App.
 var apiContainerAppSubnet = {
   name: apiContainerAppSubnetName
   properties: {
@@ -85,8 +78,6 @@ resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' 
   properties: subnet.properties
 }]
 
-
-// Outputs for exported use
 @description('The fully qualified Azure resource ID of the Network.')
 output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
 

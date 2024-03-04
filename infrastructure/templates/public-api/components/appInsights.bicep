@@ -4,18 +4,14 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Specifies the Application Insights name')
 param appInsightsName string
 
-// Variables and created data
 var kind = 'web'
 var insightsName = empty(appInsightsName)
   ? '${resourcePrefix}-ai'
   : '${resourcePrefix}-ai-${appInsightsName}'
 
-
-//Resources
 resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: insightsName
   location: location
@@ -27,6 +23,4 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-
-//Output
 output applicationInsightsKey string = applicationInsights.properties.InstrumentationKey

@@ -4,7 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Get it by using Get-AzSubscription cmdlet.')
 param tenantId string
 
@@ -24,12 +23,12 @@ param enabledForTemplateDeployment bool = true
 ])
 param skuName string = 'standard'
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
+@description('The name of the Key Vault resource')
 param keyVaultName string
 
-//Resources
 resource keyvault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   name: '${resourcePrefix}-kv-${keyVaultName}'
   location: location
@@ -53,7 +52,5 @@ resource keyvault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   tags: tagValues
 }
 
-
-//Output
 output keyVaultName string = keyvault.name
 output keyVaultId string = keyvault.id

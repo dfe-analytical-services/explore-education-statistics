@@ -4,7 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Specifies the Runtime Language of the function')
 param functionAppRuntime string = 'dotnet'
 
@@ -19,25 +18,15 @@ param storageAccountConnectionString string
 @secure()
 param dbConnectionString string
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-
-// Variables and created data
-
-
-
-//---------------------------------------------------------------------------------------------------------------
-// All resources via modules
-//---------------------------------------------------------------------------------------------------------------
-
-
-//Function App Deployment
 module functionAppModule '../components/functionApp.bicep' = {
   name: '${resourcePrefix}-${functionAppName}'
   params: {

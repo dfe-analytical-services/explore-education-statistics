@@ -4,7 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Server Name for Azure Database for PostgreSQL')
 param serverName string
 
@@ -62,10 +61,9 @@ param subnetId string
 param databaseNames array
 param firewallRules array
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-// Variables and created data
 var databaseServerName = empty(serverName)
   ? '${resourcePrefix}-psql'
   : '${resourcePrefix}-psql-${serverName}'
@@ -90,7 +88,6 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   }
 }
 
-//Resources
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: databaseServerName
   location: location
@@ -135,7 +132,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
   tags: tagValues
 }
 
-//store connections string
+// Store the connections string in Key Vault and output the URI to the generated secret.
 module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   name: 'dbConnectionStringSecretDeploy'
   params: {
@@ -147,9 +144,6 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   }
 }
 
-
-
-//Outputs
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
 
