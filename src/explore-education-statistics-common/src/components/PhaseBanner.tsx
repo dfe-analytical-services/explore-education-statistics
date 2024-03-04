@@ -1,9 +1,13 @@
 import Tag from '@common/components/Tag';
 import React from 'react';
 
-const PageBanner = () => {
+interface Props {
+  url: string;
+}
+
+export default function PhaseBanner({ url }: Props) {
   return (
-    <div className="govuk-phase-banner">
+    <div className="govuk-phase-banner" role="region" aria-label="phase-banner">
       <p className="govuk-phase-banner__content">
         <Tag className="govuk-phase-banner__content__tag" strong>
           Beta
@@ -11,11 +15,7 @@ const PageBanner = () => {
 
         <span className="govuk-phase-banner__text">
           This is a new service – your{' '}
-          <a
-            href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-VQ56HAfKLpBrG0LxbfxbVdUQjVJQVdMOFlSMURGQ1kyMzRNWlpKN1NMVy4u"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={url} rel="noopener noreferrer" target="_blank">
             feedback
           </a>{' '}
           will help us to improve it.
@@ -23,6 +23,4 @@ const PageBanner = () => {
       </p>
     </div>
   );
-};
-
-export default PageBanner;
+}

@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from '@admin/components/Breadcrumbs';
-import PageBanner from '@admin/components/PageBanner';
 import PageFooter from '@admin/components/PageFooter';
 import PageHeader from '@admin/components/PageHeader';
 import PageTitle from '@admin/components/PageTitle';
+import PhaseBanner from '@common/components/PhaseBanner';
 
 type Props = {
   title: string;
@@ -35,7 +35,7 @@ const PrototypeFrontEndPage = ({
           'dfe-width-container--wide': wide,
         })}
       >
-        <PageBanner />
+        <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-VQ56HAfKLpBrG0LxbfxbVdUQjVJQVdMOFlSMURGQ1kyMzRNWlpKN1NMVy4u" />
         <Breadcrumbs
           breadcrumbs={
             isHomepage
