@@ -17,7 +17,7 @@ param containerAppImageName string
 param containerAppName string
 
 @description('Specifies the name of the container app environment.')
-param containerAppEnvName string
+param containerAppEnvironmentName string
 
 @description('Specifies the name of the log analytics workspace.')
 param containerAppLogAnalyticsName string
@@ -67,25 +67,19 @@ param dbConnectionString string
 @description('Specifies the subnet id')
 param subnetId string
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
+@description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-
-//Variables 
 var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${containerAppImageName}'
-var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvName}'
+var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvironmentName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
 var containerLogName = '${resourcePrefix}-log-${containerAppLogAnalyticsName}'
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
-
-
-//Resources 
-
-//Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: containerLogName
   location: location
@@ -97,7 +91,6 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   tags: tagValues
 }
 
-//Managed Identity
 resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: userIdentityName
   location: location
@@ -113,8 +106,7 @@ resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01
   }
 }
 
-//Container environment
-resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
   name: containerEnvName
   location: location
   properties: {
@@ -139,7 +131,6 @@ resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   tags: tagValues
 }
 
-//Container Application
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerApplicationName
   location: location
@@ -150,7 +141,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     }
   }
   properties: {
-    managedEnvironmentId: containerAppEnv.id
+    managedEnvironmentId: containerAppEnvironment.id
     configuration: {
       maxInactiveRevisions: 1
       activeRevisionsMode: 'Single'
@@ -203,8 +194,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   tags: tagValues
 }
 
-
-// Outputs for exported use
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
 output containerImage string = containerImageName
 output managedIdentityName string = managedIdentity.name

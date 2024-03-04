@@ -20,14 +20,11 @@ param skuName string = 'Basic'
 @description('Deploy a new Container Registry or use the existing registry')
 param deployRegistry bool
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-//Variables
 var registryName = replace('${resourcePrefix}cr${containerRegistryName}', '-', '')
 
-
-//Resources 
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = if (deployRegistry) {
   name: registryName
   location: location
@@ -46,13 +43,10 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
   tags: tagValues
 }
 
-
 resource currentContainerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: registryName
 }
 
-
-// Outputs for exported use
 output containerRegistryId string = currentContainerRegistry.id
 output containerRegistryName string = currentContainerRegistry.name
 output containerRegistryLoginServer string = currentContainerRegistry.properties.loginServer

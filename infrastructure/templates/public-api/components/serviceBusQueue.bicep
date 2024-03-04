@@ -4,7 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Name of the Service Bus namespace')
 param namespaceName string
 
@@ -14,21 +13,16 @@ param queueName string
 @description('The name of the Key Vault to store the connection strings')
 param keyVaultName string
 
-//Passed in Tags
+@description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-
-// Variables and created data
 var serviceBusNamespaceName = '${resourcePrefix}-sbns-${namespaceName}'
 var serviceBusQueueName = '${resourcePrefix}-sbq-${queueName}'
 var serviceBusEndpoint = '${serviceBusNamespace.id}/AuthorizationRules/RootManageSharedAccessKey'
 var serviceBusConnectionString = listKeys(serviceBusEndpoint, serviceBusNamespace.apiVersion).primaryConnectionString
 var connectionStringSecretName = '${resourcePrefix}-sbq-${queueName}-connectionString'
 
-
-//Resources 
-
-//ServiceBus Namespace
+// Generate a ServiceBus namespace.
 resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
   name: serviceBusNamespaceName
   location: location
@@ -39,7 +33,7 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
   tags: tagValues
 }
 
-//ServiceBus Queue
+//S erviceBus Queue
 resource serviceBusQueue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = {
   parent: serviceBusNamespace
   name: serviceBusQueueName

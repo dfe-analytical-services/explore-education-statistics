@@ -14,24 +14,18 @@ param fileShareAccessTier string = 'Hot'
 @description('Name of the Storage Account')
 param storageAccountName string
 
-// Variables and created data
 var shareName = '${resourcePrefix}-fs-${fileShareName}'
 
-//Resources 
-
-//Use Storage Account created earlier
+// Reference an existing Storage Account.
 resource apiStorageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
 
-// Fileservice
 resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
   name: 'default'
   parent: apiStorageAccount
 }
 
-
-// FileShare
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
   name:  shareName
   parent: fileService
@@ -41,6 +35,4 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-0
   }
 }
 
-
-//Outputs
 output fileShareName string = fileShare.name

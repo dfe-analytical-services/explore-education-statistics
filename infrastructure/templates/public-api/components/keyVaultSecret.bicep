@@ -14,6 +14,7 @@ param contentType string = 'text/plain'
 @description('Optional: Determines whether the secret is enabled')
 param isEnabled bool = true
 
+// Reference an existing Key Vault.
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
@@ -30,5 +31,5 @@ resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   }
 }
 
-//The URI pointing at the created secret
+// Output the URI of the created secret.
 output keyVaultSecretUri string = keyVaultSecret.properties.secretUri

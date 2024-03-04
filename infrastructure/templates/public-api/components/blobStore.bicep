@@ -1,5 +1,3 @@
-
-//Specific parameters for the resources
 @description('Name of the blob store')
 param blobStoreName string = 'default'
 
@@ -11,17 +9,11 @@ param deleteRetentionPolicy int = 7
 @description('Name of the Storage Account')
 param storageAccountName string
 
-// Variables and created data
-
-
-//Resources
-
-// Existsing Storage Account
+// Reference an existing Storage Account.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
 }
 
-// Blob Services for Storage Account
 resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
   name: blobStoreName
   parent: storageAccount
@@ -36,5 +28,4 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01
   }
 }
 
-//Outputs
 output blobStoreName string = blobServices.name
