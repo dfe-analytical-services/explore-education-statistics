@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
@@ -104,6 +105,66 @@ public static class EnumUtilsTests
             };
 
             Assert.Equal(expected, EnumUtil.GetEnumsArray<TestEnum>());
+        }
+    }
+
+    public class GetEnumLabelsTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new List<string>
+            {
+                TestEnum.WithLabel.GetEnumLabel(),
+                TestEnum.WithLabelValue.GetEnumLabel(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumLabels<TestEnum>());
+        }
+    }
+
+    public class GetEnumLabelsSetTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new HashSet<string>
+            {
+                TestEnum.WithLabel.GetEnumLabel(),
+                TestEnum.WithLabelValue.GetEnumLabel(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumLabelsSet<TestEnum>());
+        }
+    }
+
+    public class GetEnumValuesTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new List<string>
+            {
+                TestEnum.WithLabel.ToString(),
+                TestEnum.WithLabelValue.GetEnumValue(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumValues<TestEnum>());
+        }
+    }
+
+    public class GetEnumValuesSetTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new HashSet<string>
+            {
+                TestEnum.WithLabel.ToString(),
+                TestEnum.WithLabelValue.GetEnumValue(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumValuesSet<TestEnum>());
         }
     }
 
