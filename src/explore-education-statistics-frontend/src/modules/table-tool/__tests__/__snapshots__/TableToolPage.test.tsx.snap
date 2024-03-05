@@ -42,7 +42,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Gender gap
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.00%
       </td>
@@ -57,7 +57,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Graduates included in earnings figures
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2
       </td>
@@ -80,7 +80,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Gender gap
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         60.00%
       </td>
@@ -95,7 +95,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Graduates included in earnings figures
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2
       </td>

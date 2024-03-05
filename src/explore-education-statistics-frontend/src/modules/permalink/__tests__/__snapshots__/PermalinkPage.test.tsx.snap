@@ -55,22 +55,22 @@ exports[`PermalinkPage renders correctly with permalink 1`] = `
         State-funded primary
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         420,194
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         385,676
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         403,409
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         402,755
       </td>
@@ -85,22 +85,22 @@ exports[`PermalinkPage renders correctly with permalink 1`] = `
         State-funded primary and secondary
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         567,279
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         516,897
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         543,325
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         540,135
       </td>
@@ -115,22 +115,22 @@ exports[`PermalinkPage renders correctly with permalink 1`] = `
         State-funded secondary
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         147,085
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         131,221
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         139,916
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         137,380
       </td>

@@ -42,7 +42,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
         2020 Week 23
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         22,500
       </td>
@@ -65,7 +65,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
         2020 Week 23
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1%
       </td>
