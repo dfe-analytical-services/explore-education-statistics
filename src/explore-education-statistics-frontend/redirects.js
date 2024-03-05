@@ -1,6 +1,6 @@
 const seoRedirects = [
   {
-    from: '/ and https://www.gov.uk/government/collections/abortion-statistics-for-england-and-wales',
+    from: '/nbsp;andnbsp;https://www.gov.uk/government/collections/abortion-statistics-for-england-and-wales',
     to: '/',
   },
   { from: '/!nd-statistics/permanent-and-', to: '/' },
@@ -52,7 +52,10 @@ const seoRedirects = [
   { from: '/data-', to: '/' },
 
   { from: '/data-table', to: '/' },
-  { from: '/data-tables - spring 2022', to: '/' },
+  {
+    from: '/data-tablesnbsp;-nbsp;springnbsp;2022',
+    to: '/',
+  },
   { from: '/data-tables/fast-track/[dataBlockId]', to: '/' },
   { from: '/data-tables/fast-track/[dataBlockParentId]', to: '/' },
   {
@@ -1499,14 +1502,14 @@ const seoRedirects = [
   { from: '/datatables/apprenticeships-and-traineeships', to: '/data-tables' },
   { from: '/datatables/permalink/48f9a035-9123-477e-', to: '/data-tables' },
   { from: '/datatables/permalink/b169759c-', to: '/data-tables' },
-  { from: '/find-st</body></html>', to: '/find-statistics' },
+  { from: '/find-st%3C/body%3E%3C/html%3E', to: '/find-statistics' },
   { from: '/find-sta', to: '/find-statistics' },
   { from: '/find-stati', to: '/find-statistics' },
   { from: '/find-statis-', to: '/find-statistics' },
   { from: '/find-statistic', to: '/find-statistics' },
   { from: '/find-statistics/[publication]', to: '/find-statistics' },
   { from: '/find-statistics/[publication]/[release]', to: '/find-statistics' },
-  { from: '/find-statistics/<a href=', to: '/find-statistics' },
+  { from: '/find-statistics/%3ca%20href=', to: '/find-statistics' },
 
   { from: '/find-statistics/16-18-', to: '/find-statistics' },
   {
@@ -1523,7 +1526,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/a-level-and-other-16-to-18-results/2019-20 –',
+    from: '/find-statistics/a-level-and-other-16-to-18-results/2019-20&nbsp%e2%80%93',
     to: '/find-statistics',
   },
 
@@ -1538,7 +1541,7 @@ const seoRedirects = [
   { from: '/find-statistics/apprenticeships-and', to: '/find-statistics' },
 
   {
-    from: '/find-statistics/apprenticeships-and-traineeships/2020-21 - apprenticeship starts down 0.3% in 21-22 vs 19-20',
+    from: '/find-statistics/apprenticeships-and-traineeships/2020-21&nbsp;-&nbsp;apprenticeship&nbsp;starts&nbsp;down&nbsp;0.3%&nbsp;in&nbsp;21-22&nbsp;vs&nbsp;19-20',
     to: '/find-statistics',
   },
 
@@ -1591,7 +1594,7 @@ const seoRedirects = [
     to: '/find-statistics',
   },
   {
-    from: '/find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak 2',
+    from: '/find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak&nbsp;2',
     to: '/find-statistics',
   },
 
@@ -1671,7 +1674,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/children-looked-after-in-england-including-adoptions/2020 - dataDownloads-1',
+    from: '/find-statistics/children-looked-after-in-england-including-adoptions/2020&nbsp;-&nbsp;dataDownloads-1',
     to: '/find-statistics',
   },
 
@@ -1684,7 +1687,7 @@ const seoRedirects = [
     to: '/find-statistics',
   },
   {
-    from: '/find-statistics/children-looked-after-in-england-including-adoptions/2021 /l dataDownloads-1',
+    from: '/find-statistics/children-looked-after-in-england-including-adoptions/2021&nbsp;/l&nbsp;dataDownloads-1',
     to: '/find-statistics',
   },
 
@@ -1732,7 +1735,7 @@ const seoRedirects = [
     to: '/find-statistics',
   },
   {
-    from: '/find-statistics/education-health-and-care-plans (opens in external window)',
+    from: '/find-statistics/education-health-and-care-plans&nbsp;(opens&nbsp;in&nbsp;external&nbsp;window)',
     to: '/find-statistics',
   },
 
@@ -1742,7 +1745,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/education-provision-children-under-5/2020 (universal three and four-year old offer and disadvantaged two year old offer) and https://www.gov.uk/government/statistics/childcare-and-early-years-survey-of-parents-2019',
+    from: '/find-statistics/education-provision-children-under-5/2020&nbsp;(universal&nbsp;three&nbsp;and&nbsp;four-year&nbsp;old&nbsp;offer&nbsp;and&nbsp;disadvantaged&nbsp;two&nbsp;year&nbsp;old&nbsp;offer)&nbsp;and&nbsp;https://www.gov.uk/government/statistics/childcare-and-early-years-survey-of-parents-2019',
     to: '/find-statistics',
   },
 
@@ -1783,7 +1786,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/higher-level-learners-in-england#dataDownloads-1',
+    from: '/find-statistics/higher-level-learners-in-england',
     to: '/find-statistics',
   },
   { from: '/find-statistics/initial-', to: '/find-statistics' },
@@ -1826,7 +1829,7 @@ const seoRedirects = [
     to: '/find-statistics',
   },
   {
-    from: '/find-statistics/key-stage-2-attainment-national-headlines/2021-22 Accessed 31st July 2022',
+    from: '/find-statistics/key-stage-2-attainment-national-headlines/2021-22&nbspAccessed&nbsp31st&nbspJuly&nbsp2022',
     to: '/find-statistics',
   },
 
@@ -1852,7 +1855,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/key-stage-4-performance-revised/2021–22',
+    from: '/find-statistics/key-stage-4-performance-revised/2021%e2%80%9322',
     to: '/find-statistics',
   },
 
@@ -1994,7 +1997,10 @@ const seoRedirects = [
     to: '/find-statistics',
   },
 
-  { from: '/find-statistics/progression-to-<a href=', to: '/find-statistics' },
+  {
+    from: '/find-statistics/progression-to-%3ca&nbsphref==',
+    to: '/find-statistics',
+  },
   { from: '/find-statistics/progression-to-higher-ed', to: '/find-statistics' },
 
   { from: '/find-statistics/pupil', to: '/find-statistics' },
@@ -2093,7 +2099,7 @@ const seoRedirects = [
     to: '/find-statistics',
   },
   {
-    from: '/find-statistics/school-workforce-in-englan</p> <p> For more detailed information about the cookies we use, please see our <a href=',
+    from: '/find-statistics/school-workforce-in-englan%3c/p%3e&nbsp;%3cp%3e&nbsp;for&nbsp;more&nbsp;detailed&nbsp;information&nbsp;about&nbsp;the&nbsp;cookies&nbsp;we&nbsp;use,&nbsp;please&nbsp;see&nbsp;our&nbsp;%3ca&nbsp;href=',
     to: '/find-statistics',
   },
   {
@@ -2102,11 +2108,7 @@ const seoRedirects = [
   },
 
   {
-    from: '/find-statistics/school-workforce-in-england#data',
-    to: '/find-statistics',
-  },
-  {
-    from: '/find-statistics/school-workforce-in-england#dataBlock-f47ed575-f6eb-4bd0-926a-02830e272452-charts',
+    from: '/find-statistics/school-workforce-in-england',
     to: '/find-statistics',
   },
   {
