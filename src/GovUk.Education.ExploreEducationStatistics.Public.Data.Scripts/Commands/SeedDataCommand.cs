@@ -785,8 +785,6 @@ public class SeedDataCommand : ICommand
                         {insertColumns.JoinToString(",\n")}
                      FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data_source
                      {insertJoins.JoinToString('\n')}
-                     JOIN time_periods ON time_periods.period = data_source.time_period 
-                         AND time_periods.identifier = data_source.time_identifier
                      ORDER BY
                          data_source.geographic_level ASC,
                          data_source.time_period DESC
