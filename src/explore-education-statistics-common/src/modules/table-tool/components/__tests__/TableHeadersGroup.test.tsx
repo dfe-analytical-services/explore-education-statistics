@@ -34,7 +34,7 @@ describe('TableHeadersGroup', () => {
       screen.getByRole('button', { name: 'Reorder items in Category group' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Move Category group to columns' }),
+      screen.getByRole('button', { name: 'Move Category group' }),
     ).toBeInTheDocument();
 
     expect(
@@ -50,18 +50,16 @@ describe('TableHeadersGroup', () => {
       screen.queryByTestId('draggable-group-category-group'),
     ).not.toBeInTheDocument();
 
-    // Reorderable items are buttons
-    const groupButtons = screen.getAllByRole('button');
-    expect(groupButtons).toHaveLength(3);
+    const groupButtons = screen.getAllByTestId('reorderable-item');
+    expect(groupButtons).toHaveLength(2);
     expect(groupButtons[0]).toHaveTextContent('Category 1');
     expect(groupButtons[1]).toHaveTextContent('Category 2');
-    expect(groupButtons[2]).toHaveTextContent('Done');
 
     expect(
       screen.queryByRole('button', { name: 'Reorder items in Category group' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Move Category group to columns' }),
+      screen.queryByRole('button', { name: 'Move Category group' }),
     ).not.toBeInTheDocument();
   });
 
@@ -87,7 +85,7 @@ describe('TableHeadersGroup', () => {
       screen.getByRole('button', { name: 'Reorder items in Category group' }),
     ).toBeDisabled();
     expect(
-      screen.getByRole('button', { name: 'Move Category group to columns' }),
+      screen.getByRole('button', { name: 'Move Category group' }),
     ).toBeDisabled();
   });
 });
@@ -118,11 +116,15 @@ function render({
             {droppableProvided => (
               <div ref={droppableProvided.innerRef}>
                 <TableHeadersGroup
+                  id="group-category-group"
                   index={0}
+                  isLastGroup={false}
                   legend="Category group"
                   name="rowGroups[0]"
                   totalItems={2}
                   onMoveGroupToOtherAxis={noop}
+                  onMoveGroupDown={noop}
+                  onMoveGroupUp={noop}
                 />
               </div>
             )}

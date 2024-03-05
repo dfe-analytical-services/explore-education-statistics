@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const ArrowLeft = ({ className }: { className: string }) => (
+export const ArrowLeft = ({ className }: { className?: string }) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +14,7 @@ export const ArrowLeft = ({ className }: { className: string }) => (
   </svg>
 );
 
-export const ArrowRight = ({ className }: { className: string }) => (
+export const ArrowRight = ({ className }: { className?: string }) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"

@@ -1,8 +1,9 @@
-import DragIcon from '@common/components/DragIcon';
 import styles from '@common/modules/table-tool/components/TableHeadersReorderableList.module.scss';
+import TableHeadersReorderableItem from '@common/modules/table-tool/components/TableHeadersReorderableItem';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { FormFieldset } from '@common/components/form';
 import reorderMultiple from '@common/utils/reorderMultiple';
+import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -24,6 +25,7 @@ interface Props {
 const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number>();
+  const [activeItem, setActiveItem] = useState<string>();
 
   const { getValues, setValue } = useFormContext();
   /**
@@ -158,6 +160,18 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
 
   const list: Filter[] = getValues(name);
 
+  const handleMoveItem = ({
+    direction,
+    index,
+  }: {
+    direction: 'up' | 'down';
+    index: number;
+  }) => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const reordered = reorder(list, index, newIndex);
+    setValue(name, reordered);
+  };
+
   return (
     <FormFieldset legend={legend} legendSize="s" id={id}>
       <div className={styles.focusContainer} ref={listRef} tabIndex={-1}>
@@ -213,66 +227,49 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
                 })}
                 ref={droppableProvided.innerRef}
               >
-                {list.map((option, index) => (
-                  <Draggable
-                    draggableId={option.value}
-                    key={option.value}
-                    index={index}
-                  >
-                    {(draggableProvided, draggableSnapshot) => (
-                      <div
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.draggableProps}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.dragHandleProps}
-                        className={classNames(styles.option, {
-                          [styles.isDragging]: draggableSnapshot.isDragging,
-                          [styles.isSelected]: selectedIndices.includes(index),
-                          [styles.isGhosted]:
-                            selectedIndices.includes(index) &&
-                            draggingIndex &&
-                            draggingIndex !== index,
-                          [styles.isDraggedOutside]:
-                            draggableSnapshot.isDragging &&
-                            !draggableSnapshot.draggingOver,
-                        })}
-                        ref={draggableProvided.innerRef}
-                        role="button"
-                        style={draggableProvided.draggableProps.style}
-                        tabIndex={0}
-                        onClick={event => {
-                          handleClick(event, index);
-                        }}
-                        onKeyDown={event =>
-                          handleKeyDown(event, draggableSnapshot, index)
-                        }
-                        onTouchEnd={event => {
-                          handleTouchEnd(event, index);
-                        }}
-                      >
-                        <div className={styles.optionLabel}>
-                          <span>{option.label}</span>
-                          <DragIcon className={styles.dragIcon} />
-                        </div>
+                {list.map((option, index) => {
+                  const isInActive = !!(activeItem && activeItem !== option.id);
 
-                        {selectedIndices.length > 1 &&
-                          draggingIndex === index &&
-                          draggableSnapshot.isDragging && (
-                            <div className={styles.selectedCount}>
-                              {selectedIndices.length}{' '}
-                              <span className="govuk-visually-hidden">
-                                {`${selectedIndices.length} ${
-                                  selectedIndices.length === 1
-                                    ? 'item'
-                                    : 'items'
-                                } selected`}
-                              </span>
-                            </div>
-                          )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+                  return (
+                    <Draggable
+                      draggableId={option.value}
+                      key={option.value}
+                      index={index}
+                      isDragDisabled={isInActive}
+                    >
+                      {(draggableProvided, draggableSnapshot) => (
+                        <TableHeadersReorderableItem
+                          activeItem={activeItem}
+                          draggableProvided={draggableProvided}
+                          draggableSnapshot={draggableSnapshot}
+                          key={option.value}
+                          index={index}
+                          isGhosted={
+                            !!(
+                              selectedIndices.includes(index) &&
+                              draggingIndex &&
+                              draggingIndex !== index
+                            )
+                          }
+                          isLastItem={index === list.length - 1}
+                          isSelected={selectedIndices.includes(index)}
+                          option={option}
+                          selectedIndicesLength={selectedIndices.length}
+                          onClick={handleClick}
+                          onClickMoveDown={() => {
+                            handleMoveItem({ index, direction: 'down' });
+                          }}
+                          onClickMoveUp={() => {
+                            handleMoveItem({ index, direction: 'up' });
+                          }}
+                          onKeyDown={handleKeyDown}
+                          onSetActive={setActiveItem}
+                          onTouchEnd={handleTouchEnd}
+                        />
+                      )}
+                    </Draggable>
+                  );
+                })}
                 {droppableProvided.placeholder}
               </div>
             )}
