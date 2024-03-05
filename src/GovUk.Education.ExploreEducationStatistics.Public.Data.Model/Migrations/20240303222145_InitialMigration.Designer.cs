@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240228013202_InitialMigration")]
+    [Migration("20240303222145_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -321,6 +321,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("FilterOptionMetaLinks");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<List<string>>("Levels")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId")
+                        .IsUnique();
+
+                    b.ToTable("GeographicLevelMetas");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
                 {
                     b.Property<int>("Id")
@@ -494,15 +523,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Period")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Year")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSetVersionId", "Code", "Year")
+                    b.HasIndex("DataSetVersionId", "Code", "Period")
                         .IsUnique();
 
                     b.ToTable("TimePeriodMetas");
@@ -1130,8 +1160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.Property<int>("Year")
-                                                .HasColumnType("integer");
+                                            b3.Property<string>("Period")
+                                                .IsRequired()
+                                                .HasColumnType("text");
 
                                             b3.HasKey("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId");
 
@@ -1150,8 +1181,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                                 .IsRequired()
                                                 .HasColumnType("text");
 
-                                            b3.Property<int>("Year")
-                                                .HasColumnType("integer");
+                                            b3.Property<string>("Period")
+                                                .IsRequired()
+                                                .HasColumnType("text");
 
                                             b3.HasKey("TimePeriodRangeDataSetVersionMetaSummaryDataSetVersionId");
 
@@ -1172,7 +1204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                 .IsRequired();
                         });
 
-                    b.Navigation("MetaSummary");
+                    b.Navigation("MetaSummary")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
@@ -1203,6 +1236,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("Meta");
 
                     b.Navigation("Option");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithOne("GeographicLevelMeta")
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.GeographicLevelMeta", "DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DataSetVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.IndicatorMeta", b =>
@@ -1272,6 +1316,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Navigation("FilterMetas");
 
                     b.Navigation("FilterOptionChanges");
+
+                    b.Navigation("GeographicLevelMeta")
+                        .IsRequired();
 
                     b.Navigation("IndicatorChanges");
 

@@ -1,10 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
@@ -67,13 +67,13 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.LatestVersion.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 content.LatestVersion.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.LatestVersion.GeographicLevels);
@@ -283,13 +283,13 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 result.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.GeographicLevels);
@@ -567,13 +567,13 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             Assert.Equal(dataSetVersion.Notes, content.Notes);
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 content.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.GeographicLevels);

@@ -4,11 +4,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
@@ -538,13 +538,13 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.LatestVersion.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 result.LatestVersion.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.LatestVersion.GeographicLevels);

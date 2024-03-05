@@ -20,7 +20,7 @@ public class DataSetVersionMetaSummary
         }
 
         var timePeriods = dataSetVersion.TimePeriodMetas
-            .OrderBy(t => t.Year)
+            .OrderBy(t => t.Period)
             .ThenBy(t => t.Code)
             .ToList();
 

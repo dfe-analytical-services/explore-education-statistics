@@ -26,8 +26,8 @@ public static class TimePeriodMetaGeneratorExtensions
     public static Generator<TimePeriodMeta> WithCode(this Generator<TimePeriodMeta> generator, TimeIdentifier code)
         => generator.ForInstance(s => s.SetCode(code));
 
-    public static Generator<TimePeriodMeta> WithYear(this Generator<TimePeriodMeta> generator, int year)
-        => generator.ForInstance(s => s.SetYear(year));
+    public static Generator<TimePeriodMeta> WithPeriod(this Generator<TimePeriodMeta> generator, string period)
+        => generator.ForInstance(s => s.SetPeriod(period));
 
 
     public static InstanceSetters<TimePeriodMeta> SetDefaults(
@@ -36,7 +36,7 @@ public static class TimePeriodMetaGeneratorExtensions
         int startYear = DefaultStartYear)
         => setters
             .Set(m => m.Code, code)
-            .Set(m => m.Year, (_, _, context) => startYear + context.Index);
+            .Set(m => m.Period, (_, _, context) => (startYear + context.Index).ToString());
 
     public static InstanceSetters<TimePeriodMeta> SetDataSetVersion(
         this InstanceSetters<TimePeriodMeta> setters,
@@ -50,8 +50,8 @@ public static class TimePeriodMetaGeneratorExtensions
         TimeIdentifier code)
         => setters.Set(m => m.Code, code);
 
-    public static InstanceSetters<TimePeriodMeta> SetYear(
+    public static InstanceSetters<TimePeriodMeta> SetPeriod(
         this InstanceSetters<TimePeriodMeta> setters,
-        int year)
-        => setters.Set(m => m.Year, year);
+        string period)
+        => setters.Set(m => m.Period, period);
 }
