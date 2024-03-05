@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static List<ReleaseHandlerTestScenario> CreateUserInProductionTeamScenarios(Release release,
             ReleaseRole[] rolesExpectedToSucceed)
         {
-            var scenarios = GetEnumValues<ReleaseRole>().Select(role =>
+            var scenarios = GetEnums<ReleaseRole>().Select(role =>
             {
                 var userId = Guid.NewGuid();
 
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static List<ReleaseHandlerTestScenario> CreateUserInPublicationTeamScenarios(Release release,
             PublicationRole[] rolesExpectedToSucceed)
         {
-            var scenarios = GetEnumValues<PublicationRole>().Select(role =>
+            var scenarios = GetEnums<PublicationRole>().Select(role =>
             {
                 var userId = Guid.NewGuid();
 
@@ -292,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             params ReleaseRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            var allReleaseRoles = GetEnumValues<ReleaseRole>();
+            var allReleaseRoles = GetEnums<ReleaseRole>();
             var userId = Guid.NewGuid();
 
             await allReleaseRoles

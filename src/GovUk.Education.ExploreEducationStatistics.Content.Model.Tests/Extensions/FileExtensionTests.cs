@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void PublicPath_FileTypeIsNotAPublicFileType()
         {
-            EnumUtil.GetEnumValues<FileType>().ForEach(type =>
+            EnumUtil.GetEnums<FileType>().ForEach(type =>
             {
                 if (!PublicFileTypes.Contains(type))
                 {

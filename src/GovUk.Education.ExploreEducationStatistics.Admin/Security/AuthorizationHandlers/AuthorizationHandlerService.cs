@@ -149,7 +149,7 @@ public class AuthorizationHandlerService
         if (await HasRolesOnPublication(
                     user.GetUserId(),
                     release.PublicationId,
-                    EnumUtil.GetEnumValuesAsArray<PublicationRole>()))
+                    EnumUtil.GetEnumsArray<PublicationRole>()))
         {
             return true;
         }

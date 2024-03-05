@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         publication.Id,
-                        EnumUtil.GetEnumValuesAsArray<PublicationRole>()))
+                        EnumUtil.GetEnumsArray<PublicationRole>()))
             {
                 context.Succeed(requirement);
                 return;

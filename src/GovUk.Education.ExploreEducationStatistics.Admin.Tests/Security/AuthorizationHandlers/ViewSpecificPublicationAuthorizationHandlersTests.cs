@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext => CreateHandler(
                     contentDbContext,
                     userPublicationRoleRepository: new UserPublicationRoleRepository(contentDbContext)),
-                EnumUtil.GetEnumValuesAsArray<PublicationRole>());
+                EnumUtil.GetEnumsArray<PublicationRole>());
         }
 
         [Fact]

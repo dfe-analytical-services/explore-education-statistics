@@ -11,10 +11,10 @@ public static class EnumUtil
     private static class EnumCache<TEnum> where TEnum : Enum
     {
         public static readonly Lazy<Dictionary<string, TEnum>> Values = new(() =>
-            GetEnumValues<TEnum>().ToDictionary(e => e.GetEnumValue()));
+            GetEnums<TEnum>().ToDictionary(e => e.GetEnumValue()));
 
         public static readonly Lazy<Dictionary<string, TEnum>> Labels = new(() =>
-            GetEnumValues<TEnum>().ToDictionary(e => e.GetEnumLabel()));
+            GetEnums<TEnum>().ToDictionary(e => e.GetEnumLabel()));
     }
 
     public static TEnum GetFromEnumValue<TEnum>(string value) where TEnum : Enum
@@ -37,13 +37,13 @@ public static class EnumUtil
         throw new ArgumentException($"The label '{label}' is not a valid {typeof(TEnum).Name}");
     }
 
-    public static List<TEnum> GetEnumValues<TEnum>()
+    public static List<TEnum> GetEnums<TEnum>() where TEnum : Enum
     {
         return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
     }
 
-    public static TEnum[] GetEnumValuesAsArray<TEnum>()
+    public static TEnum[] GetEnumsArray<TEnum>() where TEnum : Enum
     {
-        return GetEnumValues<TEnum>().ToArray();
+        return GetEnums<TEnum>().ToArray();
     }
 }

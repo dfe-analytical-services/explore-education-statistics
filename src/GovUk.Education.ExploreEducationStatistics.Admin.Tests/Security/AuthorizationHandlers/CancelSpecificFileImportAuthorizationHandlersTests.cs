@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async Task CannotCancelFinishedOrAbortingImport()
         {
             var finishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<DataImportStatus>()
+                .GetEnums<DataImportStatus>()
                 .Where(status => status.IsFinishedOrAborting())
                 .ToList();
 
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public async Task CanCancelHealthyOngoingImportWithCorrectClaim()
         {
             var nonFinishedOrAbortingStatuses = EnumUtil
-                .GetEnumValues<DataImportStatus>()
+                .GetEnums<DataImportStatus>()
                 .Where(status => !status.IsFinishedOrAborting())
                 .ToList();
 

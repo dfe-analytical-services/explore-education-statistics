@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodologyAmendment()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void FinishedAndAbortingStatuses()
         {
-            EnumUtil.GetEnumValues<DataImportStatus>().ForEach(importStatus =>
+            EnumUtil.GetEnums<DataImportStatus>().ForEach(importStatus =>
             {
                 var expectingToBeFinished = ExpectedFinishedStatuses.Contains(importStatus);
                 var expectingToBeAborting = ExpectedAbortingStatuses.Contains(importStatus);
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void NoOtherAbortingFinishStates()
         {
-            EnumUtil.GetEnumValues<DataImportStatus>().ForEach(status =>
+            EnumUtil.GetEnums<DataImportStatus>().ForEach(status =>
             {
                 if (status != CANCELLING)
                 {

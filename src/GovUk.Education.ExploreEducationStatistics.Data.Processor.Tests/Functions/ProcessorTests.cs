@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsButImportIsFinished()
         {
             var finishedStates = EnumUtil
-                .GetEnumValues<DataImportStatus>()
+                .GetEnums<DataImportStatus>()
                 .Where(status => status.IsFinished())
                 .ToList();
 

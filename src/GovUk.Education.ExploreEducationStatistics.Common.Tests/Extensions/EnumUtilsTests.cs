@@ -77,7 +77,7 @@ public static class EnumUtilsTests
         }
     }
 
-    public class GetEnumValuesTests
+    public class GetEnumsTests
     {
         [Fact]
         public void Success()
@@ -88,11 +88,11 @@ public static class EnumUtilsTests
                 TestEnum.WithLabelValue
             };
 
-            Assert.Equal(expected, EnumUtil.GetEnumValues<TestEnum>());
+            Assert.Equal(expected, EnumUtil.GetEnums<TestEnum>());
         }
     }
 
-    public class GetEnumValuesAsArrayTests
+    public class GetEnumsArrayTests
     {
         [Fact]
         public void Success()
@@ -103,7 +103,7 @@ public static class EnumUtilsTests
                 TestEnum.WithLabelValue
             };
 
-            Assert.Equal(expected, EnumUtil.GetEnumValuesAsArray<TestEnum>());
+            Assert.Equal(expected, EnumUtil.GetEnumsArray<TestEnum>());
         }
     }
 
