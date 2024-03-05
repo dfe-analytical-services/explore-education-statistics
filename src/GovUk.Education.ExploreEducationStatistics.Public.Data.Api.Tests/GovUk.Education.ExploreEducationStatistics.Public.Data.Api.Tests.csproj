@@ -4,12 +4,18 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
 
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests</RootNamespace>
     </PropertyGroup>
+
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.0" />

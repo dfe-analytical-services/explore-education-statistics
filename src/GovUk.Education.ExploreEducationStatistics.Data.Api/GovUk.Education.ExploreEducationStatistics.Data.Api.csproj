@@ -5,8 +5,15 @@
     <LangVersion>10.0</LangVersion>
     <AssemblyName>GovUk.Education.ExploreEducationStatistics.Data.Api</AssemblyName>
     <RootNamespace>GovUk.Education.ExploreEducationStatistics.Data.Api</RootNamespace>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
+
+  <ItemGroup>
+      <CompilerVisibleProperty Include="RootNamespace" />
+      <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
