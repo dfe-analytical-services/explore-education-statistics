@@ -1,10 +1,10 @@
+import PhaseBanner from '@common/components/PhaseBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
-import PageBanner from './PageBanner';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
@@ -80,7 +80,7 @@ const Page = ({
           'dfe-width-container--wide': wide,
         })}
       >
-        <PageBanner />
+        <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u" />
         <Breadcrumbs
           breadcrumbs={
             isHomepage
