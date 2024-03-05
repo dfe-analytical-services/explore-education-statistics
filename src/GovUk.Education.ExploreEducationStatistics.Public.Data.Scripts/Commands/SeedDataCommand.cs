@@ -152,7 +152,9 @@ public class SeedDataCommand : ICommand
                 "--schema", "public",
                 "--username", "postgres",
                 "--host", "db",
-                "--port", "5432"
+                "--port", "5432",
+                "--clean",
+                "--if-exists",
             ])
             .WithEnvironmentVariables(env => env
                 .Set("PGPASSWORD", "password"))
