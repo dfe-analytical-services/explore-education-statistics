@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_EditorOrApprover_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationRoleSuccess_Owner_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -441,7 +441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ReleaseRoleSuccess_Approver_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationRoleSuccess_Approver_ReleaseUnpublished()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -565,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             params SecurityClaimTypes[] claims)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseApprovalStatus>()
+            await GetEnums<ReleaseApprovalStatus>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async status =>
@@ -605,7 +605,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseApprovalStatus>()
+            await GetEnums<ReleaseApprovalStatus>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async status =>
@@ -657,7 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseApprovalStatus>()
+            await GetEnums<ReleaseApprovalStatus>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async status =>
@@ -705,7 +705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseApprovalStatus>()
+            await GetEnums<ReleaseApprovalStatus>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async status =>
@@ -770,7 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 IAuthorizationHandler> authorizationHandler)
             where TRequirement : IAuthorizationRequirement
         {
-            await GetEnumValues<ReleaseApprovalStatus>()
+            await GetEnums<ReleaseApprovalStatus>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
                     async status =>

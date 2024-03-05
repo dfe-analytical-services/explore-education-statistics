@@ -144,7 +144,7 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         Guid resourceId, 
         TRoleEnum[]? rolesToInclude)
     {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<TRoleEnum>();
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<TRoleEnum>();
         
         return await 
             GetResourceRolesQueryByResourceId(resourceId)

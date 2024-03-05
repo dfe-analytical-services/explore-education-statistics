@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfLatestPublishedMethodologyVersionOwnedByPublication()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {

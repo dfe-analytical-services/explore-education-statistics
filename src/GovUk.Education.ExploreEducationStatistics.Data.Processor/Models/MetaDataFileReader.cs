@@ -21,7 +21,7 @@ public class MetaDataFileReader
 
     public MetaDataFileReader(List<string> metaCsvHeaders)
     {
-        _metaColumnIndexes = EnumUtil.GetEnumValues<MetaColumns>()
+        _metaColumnIndexes = EnumUtil.GetEnums<MetaColumns>()
             .ToDictionary(
                 column => column,
                 column => metaCsvHeaders.FindIndex(h => h.Equals(column.ToString()))

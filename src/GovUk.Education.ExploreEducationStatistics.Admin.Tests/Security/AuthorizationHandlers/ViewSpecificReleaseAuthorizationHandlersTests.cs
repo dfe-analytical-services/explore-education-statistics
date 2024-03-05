@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         "current time"
                 };
 
-                await GetEnumValues<PreReleaseAccess>()
+                await GetEnums<PreReleaseAccess>()
                     .Where(value => value != PreReleaseAccess.Within)
                     .ToList()
                     .ToAsyncEnumerable()

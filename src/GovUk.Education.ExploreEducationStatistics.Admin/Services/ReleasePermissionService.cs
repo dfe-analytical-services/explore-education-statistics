@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
             ListReleaseInvites(Guid releaseId, ReleaseRole[]? rolesToInclude = null)
         {
-            var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<ReleaseRole>();
+            var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
             
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,

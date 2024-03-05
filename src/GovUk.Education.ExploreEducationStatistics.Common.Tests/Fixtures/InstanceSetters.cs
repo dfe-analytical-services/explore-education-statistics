@@ -112,7 +112,7 @@ public class InstanceSetters<T> where T : class
     public InstanceSetters<T> SetDefault<TEnum>(Expression<Func<T, IList<TEnum>>> property) where TEnum : Enum
         => Set(
             property,
-            faker => EnumUtil.GetEnumValues<TEnum>()
+            faker => EnumUtil.GetEnums<TEnum>()
                 .Take(faker.Random.Int(2, 5))
                 .ToList());
 

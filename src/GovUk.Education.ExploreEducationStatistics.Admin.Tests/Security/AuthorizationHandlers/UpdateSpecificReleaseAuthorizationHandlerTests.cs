@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UpdateAllReleases_ClaimSucceedsIfNotApproved()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async status =>
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task PublicationOwnerAndApproversCanUpdateUnapprovedRelease()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task EditorsCanUpdateUnapprovedRelease()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
+                await GetEnums<ReleaseApprovalStatus>()
                     .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
