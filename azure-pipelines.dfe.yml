@@ -44,16 +44,6 @@ jobs:
           performMultiLevelLookup: true
 
       - task: 'DotNetCoreCLI@2'
-        displayName: 'Restore'
-        inputs:
-          command: 'restore'
-          projects: |
-            **/GovUk.*/*csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
-          feedsToUse: config
-          nugetConfigPath: src/nuget.config
-
-      - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
           projects: |
@@ -192,14 +182,6 @@ jobs:
         inputs:
           version: 6.0.x
           performMultiLevelLookup: true
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Restore'
-        inputs:
-          command: 'restore'
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          feedsToUse: config
-          nugetConfigPath: src/nuget.config
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
