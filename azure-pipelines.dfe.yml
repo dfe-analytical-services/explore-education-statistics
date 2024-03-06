@@ -5,6 +5,7 @@ parameters:
     default:
       - master
       - dev
+      - EES-4608-build-and-deploy-container-app
 
 variables:
   BuildConfiguration: 'Release'
@@ -43,69 +44,75 @@ jobs:
           version: 6.0.x
           performMultiLevelLookup: true
 
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Build'
+#        inputs:
+#          projects: |
+#            **/GovUk.*/*csproj
+#            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
+#          arguments: '--configuration $(BuildConfiguration)'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: |
-            **/GovUk.*/*csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
+          projects: '**/GovUk.*Public.Data*/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
-      # TODO: Uncomment this step once formatter has been run globally.
-      # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
-      # - task: DotNetCoreCLI@2
-      #   displayName: 'Verify Formatting and Style'
-      #   inputs:
-      #     command: 'custom'
-      #     custom: 'format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
-      #     arguments: '--verify-no-changes --verbosity diagnostic'
+#      # TODO: Uncomment this step once formatter has been run globally.
+#      # This is because whitespace rules cannot be warnings or suggestions; they will always be errors
+#      # - task: DotNetCoreCLI@2
+#      #   displayName: 'Verify Formatting and Style'
+#      #   inputs:
+#      #     command: 'custom'
+#      #     custom: 'format whitespace src/GovUk.Education.ExploreEducationStatistics.sln --verify-no-changes --severity error'
+#      #     arguments: '--verify-no-changes --verbosity diagnostic'
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: 'Verify Formatting and Style'
+#        inputs:
+#          command: 'custom'
+#          custom: 'format'
+#          ## TODO: Remove "--severity error" once style formatter has been run across project
+#          arguments: 'style --verify-no-changes --verbosity diagnostic --severity error'
+#          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
+#
+#      - task: DotNetCoreCLI@2
+#        displayName: 'Verify Formatting and Style'
+#        inputs:
+#          command: 'custom'
+#          custom: 'format'
+#          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
+#          arguments: 'analyzers --verify-no-changes --verbosity diagnostic --severity error'
+#          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
+#
+#      # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
+#
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Test'
+#        inputs:
+#          command: 'test'
+#          projects: |
+#            **/GovUk.*[Tt]ests/*.csproj
+#            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
+#          arguments: '--configuration $(BuildConfiguration)'
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Verify Formatting and Style'
-        inputs:
-          command: 'custom'
-          custom: 'format'
-          ## TODO: Remove "--severity error" once style formatter has been run across project
-          arguments: 'style --verify-no-changes --verbosity diagnostic --severity error'
-          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
-
-      - task: DotNetCoreCLI@2
-        displayName: 'Verify Formatting and Style'
-        inputs:
-          command: 'custom'
-          custom: 'format'
-          ## TODO: Remove "--severity error" once work has been done to resolve build warnings (https://dfedigital.atlassian.net/browse/EES-4594).
-          arguments: 'analyzers --verify-no-changes --verbosity diagnostic --severity error'
-          projects: 'src/GovUk.Education.ExploreEducationStatistics.sln'
-
-      # TODO: Wrap these ^ three tasks up into a single `dotnet format` task once all 3 above TODOs are TO-DONE ;)
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Test'
-        inputs:
-          command: 'test'
-          projects: |
-            **/GovUk.*[Tt]ests/*.csproj
-            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
-          arguments: '--configuration $(BuildConfiguration)'
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Data API'
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
-          zipAfterPublish: True
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Content API'
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
-          zipAfterPublish: True
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Publish Data API'
+#        inputs:
+#          command: 'publish'
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
+#          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+#          zipAfterPublish: True
+#
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Publish Content API'
+#        inputs:
+#          command: 'publish'
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+#          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+#          zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Public APIs Artifacts'
@@ -113,50 +120,75 @@ jobs:
           artifactName: 'public-api'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Notifier Function'
+      - task: Docker@2
+        displayName: 'Build Public API "API" Container App Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
-          zipAfterPublish: True
+          containerRegistry: 'dfe-development-dw acr service connection'
+          repository: 'ees-public-api'
+          command: 'build'
+          Dockerfile: 'docker/public-api/api/Dockerfile'
+          buildContext: '$(Build.ArtifactStagingDirectory)'
+          tags: $(Build.BuildNumber)
+          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+        env:
+          DOCKER_BUILDKIT: 1
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Notifier Artifacts'
+      - task: Docker@2
+        displayName: 'Push Public API "API" Container App Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
         inputs:
-          artifactName: 'notifier'
-          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+          containerRegistry: 'dfe-development-dw acr service connection'
+          repository: 'ees-public-api'
+          command: 'push'
+          Dockerfile: 'docker/public-api/api/Dockerfile'
+          buildContext: '$(System.ArtifactStagingDirectory)'
+          tags: $(Build.BuildNumber)
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Publisher Function'
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
-          zipAfterPublish: True
-
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Publisher Artifacts'
-        inputs:
-          artifactName: 'publisher'
-          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Processor Function'
-        inputs:
-          command: 'publish'
-          publishWebProjects: false
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
-          zipAfterPublish: True
-
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Processor Artifacts'
-        inputs:
-          artifactName: 'processor'
-          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Publish Notifier Function'
+#        inputs:
+#          command: 'publish'
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
+#          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
+#          zipAfterPublish: True
+#
+#      - task: 'PublishPipelineArtifact@0'
+#        displayName: 'Publish Notifier Artifacts'
+#        inputs:
+#          artifactName: 'notifier'
+#          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+#
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Publish Publisher Function'
+#        inputs:
+#          command: 'publish'
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
+#          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
+#          zipAfterPublish: True
+#
+#      - task: 'PublishPipelineArtifact@0'
+#        displayName: 'Publish Publisher Artifacts'
+#        inputs:
+#          artifactName: 'publisher'
+#          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+#
+#      - task: 'DotNetCoreCLI@2'
+#        displayName: 'Publish Processor Function'
+#        inputs:
+#          command: 'publish'
+#          publishWebProjects: false
+#          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
+#          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
+#          zipAfterPublish: True
+#
+#      - task: 'PublishPipelineArtifact@0'
+#        displayName: 'Publish Processor Artifacts'
+#        inputs:
+#          artifactName: 'processor'
+#          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
   - job: 'Admin'
     condition: false
