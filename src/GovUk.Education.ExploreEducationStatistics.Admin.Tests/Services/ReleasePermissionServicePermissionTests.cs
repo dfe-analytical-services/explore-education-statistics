@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Publication Publication = new()
         {
             Id = Guid.NewGuid(),
-            Releases = new List<ReleaseVersion>
+            ReleaseVersions = new List<ReleaseVersion>
             {
                 ReleaseVersion
             }

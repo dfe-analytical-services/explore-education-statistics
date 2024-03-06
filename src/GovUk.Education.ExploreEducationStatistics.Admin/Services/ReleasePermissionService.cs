@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId,
                     query =>
-                        query.Include(p => p.Releases))
+                        query.Include(p => p.ReleaseVersions))
                 .OnSuccessDo(publication => _userService
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccessVoid(async publication =>

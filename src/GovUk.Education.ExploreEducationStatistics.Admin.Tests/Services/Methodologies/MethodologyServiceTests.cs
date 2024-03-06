@@ -984,7 +984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = true
                     }
                 ),
-                Releases = ListOf(
+                ReleaseVersions = ListOf(
                     new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
@@ -1022,7 +1022,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = false
                     }
                 ),
-                Releases = ListOf(
+                ReleaseVersions = ListOf(
                     new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
@@ -1069,19 +1069,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 // Check that only unpublished Releases are included and that they are in the correct order
 
-                var expectedReleaseAtIndex0 = adoptingPublication.Releases.Single(rv =>
+                var expectedReleaseAtIndex0 = adoptingPublication.ReleaseVersions.Single(rv =>
                     rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ2);
 
-                var expectedReleaseAtIndex1 = adoptingPublication.Releases.Single(rv =>
+                var expectedReleaseAtIndex1 = adoptingPublication.ReleaseVersions.Single(rv =>
                     rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ1);
 
-                var expectedReleaseAtIndex2 = adoptingPublication.Releases.Single(rv =>
+                var expectedReleaseAtIndex2 = adoptingPublication.ReleaseVersions.Single(rv =>
                     rv.Year == 2020 && rv.TimePeriodCoverage == FinancialYearQ4);
 
-                var expectedReleaseAtIndex3 = owningPublication.Releases.Single(rv =>
+                var expectedReleaseAtIndex3 = owningPublication.ReleaseVersions.Single(rv =>
                     rv.Year == 2021 && rv.TimePeriodCoverage == CalendarYear);
 
-                var expectedReleaseAtIndex4 = owningPublication.Releases.Single(rv =>
+                var expectedReleaseAtIndex4 = owningPublication.ReleaseVersions.Single(rv =>
                     rv.Year == 2020 && rv.TimePeriodCoverage == CalendarYear);
 
                 Assert.Equal(5, result.Count);
@@ -1183,7 +1183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = true
                     }
                 ),
-                Releases = ListOf(
+                ReleaseVersions = ListOf(
                     new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
@@ -1203,7 +1203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = false
                     }
                 ),
-                Releases = ListOf(
+                ReleaseVersions = ListOf(
                     new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,

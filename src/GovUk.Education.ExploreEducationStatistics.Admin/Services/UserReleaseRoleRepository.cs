@@ -37,10 +37,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext.Update(publication);
             await ContentDbContext
                 .Entry(publication)
-                .Collection(p => p.Releases)
+                .Collection(p => p.ReleaseVersions)
                 .LoadAsync();
             var allReleaseVersionIds = publication
-                .Releases // Remove on previous release versions as well
+                .ReleaseVersions // Remove on previous release versions as well
                 .Select(rv => rv.Id)
                 .ToList();
             var userReleaseRoles = await ContentDbContext.UserReleaseRoles

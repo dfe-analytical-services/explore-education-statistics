@@ -117,10 +117,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext.Update(publication);
             await _contentDbContext.Entry(publication)
-                .Collection(p => p.Releases)
+                .Collection(p => p.ReleaseVersions)
                 .LoadAsync();
 
-            var releaseVersionIds = publication.Releases
+            var releaseVersionIds = publication.ReleaseVersions
                 .Select(rv => rv.Id)
                 .ToList();
 

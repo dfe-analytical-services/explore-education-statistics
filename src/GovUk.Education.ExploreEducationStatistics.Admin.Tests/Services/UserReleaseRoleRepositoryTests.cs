@@ -565,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new() { Id = Guid.NewGuid(), },
                     new() { Id = Guid.NewGuid(), },
@@ -574,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var publication2 = new Publication
             {
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new() { Id = Guid.NewGuid(), }
                 }
@@ -583,31 +583,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = user,
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Contributor,
             };
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = user,
-                ReleaseVersion = publication.Releases[2],
+                ReleaseVersion = publication.ReleaseVersions[2],
                 Role = Contributor,
             };
             var notDeletedUserReleaseRole1 = new UserReleaseRole
             {
                 User = user,
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = PrereleaseViewer,
             };
             var notDeletedUserReleaseRole2 = new UserReleaseRole
             {
                 User = user,
-                ReleaseVersion = publication2.Releases[0],
+                ReleaseVersion = publication2.ReleaseVersions[0],
                 Role = Contributor,
             };
             var notDeletedUserReleaseRole3 = new UserReleaseRole
             {
                 UserId = Guid.NewGuid(),
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Contributor,
             };
 

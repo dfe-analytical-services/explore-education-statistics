@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [MaxLength(160)]
         public string Summary { get; set; } = string.Empty;
 
-        public List<ReleaseVersion> Releases { get; set; } = new();
+        public List<ReleaseVersion> ReleaseVersions { get; set; } = new();
 
         public List<PublicationMethodology> Methodologies { get; set; } = new();
 

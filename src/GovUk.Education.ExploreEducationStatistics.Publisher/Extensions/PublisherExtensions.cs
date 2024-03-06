@@ -24,7 +24,7 @@ public static class PublisherExtensions
     private static bool IsLatestPublishedVersionOfRelease(this ReleaseVersion releaseVersion,
         IEnumerable<Guid> includedReleaseIds)
     {
-        if (releaseVersion.Publication?.Releases == null || !releaseVersion.Publication.Releases.Any())
+        if (releaseVersion.Publication?.ReleaseVersions == null || !releaseVersion.Publication.ReleaseVersions.Any())
         {
             throw new ArgumentException(
                 "All release versions of the publication must be hydrated to test the latest published version");
@@ -34,7 +34,7 @@ public static class PublisherExtensions
             // Release version itself must be live
             releaseVersion.Live
             // It must also be the latest version unless the later version is a draft not included for publishing
-            && !releaseVersion.Publication.Releases.Any(rv =>
+            && !releaseVersion.Publication.ReleaseVersions.Any(rv =>
                 (rv.Live || includedReleaseIds != null && includedReleaseIds.Contains(rv.Id))
                 && rv.PreviousVersionId == releaseVersion.Id
                 && rv.Id != releaseVersion.Id);

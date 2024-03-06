@@ -500,7 +500,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Topic = topic,
-                Releases = AsList(new ReleaseVersion
+                ReleaseVersions = AsList(new ReleaseVersion
                     {
                         Id = releaseVersion2Id,
                         PreviousVersionId = releaseVersion1Id
@@ -654,7 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Topic = topic,
-                Releases = AsList(new ReleaseVersion
+                ReleaseVersions = AsList(new ReleaseVersion
                 {
                     Id = releaseVersionId
                 })
@@ -716,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = publicationId,
                 Topic = topic,
-                Releases = AsList(new ReleaseVersion
+                ReleaseVersions = AsList(new ReleaseVersion
                 {
                     Id = releaseVersionId
                 })

@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.Contact)
                 .Include(rv => rv.Publication)
-                .ThenInclude(publication => publication.Releases)
+                .ThenInclude(publication => publication.ReleaseVersions)
                 .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
                 .Include(rv => rv.Publication)

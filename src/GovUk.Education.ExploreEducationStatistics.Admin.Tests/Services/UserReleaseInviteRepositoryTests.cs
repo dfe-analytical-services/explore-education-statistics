@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion3 = new ReleaseVersion();
             var publication = new Publication
             {
-                Releases = ListOf(releaseVersion1, releaseVersion3),
+                ReleaseVersions = ListOf(releaseVersion1, releaseVersion3),
             };
             var invite1 = new UserReleaseInvite
             {
