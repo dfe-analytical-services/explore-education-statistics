@@ -48,8 +48,8 @@ jobs:
         inputs:
           command: 'restore'
           projects: |
-            '**/GovUk.*/*csproj'
-            '!**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj'
+            **/GovUk.*/*csproj
+            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
           feedsToUse: config
           nugetConfigPath: src/nuget.config
 
@@ -57,8 +57,8 @@ jobs:
         displayName: 'Build'
         inputs:
           projects: |
-            '**/GovUk.*/*csproj'
-            '!**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj'
+            **/GovUk.*/*csproj
+            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
           arguments: '--configuration $(BuildConfiguration)'
 
       # TODO: Uncomment this step once formatter has been run globally.
@@ -95,8 +95,8 @@ jobs:
         inputs:
           command: 'test'
           projects: |
-            '**/GovUk.*[Tt]ests/*.csproj'
-            '!**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj'
+            **/GovUk.*[Tt]ests/*.csproj
+            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
@@ -169,6 +169,7 @@ jobs:
           targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
   - job: 'Admin'
+    condition: false
     pool:
       name: dfe-development-dw agent pool
     workspace:
@@ -246,6 +247,7 @@ jobs:
           targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'Frontend'
+    condition: false
     pool:
       name: dfe-development-dw agent pool
     workspace:
@@ -339,6 +341,7 @@ jobs:
           tags: $(Build.BuildNumber)
 
   - job: 'MiscellaneousArtifacts'
+    condition: false
     pool:
       vmImage: 'ubuntu-22.04'
     workspace:
