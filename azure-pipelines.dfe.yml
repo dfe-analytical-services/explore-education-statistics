@@ -114,11 +114,20 @@ jobs:
 #          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
 #          zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Public APIs Artifacts'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Public API "API"'
         inputs:
-          artifactName: 'public-api'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api-api'
+          zipAfterPublish: True
+
+#      - task: 'PublishPipelineArtifact@0'
+#        displayName: 'Publish Public APIs Artifacts'
+#        inputs:
+#          artifactName: 'public-api'
+#          targetPath: '$(Build.ArtifactStagingDirectory)/public-api-api'
 
       - task: Docker@2
         displayName: 'Build Public API "API" Container App Docker image'
@@ -128,7 +137,7 @@ jobs:
           repository: 'ees-public-api'
           command: 'build'
           Dockerfile: 'docker/public-api/api/Dockerfile'
-          buildContext: '$(Build.ArtifactStagingDirectory)'
+          buildContext: '$(Build.ArtifactStagingDirectory)/public-api-api'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
         env:
@@ -142,7 +151,7 @@ jobs:
           repository: 'ees-public-api'
           command: 'push'
           Dockerfile: 'docker/public-api/api/Dockerfile'
-          buildContext: '$(System.ArtifactStagingDirectory)'
+          buildContext: '$(System.ArtifactStagingDirectory)/public-api-api'
           tags: $(Build.BuildNumber)
 
 #      - task: 'DotNetCoreCLI@2'
