@@ -57,8 +57,8 @@ param resourceTags {
 param dateProvisioned string = utcNow('u')
 
 var resourcePrefix = '${subscription}-ees-publicapi'
-var storageAccountName = '${subscription}saeescore'
-var keyVaultName = '${subscription}-kv-ees-01'
+var storageAccountName = '${subscription}saeescoredw'
+var keyVaultName = '${subscription}-kv-ees-01dw'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
