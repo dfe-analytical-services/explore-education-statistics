@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var newReleaseVersion = new ReleaseVersion
                     {
                         Id = _guidGenerator.NewGuid(),
-                        ReleaseParent = new ReleaseParent(),
+                        Release = new Release(),
                         PublicationId = releaseCreate.PublicationId,
                         Slug = releaseCreate.Slug,
                         TimePeriodCoverage = releaseCreate.TimePeriodCoverage,

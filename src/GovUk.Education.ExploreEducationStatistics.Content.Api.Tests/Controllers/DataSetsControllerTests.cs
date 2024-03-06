@@ -59,7 +59,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -98,7 +98,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -137,7 +137,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     // Publications have different themes
                     .WithTopics(_fixture.DefaultTopic()
@@ -182,11 +182,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                            .DefaultRelease(publishedVersions: 1, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
@@ -229,11 +229,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                            .DefaultRelease(publishedVersions: 1, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
@@ -276,11 +276,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has a published and unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -327,8 +327,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // Set up a publication with a release that has 2 published versions
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -370,11 +370,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -412,11 +412,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     // Publications have different themes
                     .WithTopics(_fixture.DefaultTopic()
@@ -455,7 +455,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -501,7 +501,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -539,13 +539,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // reverse chronological order with a published release version for both publications.
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2022),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021),
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
@@ -613,13 +613,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // unpublished versions
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1)))
+                            .DefaultRelease(publishedVersions: 1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
@@ -688,7 +688,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -740,7 +740,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -784,7 +784,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -831,7 +831,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -877,7 +877,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -924,7 +924,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -985,7 +985,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
@@ -1042,7 +1042,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1098,7 +1098,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1158,7 +1158,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1166,7 +1166,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1205,7 +1205,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1213,7 +1213,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1252,7 +1252,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1260,7 +1260,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1527,7 +1527,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1651,8 +1651,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task FetchDataSetDetails_Success()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
@@ -1699,8 +1699,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task NoRelease_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
@@ -1727,8 +1727,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task NoFile_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
@@ -1755,8 +1755,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task ReleaseNotPublished_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
@@ -1783,8 +1783,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task AmendmentNotPublished_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));

@@ -2553,13 +2553,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2591,8 +2591,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.Releases.Single();
@@ -2638,13 +2638,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2674,13 +2674,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2711,8 +2711,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
@@ -2746,8 +2746,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
@@ -2777,8 +2777,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2)
                     .Generate(4));
 
             var contextId = Guid.NewGuid().ToString();
