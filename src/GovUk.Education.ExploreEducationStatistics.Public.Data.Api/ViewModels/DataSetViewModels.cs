@@ -168,27 +168,7 @@ public class DataSetVersionViewModel
 /// <summary>
 /// A paginated list of data set versions.
 /// </summary>
-public record DataSetVersionPaginatedListViewModel : PaginatedListViewModel<DataSetVersionViewModel>
-{
-    public DataSetVersionPaginatedListViewModel(
-        List<DataSetVersionViewModel> results,
-        int totalResults,
-        int page,
-        int pageSize)
-        : base(
-            results: results,
-            totalResults: totalResults,
-            page: page,
-            pageSize: pageSize)
-    {
-    }
-
-    [JsonConstructor]
-    public DataSetVersionPaginatedListViewModel(List<DataSetVersionViewModel> results, PagingViewModel paging)
-        : base(results, paging)
-    {
-    }
-}
+public record DataSetVersionPaginatedListViewModel : PaginatedListViewModel<DataSetVersionViewModel>;
 
 /// <summary>
 /// All the metadata associated with a data set.
