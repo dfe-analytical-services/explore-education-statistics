@@ -21,4 +21,8 @@ public interface IDataSetService
         Guid dataSetId,
         int page,
         int pageSize);
+
+    Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
+        Guid dataSetId,
+        string? dataSetVersion = null);
 }

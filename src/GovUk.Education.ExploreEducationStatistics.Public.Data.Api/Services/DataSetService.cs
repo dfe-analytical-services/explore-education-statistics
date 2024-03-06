@@ -96,11 +96,11 @@ internal class DataSetService : IDataSetService
         var totalResults = await queryable.CountAsync();
 
         var dataSetVersions = (await queryable
-                .OrderByDescending(ds => ds.VersionMajor)
-                .ThenByDescending(ds => ds.VersionMinor)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync())
+            .OrderByDescending(dsv => dsv.VersionMajor)
+            .ThenByDescending(dsv => dsv.VersionMinor)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync())
             .Select(MapDataSetVersion)
             .ToList();
 
@@ -109,6 +109,22 @@ internal class DataSetService : IDataSetService
             Results = dataSetVersions,
             Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
         };
+    }
+
+    public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(Guid dataSetId, string? dataSetVersion = null)
+    {
+        return await GetVersionWithMeta(dataSetId, dataSetVersion)
+            .OnSuccess(MapVersionMeta);
+    }
+
+    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
+    {
+        return await _publicDataDbContext.DataSets
+            .Include(ds => ds.LatestVersion)
+            .Where(ds => ds.Id == dataSetId)
+            .Where(ds => ds.Status == DataSetStatus.Published
+                || ds.Status == DataSetStatus.Deprecated)
+            .SingleOrNotFound();
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -178,6 +194,162 @@ internal class DataSetService : IDataSetService
             GeographicLevels = dataSetVersion.MetaSummary.GeographicLevels,
             Filters = dataSetVersion.MetaSummary.Filters,
             Indicators = dataSetVersion.MetaSummary.Indicators,
+        };
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> GetVersionWithMeta(
+        Guid dataSetId,
+        string? dataSetVersion = null)
+    {
+        if (dataSetVersion is null)
+        {
+            return await GetVersionWithMeta(dataSetId)
+                .OrderByDescending(dsv => dsv.VersionMajor)
+                .ThenByDescending(dsv => dsv.VersionMinor)
+                .FirstOrNotFound();
+        }
+
+        if (!VersionUtils.TryParse(dataSetVersion, out var version))
+        {
+            return new NotFoundResult();
+        }
+
+        return await GetVersionWithMeta(dataSetId)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .SingleOrNotFound();
+    }
+
+    private IQueryable<DataSetVersion> GetVersionWithMeta(Guid dataSetId)
+    {
+        return _publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.FilterMetas)
+            .ThenInclude(fm => fm.Options)
+            .ThenInclude(fom => fom.MetaLinks)
+            .Include(dsv => dsv.LocationMetas)
+            .ThenInclude(lm => lm.Options)
+            .ThenInclude(lom => lom.MetaLinks)
+            .Include(dsv => dsv.IndicatorMetas)
+            .Include(dsv => dsv.TimePeriodMetas)
+            .AsSplitQuery()
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.Status == DataSetVersionStatus.Published
+                || dsv.Status == DataSetVersionStatus.Unpublished
+                || dsv.Status == DataSetVersionStatus.Deprecated);
+    }
+
+    private DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
+    {
+        return new DataSetMetaViewModel
+        {
+            Filters = dataSetVersion.FilterMetas.Select(MapFilterMeta).ToList(),
+            Indicators = dataSetVersion.IndicatorMetas.Select(MapIndicatorMeta).ToList(),
+            GeographicLevels = dataSetVersion.LocationMetas.Select(lm => lm.Level).ToList(),
+            Locations = dataSetVersion.LocationMetas.Select(MapLocationMeta).ToList(),
+            TimePeriods = dataSetVersion.TimePeriodMetas.Select(MapTimePeriod).ToList(),
+        };
+    }
+
+    private static FilterMetaViewModel MapFilterMeta(FilterMeta filterMeta)
+    {
+        return new FilterMetaViewModel
+        {
+            Id = filterMeta.PublicId,
+            Hint = filterMeta.Hint,
+            Label = filterMeta.Label,
+            Options = filterMeta.Options.Select(fom => MapFilterOptionMeta(filterMeta, fom)).ToList(),
+        };
+    }
+
+    private static FilterOptionMetaViewModel MapFilterOptionMeta(FilterMeta filterMeta, FilterOptionMeta filterOptionMeta)
+    {
+        var publicId = filterOptionMeta.MetaLinks.Single(ml => ml.MetaId == filterMeta.Id).PublicId;
+
+        return new FilterOptionMetaViewModel
+        {
+            Id = SqidProcessor.Encode(publicId),
+            Label = filterOptionMeta.Label,
+            IsAggregate = filterOptionMeta.IsAggregate,
+        };
+    }
+
+    private static IndicatorMetaViewModel MapIndicatorMeta(IndicatorMeta indicatorMeta)
+    {
+        return new IndicatorMetaViewModel
+        {
+            Id = indicatorMeta.PublicId,
+            Label = indicatorMeta.Label,
+            Unit = indicatorMeta.Unit,
+            DecimalPlaces = indicatorMeta.DecimalPlaces,
+        };
+    }
+
+    private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
+    {
+        return new LocationLevelMetaViewModel
+        {
+            Level = locationMeta.Level,
+            Options = locationMeta.Options.Select(lom => MapLocationOptionMeta(locationMeta, lom)).ToList(),
+        };
+    }
+
+    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationMeta locationMeta, LocationOptionMeta locationOptionMeta)
+    {
+        var publicId = locationOptionMeta.MetaLinks.Single(ml => ml.MetaId == locationMeta.Id).PublicId;
+
+        var encodedId = SqidProcessor.Encode(publicId);
+
+        switch (locationOptionMeta)
+        {
+            case LocationCodedOptionMeta locationCodedOptionMeta:
+                return new LocationCodedOptionMetaViewModel
+                {
+                    Id = encodedId,
+                    Label = locationCodedOptionMeta.Label,
+                    Code = locationCodedOptionMeta.Code,
+                };
+            case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
+                return new LocationLocalAuthorityOptionMetaViewModel
+                {
+                    Id = encodedId,
+                    Label = locationLocalAuthorityOptionMeta.Label,
+                    Code = locationLocalAuthorityOptionMeta.Code,
+                    OldCode = locationLocalAuthorityOptionMeta.OldCode,
+                };
+            case LocationProviderOptionMeta locationProviderOptionMeta:
+                return new LocationProviderOptionMetaViewModel
+                {
+                    Id = encodedId,
+                    Label = locationProviderOptionMeta.Label,
+                    Ukprn = locationProviderOptionMeta.Ukprn,
+                };
+            case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
+                return new LocationRscRegionOptionMetaViewModel
+                {
+                    Id = encodedId,
+                    Label = locationRscRegionOptionMeta.Label,
+                };
+            case LocationSchoolOptionMeta locationSchoolOptionMeta:
+                return new LocationSchoolOptionMetaViewModel
+                {
+                    Id = encodedId,
+                    Label = locationSchoolOptionMeta.Label,
+                    Urn = locationSchoolOptionMeta.Urn,
+                    LaEstab = locationSchoolOptionMeta.LaEstab,
+                };
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    private static TimePeriodMetaViewModel MapTimePeriod(TimePeriodMeta timePeriodMeta)
+    {
+        return new TimePeriodMetaViewModel
+        {
+            Code = timePeriodMeta.Code,
+            Period = TimePeriodFormatter.FormatYear(timePeriodMeta.Year, timePeriodMeta.Code),
+            Label = TimePeriodFormatter.Format(timePeriodMeta.Year, timePeriodMeta.Code),
         };
     }
 }

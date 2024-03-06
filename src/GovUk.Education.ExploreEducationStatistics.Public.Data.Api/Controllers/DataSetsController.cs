@@ -78,4 +78,23 @@ public class DataSetsController : ControllerBase
                 pageSize: request.PageSize)
             .HandleFailuresOrOk();
     }
+
+    /// <summary>
+    /// Get a data set’s metadata
+    /// </summary>
+    /// <remarks>
+    /// Get the metadata about a data set. Use this to create data set queries.
+    /// </remarks>
+    [HttpGet("{dataSetId:guid}/meta")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
+    [SwaggerResponse(404)]
+    public async Task<ActionResult<DataSetMetaViewModel>> GetMeta(
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] string? dataSetVersion,
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
+    {
+        return await _dataSetService
+            .GetMeta(dataSetId, dataSetVersion)
+            .HandleFailuresOrOk();
+    }
 }

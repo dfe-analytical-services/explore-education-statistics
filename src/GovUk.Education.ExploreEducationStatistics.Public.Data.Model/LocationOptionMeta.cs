@@ -115,7 +115,7 @@ public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
 
      public new required string OldCode
      {
-         get => base.OldCode!;
+         get => base.OldCode ?? string.Empty;
          set => base.OldCode = value;
      }
 
