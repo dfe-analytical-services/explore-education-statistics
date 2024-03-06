@@ -131,7 +131,7 @@ jobs:
 
       - task: Docker@2
         displayName: 'Build Public API "API" Container App Docker image'
-        condition: eq(variables.IsBranchDeployable, true)
+#        condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: 'dfe-development-dw acr service connection'
           repository: 'ees-public-api'
@@ -145,7 +145,7 @@ jobs:
 
       - task: Docker@2
         displayName: 'Push Public API "API" Container App Docker image'
-        condition: eq(variables.IsBranchDeployable, true)
+#        condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: 'dfe-development-dw acr service connection'
           repository: 'ees-public-api'
