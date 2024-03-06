@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,7 +9,7 @@ public class ReleaseParent : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; set; }
 
-    public List<Release> Releases { get; set; } = new();
+    public List<ReleaseVersion> Versions { get; set; } = new();
 
     public DateTime Created { get; set; }
 

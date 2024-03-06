@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -117,13 +117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetTimePeriodLabels()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var subject = new Subject();
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = subject
             };
 
@@ -152,10 +152,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.AddRangeAsync(
+                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+                statisticsDbContext.Subject.Add(subject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(
                     subjectObservation1,
                     subjectObservation2,
                     subjectObservation3);
@@ -176,13 +176,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetTimePeriodLabels_CorrectlyOrderWeeks()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var subject = new Subject();
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = subject
             };
 
@@ -210,10 +210,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.AddRangeAsync(
+                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+                statisticsDbContext.Subject.Add(subject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
+                statisticsDbContext.Observation.AddRange(
                     subjectObservation1,
                     subjectObservation2,
                     subjectObservation3);
@@ -234,13 +234,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetTimePeriodLabels_NoObservations()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var subject = new Subject();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Subject = subject
             };
 
@@ -248,9 +248,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject1);
+                statisticsDbContext.ReleaseVersion.Add(releaseVersion);
+                statisticsDbContext.Subject.Add(subject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject1);
                 await statisticsDbContext.SaveChangesAsync();
             }
 

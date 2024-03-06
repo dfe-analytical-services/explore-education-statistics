@@ -16,10 +16,10 @@ public static class FeaturedTableGeneratorExtensions
         int order)
         => generator.ForInstance(s => s.SetOrder(order));
 
-    public static Generator<FeaturedTable> WithRelease(
+    public static Generator<FeaturedTable> WithReleaseVersion(
         this Generator<FeaturedTable> generator,
-        Release release)
-        => generator.ForInstance(s => s.SetRelease(release));
+        ReleaseVersion releaseVersion)
+        => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
 
     public static Generator<FeaturedTable> WithDataBlock(
         this Generator<FeaturedTable> generator,
@@ -57,12 +57,13 @@ public static class FeaturedTableGeneratorExtensions
         int order)
         => setters.Set(s => s.Order, order);
 
-    public static InstanceSetters<FeaturedTable> SetRelease(
+    public static InstanceSetters<FeaturedTable> SetReleaseVersion(
         this InstanceSetters<FeaturedTable> setters,
-        Release release)
+        ReleaseVersion releaseVersion)
         => setters
-            .Set(s => s.Release, release)
-            .Set(s => s.ReleaseId, release.Id);
+            .Set(s => s.ReleaseVersion, releaseVersion)
+            .Set(s => s.ReleaseVersionId, releaseVersion.Id);
+
     public static InstanceSetters<FeaturedTable> SetDataBlock(
         this InstanceSetters<FeaturedTable> setters,
         DataBlock dataBlock)

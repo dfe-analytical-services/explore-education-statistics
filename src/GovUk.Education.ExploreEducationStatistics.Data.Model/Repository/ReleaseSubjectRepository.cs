@@ -26,11 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         }
 
         public async Task<IReadOnlyList<ReleaseSubject>> FindAll(
-            Guid releaseId,
+            Guid releaseVersionId,
             Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null)
         {
             IQueryable<ReleaseSubject> query = _statisticsDbContext.ReleaseSubject
-                .Where(rs => rs.ReleaseId == releaseId);
+                .Where(rs => rs.ReleaseVersionId == releaseVersionId);
 
             if (queryExtender is not null)
             {
@@ -41,31 +41,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .ToListAsync();
         }
 
-        public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = true)
+        public async Task DeleteAllReleaseSubjects(Guid releaseVersionId, bool softDeleteOrphanedSubjects = true)
         {
             await _statisticsDbContext.ReleaseSubject
-                .Where(rs => rs.ReleaseId == releaseId)
+                .Where(rs => rs.ReleaseVersionId == releaseVersionId)
                 .Select(rs => rs.SubjectId)
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async subjectId =>
                 {
-                    await DeleteReleaseSubject(releaseId: releaseId,
+                    await DeleteReleaseSubject(releaseVersionId: releaseVersionId,
                         subjectId: subjectId,
                         softDeleteOrphanedSubject: softDeleteOrphanedSubjects);
                 });
         }
 
-        public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = true)
+        public async Task DeleteReleaseSubject(Guid releaseVersionId,
+            Guid subjectId,
+            bool softDeleteOrphanedSubject = true)
         {
-            await DeleteReleaseSubjectIfExists(releaseId: releaseId, subjectId: subjectId);
-            await _footnoteRepository.DeleteFootnotesBySubject(releaseId: releaseId, subjectId: subjectId);
+            await DeleteReleaseSubjectIfExists(releaseVersionId: releaseVersionId, subjectId: subjectId);
+            await _footnoteRepository.DeleteFootnotesBySubject(releaseVersionId: releaseVersionId,
+                subjectId: subjectId);
             await DeleteSubjectIfOrphaned(subjectId: subjectId, softDeleteOrphanedSubject);
         }
 
-        private async Task DeleteReleaseSubjectIfExists(Guid releaseId, Guid subjectId)
+        private async Task DeleteReleaseSubjectIfExists(Guid releaseVersionId, Guid subjectId)
         {
             var releaseSubject = await _statisticsDbContext.ReleaseSubject
-                .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
+                .FirstOrDefaultAsync(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId);
             if (releaseSubject != null)
             {
                 _statisticsDbContext.Remove(releaseSubject);

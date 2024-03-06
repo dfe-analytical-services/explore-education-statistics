@@ -29,20 +29,20 @@ public class ReleaseCacheService : IReleaseCacheService
 
     [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
-        Guid releaseId,
+        Guid releaseVersionId,
         string publicationSlug,
         string? releaseSlug = null)
     {
-        return _releaseService.GetRelease(releaseId);
+        return _releaseService.GetRelease(releaseVersionId);
     }
 
     [BlobCache(typeof(ReleaseStagedCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
-        Guid releaseId,
+        Guid releaseVersionId,
         DateTime expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null)
     {
-        return _releaseService.GetRelease(releaseId, expectedPublishDate);
+        return _releaseService.GetRelease(releaseVersionId, expectedPublishDate);
     }
 }

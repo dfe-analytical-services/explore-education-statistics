@@ -23,7 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
             IMethodologyCacheService methodologyCacheService,
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
@@ -428,13 +428,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // Note the 'live' filter is applied after the latest release versions are retrieved.
                     // A published release with a current draft version is deliberately not returned when 'live' is true.
-                    var releases = (await _releaseRepository.ListLatestReleaseVersions(publicationId))
-                        .Where(release => live == null || release.Live == live)
+                    var releaseVersions = (await _releaseVersionRepository.ListLatestReleaseVersions(publicationId))
+                        .Where(rv => live == null || rv.Live == live)
                         .ToList();
 
-                    return await releases
+                    return await releaseVersions
                         .ToAsyncEnumerable()
-                        .SelectAwait(async r => await HydrateReleaseListItemViewModel(r, includePermissions))
+                        .SelectAwait(async rv => await HydrateReleaseListItemViewModel(rv, includePermissions))
                         .ToListAsync();
                 });
         }
@@ -556,13 +556,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationCreateViewModel;
         }
 
-        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)
+        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(ReleaseVersion releaseVersion,
+            bool includePermissions)
         {
-            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
+            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
 
             if (includePermissions)
             {
-                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
+                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
             }
 
             return viewModel;

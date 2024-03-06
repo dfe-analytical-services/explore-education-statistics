@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(userReleaseRole =>
                     userReleaseRole.UserId == userId &&
                     userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
-                .Select(userReleaseRole => userReleaseRole.Release.Publication)
+                .Select(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
                 .Concat(_context
                     .UserPublicationRoles
                     .AsQueryable()

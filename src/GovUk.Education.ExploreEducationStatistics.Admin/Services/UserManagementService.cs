@@ -21,7 +21,8 @@ using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserRoleService userRoleService,
             IUserService userService,
             IUserInviteRepository userInviteRepository,
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
@@ -114,20 +115,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    var releases = await _releaseRepository.ListLatestReleaseVersions();
-                    return await releases
+                    var releaseVersions = await _releaseVersionRepository.ListLatestReleaseVersions();
+                    return await releaseVersions
                         .ToAsyncEnumerable()
-                        .SelectAwait(async release =>
+                        .SelectAwait(async releaseVersion =>
                         {
                             var publicationTitle = await _contentDbContext.Publications
-                                .Where(p => p.Id == release.PublicationId)
+                                .Where(p => p.Id == releaseVersion.PublicationId)
                                 .Select(p => p.Title)
                                 .FirstAsync();
 
                             return new IdTitleViewModel
                             {
-                                Id = release.Id,
-                                Title = $"{publicationTitle} - {release.Title}"
+                                Id = releaseVersion.Id,
+                                Title = $"{publicationTitle} - {releaseVersion.Title}"
                             };
                         })
                         .ToListAsync();
@@ -240,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 var userReleaseInvites = await _contentDbContext
                                     .UserReleaseInvites
                                     .Include(userReleaseInvite =>
-                                        userReleaseInvite.Release.Publication)
+                                        userReleaseInvite.ReleaseVersion.Publication)
                                     .Where(userReleaseInvite =>
                                         userReleaseInvite.Email.ToLower().Equals(invite.Email.ToLower()))
                                     .ToListAsync();
@@ -250,8 +251,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         new UserReleaseRoleViewModel
                                         {
                                             Id = userReleaseInvite.Id,
-                                            Publication = userReleaseInvite.Release.Publication.Title,
-                                            Release = userReleaseInvite.Release.Title,
+                                            Publication = userReleaseInvite.ReleaseVersion.Publication.Title,
+                                            Release = userReleaseInvite.ReleaseVersion.Title,
                                             Role = userReleaseInvite.Role,
                                         }
                                     ).ToList();
@@ -328,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     foreach (var userReleaseRole in request.UserReleaseRoles)
                     {
                         await _userReleaseInviteRepository.Create(
-                            releaseId: userReleaseRole.ReleaseId,
+                            releaseVersionId: userReleaseRole.ReleaseId,
                             email: sanitisedEmail,
                             releaseRole: userReleaseRole.ReleaseRole,
                             emailSent: true,
@@ -348,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var userReleaseInvites = _contentDbContext
                         .UserReleaseInvites
-                        .Include(invite => invite.Release.Publication)
+                        .Include(invite => invite.ReleaseVersion.Publication)
                         .Where(invite => invite.Email.ToLower() == sanitisedEmail)
                         .ToList();
 

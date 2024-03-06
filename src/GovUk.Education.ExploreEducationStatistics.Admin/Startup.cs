@@ -83,16 +83,16 @@ using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Ser
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
-            services.AddTransient<IReleaseRepository, ReleaseRepository>();
+            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
             services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
@@ -446,8 +446,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
-            services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
-                Content.Model.Repository.ReleaseRepository>();
+            services.AddTransient<Content.Model.Repository.Interfaces.IReleaseVersionRepository,
+                Content.Model.Repository.ReleaseVersionRepository>();
             services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
                 Content.Model.Repository.PublicationRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();

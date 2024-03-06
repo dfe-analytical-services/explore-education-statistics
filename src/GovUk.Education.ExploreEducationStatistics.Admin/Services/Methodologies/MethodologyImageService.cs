@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,8 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(async release => await _userService.CheckCanUpdateMethodologyVersion(release, forceDelete))
-                .OnSuccess(async release =>
+                .OnSuccess(async methodologyVersion => await _userService.CheckCanUpdateMethodologyVersion(methodologyVersion, forceDelete))
+                .OnSuccess(async _ =>
                     await fileIds.Select(fileId =>
                         _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
                 .OnSuccessVoid(async files =>

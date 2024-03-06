@@ -25,7 +25,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Id = Guid.NewGuid()
         };
 
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             PublicationId = Publication.Id,
@@ -50,12 +50,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetRelease()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.GetRelease(_release.Id);
+                        return service.GetRelease(_releaseVersion.Id);
                     }
                 );
         }
@@ -97,12 +97,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetDeleteReleasePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanDeleteSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanDeleteSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.GetDeleteReleasePlan(_release.Id);
+                        return service.GetDeleteReleasePlan(_releaseVersion.Id);
                     }
                 );
         }
@@ -111,12 +111,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task DeleteRelease()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanDeleteSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanDeleteSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.DeleteRelease(_release.Id);
+                        return service.DeleteRelease(_releaseVersion.Id);
                     }
                 );
         }
@@ -124,9 +124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
-            var releaseRepository = new Mock<IReleaseRepository>();
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>();
 
-            var list = new List<Release>
+            var list = new List<ReleaseVersion>
             {
                 new()
                 {
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         var service = BuildReleaseService(
                             userService.Object,
-                            releaseRepository: releaseRepository.Object
+                            releaseVersionRepository: releaseVersionRepository.Object
                         );
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
@@ -180,16 +180,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-            releaseRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
-            releaseRepository.VerifyNoOtherCalls();
+            releaseVersionRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
+            releaseVersionRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
         public async Task ListReleasesWithStatuses_CanViewRelatedReleases()
         {
-            var repository = new Mock<IReleaseRepository>();
+            var repository = new Mock<IReleaseVersionRepository>();
 
-            var list = new List<Release>
+            var list = new List<ReleaseVersion>
             {
                 new()
                 {
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                         var service = BuildReleaseService(
                             userService.Object,
-                            releaseRepository: repository.Object
+                            releaseVersionRepository: repository.Object
                         );
                         var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
@@ -269,12 +269,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveDataFiles()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     async userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return await service.RemoveDataFiles(_release.Id, Guid.NewGuid());
+                        return await service.RemoveDataFiles(_releaseVersion.Id, Guid.NewGuid());
                     }
                 );
         }
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildReleaseService(userService.Object);
-                        return service.UpdateReleasePublished(_release.Id,
+                        return service.UpdateReleasePublished(_releaseVersion.Id,
                             new ReleasePublishedUpdateRequest());
                     }
                 );
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseService BuildReleaseService(
             IUserService userService,
             ContentDbContext? context = null,
-            IReleaseRepository? releaseRepository = null)
+            IReleaseVersionRepository? releaseVersionRepository = null)
         {
             return new ReleaseService(
                 context ?? Mock.Of<ContentDbContext>(),
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AdminMapper(),
                 DefaultPersistenceHelperMock().Object,
                 userService,
-                releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
                 Mock.Of<IReleaseCacheService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseDataFileService>(),
@@ -321,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
             MockUtils.SetupCall(mock, Publication.Id, Publication);
 
             return mock;

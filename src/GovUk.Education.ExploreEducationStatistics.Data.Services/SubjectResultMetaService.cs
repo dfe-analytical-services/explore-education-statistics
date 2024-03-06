@@ -75,11 +75,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         public async Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
-            Guid releaseId,
+            Guid releaseVersionId,
             ObservationQueryContext query,
             IList<Observation> observations)
         {
-            return await CheckReleaseSubjectExists(releaseId, query.SubjectId)
+            return await CheckReleaseSubjectExists(releaseVersionId: releaseVersionId,
+                    subjectId: query.SubjectId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(async releaseSubject =>
                 {
@@ -106,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Restart();
 
                     var footnoteViewModels = await GetFootnoteViewModels(
-                        releaseId: releaseId,
+                        releaseVersionId: releaseVersionId,
                         subjectId: query.SubjectId,
                         filterItemIds: filterItems.Select(fi => fi.Id).ToList(),
                         indicatorIds: indicatorViewModels.Select(i => i.Value).ToList());
@@ -121,7 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                     var releaseFile =
-                        await _releaseDataFileRepository.GetBySubject(releaseId, releaseSubject.SubjectId);
+                        await _releaseDataFileRepository.GetBySubject(releaseVersionId: releaseVersionId,
+                            subjectId: releaseSubject.SubjectId);
                     var subjectName = releaseFile.Name!;
 
                     var locationViewModels =
@@ -147,12 +149,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseId, Guid subjectId)
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseVersionId,
+            Guid subjectId)
         {
             return _persistenceHelper.CheckEntityExists<ReleaseSubject>(
                 query => query
                     .Include(rs => rs.Subject)
-                    .Where(rs => rs.ReleaseId == releaseId
+                    .Where(rs => rs.ReleaseVersionId == releaseVersionId
                                  && rs.SubjectId == subjectId)
             );
         }
@@ -180,14 +183,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private async Task<List<FootnoteViewModel>> GetFootnoteViewModels(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds)
         {
             var footnotes = await _footnoteRepository
                 .GetFilteredFootnotes(
-                    releaseId: releaseId,
+                    releaseVersionId: releaseVersionId,
                     subjectId: subjectId,
                     filterItemIds: filterItemIds,
                     indicatorIds: indicatorIds);

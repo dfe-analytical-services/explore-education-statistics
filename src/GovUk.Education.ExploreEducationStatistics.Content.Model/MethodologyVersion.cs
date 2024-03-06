@@ -63,9 +63,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
-        public Release? ScheduledWithRelease { get; set; }
+        public ReleaseVersion? ScheduledWithReleaseVersion { get; set; }
 
-        public Guid? ScheduledWithReleaseId { get; set; }
+        public Guid? ScheduledWithReleaseVersionId { get; set; }
 
         public bool Approved => Status == MethodologyApprovalStatus.Approved;
 
@@ -82,12 +82,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                     return false;
                 }
 
-                if (ScheduledWithReleaseId == null || ScheduledWithRelease == null)
+                if (ScheduledWithReleaseVersionId == null || ScheduledWithReleaseVersion == null)
                 {
                     throw new InvalidOperationException("ScheduledWithRelease field not included in MethodologyVersion");
                 }
 
-                return ScheduledWithRelease.Live;
+                return ScheduledWithReleaseVersion.Live;
             }
         }
 

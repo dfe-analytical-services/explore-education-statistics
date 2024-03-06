@@ -73,16 +73,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> ListReleaseStatuses(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _context
-                .Releases
-                .SingleOrNotFoundAsync(r => r.Id == releaseId)
-                .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
-                .OnSuccess(async release =>
+                .ReleaseVersions
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersionStatusHistory)
+                .OnSuccess(async releaseVersion =>
                 {
                     return await _context.ReleaseStatus
-                        .Where(rs => rs.Release.ReleaseParentId == release.ReleaseParentId)
+                        .Where(rs => rs.ReleaseVersion.ReleaseParentId == releaseVersion.ReleaseParentId)
                         .OrderByDescending(rs => rs.Created)
                         .Select(rs =>
                             new ReleaseStatusViewModel
@@ -92,58 +92,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 ApprovalStatus = rs.ApprovalStatus,
                                 Created = rs.Created,
                                 CreatedByEmail = rs.CreatedBy == null ? null : rs.CreatedBy.Email,
-                                ReleaseVersion = rs.Release.Version
+                                ReleaseVersion = rs.ReleaseVersion.Version
                             })
                         .ToListAsync();
                 });
         }
 
         public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseStatusCreateRequest request)
         {
             return await _context
-                .Releases
+                .ReleaseVersions
                 .HydrateReleaseForChecklist()
-                .SingleOrNotFoundAsync(r => r.Id == releaseId)
-                .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
+                .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
+                .OnSuccessDo(releaseVersion => _userService.CheckCanUpdateReleaseVersionStatus(releaseVersion, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
-                .OnSuccess(async release =>
+                .OnSuccess(async releaseVersion =>
                 {
-                    if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && release.Published.HasValue)
+                    if (request.ApprovalStatus != ReleaseApprovalStatus.Approved && releaseVersion.Published.HasValue)
                     {
                         return ValidationActionResult(PublishedReleaseCannotBeUnapproved);
                     }
 
-                    var oldStatus = release.ApprovalStatus;
+                    var oldStatus = releaseVersion.ApprovalStatus;
 
-                    release.ApprovalStatus = request.ApprovalStatus;
-                    release.NextReleaseDate = request.NextReleaseDate;
-                    release.NotifySubscribers = release.Version == 0 || (request.NotifySubscribers ?? false);
-                    release.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
-                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
+                    releaseVersion.ApprovalStatus = request.ApprovalStatus;
+                    releaseVersion.NextReleaseDate = request.NextReleaseDate;
+                    releaseVersion.NotifySubscribers =
+                        releaseVersion.Version == 0 || (request.NotifySubscribers ?? false);
+                    releaseVersion.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
+                    releaseVersion.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
                         ? _dateTimeProvider.UtcNow
                         : request.PublishScheduledDate;
 
                     var releaseStatus = new ReleaseStatus
                     {
                         Id = Guid.NewGuid(),
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         InternalReleaseNote = request.InternalReleaseNote,
                         ApprovalStatus = request.ApprovalStatus,
                         CreatedById = _userService.GetUserId()
                     };
 
                     return await
-                        ValidateReleaseWithChecklist(release)
-                        .OnSuccess(() => RemoveUnusedImages(release.Id))
-
+                        ValidateReleaseWithChecklist(releaseVersion)
+                        .OnSuccess(() => RemoveUnusedImages(releaseVersion.Id))
                         .OnSuccess(() =>
-                            SendEmailNotificationsAndInvites(request, release)
-                            .OnSuccess(() => NotifyPublisher(releaseId, request, oldStatus, releaseStatus))
+                            SendEmailNotificationsAndInvites(request, releaseVersion)
+                            .OnSuccess(() => NotifyPublisher(releaseVersionId, request, oldStatus, releaseStatus))
                             .OnSuccessDo(async () =>
                             {
-                                _context.Releases.Update(release);
+                                _context.ReleaseVersions.Update(releaseVersion);
                                 await _context.AddAsync(releaseStatus);
                                 await _context.SaveChangesAsync();
                             }));
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> NotifyPublisher(
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseStatusCreateRequest request,
             ReleaseApprovalStatus oldStatus,
             ReleaseStatus releaseStatus)
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 request.ApprovalStatus == ReleaseApprovalStatus.Approved)
             {
                 return await _publishingService.ReleaseChanged(
-                    releaseId,
+                    releaseVersionId,
                     releaseStatus.Id,
                     request.PublishMethod == PublishMethod.Immediate);
             }
@@ -171,34 +171,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> SendEmailNotificationsAndInvites(
             ReleaseStatusCreateRequest request,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
                 && request.PublishMethod == PublishMethod.Scheduled)
             {
-                return await SendPreReleaseUserInviteEmails(release);
+                return await SendPreReleaseUserInviteEmails(releaseVersion);
             }
 
             if (request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview)
             {
-                return await SendHigherLevelReviewNotificationEmails(release);
+                return await SendHigherLevelReviewNotificationEmails(releaseVersion);
             }
 
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> SendHigherLevelReviewNotificationEmails(Release release)
+        private async Task<Either<ActionResult, Unit>> SendHigherLevelReviewNotificationEmails(
+            ReleaseVersion releaseVersion)
         {
             var userReleaseRoles =
                 await _userReleaseRoleService.ListUserReleaseRolesByPublication(
                     ReleaseRole.Approver,
-                    release.Publication.Id);
+                    releaseVersion.Publication.Id);
 
             var userPublicationRoles = await _context
                 .UserPublicationRoles
                 .Include(upr => upr.User)
                 .Where(upr =>
-                    upr.PublicationId == release.PublicationId
+                    upr.PublicationId == releaseVersion.PublicationId
                     && upr.Role == PublicationRole.Approver)
                 .ToListAsync();
 
@@ -210,19 +211,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Select(urr => urr.User.Email)
                     .Concat(userPublicationRoles.Select(upr => upr.User.Email))
                     .Distinct()
-                    .Select(email => _emailTemplateService.SendReleaseHigherReviewEmail(email, release))
+                    .Select(email => _emailTemplateService.SendReleaseHigherReviewEmail(email, releaseVersion))
                     .OnSuccessAllReturnVoid();
             }
 
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(Release release)
+        private async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(ReleaseVersion releaseVersion)
         {
             var unsentUserReleaseInvites = await _context
                 .UserReleaseInvites
                 .Where(i =>
-                    i.ReleaseId == release.Id
+                    i.ReleaseVersionId == releaseVersion.Id
                     && i.Role == ReleaseRole.PrereleaseViewer
                     && !i.EmailSent)
                 .ToListAsync();
@@ -233,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var user = await _userRepository.FindByEmail(invite.Email);
                     return await _preReleaseUserService.SendPreReleaseInviteEmail(
-                            release,
+                            releaseVersion,
                             invite.Email.ToLower(),
                             isNewUser: user == null)
                         .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
@@ -243,16 +244,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return emailResults.OnSuccessAllReturnVoid();
         }
 
-        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseId)
+        private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseVersionId)
         {
-            return await _contentService.GetContentBlocks<HtmlBlock>(releaseId)
+            return await _contentService.GetContentBlocks<HtmlBlock>(releaseVersionId)
                 .OnSuccess(async contentBlocks =>
                 {
                     var contentImageIds = contentBlocks.SelectMany(contentBlock =>
                             HtmlImageUtil.GetReleaseImages(contentBlock.Body))
                         .Distinct();
 
-                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseId, FileType.Image);
+                    var imageFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, FileType.Image);
 
                     var unusedImages = imageFiles
                         .Where(file => !contentImageIds.Contains(file.File.Id))
@@ -261,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (unusedImages.Any())
                     {
-                        return await _releaseFileService.Delete(releaseId, unusedImages);
+                        return await _releaseFileService.Delete(releaseVersionId, unusedImages);
                     }
 
                     return Unit.Instance;
@@ -366,14 +367,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return occurrences.Any() ? occurrences[0] : null;
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseWithChecklist(Release release)
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseWithChecklist(ReleaseVersion releaseVersion)
         {
-            if (release.ApprovalStatus != ReleaseApprovalStatus.Approved)
+            if (releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
             {
                 return Unit.Instance;
             }
 
-            var errors = (await _releaseChecklistService.GetErrors(release))
+            var errors = (await _releaseChecklistService.GetErrors(releaseVersion))
                 .Select(error => error.Code)
                 .ToList();
 

@@ -38,11 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _dataBlockService = dataBlockService;
         }
 
-        [HttpPost("data/tablebuilder/release/{releaseId:guid}")]
+        [HttpPost("data/tablebuilder/release/{releaseVersionId:guid}")]
         [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
         public async Task Query(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
@@ -50,10 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             {
                 Response.ContentDispositionAttachment(
                     contentType: ContentTypes.Csv,
-                    filename: $"{releaseId}.csv");
+                    filename: $"{releaseVersionId}.csv");
 
                 await _tableBuilderService.QueryToCsvStream(
-                    releaseId,
+                    releaseVersionId,
                     query,
                     Response.BodyWriter.AsStream(),
                     cancellationToken
@@ -63,20 +63,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             }
 
             var result = await _tableBuilderService
-                .Query(releaseId, query, cancellationToken)
+                .Query(releaseVersionId, query, cancellationToken)
                 .HandleFailuresOr(Ok);
 
             await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpGet("data/tablebuilder/release/{releaseId:guid}/data-block/{dataBlockParentId:guid}")]
+        [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid dataBlockParentId,
             CancellationToken cancellationToken = default)
         {
             return await _dataBlockService
-                .GetDataBlockVersionForRelease(releaseId: releaseId, dataBlockParentId: dataBlockParentId)
+                .GetDataBlockVersionForRelease(releaseVersionId: releaseVersionId, dataBlockParentId: dataBlockParentId)
                 .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, cancellationToken))
                 .HandleFailuresOrOk();
         }
@@ -87,8 +87,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             CancellationToken cancellationToken)
         {
             return await _userService
-                .CheckCanViewRelease(dataBlockVersion.Release)
-                .OnSuccess(_ => _tableBuilderService.Query(dataBlockVersion.ReleaseId, dataBlockVersion.Query, cancellationToken));
+                .CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion)
+                .OnSuccess(_ => _tableBuilderService.Query(releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    dataBlockVersion.Query,
+                    cancellationToken));
         }
     }
 }

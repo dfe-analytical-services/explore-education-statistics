@@ -232,17 +232,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodologyVersion.Methodology.Publications.Select(pm => pm.PublicationId);
 
                     // Get the Releases of those publications
-                    var releases = await _context.Releases
-                        .Include(r => r.Publication)
-                        .Where(r => publicationIds.Contains(r.PublicationId))
+                    var releaseVersions = await _context.ReleaseVersions
+                        .Include(rv => rv.Publication)
+                        .Where(rv => publicationIds.Contains(rv.PublicationId))
                         .ToListAsync();
 
                     // Return an ordered list of the Releases that are not published
-                    return releases.Where(r => !r.Live)
-                        .OrderBy(r => r.Publication.Title)
-                        .ThenByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage)
-                        .Select(r => new IdTitleViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
+                    return releaseVersions.Where(rv => !rv.Live)
+                        .OrderBy(rv => rv.Publication.Title)
+                        .ThenByDescending(rv => rv.Year)
+                        .ThenByDescending(rv => rv.TimePeriodCoverage)
+                        .Select(rv => new IdTitleViewModel(rv.Id, $"{rv.Publication.Title} - {rv.Title}"))
                         .ToList();
                 });
         }
@@ -320,19 +320,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             if (loadedMethodologyVersion.ScheduledForPublishingWithRelease)
             {
                 await _context.Entry(loadedMethodologyVersion)
-                    .Reference(m => m.ScheduledWithRelease)
+                    .Reference(m => m.ScheduledWithReleaseVersion)
                     .LoadAsync();
 
-                if (loadedMethodologyVersion.ScheduledWithRelease != null)
+                if (loadedMethodologyVersion.ScheduledWithReleaseVersion != null)
                 {
-                    await _context.Entry(loadedMethodologyVersion.ScheduledWithRelease)
-                        .Reference(r => r.Publication)
+                    await _context.Entry(loadedMethodologyVersion.ScheduledWithReleaseVersion)
+                        .Reference(rv => rv.Publication)
                         .LoadAsync();
 
                     var title =
-                        $"{loadedMethodologyVersion.ScheduledWithRelease.Publication.Title} - {loadedMethodologyVersion.ScheduledWithRelease.Title}";
+                        $"{loadedMethodologyVersion.ScheduledWithReleaseVersion.Publication.Title} - {loadedMethodologyVersion.ScheduledWithReleaseVersion.Title}";
                     viewModel.ScheduledWithRelease = new IdTitleViewModel(
-                        loadedMethodologyVersion.ScheduledWithRelease.Id,
+                        loadedMethodologyVersion.ScheduledWithReleaseVersion.Id,
                         title);
                 }
             }
@@ -528,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var indirectPublicationsWithApprovalRole = await _context
                 .UserReleaseRoles
                 .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
-                .Select(role => role.Release.PublicationId)
+                .Select(role => role.ReleaseVersion.PublicationId)
                 .ToListAsync();
 
             var publicationIdsForApproval = directPublicationsWithApprovalRole

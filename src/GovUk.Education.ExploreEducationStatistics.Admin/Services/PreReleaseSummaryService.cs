@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -26,20 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PreReleaseSummaryViewModel>> GetPreReleaseSummaryViewModelAsync(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, queryable =>
-                    queryable.Include(r => r.Publication)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, queryable =>
+                    queryable.Include(releaseVersion => releaseVersion.Publication)
                         .ThenInclude(publication => publication.Contact))
                 .OnSuccess(_userService.CheckCanViewPreReleaseSummary)
-                .OnSuccess(release => new PreReleaseSummaryViewModel(
-                    release.Publication.Slug,
-                    release.Publication.Title,
-                    release.Slug,
-                    release.Title,
-                    release.Publication.Contact.TeamEmail,
-                    release.Publication.Contact.TeamName));
+                .OnSuccess(releaseVersion => new PreReleaseSummaryViewModel(
+                    releaseVersion.Publication.Slug,
+                    releaseVersion.Publication.Title,
+                    releaseVersion.Slug,
+                    releaseVersion.Title,
+                    releaseVersion.Publication.Contact.TeamEmail,
+                    releaseVersion.Publication.Contact.TeamName));
         }
     }
 }

@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IFootnoteService
     {
         Task<Either<ActionResult, Footnote>> CreateFootnote(
-            Guid releaseId,
+            Guid releaseVersionId,
             string content,
             IReadOnlySet<Guid> filterIds,
             IReadOnlySet<Guid> filterGroupIds,
@@ -21,14 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlySet<Guid> indicatorIds,
             IReadOnlySet<Guid> subjectIds);
 
-        Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid footnoteId);
+        Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseVersionId,
+            Guid footnoteId);
 
-        Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid footnoteId);
+        Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseVersionId,
+            Guid footnoteId);
 
-        Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseId);
+        Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseVersionId);
 
         Task<Either<ActionResult, Footnote>> UpdateFootnote(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid footnoteId,
             string content,
             IReadOnlySet<Guid> filterIds,
@@ -37,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IReadOnlySet<Guid> indicatorIds,
             IReadOnlySet<Guid> subjectIds);
 
-        Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseId,
+        Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseVersionId,
             FootnotesUpdateRequest request);
     }
 }

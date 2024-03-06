@@ -18,8 +18,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -28,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task InviteContributor()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(release),
+                Releases = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService: userService.Object);
                         return await service.InviteContributor("test@test.com",
                             publication.Id,
-                            ListOf(release.Id));
+                            ListOf(releaseVersion.Id));
                     }
                 });
         }
@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveByPublication()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(release),
+                Releases = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserRepository? userRepository = null,
             IUserService? userService = null,
             IUserRoleService? userRoleService = null,
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseInviteService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext),
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userRepository ?? new UserRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),

@@ -34,8 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var releaseFilesQueryable = _contentDbContext.ReleaseFiles
-                        .Include(rf => rf.Release)
-                        .ThenInclude(r => r.Publication);
+                        .Include(rf => rf.ReleaseVersion)
+                        .ThenInclude(rv => rv.Publication);
 
                     return await _contentDbContext.DataImports
                         .Include(dataImport => dataImport.File)
@@ -45,27 +45,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             (dataImport, releaseFile) => new
                             {
                                 DataImport = dataImport,
-                                releaseFile.Release
+                                releaseFile.ReleaseVersion
                             })
                         .Where(join => join.DataImport.Status != COMPLETE)
                         .OrderByDescending(join => join.DataImport.Created)
-                        .Select(join => BuildViewModel(join.DataImport, join.Release))
+                        .Select(join => BuildViewModel(join.DataImport, join.ReleaseVersion))
                         .ToListAsync();
                 });
         }
 
-        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport, Release release)
+        private static ImportStatusBauViewModel BuildViewModel(DataImport dataImport,
+            ReleaseVersion releaseVersion)
         {
             var file = dataImport.File;
-            var publication = release.Publication;
+            var publication = releaseVersion.Publication;
             return new ImportStatusBauViewModel
             {
                 SubjectTitle = null, // EES-1655
                 SubjectId = dataImport.SubjectId,
                 PublicationId = publication.Id,
                 PublicationTitle = publication.Title,
-                ReleaseId = release.Id,
-                ReleaseTitle = release.Title,
+                ReleaseId = releaseVersion.Id,
+                ReleaseTitle = releaseVersion.Title,
                 FileId = file.Id,
                 DataFileName = file.Filename,
                 TotalRows = dataImport.TotalRows,

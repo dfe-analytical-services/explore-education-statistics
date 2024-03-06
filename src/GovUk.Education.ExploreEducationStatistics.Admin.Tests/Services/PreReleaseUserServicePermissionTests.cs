@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PreReleaseUserServicePermissionTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -33,13 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPreReleaseUsers()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
-                        return service.GetPreReleaseUsers(_release.Id);
+                        return service.GetPreReleaseUsers(_releaseVersion.Id);
                     }
                 );
         }
@@ -48,14 +48,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPreReleaseUsersInvitePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
                         return service.GetPreReleaseUsersInvitePlan(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ListOf("test@test.com")
                         );
                     }
@@ -66,14 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task InvitePreReleaseUsers()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
                         return service.InvitePreReleaseUsers(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ListOf("test@test.com")
                         );
                     }
@@ -84,20 +84,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemovePreReleaseUser()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
-                        return service.RemovePreReleaseUser(_release.Id, "test@test.com");
+                        return service.RemovePreReleaseUser(_releaseVersion.Id, "test@test.com");
                     }
                 );
         }
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release);
+            return MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion);
         }
 
         private PreReleaseUserService SetupPreReleaseUserService(

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleasePublishingStatusServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -26,13 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetReleaseStatusesAsync()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheck(_release, ContentSecurityPolicies.CanViewSpecificRelease, false)
+                .SetupResourceCheck(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease, false)
                 .AssertForbidden(
                     async userService =>
                     {
                         var service = BuildReleaseStatusService(userService: userService.Object);
 
-                        return await service.GetReleaseStatusAsync(_release.Id);
+                        return await service.GetReleaseStatusAsync(_releaseVersion.Id);
                     }
                 );
         }
@@ -46,7 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleasePublishingStatusService(
                 mapper ?? MapperUtils.AdminMapper(),
                 userService ?? new Mock<IUserService>().Object,
-                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release)
+                persistenceHelper ?? MockUtils
+                    .MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion)
                     .Object,
                 publisherTableStorageService ?? new Mock<IPublisherTableStorageService>().Object
             );

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,13 +7,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
+using static
+    GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public abstract class ReleaseStatusAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, Release>
+    public abstract class
+        ReleaseStatusAuthorizationHandler<TRequirement> : AuthorizationHandler<TRequirement, ReleaseVersion>
         where TRequirement : IAuthorizationRequirement
     {
         private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
@@ -31,15 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             TRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             var statuses = await _releasePublishingStatusRepository
                 .GetAllByOverallStage(
-                    release.Id,
+                    releaseVersion.Id,
                     ReleasePublishingStatusOverallStage.Started,
                     ReleasePublishingStatusOverallStage.Complete);
 
-            if (statuses.Any() || release.Published != null)
+            if (statuses.Any() || releaseVersion.Published != null)
             {
                 return;
             }
@@ -47,13 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             switch (TargetApprovalStatus)
             {
                 case Approved:
-                    await HandleMovingToApproved(context, requirement, release);
+                    await HandleMovingToApproved(context, requirement, releaseVersion);
                     break;
                 case HigherLevelReview:
-                    await HandleMovingToHigherLevelReview(context, requirement, release);
+                    await HandleMovingToHigherLevelReview(context, requirement, releaseVersion);
                     break;
                 case Draft:
-                    await HandleMovingToDraft(context, requirement, release);
+                    await HandleMovingToDraft(context, requirement, releaseVersion);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -63,19 +66,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private async Task HandleMovingToApproved(
             AuthorizationHandlerContext context,
             TRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.ApproveAllReleases))
             {
                 context.Succeed(requirement);
                 return;
             }
-            
+
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
-                        context.User.GetUserId(),
-                        release.PublicationId,
-                        release.Id,
+                        userId: context.User.GetUserId(),
+                        publicationId: releaseVersion.PublicationId,
+                        releaseVersionId: releaseVersion.Id,
                         ListOf(PublicationRole.Approver),
                         ListOf(ReleaseRole.Approver)))
             {
@@ -86,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private async Task HandleMovingToHigherLevelReview(
             AuthorizationHandlerContext context,
             TRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.SubmitAllReleasesToHigherReview))
             {
@@ -94,19 +97,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var allowedPublicationRoles = release.ApprovalStatus == Approved
+            var allowedPublicationRoles = releaseVersion.ApprovalStatus == Approved
                 ? ListOf(PublicationRole.Approver)
                 : ListOf(PublicationRole.Owner, PublicationRole.Approver);
-            
-            var allowedReleaseRoles = release.ApprovalStatus == Approved
+
+            var allowedReleaseRoles = releaseVersion.ApprovalStatus == Approved
                 ? ListOf(ReleaseRole.Approver)
                 : ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
-                        context.User.GetUserId(),
-                        release.PublicationId,
-                        release.Id,
+                        userId: context.User.GetUserId(),
+                        publicationId: releaseVersion.PublicationId,
+                        releaseVersionId: releaseVersion.Id,
                         allowedPublicationRoles,
                         allowedReleaseRoles))
             {
@@ -117,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private async Task HandleMovingToDraft(
             AuthorizationHandlerContext context,
             TRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.MarkAllReleasesAsDraft))
             {
@@ -125,19 +128,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var allowedPublicationRoles = release.ApprovalStatus == Approved
+            var allowedPublicationRoles = releaseVersion.ApprovalStatus == Approved
                 ? ListOf(PublicationRole.Approver)
                 : ListOf(PublicationRole.Owner, PublicationRole.Approver);
-            
-            var allowedReleaseRoles = release.ApprovalStatus == Approved
+
+            var allowedReleaseRoles = releaseVersion.ApprovalStatus == Approved
                 ? ListOf(ReleaseRole.Approver)
                 : ReleaseEditorAndApproverRoles;
 
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
-                        context.User.GetUserId(),
-                        release.PublicationId,
-                        release.Id,
+                        userId: context.User.GetUserId(),
+                        publicationId: releaseVersion.PublicationId,
+                        releaseVersionId: releaseVersion.Id,
                         allowedPublicationRoles,
                         allowedReleaseRoles))
             {
@@ -193,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public MarkReleaseAsApprovedAuthorizationHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerService authorizationHandlerService) 
+            AuthorizationHandlerService authorizationHandlerService)
             : base(
                 releasePublishingStatusRepository,
                 authorizationHandlerService)

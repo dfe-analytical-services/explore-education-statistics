@@ -32,7 +32,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -661,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 SupersededBy = new Publication
                 {
-                    LatestPublishedReleaseId = Guid.NewGuid()
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                 }
             };
 
@@ -700,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SupersededBy = new Publication
                 {
                     // Superseding publication doesn't have a published release
-                    LatestPublishedReleaseId = null
+                    LatestPublishedReleaseVersionId = null
                 }
             };
 
@@ -1122,7 +1122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                LatestPublishedRelease = new Release(),
+                LatestPublishedReleaseVersion = new ReleaseVersion(),
                 SupersededBy = supersedingPublicationToRemove,
             };
 
@@ -1259,7 +1259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                LatestPublishedRelease = new Release(),
+                LatestPublishedReleaseVersion = new ReleaseVersion(),
             };
 
             var methodologyVersionId = Guid.NewGuid();
@@ -1450,7 +1450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Test topic",
                     Theme = new Theme(),
                 },
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var supersededPublication1 = new Publication
@@ -1583,7 +1583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Current title",
                 Slug = "current-title",
                 Topic = topic,
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
             {
@@ -1681,7 +1681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Title",
                 Slug = "title",
                 Topic = topic,
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
             {
@@ -2579,9 +2579,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2022, Version: 1 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2021, Version: 0 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2020, Version: 1 }).Id
+                    publication.Releases.Single(rv => rv is { Year: 2022, Version: 1 }).Id,
+                    publication.Releases.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
+                    publication.Releases.Single(rv => rv is { Year: 2020, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2664,7 +2664,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2022, Version: 1 }).Id
+                    publication.Releases.Single(rv => rv is { Year: 2022, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2700,8 +2700,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2021, Version: 0 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2020, Version: 1 }).Id
+                    publication.Releases.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
+                    publication.Releases.Single(rv => rv is { Year: 2020, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2817,7 +2817,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(expectedTotalResults, pagedResult.Paging.TotalResults);
 
                     var expectedLatestReleaseVersionIds = years.Select(year =>
-                        publication.Releases.Single(r => r.Year == year && r.Version == 1).Id).ToArray();
+                        publication.Releases.Single(rv => rv.Year == year && rv.Version == 1).Id).ToArray();
 
                     Assert.Equal(expectedLatestReleaseVersionIds, pagedResult.Results.Select(r => r.Id).ToArray());
                 }
@@ -2828,7 +2828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
@@ -2840,7 +2840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
-                releaseRepository ?? new ReleaseRepository(context),
+                releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

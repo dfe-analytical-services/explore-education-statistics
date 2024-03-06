@@ -1,24 +1,19 @@
 #nullable enable
 using System;
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
     public class UserReleaseInvite : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     {
-        [Key] 
-        [Required]
         public Guid Id { get; set; }
 
-        [Required] public string Email { get; set; } = null!;
+        public string Email { get; set; } = null!;
 
-        [Required] public Release Release { get; set; } = null!;
+        public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
-        [Required]
-        public Guid ReleaseId { get; set; }
-        
-        [Required]
+        public Guid ReleaseVersionId { get; set; }
+
         public ReleaseRole Role { get; set; }
 
         public bool EmailSent { get; set; }

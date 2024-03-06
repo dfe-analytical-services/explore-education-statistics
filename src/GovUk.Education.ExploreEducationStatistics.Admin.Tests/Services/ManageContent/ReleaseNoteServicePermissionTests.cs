@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 {
     public class ReleaseNoteServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -28,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.AddReleaseNoteAsync(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -38,8 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.DeleteReleaseNoteAsync(
-                        _release.Id,
-                        Guid.NewGuid()),
+                        releaseVersionId: _releaseVersion.Id,
+                        releaseNoteId: Guid.NewGuid()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
 
@@ -48,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         {
             AssertSecurityPoliciesChecked(service =>
                     service.UpdateReleaseNoteAsync(
-                        _release.Id,
-                        Guid.NewGuid(),
+                        releaseVersionId: _releaseVersion.Id,
+                        releaseNoteId: Guid.NewGuid(),
                         new ReleaseNoteSaveRequest()),
                 SecurityPolicies.CanUpdateSpecificRelease);
         }
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var service = new ReleaseNoteService(mapper.Object, contentDbContext.Object, releaseHelper.Object, userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _release, userService, service, policies);
+            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, _releaseVersion, userService, service, policies);
         }
 
         private (
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             return (
                 new Mock<IMapper>(),
                 new Mock<ContentDbContext>(),
-                MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release),
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion),
                 new Mock<IUserService>());
         }
     }

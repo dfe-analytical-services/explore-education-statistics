@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();
             services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<IReleaseRepository, ReleaseRepository>();
+            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();

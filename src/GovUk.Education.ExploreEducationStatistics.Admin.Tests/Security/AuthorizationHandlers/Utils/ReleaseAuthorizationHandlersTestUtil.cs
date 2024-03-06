@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -22,12 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          */
         public static async Task AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release,
+            ReleaseVersion releaseVersion,
             params ReleaseRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            var inTeamScenarios = CreateUserInProductionTeamScenarios(release, rolesExpectedToSucceed);
-            var notInTeamScenario = CreateUserNotInProductionTeamScenario(release, rolesExpectedToSucceed);
+            var inTeamScenarios = CreateUserInProductionTeamScenarios(releaseVersion, rolesExpectedToSucceed);
+            var notInTeamScenario = CreateUserNotInProductionTeamScenario(releaseVersion, rolesExpectedToSucceed);
             var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
             await allScenarios
                 .ToAsyncEnumerable()
@@ -41,12 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
          */
         public static async Task AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release,
+            ReleaseVersion releaseVersion,
             params PublicationRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            var inTeamScenarios = CreateUserInPublicationTeamScenarios(release, rolesExpectedToSucceed);
-            var notInTeamScenario = CreateUserNotInPublicationTeamScenario(release, rolesExpectedToSucceed);
+            var inTeamScenarios = CreateUserInPublicationTeamScenarios(releaseVersion, rolesExpectedToSucceed);
+            var notInTeamScenario = CreateUserNotInPublicationTeamScenario(releaseVersion, rolesExpectedToSucceed);
             var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
             await allScenarios
                 .ToAsyncEnumerable()
@@ -54,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
-        private static ReleaseHandlerTestScenario CreateUserNotInProductionTeamScenario(Release release,
+        private static ReleaseHandlerTestScenario CreateUserNotInProductionTeamScenario(ReleaseVersion releaseVersion,
             ReleaseRole[] rolesExpectedToSucceed)
         {
             var userId = Guid.NewGuid();
@@ -69,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 rolesList.Add(new UserReleaseRole
                 {
-                    ReleaseId = release.Id,
+                    ReleaseVersionId = releaseVersion.Id,
                     UserId = Guid.NewGuid(),
                     Role = roleExpectedToSucceed
                 });
@@ -81,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 rolesList.Add(new UserReleaseRole
                 {
-                    ReleaseId = Guid.NewGuid(),
+                    ReleaseVersionId = Guid.NewGuid(),
                     UserId = userId,
                     Role = roleExpectedToSucceed
                 });
@@ -90,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var notInTeamScenario = new ReleaseHandlerTestScenario
             {
                 User = user,
-                Entity = release,
+                Entity = releaseVersion,
                 UserReleaseRoles = rolesList,
                 ExpectedToPass = false,
                 UnexpectedPassMessage = "Expected not having a role on the Release would have made the handler fail"
@@ -98,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return notInTeamScenario;
         }
 
-        private static List<ReleaseHandlerTestScenario> CreateUserInProductionTeamScenarios(Release release,
+        private static List<ReleaseHandlerTestScenario> CreateUserInProductionTeamScenarios(
+            ReleaseVersion releaseVersion,
             ReleaseRole[] rolesExpectedToSucceed)
         {
             var scenarios = GetEnums<ReleaseRole>().Select(role =>
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     new UserReleaseRole
                     {
-                        ReleaseId = release.Id,
+                        ReleaseVersionId = releaseVersion.Id,
                         UserId = userId,
                         Role = role
                     }
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     rolesList.Add(new UserReleaseRole
                     {
-                        ReleaseId = release.Id,
+                        ReleaseVersionId = releaseVersion.Id,
                         UserId = Guid.NewGuid(),
                         Role = roleExpectedToSucceed
                     });
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     rolesList.Add(new UserReleaseRole
                     {
-                        ReleaseId = Guid.NewGuid(),
+                        ReleaseVersionId = Guid.NewGuid(),
                         UserId = userId,
                         Role = roleExpectedToSucceed
                     });
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new ReleaseHandlerTestScenario
                 {
                     User = user,
-                    Entity = release,
+                    Entity = releaseVersion,
                     UserReleaseRoles = rolesList,
                     ExpectedToPass = rolesExpectedToSucceed.Contains(role),
                     UnexpectedFailMessage = "Expected role " + role + " to have made the handler succeed",
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return scenarios;
         }
 
-        private static ReleaseHandlerTestScenario CreateUserNotInPublicationTeamScenario(Release release,
+        private static ReleaseHandlerTestScenario CreateUserNotInPublicationTeamScenario(ReleaseVersion releaseVersion,
             PublicationRole[] rolesExpectedToSucceed)
         {
             var userId = Guid.NewGuid();
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 rolesList.Add(new UserPublicationRole
                 {
-                    PublicationId = release.Publication.Id,
+                    PublicationId = releaseVersion.Publication.Id,
                     UserId = Guid.NewGuid(),
                     Role = roleExpectedToSucceed
                 });
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var notInTeamScenario = new ReleaseHandlerTestScenario
             {
                 User = user,
-                Entity = release,
+                Entity = releaseVersion,
                 UserPublicationRoles = rolesList,
                 ExpectedToPass = false,
                 UnexpectedPassMessage = "Expected not having a role on the Publication would have made the handler fail"
@@ -199,7 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return notInTeamScenario;
         }
 
-        private static List<ReleaseHandlerTestScenario> CreateUserInPublicationTeamScenarios(Release release,
+        private static List<ReleaseHandlerTestScenario> CreateUserInPublicationTeamScenarios(
+            ReleaseVersion releaseVersion,
             PublicationRole[] rolesExpectedToSucceed)
         {
             var scenarios = GetEnums<PublicationRole>().Select(role =>
@@ -213,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     new UserPublicationRole
                     {
-                        PublicationId = release.Publication.Id,
+                        PublicationId = releaseVersion.Publication.Id,
                         UserId = userId,
                         Role = role
                     }
@@ -225,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     rolesList.Add(new UserPublicationRole
                     {
-                        PublicationId = release.Publication.Id,
+                        PublicationId = releaseVersion.Publication.Id,
                         UserId = Guid.NewGuid(),
                         Role = roleExpectedToSucceed
                     });
@@ -246,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new ReleaseHandlerTestScenario
                 {
                     User = user,
-                    Entity = release,
+                    Entity = releaseVersion,
                     UserPublicationRoles = rolesList,
                     ExpectedToPass = rolesExpectedToSucceed.Contains(role),
                     UnexpectedFailMessage = "Expected role " + role + " to have made the handler succeed",
@@ -285,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         public static async Task AssertHandlerOnlySucceedsWithReleaseRoles<TRequirement, TEntity>(
-            Guid releaseId,
+            Guid releaseVersionId,
             TEntity handleRequirementArgument,
             Action<ContentDbContext> addToDbHandler,
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
@@ -307,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         {
                             UserId = userId,
                             Role = role,
-                            ReleaseId = releaseId,
+                            ReleaseVersionId = releaseVersionId
                         });
                         await contentDbContext.SaveChangesAsync();
                     }

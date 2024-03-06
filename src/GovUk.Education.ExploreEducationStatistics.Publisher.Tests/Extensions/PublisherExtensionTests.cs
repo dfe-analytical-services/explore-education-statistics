@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
@@ -13,19 +14,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                release
+                releaseVersion
             };
 
-            Assert.True(release.IsReleasePublished());
+            Assert.True(releaseVersion.IsReleasePublished());
         }
 
         [Fact]
@@ -33,19 +34,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
                 Published = null
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                release
+                releaseVersion
             };
 
-            Assert.False(release.IsReleasePublished());
+            Assert.False(releaseVersion.IsReleasePublished());
         }
 
         [Fact]
@@ -53,21 +54,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
                 Published = null
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                release
+                releaseVersion
             };
 
-            Assert.True(release.IsReleasePublished(new List<Guid>
+            Assert.True(releaseVersion.IsReleasePublished(new List<Guid>
             {
-                release.Id
+                releaseVersion.Id
             }));
         }
 
@@ -76,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var originalRelease = new Release
+            var originalReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -84,22 +85,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            var amendmentRelease = new Release
+            var amendmentReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
-                PreviousVersionId = originalRelease.Id,
+                PreviousVersionId = originalReleaseVersion.Id,
                 Version = 1
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                originalRelease,
-                amendmentRelease
+                originalReleaseVersion,
+                amendmentReleaseVersion
             };
 
-            Assert.True(originalRelease.IsReleasePublished());
-            Assert.False(amendmentRelease.IsReleasePublished());
+            Assert.True(originalReleaseVersion.IsReleasePublished());
+            Assert.False(amendmentReleaseVersion.IsReleasePublished());
         }
 
         [Fact]
@@ -107,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var originalRelease = new Release
+            var originalReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -115,23 +116,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            var amendmentRelease = new Release
+            var amendmentReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
-                PreviousVersionId = originalRelease.Id,
+                PreviousVersionId = originalReleaseVersion.Id,
                 Version = 1,
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                originalRelease,
-                amendmentRelease
+                originalReleaseVersion,
+                amendmentReleaseVersion
             };
 
-            Assert.False(originalRelease.IsReleasePublished());
-            Assert.True(amendmentRelease.IsReleasePublished());
+            Assert.False(originalReleaseVersion.IsReleasePublished());
+            Assert.True(amendmentReleaseVersion.IsReleasePublished());
         }
 
         [Fact]
@@ -139,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
         {
             var publication = new Publication();
 
-            var originalRelease = new Release
+            var originalReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -147,28 +148,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            var amendmentRelease = new Release
+            var amendmentReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
-                PreviousVersionId = originalRelease.Id,
+                PreviousVersionId = originalReleaseVersion.Id,
                 Version = 1
             };
 
-            publication.Releases = new List<Release>
+            publication.Releases = new List<ReleaseVersion>
             {
-                originalRelease,
-                amendmentRelease
+                originalReleaseVersion,
+                amendmentReleaseVersion
             };
 
-            Assert.False(originalRelease.IsReleasePublished(new List<Guid>
+            Assert.False(originalReleaseVersion.IsReleasePublished(new List<Guid>
             {
-                amendmentRelease.Id
+                amendmentReleaseVersion.Id
             }));
 
-            Assert.True(amendmentRelease.IsReleasePublished(new List<Guid>
+            Assert.True(amendmentReleaseVersion.IsReleasePublished(new List<Guid>
             {
-                amendmentRelease.Id
+                amendmentReleaseVersion.Id
             }));
         }
     }

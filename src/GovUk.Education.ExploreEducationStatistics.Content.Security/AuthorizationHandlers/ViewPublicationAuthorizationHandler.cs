@@ -16,7 +16,7 @@ public class ViewPublicationAuthorizationHandler : AuthorizationHandler<ViewPubl
         ViewPublicationRequirement requirement,
         Publication publication)
     {
-        if (publication.LatestPublishedReleaseId != null)
+        if (publication.LatestPublishedReleaseVersionId != null)
         {
             authContext.Succeed(requirement);
         }

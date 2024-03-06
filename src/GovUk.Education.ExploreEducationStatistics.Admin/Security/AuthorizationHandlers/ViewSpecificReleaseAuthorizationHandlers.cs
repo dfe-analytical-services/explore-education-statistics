@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
-public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<ViewReleaseRequirement, Release>
+public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<ViewReleaseRequirement, ReleaseVersion>
 {
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
@@ -18,9 +18,9 @@ public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<View
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
         ViewReleaseRequirement requirement,
-        Release release)
+        ReleaseVersion releaseVersion)
     {
-        if (await _authorizationHandlerService.IsReleaseViewableByUser(release, context.User))
+        if (await _authorizationHandlerService.IsReleaseViewableByUser(releaseVersion, context.User))
         {
             context.Succeed(requirement);
         }

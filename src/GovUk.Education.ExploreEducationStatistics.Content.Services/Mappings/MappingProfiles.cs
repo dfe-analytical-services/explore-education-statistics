@@ -43,18 +43,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<KeyStatistic, KeyStatisticViewModel>()
                 .IncludeAllDerived();
 
-            CreateMap<Release, ReleaseCacheViewModel>()
+            CreateMap<ReleaseVersion, ReleaseCacheViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
-                    m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
+                    m => m.MapFrom(rv => rv.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(
                     dest => dest.Updates,
-                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
+                    m => m.MapFrom(rv => rv.Updates.OrderByDescending(update => update.On)))
                 .ForMember(
                     dest => dest.Content,
-                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
+                    m => m.MapFrom(rv => rv.GenericContent.OrderBy(s => s.Order)))
                 .ForMember(
                     dest => dest.KeyStatistics,
-                    m => m.MapFrom(r => r.KeyStatistics.OrderBy(ks => ks.Order)));
+                    m => m.MapFrom(rv => rv.KeyStatistics.OrderBy(ks => ks.Order)));
 
             CreateMap<Link, LinkViewModel>();
 

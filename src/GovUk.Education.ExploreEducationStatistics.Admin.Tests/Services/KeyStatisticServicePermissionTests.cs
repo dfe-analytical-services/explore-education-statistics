@@ -21,19 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class KeyStatisticServicePermissionTests
 {
-    private readonly Release _release = new();
+    private readonly ReleaseVersion _releaseVersion = new();
 
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.CreateKeyStatisticDataBlock(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new KeyStatisticDataBlockCreateRequest());
                 }
             );
@@ -43,13 +43,13 @@ public class KeyStatisticServicePermissionTests
     public async Task CreateKeyStatisticText()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.CreateKeyStatisticText(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new KeyStatisticTextCreateRequest());
                 }
             );
@@ -59,13 +59,13 @@ public class KeyStatisticServicePermissionTests
     public async Task UpdateKeyStatisticDataBlock()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.CreateKeyStatisticDataBlock(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new KeyStatisticDataBlockCreateRequest());
                 }
             );
@@ -75,13 +75,13 @@ public class KeyStatisticServicePermissionTests
     public async Task UpdateKeyStatisticText()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.CreateKeyStatisticText(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new KeyStatisticTextCreateRequest());
                 }
             );
@@ -91,13 +91,13 @@ public class KeyStatisticServicePermissionTests
     public async Task Delete()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.Delete(
-                        _release.Id,
+                        _releaseVersion.Id,
                         Guid.NewGuid());
                 }
             );
@@ -107,13 +107,13 @@ public class KeyStatisticServicePermissionTests
     public async Task Reorder()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.Reorder(
-                        _release.Id,
+                        _releaseVersion.Id,
                         new List<Guid>());
                 }
             );
@@ -136,8 +136,8 @@ public class KeyStatisticServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-        MockUtils.SetupCall(mock, _release.Id, _release);
+        var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+        MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
         return mock;
     }
 }

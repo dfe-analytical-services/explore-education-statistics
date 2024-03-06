@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,5 +8,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 public interface IPublishingCompletionService
 {
     Task CompletePublishingIfAllPriorStagesComplete(
-        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds);
+        IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releaseVersionAndReleaseStatusIds);
 }

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
@@ -21,26 +20,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publisherTableStorageService = publisherTableStorageService;
         }
 
-        public Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId, params ReleasePublishingStatusOverallStage[] overallStages)
+        public Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
+            params ReleasePublishingStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseId.ToString());
+                QueryComparisons.Equal,
+                releaseVersionId.ToString());
 
             if (overallStages.Any())
             {
-                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) => 
+                var allStageFilters = overallStages.ToList().Aggregate("", (acc, stage) =>
                 {
-                   var stageFilter = TableQuery.GenerateFilterCondition(
-                       nameof(ReleasePublishingStatus.OverallStage),
-                       QueryComparisons.Equal,
-                       stage.ToString()
+                    var stageFilter = TableQuery.GenerateFilterCondition(
+                        nameof(ReleasePublishingStatus.OverallStage),
+                        QueryComparisons.Equal,
+                        stage.ToString()
                     );
-                
-                    if (acc == "")  {
+
+                    if (acc == "")
+                    {
                         return stageFilter;
                     }
 
-                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter); 
+                    return TableQuery.CombineFilters(acc, TableOperators.Or, stageFilter);
                 });
 
                 filter = TableQuery.CombineFilters(filter, TableOperators.And, allStageFilters);
@@ -50,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
 
-        public async Task RemovePublisherReleaseStatuses(List<Guid> releaseIds)
+        public async Task RemovePublisherReleaseStatuses(List<Guid> releaseVersionIds)
         {
-            if (releaseIds.IsNullOrEmpty())
+            if (releaseVersionIds.IsNullOrEmpty())
             {
                 // Return early as we want to do nothing in this case - without this,
                 // `filter` will be string.Empty and the query returns all table entities
@@ -60,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var filter = string.Empty;
-            foreach (var releaseId in releaseIds)
+            foreach (var releaseVersionId in releaseVersionIds)
             {
                 var newFilter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseId.ToString());
+                    QueryComparisons.Equal, releaseVersionId.ToString());
 
                 filter = filter == string.Empty
                     ? newFilter

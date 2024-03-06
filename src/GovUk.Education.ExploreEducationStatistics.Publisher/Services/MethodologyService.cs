@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.MethodologyVersions.FindAsync(methodologyVersionId);
         }
 
-        public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(Release release)
+        public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion)
         {
-            return await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+            return await _methodologyVersionRepository.GetLatestVersionByPublication(releaseVersion.PublicationId);
         }
 
         public async Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types)
@@ -75,14 +75,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, Release release)
+        public async Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, ReleaseVersion releaseVersion)
         {
             if (!methodologyVersion.Approved)
             {
                 return false;
             }
 
-            var firstRelease = !await _publicationRepository.IsPublished(release.PublicationId);
+            var firstRelease = !await _publicationRepository.IsPublished(releaseVersion.PublicationId);
 
             var firstReleaseAndMethodologyScheduledImmediately =
                 firstRelease &&
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             var methodologyScheduledWithThisRelease =
                 methodologyVersion.ScheduledForPublishingWithRelease
-                && methodologyVersion.ScheduledWithReleaseId == release.Id;
+                && methodologyVersion.ScheduledWithReleaseVersionId == releaseVersion.Id;
 
             return firstReleaseAndMethodologyScheduledImmediately ||
                    methodologyScheduledWithThisRelease;

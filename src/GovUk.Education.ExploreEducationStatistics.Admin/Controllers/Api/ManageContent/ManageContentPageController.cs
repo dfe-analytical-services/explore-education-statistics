@@ -20,12 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _manageContentPageService = manageContentPageService;
         }
 
-        [HttpGet("release/{releaseId:guid}/content")]
-        public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseId,
+        [HttpGet("release/{releaseVersionId:guid}/content")]
+        public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseVersionId,
             [FromQuery] bool isPrerelease = false)
         {
             return await _manageContentPageService
-                .GetManageContentPageViewModel(releaseId, isPrerelease)
+                .GetManageContentPageViewModel(releaseVersionId, isPrerelease)
                 .HandleFailuresOrOk();
         }
     }

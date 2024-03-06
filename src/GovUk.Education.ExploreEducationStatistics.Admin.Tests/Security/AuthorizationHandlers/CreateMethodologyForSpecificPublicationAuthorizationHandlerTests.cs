@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var handler = new CreateMethodologyForSpecificPublicationAuthorizationHandler(
                 contentDbContext,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(contentDbContext),
+                    new ReleaseVersionRepository(contentDbContext),
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));

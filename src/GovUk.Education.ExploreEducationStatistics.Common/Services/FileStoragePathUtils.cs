@@ -49,14 +49,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{DataBlocksDirectory}";
         }
 
-        public static string PrivateContentDataBlockPath(Guid releaseId, Guid dataBlockId)
+        public static string PrivateContentDataBlockPath(Guid releaseVersionId, Guid dataBlockId)
         {
-            return $"{ReleasesDirectory}/{releaseId}/{DataBlocksDirectory}/{dataBlockId}.json";
+            return $"{ReleasesDirectory}/{releaseVersionId}/{DataBlocksDirectory}/{dataBlockId}.json";
         }
 
-        public static string PrivateContentSubjectMetaPath(Guid releaseId, Guid subjectId)
+        public static string PrivateContentSubjectMetaPath(Guid releaseVersionId, Guid subjectId)
         {
-            return $"{ReleasesDirectory}/{releaseId}/{SubjectMetaDirectory}/{subjectId}.json";
+            return $"{ReleasesDirectory}/{releaseVersionId}/{SubjectMetaDirectory}/{subjectId}.json";
         }
 
         public static string PublicContentDataBlockPath(

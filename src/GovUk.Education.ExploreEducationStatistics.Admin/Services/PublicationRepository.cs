@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var releasesGrantedByReleaseRolesQueryable = _context.UserReleaseRoles
-                .Include(userReleaseRole => userReleaseRole.Release.Publication)
+                .Include(userReleaseRole => userReleaseRole.ReleaseVersion.Publication)
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
                                           userReleaseRole.Role != ReleaseRole.PrereleaseViewer);
 
@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 releasesGrantedByReleaseRolesQueryable =
                     releasesGrantedByReleaseRolesQueryable.Where(userReleaseRole =>
-                        userReleaseRole.Release.Publication.TopicId == topicId.Value);
+                        userReleaseRole.ReleaseVersion.Publication.TopicId == topicId.Value);
             }
 
             var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable
-                .Select(userReleaseRole => userReleaseRole.Release)
+                .Select(userReleaseRole => userReleaseRole.ReleaseVersion)
                 .ToListAsync();
 
             var publications = new List<Publication>();
@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Add publication view models for the Publications granted indirectly via Release roles
             publications.AddRange(await releasesGrantedByReleaseRoles
-                .GroupBy(release => release.Publication)
+                .GroupBy(releaseVersion => releaseVersion.Publication)
                 .Where(publicationWithReleases =>
                 {
                     // Don't include a publication that's already been included by Publication roles

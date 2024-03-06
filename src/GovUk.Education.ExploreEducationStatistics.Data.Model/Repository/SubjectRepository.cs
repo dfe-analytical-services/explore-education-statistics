@@ -23,7 +23,7 @@ public class SubjectRepository : ISubjectRepository
     {
         return await _context.ReleaseSubject
             .Where(rs => rs.SubjectId == subjectId)
-            .Select(rs => (Guid?) rs.Release.PublicationId)
+            .Select(rs => (Guid?) rs.ReleaseVersion.PublicationId)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 }

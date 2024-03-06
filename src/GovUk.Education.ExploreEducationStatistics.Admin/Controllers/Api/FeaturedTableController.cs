@@ -22,63 +22,63 @@ public class FeaturedTableController : ControllerBase
         _featuredTableService = featuredTableService;
     }
 
-    [HttpGet("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
-    public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseId, Guid dataBlockId)
+    [HttpGet("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
+    public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _featuredTableService
             .Get(
-                releaseId: releaseId,
+                releaseVersionId: releaseVersionId,
                 dataBlockId: dataBlockId)
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("releases/{releaseId:guid}/featured-tables")]
-    public async Task<ActionResult<List<FeaturedTableViewModel>>> List(Guid releaseId)
+    [HttpGet("releases/{releaseVersionId:guid}/featured-tables")]
+    public async Task<ActionResult<List<FeaturedTableViewModel>>> List(Guid releaseVersionId)
     {
         return await _featuredTableService
-            .List(releaseId)
+            .List(releaseVersionId)
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("releases/{releaseId:guid}/featured-tables")]
+    [HttpPost("releases/{releaseVersionId:guid}/featured-tables")]
     public async Task<ActionResult<FeaturedTableViewModel>> Create(
-        Guid releaseId,
+        Guid releaseVersionId,
         FeaturedTableCreateRequest request)
     {
         return await _featuredTableService
-            .Create(releaseId, request)
+            .Create(releaseVersionId, request)
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
+    [HttpPost("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
     public async Task<ActionResult<FeaturedTableViewModel>> Update(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid dataBlockId,
         FeaturedTableUpdateRequest request)
     {
         return await _featuredTableService
             .Update(
-                releaseId: releaseId,
+                releaseVersionId: releaseVersionId,
                 dataBlockId: dataBlockId,
                 request: request)
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
-    public async Task<ActionResult> Delete(Guid releaseId, Guid dataBlockId)
+    [HttpDelete("releases/{releaseVersionId:guid}/featured-tables/{dataBlockId:guid}")]
+    public async Task<ActionResult> Delete(Guid releaseVersionId, Guid dataBlockId)
     {
         return await _featuredTableService
-            .Delete(releaseId: releaseId, dataBlockId: dataBlockId)
+            .Delete(releaseVersionId: releaseVersionId, dataBlockId: dataBlockId)
             .HandleFailuresOrNoContent();
     }
 
-    [HttpPut("releases/{releaseId:guid}/featured-tables/order")]
+    [HttpPut("releases/{releaseVersionId:guid}/featured-tables/order")]
     public async Task<ActionResult<List<FeaturedTableViewModel>>> Reorder(
-        Guid releaseId,
+        Guid releaseVersionId,
         List<Guid> newOrder)
     {
         return await _featuredTableService
-            .Reorder(releaseId, newOrder)
+            .Reorder(releaseVersionId, newOrder)
             .HandleFailuresOrOk();
     }
 }

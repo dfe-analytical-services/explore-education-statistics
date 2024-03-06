@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [MaxLength(160)]
         public string Summary { get; set; } = string.Empty;
 
-        public List<Release> Releases { get; set; } = new();
+        public List<ReleaseVersion> Releases { get; set; } = new();
 
         public List<PublicationMethodology> Methodologies { get; set; } = new();
 
@@ -39,10 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public bool Live => LatestPublishedReleaseId.HasValue;
+        public bool Live => LatestPublishedReleaseVersionId.HasValue;
 
-        public Guid? LatestPublishedReleaseId { get; set; }
+        public Guid? LatestPublishedReleaseVersionId { get; set; }
 
-        public Release? LatestPublishedRelease { get; set; }
+        public ReleaseVersion? LatestPublishedReleaseVersion { get; set; }
     }
 }

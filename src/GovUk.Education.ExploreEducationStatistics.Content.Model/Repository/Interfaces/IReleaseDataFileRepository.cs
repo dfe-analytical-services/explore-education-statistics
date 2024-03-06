@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
     public interface IReleaseDataFileRepository
     {
         public Task<File> Create(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             string filename,
             long contentLength,
@@ -21,18 +21,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             int order = 0);
 
         public Task<File> CreateZip(
-            Guid releaseId,
+            Guid releaseVersionId,
             string filename,
             long contentLength,
             string contentType,
             Guid createdById);
 
-        public Task<IList<File>> ListDataFiles(Guid releaseId);
+        public Task<IList<File>> ListDataFiles(Guid releaseVersionId);
 
-        public Task<bool> HasAnyDataFiles(Guid releaseId);
+        public Task<bool> HasAnyDataFiles(Guid releaseVersionId);
 
-        public Task<IList<File>> ListReplacementDataFiles(Guid releaseId);
+        public Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId);
 
-        public Task<ReleaseFile> GetBySubject(Guid releaseId, Guid subjectId);
+        public Task<ReleaseFile> GetBySubject(Guid releaseVersionId,
+            Guid subjectId);
     }
 }

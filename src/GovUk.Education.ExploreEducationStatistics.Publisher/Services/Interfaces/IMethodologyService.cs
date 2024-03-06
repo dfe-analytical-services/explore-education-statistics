@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,12 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<MethodologyVersion> Get(Guid methodologyVersionId);
 
-        Task<List<MethodologyVersion>> GetLatestVersionByRelease(Release release);
+        Task<List<MethodologyVersion>> GetLatestVersionByRelease(ReleaseVersion releaseVersion);
 
         Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
 
         Task Publish(MethodologyVersion methodologyVersion);
 
-        Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, Release release);
+        Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion,
+            ReleaseVersion releaseVersion);
     }
 }

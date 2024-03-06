@@ -13,12 +13,12 @@ public interface IReleaseCacheService
         string? releaseSlug = null);
 
     Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
-        Guid releaseId,
+        Guid releaseVersionId,
         string publicationSlug,
         string? releaseSlug = null);
 
     Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
-        Guid releaseId,
+        Guid releaseVersionId,
         DateTime expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null);

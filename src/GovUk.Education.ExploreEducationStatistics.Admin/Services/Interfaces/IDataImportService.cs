@@ -12,11 +12,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<DataImport?> GetImport(Guid fileId);
 
-        Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, Unit>> CancelImport(Guid releaseVersionId,
+            Guid fileId);
 
         Task DeleteImport(Guid fileId);
 
-        Task<bool> HasIncompleteImports(Guid releaseId);
+        Task<bool> HasIncompleteImports(Guid releaseVersionId);
 
         Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 

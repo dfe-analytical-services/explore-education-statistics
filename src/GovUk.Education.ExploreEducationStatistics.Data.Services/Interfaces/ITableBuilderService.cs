@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            Guid releaseId,
+            Guid releaseVersionId,
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default);
 
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
             CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> QueryToCsvStream(
-            Guid releaseId,
+            Guid releaseVersionId,
             ObservationQueryContext queryContext,
             Stream stream,
             CancellationToken cancellationToken = default);

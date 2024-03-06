@@ -15,7 +15,7 @@ public interface IDataSetService
     Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
         Guid? themeId,
         Guid? publicationId,
-        Guid? releaseId,
+        Guid? releaseVersionId,
         bool? latestOnly,
         string? searchTerm,
         DataSetsListRequestOrderBy? orderBy,
@@ -25,6 +25,6 @@ public interface IDataSetService
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid fileId);
 }

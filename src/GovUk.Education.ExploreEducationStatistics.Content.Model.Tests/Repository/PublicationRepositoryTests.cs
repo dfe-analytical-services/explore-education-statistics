@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -9,19 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
 public class PublicationRepositoryTests
 {
+    private readonly DataFixture _dataFixture = new();
+
     [Fact]
     public async Task IsPublicationPublished_FalseWhenPublicationHasNoPublishedRelease()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseId = null
-        };
+        Publication publication = _dataFixture.DefaultPublication()
+            .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .Generate(1));
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            await contentDbContext.AddAsync(publication);
+            contentDbContext.Publications.Add(publication);
             await contentDbContext.SaveChangesAsync();
         }
 
@@ -36,16 +39,15 @@ public class PublicationRepositoryTests
     [Fact]
     public async Task IsPublicationPublished_TrueWhenPublicationHasPublishedRelease()
     {
-        var publication = new Publication
-        {
-            LatestPublishedReleaseId = Guid.NewGuid()
-        };
+        Publication publication = _dataFixture.DefaultPublication()
+            .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1)
+                .Generate(1));
 
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            await contentDbContext.AddAsync(publication);
+            contentDbContext.Publications.Add(publication);
             await contentDbContext.SaveChangesAsync();
         }
 

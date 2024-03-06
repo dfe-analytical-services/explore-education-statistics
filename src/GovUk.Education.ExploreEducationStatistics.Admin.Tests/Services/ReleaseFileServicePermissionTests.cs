@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseFileServicePermissionTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -36,12 +36,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetFile()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.GetFile(_release.Id, Guid.NewGuid());
+                        return service.GetFile(releaseVersionId: _releaseVersion.Id,
+                            fileId: Guid.NewGuid());
                     }
                 );
         }
@@ -50,14 +51,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateDataFileDetails()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UpdateDataFileDetails(
-                            _release.Id,
-                            Guid.NewGuid(),
+                            releaseVersionId: _releaseVersion.Id,
+                            fileId: Guid.NewGuid(),
                             new ReleaseDataFileUpdateRequest
                             {
                                 Title = "Test title"
@@ -71,12 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Delete(_release.Id,Guid.NewGuid());
+                        return service.Delete(_releaseVersion.Id, Guid.NewGuid());
                     }
                 );
         }
@@ -85,12 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Delete_MultipleFiles()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Delete(_release.Id,
+                        return service.Delete(_releaseVersion.Id,
                             new List<Guid>
                             {
                                 Guid.NewGuid()
@@ -104,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseFile = new ReleaseFile
             {
-                Release = _release,
+                ReleaseVersion = _releaseVersion,
                 File = new File
                 {
                     Filename = "ancillary.pdf",
@@ -121,14 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(
                             contentDbContext: DbUtils.InMemoryApplicationDbContext(contentDbContextId),
                             userService: userService.Object);
-                        return service.DeleteAll(_release.Id);
+                        return service.DeleteAll(_releaseVersion.Id);
                     }
                 );
         }
@@ -137,12 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListAll()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.ListAll(_release.Id, Ancillary);
+                        return service.ListAll(_releaseVersion.Id, Ancillary);
                     }
                 );
         }
@@ -151,13 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Stream()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Stream(_release.Id,
-                            Guid.NewGuid());
+                        return service.Stream(releaseVersionId: _releaseVersion.Id,
+                            fileId: Guid.NewGuid());
                     }
                 );
         }
@@ -166,13 +167,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UploadAncillary()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UploadAncillary(
-                            releaseId: _release.Id,
+                            releaseVersionId: _releaseVersion.Id,
                             upload: new ReleaseAncillaryFileUploadRequest
                             {
                                 File = Mock.Of<IFormFile>(),
@@ -188,13 +189,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateAncillary()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UpdateAncillary(
-                            releaseId: _release.Id,
+                            releaseVersionId: _releaseVersion.Id,
                             fileId: Guid.NewGuid(),
                             request: new ReleaseAncillaryFileUpdateRequest
                             {
@@ -209,12 +210,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UploadChart()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.UploadChart(releaseId: _release.Id,
+                        return service.UploadChart(releaseVersionId: _releaseVersion.Id,
                             formFile: new Mock<IFormFile>().Object,
                             replacingId: null);
                     }
@@ -245,8 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
             return mock;
         }
     }

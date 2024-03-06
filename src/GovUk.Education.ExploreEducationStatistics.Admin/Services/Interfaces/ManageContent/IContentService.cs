@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,34 +12,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IContentService
     {
-        public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock;
+        public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseVersionId) where T : ContentBlock;
 
         Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
-            Guid releaseId, Dictionary<Guid, int> newSectionOrder);
+            Guid releaseVersionId,
+            Dictionary<Guid, int> newSectionOrder);
 
         Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, ContentSectionAddRequest? request);
+            Guid releaseVersionId,
+            ContentSectionAddRequest? request);
 
         Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid releaseId, Guid contentSectionId, string newHeading);
+            Guid releaseVersionId,
+            Guid contentSectionId,
+            string newHeading);
 
         Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
-            Guid releaseId, Guid contentSectionId);
+            Guid releaseVersionId,
+            Guid contentSectionId);
 
         Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
-            Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder);
+            Guid releaseVersionId,
+            Guid contentSectionId,
+            Dictionary<Guid, int> newBlocksOrder);
 
         Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(
-            Guid releaseId, Guid contentSectionId,
+            Guid releaseVersionId,
+            Guid contentSectionId,
             ContentBlockAddRequest request);
 
         Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId);
+            Guid releaseVersionId,
+            Guid contentSectionId,
+            Guid contentBlockId);
 
         Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
+            Guid releaseVersionId,
+            Guid contentSectionId,
+            Guid contentBlockId,
+            ContentBlockUpdateRequest request);
 
         Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(
-            Guid releaseId, Guid contentSectionId, DataBlockAttachRequest request);
+            Guid releaseVersionId,
+            Guid contentSectionId,
+            DataBlockAttachRequest request);
     }
 }

@@ -41,21 +41,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication();
 
-            var initialReleaseId = Guid.NewGuid();
-            var initialRelease = new Release
+            var initialReleaseVersion = new ReleaseVersion
             {
-                Id = initialReleaseId,
+                Id = Guid.NewGuid(),
                 Type = ReleaseType.AdHocStatistics,
                 TimePeriodCoverage = TimeIdentifier.TaxYear,
                 Publication = publication,
                 ReleaseName = "2035",
                 Slug = "2035",
                 PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = initialReleaseId
+                Version = 0
             };
 
-            var amendedRelease = new Release
+            var amendedReleaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
@@ -64,21 +62,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 Version = 1,
-                PreviousVersionId = initialRelease.Id
+                PreviousVersionId = initialReleaseVersion.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(amendedRelease, initialRelease);
+                context.ReleaseVersions.AddRange(initialReleaseVersion, amendedReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
+                    mock.GetContentBlocks<HtmlBlock>(amendedReleaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -89,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        amendedRelease.Id,
+                        amendedReleaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
@@ -104,8 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases
-                    .SingleAsync(r => r.Id == amendedRelease.Id);
+                var saved = await context.ReleaseVersions
+                    .SingleAsync(rv => rv.Id == amendedReleaseVersion.Id);
 
                 Assert.Equal("2030", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.CalendarYear, saved.TimePeriodCoverage);
@@ -115,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -132,14 +130,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
@@ -152,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
@@ -168,16 +166,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                var saved = await context.ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                Assert.Equal(release.Publication.Id, saved.PublicationId);
+                Assert.Equal(releaseVersion.Publication.Id, saved.PublicationId);
                 Assert.Equal(ReleaseApprovalStatus.Draft, saved.ApprovalStatus);
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
                     saved.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
-                // NotifySubscribers should default to true for original releases
+                // NotifySubscribers should default to true for first release versions
                 Assert.True(saved.NotifySubscribers);
                 Assert.False(saved.UpdatePublishedDate);
                 Assert.Equal(ReleaseType.AdHocStatistics, saved.Type);
@@ -187,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Access list", saved.PreReleaseAccessList);
 
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.Draft, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test note", savedStatus.InternalReleaseNote);
@@ -197,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsOnChecklistErrors()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication {Title = "Old publication"},
@@ -211,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -221,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 releaseChecklistService
                     .Setup(s =>
-                        s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                        s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                     .ReturnsAsync(
                         new List<ReleaseChecklistIssue>
                         {
@@ -236,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -258,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsNullPublishDate()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -272,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -282,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -300,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_FailsEmptyPublishDate()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -314,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -324,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -342,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -356,7 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -380,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request a publish day which is earlier than today
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -401,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay_DaylightSavingTime()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -415,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -441,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request a publish day which is the same as the UTC day but earlier than the BST day
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -461,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -475,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -499,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request a publish day which is today
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -520,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay_DaylightSavingTime()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -534,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -560,7 +558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request a publish day which is today
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -580,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_FutureDay()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -594,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -618,7 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request a publish day in the future which has no scheduled occurrence
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -639,7 +637,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task
             CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SecondFunctionHasNoOccurrence()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
@@ -653,7 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -677,7 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -698,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsChangingToDraft()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication
@@ -716,7 +714,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -726,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
@@ -740,7 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Type = ReleaseType.AdHocStatistics,
@@ -757,7 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var existingUser1Invite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = existingUser1.Email,
                 EmailSent = false,
@@ -770,7 +768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var existingUser2SentInvite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = existingUser2.Email,
                 EmailSent = true,
@@ -783,7 +781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var existingUser3NonPreReleaseInvite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Contributor,
                 Email = existingUser3.Email,
                 EmailSent = false,
@@ -791,7 +789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var nonExistingUserPreReleaseInvite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = "nonexistent1@test.com",
                 EmailSent = false,
@@ -799,7 +797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var nonExistingUserNonPreReleaseInvite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Contributor,
                 Email = "nonexistent2@test.com",
                 EmailSent = false,
@@ -808,9 +806,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
-                await context.Users.AddRangeAsync(existingUser1, existingUser2, existingUser3);
-                await context.UserReleaseInvites.AddRangeAsync(
+                context.ReleaseVersions.Add(releaseVersion);
+                context.Users.AddRange(existingUser1, existingUser2, existingUser3);
+                context.UserReleaseInvites.AddRange(
                     existingUser1Invite, existingUser2SentInvite, existingUser3NonPreReleaseInvite,
                     nonExistingUserPreReleaseInvite, nonExistingUserNonPreReleaseInvite);
                 await context.SaveChangesAsync();
@@ -823,33 +821,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseChecklistService
                 .Setup(s =>
-                    s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                 .ReturnsAsync(
                     new List<ReleaseChecklistIssue>()
                 );
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == release.Id),
+                    It.Is<Guid>(g => g == releaseVersion.Id),
                     It.IsAny<Guid>(),
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(Unit.Instance);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<Release>(r => r.Id == release.Id),
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                     existingUser1Invite.Email,
                     false))
                 .ReturnsAsync(Unit.Instance);
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<Release>(r => r.Id == release.Id),
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                     nonExistingUserPreReleaseInvite.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
@@ -876,7 +874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -897,9 +895,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                var saved = await context.ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
 
@@ -913,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(saved.UpdatePublishedDate);
 
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.Approved, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test note", savedStatus.InternalReleaseNote);
@@ -923,7 +921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Immediately()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Type = ReleaseType.AdHocStatistics,
@@ -936,7 +934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -946,21 +944,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseChecklistService
                 .Setup(s =>
-                    s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                 .ReturnsAsync(
                     new List<ReleaseChecklistIssue>()
                 );
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == release.Id),
+                    It.Is<Guid>(g => g == releaseVersion.Id),
                     It.IsAny<Guid>(),
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(Unit.Instance);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
@@ -974,7 +972,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -985,7 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 // We don't expect PrereleaseUserService.SendPreReleaseUserInviteEmails to be called if the
-                // Release is being published immediately.
+                // release version is being published immediately.
                 VerifyAllMocks(contentService,
                     publishingService,
                     releaseChecklistService);
@@ -995,9 +993,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                var saved = await context.ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
                 Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
 
@@ -1005,12 +1003,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 saved.PublishScheduled.AssertUtcNow();
 
                 nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
-                // NotifySubscribers should default to true for original releases
+                // NotifySubscribers should default to true for first release versions
                 Assert.True(saved.NotifySubscribers);
                 Assert.False(saved.UpdatePublishedDate);
 
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.Approved, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test note", savedStatus.InternalReleaseNote);
@@ -1022,13 +1020,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication();
 
-            var initialRelease = new Release
+            var initialReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication
             };
 
-            var amendedRelease = new Release
+            var amendedReleaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Type = ReleaseType.AdHocStatistics,
@@ -1039,15 +1037,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 NotifySubscribers = true,
                 UpdatePublishedDate = false,
                 Version = 1,
-                PreviousVersionId = initialRelease.Id
+                PreviousVersionId = initialReleaseVersion.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddAsync(publication);
-                await context.Releases.AddRangeAsync(initialRelease, amendedRelease);
+                context.Publications.Add(publication);
+                context.ReleaseVersions.AddRange(initialReleaseVersion, amendedReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1057,21 +1055,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseChecklistService
                 .Setup(s =>
-                    s.GetErrors(It.Is<Release>(r => r.Id == amendedRelease.Id)))
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == amendedReleaseVersion.Id)))
                 .ReturnsAsync(
                     new List<ReleaseChecklistIssue>()
                 );
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == amendedRelease.Id),
+                    It.Is<Guid>(g => g == amendedReleaseVersion.Id),
                     It.IsAny<Guid>(),
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(Unit.Instance);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
+                    mock.GetContentBlocks<HtmlBlock>(amendedReleaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1086,7 +1084,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // toggling the values of NotifySubscribers and UpdatePublishedDate from their initial values
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        amendedRelease.Id,
+                        amendedReleaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1104,8 +1102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases
-                    .SingleAsync(r => r.Id == amendedRelease.Id);
+                var saved = await context.ReleaseVersions
+                    .SingleAsync(rv => rv.Id == amendedReleaseVersion.Id);
 
                 // Expect NotifySubscribers and UpdatePublishedDate to match the approval request values
                 Assert.False(saved.NotifySubscribers);
@@ -1116,7 +1114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Draft_DoNotSendPreReleaseEmails()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication {Title = "Old publication"},
@@ -1128,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1137,7 +1135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 contentService.Setup(mock =>
-                        mock.GetContentBlocks<HtmlBlock>(release.Id))
+                        mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 var releaseService = BuildService(
@@ -1146,7 +1144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
@@ -1163,11 +1161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_ReleaseHasImages()
         {
-            var releaseId = Guid.NewGuid();
-
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId,
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
@@ -1176,13 +1171,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PublishScheduled = DateTime.UtcNow,
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
                 PreReleaseAccessList = "Access list",
-                Version = 0,
-                PreviousVersionId = releaseId
+                Version = 0
             };
 
             var imageFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1193,7 +1187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var imageFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1206,7 +1200,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(release, imageFile1, imageFile2);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.ReleaseFiles.AddRange(imageFile1, imageFile2);
                 await context.SaveChangesAsync();
             }
 
@@ -1214,11 +1209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                 .ReturnsAsync(ListOf<UserReleaseRole>());
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>
                 {
                     new()
@@ -1240,7 +1235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        releaseId,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
@@ -1259,11 +1254,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_ReleaseHasUnusedImages()
         {
-            var releaseId = Guid.NewGuid();
-
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId,
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication {Title = "Old publication"},
                 ReleaseName = "2030",
@@ -1272,12 +1264,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
                 PreReleaseAccessList = "Access list",
                 Version = 0,
-                PreviousVersionId = releaseId
             };
 
             var imageFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1288,7 +1279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var imageFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1301,7 +1292,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(release, imageFile1, imageFile2);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.ReleaseFiles.AddRange(imageFile1, imageFile2);
                 await context.SaveChangesAsync();
             }
 
@@ -1310,11 +1302,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             releaseFileService.Setup(mock =>
-                    mock.Delete(release.Id, new List<Guid>
+                    mock.Delete(releaseVersion.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -1322,7 +1314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             userReleaseRoleService.Setup(mock =>
-                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                 .ReturnsAsync(ListOf<UserReleaseRole>());
 
             var nextReleaseDateEdited = new PartialDate {Day = "1", Month = "1", Year = "2040"};
@@ -1336,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        releaseId,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
@@ -1347,7 +1339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 releaseFileService.Verify(mock =>
-                    mock.Delete(release.Id, new List<Guid>
+                    mock.Delete(releaseVersion.Id, new List<Guid>
                     {
                         imageFile1.File.Id,
                         imageFile2.File.Id
@@ -1362,7 +1354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsSendingPreReleaseInviteEmail()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Type = ReleaseType.AdHocStatistics,
@@ -1374,7 +1366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var invite1 = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = "test@test.com",
                 EmailSent = false,
@@ -1382,7 +1374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var invite2 = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = "test2@test.com",
                 EmailSent = false,
@@ -1391,8 +1383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
-                await context.UserReleaseInvites.AddRangeAsync(invite1, invite2);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.UserReleaseInvites.AddRange(invite1, invite2);
                 await context.SaveChangesAsync();
             }
 
@@ -1402,25 +1394,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseChecklistService
                 .Setup(s =>
-                    s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                 .ReturnsAsync(
                     new List<ReleaseChecklistIssue>()
                 );
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<Release>(r => r.Id == release.Id),
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                     invite1.Email,
                     true))
                 .ReturnsAsync(new BadRequestResult());
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<Release>(r => r.Id == release.Id),
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                     invite2.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
@@ -1441,7 +1433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1462,17 +1454,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
+                    .ReleaseVersions
                     .HydrateReleaseForChecklist()
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the failure to send emails prevented the Release from completing approval.
-                // The Release should remain unchanged from the original Release.
+                // Assert that the failure to send emails prevented the release version from completing approval.
+                // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
-                saved.AssertDeepEqualTo(release);
+                saved.AssertDeepEqualTo(releaseVersion);
 
-                // Furthermore, we have proven that the Publisher was not informed of the Release change, as it
+                // Furthermore, we have proven that the Publisher was not informed of the change, as it
                 // did not complete.
             }
         }
@@ -1480,7 +1472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_Approved_Scheduled_FailsWhileInformingPublisher()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Type = ReleaseType.AdHocStatistics,
@@ -1492,7 +1484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var invite = new UserReleaseInvite
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.PrereleaseViewer,
                 Email = "test@test.com",
                 EmailSent = false,
@@ -1501,8 +1493,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
-                await context.UserReleaseInvites.AddAsync(invite);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.UserReleaseInvites.Add(invite);
                 await context.SaveChangesAsync();
             }
 
@@ -1513,14 +1505,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseChecklistService
                 .Setup(s =>
-                    s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                    s.GetErrors(It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                 .ReturnsAsync(
                     new List<ReleaseChecklistIssue>()
                 );
 
             preReleaseUserService
                 .Setup(mock => mock.SendPreReleaseInviteEmail(
-                    It.Is<Release>(r => r.Id == release.Id),
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                     invite.Email,
                     true))
                 .ReturnsAsync(Unit.Instance);
@@ -1532,14 +1524,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publishingService
                 .Setup(s => s.ReleaseChanged(
-                    It.Is<Guid>(g => g == release.Id),
+                    It.Is<Guid>(g => g == releaseVersion.Id),
                     It.IsAny<Guid>(),
                     It.IsAny<bool>()
                 ))
                 .ReturnsAsync(new BadRequestResult());
 
             contentService.Setup(mock =>
-                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
@@ -1554,7 +1546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id,
+                        releaseVersion.Id,
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1577,18 +1569,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
+                    .ReleaseVersions
                     .HydrateReleaseForChecklist()
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the failure to notify the Publisher prevented the Release from completing approval.
-                // The Release should remain unchanged from the original Release.
+                // Assert that the failure to notify the Publisher prevented the release version from completing approval.
+                // The release version should remain unchanged from the original release version.
                 // Additionally, no new ReleaseStatus entries were added.
-                saved.AssertDeepEqualTo(release);
+                saved.AssertDeepEqualTo(releaseVersion);
 
                 // We have also shown that unfortunately the invite emails would have been sent out despite the
-                // approval failing, but we have more importantly stopped a Release from only having been partially
+                // approval failing, but we have more importantly stopped a release version from only having been partially
                 // approved.
             }
         }
@@ -1596,7 +1588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_DoesNotSendEmailIfNoReleaseApprovers()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication { Title = "Test publication" },
@@ -1609,7 +1601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1619,11 +1611,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                     .ReturnsAsync(new List<UserReleaseRole>());
 
                 var releaseService = BuildService(
@@ -1635,7 +1627,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateRequest
+                        releaseVersion.Id,
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1654,16 +1647,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the Release has moved into Higher Level Review successfully.
+                // Assert that the release version has moved into Higher Level Review successfully.
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, saved.ApprovalStatus);
 
                 // Assert a new ReleaseStatus entry is included.
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
@@ -1673,7 +1666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_SendsEmailIfReleaseApprovers()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication { Title = "Test publication" },
@@ -1685,14 +1678,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test@test.com"},
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test2@test.com"},
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
@@ -1700,7 +1693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1710,17 +1703,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                     .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
-                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email,
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                     .Returns(Unit.Instance);
 
-                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole2.User.Email,
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                     .Returns(Unit.Instance);
 
                 var releaseService = BuildService(
@@ -1732,7 +1727,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateRequest
+                        releaseVersion.Id,
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1748,16 +1744,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the Release has moved into Higher Level Review successfully.
+                // Assert that the release version has moved into Higher Level Review successfully.
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, saved.ApprovalStatus);
 
                 // Assert a new ReleaseStatus entry is included.
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
@@ -1767,7 +1763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_SendsEmailIfPublicationReleaseApprover()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication { Title = "Test publication" },
@@ -1779,7 +1775,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userPublicationApproverRole = new UserPublicationRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test@test.com" },
-                Publication = release.Publication,
+                Publication = releaseVersion.Publication,
                 Role = PublicationRole.Approver
             };
 
@@ -1787,8 +1783,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
-                await context.UserPublicationRoles.AddAsync(userPublicationApproverRole);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.UserPublicationRoles.Add(userPublicationApproverRole);
                 await context.SaveChangesAsync();
             }
 
@@ -1798,16 +1794,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
                 var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
 
-                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                     .ReturnsAsync(new List<UserReleaseRole>());
 
                 emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(
                     userPublicationApproverRole.User.Email,
-                    It.Is<Release>(r => r.Id == release.Id))).Returns(Unit.Instance);
+                    It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id))).Returns(Unit.Instance);
 
                 var releaseService = BuildService(
                     contentDbContext: context,
@@ -1818,7 +1814,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateRequest
+                        releaseVersion.Id,
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1835,16 +1832,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the Release has moved into Higher Level Review successfully.
+                // Assert that the release version has moved into Higher Level Review successfully.
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, saved.ApprovalStatus);
 
                 // Assert a new ReleaseStatus entry is included.
                 var savedStatus = Assert.Single(saved.ReleaseStatuses);
-                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(releaseVersion.Id, savedStatus.ReleaseVersionId);
                 Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
                 Assert.Equal(_userId, savedStatus.CreatedById);
                 Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
@@ -1854,7 +1851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseStatus_HigherReview_FailsSendingEmail()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication { Title = "Test publication" },
@@ -1866,14 +1863,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test@test.com"},
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test2@test.com"},
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = ReleaseRole.Approver,
             };
 
@@ -1881,7 +1878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1891,17 +1888,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(releaseVersion.Id))
                     .ReturnsAsync(new List<HtmlBlock>());
 
                 userReleaseRoleService.Setup(mock =>
-                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, releaseVersion.Publication.Id))
                     .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
-                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email,
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                     .Returns(Unit.Instance);
 
-                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole2.User.Email,
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id)))
                     .Returns(new BadRequestResult());
 
                 var releaseService = BuildService(
@@ -1913,7 +1912,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateRequest
+                        releaseVersion.Id,
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1929,12 +1929,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context
-                    .Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .SingleAsync(r => r.Id == release.Id);
+                    .ReleaseVersions
+                    .Include(rv => rv.ReleaseStatuses)
+                    .SingleAsync(rv => rv.Id == releaseVersion.Id);
 
-                // Assert that the failure to send emails prevented the Release from completing moving into Higher
-                // Level Review.
+                // Assert that the failure to send emails prevented the release version from completing moving into
+                // Higher Level Review.
                 Assert.Equal(ReleaseApprovalStatus.Draft, saved.ApprovalStatus);
 
                 // Assert no new ReleaseStatus entries were added.
@@ -1955,8 +1955,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var (releaseParent, otherReleaseParent) = _fixture
                     .DefaultReleaseParent()
-                    .ForIndex(0, rp => rp.SetReleases(_fixture
-                        .DefaultRelease()
+                    .ForIndex(0, rp => rp.SetVersions(_fixture
+                        .DefaultReleaseVersion()
                         .ForIndex(0, r => r
                             .SetVersion(0)
                             .SetReleaseStatuses(_fixture
@@ -1978,8 +1978,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     .SetCreated(DateTime.UtcNow.AddDays(-1)))
                                 .Generate(2)))
                         .Generate(2)))
-                    .ForIndex(1, rp => rp.SetReleases(_fixture
-                        .DefaultRelease()
+                    .ForIndex(1, rp => rp.SetVersions(_fixture
+                        .DefaultReleaseVersion()
                         .WithReleaseStatuses(_fixture
                             .DefaultReleaseStatus()
                             .WithCreatedBy(User)
@@ -1998,9 +1998,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Releases[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
 
-                    var expectedReleaseStatuses = releaseParent.Releases.SelectMany(r => r.ReleaseStatuses)
+                    var expectedReleaseStatuses = releaseParent.Versions.SelectMany(rv => rv.ReleaseStatuses)
                         .OrderByDescending(rs => rs.Created)
                         .ToList();
 
@@ -2017,7 +2017,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             () => Assert.Equal(releaseStatus.ApprovalStatus, viewModel.ApprovalStatus),
                             () => Assert.Equal(releaseStatus.Created, viewModel.Created),
                             () => Assert.Equal(releaseStatus.CreatedBy!.Email, viewModel.CreatedByEmail),
-                            () => Assert.Equal(releaseStatus.Release.Version, viewModel.ReleaseVersion)
+                            () => Assert.Equal(releaseStatus.ReleaseVersion.Version, viewModel.ReleaseVersion)
                         );
                     });
                 }
@@ -2028,9 +2028,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseParent releaseParent = _fixture
                     .DefaultReleaseParent()
-                    .WithReleases(
+                    .WithVersions(
                         _fixture
-                            .DefaultRelease()
+                            .DefaultReleaseVersion()
                             .WithReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
                                 .WithCreated()
@@ -2048,7 +2048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Releases[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
 
@@ -2062,9 +2062,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseParent releaseParent = _fixture
                     .DefaultReleaseParent()
-                    .WithReleases(
+                    .WithVersions(
                         _fixture
-                            .DefaultRelease()
+                            .DefaultReleaseVersion()
                             .WithReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
                                 .WithCreatedBy()
@@ -2081,7 +2081,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Releases[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
 
@@ -2095,8 +2095,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 ReleaseParent releaseParent = _fixture
                     .DefaultReleaseParent()
-                    .WithReleases(_fixture
-                        .DefaultRelease()
+                    .WithVersions(_fixture
+                        .DefaultReleaseVersion()
                         .Generate(1));
 
                 var contextId = Guid.NewGuid().ToString();
@@ -2109,7 +2109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(context);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Releases[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
                     Assert.Empty(viewModels);

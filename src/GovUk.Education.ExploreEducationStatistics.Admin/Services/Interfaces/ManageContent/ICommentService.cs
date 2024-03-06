@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,11 +11,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface ICommentService
     {
-        Task<Either<ActionResult, List<CommentViewModel>>> GetComments(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId);
+        Task<Either<ActionResult, List<CommentViewModel>>> GetComments(Guid releaseVersionId,
+            Guid contentSectionId,
+            Guid contentBlockId);
 
-        Task<Either<ActionResult, CommentViewModel>> AddComment(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest);
+        Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseVersionId,
+            Guid contentSectionId,
+            Guid contentBlockId,
+            CommentSaveRequest saveRequest);
 
         Task<Either<ActionResult, CommentViewModel>> SetResolved(Guid commentId, bool resolve);
 

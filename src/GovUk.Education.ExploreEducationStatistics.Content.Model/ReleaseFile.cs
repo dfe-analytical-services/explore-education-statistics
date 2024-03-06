@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
@@ -8,10 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        [JsonIgnore]
-        public Release Release { get; set; } = null!;
+        public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
-        public Guid ReleaseId { get; set; }
+        public Guid ReleaseVersionId { get; set; }
 
         public File File { get; set; } = null!;
 

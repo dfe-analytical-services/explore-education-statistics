@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,11 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var template = _configuration.GetValue<string>("NotifyInviteWithRolesTemplateId");
 
             var releaseRoleList = userReleaseInvites
-                .OrderBy(invite => invite.Release.Publication.Title)
-                .ThenBy(invite => invite.Release.Title)
+                .OrderBy(invite => invite.ReleaseVersion.Publication.Title)
+                .ThenBy(invite => invite.ReleaseVersion.Title)
                 .ThenBy(invite => invite.Role.ToString())
                 .Select(invite =>
-                    $"* {invite.Release.Publication.Title}, {invite.Release.Title} - {invite.Role.ToString()}")
+                    $"* {invite.ReleaseVersion.Publication.Title}, {invite.ReleaseVersion.Title} - {invite.Role.ToString()}")
                 .ToList();
 
             var publicationRoleList = userPublicationInvites
@@ -46,26 +46,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}"},
+                { "url", $"https://{uri}" },
                 {
                     "release role list",
                     releaseRoleList.IsNullOrEmpty()
                         ? "* No release permissions granted"
                         : releaseRoleList.JoinToString("\n")
-
                 },
                 {
                     "publication role list",
                     publicationRoleList.IsNullOrEmpty()
                         ? "* No publication permissions granted"
                         : publicationRoleList.JoinToString("\n")
-
                 },
             };
 
             return _emailService.SendEmail(email, template, emailValues);
         }
-        
+
         public Either<ActionResult, Unit> SendPublicationRoleEmail(
             string email,
             Publication publication,
@@ -86,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public Either<ActionResult, Unit> SendReleaseRoleEmail(
             string email,
-            Release release,
+            ReleaseVersion releaseVersion,
             ReleaseRole role)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
@@ -95,27 +93,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var link = role == ReleaseRole.PrereleaseViewer ? "prerelease " : "summary";
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}/publication/{release.Publication.Id}/release/{release.Id}/{link}"},
-                {"role", role.ToString()},
-                {"publication", release.Publication.Title},
-                {"release", release.Title}
+                {
+                    "url",
+                    $"https://{uri}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/{link}"
+                },
+                { "role", role.ToString() },
+                { "publication", releaseVersion.Publication.Title },
+                { "release", releaseVersion.Title }
             };
 
             return _emailService.SendEmail(email, template, emailValues);
         }
-        
-        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, Release release)
+
+        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email,
+            ReleaseVersion releaseVersion)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyReleaseHigherReviewersTemplateId");
-            
+
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}/publication/{release.Publication.Id}/release/{release.Id}/summary"},
-                {"publication", release.Publication.Title},
-                {"release", release.Title},
+                {
+                    "url",
+                    $"https://{uri}/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                },
+                { "publication", releaseVersion.Publication.Title },
+                { "release", releaseVersion.Title },
             };
-            
+
             return _emailService.SendEmail(email, template, emailValues);
         }
 

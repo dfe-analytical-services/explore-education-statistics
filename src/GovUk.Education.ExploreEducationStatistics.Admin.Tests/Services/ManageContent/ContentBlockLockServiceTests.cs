@@ -27,7 +27,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var user = new User
         {
@@ -41,9 +41,9 @@ public class ContentBlockLockServiceTests
         {
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -63,7 +63,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -78,7 +78,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(contentBlock.Id, viewModel.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel.SectionId);
-            Assert.Equal(release.Id, viewModel.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseVersionId);
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
@@ -99,7 +99,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_RefreshesExistingLock()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var user = new User
         {
@@ -117,9 +117,9 @@ public class ContentBlockLockServiceTests
             LockedBy = user,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -139,7 +139,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -154,7 +154,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(contentBlock.Id, viewModel.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel.SectionId);
-            Assert.Equal(release.Id, viewModel.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseVersionId);
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
@@ -182,7 +182,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_PreviousLockExpired()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var previousUser = new User
         {
@@ -210,9 +210,9 @@ public class ContentBlockLockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -232,7 +232,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -247,7 +247,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(contentBlock.Id, viewModel.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel.SectionId);
-            Assert.Equal(release.Id, viewModel.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseVersionId);
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
@@ -270,7 +270,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_Force()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var user = new User
         {
@@ -293,9 +293,9 @@ public class ContentBlockLockServiceTests
             },
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -315,7 +315,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -330,7 +330,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(contentBlock.Id, viewModel.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel.SectionId);
-            Assert.Equal(release.Id, viewModel.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseVersionId);
             Assert.Equal("Jane Doe", viewModel.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel.LockedBy.Email);
 
@@ -352,7 +352,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_PreviousLockNotExpired()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var previousUser = new User
         {
@@ -378,9 +378,9 @@ public class ContentBlockLockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -400,7 +400,7 @@ public class ContentBlockLockServiceTests
             var viewModel = result.AssertRight();
             Assert.Equal(contentBlock.Id, viewModel.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel.SectionId);
-            Assert.Equal(release.Id, viewModel.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel.ReleaseVersionId);
             Assert.Equal("Rob Rowe", viewModel.LockedBy.DisplayName);
             Assert.Equal("rob@test.com", viewModel.LockedBy.Email);
         }
@@ -418,7 +418,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task LockContentBlock_ConcurrentUsers()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var user1 = new User
         {
@@ -438,9 +438,9 @@ public class ContentBlockLockServiceTests
         {
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -460,13 +460,13 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var userService = new Mock<IUserService>(Strict);
 
             userService
-                .Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanUpdateSpecificRelease))
+                .Setup(s => s.MatchesPolicy(It.IsAny<ReleaseVersion>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
 
             userService
@@ -497,7 +497,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(contentBlock.Id, viewModel1.Id);
             Assert.Equal(contentBlock.ContentSectionId, viewModel1.SectionId);
-            Assert.Equal(release.Id, viewModel1.ReleaseId);
+            Assert.Equal(releaseVersion.Id, viewModel1.ReleaseVersionId);
             Assert.Equal("Jane Doe", viewModel1.LockedBy.DisplayName);
             Assert.Equal("jane@test.com", viewModel1.LockedBy.Email);
 
@@ -556,7 +556,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var user = new User
         {
@@ -572,9 +572,9 @@ public class ContentBlockLockServiceTests
             LockedBy = user,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -604,7 +604,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -616,7 +616,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
-            Assert.Equal(viewModel.ReleaseId, release.Id);
+            Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -632,7 +632,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_PreviousLockExpired()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var nextUser = new User
         {
@@ -657,9 +657,9 @@ public class ContentBlockLockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -689,7 +689,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -701,7 +701,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
-            Assert.Equal(viewModel.ReleaseId, release.Id);
+            Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -717,7 +717,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_PreviousLockNotExpired()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var nextUser = new User
         {
@@ -744,9 +744,9 @@ public class ContentBlockLockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -779,7 +779,7 @@ public class ContentBlockLockServiceTests
     [Fact]
     public async Task UnlockContentBlock_Force()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var nextUser = new User
         {
@@ -805,9 +805,9 @@ public class ContentBlockLockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             },
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -837,7 +837,7 @@ public class ContentBlockLockServiceTests
             var hubContext = new Mock<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(Strict);
 
             hubContext
-                .Setup(s => s.Clients.Group(release.Id.ToString()))
+                .Setup(s => s.Clients.Group(releaseVersion.Id.ToString()))
                 .Returns(client.Object);
 
             var service = BuildService(contentDbContext, hubContext: hubContext.Object);
@@ -849,7 +849,7 @@ public class ContentBlockLockServiceTests
 
             Assert.Equal(viewModel.Id, contentBlock.Id);
             Assert.Equal(viewModel.SectionId, contentBlock.ContentSectionId);
-            Assert.Equal(viewModel.ReleaseId, release.Id);
+            Assert.Equal(viewModel.ReleaseVersionId, releaseVersion.Id);
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Create()
         {
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
             var createdById = Guid.NewGuid();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
                 await repository.Create(
-                    releaseId: releaseId,
+                    releaseVersionId: releaseVersionId,
                     email: "test@test.com",
                     releaseRole: Contributor,
                     emailSent: true,
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleOrDefaultAsync();
 
                 Assert.NotNull(userReleaseInvite);
-                Assert.Equal(releaseId, userReleaseInvite.ReleaseId);
+                Assert.Equal(releaseVersionId, userReleaseInvite.ReleaseVersionId);
                 Assert.Equal("test@test.com", userReleaseInvite.Email);
                 Assert.Equal(Contributor, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
@@ -51,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateManyIfNotExists()
         {
             var createdById = Guid.NewGuid();
-            var releaseId1 = Guid.NewGuid();
-            var releaseId2 = Guid.NewGuid();
+            var releaseVersionId1 = Guid.NewGuid();
+            var releaseVersionId2 = Guid.NewGuid();
             var existingReleaseInvite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
                 EmailSent = true,
                 CreatedById = createdById,
@@ -73,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
                 await repository.CreateManyIfNotExists(
-                    releaseIds: ListOf(releaseId1, releaseId2,
-                        existingReleaseInvite.ReleaseId),
+                    releaseVersionIds: ListOf(releaseVersionId1, releaseVersionId2,
+                        existingReleaseInvite.ReleaseVersionId),
                     email: "test@test.com",
                     releaseRole: Contributor,
                     emailSent: false,
@@ -90,21 +90,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, userReleaseInvites.Count);
 
                 Assert.Equal(existingReleaseInvite.Id, userReleaseInvites[0].Id);
-                Assert.Equal(existingReleaseInvite.ReleaseId, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(existingReleaseInvite.ReleaseVersionId, userReleaseInvites[0].ReleaseVersionId);
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[0].CreatedById);
 
-                Assert.Equal(releaseId1, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(releaseVersionId1, userReleaseInvites[1].ReleaseVersionId);
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.False(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[1].CreatedById);
 
-                Assert.Equal(releaseId2, userReleaseInvites[2].ReleaseId);
+                Assert.Equal(releaseVersionId2, userReleaseInvites[2].ReleaseVersionId);
                 Assert.Equal("test@test.com", userReleaseInvites[2].Email);
                 Assert.Equal(Contributor, userReleaseInvites[2].Role);
                 Assert.False(userReleaseInvites[2].EmailSent);
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
             };
 
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
-                var result = await repository.UserHasInvite(invite.ReleaseId, invite.Email, invite.Role);
+                var result = await repository.UserHasInvite(invite.ReleaseVersionId, invite.Email, invite.Role);
                 Assert.True(result);
             }
         }
@@ -153,14 +153,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite1 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
             };
 
             var invite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
             };
 
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
                 var result = await repository.UserHasInvites(
-                    ListOf(invite1.ReleaseId, invite2.ReleaseId),
+                    ListOf(invite1.ReleaseVersionId, invite2.ReleaseVersionId),
                     "test@test.com", Contributor);
                 Assert.True(result);
             }
@@ -187,14 +187,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite1 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
             };
 
             var invite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 Role = Contributor,
             };
 
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
                 var result = await repository.UserHasInvites(
-                    ListOf(invite1.ReleaseId, invite2.ReleaseId, Guid.NewGuid()),
+                    ListOf(invite1.ReleaseVersionId, invite2.ReleaseVersionId, Guid.NewGuid()),
                     "test@test.com", Contributor);
                 Assert.False(result);
             }
@@ -218,17 +218,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveByPublication()
         {
-            var release1 = new Release();
-            var release2 = new Release();
-            var release3 = new Release();
+            var releaseVersion1 = new ReleaseVersion();
+            var releaseVersion2 = new ReleaseVersion();
+            var releaseVersion3 = new ReleaseVersion();
             var publication = new Publication
             {
-                Releases = ListOf(release1, release3),
+                Releases = ListOf(releaseVersion1, releaseVersion3),
             };
             var invite1 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release1,
+                ReleaseVersion = releaseVersion1,
                 Role = Contributor,
             };
 
@@ -236,14 +236,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release2,
+                ReleaseVersion = releaseVersion2,
                 Role = Contributor,
             };
 
             var invite3 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release3,
+                ReleaseVersion = releaseVersion3,
                 Role = Contributor,
             };
 
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite4 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                Release = release1,
+                ReleaseVersion = releaseVersion1,
                 Role = Lead,
             };
 
@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var invite5 = new UserReleaseInvite
             {
                 Email = "test_different@test.com",
-                Release = release1,
+                ReleaseVersion = releaseVersion1,
                 Role = Contributor,
             };
 
@@ -285,17 +285,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(invite2.Id, remainingInvites[0].Id);
                 Assert.Equal(invite2.Email, remainingInvites[0].Email);
-                Assert.Equal(invite2.ReleaseId, remainingInvites[0].ReleaseId);
+                Assert.Equal(invite2.ReleaseVersionId, remainingInvites[0].ReleaseVersionId);
                 Assert.Equal(invite2.Role, remainingInvites[0].Role);
 
                 Assert.Equal(invite4.Id, remainingInvites[1].Id);
                 Assert.Equal(invite4.Email, remainingInvites[1].Email);
-                Assert.Equal(invite4.ReleaseId, remainingInvites[1].ReleaseId);
+                Assert.Equal(invite4.ReleaseVersionId, remainingInvites[1].ReleaseVersionId);
                 Assert.Equal(invite4.Role, remainingInvites[1].Role);
 
                 Assert.Equal(invite5.Id, remainingInvites[2].Id);
                 Assert.Equal(invite5.Email, remainingInvites[2].Email);
-                Assert.Equal(invite5.ReleaseId, remainingInvites[2].ReleaseId);
+                Assert.Equal(invite5.ReleaseVersionId, remainingInvites[2].ReleaseVersionId);
                 Assert.Equal(invite5.Role, remainingInvites[2].Role);
             }
         }

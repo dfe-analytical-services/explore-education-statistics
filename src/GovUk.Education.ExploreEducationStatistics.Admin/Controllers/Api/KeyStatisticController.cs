@@ -24,65 +24,70 @@ public class KeyStatisticController : ControllerBase
         _keyStatisticService = keyStatisticService;
     }
 
-    [HttpPost("release/{releaseId:guid}/key-statistic-data-block")]
+    [HttpPost("release/{releaseVersionId:guid}/key-statistic-data-block")]
     public async Task<ActionResult<KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
-        Guid releaseId,
+        Guid releaseVersionId,
         KeyStatisticDataBlockCreateRequest request)
     {
         return await _keyStatisticService
-            .CreateKeyStatisticDataBlock(releaseId, request)
+            .CreateKeyStatisticDataBlock(releaseVersionId, request)
             .HandleFailuresOrOk();
     }
 
-    [HttpPost("release/{releaseId:guid}/key-statistic-text")]
+    [HttpPost("release/{releaseVersionId:guid}/key-statistic-text")]
     public async Task<ActionResult<KeyStatisticTextViewModel>> CreateKeyStatisticText(
-        Guid releaseId,
+        Guid releaseVersionId,
         KeyStatisticTextCreateRequest request)
     {
         return await _keyStatisticService
-            .CreateKeyStatisticText(releaseId, request)
+            .CreateKeyStatisticText(releaseVersionId, request)
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("release/{releaseId:guid}/key-statistic-data-block/{keyStatisticId:guid}")]
+    [HttpPut("release/{releaseVersionId:guid}/key-statistic-data-block/{keyStatisticId:guid}")]
     public async Task<ActionResult<KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid keyStatisticId,
         KeyStatisticDataBlockUpdateRequest request)
     {
         return await _keyStatisticService
-            .UpdateKeyStatisticDataBlock(releaseId, keyStatisticId, request)
+            .UpdateKeyStatisticDataBlock(releaseVersionId: releaseVersionId,
+                keyStatisticId: keyStatisticId,
+                request)
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("release/{releaseId:guid}/key-statistic-text/{keyStatisticId:guid}")]
+    [HttpPut("release/{releaseVersionId:guid}/key-statistic-text/{keyStatisticId:guid}")]
     public async Task<ActionResult<KeyStatisticTextViewModel>> UpdateKeyStatisticText(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid keyStatisticId,
         KeyStatisticTextUpdateRequest request)
     {
         return await _keyStatisticService
-            .UpdateKeyStatisticText(releaseId, keyStatisticId, request)
+            .UpdateKeyStatisticText(releaseVersionId: releaseVersionId,
+                keyStatisticId: keyStatisticId,
+                request)
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("release/{releaseId:guid}/key-statistic/{keyStatisticId:guid}")]
+    [HttpDelete("release/{releaseVersionId:guid}/key-statistic/{keyStatisticId:guid}")]
     public async Task<ActionResult<Unit>> Delete(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid keyStatisticId)
     {
         return await _keyStatisticService
-            .Delete(releaseId, keyStatisticId)
+            .Delete(releaseVersionId: releaseVersionId,
+                keyStatisticId: keyStatisticId)
             .HandleFailuresOrNoContent();
     }
 
-    [HttpPut("release/{releaseId:guid}/key-statistic/order")]
+    [HttpPut("release/{releaseVersionId:guid}/key-statistic/order")]
     public async Task<ActionResult<List<KeyStatisticViewModel>>> ReorderKeyStatistics(
-        Guid releaseId,
+        Guid releaseVersionId,
         List<Guid> newOrder)
     {
         return await _keyStatisticService
-            .Reorder(releaseId, newOrder)
+            .Reorder(releaseVersionId, newOrder)
             .HandleFailuresOrOk();
     }
 }

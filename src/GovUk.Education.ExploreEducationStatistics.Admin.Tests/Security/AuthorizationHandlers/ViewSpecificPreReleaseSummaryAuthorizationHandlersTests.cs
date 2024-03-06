@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -25,9 +25,9 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         // Assert that any users with the "AccessAllReleases" claim can view an arbitrary PreRelease Summary
         // (and no other claim allows this)
-        await AssertHandlerSucceedsWithCorrectClaims<Release, ViewSpecificPreReleaseSummaryRequirement>(
+        await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            new Release
+            new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             },
@@ -40,7 +40,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
         await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            new Release
+            new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             },
@@ -56,7 +56,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         };
         await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            new Release
+            new ReleaseVersion
             {
                 PublicationId = publication.Id,
                 Publication = publication
@@ -68,7 +68,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         return new ViewSpecificPreReleaseSummaryAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseRepository(contentDbContext),
+                new ReleaseVersionRepository(contentDbContext),
                 new UserReleaseRoleRepository(contentDbContext),
                 new UserPublicationRoleRepository(contentDbContext),
                 Mock.Of<IPreReleaseService>(Strict)));

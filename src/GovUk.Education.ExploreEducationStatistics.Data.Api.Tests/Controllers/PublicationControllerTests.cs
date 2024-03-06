@@ -29,23 +29,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var subjects = new List<SubjectViewModel>();
 
-            var latestReleaseId = Guid.NewGuid();
+            var latestReleaseVersionId = Guid.NewGuid();
 
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                LatestPublishedReleaseId = latestReleaseId
+                LatestPublishedReleaseVersionId = latestReleaseVersionId
             };
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseId);
+            var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseVersionId);
 
             SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
             mocks
                 .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseId))
+                .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseVersionId))
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks
                 .releaseService
-                .Setup(s => s.ListSubjects(latestReleaseId))
+                .Setup(s => s.ListSubjects(latestReleaseVersionId))
                 .ReturnsAsync(subjects);
 
             mocks.cacheService
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                LatestPublishedReleaseId = null
+                LatestPublishedReleaseVersionId = null
             };
 
             var (controller, mocks) = BuildControllerAndMocks();
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                LatestPublishedReleaseId = latestReleaseId
+                LatestPublishedReleaseVersionId = latestReleaseId
             };
 
             var featuredTables = new List<FeaturedTableViewModel>
@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                LatestPublishedReleaseId = null
+                LatestPublishedReleaseVersionId = null
             };
 
             var (controller, mocks) = BuildControllerAndMocks();

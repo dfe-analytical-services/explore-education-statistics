@@ -27,41 +27,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _subjectMetaService = subjectMetaService;
         }
 
-        [HttpGet("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
+        [HttpGet("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}")]
         [BlobCache(typeof(PrivateSubjectMetaCacheKey))]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
+            Guid releaseVersionId,
+            Guid subjectId)
         {
-            return _subjectMetaService.GetSubjectMeta(releaseId: releaseId, subjectId: subjectId)
+            return _subjectMetaService.GetSubjectMeta(releaseVersionId: releaseVersionId,
+                    subjectId: subjectId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("data/release/{releaseId:guid}/meta/subject")]
+        [HttpPost("data/release/{releaseVersionId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(releaseId, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/filters")]
+        [HttpPatch("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}/filters")]
         public Task<ActionResult<Unit>> UpdateFilters(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             List<FilterUpdateViewModel> request)
         {
-            return _subjectMetaService.UpdateSubjectFilters(releaseId, subjectId, request)
+            return _subjectMetaService.UpdateSubjectFilters(releaseVersionId: releaseVersionId,
+                    subjectId: subjectId,
+                    request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/indicators")]
+        [HttpPatch("data/release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}/indicators")]
         public Task<ActionResult<Unit>> UpdateIndicators(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request)
         {
-            return _subjectMetaService.UpdateSubjectIndicators(releaseId, subjectId, request)
+            return _subjectMetaService.UpdateSubjectIndicators(releaseVersionId: releaseVersionId,
+                    subjectId: subjectId,
+                    request)
                 .HandleFailuresOrOk();
         }
     }

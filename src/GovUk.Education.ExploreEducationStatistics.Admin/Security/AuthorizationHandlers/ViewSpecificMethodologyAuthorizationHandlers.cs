@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
     AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using IReleaseRepository =
-    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository =
+    GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -25,20 +25,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IPreReleaseService _preReleaseService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public ViewSpecificMethodologyAuthorizationHandler(
             IMethodologyRepository methodologyRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IPreReleaseService preReleaseService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             AuthorizationHandlerService authorizationHandlerService)
         {
             _methodologyRepository = methodologyRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _preReleaseService = preReleaseService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _authorizationHandlerService = authorizationHandlerService;
         }
 
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
             // view it.  Additionally, if the user is an Editor (Contributor, Lead) or an Approver of any
-            // (Live or non-Live) Release of the owning Publication of this Methodology, they can view it.
+            // (Live or non-Live) release version of the owning publication of this methodology, they can view it.
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrAnyRelease(
                         context.User.GetUserId(),
@@ -70,10 +70,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            // A user can view an approved methodology version used by a release in prerelease if they have
-            // PrereleaseViewer role on the release.
-            // The release must be the latest version of the most recent release by time series for the publication,
-            // approved but unpublished, and within the prerelease window.
+            // A user can view an approved methodology version used by a release version in prerelease if they have
+            // PrereleaseViewer role on the release version.
+            // The release version must be the latest version of the most recent release by time series for the
+            // publication, approved but unpublished, and within the prerelease window.
             if (methodologyVersion.Approved)
             {
                 var publicationIds = await _methodologyRepository
@@ -81,33 +81,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
                 foreach (var publicationId in publicationIds)
                 {
-                    var latestRelease = await _releaseRepository.GetLatestReleaseVersion(publicationId);
+                    var latestReleaseVersion = await _releaseVersionRepository.GetLatestReleaseVersion(publicationId);
 
                     // The publication may have no releases
-                    if (latestRelease == null)
+                    if (latestReleaseVersion == null)
                     {
                         continue;
                     }
 
                     // A published release is not in prerelease
-                    if (latestRelease.Live)
+                    if (latestReleaseVersion.Live)
                     {
                         continue;
                     }
 
                     // An unapproved release is not in prerelease
-                    if (latestRelease.ApprovalStatus != ReleaseApprovalStatus.Approved)
+                    if (latestReleaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
                     {
                         continue;
                     }
 
                     if (await _userReleaseRoleRepository.HasUserReleaseRole(
                             context.User.GetUserId(),
-                            latestRelease.Id,
+                            latestReleaseVersion.Id,
                             ReleaseRole.PrereleaseViewer))
                     {
                         if (_preReleaseService
-                                .GetPreReleaseWindowStatus(latestRelease, DateTime.UtcNow)
+                                .GetPreReleaseWindowStatus(latestReleaseVersion, DateTime.UtcNow)
                                 .Access == PreReleaseAccess.Within)
                         {
                             context.Succeed(requirement);

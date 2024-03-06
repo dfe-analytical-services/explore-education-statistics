@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -17,16 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var (preReleaseContactsService, preReleaseSummaryService) = Mocks();
 
             var preReleaseSummaryViewModel = new PreReleaseSummaryViewModel();
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
 
             preReleaseSummaryService
-                .Setup(s => s.GetPreReleaseSummaryViewModelAsync(It.Is<Guid>(id => id == releaseId)))
+                .Setup(s => s.GetPreReleaseSummaryViewModelAsync(It.Is<Guid>(id => id == releaseVersionId)))
                 .ReturnsAsync(preReleaseSummaryViewModel);
 
             var controller =
                 new PreReleaseController(preReleaseContactsService.Object, preReleaseSummaryService.Object);
 
-            var result = await controller.GetPreReleaseSummaryAsync(releaseId);
+            var result = await controller.GetPreReleaseSummaryAsync(releaseVersionId);
             result.AssertOkResult();
         }
 

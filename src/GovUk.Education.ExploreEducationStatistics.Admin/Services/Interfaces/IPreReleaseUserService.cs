@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,20 +11,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPreReleaseUserService
     {
-        Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseId);
+        Task<Either<ActionResult, List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId);
 
         Task<Either<ActionResult, PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
-            Guid releaseId,
+            Guid releaseVersionId,
             List<string> emails);
 
         Task<Either<ActionResult, List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
-            Guid releaseId,
+            Guid releaseVersionId,
             List<string> emails);
 
-        Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseId, string email);
+        Task<Either<ActionResult, Unit>> RemovePreReleaseUser(Guid releaseVersionId,
+            string email);
 
         Task<Either<ActionResult, Unit>> SendPreReleaseInviteEmail(
-            Release release,
+            ReleaseVersion releaseVersion,
             string email,
             bool isNewUser);
 

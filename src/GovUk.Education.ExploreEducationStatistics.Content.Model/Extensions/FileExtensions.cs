@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -52,19 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(rootPath, type)}{fileId}";
         }
 
-        public static string PublicPath(this File file, Guid releaseId)
+        public static string PublicPath(this File file, Guid releaseVersionId)
         {
             if (!PublicFileTypes.Contains(file.Type))
             {
                 throw new ArgumentOutOfRangeException(nameof(file.Type), file.Type, "Cannot create public path for file type");
             }
 
-            // Public Release files are located in blob storage on path /<releaseId>/<type>/...
-            // where Release is that of the latest Release version.
-            // This is not necessarily the same as the Release at the time of uploading,
-            // if the file belongs to a Release amendment.
-
-            return $"{FilesPath(releaseId, file.Type)}{file.Id}";
+            // Public release files are located in blob storage under the latest release version in path /<releaseVersionId>/<type>/<fileId>.
+            // This is not necessarily the same release version that they were originally created for at the time of uploading.
+            return $"{FilesPath(releaseVersionId, file.Type)}{file.Id}";
         }
 
         public static string ZipFileEntryName(this File file)

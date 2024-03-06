@@ -22,64 +22,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataBlockService = dataBlockService;
         }
 
-        [HttpPost("releases/{releaseId:guid}/data-blocks")]
+        [HttpPost("releases/{releaseVersionId:guid}/data-blocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             DataBlockCreateViewModel dataBlock)
         {
             return await _dataBlockService
-                .Create(releaseId, dataBlock)
+                .Create(releaseVersionId, dataBlock)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("releases/{releaseId:guid}/data-blocks/{id:guid}")]
-        public async Task<ActionResult> DeleteDataBlock(Guid releaseId, Guid id)
+        [HttpDelete("releases/{releaseVersionId:guid}/data-blocks/{dataBlockVersionId:guid}")]
+        public async Task<ActionResult> DeleteDataBlock(Guid releaseVersionId,
+            Guid dataBlockVersionId)
         {
             return await _dataBlockService
-                .Delete(releaseId, id)
+                .Delete(releaseVersionId: releaseVersionId,
+                    dataBlockVersionId: dataBlockVersionId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("releases/{releaseId:guid}/data-blocks/{id:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id)
+        [HttpGet("releases/{releaseVersionId:guid}/data-blocks/{dataBlockVersionId:guid}/delete-plan")]
+        public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseVersionId,
+            Guid dataBlockVersionId)
         {
             return await _dataBlockService
-                .GetDeletePlan(releaseId, id)
+                .GetDeletePlan(releaseVersionId: releaseVersionId,
+                    dataBlockVersionId: dataBlockVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}/data-blocks")]
-        public async Task<ActionResult<List<DataBlockSummaryViewModel>>> List(Guid releaseId)
+        [HttpGet("releases/{releaseVersionId:guid}/data-blocks")]
+        public async Task<ActionResult<List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId)
         {
             return await _dataBlockService
-                .List(releaseId)
+                .List(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("data-blocks/{id:guid}")]
-        public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid id)
+        [HttpGet("data-blocks/{dataBlockVersionId:guid}")]
+        public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid dataBlockVersionId)
         {
             return await _dataBlockService
-                .Get(id)
+                .Get(dataBlockVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("data-blocks/{id:guid}")]
-        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
+        [HttpPut("data-blocks/{dataBlockVersionId:guid}")]
+        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid dataBlockVersionId,
             DataBlockUpdateViewModel dataBlock)
         {
             return await _dataBlockService
-                .Update(id, dataBlock)
+                .Update(dataBlockVersionId, dataBlock)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data-blocks/unattached")]
-        public async Task<ActionResult<List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/data-blocks/unattached")]
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
         {
             return await _dataBlockService
-                .GetUnattachedDataBlocks(releaseId)
+                .GetUnattachedDataBlocks(releaseVersionId)
                 .HandleFailuresOrOk();
         }
-
     }
 }

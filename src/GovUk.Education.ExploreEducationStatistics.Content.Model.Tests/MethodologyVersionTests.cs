@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void ScheduledForPublishingImmediately_FalseWhenPublishingStrategyIsWithRelease()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -28,8 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var methodology = new MethodologyVersion
             {
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = release.Id,
-                ScheduledWithRelease = release
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
+                ScheduledWithReleaseVersion = releaseVersion
             };
 
             Assert.False(methodology.ScheduledForPublishingImmediately);
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var methodology = new MethodologyVersion
             {
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = release.Id,
-                ScheduledWithRelease = release
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
+                ScheduledWithReleaseVersion = releaseVersion
             };
 
             Assert.True(methodology.ScheduledForPublishingWithRelease);
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
         {
-            var liveRelease = new Release
+            var liveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow
@@ -76,8 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var methodology = new MethodologyVersion
             {
                 PublishingStrategy = WithRelease,
-                ScheduledWithRelease = liveRelease,
-                ScheduledWithReleaseId = liveRelease.Id
+                ScheduledWithReleaseVersion = liveReleaseVersion,
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id
             };
 
             Assert.True(methodology.ScheduledForPublishingWithPublishedRelease);
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         [Fact]
         public void ScheduledForPublishingWithPublishedRelease_FalseWhenScheduledWithNonLiveRelease()
         {
-            var nonLiveRelease = new Release
+            var nonLiveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -94,8 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var methodology = new MethodologyVersion
             {
                 PublishingStrategy = WithRelease,
-                ScheduledWithRelease = nonLiveRelease,
-                ScheduledWithReleaseId = nonLiveRelease.Id
+                ScheduledWithReleaseVersion = nonLiveReleaseVersion,
+                ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
             };
 
             Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var methodology = new MethodologyVersion
             {
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = Guid.NewGuid()
+                ScheduledWithReleaseVersionId = Guid.NewGuid()
             };
 
             Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);

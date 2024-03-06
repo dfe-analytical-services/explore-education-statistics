@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class ViewReleaseStatusHistoryAuthorizationHandler
-        : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, Release>
+        : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, ReleaseVersion>
     {
         private readonly AuthorizationHandlerService _authorizationHandlerService;
 
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             ViewReleaseStatusHistoryRequirement requirement,
-            Release release)
+            ReleaseVersion releaseVersion)
         {
             if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllReleases))
             {
@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
-                        release.PublicationId,
-                        release.Id,
+                        releaseVersion.PublicationId,
+                        releaseVersion.Id,
                         ListOf(PublicationRole.Owner, PublicationRole.Approver),
                         UnrestrictedReleaseViewerRoles))
             {

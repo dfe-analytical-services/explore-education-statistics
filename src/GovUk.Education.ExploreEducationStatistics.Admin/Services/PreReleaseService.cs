@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -16,14 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _preReleaseOptions = config.Value.PreReleaseAccess.AccessWindow;
         }
 
-        public PreReleaseWindow GetPreReleaseWindow(Release release)
+        public PreReleaseWindow GetPreReleaseWindow(ReleaseVersion releaseVersion)
         {
-            if (!release.PublishScheduled.HasValue)
+            if (!releaseVersion.PublishScheduled.HasValue)
             {
-                throw new ArgumentException("Release has no PublishScheduled value", nameof(release));
+                throw new ArgumentException("Release version has no PublishScheduled value", nameof(releaseVersion));
             }
 
-            var publishScheduled = release.PublishScheduled.Value;
+            var publishScheduled = releaseVersion.PublishScheduled.Value;
 
             return new PreReleaseWindow
             {
@@ -32,9 +32,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
+        public PreReleaseWindowStatus GetPreReleaseWindowStatus(ReleaseVersion releaseVersion, DateTime referenceTime)
         {
-            if (release.Live)
+            if (releaseVersion.Live)
             {
                 return new PreReleaseWindowStatus
                 {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
             }
 
-            if (!release.PublishScheduled.HasValue)
+            if (!releaseVersion.PublishScheduled.HasValue)
             {
                 return new PreReleaseWindowStatus
                 {
@@ -50,14 +50,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 };
             }
 
-            var publishScheduled = release.PublishScheduled.Value;
+            var publishScheduled = releaseVersion.PublishScheduled.Value;
             var startTime = GetStartTime(publishScheduled);
 
             return new PreReleaseWindowStatus
             {
                 Start = GetStartTime(publishScheduled),
                 ScheduledPublishDate = publishScheduled,
-                Access = GetAccess(release, startTime, referenceTime)
+                Access = GetAccess(releaseVersion, startTime, referenceTime)
             };
         }
 
@@ -67,11 +67,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static PreReleaseAccess GetAccess(
-            Release release,
+            ReleaseVersion releaseVersion,
             DateTime startTime,
             DateTime referenceTime)
         {
-            if (!release.PublishScheduled.HasValue || release.ApprovalStatus != ReleaseApprovalStatus.Approved)
+            if (!releaseVersion.PublishScheduled.HasValue ||
+                releaseVersion.ApprovalStatus != ReleaseApprovalStatus.Approved)
             {
                 return PreReleaseAccess.NoneSet;
             }
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return PreReleaseAccess.Before;
             }
 
-            return release.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
+            return releaseVersion.Live ? PreReleaseAccess.After : PreReleaseAccess.Within;
         }
     }
 

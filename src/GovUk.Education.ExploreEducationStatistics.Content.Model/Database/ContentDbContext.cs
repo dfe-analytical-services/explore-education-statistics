@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Theme> Themes { get; set; }
         public virtual DbSet<Topic> Topics { get; set; }
         public virtual DbSet<Publication> Publications { get; set; }
-        public virtual DbSet<Release> Releases { get; set; }
+        public virtual DbSet<ReleaseVersion> ReleaseVersions { get; set; }
         public virtual DbSet<ReleaseParent> ReleaseParents { get; set; }
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
         public virtual DbSet<LegacyRelease> LegacyReleases { get; set; }
@@ -333,9 +333,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Publication>()
-                .HasOne(p => p.LatestPublishedRelease)
+                .HasOne(p => p.LatestPublishedReleaseVersion)
                 .WithOne()
-                .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
+                .HasForeignKey<Publication>(p => p.LatestPublishedReleaseVersionId)
                 .IsRequired(false);
         }
 
@@ -381,8 +381,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<ReleaseFile>(entity =>
             {
-                entity.HasQueryFilter(e => !e.Release.SoftDeleted);
-                entity.HasOne(rf => rf.Release)
+                entity.HasQueryFilter(e => !e.ReleaseVersion.SoftDeleted);
+                entity.HasOne(rf => rf.ReleaseVersion)
                     .WithMany()
                     .OnDelete(DeleteBehavior.NoAction);
                 entity.HasOne(rf => rf.File)
@@ -449,66 +449,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         private static void ConfigureRelease(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Release>()
-                .Property(r => r.TimePeriodCoverage)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
 
-            modelBuilder.Entity<Release>()
+            modelBuilder.Entity<ReleaseVersion>()
                 .Property<List<Link>>("RelatedInformation")
                 .IsRequired()
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<Link>>(v));
 
-            modelBuilder.Entity<Release>()
-                .Property(r => r.NotifiedOn)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.NotifiedOn)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-            modelBuilder.Entity<Release>()
-                .HasIndex(r => new { r.PreviousVersionId, r.Version });
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasIndex(rv => new { rv.PreviousVersionId, rv.Version });
 
-            modelBuilder.Entity<Release>()
-                .HasOne(r => r.CreatedBy)
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasOne(rv => rv.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Release>()
-                .Property(r => r.Published)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.Published)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-            modelBuilder.Entity<Release>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasQueryFilter(rv => !rv.SoftDeleted);
 
-            modelBuilder.Entity<Release>()
-                .Property(release => release.Type)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.Type)
                 .HasConversion(new EnumToStringConverter<ReleaseType>());
 
-            modelBuilder.Entity<Release>()
-                .HasIndex(release => release.Type);
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasIndex(rv => rv.Type);
 
-            modelBuilder.Entity<Release>()
-                .Property(release => release.NextReleaseDate)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.NextReleaseDate)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<PartialDate>(v));
 
-            modelBuilder.Entity<Release>()
-                .Property(release => release.PublishScheduled)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.PublishScheduled)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-            modelBuilder.Entity<Release>()
-                .Property(release => release.ApprovalStatus)
+            modelBuilder.Entity<ReleaseVersion>()
+                .Property(rv => rv.ApprovalStatus)
                 .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
 
-            modelBuilder.Entity<Release>()
-                .HasOne(r => r.PreviousVersion)
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasOne(rv => rv.PreviousVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
         }
@@ -583,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<Permalink>()
-                .HasIndex(data => data.ReleaseId);
+                .HasIndex(data => data.ReleaseVersionId);
 
             modelBuilder.Entity<Permalink>()
                 .HasIndex(data => data.SubjectId);

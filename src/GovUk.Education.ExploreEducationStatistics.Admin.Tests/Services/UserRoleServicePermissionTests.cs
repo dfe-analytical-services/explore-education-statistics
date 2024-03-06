@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminM
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -59,13 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task AddReleaseRole()
         {
             var userId = Guid.NewGuid();
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
-                    release,
+                    releaseVersion,
                 }
             };
 
@@ -86,7 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = SetupUserRoleService(contentDbContext: contentDbContext,
                             userService: userService.Object);
-                        return await service.AddReleaseRole(userId, release.Id, Contributor);
+                        return await service.AddReleaseRole(userId: userId,
+                            releaseVersionId: releaseVersion.Id,
+                            Contributor);
                     }
                 });
         }
@@ -185,18 +187,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<Release>
+                Releases = new List<ReleaseVersion>
                 {
-                    release,
+                    releaseVersion,
                 }
             };
             var userReleaseRole = new UserReleaseRole
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 Role = Contributor,
                 User = new User(),
             };
@@ -241,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserPublicationRoleRepository? userPublicationRoleRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
@@ -258,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
                 userService ?? Mock.Of<IUserService>(),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
                 userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),

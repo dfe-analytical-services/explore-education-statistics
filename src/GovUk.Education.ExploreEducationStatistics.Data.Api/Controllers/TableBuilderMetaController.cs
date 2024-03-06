@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -15,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -46,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
+        [HttpGet("release/{releaseVersionId:guid}/meta/subject/{subjectId:guid}")]
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId, Guid subjectId)
         {
-            return _releaseSubjectService.Find(releaseId: releaseId, subjectId: subjectId)
+            return _releaseSubjectService.Find(releaseVersionId: releaseVersionId,
+                    subjectId: subjectId)
                 .OnSuccess(GetCacheableReleaseSubject)
                 .OnSuccess(GetSubjectMeta)
                 .HandleFailuresOrOk();
@@ -61,9 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             // TODO EES-3363 CacheableReleaseSubject exists to provide the Publication slug not available from the ReleaseSubject
             // In future we should change the storage path for cached items to use Publication and Release id's in the
             // directory structure rather than slugs so that we don't need to lookup the Publication from the Content Release.
-            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseSubject.ReleaseId,
-                    q => q.Include(release => release.Publication))
-                .OnSuccess(release => new CacheableReleaseSubject(releaseSubject, release));
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseVersion>(releaseSubject.ReleaseVersionId,
+                    q => q.Include(releaseVersion => releaseVersion.Publication))
+                .OnSuccess(releaseVersion => new CacheableReleaseSubject(releaseSubject, releaseVersion));
         }
 
         [BlobCache(typeof(SubjectMetaCacheKey))]
@@ -77,17 +77,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(null, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId: null, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/meta/subject")]
+        [HttpPost("release/{releaseVersionId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.FilterSubjectMeta(releaseId, query, cancellationToken)
+            return _subjectMetaService.FilterSubjectMeta(releaseVersionId, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

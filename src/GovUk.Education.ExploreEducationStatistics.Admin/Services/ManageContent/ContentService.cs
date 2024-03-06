@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,24 +52,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock
+        public async Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseVersionId)
+            where T : ContentBlock
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _contentSectionRepository.GetAllContentBlocks<T>(release.Id));
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(releaseVersion => _contentSectionRepository.GetAllContentBlocks<T>(releaseVersion.Id));
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
-            Guid releaseId,
+            Guid releaseVersionId,
             Dictionary<Guid, int> newSectionOrder)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
-                    var contentSections = release
+                    var contentSections = releaseVersion
                         .GenericContent
                         .ToList();
 
@@ -85,24 +86,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         }
                     });
 
-                    _context.Releases.Update(release);
+                    _context.ReleaseVersions.Update(releaseVersion);
                     await _context.SaveChangesAsync();
-                    return OrderedContentSections(release);
+                    return OrderedContentSections(releaseVersion);
                 });
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> AddContentSectionAsync(
-            Guid releaseId, ContentSectionAddRequest? request)
+            Guid releaseVersionId, ContentSectionAddRequest? request)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
                     var orderForNewSection = request?.Order ??
-                                             release.GenericContent.Max(contentSection => contentSection.Order) + 1;
+                                             releaseVersion.GenericContent.Max(contentSection => contentSection.Order) + 1;
 
-                    release.GenericContent
+                    releaseVersion.GenericContent
                         .ToList()
                         .FindAll(contentSection => contentSection.Order >= orderForNewSection)
                         .ForEach(contentSection => contentSection.Order++);
@@ -113,20 +114,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Order = orderForNewSection
                     };
 
-                    release.Content.Add(newContentSection);
+                    releaseVersion.Content.Add(newContentSection);
 
-                    _context.Releases.Update(release);
+                    _context.ReleaseVersions.Update(releaseVersion);
                     await _context.SaveChangesAsync();
                     return _mapper.Map<ContentSectionViewModel>(newContentSection);
                 });
         }
 
         public Task<Either<ActionResult, ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid releaseId, Guid contentSectionId, string newHeading)
+            Guid releaseVersionId, Guid contentSectionId, string newHeading)
         {
             return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                        contentSectionId: contentSectionId)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, sectionToUpdate) = tuple;
@@ -139,43 +141,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
-        public  Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
-            Guid releaseId,
+        public Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
+            Guid releaseVersionId,
             Guid contentSectionId)
         {
             return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                        contentSectionId: contentSectionId)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
-                        var (release, sectionToRemove) = tuple;
+                        var (releaseVersion, sectionToRemove) = tuple;
 
                         await _contentBlockService.DeleteSectionContentBlocks(sectionToRemove.Id);
 
-                        release.Content.Remove(sectionToRemove);
+                        releaseVersion.Content.Remove(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
 
                         var removedSectionOrder = sectionToRemove.Order;
 
-                        release.GenericContent
+                        releaseVersion.GenericContent
                             .ToList()
                             .FindAll(contentSection => contentSection.Order > removedSectionOrder)
                             .ForEach(contentSection => contentSection.Order--);
 
-                        _context.Releases.Update(release);
+                        _context.ReleaseVersions.Update(releaseVersion);
                         await _context.SaveChangesAsync();
-                        return OrderedContentSections(release);
+                        return OrderedContentSections(releaseVersion);
                     });
         }
 
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid contentSectionId,
             Dictionary<Guid, int> newBlocksOrder)
         {
             return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                        contentSectionId: contentSectionId)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, section) = tuple;
@@ -198,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(Guid releaseId,
+        public Task<Either<ActionResult, IContentBlockViewModel>> AddContentBlock(Guid releaseVersionId,
             Guid contentSectionId,
             ContentBlockAddRequest request)
         {
@@ -208,8 +212,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             }
 
             return
-                CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateRelease)
+                CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                        contentSectionId: contentSectionId)
+                    .OnSuccess(CheckCanUpdateReleaseVersion)
                     .OnSuccess(async tuple =>
                     {
                         var (_, section) = tuple;
@@ -220,10 +225,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> RemoveContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+            Guid releaseVersionId, Guid contentSectionId, Guid contentBlockId)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+            return CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -249,10 +255,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
+            Guid releaseVersionId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+            return CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -272,14 +279,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         _ => throw new ArgumentOutOfRangeException()
                     };
                 })
-                .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
+                .OnSuccessDo(block => _hubContext.Clients.Group(releaseVersionId.ToString()).ContentBlockUpdated(block));
         }
 
-        public Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
+        public Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(Guid releaseVersionId,
+            Guid contentSectionId,
             DataBlockAttachRequest request)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
+            return CheckContentSectionExists(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId)
+                .OnSuccess(CheckCanUpdateReleaseVersion)
                 .OnSuccess(async tuple =>
                 {
                     var (_, section) = tuple;
@@ -319,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ForEach(contentBlock => contentBlock.Order++);
 
             newContentBlock.Order = orderForNewBlock;
-            newContentBlock.ReleaseId = section.ReleaseId;
+            newContentBlock.ReleaseVersionId = section.ReleaseVersionId;
             section.Content.Add(newContentBlock);
 
             _context.ContentSections.Update(section);
@@ -388,53 +397,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ToList());
         }
 
-        private List<ContentSectionViewModel> OrderedContentSections(Release release)
+        private List<ContentSectionViewModel> OrderedContentSections(ReleaseVersion releaseVersion)
         {
-            return _mapper.Map<List<ContentSectionViewModel>>(release.GenericContent)
+            return _mapper.Map<List<ContentSectionViewModel>>(releaseVersion.GenericContent)
                 .OrderBy(c => c.Order)
                 .ToList();
         }
 
-        private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> releases)
+        private static IQueryable<ReleaseVersion> HydrateContentSectionsAndBlocks(
+            IQueryable<ReleaseVersion> releaseVersions)
         {
-            return releases
-                .Include(r => r.Content)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(block => block.Comments)
-                    .ThenInclude(comment => comment.CreatedBy)
-                .Include(r => r.Content)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(block => block.Comments)
-                    .ThenInclude(comment => comment.ResolvedBy)
-                .Include(r => r.Content)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
-                .Include(r => r.Content)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(block => block.LockedBy);
+            return releaseVersions
+                .Include(rv => rv.Content)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(block => block.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
+                .Include(rv => rv.Content)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(block => block.Comments)
+                .ThenInclude(comment => comment.ResolvedBy)
+                .Include(rv => rv.Content)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
+                .Include(rv => rv.Content)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(block => block.LockedBy);
         }
 
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
-            Guid releaseId, Guid contentSectionId)
+        private Task<Either<ActionResult, Tuple<ReleaseVersion, ContentSection>>> CheckContentSectionExists(
+            Guid releaseVersionId,
+            Guid contentSectionId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccessCombineWith(release => release
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, HydrateContentSectionsAndBlocks)
+                .OnSuccessCombineWith(releaseVersion => releaseVersion
                     .Content
                     .FirstOrDefault(contentSection => contentSection.Id == contentSectionId)
                     .OrNotFound());
         }
 
-        private Task<Either<ActionResult, Release>> CheckCanUpdateRelease(Release release)
+        private Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(ReleaseVersion releaseVersion)
         {
-            return _userService.CheckCanUpdateRelease(release);
+            return _userService.CheckCanUpdateReleaseVersion(releaseVersion);
         }
 
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckCanUpdateRelease(
-            Tuple<Release, ContentSection> tuple)
+        private Task<Either<ActionResult, Tuple<ReleaseVersion, ContentSection>>> CheckCanUpdateReleaseVersion(
+            Tuple<ReleaseVersion, ContentSection> tuple)
         {
             return _userService
-                .CheckCanUpdateRelease(tuple.Item1)
+                .CheckCanUpdateReleaseVersion(tuple.Item1)
                 .OnSuccess(_ => tuple);
         }
     }

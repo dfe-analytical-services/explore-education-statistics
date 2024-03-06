@@ -24,21 +24,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePermissionService = releasePermissionService;
         }
 
-        [HttpGet("releases/{releaseId:guid}/roles")]
+        [HttpGet("releases/{releaseVersionId:guid}/roles")]
         public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releasePermissionService
-                .ListReleaseRoles(releaseId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+                .ListReleaseRoles(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}/invites")]
+        [HttpGet("releases/{releaseVersionId:guid}/invites")]
         public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseInvites(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releasePermissionService
-                .ListReleaseInvites(releaseId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
+                .ListReleaseInvites(releaseVersionId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
                 .HandleFailuresOrOk();
         }
 
@@ -51,11 +51,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId:guid}/contributors")]
-        public async Task<ActionResult> UpdateReleaseContributors(Guid releaseId, UpdateReleaseContributorsViewModel request)
+        [HttpPut("releases/{releaseVersionId:guid}/contributors")]
+        public async Task<ActionResult> UpdateReleaseContributors(Guid releaseVersionId, UpdateReleaseContributorsViewModel request)
         {
             return await _releasePermissionService
-                .UpdateReleaseContributors(releaseId, request.UserIds)
+                .UpdateReleaseContributors(releaseVersionId, request.UserIds)
                 .HandleFailuresOr(result => new AcceptedResult());
         }
 

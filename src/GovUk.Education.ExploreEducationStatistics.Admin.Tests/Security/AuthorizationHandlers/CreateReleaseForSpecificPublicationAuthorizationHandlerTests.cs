@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -146,7 +146,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 
         var handler = new CreateReleaseForSpecificPublicationAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseRepository(InMemoryApplicationDbContext()),
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
                 Mock.Of<IPreReleaseService>(Strict))

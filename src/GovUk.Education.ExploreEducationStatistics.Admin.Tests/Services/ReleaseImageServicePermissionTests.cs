@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseImageServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -29,24 +30,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Upload()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupReleaseImageService(userService: userService.Object);
-                        return service.Upload(releaseId: _release.Id,
+                        return service.Upload(releaseVersionId: _releaseVersion.Id,
                             formFile: new Mock<IFormFile>().Object);
                     }
                 );
         }
 
         private ReleaseImageService SetupReleaseImageService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPrivateBlobStorageService privateBlobStorageService = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
+            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            IUserService? userService = null)
         {
             return new ReleaseImageService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
@@ -60,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            return MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release);
+            return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id,
+                _releaseVersion);
         }
     }
 }

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
 {
@@ -23,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
         }
 
         public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid dataBlockVersionId)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<DataBlockVersion>(query => query
                     .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId
-                                               && dataBlockVersion.ReleaseId == releaseId))
+                                               && dataBlockVersion.ReleaseVersionId == releaseVersionId))
                 .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
         }
     }

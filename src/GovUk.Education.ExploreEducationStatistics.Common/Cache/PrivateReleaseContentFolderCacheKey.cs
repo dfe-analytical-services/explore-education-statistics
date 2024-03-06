@@ -4,19 +4,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
+
+public record PrivateReleaseContentFolderCacheKey : IBlobCacheKey
 {
-    public record PrivateReleaseContentFolderCacheKey : IBlobCacheKey
+    private Guid ReleaseVersionId { get; }
+
+    public PrivateReleaseContentFolderCacheKey(Guid releaseVersionId)
     {
-        private Guid ReleaseId { get; }
-
-        public PrivateReleaseContentFolderCacheKey(Guid releaseId)
-        {
-            ReleaseId = releaseId;
-        }
-
-        public string Key => $"{ReleasesDirectory}/{ReleaseId}";
-
-        public IBlobContainer Container => PrivateContent;
+        ReleaseVersionId = releaseVersionId;
     }
+
+    public string Key => $"{ReleasesDirectory}/{ReleaseVersionId}";
+
+    public IBlobContainer Container => PrivateContent;
 }
