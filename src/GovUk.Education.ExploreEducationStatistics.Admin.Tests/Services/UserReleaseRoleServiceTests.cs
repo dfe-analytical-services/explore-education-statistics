@@ -23,8 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (publication, publicationIgnored) = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(2))
                 .Generate(2)
                 .ToTuple2();

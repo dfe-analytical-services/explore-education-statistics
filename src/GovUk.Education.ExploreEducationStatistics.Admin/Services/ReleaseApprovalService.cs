@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async releaseVersion =>
                 {
                     return await _context.ReleaseStatus
-                        .Where(rs => rs.ReleaseVersion.ReleaseParentId == releaseVersion.ReleaseParentId)
+                        .Where(rs => rs.ReleaseVersion.ReleaseId == releaseVersion.ReleaseId)
                         .OrderByDescending(rs => rs.Created)
                         .Select(rs =>
                             new ReleaseStatusViewModel

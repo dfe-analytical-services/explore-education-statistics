@@ -27,15 +27,15 @@ public static class PublicationGeneratorExtensions
         ReleaseVersion releaseVersion)
         => generator.ForInstance(s => s.SetLatestPublishedReleaseVersion(releaseVersion));
 
-    public static Generator<Publication> WithReleaseParents(
+    public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
-        IEnumerable<ReleaseParent> releaseParents)
-        => generator.ForInstance(s => s.SetReleaseParents(releaseParents));
+        IEnumerable<Release> releases)
+        => generator.ForInstance(s => s.SetReleases(releases));
 
-    public static Generator<Publication> WithReleaseParents(
+    public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
-        Func<SetterContext, IEnumerable<ReleaseParent>> releaseParents)
-        => generator.ForInstance(s => s.SetReleaseParents(releaseParents.Invoke));
+        Func<SetterContext, IEnumerable<Release>> releases)
+        => generator.ForInstance(s => s.SetReleases(releases.Invoke));
 
     public static Generator<Publication> WithReleaseVersions(
         this Generator<Publication> generator,
@@ -97,21 +97,21 @@ public static class PublicationGeneratorExtensions
         return generator;
     }
 
-    public static InstanceSetters<Publication> SetReleaseParents(
+    public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
-        IEnumerable<ReleaseParent> releaseParents)
-        => setters.SetReleaseParents(_ => releaseParents);
+        IEnumerable<Release> releases)
+        => setters.SetReleases(_ => releases);
 
-    private static InstanceSetters<Publication> SetReleaseParents(
+    private static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
-        Func<SetterContext, IEnumerable<ReleaseParent>> releaseParents)
+        Func<SetterContext, IEnumerable<Release>> releases)
         => setters.Set(
                 p => p.Releases,
                 (_, publication, context) =>
                 {
-                    var list = releaseParents.Invoke(context).ToList();
+                    var list = releases.Invoke(context).ToList();
 
-                    var releaseVersions = list.SelectMany(rp => rp.Versions)
+                    var releaseVersions = list.SelectMany(r => r.Versions)
                         .ToList();
 
                     releaseVersions.ForEach(releaseVersion =>
@@ -140,16 +140,16 @@ public static class PublicationGeneratorExtensions
                 }
 
                 return publishedVersions
-                    .GroupBy(releaseVersion => releaseVersion.ReleaseParentId)
+                    .GroupBy(releaseVersion => releaseVersion.ReleaseId)
                     .Select(groupedReleases =>
                         new
                         {
-                            ReleaseParentId = groupedReleases.Key,
+                            ReleaseId = groupedReleases.Key,
                             Version = groupedReleases.Max(releaseVersion => releaseVersion.Version)
                         })
                     .Join(publishedVersions,
                         maxVersion => maxVersion,
-                        releaseVersion => new { releaseVersion.ReleaseParentId, releaseVersion.Version },
+                        releaseVersion => new { releaseVersion.ReleaseId, releaseVersion.Version },
                         (_, release) => release)
                     .OrderByDescending(releaseVersion => releaseVersion.Year)
                     .ThenByDescending(releaseVersion => releaseVersion.TimePeriodCoverage)

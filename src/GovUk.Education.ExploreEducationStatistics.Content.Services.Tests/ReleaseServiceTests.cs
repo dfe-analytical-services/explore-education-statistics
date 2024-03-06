@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             }
         };
 
-        private static readonly ReleaseParent ReleaseParent1 = new()
+        private static readonly Release Release1 = new()
         {
             Id = Guid.NewGuid()
         };
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static readonly ReleaseVersion Release1V1 = new()
         {
             Id = Release1Version1Id,
-            ReleaseParent = ReleaseParent1,
+            Release = Release1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v1 Guidance",
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static readonly ReleaseVersion Release1V2Deleted = new()
         {
             Id = Guid.NewGuid(),
-            ReleaseParent = ReleaseParent1,
+            Release = Release1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v2 Guidance",
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static readonly ReleaseVersion Release1V3NotPublished = new()
         {
             Id = Guid.NewGuid(),
-            ReleaseParent = ReleaseParent1,
+            Release = Release1,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v3 Guidance",
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             PreviousVersionId = Release1V1.Id
         };
 
-        private static readonly List<ReleaseVersion> Releases = new()
+        private static readonly List<ReleaseVersion> ReleaseVersions = new()
         {
             Release1V1,
             Release1V2Deleted,
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.AddRange(Releases);
+                contentDbContext.ReleaseVersions.AddRange(ReleaseVersions);
                 contentDbContext.DataBlockVersions.AddRange(Release1DataBlockVersion1, Release1DataBlockVersion2);
                 contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 contentDbContext.ContentSections.AddRange(ContentSections);
@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var releaseVersion = publication.Releases[0];
@@ -550,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var releaseVersion = publication.Releases.Single(rv => rv is { Published: null });
@@ -583,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var releaseVersion = publication.Releases.Single(rv => rv is { Published: null });
@@ -616,7 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
             var (previousReleaseVersion, releaseVersion) = publication.Releases.ToTuple2();
@@ -652,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
             var releaseVersion = publication.Releases[1];
@@ -690,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                contentDbContext.ReleaseVersions.AddRange(Releases);
+                contentDbContext.ReleaseVersions.AddRange(ReleaseVersions);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -718,8 +718,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(2));
 
             var (release1Version1, release2Version1) = publication.Releases.ToTuple2();
@@ -771,8 +771,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 3)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 3)
                     .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
@@ -803,8 +803,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
                     .Generate(2));
 
             var contextId = Guid.NewGuid().ToString();

@@ -88,7 +88,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             Id = amendmentReleaseVersionId,
 
             // Copy various fields directly from the originalRelease.
-            ReleaseParent = originalReleaseVersion.ReleaseParent,
+            Release = originalReleaseVersion.Release,
             Publication = originalReleaseVersion.Publication,
             Slug = originalReleaseVersion.Slug,
             Type = originalReleaseVersion.Type,
@@ -653,7 +653,7 @@ internal static class ReleaseAmendmentQueryableExtensions
         return queryable
             .AsSplitQuery()
             .Include(releaseVersion => releaseVersion.Publication)
-            .Include(releaseVersion => releaseVersion.ReleaseParent)
+            .Include(releaseVersion => releaseVersion.Release)
             .Include(releaseVersion => releaseVersion.Content)
             .ThenInclude(section => section.Content)
             .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
