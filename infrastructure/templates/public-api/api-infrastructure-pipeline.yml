@@ -20,23 +20,30 @@ parameters:
     displayName: The current Azure subscription 
     type: string
     default: 'AzureConnection'
-  - name: postgreSqlAdminPassword
-    displayName: The Postgresql DB Admin Password 
-    type: string
-    default: 'change-me'
 
 variables:
-  isDev: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
-  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
-  vmImageName: 'ubuntu-latest'
-  templateDirectory: $(Build.SourcesDirectory)/infrastructure/templates/public-api
-  templateFile: $(templateDirectory)/main.bicep
-  paramDirectory: $(templateDirectory)/parameters
-  devParamFile: $(paramDirectory)/main-dev.bicepparam
-  testParamFile: $(paramDirectory)/main-test.bicepparam
-  preProdParamFile: $(paramDirectory)/main-preprod.bicepparam
-  prodParamFile: $(paramDirectory)/main-prod.bicepparam
-  group: EES Bicep Infrastructure Resource Tags
+  - group: EES Bicep Infrastructure common
+  - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
+  - name: isDev
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
+  - name: isMaster
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  - name: vmImageName
+    value: 'ubuntu-latest'
+  - name: templateDirectory
+    value: $(Build.SourcesDirectory)/infrastructure/templates/public-api
+  - name: templateFile
+    value: $(templateDirectory)/main.bicep
+  - name: paramDirectory
+    value: $(templateDirectory)/parameters
+  - name: devParamFile
+    value: $(paramDirectory)/main-dev.bicepparam
+  - name: testParamFile
+    value: $(paramDirectory)/main-test.bicepparam
+  - name: preProdParamFile
+    value: $(paramDirectory)/main-preprod.bicepparam
+  - name: prodParamFile
+    value: $(paramDirectory)/main-prod.bicepparam
 
 pool:
 #  vmImage: $(vmImageName)
@@ -56,9 +63,9 @@ stages:
           tree $(Build.SourcesDirectory)
 
     - task: AzureCLI@2
-      displayName: 'Install Bicep' 
+      displayName: 'Install Bicep'
       inputs:
-        azureSubscription: ${{parameters.azureSubscription}} 
+        azureSubscription: ${{parameters.azureSubscription}}
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: 'az bicep install'
@@ -70,10 +77,12 @@ stages:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
+          set -e
           az deployment group validate \
           --resource-group ${{parameters.resourceGroupName}} \
           --template-file $(templateFile) \
-          --parameters $(devParamFile)
+          --parameters $(devParamFile) \
+          --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployDev
   displayName: 'Deploy to Development'
@@ -93,14 +102,15 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                set -e
                 az deployment group create \
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
-                --parameters $(devParamFile)
+                --parameters $(devParamFile) \
+                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
@@ -119,14 +129,15 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                set -e
                 az deployment group create \
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(testParamFile)
+                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
@@ -146,14 +157,15 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                set -e
                 az deployment group create \
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(preProdParamFile)
+                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
@@ -173,11 +185,12 @@ stages:
             displayName: 'Deploy bicep template to Azure'
             inputs:
               azureSubscription: ${{parameters.azureSubscription}}
-              overrideParameters: '-postgreSqlAdminPassword $(postgreSqlAdminPassword)'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
+                set -e
                 az deployment group create \
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(prodParamFile)
+                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'

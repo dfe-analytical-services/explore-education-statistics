@@ -1,5 +1,5 @@
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string = 's101d01'
+param subscription string
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -9,12 +9,12 @@ param fileShareQuota int = 1
 
 @description('Database : administrator login name.')
 @minLength(0)
-param postgreSqlAdminName string
+param postgreSqlAdminName string?
 
 @description('Database : administrator password.')
 @minLength(8)
 @secure()
-param postgreSqlAdminPassword string
+param postgreSqlAdminPassword string?
 
 @description('Database : Azure Database for PostgreSQL sku name.')
 @allowed([
@@ -31,7 +31,11 @@ param postgreSqlStorageSizeGB int = 32
 param postgreSqlAutoGrowStatus string = 'Disabled'
 
 @description('Database : Firewall rules.')
-param postgreSqlFirewallRules array = []
+param postgreSqlFirewallRules {
+  name: string
+  startIpAddress: string
+  endIpAddress: string
+}[] = []
 
 @description('Container App : Select if you want to use a public dummy image to start the container app.')
 param useDummyImage bool = true
@@ -39,69 +43,42 @@ param useDummyImage bool = true
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
-@description('Tagging : Department name. Used for tagging resources created by this infrastructure pipeline.')
-param departmentName string
-
-@description('Tagging : Solution name. Used for tagging resources created by this infrastructure pipeline.')
-param solutionName string
-
-@description('Tagging : Cost Centre. Used for tagging resources created by this infrastructure pipeline.')
-param costCentre string
-
-@description('Tagging : Service Owner name. Used for tagging resources created by this infrastructure pipeline.')
-param serviceOwnerName string
-
-@description('Tagging : Created By. The person who is creating the resources, in the format "SURNAME, Firstname". Used for tagging resources created by this infrastructure pipeline.')
-// Note that at the moment, it does not seem possible to dynamically infer the user who is currently initiating the
-// infrastructure deployment, so for the time being it will need to be explicitly provided as a parameter. There are
-// plans to allow this feature in the future should we wish to use it.
-param createdBy string
-
-@description('Tagging : Deployment Repo URL. Used for tagging resources created by this infrastructure pipeline.')
-param deploymentRepoUrl string
+@description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
+param resourceTags {
+  CostCentre: string
+  Department: string
+  Solution: string
+  ServiceOwner: string
+  CreatedBy: string
+  DeploymentRepoUrl: string
+}?
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
-var project = 'ees-publicapi'
-var resourcePrefix = '${subscription}-${project}'
-var storageAccountFullName = '${subscription}saeescoredw'
-var keyVaultName = 'kv-ees-01dw'
-var keyVaultFullName = '${subscription}-${keyVaultName}'
-var containerAppName = 'api'
-var containerAppImageName = useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
-var containerAppTargetPort = 80
-var rootFileShareFolderName = 'data'
-var containerRegistryName = 'eesacrdw'
-var databaseNames = ['publicapi']
+var resourcePrefix = '${subscription}-ees-publicapi'
+var storageAccountName = '${subscription}saeescoredw'
+var keyVaultName = '${subscription}-kv-ees-01dw'
 
-var tagValues = {
-  departmentName: departmentName
-  environmentName: environmentName
-  solutionName: solutionName
-  subscriptionName: subscription
-  costCentre: costCentre
-  serviceOwnerName: serviceOwnerName
-  dateProvisioned: dateProvisioned
-  createdBy: createdBy
-  deploymentRepoUrl: deploymentRepoUrl
-  deploymentScript: 'main.bicep'
-}
+var tagValues = union(resourceTags ?? {}, {
+  Environment: environmentName
+  DateProvisioned: dateProvisioned
+})
 
 // Reference the existing Key Vault resource as currently managed by the EES ARM template.
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
-  name: keyVaultFullName
+  name: keyVaultName
   scope: resourceGroup(resourceGroup().name)
 }
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
-  name: containerRegistryName
+  name: 'eesacrdw'
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-  name: storageAccountFullName
+  name: storageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
 var storageAccountKey = storageAccount.listKeys().keys[0].value
@@ -133,9 +110,9 @@ module fileShareModule 'components/fileShares.bicep' = {
   name: 'fileShareDeploy'
   params: {
     resourcePrefix: resourcePrefix
-    fileShareName: rootFileShareFolderName
+    fileShareName: 'data'
     fileShareQuota: fileShareQuota
-    storageAccountName: storageAccountFullName
+    storageAccountName: storageAccountName
   }
 }
 
@@ -145,18 +122,17 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    serverName: ''
-    adminName: postgreSqlAdminName
-    adminPassword: postgreSqlAdminPassword
+    adminName: postgreSqlAdminName!
+    adminPassword: postgreSqlAdminPassword!
     dbSkuName: postgreSqlSkuName
     dbStorageSizeGB: postgreSqlStorageSizeGB
     dbAutoGrowStatus: postgreSqlAutoGrowStatus
-    keyVaultName: keyVaultFullName
+    keyVaultName: keyVaultName
     tagValues: tagValues
     vNetId: vNetModule.outputs.vNetRef
-    subnetId: vNetModule.outputs.postgreSqlSubnetRef
     firewallRules: postgreSqlFirewallRules
-    databaseNames: databaseNames
+    subnetId: vNetModule.outputs.postgreSqlSubnetRef
+    databaseNames: ['public_data']
   }
   dependsOn: [
     vNetModule
@@ -164,17 +140,15 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
 }
 
 // Deploy main Public API Container App.
-module containerAppModule 'components/containerApp.bicep' = {
-  name: 'containerAppDeploy-api'
+module apiContainerAppModule 'components/containerApp.bicep' = {
+  name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: containerAppName
-    containerAppEnvName: containerAppName
-    containerAppLogAnalyticsName: containerAppName
+    containerAppName: 'api'
     acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: containerAppImageName
-    containerAppTargetPort: containerAppTargetPort
+    containerAppImageName: useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
+    containerAppTargetPort: 80
     useDummyImage: useDummyImage
     dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
     tagValues: tagValues
@@ -190,7 +164,7 @@ module containerAppModule 'components/containerApp.bicep' = {
 
 // Deploy data-processing Function.
 module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = {
-  name: 'functionAppDeploy-data-processor'
+  name: 'dataProcessorFunctionAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
@@ -207,8 +181,3 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
     vNetModule
   ]
 }
-
-output containerRegistryLoginServer string = containerRegistry.properties.loginServer
-output containerRegistryName string = containerRegistry.name
-output metadataDatabaseRef string = postgreSqlServerModule.outputs.databaseRef
-output managedIdentityName string = containerAppModule.outputs.managedIdentityName
