@@ -85,8 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions[0];
@@ -206,8 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions[0];
@@ -383,8 +383,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions[0];
@@ -675,8 +675,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions[0];

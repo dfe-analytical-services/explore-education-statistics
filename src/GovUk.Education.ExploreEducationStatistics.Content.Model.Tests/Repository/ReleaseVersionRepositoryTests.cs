@@ -24,13 +24,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2022),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2020)))
+                        .DefaultRelease(publishedVersions: 2, year: 2020)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -55,11 +55,11 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has an unpublished release version
                 // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .ForIndex(0, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1)))
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -77,8 +77,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -94,8 +94,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -110,11 +110,11 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, year: 2022),
+                        .DefaultRelease(publishedVersions: 1, year: 2022),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021)))
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -138,11 +138,11 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has an unpublished release version
                 // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021)
+                .ForIndex(0, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021)
                     .Generate(1)))
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, year: 2021)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, year: 2021)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -158,8 +158,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, year: 2020)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, year: 2020)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -176,8 +176,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, year: 2021)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, year: 2021)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -193,8 +193,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, year: 2021)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, year: 2021)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -212,13 +212,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2022),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2020)))
+                        .DefaultRelease(publishedVersions: 2, year: 2020)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -243,8 +243,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -260,8 +260,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -279,8 +279,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2, draftVersion: true)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -300,8 +300,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -318,8 +318,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -337,8 +337,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2, draftVersion: true)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -358,8 +358,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -377,13 +377,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)))
+                        .DefaultRelease(publishedVersions: 2)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -407,11 +407,11 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has an unpublished release version
                 // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .ForIndex(0, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1)))
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -427,8 +427,8 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -444,8 +444,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -463,13 +463,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)))
+                        .DefaultRelease(publishedVersions: 2)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -493,11 +493,11 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has an unpublished release version
                 // Index 1 has a published release version
-                .ForIndex(0, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .ForIndex(0, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1)))
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -515,8 +515,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -532,8 +532,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -551,13 +551,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)))
+                        .DefaultRelease(publishedVersions: 2)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -582,8 +582,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -599,8 +599,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);
@@ -618,13 +618,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)))
+                        .DefaultRelease(publishedVersions: 2)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -673,13 +673,13 @@ public class ReleaseVersionRepositoryTests
         {
             var publications = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                .WithReleases(_ => ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)))
+                        .DefaultRelease(publishedVersions: 2)))
                 .GenerateList(2);
 
             var contextId = await AddTestData(publications);
@@ -704,8 +704,8 @@ public class ReleaseVersionRepositoryTests
                 .DefaultPublication()
                 // Index 0 has no release versions
                 // Index 1 has a published release version
-                .ForIndex(1, p => p.SetReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .ForIndex(1, p => p.SetReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1)))
                 .GenerateList(2);
 
@@ -721,8 +721,8 @@ public class ReleaseVersionRepositoryTests
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var contextId = await AddTestData(publication);

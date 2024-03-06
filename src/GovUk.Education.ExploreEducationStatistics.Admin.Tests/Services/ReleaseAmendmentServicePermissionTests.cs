@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid(),
             Publication = new Publication(),
-            ReleaseParent = new ReleaseParent()
+            Release = new Release()
         };
 
         [Fact]

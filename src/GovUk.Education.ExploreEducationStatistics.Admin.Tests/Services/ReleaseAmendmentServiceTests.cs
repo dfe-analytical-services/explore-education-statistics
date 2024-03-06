@@ -62,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithPublication(_fixture
                     .DefaultPublication())
-                .WithReleaseParent(_fixture
-                    .DefaultReleaseParent())
+                .WithRelease(_fixture
+                    .DefaultRelease())
                 .WithCreated(
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
@@ -389,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     r => r.Id,
                     r => r.Amendment,
                     r => r.Publication,
-                    r => r.ReleaseParent,
+                    r => r.Release,
                     r => r.PreviousVersion!,
                     r => r.PreviousVersionId!,
                     r => r.Version,
@@ -675,7 +675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReleaseVersions
                 .Include(releaseVersion => releaseVersion.PreviousVersion)
                 .Include(releaseVersion => releaseVersion.Publication)
-                .Include(releaseVersion => releaseVersion.ReleaseParent)
+                .Include(releaseVersion => releaseVersion.Release)
                 .Include(releaseVersion => releaseVersion.Content)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(section => section.Comments)
@@ -759,8 +759,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithPublication(_fixture
                     .DefaultPublication())
-                .WithReleaseParent(_fixture
-                    .DefaultReleaseParent())
+                .WithRelease(_fixture
+                    .DefaultRelease())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -834,8 +834,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithPublication(_fixture
                     .DefaultPublication())
-                .WithReleaseParent(_fixture
-                    .DefaultReleaseParent())
+                .WithRelease(_fixture
+                    .DefaultRelease())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()
@@ -887,8 +887,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithPublication(_fixture
                     .DefaultPublication())
-                .WithReleaseParent(_fixture
-                    .DefaultReleaseParent())
+                .WithRelease(_fixture
+                    .DefaultRelease())
                 .WithCreated(createdById: _userId);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -934,8 +934,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .DefaultReleaseVersion()
                 .WithPublication(_fixture
                     .DefaultPublication())
-                .WithReleaseParent(_fixture
-                    .DefaultReleaseParent())
+                .WithRelease(_fixture
+                    .DefaultRelease())
                 .WithCreated(createdById: _userId)
                 .WithContent(_fixture
                     .DefaultContentSection()

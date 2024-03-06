@@ -96,9 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? PreviousVersionId { get; set; }
 
-        public ReleaseParent ReleaseParent { get; set; } = null!;
+        public Release Release { get; set; } = null!;
 
-        public Guid ReleaseParentId { get; set; }
+        public Guid ReleaseId { get; set; }
 
         public DateTime Created { get; set; }
 

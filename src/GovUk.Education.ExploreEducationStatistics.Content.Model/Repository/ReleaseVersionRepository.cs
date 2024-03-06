@@ -161,40 +161,40 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
         bool publishedOnly,
         CancellationToken cancellationToken = default)
     {
-        var releaseVersion = await GetReleaseParentIdAndVersion(releaseVersionId, cancellationToken);
+        var releaseVersion = await GetReleaseIdAndVersion(releaseVersionId, cancellationToken);
 
         if (releaseVersion == null)
         {
             return false;
         }
 
-        return await GetMaxVersionNumber(releaseVersion.ReleaseParentId, publishedOnly, cancellationToken) ==
+        return await GetMaxVersionNumber(releaseVersion.ReleaseId, publishedOnly, cancellationToken) ==
                releaseVersion.Version;
     }
 
     private async Task<int?> GetMaxVersionNumber(
-        Guid releaseParentId,
+        Guid releaseId,
         bool publishedOnly = false,
         CancellationToken cancellationToken = default)
     {
         return await _contentDbContext.ReleaseVersions
-            .Where(rv => rv.ReleaseParentId == releaseParentId)
+            .Where(rv => rv.ReleaseId == releaseId)
             .Where(rv => !publishedOnly || rv.Published.HasValue)
-            .MaxAsync(rv => (int?) rv.Version,
+            .MaxAsync(rv => (int?)rv.Version,
                 cancellationToken: cancellationToken);
     }
 
-    private async Task<ParentIdVersion?> GetReleaseParentIdAndVersion(
+    private async Task<ReleaseIdVersion?> GetReleaseIdAndVersion(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default)
     {
         return await _contentDbContext.ReleaseVersions
             .Where(rv => rv.Id == releaseVersionId)
-            .Select(rv => new ParentIdVersion(rv.ReleaseParentId, rv.Version))
+            .Select(rv => new ReleaseIdVersion(rv.ReleaseId, rv.Version))
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    private record ParentIdVersion(Guid ReleaseParentId, int Version);
+    private record ReleaseIdVersion(Guid ReleaseId, int Version);
 }
 
 internal static class ReleaseVersionIEnumerableExtensions
