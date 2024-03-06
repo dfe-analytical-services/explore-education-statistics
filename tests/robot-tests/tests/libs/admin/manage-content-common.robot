@@ -425,6 +425,9 @@ user adds image to accordion section text block
     choose file
     ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
+
+    user scrolls down    200
+
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save
