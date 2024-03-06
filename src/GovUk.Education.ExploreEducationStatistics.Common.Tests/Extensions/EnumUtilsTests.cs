@@ -41,6 +41,22 @@ public static class EnumUtilsTests
         }
     }
 
+    public class TryGetFromEnumValueTests
+    {
+        [Fact]
+        public void WithLabelValue_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumValue<TestEnum>("with-label-value", out var @enum));
+            Assert.Equal(TestEnum.WithLabelValue, @enum);
+        }
+
+        [Fact]
+        public void NoMatch_Invalid()
+        {
+            Assert.False(EnumUtil.TryGetFromEnumValue<TestEnum>("Invalid", out _));
+        }
+    }
+
     public class GetFromEnumLabelTests
     {
         [Fact]
@@ -75,6 +91,29 @@ public static class EnumUtilsTests
             Assert.Equal(
                 $"The label 'Invalid label' is not a valid {nameof(TestEnum)}",
                 exception.Message);
+        }
+    }
+
+    public class TryGetFromEnumLabelTests
+    {
+        [Fact]
+        public void WithLabel_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumLabel<TestEnum>("With label", out var @enum));
+            Assert.Equal(TestEnum.WithLabel, @enum);
+        }
+
+        [Fact]
+        public void WithLabelValue_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumLabel<TestEnum>("With label value", out var @enum));
+            Assert.Equal(TestEnum.WithLabelValue, @enum);
+        }
+
+        [Fact]
+        public void NoMatch_Invalid()
+        {
+            Assert.False(EnumUtil.TryGetFromEnumLabel<TestEnum>("Invalid", out _));
         }
     }
 
