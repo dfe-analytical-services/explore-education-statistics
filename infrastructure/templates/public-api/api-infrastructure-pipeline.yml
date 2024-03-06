@@ -15,7 +15,7 @@ parameters:
   - name: resourceGroupName
     displayName: Resource Group Name
     type: string
-    default: 'dfe-development-dw'
+    default: 's101d01'
   - name: azureSubscription
     displayName: The current Azure subscription 
     type: string
@@ -25,7 +25,7 @@ variables:
   - group: EES Bicep Infrastructure common
   - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -46,8 +46,7 @@ variables:
     value: $(paramDirectory)/main-prod.bicepparam
 
 pool:
-#  vmImage: $(vmImageName)
-  name: dfe-development-dw agent pool
+  vmImage: $(vmImageName)
 
 stages:
 - stage: Build
