@@ -5,7 +5,7 @@ param resourcePrefix string
 param location string
 
 @description('Server Name for Azure Database for PostgreSQL')
-param serverName string
+param serverName string = ''
 
 @description('Database administrator login name')
 @minLength(0)
@@ -58,8 +58,15 @@ param vNetId string
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('An array of database names')
 param databaseNames array
-param firewallRules array
+
+@description('An array of firewall rules containing IP address ranges')
+param firewallRules {
+  name: string
+  startIpAddress: string
+  endIpAddress: string
+}[] = []
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -74,7 +81,7 @@ var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suff
 // In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
 // with "postgres.database.azure.com".
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: '${databaseServerName}.privatedns.postgres.database.azure.com'
+  name: 'private.postgres.database.azure.com'
   location: 'global'
   resource vNetLink 'virtualNetworkLinks' = {
     name: '${databaseServerName}-vnet-link'
@@ -122,10 +129,10 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
   }]
 
   resource rules 'firewallRules' = [for rule in firewallRules: {
-    name: '${rule.Name}'
+    name: rule.name
     properties: {
-      startIpAddress: rule.StartIpAddress
-      endIpAddress: rule.EndIpAddress
+      startIpAddress: rule.startIpAddress
+      endIpAddress: rule.endIpAddress
     }
   }]
 

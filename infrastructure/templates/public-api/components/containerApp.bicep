@@ -4,7 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-//Specific parameters for the resources
 @description('Specifies the login server from the registry.')
 param acrLoginServer string
 
@@ -15,12 +14,6 @@ param containerAppImageName string
 @maxLength(32)
 @description('Specifies the name of the container app.')
 param containerAppName string
-
-@description('Specifies the name of the container app environment.')
-param containerAppEnvironmentName string
-
-@description('Specifies the name of the log analytics workspace.')
-param containerAppLogAnalyticsName string
 
 @description('Specifies the container port.')
 param containerAppTargetPort int = 80
@@ -74,10 +67,10 @@ param tagValues object
 param applicationInsightsKey string
 
 var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${containerAppImageName}'
-var containerEnvName = '${resourcePrefix}-cae-${containerAppEnvironmentName}'
+var containerEnvName = '${resourcePrefix}-cae-${containerAppName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
-var containerLogName = '${resourcePrefix}-log-${containerAppLogAnalyticsName}'
+var containerLogName = '${resourcePrefix}-log-${containerAppName}'
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {

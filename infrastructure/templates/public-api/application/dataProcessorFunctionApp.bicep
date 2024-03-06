@@ -41,5 +41,10 @@ module functionAppModule '../components/functionApp.bicep' = {
       dbConnectionString: dbConnectionString
     }
     functionAppRuntime: functionAppRuntime
+    sku: {
+      name: 'EP1'
+      tier: 'ElasticPremium'
+      family: 'EP'
+    }
   }
 }

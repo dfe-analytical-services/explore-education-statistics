@@ -39,6 +39,9 @@ param applicationInsightsKey string
 @description('Specifies the subnet id')
 param subnetId string
 
+@description('Specifies the SKU for the Function App hosting plan')
+param sku object
+
 var kind = 'functionapp'
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
@@ -48,13 +51,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
   location: location
   kind: kind
-  sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
-    size: 'Y1'
-    family: 'Y'
-    capacity: 0
-  }
+  sku: sku
   properties: {
     reserved: reserved
   }
