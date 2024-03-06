@@ -106,7 +106,7 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         Func<SetterContext, IEnumerable<ReleaseParent>> releaseParents)
         => setters.Set(
-                p => p.Releases,
+                p => p.ReleaseVersions,
                 (_, publication, context) =>
                 {
                     var list = releaseParents.Invoke(context).ToList();
@@ -125,7 +125,7 @@ public static class PublicationGeneratorExtensions
             )
             .Set(p => p.LatestPublishedReleaseVersion, (_, publication, _) =>
             {
-                var publishedVersions = publication.Releases
+                var publishedVersions = publication.ReleaseVersions
                     .Where(releaseVersion => releaseVersion.Published.HasValue)
                     .ToList();
 
@@ -167,7 +167,7 @@ public static class PublicationGeneratorExtensions
         this InstanceSetters<Publication> setters,
         Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
         => setters.Set(
-            p => p.Releases,
+            p => p.ReleaseVersions,
             (_, publication, context) =>
             {
                 var list = releaseVersions.Invoke(context).ToList();

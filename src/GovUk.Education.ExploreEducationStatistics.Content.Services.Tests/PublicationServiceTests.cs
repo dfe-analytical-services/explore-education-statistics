@@ -150,8 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             .DefaultTheme()));
 
                 // Expect the latest published release versions in reverse chronological order
-                var expectedReleaseVersion1 = publication.Releases.Single(rv => rv is { Year: 2022, Version: 1 });
-                var expectedReleaseVersion2 = publication.Releases.Single(rv => rv is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -669,7 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        ReleaseVersion = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Data
@@ -678,7 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Older release has no data
                     new()
                     {
-                        ReleaseVersion = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -738,7 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        ReleaseVersion = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -747,7 +747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Older release has data, so the publication is visible
                     new()
                     {
-                        ReleaseVersion = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Data
@@ -807,7 +807,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        ReleaseVersion = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -816,7 +816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Unpublished release has data but this shouldn't alter anything
                     new()
                     {
-                        ReleaseVersion = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Data

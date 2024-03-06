@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 releaseVersion
             };
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = null
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 releaseVersion
             };
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = null
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 releaseVersion
             };
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Version = 1
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 originalReleaseVersion,
                 amendmentReleaseVersion
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Published = DateTime.UtcNow.AddSeconds(-1)
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 originalReleaseVersion,
                 amendmentReleaseVersion
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
                 Version = 1
             };
 
-            publication.Releases = new List<ReleaseVersion>
+            publication.ReleaseVersions = new List<ReleaseVersion>
             {
                 originalReleaseVersion,
                 amendmentReleaseVersion

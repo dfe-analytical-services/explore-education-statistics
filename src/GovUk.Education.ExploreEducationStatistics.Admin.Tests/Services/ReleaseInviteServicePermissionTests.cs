@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(releaseVersion),
+                ReleaseVersions = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = ListOf(releaseVersion),
+                ReleaseVersions = ListOf(releaseVersion),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()
