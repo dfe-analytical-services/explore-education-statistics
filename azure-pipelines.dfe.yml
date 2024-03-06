@@ -46,14 +46,18 @@ jobs:
         displayName: 'Restore'
         inputs:
           command: 'restore'
-          projects: '**/GovUk.*/*csproj'
+          projects: |
+            '**/GovUk.*/*csproj'
+            '!**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj'
           feedsToUse: config
           nugetConfigPath: src/nuget.config
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.*/*csproj'
+          projects: |
+            '**/GovUk.*/*csproj'
+            '!**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
       # TODO: Uncomment this step once formatter has been run globally.
@@ -89,7 +93,9 @@ jobs:
         displayName: 'Test'
         inputs:
           command: 'test'
-          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          projects: |
+            '**/GovUk.*[Tt]ests/*.csproj'
+            '!**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
