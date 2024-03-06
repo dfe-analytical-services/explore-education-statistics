@@ -165,7 +165,7 @@ csharp_style_deconstructed_variable_declaration = true:suggestion
 ## IDE0059 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0059?pivots=lang-csharp-vb)
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 ## IDE0058 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0058)
-csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # Field preferences
 ## IDE0044 (https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/ide0044)
