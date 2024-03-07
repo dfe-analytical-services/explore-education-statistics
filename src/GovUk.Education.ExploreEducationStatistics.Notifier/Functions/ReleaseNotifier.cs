@@ -2,64 +2,60 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Notify.Client;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
-using IConfigurationProvider = GovUk.Education.ExploreEducationStatistics.Notifier.Services.IConfigurationProvider;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions;
 
-// ReSharper disable once UnusedType.Global
 public class ReleaseNotifier
 {
+    private readonly ILogger<ReleaseNotifier> _logger;
+    private readonly AppSettingOptions _appSettingOptions;
+    private readonly GovUkNotifyOptions.EmailTemplateOptions _emailTemplateOptions;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
     private readonly IStorageTableService _storageTableService;
-    private readonly IConfigurationProvider _configurationProvider;
     private readonly INotificationClientProvider _notificationClientProvider;
 
     public ReleaseNotifier(
+        ILogger<ReleaseNotifier> logger,
+        IOptions<AppSettingOptions> appSettingOptions,
+        IOptions<GovUkNotifyOptions> govUkNotifyOptions,
         ITokenService tokenService,
         IEmailService emailService,
         IStorageTableService storageTableService,
-        IConfigurationProvider configurationProvider,
         INotificationClientProvider notificationClientProvider)
     {
+        _logger = logger;
+        _appSettingOptions = appSettingOptions.Value;
+        _emailTemplateOptions = govUkNotifyOptions.Value.EmailTemplates;
         _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
-        _configurationProvider = configurationProvider
-                                 ?? throw new ArgumentNullException(nameof(configurationProvider));
         _notificationClientProvider = notificationClientProvider
                                  ?? throw new ArgumentNullException(nameof(notificationClientProvider));
     }
 
-    [FunctionName("ReleaseNotifier")]
-    // ReSharper disable once UnusedMember.Global
+    [Function("ReleaseNotifier")]
     public async Task ReleaseNotifierFunc(
         [QueueTrigger(ReleaseNotificationQueue)]
         ReleaseNotificationMessage msg,
-        ILogger logger,
-        ExecutionContext context)
+        FunctionContext context)
     {
-        logger.LogInformation("{FunctionName} triggered",
-            context.FunctionName);
+        _logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        var config = _configurationProvider.Get(context);
+        var notificationClient = _notificationClientProvider.Get();
 
-        var notifyApiKey = config.GetValue<string>(NotifyApiKeyName);
-        var notificationClient = _notificationClientProvider.Get(notifyApiKey);
-
-        var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
-        var subscribersTable = await _storageTableService.GetTable(storageConnectionStr, SubscriptionsTblName);
+        var subscribersTable = await _storageTableService.GetTable(NotifierSubscriptionsTableName);
 
         var sentEmails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -71,11 +67,11 @@ public class ReleaseNotifier
 
         foreach (var email in releaseSubscriberEmails)
         {
-            SendSubscriberEmail(email, msg, notificationClient, config);
+            SendSubscriberEmail(email, msg, notificationClient);
             sentEmails.Add(email);
         }
 
-        logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
+        _logger.LogInformation("Emailed {NumReleaseSubscriberEmailsSent} publication subscribers",
             sentEmails.Count);
 
         // Send emails to subscribers of any associated superseded publication
@@ -96,15 +92,19 @@ public class ReleaseNotifier
                     continue;
                 }
 
-                SendSupersededSubscriberEmail(email, supersededPublication,
-                    msg, notificationClient, config);
+                SendSupersededSubscriberEmail(email,
+                    supersededPublication,
+                    msg,
+                    notificationClient);
                 sentEmails.Add(email);
                 numSupersededSubscriberEmailsSent++;
             }
-            logger.LogInformation("Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
+
+            _logger.LogInformation("Emailed {NumSupersededPublicationEmailsSent} subscribers from a superseded publication",
                 numSupersededSubscriberEmailsSent);
         }
-        logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
+
+        _logger.LogInformation("Sent {TotalNumEmailsSent} emails in total to subscribers",
             sentEmails.Count);
     }
 
@@ -133,25 +133,27 @@ public class ReleaseNotifier
     private void SendSubscriberEmail(
         string email,
         ReleaseNotificationMessage msg,
-        NotificationClient notificationClient,
-        IConfigurationRoot config)
+        NotificationClient notificationClient)
     {
-        var baseUrl = config.GetValue<string>(BaseUrlName);
-        var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
-        var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-
         var unsubscribeToken =
-            _tokenService.GenerateToken(tokenSecretKey, email, DateTime.UtcNow.AddYears(1));
+            _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
         var values = new Dictionary<string, dynamic>
         {
-            { "publication_name", msg.PublicationName },
-            { "release_name", msg.ReleaseName },
+            {
+                "publication_name", msg.PublicationName
+            },
+            {
+                "release_name", msg.ReleaseName
+            },
             {
                 "release_link",
-                $"{webApplicationBaseUrl}find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                $"{_appSettingOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
             },
-            { "unsubscribe_link", $"{baseUrl}{msg.PublicationId}/unsubscribe/{unsubscribeToken}" },
+            {
+                "unsubscribe_link",
+                $"{_appSettingOptions.BaseUrl}/publication/{msg.PublicationId}/unsubscribe/{unsubscribeToken}"
+            }
         };
 
         if (msg.Amendment)
@@ -160,36 +162,42 @@ public class ReleaseNotifier
         }
 
         var releaseTemplateId = msg.Amendment
-            ? config.GetValue<string>(ReleaseAmendmentEmailTemplateIdName)
-            : config.GetValue<string>(ReleaseEmailTemplateIdName);
+            ? _emailTemplateOptions.ReleaseAmendmentPublishedId
+            : _emailTemplateOptions.ReleasePublishedId;
 
-        _emailService.SendEmail(notificationClient, email, releaseTemplateId, values);
+        _emailService.SendEmail(notificationClient,
+            email: email,
+            templateId: releaseTemplateId,
+            values);
     }
 
     private void SendSupersededSubscriberEmail(
         string email,
         IdTitleViewModel supersededPublication,
         ReleaseNotificationMessage msg,
-        NotificationClient notificationClient,
-        IConfigurationRoot config)
+        NotificationClient notificationClient)
     {
-        var baseUrl = config.GetValue<string>(BaseUrlName);
-        var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
-        var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-
-        var unsubscribeToken =
-            _tokenService.GenerateToken(tokenSecretKey, email, DateTime.UtcNow.AddYears(1));
+        var unsubscribeToken = _tokenService.GenerateToken(email, DateTime.UtcNow.AddYears(1));
 
         var values = new Dictionary<string, dynamic>
         {
-            { "publication_name", msg.PublicationName },
-            { "release_name", msg.ReleaseName },
+            {
+                "publication_name", msg.PublicationName
+            },
+            {
+                "release_name", msg.ReleaseName
+            },
             {
                 "release_link",
-                $"{webApplicationBaseUrl}find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                $"{_appSettingOptions.PublicAppUrl}/find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
             },
-            { "unsubscribe_link", $"{baseUrl}{supersededPublication.Id}/unsubscribe/{unsubscribeToken}" },
-            { "superseded_publication_title", supersededPublication.Title },
+            {
+                "unsubscribe_link",
+                $"{_appSettingOptions.BaseUrl}/publication/{supersededPublication.Id}/unsubscribe/{unsubscribeToken}"
+            },
+            {
+                "superseded_publication_title", supersededPublication.Title
+            }
         };
 
         if (msg.Amendment)
@@ -198,9 +206,12 @@ public class ReleaseNotifier
         }
 
         var releaseSupersededSubscribersEmailTemplateId = msg.Amendment
-            ? config.GetValue<string>(ReleaseAmendmentSupersededSubscribersEmailTemplateIdName)
-            : config.GetValue<string>(ReleaseSupersededSubscribersEmailTemplateIdName);
+            ? _emailTemplateOptions.ReleaseAmendmentPublishedSupersededSubscribersId
+            : _emailTemplateOptions.ReleasePublishedSupersededSubscribersId;
 
-        _emailService.SendEmail(notificationClient, email, releaseSupersededSubscribersEmailTemplateId, values);
+        _emailService.SendEmail(notificationClient,
+            email: email,
+            templateId: releaseSupersededSubscribersEmailTemplateId,
+            values);
     }
 }
