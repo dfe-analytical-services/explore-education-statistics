@@ -1,11 +1,15 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Drawing.Printing;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -41,8 +45,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     locations: 1,
                     timePeriods: 3)
                 .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .WithDataSet(dataSet);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -699,6 +702,284 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             var client = TestApp.CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class GetMetaTests : DataSetsControllerTests
+    {
+        public GetMetaTests(TestApplicationFactory testApp) : base(testApp)
+        {
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Published)]
+        [InlineData(DataSetVersionStatus.Unpublished)]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        public async Task VersionIsAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var locationOptionMetaGeneratorByLevel = new Dictionary<GeographicLevel, Func<LocationOptionMeta>>
+            {
+                { GeographicLevel.School, () => DataFixture.DefaultLocationSchoolOptionMeta() },
+                { GeographicLevel.LocalAuthority, () => DataFixture.DefaultLocationLocalAuthorityOptionMeta() },
+                { GeographicLevel.RscRegion, () => DataFixture.DefaultLocationRscRegionOptionMeta() },
+                { GeographicLevel.Provider, () => DataFixture.DefaultLocationProviderOptionMeta() },
+                { GeographicLevel.EnglishDevolvedArea, () => DataFixture.DefaultLocationCodedOptionMeta() },
+            };
+
+            var filterMetas = DataFixture
+                .DefaultFilterMeta()
+                .GenerateList(3);
+
+            foreach (var filterMeta in filterMetas)
+            {
+                var filterOptionMetas = DataFixture
+                    .DefaultFilterOptionMeta()
+                    .GenerateList(3);
+
+                foreach (var filterOptionMeta in filterOptionMetas)
+                {
+                    var filterOptionMetaLink = DataFixture
+                        .DefaultFilterOptionMetaLink()
+                        .WithMeta(filterMeta)
+                        .Generate();
+
+                    filterOptionMeta.MetaLinks.Add(filterOptionMetaLink);
+                }
+
+                filterMeta.Options.AddRange(filterOptionMetas);
+            }
+
+            var locationMetas = new List<LocationMeta>();
+
+            foreach (var locationOptionMetaGenerator in locationOptionMetaGeneratorByLevel)
+            {
+                LocationMeta locationMeta = DataFixture
+                    .DefaultLocationMeta()
+                    .WithLevel(locationOptionMetaGenerator.Key);
+
+                var locationOptionMetas = new List<LocationOptionMeta>() 
+                { 
+                    locationOptionMetaGenerator.Value.Invoke(),
+                    locationOptionMetaGenerator.Value.Invoke(),
+                    locationOptionMetaGenerator.Value.Invoke(),
+                };
+
+                foreach (var locationOptionMeta in locationOptionMetas)
+                {
+                    var locationOptionMetaLink = DataFixture
+                        .DefaultLocationOptionMetaLink()
+                        .WithMeta(locationMeta)
+                        .Generate();
+
+                    locationOptionMeta.MetaLinks.Add(locationOptionMetaLink);
+                }
+
+                locationMeta.Options.AddRange(locationOptionMetas);
+
+                locationMetas.Add(locationMeta);
+            }
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion()
+                .WithStatus(dataSetVersionStatus)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithDataSetId(dataSet.Id)
+                .WithFilterMetas(() => filterMetas)
+                .WithLocationMetas(() => locationMetas)
+                .WithIndicatorMetas(() =>
+                    DataFixture
+                    .DefaultIndicatorMeta()
+                    .GenerateList(3)
+                )
+                .WithTimePeriodMetas(() =>
+                    DataFixture
+                    .DefaultTimePeriodMeta()
+                    .GenerateList(3)
+                )
+                .WithMetaSummary();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
+
+            var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+
+            foreach (var filterMetaViewModel in content.Filters)
+            {
+                var filterMeta = Assert.Single(dataSetVersion.FilterMetas, fm => fm.PublicId == filterMetaViewModel.Id);
+                Assert.Equal(filterMeta.Hint, filterMetaViewModel.Hint);
+                Assert.Equal(filterMeta.Label, filterMetaViewModel.Label);
+
+                var allFilterMetaLinks = filterMeta.Options.SelectMany(fom => fom.MetaLinks);
+
+                foreach (var filterOptionMetaViewModel in filterMetaViewModel.Options)
+                {
+                    var filterOptionMetaLink = Assert.Single(
+                        allFilterMetaLinks, 
+                        foml => SqidProcessor.Encode(foml.PublicId) == filterOptionMetaViewModel.Id);
+
+                    var filterOptionMeta = Assert.Single(
+                        filterMeta.Options,
+                        fom => fom.Id == filterOptionMetaLink.OptionId);
+
+                    Assert.Equal(filterOptionMeta.Label, filterOptionMetaViewModel.Label);
+                    Assert.Equal(filterOptionMeta.IsAggregate, filterOptionMetaViewModel.IsAggregate);
+                }
+            }
+
+            foreach (var locationMetaViewModel in content.Locations)
+            {
+                var locationMeta = Assert.Single(dataSetVersion.LocationMetas, fm => fm.Level == locationMetaViewModel.Level);
+
+                var allLocationMetaLinks = locationMeta.Options.SelectMany(fom => fom.MetaLinks);
+
+                foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
+                {
+                    var locationOptionMetaLink = Assert.Single(
+                        allLocationMetaLinks,
+                        foml => SqidProcessor.Encode(foml.PublicId) == locationOptionMetaViewModel.Id);
+
+                    var locationOptionMeta = Assert.Single(
+                        locationMeta.Options,
+                        fom => fom.Id == locationOptionMetaLink.OptionId);
+
+                    switch (locationOptionMeta)
+                    {
+                        case LocationCodedOptionMeta locationCodedOptionMeta:
+                            var locationCodedOptionMetaViewModel = Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(locationCodedOptionMeta.Label, locationCodedOptionMetaViewModel.Label);
+                            Assert.Equal(locationCodedOptionMeta.Code, locationCodedOptionMetaViewModel.Code);
+                            break;
+                        case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
+                            var locationLocalAuthorityOptionMetaViewModel = Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(locationLocalAuthorityOptionMeta.Label, locationLocalAuthorityOptionMetaViewModel.Label);
+                            Assert.Equal(locationLocalAuthorityOptionMeta.Code, locationLocalAuthorityOptionMetaViewModel.Code);
+                            Assert.Equal(locationLocalAuthorityOptionMeta.OldCode, locationLocalAuthorityOptionMetaViewModel.OldCode);
+                            break;
+                        case LocationProviderOptionMeta locationProviderOptionMeta:
+                            var locationProviderOptionMetaViewModel = Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(locationProviderOptionMeta.Label, locationProviderOptionMetaViewModel.Label);
+                            Assert.Equal(locationProviderOptionMeta.Ukprn, locationProviderOptionMetaViewModel.Ukprn);
+                            break;
+                        case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
+                            var locationRscRegionOptionMetaViewModel = Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(locationRscRegionOptionMeta.Label, locationRscRegionOptionMetaViewModel.Label);
+                            break;
+                        case LocationSchoolOptionMeta locationSchoolOptionMeta:
+                            var locationSchoolOptionMetaViewModel = Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(locationSchoolOptionMeta.Label, locationSchoolOptionMetaViewModel.Label);
+                            Assert.Equal(locationSchoolOptionMeta.Urn, locationSchoolOptionMetaViewModel.Urn);
+                            Assert.Equal(locationSchoolOptionMeta.LaEstab, locationSchoolOptionMetaViewModel.LaEstab);
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+            }
+
+            foreach (var indicator in content.Indicators)
+            {
+
+            }
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Staged)]
+        public async Task VersionNotAvailable_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSetId(dataSet.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task VersionExistsForOtherDataSet_Returns404()
+        {
+            DataSet dataSet1 = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            DataSet dataSet2 = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet1, dataSet2));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSetId(dataSet1.Id);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+            var response = await GetMeta(dataSet2.Id, dataSetVersion.Version);
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task VersionDoesNotExist_Returns404()
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await GetMeta(dataSet.Id, "1.0");
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await GetMeta(Guid.NewGuid());
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetMeta(Guid dataSetId, string? dataSetVersion = null)
+        {
+            var query = new Dictionary<string, string?>
+            {
+                { "dataSetVersion", dataSetVersion?.ToString() },
+            };
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/meta", query);
+
+            var client = TestApp.CreateClient();
 
             return await client.GetAsync(uri);
         }

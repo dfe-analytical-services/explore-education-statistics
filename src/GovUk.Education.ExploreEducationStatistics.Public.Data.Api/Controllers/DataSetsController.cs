@@ -90,7 +90,7 @@ public class DataSetsController : ControllerBase
     [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetMetaViewModel>> GetMeta(
-        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] string? dataSetVersion,
+        [FromQuery] [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] string? dataSetVersion,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
     {
         return await _dataSetService

@@ -30,6 +30,11 @@ public static class LocationMetaGeneratorExtensions
         DataSetVersion dataSetVersion)
         => generator.ForInstance(s => s.SetDataSetVersion(dataSetVersion));
 
+    public static Generator<LocationMeta> WithDataSetVersionId(
+        this Generator<LocationMeta> generator,
+        Guid dataSetVersionId)
+        => generator.ForInstance(s => s.SetDataSetVersionId(dataSetVersionId));
+
     public static Generator<LocationMeta> WithLevel(
         this Generator<LocationMeta> generator,
         GeographicLevel level)
@@ -63,6 +68,12 @@ public static class LocationMetaGeneratorExtensions
         => setters
             .Set(m => m.DataSetVersion, dataSetVersion)
             .Set(m => m.DataSetVersionId, dataSetVersion.Id);
+
+    public static InstanceSetters<LocationMeta> SetDataSetVersionId(
+        this InstanceSetters<LocationMeta> setters,
+        Guid dataSetVersionId)
+        => setters
+            .Set(m => m.DataSetVersionId, dataSetVersionId);
 
     public static InstanceSetters<LocationMeta> SetLevel(
         this InstanceSetters<LocationMeta> setters,
