@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using System.Text.Json.Serialization;
 
@@ -322,11 +323,7 @@ public record LocationLevelMetaViewModel
 /// <summary>
 /// A geographic location e.g. a country, region, local authority, etc.
 /// </summary>
-[JsonDerivedType(typeof(LocationCodedOptionMetaViewModel))]
-[JsonDerivedType(typeof(LocationLocalAuthorityOptionMetaViewModel))]
-[JsonDerivedType(typeof(LocationProviderOptionMetaViewModel))]
-[JsonDerivedType(typeof(LocationRscRegionOptionMetaViewModel))]
-[JsonDerivedType(typeof(LocationSchoolOptionMetaViewModel))]
+[JsonConverter(typeof(LocationOptionMetaJsonConverter))]
 public abstract record LocationOptionMetaViewModel
 {
     /// <summary>
