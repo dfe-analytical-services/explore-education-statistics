@@ -9,6 +9,10 @@ public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; set; }
 
+    public Guid? PublicationId { get; set; }
+
+    public Publication? Publication { get; set; }
+
     public List<ReleaseVersion> Versions { get; set; } = new();
 
     public DateTime Created { get; set; }

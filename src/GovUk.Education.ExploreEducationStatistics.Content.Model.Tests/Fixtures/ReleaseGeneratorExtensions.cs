@@ -49,6 +49,20 @@ public static class ReleaseGeneratorExtensions
             .Set(r => r.Created, f => f.Date.Past())
             .Set(r => r.Updated, (f, r) => f.Date.Soon(refDate: r.Created));
 
+    public static Generator<Release> WithPublication(
+        this Generator<Release> generator,
+        Publication publication)
+    {
+        return generator.ForInstance(s => s.SetPublication(publication));
+    }
+
+    public static Generator<Release> WithPublicationId(
+        this Generator<Release> generator,
+        Guid publicationId)
+    {
+        return generator.ForInstance(s => s.SetPublicationId(publicationId));
+    }
+
     public static Generator<Release> WithVersions(
         this Generator<Release> generator,
         Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
@@ -72,6 +86,17 @@ public static class ReleaseGeneratorExtensions
     {
         return generator.ForInstance(s => s.SetUpdated(updated));
     }
+
+    public static InstanceSetters<Release> SetPublication(
+        this InstanceSetters<Release> setters,
+        Publication publication)
+        => setters.Set(r => r.Publication, publication)
+            .SetPublicationId(publication.Id);
+
+    public static InstanceSetters<Release> SetPublicationId(
+        this InstanceSetters<Release> setters,
+        Guid publicationId)
+        => setters.Set(r => r.PublicationId, publicationId);
 
     public static InstanceSetters<Release> SetVersions(
         this InstanceSetters<Release> setters,
