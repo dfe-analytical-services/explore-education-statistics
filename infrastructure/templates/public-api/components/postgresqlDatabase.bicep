@@ -59,7 +59,7 @@ param vNetId string
 param subnetId string
 
 @description('An array of database names')
-param databaseNames array
+param databaseNames string[]
 
 @description('An array of firewall rules containing IP address ranges')
 param firewallRules {
