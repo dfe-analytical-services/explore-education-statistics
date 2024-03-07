@@ -81,7 +81,10 @@ stages:
           --resource-group ${{parameters.resourceGroupName}} \
           --template-file $(templateFile) \
           --parameters $(devParamFile) \
-          --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+          --parameters \
+              resourceTags='$(resourceTags)' \
+              postgreSqlAdminName='$(postgreSqlAdminName)' \
+              postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployDev
   displayName: 'Deploy to Development'
@@ -109,7 +112,10 @@ stages:
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
-                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                --parameters \
+                resourceTags='$(resourceTags)' \
+                postgreSqlAdminName='$(postgreSqlAdminName)' \
+                postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
@@ -136,7 +142,10 @@ stages:
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(testParamFile)
-                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                --parameters \
+                    resourceTags='$(resourceTags)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
@@ -164,7 +173,10 @@ stages:
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(preProdParamFile)
-                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                --parameters \
+                    resourceTags='$(resourceTags)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
@@ -192,4 +204,7 @@ stages:
                 --resource-group ${{parameters.resourceGroupName}} \
                 --template-file $(templateFile) \
                 --parameters $(prodParamFile)
-                --parameters resourceTags='$(resourceTags)' postgreSqlAdminName='$(postgreSqlAdminName)' postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                --parameters \
+                    resourceTags='$(resourceTags)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
