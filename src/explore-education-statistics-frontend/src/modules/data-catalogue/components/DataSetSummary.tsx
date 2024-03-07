@@ -77,7 +77,9 @@ export default function DataSetSummary({
           className: `govuk-heading-m govuk-!-margin-bottom-2`,
           id: `${id}-heading`,
         },
-        <Link to="#">{title}</Link>,
+        <Link to={`/data-catalogue/release/${release.id}/data-set/${fileId}`}>
+          {title}
+        </Link>,
       )}
 
       <ContentHtml
