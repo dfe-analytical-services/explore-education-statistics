@@ -80,11 +80,8 @@ You will need the following groups of dependencies to run the project successful
 To run applications in this service you will require the following:
 
    - [NodeJS v18+](https://nodejs.org/)
-   - [.NET SDK v6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
    - [.NET SDK v8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
-
-**Note** - Both .NET 6 and 8 are currently required as not all projects are using the latest SDK version.
 
 To run the databases:
    - [Docker and Docker Compose](https://docs.docker.com/) - see [Set up your database](#set-up-your-database)
