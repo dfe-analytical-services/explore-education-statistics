@@ -447,6 +447,57 @@ describe('ReleaseContentPage', () => {
     expect(radios[2]).toEqual(screen.getByLabelText('Preview table tool'));
   });
 
+  test('maintains the open state of accordions when switching between edit and preview mode', async () => {
+    releaseContentService.getContent.mockResolvedValue(testReleaseContent);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
+    permissionService.canUpdateRelease.mockResolvedValue(true);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
+    });
+
+    const contentAccordion = screen.getAllByTestId('accordion')[0];
+    const contentAccordionSections =
+      within(contentAccordion).getAllByTestId('accordionSection');
+
+    const section1Button = within(contentAccordionSections[0]).getByRole(
+      'button',
+      {
+        name: /Section 1/,
+      },
+    );
+
+    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
+
+    await userEvent.click(section1Button);
+
+    expect(section1Button).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(screen.getByLabelText('Preview release page'));
+
+    await waitFor(() =>
+      expect(screen.queryByText('Add note')).not.toBeInTheDocument(),
+    );
+
+    expect(section1Button).toHaveAttribute('aria-expanded', 'true');
+
+    await userEvent.click(section1Button);
+
+    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
+
+    await userEvent.click(screen.getByLabelText('Edit content'));
+
+    await waitFor(() =>
+      expect(screen.getByText('Add note')).toBeInTheDocument(),
+    );
+
+    expect(section1Button).toHaveAttribute('aria-expanded', 'false');
+  });
+
   describe('edit content mode', () => {
     test('renders the release content in edit mode', async () => {
       releaseContentService.getContent.mockResolvedValue(testReleaseContent);

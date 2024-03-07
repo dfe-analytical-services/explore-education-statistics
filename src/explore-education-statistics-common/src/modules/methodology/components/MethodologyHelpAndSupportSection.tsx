@@ -4,13 +4,15 @@ import { PublicationSummary } from '@common/services/publicationService';
 
 interface Props {
   owningPublication: PublicationSummary;
+  trackScroll?: boolean;
 }
 
 export default function MethodologyHelpAndSupportSection({
   owningPublication,
+  trackScroll = false,
 }: Props) {
   return (
-    <>
+    <div data-scroll={trackScroll ? true : undefined} id="help-section">
       <h2
         className="govuk-!-margin-top-9"
         data-testid="extra-information"
@@ -23,6 +25,6 @@ export default function MethodologyHelpAndSupportSection({
         publicationContact={owningPublication.contact}
         publicationTitle={owningPublication.title}
       />
-    </>
+    </div>
   );
 }
