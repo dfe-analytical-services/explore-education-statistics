@@ -66,19 +66,6 @@
       "matchPackageNames": ["node"],
       "groupName": "Node version",
       "enabled": false
-    },
-    {
-      "description": "Packages which need major versions to be in sync with the EF Core version or the .NET version",
-      "matchDatasources": ["nuget"],
-      "matchPackagePrefixes": [
-        "Microsoft.AspNetCore",
-        "Microsoft.EntityFrameworkCore",
-        "Microsoft.Extensions",
-        "Thinktecture.EntityFrameworkCore",
-        "MockQueryable.Moq"
-      ],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
     }
   ]
 }
