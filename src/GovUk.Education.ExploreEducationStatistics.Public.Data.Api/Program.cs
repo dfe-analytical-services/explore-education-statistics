@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Configuration.AddJsonFile(
-    path:"appsettings.Local.json",
+    path: "appsettings.Local.json",
     optional: true,
     reloadOnChange: false);
 
@@ -30,7 +30,12 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfi
 builder.Services.AddSwaggerGen(options =>
 {
     options.DescribeAllParametersInCamelCase();
-    options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
+    options.UseOneOfForPolymorphism();
+    options.UseAllOfForInheritance();
+    options.SelectSubTypesUsing(baseType =>
+    {
+        return typeof(Startup).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
+    });
 });
 
 var startup = new Startup(builder.Configuration, builder.Environment);
@@ -43,7 +48,7 @@ startup.Configure(app, app.Environment);
 
 app.UseSwagger(options =>
 {
-     options.RouteTemplate = "/docs/{documentName}/openapi.json";
+    options.RouteTemplate = "/docs/{documentName}/openapi.json";
 });
 app.UseSwaggerUI(options =>
 {
