@@ -1,10 +1,9 @@
-#nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
@@ -12,25 +11,13 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseP
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once UnusedType.Global
-    public class NotifyChangeFunction
+    public class NotifyChangeFunction(
+        ILogger<NotifyChangeFunction> logger,
+        IFileStorageService fileStorageService,
+        IQueueService queueService,
+        IReleasePublishingStatusService releasePublishingStatusService,
+        IValidationService validationService)
     {
-        private readonly IFileStorageService _fileStorageService;
-        private readonly IQueueService _queueService;
-        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-        private readonly IValidationService _validationService;
-
-        public NotifyChangeFunction(IFileStorageService fileStorageService,
-            IQueueService queueService,
-            IReleasePublishingStatusService releasePublishingStatusService,
-            IValidationService validationService)
-        {
-            _fileStorageService = fileStorageService;
-            _queueService = queueService;
-            _releasePublishingStatusService = releasePublishingStatusService;
-            _validationService = validationService;
-        }
-
         /// <summary>
         /// Azure function which validates that a release version is in a state to be published.
         /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
@@ -40,26 +27,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// A future schedule for publishing a release version that's not yet started will be cancelled.
         /// </remarks>
         /// <param name="message"></param>
-        /// <param name="executionContext"></param>
-        /// <param name="logger"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        [FunctionName("NotifyChange")]
-        // ReSharper disable once UnusedMember.Global
+        [Function("NotifyChange")]
         public async Task NotifyChange(
             [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
-            ExecutionContext executionContext,
-            ILogger logger)
+            FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered: {Message}",
-                executionContext.FunctionName,
+                context.FunctionDefinition.Name,
                 message);
-            var lease = await _fileStorageService.AcquireLease(message.ReleaseVersionId.ToString());
+            var lease = await fileStorageService.AcquireLease(message.ReleaseVersionId.ToString());
             try
             {
                 await MarkScheduledReleaseStatusAsSuperseded(message);
-                if (await _validationService.ValidatePublishingState(message.ReleaseVersionId))
+                if (await validationService.ValidatePublishingState(message.ReleaseVersionId))
                 {
-                    await _validationService
+                    await validationService
                         .ValidateRelease(message.ReleaseVersionId)
                         .OnSuccessDo(async () =>
                         {
@@ -67,10 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                             {
                                 var releaseStatus =
                                     await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                                await _queueService.QueuePublishReleaseFilesMessage(
+                                await queueService.QueuePublishReleaseFilesMessage(
                                     releaseVersionId: releaseStatus.ReleaseVersionId,
                                     releaseStatusId: releaseStatus.Id);
-                                await _queueService.QueuePublishReleaseContentMessage(
+                                await queueService.QueuePublishReleaseContentMessage(
                                     releaseVersionId: message.ReleaseVersionId,
                                     releaseStatusId: message.ReleaseStatusId);
                             }
@@ -91,14 +75,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await lease.Release();
             }
 
-            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
         private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
             ReleasePublishingStatusState state,
             IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
-            return await _releasePublishingStatusService.CreateAsync(
+            return await releasePublishingStatusService.CreateAsync(
                 releaseVersionId: message.ReleaseVersionId,
                 releaseStatusId: message.ReleaseStatusId,
                 state,
@@ -110,12 +94,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             // There may be an existing scheduled ReleaseStatus entry if this release version has been validated before
             // If so, mark it as superseded
-            var scheduled = await _releasePublishingStatusService.GetAllByOverallStage(
+            var scheduled = await releasePublishingStatusService.GetAllByOverallStage(
                 message.ReleaseVersionId,
                 Scheduled);
             foreach (var releaseStatus in scheduled)
             {
-                await _releasePublishingStatusService.UpdateStateAsync(releaseVersionId: message.ReleaseVersionId,
+                await releasePublishingStatusService.UpdateStateAsync(releaseVersionId: message.ReleaseVersionId,
                     releaseStatusId: releaseStatus.Id,
                     SupersededState);
             }
