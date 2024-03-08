@@ -66,7 +66,7 @@ var tagValues = union(resourceTags ?? {}, {
 })
 
 // Reference the existing Key Vault resource as currently managed by the EES ARM template.
-resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
   scope: resourceGroup(resourceGroup().name)
 }
