@@ -77,7 +77,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-pr
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
   scope: resourceGroup(resourceGroup().name)
 }

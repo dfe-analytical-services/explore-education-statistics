@@ -39,7 +39,7 @@ var connectionStringSecretName = '${resourcePrefix}-sa-${storageAccountName}-con
 var endpointSuffix = environment().suffixes.storage
 
 //Resources 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: storageName
   location: location
   kind: 'StorageV2'
