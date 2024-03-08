@@ -72,7 +72,7 @@ var subnets = [
 // Create the subnets sequentially rather than in parallel to avoid "AnotherOperationInProgress" errors when multiple
 // subnets attempt to update the parent VNet at the same time.
 @batchSize(1)
-resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = [for subnet in subnets: {
+resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = [for subnet in subnets: {
   parent: vNet
   name: subnet.name
   properties: subnet.properties
