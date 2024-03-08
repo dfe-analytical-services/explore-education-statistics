@@ -6,14 +6,12 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
-
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="Moq" Version="4.20.69" />
         <PackageReference Include="xunit" Version="2.5.0" />
@@ -23,7 +21,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />

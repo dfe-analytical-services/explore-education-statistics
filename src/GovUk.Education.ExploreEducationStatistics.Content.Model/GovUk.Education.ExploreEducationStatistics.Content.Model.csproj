@@ -8,9 +8,8 @@
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
     </ItemGroup>
-    
+
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />

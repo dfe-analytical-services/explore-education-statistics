@@ -5,7 +5,6 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
-
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
@@ -13,7 +12,6 @@
 
     <ItemGroup>
         <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="System.Linq.Async.Queryable" Version="6.0.1" />
     </ItemGroup>

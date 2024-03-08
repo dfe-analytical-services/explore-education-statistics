@@ -12,7 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="Moq" Version="4.20.69" />
@@ -27,5 +26,5 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
     </ItemGroup>
-    
+
 </Project>

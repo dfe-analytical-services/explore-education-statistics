@@ -7,14 +7,12 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
-
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="MockQueryable.Moq" Version="7.0.1" />
         <PackageReference Include="Moq" Version="4.20.69" />
