@@ -1,0 +1,58 @@
+parameters:
+  - name: DeployBranches
+    displayName: Branches that should be deployed
+    type: object
+    default:
+#      - master
+#      - dev
+      - EES-4608-build-and-deploy-container-app
+  - name: resourceGroupName
+    displayName: Resource Group Name
+    type: string
+    default: 'dfe-development-dw'
+  - name: prefix
+    displayName: Resource Group prefix
+    type: string
+    default: 's101d01'
+  - name: azureSubscription
+    displayName: The current Azure subscription
+    type: string
+    default: 'AzureConnection'
+  - name: buildNumber
+    displayName: The matching build number
+    type: string
+
+trigger:
+  branches:
+    include:
+      #      - master
+      #      - dev
+      - EES-4608-build-and-deploy-container-app
+  paths:
+    exclude:
+      - infrastructure/
+
+#pr:
+#  - master
+#  - dev
+
+variables:
+  subscription: ${{ parameters.resourceGroupName }}
+  environment: 'ees'
+  eesAcrName: 'eesacrdw'
+
+jobs:
+  - job: 'DeployPublicApi'
+    pool:
+      name: dfe-development-dw agent pool
+    workspace:
+      clean: all
+    steps:
+      - task: AzureContainerApps@1
+        displayName: 'Deploy Public API "API" Container App'
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          containerAppName: '${{ parameters.prefix }}-$(environment)-publicapi-ca-api'
+          acrName: $(eesAcrName)
+          resourceGroup: ${{ parameters.resourceGroupName }}
+          imageToDeploy: "$(eesAcrName).azurecr.io/ees-public-api:${{ parameters.buildNumber }}"
