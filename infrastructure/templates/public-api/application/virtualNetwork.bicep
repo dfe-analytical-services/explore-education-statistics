@@ -15,7 +15,7 @@ var postgreSqlSubnetPrefix = '10.0.7.0/24'
 var apiContainerAppSubnetPrefix = '10.0.8.0/24'
 
 // Reference the existing VNet.
-resource vNet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: vNetName
 }
 
