@@ -309,6 +309,31 @@ Test
             }
         }
 
+        public class ToLowerFirstTests
+        {
+            [Fact]
+            public void NullString()
+            {
+                string? input = null;
+                Assert.Null(input!.ToLowerFirst());
+            }
+
+            [Fact]
+            public void EmptyString()
+            {
+                Assert.Equal(string.Empty, string.Empty.ToLowerFirst());
+            }
+
+            [Theory]
+            [InlineData("Foo", "foo")]
+            [InlineData("Bar", "bar")]
+            [InlineData("FooBar", "fooBar")]
+            public void FirstCharacterIsLowerCased(string input, string expected)
+            {
+                Assert.Equal(expected, input.ToLowerFirst());
+            }
+        }
+
         public class PascalCaseTests
         {
             [Fact]

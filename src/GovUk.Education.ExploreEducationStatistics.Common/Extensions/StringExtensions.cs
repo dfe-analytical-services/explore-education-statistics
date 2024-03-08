@@ -97,6 +97,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
+        public static string ToLowerFirst(this string input)
+        {
+            return input.IsNullOrEmpty() ?
+                input :
+                char.ToLowerInvariant(input[0]) + input[1..];
+        }
+
         public static bool IsNullOrEmpty(this string? value)
         {
             return string.IsNullOrEmpty(value);
