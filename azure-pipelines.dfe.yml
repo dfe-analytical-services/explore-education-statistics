@@ -3,8 +3,8 @@ parameters:
     displayName: Branches that should be deployed
     type: object
     default:
-      - master
-      - dev
+#      - master
+#      - dev
       - EES-4608-build-and-deploy-container-app
 
 variables:
@@ -16,14 +16,15 @@ variables:
 trigger:
   branches:
     include:
-      - master
-      - dev
+#      - master
+#      - dev
+      - EES-4608-build-and-deploy-container-app
   paths:
     exclude:
       - infrastructure/
-pr:
-  - master
-  - dev
+#pr:
+#  - master
+#  - dev
 
 jobs:
   - job: 'Backend'
