@@ -103,6 +103,7 @@ async function startServer() {
     // newUri = replaceLastOccurance(newUri, '/1000', '');
 
     // TODO: Remove these redirects after Google's index is updated (will happen within 6 months)
+    // https://dfedigital.atlassian.net/browse/EES-4979
     newUri = replaceLastOccurance(newUri, '/meta-guidance', '/data-guidance');
     newUri = replaceLastOccurance(
       newUri,
