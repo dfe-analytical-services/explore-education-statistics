@@ -7,7 +7,7 @@ param principalId string
 @description('Specifies the tenant ID of the resource that should have access to the Key Vault')
 param tenantId string
 
-resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2022-07-01' = {
+resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-01' = {
   name: '${keyVaultName}/add'
   properties: {
     accessPolicies: [
