@@ -122,7 +122,7 @@ jobs:
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api-api'
-          zipAfterPublish: True
+          zipAfterPublish: False
 
 #      - task: 'PublishPipelineArtifact@0'
 #        displayName: 'Publish Public APIs Artifacts'
