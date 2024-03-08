@@ -1785,10 +1785,6 @@ const seoRedirects = [
     to: '/find-statistics',
   },
 
-  {
-    from: '/find-statistics/higher-level-learners-in-england',
-    to: '/find-statistics',
-  },
   { from: '/find-statistics/initial-', to: '/find-statistics' },
   { from: '/find-statistics/initial-teacher-train-', to: '/find-statistics' },
   {
@@ -1846,7 +1842,6 @@ const seoRedirects = [
     to: '/find-statistics',
   },
 
-  { from: '/find-statistics/key-stage-4-performance', to: '/find-statistics' },
   { from: '/find-statistics/key-stage-4-performance-', to: '/find-statistics' },
 
   {
@@ -2059,10 +2054,6 @@ const seoRedirects = [
     from: '/find-statistics/school-pupils-and-their-cha',
     to: '/find-statistics',
   },
-  {
-    from: '/find-statistics/school-pupils-and-their-characteristics;',
-    to: '/find-statistics',
-  },
 
   {
     from: '/find-statistics/school-pupils-and-their-characteristics',
@@ -2106,11 +2097,6 @@ const seoRedirects = [
     from: '/find-statistics/school-workforce-in-england,',
     to: '/find-statistics',
   },
-
-  {
-    from: '/find-statistics/school-workforce-in-england',
-    to: '/find-statistics',
-  },
   {
     from: '/find-statistics/school-workforce-in-englandhttps:/explore-education-statistics.service.gov.uk/find-statistics/school-workforce-in-england',
     to: '/find-statistics',
@@ -2123,7 +2109,6 @@ const seoRedirects = [
     from: '/find-statistics/schoolworkforce-in-england',
     to: '/find-statistics',
   },
-
   { from: '/find-statistics/serious-', to: '/find-statistics' },
 
   {
