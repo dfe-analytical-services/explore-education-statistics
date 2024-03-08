@@ -309,6 +309,56 @@ Test
             }
         }
 
+        public class ToLowerFirstTests
+        {
+            [Fact]
+            public void NullString()
+            {
+                string? input = null;
+                Assert.Null(input!.ToLowerFirst());
+            }
+
+            [Fact]
+            public void EmptyString()
+            {
+                Assert.Equal(string.Empty, string.Empty.ToLowerFirst());
+            }
+
+            [Theory]
+            [InlineData("Foo", "foo")]
+            [InlineData("Bar", "bar")]
+            [InlineData("FooBar", "fooBar")]
+            public void FirstCharacterIsLowerCased(string input, string expected)
+            {
+                Assert.Equal(expected, input.ToLowerFirst());
+            }
+        }
+
+        public class ToUpperFirstTests
+        {
+            [Fact]
+            public void NullString()
+            {
+                string? input = null;
+                Assert.Null(input!.ToUpperFirst());
+            }
+
+            [Fact]
+            public void EmptyString()
+            {
+                Assert.Equal(string.Empty, string.Empty.ToUpperFirst());
+            }
+
+            [Theory]
+            [InlineData("foo", "Foo")]
+            [InlineData("bar", "Bar")]
+            [InlineData("fooBar", "FooBar")]
+            public void FirstCharacterIsLowerCased(string input, string expected)
+            {
+                Assert.Equal(expected, input.ToUpperFirst());
+            }
+        }
+
         public class PascalCaseTests
         {
             [Fact]
