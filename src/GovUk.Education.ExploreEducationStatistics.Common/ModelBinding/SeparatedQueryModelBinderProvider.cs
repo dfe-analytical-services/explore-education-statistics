@@ -1,8 +1,10 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding
 {
@@ -33,7 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding
 
         public IModelBinder? GetBinder(ModelBinderProviderContext context)
         {
-            if (!IsSupported(context.Metadata))
+            var separatorAttribute = context.Metadata is DefaultModelMetadata defaultMetadata
+                ? defaultMetadata.Attributes.Attributes.FirstOrDefault(
+                    attribute => attribute is QuerySeparatorAttribute) as QuerySeparatorAttribute
+                : null;
+
+            if (!IsSupported(context, separatorAttribute))
             {
                 return null;
             }
@@ -49,15 +56,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ModelBinding
                 provider = new CollectionModelBinderProvider();
             }
 
-            var binder = provider.GetBinder(context);
+            var binder = provider.GetBinder(context)
+                         ?? throw new NullReferenceException($"Could not get binder for {provider.GetType().Name}");
 
-            return new SeparatedQueryModelBinder(binder, _separator);
+            return new SeparatedQueryModelBinder(binder, separatorAttribute?.Separator ?? _separator);
         }
 
-        private bool IsSupported(ModelMetadata metadata) {
-            return metadata.BindingSource == BindingSource.Query
-                   && metadata.IsEnumerableType
-                   && SupportedElementTypes.Contains(metadata.ElementType);
+        private bool IsSupported(ModelBinderProviderContext context, QuerySeparatorAttribute? attribute)
+        {
+            if (attribute is not null && context.Metadata.IsEnumerableType)
+            {
+                return true;
+            }
+
+            return context.BindingInfo.BindingSource == BindingSource.Query
+                   && context.Metadata.IsEnumerableType
+                   && SupportedElementTypes.Contains(context.Metadata.ElementType!);
         }
     }
 }
