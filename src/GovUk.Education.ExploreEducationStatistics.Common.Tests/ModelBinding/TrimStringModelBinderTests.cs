@@ -10,9 +10,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.ModelBinding;
 
-public class TrimStringModelBinderIntegrationTests : IntegrationTest<TestStartup>
+public class TrimStringModelBinderTests : IntegrationTest<TestStartup>
 {
-    public TrimStringModelBinderIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+    public TrimStringModelBinderTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
     }
 
