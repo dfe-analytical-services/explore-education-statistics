@@ -14,7 +14,7 @@
     
     <ItemGroup>
         <PackageReference Include="AspectInjector" Version="2.8.2" />
-        <PackageReference Include="Bogus" Version="34.0.2" />
+        <PackageReference Include="Bogus" Version="35.5.0" />
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.21" PrivateAssets="all" />
         <PackageReference Include="CompareNETObjects" Version="4.81.0" />
