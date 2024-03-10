@@ -72,7 +72,7 @@ internal class DataSetService : IDataSetService
         var queryable = _publicDataDbContext.DataSetVersions
             .Where(ds => ds.DataSetId == dataSetId)
             .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Unpublished
+                || ds.Status == DataSetVersionStatus.Withdrawn
                 || ds.Status == DataSetVersionStatus.Deprecated);
 
         var totalResults = await queryable.CountAsync();
@@ -130,7 +130,7 @@ internal class DataSetService : IDataSetService
             .Where(dsv => dsv.VersionMajor == version.Major)
             .Where(dsv => dsv.VersionMinor == version.Minor)
             .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Unpublished
+                || ds.Status == DataSetVersionStatus.Withdrawn
                 || ds.Status == DataSetVersionStatus.Deprecated)
             .SingleOrNotFound();
     }
@@ -166,7 +166,7 @@ internal class DataSetService : IDataSetService
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,
-            Unpublished = dataSetVersion.Unpublished,
+            Unpublished = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
             TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary.TimePeriodRange),

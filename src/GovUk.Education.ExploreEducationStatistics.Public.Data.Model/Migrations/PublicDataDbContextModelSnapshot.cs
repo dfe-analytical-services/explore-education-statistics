@@ -166,10 +166,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("Unpublished")
+                    b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset?>("Updated")
+                    b.Property<DateTimeOffset?>("Withdrawn")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -215,9 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<long>("TotalResults")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTimeOffset?>("Unpublished")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<DateTimeOffset?>("Updated")
                         .HasColumnType("timestamp with time zone");
 
@@ -226,6 +223,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Property<int>("VersionMinor")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("Withdrawn")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

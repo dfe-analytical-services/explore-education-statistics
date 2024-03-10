@@ -38,7 +38,7 @@ public class DataSetStatusSchemaFilterTests
         Assert.Equal(DataSetStatus.Deprecated.ToString(), enumString2.Value);
 
         var enumString3 = Assert.IsType<OpenApiString>(schema.Enum[2]);
-        Assert.Equal(DataSetStatus.Unpublished.ToString(), enumString3.Value);
+        Assert.Equal(DataSetStatus.Withdrawn.ToString(), enumString3.Value);
     }
 
     private OpenApiSchema GenerateSchema()

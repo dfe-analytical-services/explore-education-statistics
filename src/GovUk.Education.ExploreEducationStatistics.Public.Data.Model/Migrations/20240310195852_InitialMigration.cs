@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     SupersedingDataSetId = table.Column<Guid>(type: "uuid", nullable: true),
                     LatestVersionId = table.Column<Guid>(type: "uuid", nullable: true),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     TotalResults = table.Column<long>(type: "bigint", nullable: false),
                     MetaSummary = table.Column<string>(type: "jsonb", nullable: false),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },

@@ -46,7 +46,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var unpublishedDataSets = DataFixture
                 .DefaultDataSet()
-                .WithStatus(DataSetStatus.Unpublished)
+                .WithStatus(DataSetStatus.Withdrawn)
                 .GenerateList(numberOfUnpublishedDataSets);
 
             var allDataSets = publishedDataSets.Concat(unpublishedDataSets).ToArray();
@@ -355,7 +355,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var unpublishedDataSets = DataFixture
                 .DefaultDataSet()
-                .WithStatus(DataSetStatus.Unpublished)
+                .WithStatus(DataSetStatus.Withdrawn)
                 .WithPublicationId(publicationId)
                 .GenerateList(3);
 
@@ -616,8 +616,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(DataSetStatus.Staged)]
-        [InlineData(DataSetStatus.Unpublished)]
+        [InlineData(DataSetStatus.Draft)]
+        [InlineData(DataSetStatus.Withdrawn)]
         public async Task DataSetUnavailable_Returns200_EmptyList(DataSetStatus dataSetStatus)
         {
             var publicationId = Guid.NewGuid();
