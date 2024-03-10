@@ -7,22 +7,31 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService : IDataSetService
 {
     private readonly PublicDataDbContext _publicDataDbContext;
+    private readonly IUserService _userService;
 
-    public DataSetService(PublicDataDbContext publicDataDbContext)
+    public DataSetService(
+        PublicDataDbContext publicDataDbContext,
+        IUserService userService)
     {
         _publicDataDbContext = publicDataDbContext;
+        _userService = userService;
     }
 
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(Guid dataSetId)
     {
-        return await CheckDataSetExists(dataSetId)
+        return await _publicDataDbContext.DataSets
+            .Include(ds => ds.LatestVersion)
+            .SingleOrNotFound(ds => ds.Id == dataSetId)
+            .OnSuccessDo(_userService.CheckCanViewDataSet)
             .OnSuccess(MapDataSet);
     }
 
@@ -34,8 +43,7 @@ internal class DataSetService : IDataSetService
         var queryable = _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
-            .Where(ds => ds.Status == DataSetStatus.Published 
-                || ds.Status == DataSetStatus.Deprecated);
+            .WherePublicStatus();
 
         var totalResults = await queryable.CountAsync();
 
@@ -61,28 +69,38 @@ internal class DataSetService : IDataSetService
         string dataSetVersion)
     {
         return await CheckVersionExists(dataSetId, dataSetVersion)
+            .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapDataSetVersion);
     }
 
     public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
+        Guid dataSetId,
         int page,
-        int pageSize,
-        Guid dataSetId)
+        int pageSize)
+    {
+        return await _publicDataDbContext.DataSets
+            .SingleOrNotFound(ds => ds.Id == dataSetId)
+            .OnSuccessDo(_userService.CheckCanViewDataSet)
+            .OnSuccess(dataSet => ListPaginatedVersions(dataSet: dataSet, page: page, pageSize: pageSize));
+    }
+
+    private async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListPaginatedVersions(
+        DataSet dataSet,
+        int page,
+        int pageSize)
     {
         var queryable = _publicDataDbContext.DataSetVersions
-            .Where(ds => ds.DataSetId == dataSetId)
-            .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Withdrawn
-                || ds.Status == DataSetVersionStatus.Deprecated);
+            .Where(ds => ds.DataSetId == dataSet.Id)
+            .WherePublicStatus();
 
         var totalResults = await queryable.CountAsync();
 
         var dataSetVersions = (await queryable
-            .OrderByDescending(ds => ds.VersionMajor)
-            .ThenByDescending(ds => ds.VersionMinor)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync())
+                .OrderByDescending(ds => ds.VersionMajor)
+                .ThenByDescending(ds => ds.VersionMinor)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync())
             .Select(MapDataSetVersion)
             .ToList();
 
@@ -91,16 +109,6 @@ internal class DataSetService : IDataSetService
             Results = dataSetVersions,
             Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
         };
-    }
-
-    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
-    {
-        return await _publicDataDbContext.DataSets
-            .Include(ds => ds.LatestVersion)
-            .Where(ds => ds.Id == dataSetId)
-            .Where(ds => ds.Status == DataSetStatus.Published
-                || ds.Status == DataSetStatus.Deprecated)
-            .SingleOrNotFound();
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -129,9 +137,6 @@ internal class DataSetService : IDataSetService
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(dsv => dsv.VersionMajor == version.Major)
             .Where(dsv => dsv.VersionMinor == version.Minor)
-            .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Withdrawn
-                || ds.Status == DataSetVersionStatus.Deprecated)
             .SingleOrNotFound();
     }
 

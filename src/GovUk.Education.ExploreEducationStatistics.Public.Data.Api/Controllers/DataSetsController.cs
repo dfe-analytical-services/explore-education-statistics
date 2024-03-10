@@ -73,9 +73,9 @@ public class DataSetsController : ControllerBase
     {
         return await _dataSetService
             .ListVersions(
+                dataSetId: dataSetId,
                 page: request.Page,
-                pageSize: request.PageSize,
-                dataSetId: dataSetId)
+                pageSize: request.PageSize)
             .HandleFailuresOrOk();
     }
 }

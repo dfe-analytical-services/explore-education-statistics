@@ -84,7 +84,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [Theory]
         [InlineData(DataSetStatus.Draft)]
         [InlineData(DataSetStatus.Withdrawn)]
-        public async Task DataSetNotAvailable_Returns404(DataSetStatus dataSetStatus)
+        public async Task DataSetNotAvailable_Returns403(DataSetStatus dataSetStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -94,7 +94,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var response = await GetDataSet(dataSet.Id);
 
-            response.AssertNotFound();
+            response.AssertForbidden();
         }
 
         [Fact]
@@ -481,6 +481,22 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             validationProblem.AssertHasInclusiveBetweenError("pageSize");
         }
 
+        [Theory]
+        [InlineData(DataSetStatus.Draft)]
+        [InlineData(DataSetStatus.Withdrawn)]
+        public async Task UnavailableDataSet_Returns503(DataSetStatus status)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatus(status);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await ListVersions(dataSetId: dataSet.Id);
+
+            response.AssertForbidden();
+        }
+
         [Fact]
         public async Task InvalidDataSetId_Returns404()
         {
@@ -582,8 +598,11 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
         [InlineData(DataSetVersionStatus.Draft)]
-        public async Task VersionNotAvailable_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        public async Task VersionNotAvailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -604,7 +623,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
 
-            response.AssertNotFound();
+            response.AssertForbidden();
         }
 
         [Fact]
