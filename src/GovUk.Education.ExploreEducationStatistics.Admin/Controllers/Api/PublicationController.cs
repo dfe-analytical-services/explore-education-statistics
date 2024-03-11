@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPatch("api/publications/{publicationId:guid}/release-series-view")]
-        public async Task<ActionResult<List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
+        public async Task<ActionResult<List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries( // @MarkFix return type
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {

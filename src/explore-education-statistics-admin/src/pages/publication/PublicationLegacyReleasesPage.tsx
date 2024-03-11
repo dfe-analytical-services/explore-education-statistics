@@ -1,10 +1,9 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import { ReleaseSeriesItem } from '@admin/services/legacyReleaseService';
+import publicationService, { ReleaseSeriesItem } from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import publicationService from '@admin/services/publicationService';
 
 const PublicationLegacyReleasesPage = () => {
   const { publicationId, publication } = usePublicationContext();

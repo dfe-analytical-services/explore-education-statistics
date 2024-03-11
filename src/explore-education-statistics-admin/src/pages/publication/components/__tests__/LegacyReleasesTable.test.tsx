@@ -1,7 +1,5 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
-import _legacyReleaseService, {
-  ReleaseSeriesItem,
-} from '@admin/services/legacyReleaseService';
+import { ReleaseSeriesItem } from '@admin/services/publicationService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
@@ -9,13 +7,14 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
 
-jest.mock('@admin/services/legacyReleaseService');
-const legacyReleaseService = _legacyReleaseService as jest.Mocked<
-  typeof _legacyReleaseService
->;
+// jest.mock('@admin/services/legacyReleaseService'); // @MarkFix remove
+// const legacyReleaseService = _legacyReleaseService as jest.Mocked<
+//  typeof _legacyReleaseService
+// >;
 
 describe('LegacyReleasesTable', () => {
-  const testReleaseSeries: ReleaseSeriesItem[] = [ // @MarkFix create isLegacyLink: false in here and test that
+  const testReleaseSeries: ReleaseSeriesItem[] = [
+    // @MarkFix create isLegacyLink: false in here and test that
     {
       id: 'ees-release-3',
       isLegacyLink: true, // @MarkFix should be false?
@@ -86,7 +85,7 @@ describe('LegacyReleasesTable', () => {
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent(
-      'EES release 3 amendment' // @MarkFix Draft Amendment',
+      'EES release 3 amendment', // @MarkFix Draft Amendment',
     );
     expect(row2Cells[1]).toHaveTextContent(
       'http://explore-education-statistics/3a',
@@ -323,7 +322,7 @@ describe('LegacyReleasesTable', () => {
     });
 
     // @MarkFix
-    //test('sends the delete request and updates the releases table when confirm is clicked', async () => {
+    // test('sends the delete request and updates the releases table when confirm is clicked', async () => {
     //  render(
     //    <TestConfigContextProvider>
     //      <LegacyReleasesTable
@@ -356,7 +355,7 @@ describe('LegacyReleasesTable', () => {
     //  });
     //  const rows = table.getAllByRole('row');
     //  expect(rows).toHaveLength(7);
-    //});
+    // });
   });
 
   describe('creating', () => {

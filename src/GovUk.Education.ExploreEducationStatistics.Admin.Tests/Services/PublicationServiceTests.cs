@@ -1,7 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -2909,10 +2908,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IReleaseRepository? releaseRepository = null,
-            ILegacyReleaseService? legacyReleaseService = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IRedirectsCacheService? redirectsCacheService = null)
         {
@@ -2923,10 +2920,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
                 releaseRepository ?? new ReleaseRepository(context),
-                legacyReleaseService ?? Mock.Of<ILegacyReleaseService>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }

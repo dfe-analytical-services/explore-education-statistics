@@ -1,9 +1,3 @@
-import {
-  LegacyRelease,
-  UpdateReleaseSeriesItem,
-  ReleaseSeriesItem,
-  ReleaseSeriesLegacyLinkAddRequest,
-} from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -79,6 +73,33 @@ export interface PublicationCreateRequest {
   contact: ContactSave;
   supersededById?: string;
   topicId: string;
+}
+
+export interface ReleaseSeriesItem {
+  id: string;
+  isLegacyLink: boolean;
+  description: string;
+
+  releaseParentId?: string;
+  publicationSlug?: string;
+  releaseSlug?: string;
+
+  legacyLinkUrl?: string;
+}
+
+export interface ReleaseSeriesLegacyLinkAddRequest {
+  description: string;
+  url: string;
+}
+
+export interface UpdateReleaseSeriesItem {
+  // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
+  id: string;
+
+  releaseParentId?: string;
+
+  legacyLinkDescription?: string;
+  legacyLinkUrl?: string;
 }
 
 export interface ListReleasesParams {
@@ -219,7 +240,7 @@ const publicationService = {
   updateReleaseSeriesView(
     publicationId: string,
     legacyReleases: UpdateReleaseSeriesItem[],
-  ): Promise<LegacyRelease> {
+  ): Promise<UpdateReleaseSeriesItem[]> {
     return client.patch(
       `/publications/${publicationId}/release-series-view`,
       legacyReleases,

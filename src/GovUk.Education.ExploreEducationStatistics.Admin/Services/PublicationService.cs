@@ -41,10 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly ILegacyReleaseService _legacyReleaseService; // @MarkFix
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService; // @MarkFix
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IRedirectsCacheService _redirectsCacheService;
 
@@ -55,10 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IReleaseRepository releaseRepository,
-            ILegacyReleaseService legacyReleaseService,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
-            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService,
             IMethodologyCacheService methodologyCacheService,
             IRedirectsCacheService redirectsCacheService)
         {
@@ -68,10 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _publicationRepository = publicationRepository;
             _releaseRepository = releaseRepository;
-            _legacyReleaseService = legacyReleaseService;
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
-            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
             _methodologyCacheService = methodologyCacheService;
             _redirectsCacheService = redirectsCacheService;
         }

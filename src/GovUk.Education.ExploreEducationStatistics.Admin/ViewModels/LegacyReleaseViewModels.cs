@@ -26,17 +26,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public Guid PublicationId { get; set; }
     }
-
-    public class LegacyReleaseUpdateViewModel
-    {
-        [Required]
-        public string Description { get; set; }
-
-        [Required]
-        [Url]
-        public string Url { get; set; }
-
-        [Required]
-        public Guid PublicationId { get; set; }
-    }
 }

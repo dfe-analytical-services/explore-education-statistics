@@ -32,20 +32,17 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
     private readonly IFootnoteRepository _footnoteRepository;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IUserService _userService;
-    private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
     public ReleaseAmendmentService(
         ContentDbContext context,
         IUserService userService,
         IFootnoteRepository footnoteRepository,
-        StatisticsDbContext statisticsDbContext,
-        IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
+        StatisticsDbContext statisticsDbContext)
     {
         _context = context;
         _userService = userService;
         _footnoteRepository = footnoteRepository;
         _statisticsDbContext = statisticsDbContext;
-        _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
     }
 
     public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseId)
@@ -117,11 +114,11 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
         await _context.Releases.AddAsync(amendment);
 
-        await _publicationReleaseSeriesViewService.CreateForAmendRelease(
-            originalRelease.PublicationId,
-            releaseAmendmentId);
+        //await _publicationReleaseSeriesViewService.CreateForAmendRelease( // @MarkFix just remove?
+        //    originalRelease.PublicationId,
+        //    releaseAmendmentId);
 
-        // What to do about ReleaseStatuses?
+        // What to do about ReleaseStatuses? @MarkFix old comment - investigate
 
         await _context.SaveChangesAsync();
         return amendment;

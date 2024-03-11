@@ -2,7 +2,6 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -554,10 +553,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IReleaseRepository? releaseRepository = null,
-            ILegacyReleaseService? legacyReleaseService = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IRedirectsCacheService? redirectsCacheService = null)
         {
@@ -570,10 +567,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
-                legacyReleaseService ?? Mock.Of<ILegacyReleaseService>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }

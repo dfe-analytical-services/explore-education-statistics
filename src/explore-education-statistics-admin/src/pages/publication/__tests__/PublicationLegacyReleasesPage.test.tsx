@@ -1,10 +1,10 @@
 import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import { ReleaseSeriesItem } from '@admin/services/legacyReleaseService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService, {
   PublicationWithPermissions,
+  ReleaseSeriesItem,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';

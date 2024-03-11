@@ -7,6 +7,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
   PublicationWithPermissions,
+  ReleaseSeriesItem,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,7 +15,6 @@ import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
-import { ReleaseSeriesItem } from '@admin/services/legacyReleaseService';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -125,7 +125,7 @@ function renderPage(
           publicationEditLegacyReleaseRoute.path,
           {
             publicationId: publication.id,
-            legacyReleaseId: legacyReleaseId,
+            legacyReleaseId,
           },
         ),
       ]}

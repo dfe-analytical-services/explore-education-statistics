@@ -1251,7 +1251,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
-            var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
@@ -1267,10 +1266,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(release.Id))))
                 .Returns(Task.CompletedTask);
 
-            publicationReleaseSeriesViewService.Setup(s => s.DeleteForDeleteRelease(
-                    It.IsAny<Guid>(),
-                    It.IsAny<Guid>()))
-                .Returns(Task.CompletedTask);
+            //publicationReleaseSeriesViewService.Setup(s => s.DeleteForDeleteRelease( // @MarkFix
+            //        It.IsAny<Guid>(),
+            //        It.IsAny<Guid>()))
+            //    .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1278,8 +1277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseDataFileService: releaseDataFilesService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    cacheService: cacheService.Object,
-                    publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
+                    cacheService: cacheService.Object);
 
                 var result = await releaseService.DeleteRelease(release.Id);
 
@@ -1292,8 +1290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(
                     cacheService,
                     releaseDataFilesService,
-                    releaseFileService,
-                    publicationReleaseSeriesViewService
+                    releaseFileService
                 );
 
                 result.AssertRight();
@@ -1917,8 +1914,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
-            IBlobCacheService? cacheService = null,
-            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null)
+            IBlobCacheService? cacheService = null)
         {
             var userService = AlwaysTrueUserService();
 
@@ -1942,8 +1938,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
                 new SequentialGuidGenerator(),
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict),
-                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
+                cacheService ?? Mock.Of<IBlobCacheService>(Strict)
             );
         }
     }

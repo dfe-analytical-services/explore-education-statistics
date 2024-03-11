@@ -7,10 +7,9 @@ import {
   publicationEditLegacyReleaseRoute,
   PublicationEditLegacyReleaseRouteParams,
 } from '@admin/routes/publicationRoutes';
-import legacyReleaseService, {
+import publicationService, {
   ReleaseSeriesItem,
-} from '@admin/services/legacyReleaseService';
-import publicationService from '@admin/services/publicationService';
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -149,16 +148,16 @@ const LegacyReleasesTable = ({
                         <span className="govuk-!-display-block">
                           {seriesItem.description}
                         </span>
-                        {/*@MarkFix{seriesItem.isLatest && (*/}
-                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1">*/}
-                        {/*    Latest*/}
-                        {/*  </span>*/}
-                        {/*)}*/}
-                        {/*@MarkFix{seriesItem.isDraft && (*/}
-                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap">*/}
-                        {/*    Draft{seriesItem.isAmendment && ' Amendment'}*/}
-                        {/*  </span>*/}
-                        {/*)}*/}
+                        {/* @MarkFix{seriesItem.isLatest && ( */}
+                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1"> */}
+                        {/*    Latest */}
+                        {/*  </span> */}
+                        {/* )} */}
+                        {/* @MarkFix{seriesItem.isDraft && ( */}
+                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap"> */}
+                        {/*    Draft{seriesItem.isAmendment && ' Amendment'} */}
+                        {/*  </span> */}
+                        {/* )} */}
                       </td>
                       <td
                         className={classNames({
@@ -243,16 +242,18 @@ const LegacyReleasesTable = ({
                                     );
                                   await publicationService.updateReleaseSeriesView(
                                     publicationId,
-                                    nextReleaseSeries.map(seriesItem => ({ // @MarkFix abstract this mapping out?
-                                      id: seriesItem.id,
-                                      releaseParentId: !seriesItem.isLegacyLink
-                                        ? seriesItem.releaseParentId
+                                    nextReleaseSeries.map(item => ({
+                                      // @MarkFix abstract this mapping out?
+                                      id: item.id,
+                                      releaseParentId: !item.isLegacyLink
+                                        ? item.releaseParentId
                                         : undefined,
-                                      legacyLinkDescription: seriesItem.isLegacyLink
-                                        ? seriesItem.description
-                                        : undefined,
-                                      legacyLinkUrl: seriesItem.isLegacyLink
-                                        ? seriesItem.legacyLinkUrl
+                                      legacyLinkDescription:
+                                        item.isLegacyLink
+                                          ? item.description
+                                          : undefined,
+                                      legacyLinkUrl: item.isLegacyLink
+                                        ? item.legacyLinkUrl
                                         : undefined,
                                     })),
                                   );

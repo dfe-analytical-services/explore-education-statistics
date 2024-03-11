@@ -590,15 +590,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //}
 
         private static Publisher.Services.ReleaseService BuildReleaseService(
-            ContentDbContext? contentDbContext = null,
-            IPublicationReleaseSeriesViewService? publicationReleaseSeriesViewService = null)
+            ContentDbContext? contentDbContext = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
                 contentDbContext,
-                releaseRepository: new Content.Model.Repository.ReleaseRepository(contentDbContext),
-                publicationReleaseSeriesViewService ?? Mock.Of<IPublicationReleaseSeriesViewService>(Strict)
+                releaseRepository: new Content.Model.Repository.ReleaseRepository(contentDbContext)
             );
         }
     }

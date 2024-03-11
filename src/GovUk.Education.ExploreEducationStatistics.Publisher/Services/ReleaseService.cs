@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -18,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
-            IReleaseRepository releaseRepository,
-            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
+            IReleaseRepository releaseRepository)
         {
             _contentDbContext = contentDbContext;
             _releaseRepository = releaseRepository;
-            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
 
         public async Task<Release> Get(Guid id)
@@ -91,9 +87,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _contentDbContext.Releases.Update(release);
             release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
 
-            await _publicationReleaseSeriesViewService.UpdateForPublishRelease(
-                release.PublicationId,
-                releaseId);
+            //await _publicationReleaseSeriesViewService.UpdateForPublishRelease( // @MarkFix not required I think?
+            //    release.PublicationId,
+            //    releaseId);
 
             await UpdatePublishedDataBlockVersions(release);
 

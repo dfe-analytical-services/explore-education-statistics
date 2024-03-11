@@ -55,7 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IBlobCacheService _cacheService;
-        private readonly IPublicationReleaseSeriesViewService _publicationReleaseSeriesViewService;
 
         // TODO EES-212 - ReleaseService needs breaking into smaller services as it feels like it is now doing too
         // much work and has too many dependencies
@@ -75,8 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator,
-            IBlobCacheService cacheService,
-            IPublicationReleaseSeriesViewService publicationReleaseSeriesViewService)
+            IBlobCacheService cacheService)
         {
             _context = context;
             _statisticsDbContext = statisticsDbContext;
@@ -94,7 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
             _cacheService = cacheService;
-            _publicationReleaseSeriesViewService = publicationReleaseSeriesViewService;
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
@@ -245,9 +242,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     _context.UpdateRange(methodologiesScheduledWithRelease);
 
-                    await _publicationReleaseSeriesViewService.DeleteForDeleteRelease(
-                        release.PublicationId,
-                        release.Id);
+                    // @MarkFix all this needs refactoring
+                    var releases = await _context.Releases
+                        .Where(r => r.ReleaseParentId == release.ReleaseParentId)
+                        .ToListAsync();
+                    if (releases.Count == 1)
+                    {
+                        var publication = await _context.Publications
+                            .Where(p => p.Id == releases[0].PublicationId)
+                            .SingleAsync();
+                        var releaseSeries = publication.ReleaseSeriesView;
+                        var seriesItem = releaseSeries.Where(rsi => rsi.ReleaseParentId == release.ReleaseParentId)
+                            .Single();
+                        releaseSeries.Remove(seriesItem);
+                        _context.Publications.Update(publication);
+                    }
 
                     await _context.SaveChangesAsync();
 
