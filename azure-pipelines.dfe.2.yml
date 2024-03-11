@@ -138,7 +138,7 @@ jobs:
           repository: 'ees-public-api'
           command: 'build'
           Dockerfile: 'docker/public-api/api/Dockerfile'
-          buildContext: '$(Build.ArtifactStagingDirectory)/public-api-api'
+          buildContext: '$(Build.ArtifactStagingDirectory)/public-api-api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
         env:
