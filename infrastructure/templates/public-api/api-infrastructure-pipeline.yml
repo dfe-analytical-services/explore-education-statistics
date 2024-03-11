@@ -93,7 +93,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: 'Deploy Dev Infrastructure'
-    environment: 'Dev'
+    environment: 'Development'
     strategy:
       runOnce:
         deploy:
@@ -154,7 +154,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: 'Deploy Pre Prod Infrastructure'
-    environment: 'Pre-prod'
+    environment: 'Pre-production'
     strategy:
       runOnce:
         deploy:
@@ -185,7 +185,7 @@ stages:
   jobs:
   - deployment: Deploy
     displayName: 'Deploy Production Infrastructure'
-    environment: 'Prod'
+    environment: 'Production'
     strategy:
       runOnce:
         deploy:
