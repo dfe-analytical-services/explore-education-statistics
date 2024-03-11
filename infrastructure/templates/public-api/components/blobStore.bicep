@@ -10,11 +10,11 @@ param deleteRetentionPolicy int = 7
 param storageAccountName string
 
 // Reference an existing Storage Account.
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
 }
 
-resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2022-09-01' = {
+resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
   name: blobStoreName
   parent: storageAccount
   properties: {

@@ -66,18 +66,18 @@ var tagValues = union(resourceTags ?? {}, {
 })
 
 // Reference the existing Key Vault resource as currently managed by the EES ARM template.
-resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
   scope: resourceGroup(resourceGroup().name)
 }
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
-resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
+resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
   name: 'eesacr'
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
