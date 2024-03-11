@@ -309,7 +309,6 @@ public class SeedDataCommand : ICommand
                 VersionMinor = 0,
                 Status = DataSetVersionStatus.Published,
                 Notes = string.Empty,
-                ParquetFilename = string.Empty,
                 CsvFileId = Guid.NewGuid(),
                 DataSetId = _seed.DataSet.Id,
                 TotalResults = totalResults,

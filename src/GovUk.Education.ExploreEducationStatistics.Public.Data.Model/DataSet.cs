@@ -28,7 +28,7 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public DateTimeOffset? Published { get; set; }
 
-    public DateTimeOffset? Unpublished { get; set; }
+    public DateTimeOffset? Withdrawn { get; set; }
 
     public DateTimeOffset Created { get; set; }
 

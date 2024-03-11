@@ -25,11 +25,17 @@ public static class DataSetGeneratorExtensions
     public static Generator<DataSet> WithStatusPublished(this Generator<DataSet> generator)
         => generator.ForInstance(s => s.SetStatusPublished());
 
-    public static Generator<DataSet> WithStatusStaged(this Generator<DataSet> generator)
-        => generator.ForInstance(s => s.SetStatusStaged());
+    public static Generator<DataSet> WithStatusDraft(this Generator<DataSet> generator)
+        => generator.ForInstance(s => s.SetStatusDraft());
 
     public static Generator<DataSet> WithStatusUnpublished(this Generator<DataSet> generator)
-        => generator.ForInstance(s => s.SetStatusUnpublished());
+        => generator.ForInstance(s => s.SetStatusWithdrawn());
+
+    public static Generator<DataSet> WithPublished(this Generator<DataSet> generator, DateTimeOffset? published)
+        => generator.ForInstance(s => s.SetPublished(published));
+
+    public static Generator<DataSet> WithWithdrawn(this Generator<DataSet> generator, DateTimeOffset? withdrawn)
+        => generator.ForInstance(s => s.SetWithdrawn(withdrawn));
 
     public static Generator<DataSet> WithSupersedingDataSet(this Generator<DataSet> generator, DataSet? dataSet)
         => generator.ForInstance(s => s.SetSupersedingDataSet(dataSet));
@@ -60,7 +66,7 @@ public static class DataSetGeneratorExtensions
             .SetDefault(ds => ds.Title)
             .SetDefault(ds => ds.Summary)
             .SetDefault(ds => ds.PublicationId)
-            .Set(ds => ds.Status, DataSetStatus.Staged);
+            .Set(ds => ds.Status, DataSetStatus.Draft);
 
     public static InstanceSetters<DataSet> SetTitle(
         this InstanceSetters<DataSet> instanceSetter,
@@ -86,29 +92,29 @@ public static class DataSetGeneratorExtensions
         => instanceSetter
             .SetStatus(DataSetStatus.Published)
             .SetPublished(DateTimeOffset.UtcNow)
-            .SetUnpublished(null);
+            .SetWithdrawn(null);
 
-    public static InstanceSetters<DataSet> SetStatusStaged(this InstanceSetters<DataSet> instanceSetter)
+    public static InstanceSetters<DataSet> SetStatusDraft(this InstanceSetters<DataSet> instanceSetter)
         => instanceSetter
-            .SetStatus(DataSetStatus.Staged)
-            .SetUnpublished(null)
+            .SetStatus(DataSetStatus.Draft)
+            .SetWithdrawn(null)
             .SetPublished(null);
 
-    public static InstanceSetters<DataSet> SetStatusUnpublished(this InstanceSetters<DataSet> instanceSetter)
+    public static InstanceSetters<DataSet> SetStatusWithdrawn(this InstanceSetters<DataSet> instanceSetter)
         => instanceSetter
-            .SetStatus(DataSetStatus.Unpublished)
-            .SetUnpublished(DateTimeOffset.UtcNow)
-            .SetPublished(null);
+            .SetStatus(DataSetStatus.Withdrawn)
+            .SetWithdrawn(DateTimeOffset.UtcNow)
+            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-1));
 
     public static InstanceSetters<DataSet> SetPublished(
         this InstanceSetters<DataSet> instanceSetter,
         DateTimeOffset? published)
         => instanceSetter.Set(ds => ds.Published, published);
 
-    public static InstanceSetters<DataSet> SetUnpublished(
+    public static InstanceSetters<DataSet> SetWithdrawn(
         this InstanceSetters<DataSet> instanceSetter,
-        DateTimeOffset? unpublished)
-        => instanceSetter.Set(ds => ds.Unpublished, unpublished);
+        DateTimeOffset? withdrawn)
+        => instanceSetter.Set(ds => ds.Withdrawn, withdrawn);
 
     public static InstanceSetters<DataSet> SetSupersedingDataSet(
         this InstanceSetters<DataSet> instanceSetter,
