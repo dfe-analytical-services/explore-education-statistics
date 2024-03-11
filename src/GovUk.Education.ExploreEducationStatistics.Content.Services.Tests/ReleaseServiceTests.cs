@@ -437,7 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[0];
+            var releaseVersion = publication.ReleaseVersions[0];
 
             var originalContent = @"
                 <p>
@@ -553,7 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: null });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -586,7 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: null });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null });
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -619,7 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
-            var (previousReleaseVersion, releaseVersion) = publication.Releases.ToTuple2();
+            var (previousReleaseVersion, releaseVersion) = publication.ReleaseVersions.ToTuple2();
             releaseVersion.UpdatePublishedDate = false;
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -655,7 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[1];
+            var releaseVersion = publication.ReleaseVersions[1];
             releaseVersion.UpdatePublishedDate = true;
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -722,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(2));
 
-            var (release1Version1, release2Version1) = publication.Releases.ToTuple2();
+            var (release1Version1, release2Version1) = publication.ReleaseVersions.ToTuple2();
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -793,7 +793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(rv => rv is { Version: 2 }).Id
+                    publication.ReleaseVersions.Single(rv => rv is { Version: 2 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -824,8 +824,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(rv => rv is { Year: 2001, Published: not null }).Id,
-                    publication.Releases.Single(rv => rv is { Year: 2000, Published: not null }).Id
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2001, Published: not null }).Id,
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2000, Published: not null }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }

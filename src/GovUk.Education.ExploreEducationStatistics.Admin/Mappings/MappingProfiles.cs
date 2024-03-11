@@ -131,9 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = rv.Publication.Topic.Theme.Title
                             }
                         },
-                        Releases = rv.Publication.Releases
+                        Releases = rv.Publication.ReleaseVersions
                             .FindAll(otherReleaseVersion => rv.Id != otherReleaseVersion.Id &&
-                                                     IsLatestVersionOfRelease(rv.Publication.Releases, otherReleaseVersion.Id))
+                                                     IsLatestVersionOfRelease(rv.Publication.ReleaseVersions, otherReleaseVersion.Id))
                             .OrderByDescending(otherReleaseVersion => otherReleaseVersion.Year)
                             .ThenByDescending(otherReleaseVersion => otherReleaseVersion.TimePeriodCoverage)
                             .Select(otherReleaseVersion => new PreviousReleaseViewModel

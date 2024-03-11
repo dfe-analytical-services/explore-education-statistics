@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
 
                 // Assert that no users can amend an unpublished Release that is the only version
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
                 // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the only version
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 1 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
                 // Assert that no users can amend a version that is not published
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 0);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
                 // Assert that no users can amend an amendment Release if it is not the latest version
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 1);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
                 // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the latest version
                 await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, MakeAmendmentOfSpecificReleaseRequirement>(
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
 
                 // Assert that no User Publication roles will allow an unpublished Release that is the only version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
                 // Assert that a User who has the Publication Owner role on a Release can amend it if it is the only version published
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 1 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
                 // Assert that no User Publication roles will allow an amendment Release that is not yet approved to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 0);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
                 // Assert that no User Publication roles will allow an amendment Release that is not the latest version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 1);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
                 // Assert that a User who has the Publication Owner role on a Release can amend it if it is the latest published version
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
 
                 // Assert that no User Release roles will allow an unpublished Release that is the only version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 0 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
                 // Assert that no User Release roles will allow a published Release that is the only version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 1 });
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
                 // Assert that no User Release roles will allow an amendment Release that is not yet approved to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -351,7 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 0);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
 
                 // Assert that no User Release roles will allow an amendment Release that is not the latest version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .DefaultReleaseParent(publishedVersions: 2)
                         .Generate(1));
 
-                var releaseVersion = publication.Releases.Single(rv => rv.Version == 1);
+                var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
 
                 // Assert that no User Release roles will allow an amendment Release that is the latest version to be amended
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<MakeAmendmentOfSpecificReleaseRequirement>(

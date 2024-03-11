@@ -41,7 +41,7 @@ public class ReleaseVersionRepositoryTests
 
             // Expect the result to be the latest published version taken from releases of the specified publication in
             // reverse chronological order
-            var expectedReleaseVersion = publications[0].Releases
+            var expectedReleaseVersion = publications[0].ReleaseVersions
                 .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
 
             Assert.NotNull(result);
@@ -124,7 +124,7 @@ public class ReleaseVersionRepositoryTests
             var result = await repository.GetLatestPublishedReleaseVersion(publications[0].Id, "2021-22");
 
             // Expect the result to be the latest published version for the 2021-22 release of the specified publication
-            var expectedReleaseVersion = publications[0].Releases
+            var expectedReleaseVersion = publications[0].ReleaseVersions
                 .Single(rv => rv is { Published: not null, Year: 2021, Version: 1 });
 
             Assert.NotNull(result);
@@ -229,7 +229,7 @@ public class ReleaseVersionRepositoryTests
 
             // Expect the result to be the latest version taken from releases of the specified publication in
             // reverse chronological order
-            var expectedReleaseVersion = publications[0].Releases
+            var expectedReleaseVersion = publications[0].ReleaseVersions
                 .Single(rv => rv is { Year: 2022, Version: 0 });
 
             Assert.NotNull(result);
@@ -287,7 +287,7 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersions = publication.Releases;
+            var releaseVersions = publication.ReleaseVersions;
 
             // Expect only the highest published version of the release to be the latest
             Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersions[0].Id));
@@ -308,7 +308,7 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             Assert.False(await repository.IsLatestPublishedReleaseVersion(releaseVersion.Id));
         }
@@ -345,7 +345,7 @@ public class ReleaseVersionRepositoryTests
             await using var contentDbContext = InMemoryContentDbContext(contextId);
             var repository = BuildRepository(contentDbContext);
 
-            var releaseVersions = publication.Releases;
+            var releaseVersions = publication.ReleaseVersions;
 
             // Expect only the highest version of the release to be the latest
             Assert.False(await repository.IsLatestReleaseVersion(releaseVersions[0].Id));
@@ -395,8 +395,8 @@ public class ReleaseVersionRepositoryTests
             // Expect the result to contain the highest published version of each release for the specified publication
             AssertIdsAreEqualIgnoringOrder(new[]
             {
-                publications[0].Releases[2].Id,
-                publications[0].Releases[5].Id
+                publications[0].ReleaseVersions[2].Id,
+                publications[0].ReleaseVersions[5].Id
             }, result);
         }
 
@@ -481,8 +481,8 @@ public class ReleaseVersionRepositoryTests
             // Expect the result to contain the highest published version of each release for the specified publication
             AssertIdsAreEqualIgnoringOrder(new[]
             {
-                publications[0].Releases[2].Id,
-                publications[0].Releases[5].Id
+                publications[0].ReleaseVersions[2].Id,
+                publications[0].ReleaseVersions[5].Id
             }, result);
         }
 
@@ -569,9 +569,9 @@ public class ReleaseVersionRepositoryTests
             // Expect the result to contain the highest version of each release for the specified publication
             AssertIdsAreEqualIgnoringOrder(new[]
             {
-                publications[0].Releases[0].Id,
-                publications[0].Releases[3].Id,
-                publications[0].Releases[5].Id
+                publications[0].ReleaseVersions[0].Id,
+                publications[0].ReleaseVersions[3].Id,
+                publications[0].ReleaseVersions[5].Id
             }, result);
         }
 
@@ -636,12 +636,12 @@ public class ReleaseVersionRepositoryTests
             // Expect the result to contain the highest version of each release for each publication
             AssertIdsAreEqualIgnoringOrder(new[]
             {
-                publications[0].Releases[0].Id,
-                publications[0].Releases[3].Id,
-                publications[0].Releases[5].Id,
-                publications[1].Releases[0].Id,
-                publications[1].Releases[3].Id,
-                publications[1].Releases[5].Id
+                publications[0].ReleaseVersions[0].Id,
+                publications[0].ReleaseVersions[3].Id,
+                publications[0].ReleaseVersions[5].Id,
+                publications[1].ReleaseVersions[0].Id,
+                publications[1].ReleaseVersions[3].Id,
+                publications[1].ReleaseVersions[5].Id
             }, result);
         }
 
@@ -691,9 +691,9 @@ public class ReleaseVersionRepositoryTests
             // Expect the result to contain the highest version of each release for the specified publication
             AssertIdsAreEqualIgnoringOrder(new[]
             {
-                publications[0].Releases[0].Id,
-                publications[0].Releases[3].Id,
-                publications[0].Releases[5].Id
+                publications[0].ReleaseVersions[0].Id,
+                publications[0].ReleaseVersions[3].Id,
+                publications[0].ReleaseVersions[5].Id
             }, result);
         }
 

@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
                     .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
                     .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
                     .DefaultReleaseParent(publishedVersions: 2)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))

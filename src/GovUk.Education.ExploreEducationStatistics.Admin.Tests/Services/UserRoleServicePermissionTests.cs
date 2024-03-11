@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     releaseVersion,
                 }
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Id = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     releaseVersion,
                 }

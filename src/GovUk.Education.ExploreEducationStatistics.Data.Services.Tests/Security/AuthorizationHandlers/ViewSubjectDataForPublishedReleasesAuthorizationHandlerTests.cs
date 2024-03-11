@@ -30,7 +30,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
                 .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
                 .Generate(1));
 
-        var releaseVersion = publication.Releases.Single(rv => rv is { Published: null, Version: 1 });
+        var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()
@@ -69,7 +69,7 @@ public class ViewSubjectDataForPublishedReleasesAuthorizationHandlerTests
                 .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
                 .Generate(1));
 
-        var releaseVersion = publication.Releases.Single(rv => rv is { Published: not null, Version: 1 });
+        var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
         ReleaseSubject releaseSubject = _dataFixture
             .DefaultReleaseSubject()

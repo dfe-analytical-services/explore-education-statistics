@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[0];
+            var releaseVersion = publication.ReleaseVersions[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[0];
+            var releaseVersion = publication.ReleaseVersions[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
@@ -387,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[0];
+            var releaseVersion = publication.ReleaseVersions[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();
@@ -679,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases[0];
+            var releaseVersion = publication.ReleaseVersions[0];
 
             Subject subject = _dataFixture
                 .DefaultSubject();

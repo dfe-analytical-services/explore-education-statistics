@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         Title = "Publication",
-                        Releases = ListOf(templateRelease)
+                        ReleaseVersions = ListOf(templateRelease)
                     }
                 );
                 await context.ContentBlocks.AddRangeAsync(dataBlock1, dataBlock2);
@@ -790,7 +790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test publication",
                 Slug = "test-publication",
                 LatestPublishedReleaseVersion = releaseVersion,
-                Releases =
+                ReleaseVersions =
                 {
                     releaseVersion
                 }
@@ -863,7 +863,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Releases =
+                ReleaseVersions =
                 {
                     releaseVersion
                 }
@@ -906,7 +906,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Releases =
+                ReleaseVersions =
                 {
                     releaseVersion
                 }
@@ -991,7 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     releaseVersion
                 },
@@ -1292,12 +1292,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // assert that soft-deleted entities do not appear via references from other entities by default
                 var publicationWithoutDeletedRelease = context
                     .Publications
-                    .Include(p => p.Releases)
+                    .Include(p => p.ReleaseVersions)
                     .AsNoTracking()
                     .First(p => p.Id == publication.Id);
 
-                Assert.Single(publicationWithoutDeletedRelease.Releases);
-                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.Releases[0].Id);
+                Assert.Single(publicationWithoutDeletedRelease.ReleaseVersions);
+                Assert.Equal(anotherRelease.Id, publicationWithoutDeletedRelease.ReleaseVersions[0].Id);
 
                 // assert that soft-deleted entities have had their soft-deleted flag set to true
                 var updatedRelease = context
@@ -1324,16 +1324,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // assert that soft-deleted entities appear via references from other entities when explicitly searched for
                 var publicationWithDeletedRelease = context
                     .Publications
-                    .Include(p => p.Releases)
+                    .Include(p => p.ReleaseVersions)
                     .IgnoreQueryFilters()
                     .AsNoTracking()
                     .First(p => p.Id == publication.Id);
 
-                Assert.Equal(2, publicationWithDeletedRelease.Releases.Count);
-                Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.Releases[0].Id);
-                Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.Releases[1].Id);
-                Assert.True(publicationWithDeletedRelease.Releases[0].SoftDeleted);
-                Assert.False(publicationWithDeletedRelease.Releases[1].SoftDeleted);
+                Assert.Equal(2, publicationWithDeletedRelease.ReleaseVersions.Count);
+                Assert.Equal(updatedRelease.Id, publicationWithDeletedRelease.ReleaseVersions[0].Id);
+                Assert.Equal(anotherRelease.Id, publicationWithDeletedRelease.ReleaseVersions[1].Id);
+                Assert.True(publicationWithDeletedRelease.ReleaseVersions[0].SoftDeleted);
+                Assert.False(publicationWithDeletedRelease.ReleaseVersions[1].SoftDeleted);
 
                 // assert that other entities were not accidentally soft-deleted
                 var retrievedAnotherReleaseRole = context
@@ -1373,7 +1373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -1402,7 +1402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
                 publication.Slug,
-                publication.Releases[0].Slug
+                publication.ReleaseVersions[0].Slug
             )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1438,7 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 LatestPublishedReleaseVersionId = releaseVersionId,
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -1467,7 +1467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
                 publication.Slug,
-                publication.Releases[0].Slug
+                publication.ReleaseVersions[0].Slug
             )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
 
             // As the release is the latest for the publication the separate cache entry for the publication's latest
@@ -1510,7 +1510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -1557,7 +1557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -1604,7 +1604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 LatestPublishedReleaseVersionId = Guid.NewGuid(),
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -1633,7 +1633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             releaseCacheService.Setup(s => s.UpdateRelease(releaseVersionId,
                 publication.Slug,
-                publication.Releases[0].Slug
+                publication.ReleaseVersions[0].Slug
             )).ReturnsAsync(new ReleaseCacheViewModel(releaseVersionId));
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1692,31 +1692,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.Contributor)
-                    .WithReleaseVersions(publications[0].Releases)
+                    .WithReleaseVersions(publications[0].ReleaseVersions)
                     .GenerateList();
 
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
-                    .WithReleaseVersions(publications[1].Releases)
+                    .WithReleaseVersions(publications[1].ReleaseVersions)
                     .GenerateList();
 
                 var prereleaseReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.PrereleaseViewer)
-                    .WithReleaseVersions(publications[2].Releases)
+                    .WithReleaseVersions(publications[2].ReleaseVersions)
                     .GenerateList();
 
                 var approverReleaseRolesForOtherUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(otherUser)
                     .WithRole(ReleaseRole.Approver)
-                    .WithReleaseVersions(publications.SelectMany(publication => publication.Releases))
+                    .WithReleaseVersions(publications.SelectMany(publication => publication.ReleaseVersions))
                     .GenerateList();
 
-                var higherReviewReleaseWithApproverRoleForUser = publications[1].Releases[1];
+                var higherReviewReleaseWithApproverRoleForUser = publications[1].ReleaseVersions[1];
 
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
@@ -1796,8 +1796,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithPublications(publications)
                     .GenerateList();
 
-                var release1WithApproverRoleForUser = publications[1].Releases[1];
-                var release2WithApproverRoleForUser = publications[1].Releases[3];
+                var release1WithApproverRoleForUser = publications[1].ReleaseVersions[1];
+                var release2WithApproverRoleForUser = publications[1].ReleaseVersions[3];
 
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
@@ -1843,7 +1843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
-                    .WithReleaseVersions(publication.Releases)
+                    .WithReleaseVersions(publication.ReleaseVersions)
                     .GenerateList();
 
                 var approverPublicationRoleForUser = _fixture
@@ -1872,7 +1872,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Assert that the Release only appears once despite the user having approval directly via the
                     // Release itself AND via the overarching Publication.
                     Assert.Single(viewModels);
-                    Assert.Equal(publication.Releases[0].Id, viewModels[0].Id);
+                    Assert.Equal(publication.ReleaseVersions[0].Id, viewModels[0].Id);
                 }
             }
         }

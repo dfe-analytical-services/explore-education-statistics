@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -292,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             // Set up a ReleaseSubject that references a non-existent publication
             ReleaseSubject releaseSubject = _fixture
@@ -372,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -455,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -645,7 +645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -690,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -735,7 +735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -895,7 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .DefaultReleaseSubject()
                 .WithReleaseVersion(_fixture
                     .DefaultStatsReleaseVersion()
-                    .WithId(publication.Releases[0].Id)
+                    .WithId(publication.ReleaseVersions[0].Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(_fixture.DefaultSubject()
                     .WithFilters(filters)
@@ -1054,7 +1054,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1102,7 +1102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1187,7 +1187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
@@ -1373,7 +1373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1509,7 +1509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1557,7 +1557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
@@ -1605,7 +1605,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()

@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<ReleaseVersion>
+                    ReleaseVersions = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await repository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Single(result);
-                Assert.Equal(userPublicationRole1.Publication.Releases[0].Id, result[0].Id);
+                Assert.Equal(userPublicationRole1.Publication.ReleaseVersions[0].Id, result[0].Id);
             }
         }
 
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<ReleaseVersion>
+                    ReleaseVersions = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Releases = new List<ReleaseVersion>
+                    ReleaseVersions = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Releases = new List<ReleaseVersion>
+                ReleaseVersions = new List<ReleaseVersion>
                 {
                     new()
                     {
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseApprovalStatus.Approved);
 
                 var resultRelease = Assert.Single(result);
-                Assert.Equal(userPublicationRole1.Publication.Releases[0].Id, resultRelease.Id);
+                Assert.Equal(userPublicationRole1.Publication.ReleaseVersions[0].Id, resultRelease.Id);
             }
         }
 

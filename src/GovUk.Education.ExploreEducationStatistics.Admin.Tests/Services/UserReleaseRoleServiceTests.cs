@@ -32,38 +32,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole1 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Contributor,
             };
             var userReleaseRole2 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Contributor,
             };
             var userReleaseRole3 = new UserReleaseRole
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publication.Releases[1],
+                ReleaseVersion = publication.ReleaseVersions[1],
                 Role = Contributor,
             };
             var userReleaseRoleIgnored1 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Lead,
             };
             var userReleaseRoleIgnored2 = new UserReleaseRole // Ignored because Deleted set
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publication.Releases[0],
+                ReleaseVersion = publication.ReleaseVersions[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };
             var userReleaseRoleIgnored3 = new UserReleaseRole // Ignored due to release under different publication
             {
                 User = new User { Id = Guid.NewGuid() },
-                ReleaseVersion = publicationIgnored.Releases[0],
+                ReleaseVersion = publicationIgnored.ReleaseVersions[0],
                 Role = Contributor,
             };
 
