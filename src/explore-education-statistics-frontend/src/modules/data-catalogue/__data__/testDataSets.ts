@@ -1,6 +1,5 @@
-import { DataSetSummary } from '@frontend/services/dataSetService';
+import { DataSet, DataSetSummary } from '@frontend/services/dataSetService';
 
-// eslint-disable-next-line import/prefer-default-export
 export const testDataSetSummaries: DataSetSummary[] = [
   {
     fileExtension: 'csv',
@@ -90,3 +89,31 @@ export const testDataSetSummaries: DataSetSummary[] = [
     title: 'Data set 3',
   },
 ];
+
+export const testDataSet: DataSet = {
+  file: { id: 'file-id', name: 'file name', size: 'file size' },
+  release: {
+    id: 'release-id',
+    isLatestPublishedRelease: true,
+    publication: {
+      id: 'publication-id',
+      slug: 'publication-slug',
+      themeTitle: 'Theme 1',
+      title: 'Publication 1',
+    },
+    published: new Date('2024-01-01'),
+    slug: 'release-slug',
+    title: 'Release 1',
+    type: 'NationalStatistics',
+  },
+  summary: 'Data set 1 summary',
+  title: 'Data set 1',
+  // These aren't in the backend yet, so may change.
+  filters: ['Filter 1', 'Filter 2'],
+  geographicLevels: ['Local authority', 'National'],
+  indicators: ['Indicator 1', 'Indicator 2'],
+  timePeriods: {
+    from: '2023',
+    to: '2024',
+  },
+};

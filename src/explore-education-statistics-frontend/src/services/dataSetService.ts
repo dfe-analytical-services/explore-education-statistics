@@ -1,5 +1,34 @@
 import { PaginatedList } from '@common/services/types/pagination';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
+
+export interface DataSet {
+  file: { id: string; name: string; size: string };
+  release: {
+    id: string;
+    isLatestPublishedRelease: boolean;
+    publication: {
+      id: string;
+      slug: string;
+      themeTitle: string;
+      title: string;
+    };
+    published: Date;
+    slug: string;
+    title: string;
+    type: ReleaseType;
+  };
+  summary: string;
+  title: string;
+  // These aren't in the backend yet, so may change.
+  filters: string[];
+  geographicLevels: string[];
+  indicators: string[];
+  timePeriods: {
+    from?: string;
+    to?: string;
+  };
+}
 
 export interface DataSetSummary {
   content: string;
@@ -22,6 +51,7 @@ export interface DataSetSummary {
   };
   latestData: boolean;
   published: Date;
+  // These aren't in the backend yet, so may change.
   timePeriods: {
     from?: string;
     to?: string;
@@ -67,6 +97,9 @@ export interface DataSetListRequest {
 }
 
 const dataSetService = {
+  getDataSet(dataSetId: string, releaseId: string): Promise<DataSet> {
+    return contentApi.get(`/releases/${releaseId}/data-sets/${dataSetId}`);
+  },
   listDataSets(
     params: DataSetListRequest,
   ): Promise<PaginatedList<DataSetSummary>> {

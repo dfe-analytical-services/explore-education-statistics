@@ -1,0 +1,10 @@
+@import '~govuk-frontend/govuk/base';
+
+.container {
+  margin-bottom: govuk-spacing(6);
+  overflow: auto;
+
+  &:focus-visible {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
