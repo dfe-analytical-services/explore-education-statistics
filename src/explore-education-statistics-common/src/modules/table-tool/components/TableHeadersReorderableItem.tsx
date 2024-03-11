@@ -7,7 +7,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import classNames from 'classnames';
 import React, { MouseEvent, KeyboardEvent, TouchEvent } from 'react';
-import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd';
+import { DraggableProvided, DraggableStateSnapshot } from '@hello-pangea/dnd';
 
 interface Props {
   activeItem?: string;

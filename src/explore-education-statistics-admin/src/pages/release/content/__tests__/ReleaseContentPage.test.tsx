@@ -464,7 +464,7 @@ describe('ReleaseContentPage', () => {
     const contentAccordionSections =
       within(contentAccordion).getAllByTestId('accordionSection');
 
-    const section1Button = within(contentAccordionSections[0]).getByRole(
+    const section1Button = await within(contentAccordionSections[0]).findByRole(
       'button',
       {
         name: /Section 1/,

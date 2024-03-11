@@ -6,7 +6,7 @@ import {
   DraggableProvided,
   DraggableProvidedDraggableProps,
   DraggableStateSnapshot,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 import { Filter } from '../../types/filters';
 
 describe('TableHeadersReorderableItem', () => {
