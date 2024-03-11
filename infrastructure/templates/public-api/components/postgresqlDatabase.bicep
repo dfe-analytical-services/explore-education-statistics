@@ -72,8 +72,8 @@ param firewallRules {
 param tagValues object
 
 var databaseServerName = empty(serverName)
-  ? '${resourcePrefix}-psql'
-  : '${resourcePrefix}-psql-${serverName}'
+  ? '${resourcePrefix}-psql-server'
+  : '${resourcePrefix}-psql-server-${serverName}'
 
 var connectionStringSecretName = '${databaseServerName}-connectionString'
 var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
