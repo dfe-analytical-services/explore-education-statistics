@@ -826,7 +826,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 {
                     var filterOptionMetaLink = Assert.Single(
                         allFilterMetaLinks, 
-                        foml => SqidProcessor.Encode(foml.PublicId) == filterOptionMetaViewModel.Id);
+                        foml => SqidEncoder.Encode(foml.PublicId) == filterOptionMetaViewModel.Id);
 
                     var filterOptionMeta = Assert.Single(
                         filterMeta.Options,
@@ -847,7 +847,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 {
                     var locationOptionMetaLink = Assert.Single(
                         allLocationMetaLinks,
-                        foml => SqidProcessor.Encode(foml.PublicId) == locationOptionMetaViewModel.Id);
+                        foml => SqidEncoder.Encode(foml.PublicId) == locationOptionMetaViewModel.Id);
 
                     var locationOptionMeta = Assert.Single(
                         locationMeta.Options,

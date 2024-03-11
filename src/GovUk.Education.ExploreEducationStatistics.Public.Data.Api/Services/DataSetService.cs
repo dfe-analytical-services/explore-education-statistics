@@ -269,7 +269,7 @@ internal class DataSetService : IDataSetService
 
         return new FilterOptionMetaViewModel
         {
-            Id = SqidProcessor.Encode(publicId),
+            Id = SqidEncoder.Encode(publicId),
             Label = filterOptionMeta.Label,
             IsAggregate = filterOptionMeta.IsAggregate,
         };
@@ -299,7 +299,7 @@ internal class DataSetService : IDataSetService
     {
         var publicId = locationOptionMeta.MetaLinks.Single(ml => ml.MetaId == locationMeta.Id).PublicId;
 
-        var encodedId = SqidProcessor.Encode(publicId);
+        var encodedId = SqidEncoder.Encode(publicId);
 
         switch (locationOptionMeta)
         {
