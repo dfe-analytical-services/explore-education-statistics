@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240310195852_InitialMigration")]
+    [Migration("20240311024812_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -201,10 +201,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("uuid");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ParquetFilename")
                         .IsRequired()
                         .HasColumnType("text");
 

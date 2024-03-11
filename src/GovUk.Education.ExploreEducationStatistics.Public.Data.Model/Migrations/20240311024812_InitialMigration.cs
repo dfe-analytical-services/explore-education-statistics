@@ -155,7 +155,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     CsvFileId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ParquetFilename = table.Column<string>(type: "text", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),

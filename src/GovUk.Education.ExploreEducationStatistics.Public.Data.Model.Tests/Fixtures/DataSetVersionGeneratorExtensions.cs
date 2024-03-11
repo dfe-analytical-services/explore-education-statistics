@@ -45,11 +45,6 @@ public static class DataSetVersionGeneratorExtensions
         Guid csvFileId)
         => generator.ForInstance(s => s.SetCsvFileId(csvFileId));
 
-    public static Generator<DataSetVersion> WithParquetFilename(
-        this Generator<DataSetVersion> generator,
-        string parquetFilename)
-        => generator.ForInstance(s => s.SetParquetFilename(parquetFilename));
-
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
         int major,
@@ -153,7 +148,6 @@ public static class DataSetVersionGeneratorExtensions
             .SetDefault(dsv => dsv.Id)
             .SetDefault(dsv => dsv.DataSetId)
             .SetDefault(dsv => dsv.CsvFileId)
-            .SetDefault(dsv => dsv.ParquetFilename)
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
@@ -176,11 +170,6 @@ public static class DataSetVersionGeneratorExtensions
         this InstanceSetters<DataSetVersion> instanceSetter,
         Guid csvFileId)
         => instanceSetter.Set(dsv => dsv.CsvFileId, csvFileId);
-
-    public static InstanceSetters<DataSetVersion> SetParquetFilename(
-        this InstanceSetters<DataSetVersion> instanceSetter,
-        string parquetFilename)
-        => instanceSetter.Set(dsv => dsv.ParquetFilename, parquetFilename);
 
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,

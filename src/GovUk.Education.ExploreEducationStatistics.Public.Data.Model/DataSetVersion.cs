@@ -19,8 +19,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required Guid CsvFileId { get; set; }
 
-    public required string ParquetFilename { get; set; }
-
     public required int VersionMajor { get; set; }
 
     public required int VersionMinor { get; set; }

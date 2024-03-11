@@ -201,10 +201,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ParquetFilename")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset?>("Published")
                         .HasColumnType("timestamp with time zone");
 
