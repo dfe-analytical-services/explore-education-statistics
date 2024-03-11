@@ -15,11 +15,11 @@ param contentType string = 'text/plain'
 param isEnabled bool = true
 
 // Reference an existing Key Vault.
-resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   name: keyVaultName
 }
 
-resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   name: replace(replace(secretName, '.', '-'), ' ', '-')
   parent: keyVault
   properties: {

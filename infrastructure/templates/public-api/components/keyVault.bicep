@@ -29,7 +29,7 @@ param tagValues object
 @description('The name of the Key Vault resource')
 param keyVaultName string
 
-resource keyvault 'Microsoft.KeyVault/vaults@2022-07-01' = {
+resource keyvault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: '${resourcePrefix}-kv-${keyVaultName}'
   location: location
   properties: {

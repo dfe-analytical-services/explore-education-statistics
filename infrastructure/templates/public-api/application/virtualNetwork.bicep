@@ -15,7 +15,7 @@ var postgreSqlSubnetPrefix = '10.0.7.0/24'
 var apiContainerAppSubnetPrefix = '10.0.8.0/24'
 
 // Reference the existing VNet.
-resource vNet 'Microsoft.Network/virtualNetworks@2023-04-01' existing = {
+resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: vNetName
 }
 
@@ -72,7 +72,7 @@ var subnets = [
 // Create the subnets sequentially rather than in parallel to avoid "AnotherOperationInProgress" errors when multiple
 // subnets attempt to update the parent VNet at the same time.
 @batchSize(1)
-resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = [for subnet in subnets: {
+resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = [for subnet in subnets: {
   parent: vNet
   name: subnet.name
   properties: subnet.properties

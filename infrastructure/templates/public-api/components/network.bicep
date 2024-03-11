@@ -15,7 +15,7 @@ param tagValues object
 
 var vNetName = '${subscription}-vnet-${environment}'
 
-resource vNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
+resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: vNetName
   location: location
   properties: {
