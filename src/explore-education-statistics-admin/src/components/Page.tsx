@@ -1,11 +1,11 @@
 import Link from '@admin/components/Link';
 import PageFooter from '@admin/components/PageFooter';
 import PageTitle from '@admin/components/PageTitle';
+import PhaseBanner from '@common/components/PhaseBanner';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Helmet } from 'react-helmet';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
-import PageBanner from './PageBanner';
 import PageHeader from './PageHeader';
 
 export type PageProps = {
@@ -45,7 +45,9 @@ const Page = ({
           'dfe-width-container--wide': wide,
         })}
       >
-        {pageBanner ?? <PageBanner />}
+        {pageBanner ?? (
+          <PhaseBanner url="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-VQ56HAfKLpBrG0LxbfxbVdUQjVJQVdMOFlSMURGQ1kyMzRNWlpKN1NMVy4u" />
+        )}
 
         <Breadcrumbs {...breadcrumbProps} />
 

@@ -13,10 +13,12 @@ export interface TableHeadersContextState {
   expandedLists: string[];
   groupDraggingActive: boolean;
   groupDraggingEnabled: boolean;
+  moveControlsActive: string[];
   setActiveGroup: (listName?: string) => void;
   toggleExpandedList: (listName: string) => void;
   toggleGroupDraggingActive: (active: boolean) => void;
   toggleGroupDraggingEnabled: (enabled: boolean) => void;
+  toggleMoveControlsActive: (groupId: string) => void;
 }
 
 const TableHeadersContext = createContext<TableHeadersContextState>({
@@ -24,10 +26,12 @@ const TableHeadersContext = createContext<TableHeadersContextState>({
   expandedLists: [],
   groupDraggingActive: false,
   groupDraggingEnabled: true,
+  moveControlsActive: [],
   setActiveGroup: noop,
   toggleExpandedList: noop,
   toggleGroupDraggingActive: noop,
   toggleGroupDraggingEnabled: noop,
+  toggleMoveControlsActive: noop,
 });
 
 export interface TableHeadersContextProviderProps {
@@ -57,6 +61,7 @@ export const TableHeadersContextProvider = ({
   const [groupDraggingEnabled, toggleGroupDraggingEnabled] = useToggle(
     initialGroupDraggingEnabled ?? true,
   );
+  const [moveControlsActive, setMoveControlsActive] = useState<string[]>([]);
 
   const state = useMemo<TableHeadersContextState>(() => {
     const toggleExpandedList = (listName: string) =>
@@ -66,21 +71,31 @@ export const TableHeadersContextProvider = ({
           : [...current, listName],
       );
 
+    const toggleMoveControlsActive = (groupId: string) =>
+      setMoveControlsActive(current =>
+        current.includes(groupId)
+          ? current.filter(currentId => currentId !== groupId)
+          : [...current, groupId],
+      );
+
     return {
       activeGroup,
       expandedLists,
       groupDraggingActive,
       groupDraggingEnabled,
+      moveControlsActive,
       setActiveGroup,
       toggleExpandedList,
       toggleGroupDraggingActive,
       toggleGroupDraggingEnabled,
+      toggleMoveControlsActive,
     };
   }, [
     activeGroup,
     expandedLists,
     groupDraggingActive,
     groupDraggingEnabled,
+    moveControlsActive,
     setActiveGroup,
     toggleGroupDraggingActive,
     toggleGroupDraggingEnabled,

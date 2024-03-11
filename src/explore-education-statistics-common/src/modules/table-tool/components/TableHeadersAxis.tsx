@@ -3,6 +3,8 @@ import styles from '@common/modules/table-tool/components/TableHeadersAxis.modul
 import TableHeadersGroup from '@common/modules/table-tool/components/TableHeadersGroup';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
+import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
+import getTableHeaderGroupId from '@common/modules/table-tool/components/utils/getTableHeaderGroupId';
 import {
   CategoryFilter,
   LocationFilter,
@@ -13,12 +15,13 @@ import classNames from 'classnames';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import { useFormContext } from 'react-hook-form';
-import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 
 interface Props {
   id: string;
   legend: string;
   name: keyof TableHeadersFormValues;
+  onMoveGroupDown: (index: number) => void;
+  onMoveGroupUp: (index: number) => void;
   onMoveGroupToOtherAxis: (index: number) => void;
 }
 
@@ -26,6 +29,8 @@ export default function TableHeadersAxis({
   id,
   legend,
   name,
+  onMoveGroupDown,
+  onMoveGroupUp,
   onMoveGroupToOtherAxis,
 }: Props) {
   const { groupDraggingActive, groupDraggingEnabled } =
@@ -73,6 +78,9 @@ export default function TableHeadersAxis({
 
                 {values.map((group: Filter[], index: number) => {
                   const key = `group-${index}`;
+                  const groupName = `${name}[${index}]`;
+                  const groupLegend = getGroupLegend(group);
+                  const groupId = getTableHeaderGroupId(groupLegend);
 
                   return (
                     <div
@@ -81,10 +89,18 @@ export default function TableHeadersAxis({
                       key={key}
                     >
                       <TableHeadersGroup
+                        id={groupId}
                         index={index}
-                        legend={getGroupLegend(group)}
-                        name={`${name}[${index}]`}
+                        isLastGroup={index === values.length - 1}
+                        legend={groupLegend}
+                        name={groupName}
                         totalItems={group.length}
+                        onMoveGroupDown={() => {
+                          onMoveGroupDown(index);
+                        }}
+                        onMoveGroupUp={() => {
+                          onMoveGroupUp(index);
+                        }}
                         onMoveGroupToOtherAxis={() => {
                           onMoveGroupToOtherAxis(index);
                         }}
@@ -103,6 +119,10 @@ export default function TableHeadersAxis({
               <div className={styles.groupsContainer}>
                 {values.map((group: Filter[], index: number) => {
                   const key = `group-${index}`;
+                  const groupName = `${name}[${index}]`;
+                  const groupLegend = getGroupLegend(group);
+                  const groupId = getTableHeaderGroupId(groupLegend);
+
                   return (
                     <div
                       className={styles.groupContainer}
@@ -110,10 +130,18 @@ export default function TableHeadersAxis({
                       key={key}
                     >
                       <TableHeadersGroup
+                        id={groupId}
                         index={index}
-                        legend={getGroupLegend(group)}
-                        name={`${name}[${index}]`}
+                        isLastGroup={index === values.length - 1}
+                        legend={groupLegend}
+                        name={groupName}
                         totalItems={group.length}
+                        onMoveGroupDown={() => {
+                          onMoveGroupDown(index);
+                        }}
+                        onMoveGroupUp={() => {
+                          onMoveGroupUp(index);
+                        }}
                         onMoveGroupToOtherAxis={() => {
                           onMoveGroupToOtherAxis(index);
                         }}

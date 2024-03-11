@@ -121,21 +121,22 @@ function renderTable(element: Element): ReactElement | undefined {
     child => child instanceof Element && child.name === 'table',
   ) as Element | undefined;
 
+  if (!table) {
+    return undefined;
+  }
+
   const figcaption = children.find(
     child => child instanceof Element && child.name === 'figcaption',
   ) as Element | undefined;
 
-  if (!table || !figcaption) {
-    return undefined;
-  }
-
   return (
-    <div className={styles.tableContainer}>
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+    <div className={styles.tableContainer} tabIndex={0}>
       <table
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...attributesToProps(table.attribs)}
       >
-        <caption>{domToReact(figcaption.children)}</caption>
+        {figcaption && <caption>{domToReact(figcaption.children)}</caption>}
         {domToReact(table.children, { trim: true })}
       </table>
     </div>
