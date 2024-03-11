@@ -11,8 +11,6 @@ public abstract class SqidEncoderTests
         MinLength = 5,
     });
 
-    private readonly SqidsEncoder<int> _defaultSqidsEncoder = new();
-
     public class EncodeTests() : SqidEncoderTests
     {
         [Fact]
