@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Xunit;
 
@@ -37,6 +38,22 @@ public static class EnumUtilsTests
             Assert.Equal(
                 $"The value 'Invalid label' is not a valid {nameof(TestEnum)}",
                 exception.Message);
+        }
+    }
+
+    public class TryGetFromEnumValueTests
+    {
+        [Fact]
+        public void WithLabelValue_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumValue<TestEnum>("with-label-value", out var @enum));
+            Assert.Equal(TestEnum.WithLabelValue, @enum);
+        }
+
+        [Fact]
+        public void NoMatch_Invalid()
+        {
+            Assert.False(EnumUtil.TryGetFromEnumValue<TestEnum>("Invalid", out _));
         }
     }
 
@@ -77,6 +94,29 @@ public static class EnumUtilsTests
         }
     }
 
+    public class TryGetFromEnumLabelTests
+    {
+        [Fact]
+        public void WithLabel_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumLabel<TestEnum>("With label", out var @enum));
+            Assert.Equal(TestEnum.WithLabel, @enum);
+        }
+
+        [Fact]
+        public void WithLabelValue_Success()
+        {
+            Assert.True(EnumUtil.TryGetFromEnumLabel<TestEnum>("With label value", out var @enum));
+            Assert.Equal(TestEnum.WithLabelValue, @enum);
+        }
+
+        [Fact]
+        public void NoMatch_Invalid()
+        {
+            Assert.False(EnumUtil.TryGetFromEnumLabel<TestEnum>("Invalid", out _));
+        }
+    }
+
     public class GetEnumsTests
     {
         [Fact]
@@ -104,6 +144,66 @@ public static class EnumUtilsTests
             };
 
             Assert.Equal(expected, EnumUtil.GetEnumsArray<TestEnum>());
+        }
+    }
+
+    public class GetEnumLabelsTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new List<string>
+            {
+                TestEnum.WithLabel.GetEnumLabel(),
+                TestEnum.WithLabelValue.GetEnumLabel(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumLabels<TestEnum>());
+        }
+    }
+
+    public class GetEnumLabelsSetTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new HashSet<string>
+            {
+                TestEnum.WithLabel.GetEnumLabel(),
+                TestEnum.WithLabelValue.GetEnumLabel(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumLabelsSet<TestEnum>());
+        }
+    }
+
+    public class GetEnumValuesTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new List<string>
+            {
+                TestEnum.WithLabel.ToString(),
+                TestEnum.WithLabelValue.GetEnumValue(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumValues<TestEnum>());
+        }
+    }
+
+    public class GetEnumValuesSetTests
+    {
+        [Fact]
+        public void Success()
+        {
+            var expected = new HashSet<string>
+            {
+                TestEnum.WithLabel.ToString(),
+                TestEnum.WithLabelValue.GetEnumValue(),
+            };
+
+            Assert.Equal(expected, EnumUtil.GetEnumValuesSet<TestEnum>());
         }
     }
 
