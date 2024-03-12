@@ -54,7 +54,8 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
                       rowSpan: cell.rowSpan,
                       scope: cell.scope,
                       className: classNames({
-                        'govuk-table__cell--numeric': cell.tag === 'td',
+                        'govuk-table__cell--numeric dfe-white-space--nowrap':
+                          cell.tag === 'td',
                       }),
                     },
                     cell.text,

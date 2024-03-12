@@ -1,29 +1,37 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using Semver;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetService : IDataSetService
 {
     private readonly PublicDataDbContext _publicDataDbContext;
+    private readonly IUserService _userService;
 
-    public DataSetService(PublicDataDbContext publicDataDbContext)
+    public DataSetService(
+        PublicDataDbContext publicDataDbContext,
+        IUserService userService)
     {
         _publicDataDbContext = publicDataDbContext;
+        _userService = userService;
     }
 
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(Guid dataSetId)
     {
-        return await CheckDataSetExists(dataSetId)
+        return await _publicDataDbContext.DataSets
+            .Include(ds => ds.LatestVersion)
+            .SingleOrNotFound(ds => ds.Id == dataSetId)
+            .OnSuccessDo(_userService.CheckCanViewDataSet)
             .OnSuccess(MapDataSet);
     }
 
@@ -35,8 +43,7 @@ internal class DataSetService : IDataSetService
         var queryable = _publicDataDbContext.DataSets
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
-            .Where(ds => ds.Status == DataSetStatus.Published 
-                || ds.Status == DataSetStatus.Deprecated);
+            .WherePublicStatus();
 
         var totalResults = await queryable.CountAsync();
 
@@ -50,7 +57,11 @@ internal class DataSetService : IDataSetService
             .Select(MapDataSet)
             .ToList();
 
-        return new DataSetPaginatedListViewModel(dataSets, totalResults, page, pageSize);
+        return new DataSetPaginatedListViewModel
+        {
+            Results = dataSets,
+            Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
+        };
     }
 
     public async Task<Either<ActionResult, DataSetVersionViewModel>> GetVersion(
@@ -58,42 +69,46 @@ internal class DataSetService : IDataSetService
         string dataSetVersion)
     {
         return await CheckVersionExists(dataSetId, dataSetVersion)
+            .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapDataSetVersion);
     }
 
     public async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListVersions(
+        Guid dataSetId,
         int page,
-        int pageSize,
-        Guid dataSetId)
+        int pageSize)
+    {
+        return await _publicDataDbContext.DataSets
+            .SingleOrNotFound(ds => ds.Id == dataSetId)
+            .OnSuccessDo(_userService.CheckCanViewDataSet)
+            .OnSuccess(dataSet => ListPaginatedVersions(dataSet: dataSet, page: page, pageSize: pageSize));
+    }
+
+    private async Task<Either<ActionResult, DataSetVersionPaginatedListViewModel>> ListPaginatedVersions(
+        DataSet dataSet,
+        int page,
+        int pageSize)
     {
         var queryable = _publicDataDbContext.DataSetVersions
-            .Where(ds => ds.DataSetId == dataSetId)
-            .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Unpublished
-                || ds.Status == DataSetVersionStatus.Deprecated);
+            .Where(ds => ds.DataSetId == dataSet.Id)
+            .WherePublicStatus();
 
         var totalResults = await queryable.CountAsync();
 
         var dataSetVersions = (await queryable
-            .OrderByDescending(ds => ds.VersionMajor)
-            .ThenByDescending(ds => ds.VersionMinor)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync())
+                .OrderByDescending(ds => ds.VersionMajor)
+                .ThenByDescending(ds => ds.VersionMinor)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync())
             .Select(MapDataSetVersion)
             .ToList();
 
-        return new DataSetVersionPaginatedListViewModel(dataSetVersions, totalResults, page, pageSize);
-    }
-
-    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
-    {
-        return await _publicDataDbContext.DataSets
-            .Include(ds => ds.LatestVersion)
-            .Where(ds => ds.Id == dataSetId)
-            .Where(ds => ds.Status == DataSetStatus.Published
-                || ds.Status == DataSetStatus.Deprecated)
-            .SingleOrNotFound();
+        return new DataSetVersionPaginatedListViewModel
+        {
+            Results = dataSetVersions,
+            Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults)
+        };
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -122,9 +137,6 @@ internal class DataSetService : IDataSetService
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(dsv => dsv.VersionMajor == version.Major)
             .Where(dsv => dsv.VersionMinor == version.Minor)
-            .Where(ds => ds.Status == DataSetVersionStatus.Published
-                || ds.Status == DataSetVersionStatus.Unpublished
-                || ds.Status == DataSetVersionStatus.Deprecated)
             .SingleOrNotFound();
     }
 
@@ -146,8 +158,8 @@ internal class DataSetService : IDataSetService
     {
         return new TimePeriodRangeViewModel
         {
-            Start = TimePeriodFormatter.Format(timePeriodRange.Start.Year, timePeriodRange.Start.Code),
-            End = TimePeriodFormatter.Format(timePeriodRange.End.Year, timePeriodRange.End.Code),
+            Start = TimePeriodFormatter.FormatLabel(timePeriodRange.Start.Period, timePeriodRange.Start.Code),
+            End = TimePeriodFormatter.FormatLabel(timePeriodRange.End.Period, timePeriodRange.End.Code),
         };
     }
 
@@ -159,7 +171,7 @@ internal class DataSetService : IDataSetService
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,
-            Unpublished = dataSetVersion.Unpublished,
+            Unpublished = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
             TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary.TimePeriodRange),

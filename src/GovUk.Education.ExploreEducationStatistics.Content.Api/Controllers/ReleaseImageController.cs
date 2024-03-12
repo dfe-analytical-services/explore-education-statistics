@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -17,14 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _releaseFileService = releaseFileService;
         }
 
-        [HttpGet("releases/{releaseId}/images/{fileId}")]
-        public async Task<ActionResult> Stream(string releaseId, string fileId)
+        [HttpGet("releases/{releaseVersionId}/images/{fileId}")]
+        public async Task<ActionResult> Stream(string releaseVersionId, string fileId)
         {
-            if (Guid.TryParse(releaseId, out var releaseIdAsGuid) &&
+            if (Guid.TryParse(releaseVersionId, out var releaseVersionIdAsGuid) &&
                 Guid.TryParse(fileId, out var fileIdAsGuid))
             {
                 return await _releaseFileService
-                    .StreamFile(releaseId: releaseIdAsGuid, fileId: fileIdAsGuid)
+                    .StreamFile(releaseVersionId: releaseVersionIdAsGuid, fileId: fileIdAsGuid)
                     .HandleFailures();
             }
 

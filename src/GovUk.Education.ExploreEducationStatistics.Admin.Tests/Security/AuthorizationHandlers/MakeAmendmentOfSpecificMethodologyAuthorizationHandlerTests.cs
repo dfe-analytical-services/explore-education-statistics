@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfLatestPublishedMethodologyVersionOwnedByPublication()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));

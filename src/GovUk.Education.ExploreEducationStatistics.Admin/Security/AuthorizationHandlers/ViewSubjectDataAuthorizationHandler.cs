@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+#nullable enable
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
@@ -27,11 +28,11 @@ public class ViewSubjectDataAuthorizationHandler : AuthorizationHandler<
         ReleaseSubject releaseSubject)
     {
         // If this data has been published, it is visible to anyone.
-        var release = await _contentDbContext
-            .Releases
-            .FirstAsync(r => r.Id == releaseSubject.ReleaseId);
+        var releaseVersion = await _contentDbContext
+            .ReleaseVersions
+            .FirstAsync(rv => rv.Id == releaseSubject.ReleaseVersionId);
 
-        if (await _authorizationHandlerService.IsReleaseViewableByUser(release, context.User))
+        if (await _authorizationHandlerService.IsReleaseViewableByUser(releaseVersion, context.User))
         {
             context.Succeed(requirement);
         }

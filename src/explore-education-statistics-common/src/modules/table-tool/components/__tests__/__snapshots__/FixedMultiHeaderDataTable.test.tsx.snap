@@ -42,10 +42,10 @@ exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
           >
             Row header
           </th>
-          <td class="govuk-table__cell--numeric">
+          <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
             425,590
           </td>
-          <td class="govuk-table__cell--numeric">
+          <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
             425,591
           </td>
         </tr>

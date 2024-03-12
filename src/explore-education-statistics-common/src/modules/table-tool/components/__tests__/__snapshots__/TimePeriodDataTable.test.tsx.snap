@@ -48,17 +48,17 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Authorised absence rate
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         21.5%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.2%
       </td>
@@ -124,17 +124,17 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Authorised absence rate
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         21.5%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.2%
       </td>
@@ -177,7 +177,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -192,7 +192,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         21.5%
       </td>
@@ -207,7 +207,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.2%
       </td>
@@ -250,7 +250,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -273,7 +273,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         21.5%
       </td>
@@ -288,7 +288,7 @@ exports[`TimePeriodDataTable renders table correctly when region group is missin
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.2%
       </td>
@@ -384,22 +384,22 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         6,492
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,542
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,185
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
@@ -414,22 +414,22 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         7,280
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         6,493
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,142
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
@@ -460,22 +460,22 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,179
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,809
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,322
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         x
       </td>
@@ -490,22 +490,22 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,390
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,076
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,483
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         x
       </td>
@@ -587,17 +587,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         6,492
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,542
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,185
       </td>
@@ -612,17 +612,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         7,280
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         6,493
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,142
       </td>
@@ -653,17 +653,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,179
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,809
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,322
       </td>
@@ -678,17 +678,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4,390
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,076
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         5,483
       </td>
@@ -711,17 +711,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         x
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
@@ -736,17 +736,17 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         x
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         no data
       </td>
@@ -789,7 +789,7 @@ exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -812,7 +812,7 @@ exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         21.5%
       </td>
@@ -835,7 +835,7 @@ exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         20.2%
       </td>
@@ -900,17 +900,17 @@ exports[`TimePeriodDataTable renders table with no filters 1`] = `
         Authorised absence rate
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.6%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         19.2%
       </td>
@@ -925,17 +925,17 @@ exports[`TimePeriodDataTable renders table with no filters 1`] = `
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,280,964
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,397,521
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,488,865
       </td>
@@ -950,17 +950,17 @@ exports[`TimePeriodDataTable renders table with no filters 1`] = `
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2,212,399
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2,453,340
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2,637,752
       </td>
@@ -1003,7 +1003,7 @@ exports[`TimePeriodDataTable renders table with only one of each option 1`] = `
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -1046,7 +1046,7 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -1089,7 +1089,7 @@ exports[`TimePeriodDataTable renders table with only one of each option and no f
         England
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         18.3%
       </td>
@@ -1185,22 +1185,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         32,125
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         33,725
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         31,241
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         31,322
       </td>
@@ -1215,22 +1215,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         39,697
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         41,239
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         41,945
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         41,228
       </td>
@@ -1253,22 +1253,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,135
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,582
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         904
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         939
       </td>
@@ -1283,22 +1283,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,512
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2,122
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,215
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,268
       </td>
@@ -1329,22 +1329,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         30,389
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         31,244
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         25,741
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         26,594
       </td>
@@ -1359,22 +1359,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         34,689
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         36,083
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         33,422
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         37,084
       </td>
@@ -1397,22 +1397,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of authorised absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         481
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         274
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         442
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         745
       </td>
@@ -1427,22 +1427,22 @@ exports[`TimePeriodDataTable renders table with two of every option 1`] = `
         Number of overall absence sessions
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         752
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         571
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         788
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1,105
       </td>
@@ -1530,22 +1530,22 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.4%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.4%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.9%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.8%
       </td>
@@ -1560,22 +1560,22 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.7%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.5%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.4%
       </td>
@@ -1598,22 +1598,22 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.9%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.0%
       </td>
@@ -1628,22 +1628,22 @@ exports[`TimePeriodDataTable renders table without indicators when there is only
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.1%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         1.8%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.6%
       </td>
@@ -1701,12 +1701,12 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.4%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.8%
       </td>
@@ -1721,12 +1721,12 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         4.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.4%
       </td>
@@ -1749,12 +1749,12 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
         Barnet
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.3%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         3.0%
       </td>
@@ -1769,12 +1769,12 @@ exports[`TimePeriodDataTable renders table without time period when there is onl
         Barnsley
       </th>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.1%
       </td>
       <td
-        class="govuk-table__cell--numeric"
+        class="govuk-table__cell--numeric dfe-white-space--nowrap"
       >
         2.6%
       </td>

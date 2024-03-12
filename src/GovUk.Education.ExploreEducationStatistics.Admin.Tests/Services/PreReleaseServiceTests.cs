@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [InlineData("2003-11-15T09:32:00.00Z", true,PreReleaseAccess.After)]
         public void CalculatesAccessRangeAsExpected(string referenceTimeString, bool releaseHasBeenPublished, PreReleaseAccess expectedAccess)
         {
-            var release  = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = releaseHasBeenPublished ? DefaultActuallyPublishedDate : null,
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var referenceTime = DateTime.Parse(referenceTimeString, styles: DateTimeStyles.AdjustToUniversal);
 
-            var result = _service.GetPreReleaseWindowStatus(release, referenceTime);
+            var result = _service.GetPreReleaseWindowStatus(releaseVersion, referenceTime);
 
             Assert.Equal(expectedAccess, result.Access);
         }
@@ -58,14 +59,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void CalculatesStartAndScheduledPublishDatesAsExpected()
         {
-            var testRelease = new Release
+            var testReleaseVersion = new ReleaseVersion
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.Approved
             };
 
-            var result = _service.GetPreReleaseWindowStatus(testRelease, DateWithinPreReleaseAccessWindow);
+            var result = _service.GetPreReleaseWindowStatus(testReleaseVersion, DateWithinPreReleaseAccessWindow);
 
             Assert.Equal(PreReleaseAccess.Within, result.Access);
             Assert.Equal(new DateTime(2003, 11, 14, 0, 0, 0, DateTimeKind.Utc), result.Start);
@@ -75,41 +76,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void AccessIsNoneSetIfReleaseIsStillInReview()
         {
-            var testReleaseInReview = new Release
+            var testReleaseVersionInReview = new ReleaseVersion
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
             };
 
-            var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(testReleaseInReview, DateWithinPreReleaseAccessWindow);
+            var preReleaseWindowStatus =
+                _service.GetPreReleaseWindowStatus(testReleaseVersionInReview, DateWithinPreReleaseAccessWindow);
             Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
         }
 
         [Fact]
         public void AccessIsNoneSetIfPublishedScheduleIsStillInDraft()
         {
-            var testReleaseInDraft = new Release
+            var testReleaseVersionInDraft = new ReleaseVersion
             {
                 PublishScheduled = DefaultScheduledPublishDate,
                 Published = null,
                 ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
-            var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(testReleaseInDraft, DateWithinPreReleaseAccessWindow);
+            var preReleaseWindowStatus =
+                _service.GetPreReleaseWindowStatus(testReleaseVersionInDraft, DateWithinPreReleaseAccessWindow);
             Assert.Equal(PreReleaseAccess.NoneSet, preReleaseWindowStatus.Access);
         }
 
         [Fact]
         public void AccessIsAfterIfReleaseIsLiveButPublishedScheduleHasNoValue()
         {
-            var releaseWithNoScheduledPublishDate = new Release
+            var releaseVersionWithNoScheduledPublishDate = new ReleaseVersion
             {
                 PublishScheduled = null,
                 Published = DefaultActuallyPublishedDate
             };
 
-            var preReleaseWindowStatus = _service.GetPreReleaseWindowStatus(releaseWithNoScheduledPublishDate, DateTime.UtcNow);
+            var preReleaseWindowStatus =
+                _service.GetPreReleaseWindowStatus(releaseVersionWithNoScheduledPublishDate, DateTime.UtcNow);
 
             Assert.Equal(PreReleaseAccess.After, preReleaseWindowStatus.Access);
         }

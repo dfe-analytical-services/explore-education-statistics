@@ -1,9 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -144,7 +143,7 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
         Guid resourceId, 
         TRoleEnum[]? rolesToInclude)
     {
-        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<TRoleEnum>();
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<TRoleEnum>();
         
         return await 
             GetResourceRolesQueryByResourceId(resourceId)

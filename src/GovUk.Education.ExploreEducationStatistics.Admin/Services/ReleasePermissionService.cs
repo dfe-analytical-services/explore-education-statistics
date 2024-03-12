@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -15,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -23,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserService _userService;
@@ -31,34 +30,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleasePermissionService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userService = userService;
         }
 
         public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-            ListReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude = null)
+            ListReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude = null)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId,
                     query =>
-                        query.Include(r => r.Publication))
-                .OnSuccessDo(release => _userService.CheckCanViewReleaseTeamAccess(release.Publication))
+                        query.Include(rv => rv.Publication))
+                .OnSuccessDo(releaseVersion => _userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
                 .OnSuccess(async _ =>
                 {
                     var users = await _userReleaseRoleRepository
-                        .ListUserReleaseRoles(releaseId, rolesToInclude);
+                        .ListUserReleaseRoles(releaseVersionId, rolesToInclude);
 
-                   return users
-                        .Select(userReleaseRole => 
+                    return users
+                        .Select(userReleaseRole =>
                             new UserReleaseRoleSummaryViewModel(
                                 userReleaseRole.UserId,
                                 userReleaseRole.User.DisplayName,
@@ -70,21 +69,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
-            ListReleaseInvites(Guid releaseId, ReleaseRole[]? rolesToInclude = null)
+            ListReleaseInvites(Guid releaseVersionId, ReleaseRole[]? rolesToInclude = null)
         {
-            var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<ReleaseRole>();
-            
+            var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumsArray<ReleaseRole>();
+
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId,
                     query =>
-                        query.Include(r => r.Publication))
-                .OnSuccessDo(release => _userService.CheckCanViewReleaseTeamAccess(release.Publication))
+                        query.Include(rv => rv.Publication))
+                .OnSuccessDo(releaseVersion => _userService.CheckCanViewReleaseTeamAccess(releaseVersion.Publication))
                 .OnSuccess(async _ =>
                 {
                     var invites = await _contentDbContext
                         .UserReleaseInvites
                         .Where(i =>
-                            i.ReleaseId == releaseId
+                            i.ReleaseVersionId == releaseVersionId
                             && rolesToCheck.Contains(i.Role))
                         .ToListAsync();
 
@@ -104,13 +103,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccess(async () =>
                 {
-                    var releaseIds = await _releaseRepository.ListLatestReleaseVersionIds(publicationId);
+                    var releaseVersionIds = await _releaseVersionRepository.ListLatestReleaseVersionIds(publicationId);
 
                     var users = await _contentDbContext
                         .UserReleaseRoles
                         .Include(releaseRole => releaseRole.User)
                         .Where(userReleaseRole =>
-                            releaseIds.Contains(userReleaseRole.ReleaseId)
+                            releaseVersionIds.Contains(userReleaseRole.ReleaseVersionId)
                             && userReleaseRole.Role == Contributor)
                         .Select(userReleaseRole =>
                             userReleaseRole.User)
@@ -120,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return users
                         .Select(user =>
                             new UserReleaseRoleSummaryViewModel(
-                                user.Id, 
-                                user.DisplayName, 
-                                user.Email, 
+                                user.Id,
+                                user.DisplayName,
+                                user.Email,
                                 Contributor))
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
@@ -130,20 +129,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateReleaseContributors(
-            Guid releaseId, List<Guid> userIds)
+            Guid releaseVersionId, List<Guid> userIds)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId,
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId,
                     query =>
-                        query.Include(r => r.Publication))
-                .OnSuccessDo(release => _userService
-                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
-                .OnSuccess(async release =>
+                        query.Include(rv => rv.Publication))
+                .OnSuccessDo(releaseVersion => _userService
+                    .CheckCanUpdateReleaseRole(releaseVersion.Publication, Contributor))
+                .OnSuccess(async releaseVersion =>
                 {
                     var releaseContributorReleaseRoles = await _contentDbContext.UserReleaseRoles
                         .Include(releaseRole => releaseRole.User)
                         .Where(userReleaseRole =>
-                            userReleaseRole.ReleaseId == release.Id
+                            userReleaseRole.ReleaseVersionId == releaseVersion.Id
                             && userReleaseRole.Role == Contributor)
                         .ToListAsync();
 
@@ -167,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _userReleaseRoleRepository.CreateManyIfNotExists(
                         userIds: usersToBeAdded,
-                        releaseId: release.Id,
+                        releaseVersionId: releaseVersion.Id,
                         role: Contributor,
                         createdById: _userService.GetUserId());
 
@@ -181,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId,
                     query =>
-                        query.Include(p => p.Releases))
+                        query.Include(p => p.ReleaseVersions))
                 .OnSuccessDo(publication => _userService
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccessVoid(async publication =>

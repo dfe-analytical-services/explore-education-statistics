@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
     public interface IFootnoteRepository
     {
         Task<Footnote> CreateFootnote(
-            Guid releaseId,
+            Guid releaseVersionId,
             string content,
             IReadOnlySet<Guid> filterIds,
             IReadOnlySet<Guid> filterGroupIds,
@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
             int order);
 
         Task<List<Footnote>> GetFilteredFootnotes(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds
@@ -26,16 +26,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
         Task<Footnote> GetFootnote(Guid footnoteId);
 
-        Task<List<Footnote>> GetFootnotes(Guid releaseId, Guid? subjectId = null);
+        Task<List<Footnote>> GetFootnotes(Guid releaseVersionId, Guid? subjectId = null);
 
-        Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseId);
+        Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseVersionId);
 
-        Task DeleteFootnote(Guid releaseId, Guid footnoteId);
+        Task DeleteFootnote(Guid releaseVersionId, Guid footnoteId);
 
-        Task DeleteFootnotesBySubject(Guid releaseId, Guid subjectId);
+        Task DeleteFootnotesBySubject(Guid releaseVersionId, Guid subjectId);
 
-        Task<bool> IsFootnoteExclusiveToRelease(Guid releaseId, Guid footnoteId);
+        Task<bool> IsFootnoteExclusiveToRelease(Guid releaseVersionId, Guid footnoteId);
 
-        Task DeleteReleaseFootnoteLink(Guid releaseId, Guid footnoteId);
+        Task DeleteReleaseFootnoteLink(Guid releaseVersionId, Guid footnoteId);
     }
 }

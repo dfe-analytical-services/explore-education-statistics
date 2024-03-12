@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string PublicPath(this ReleaseFile releaseFile)
         {
-            return releaseFile.File.PublicPath(releaseFile.ReleaseId);
+            return releaseFile.File.PublicPath(releaseFile.ReleaseVersionId);
         }
 
         public static FileInfo ToPublicFileInfo(this ReleaseFile releaseFile)

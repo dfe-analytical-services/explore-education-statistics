@@ -903,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Methodology = methodology,
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
-                ScheduledWithRelease = new Release
+                ScheduledWithReleaseVersion = new ReleaseVersion
                 {
                     Publication = owningPublication,
                     TimePeriodCoverage = CalendarYear,
@@ -959,7 +959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Adopting publication 2", viewModel.OtherPublications[1].Title);
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
-                Assert.Equal(methodologyVersion.ScheduledWithReleaseId, viewModel.ScheduledWithRelease!.Id);
+                Assert.Equal(methodologyVersion.ScheduledWithReleaseVersionId, viewModel.ScheduledWithRelease!.Id);
                 Assert.Equal("Owning publication - Calendar year 2021", viewModel.ScheduledWithRelease.Title);
             }
         }
@@ -984,26 +984,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = true
                     }
                 ),
-                Releases = ListOf(
-                    new Release
+                ReleaseVersions = ListOf(
+                    new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
                         TimePeriodCoverage = CalendarYear,
                         ReleaseName = "2018"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = null,
                         TimePeriodCoverage = CalendarYear,
                         ReleaseName = "2021"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
                         TimePeriodCoverage = CalendarYear,
                         ReleaseName = "2019"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = null,
                         TimePeriodCoverage = CalendarYear,
@@ -1022,26 +1022,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = false
                     }
                 ),
-                Releases = ListOf(
-                    new Release
+                ReleaseVersions = ListOf(
+                    new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
                         TimePeriodCoverage = FinancialYearQ3,
                         ReleaseName = "2020"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = null,
                         TimePeriodCoverage = FinancialYearQ2,
                         ReleaseName = "2021"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = null,
                         TimePeriodCoverage = FinancialYearQ4,
                         ReleaseName = "2020"
                     },
-                    new Release
+                    new ReleaseVersion
                     {
                         Published = null,
                         TimePeriodCoverage = FinancialYearQ1,
@@ -1069,20 +1069,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 // Check that only unpublished Releases are included and that they are in the correct order
 
-                var expectedReleaseAtIndex0 = adoptingPublication.Releases.Single(r =>
-                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ2);
+                var expectedReleaseAtIndex0 = adoptingPublication.ReleaseVersions.Single(rv =>
+                    rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ2);
 
-                var expectedReleaseAtIndex1 = adoptingPublication.Releases.Single(r =>
-                    r.Year == 2021 && r.TimePeriodCoverage == FinancialYearQ1);
+                var expectedReleaseAtIndex1 = adoptingPublication.ReleaseVersions.Single(rv =>
+                    rv.Year == 2021 && rv.TimePeriodCoverage == FinancialYearQ1);
 
-                var expectedReleaseAtIndex2 = adoptingPublication.Releases.Single(r =>
-                    r.Year == 2020 && r.TimePeriodCoverage == FinancialYearQ4);
+                var expectedReleaseAtIndex2 = adoptingPublication.ReleaseVersions.Single(rv =>
+                    rv.Year == 2020 && rv.TimePeriodCoverage == FinancialYearQ4);
 
-                var expectedReleaseAtIndex3 = owningPublication.Releases.Single(r =>
-                    r.Year == 2021 && r.TimePeriodCoverage == CalendarYear);
+                var expectedReleaseAtIndex3 = owningPublication.ReleaseVersions.Single(rv =>
+                    rv.Year == 2021 && rv.TimePeriodCoverage == CalendarYear);
 
-                var expectedReleaseAtIndex4 = owningPublication.Releases.Single(r =>
-                    r.Year == 2020 && r.TimePeriodCoverage == CalendarYear);
+                var expectedReleaseAtIndex4 = owningPublication.ReleaseVersions.Single(rv =>
+                    rv.Year == 2020 && rv.TimePeriodCoverage == CalendarYear);
 
                 Assert.Equal(5, result.Count);
 
@@ -1183,8 +1183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = true
                     }
                 ),
-                Releases = ListOf(
-                    new Release
+                ReleaseVersions = ListOf(
+                    new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
                         TimePeriodCoverage = CalendarYear,
@@ -1203,8 +1203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Owner = false
                     }
                 ),
-                Releases = ListOf(
-                    new Release
+                ReleaseVersions = ListOf(
+                    new ReleaseVersion
                     {
                         Published = DateTime.UtcNow,
                         TimePeriodCoverage = CalendarYear,
@@ -3222,12 +3222,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_Included()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(ListOf(release))
+                    .WithReleaseVersions(ListOf(releaseVersion))
                     .Generate();
 
                 var methodology = _fixture
@@ -3242,7 +3242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3272,8 +3272,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationOldRelease_Included()
             {
-                var releases = _fixture
-                    .DefaultRelease()
+                var releaseVersions = _fixture
+                    .DefaultReleaseVersion()
                     .WithApprovalStatuses(ListOf(
                         ReleaseApprovalStatus.Approved,
                         ReleaseApprovalStatus.Draft))
@@ -3282,7 +3282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(releases)
+                    .WithReleaseVersions(releaseVersions)
                     .Generate();
 
                 var methodology = _fixture
@@ -3297,7 +3297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUserOnOldRelease = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(releases[0])
+                    .WithReleaseVersion(releaseVersions[0])
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3328,7 +3328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
@@ -3352,7 +3352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3375,7 +3375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsReleaseApproverOnAdoptingPublication_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
@@ -3395,7 +3395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3419,7 +3419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsOnlyContributorOnOwningPublicationRelease_NotIncluded()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
@@ -3438,7 +3438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Contributor)
                     .Generate();
 
@@ -3464,7 +3464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // Set up a different User as the Approver for the owning Publication.
                 var otherUser = new User();
 
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
@@ -3483,7 +3483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForOtherUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(otherUser)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Contributor)
                     .Generate();
 
@@ -3506,12 +3506,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
             {
-                var release = _fixture.DefaultRelease().Generate();
+                var releaseVersion = _fixture.DefaultReleaseVersion().Generate();
 
                 var publication = _fixture
                     .DefaultPublication()
                     .WithContact(MockContact)
-                    .WithReleases(ListOf(release))
+                    .WithReleaseVersions(ListOf(releaseVersion))
                     .Generate();
 
                 var methodology = _fixture
@@ -3533,7 +3533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releaseRoleForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
-                    .WithRelease(release)
+                    .WithReleaseVersion(releaseVersion)
                     .WithRole(ReleaseRole.Approver)
                     .Generate();
 
@@ -3888,7 +3888,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publication = new Publication
                     {
                         Id = publicationId,
-                        LatestPublishedRelease = new Release()
+                        LatestPublishedReleaseVersion = new ReleaseVersion()
                     },
                     Owner = true,
                     Methodology = new Methodology
@@ -3952,7 +3952,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publication = new Publication
                     {
                         Id = publicationId,
-                        LatestPublishedRelease = new Release()
+                        LatestPublishedReleaseVersion = new ReleaseVersion()
                     },
                     Owner = true,
                     Methodology = new Methodology
@@ -4047,7 +4047,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publication = new Publication
                     {
                         Id = publicationId,
-                        LatestPublishedRelease = new Release()
+                        LatestPublishedReleaseVersion = new ReleaseVersion()
                     },
                     Owner = true,
                     Methodology = new Methodology

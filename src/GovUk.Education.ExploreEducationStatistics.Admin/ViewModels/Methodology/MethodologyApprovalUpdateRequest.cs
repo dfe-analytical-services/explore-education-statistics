@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         {
             return methodologyVersion.Status != Status
                    || methodologyVersion.PublishingStrategy != PublishingStrategy
-                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId;
+                   || methodologyVersion.ScheduledWithReleaseVersionId != WithReleaseId;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseChecklistPermissionServiceTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication()
@@ -29,15 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetChecklist()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Release>(
-                    r => r.Id == _release.Id,
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(
+                    rv => rv.Id == _releaseVersion.Id,
                     ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(_release);
+                        contentDbContext.ReleaseVersions.Add(_releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildReleaseChecklistService(
                             contentDbContext: contentDbContext,
                             userService: userService.Object);
-                        return await service.GetChecklist(_release.Id);
+                        return await service.GetChecklist(_releaseVersion.Id);
                     }
                 });
         }
@@ -62,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null)
         {
-
             return new(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,

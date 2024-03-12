@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,14 +29,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(Guid releaseId)
+        public async Task<Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit>> ValidateRelease(
+            Guid releaseVersionId)
         {
-            _logger.LogTrace("Validating release: {0}", releaseId);
+            _logger.LogTrace("Validating release version: {0}", releaseVersionId);
 
-            var release = await GetReleaseAsync(releaseId);
+            var releaseVersion = await _context.ReleaseVersions
+                .AsNoTracking()
+                .Include(releaseVersion => releaseVersion.Publication)
+                .SingleAsync(releaseVersion => releaseVersion.Id == releaseVersionId);
 
-            var approvalResult = ValidateApproval(release);
-            var scheduledPublishDateResult = ValidateScheduledPublishDate(release);
+            var approvalResult = ValidateApproval(releaseVersion);
+            var scheduledPublishDateResult = ValidateScheduledPublishDate(releaseVersion);
             var valid = approvalResult.IsRight && scheduledPublishDateResult.IsRight;
 
             if (!valid)
@@ -46,12 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return Unit.Instance;
         }
 
-        public async Task<bool> ValidatePublishingState(Guid releaseId)
+        public async Task<bool> ValidatePublishingState(Guid releaseVersionId)
         {
-            _logger.LogTrace("Validating publishing state: {0}", releaseId);
+            _logger.LogTrace("Validating publishing state: {0}", releaseVersionId);
 
             var releaseStatuses =
-                (await _releasePublishingStatusService.GetAllByOverallStage(releaseId, Scheduled, Started)).ToList();
+                (await _releasePublishingStatusService.GetAllByOverallStage(releaseVersionId, Scheduled, Started))
+                .ToList();
 
             // Should never happen as we mark scheduled releases as superseded prior to validation
             var scheduled = releaseStatuses.FirstOrDefault(status => status.State.Overall == Scheduled);
@@ -79,30 +85,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return true;
         }
 
-        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateApproval(Release release)
+        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateApproval(
+            ReleaseVersion releaseVersion)
         {
-            return release.ApprovalStatus == ReleaseApprovalStatus.Approved
+            return releaseVersion.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? Unit.Instance
-                : Failure(ValidationStage.ReleaseMustBeApproved, $"Release approval status is {release.ApprovalStatus}");
+                : Failure(ValidationStage.ReleaseMustBeApproved, $"Release approval status is {releaseVersion.ApprovalStatus}");
         }
 
         private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> ValidateScheduledPublishDate(
-            Release release)
+            ReleaseVersion releaseVersion)
         {
-            return release.PublishScheduled.HasValue
+            return releaseVersion.PublishScheduled.HasValue
                 ? Unit.Instance
                 : Failure(ValidationStage.ReleaseMustHavePublishScheduledDate, "Scheduled publish date is not set");
         }
 
-        private Task<Release> GetReleaseAsync(Guid releaseId)
-        {
-            return _context.Releases
-                .AsNoTracking()
-                .Include(release => release.Publication)
-                .SingleAsync(release => release.Id == releaseId);
-        }
-
-        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> Failure(ValidationStage stage, string message)
+        private static Either<IEnumerable<ReleasePublishingStatusLogMessage>, Unit> Failure(ValidationStage stage,
+            string message)
         {
             return new List<ReleasePublishingStatusLogMessage>
             {

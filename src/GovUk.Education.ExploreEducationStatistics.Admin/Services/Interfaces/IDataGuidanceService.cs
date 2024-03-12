@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IDataGuidanceService
 {
-    public Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(Guid releaseId,
+    public Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(Guid releaseVersionId,
         CancellationToken cancellationToken = default);
 
-    public Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(Guid releaseId,
+    public Task<Either<ActionResult, DataGuidanceViewModel>> UpdateDataGuidance(Guid releaseVersionId,
         DataGuidanceUpdateRequest request,
         CancellationToken cancellationToken = default);
 
-    public Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseId,
+    public Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseVersionId,
         CancellationToken cancellationToken = default);
 }

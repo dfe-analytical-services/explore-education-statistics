@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 public interface IReleaseFileRepository
 {
     Task<ReleaseFile> Create(
-        Guid releaseId,
+        Guid releaseVersionId,
         string filename,
         long contentLength,
         string contentType,
@@ -20,18 +20,23 @@ public interface IReleaseFileRepository
         string? summary = null,
         Guid? newFileId = null);
 
-    Task Delete(Guid releaseId, Guid fileId);
+    Task Delete(Guid releaseVersionId,
+        Guid fileId);
 
-    Task<ReleaseFile?> Find(Guid releaseId, Guid fileId);
+    Task<ReleaseFile?> Find(Guid releaseVersionId,
+        Guid fileId);
 
-    Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseId, Guid fileId);
+    Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
+        Guid fileId);
 
-    Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types);
+    Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+        params FileType[] types);
 
-    Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId);
+    Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,
+        Guid fileId);
 
     Task<ReleaseFile> Update(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid fileId,
         Guid? newFileId = null,
         string? name = null,

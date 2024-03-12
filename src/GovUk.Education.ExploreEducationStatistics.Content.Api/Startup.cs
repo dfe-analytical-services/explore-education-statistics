@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
-            services.AddTransient<IReleaseRepository, ReleaseRepository>();
+            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();

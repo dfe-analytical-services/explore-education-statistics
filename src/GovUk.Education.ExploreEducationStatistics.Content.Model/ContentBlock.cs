@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -34,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public Guid? ContentSectionId { get; set; }
 
-        public Guid ReleaseId { get; set; }
+        public Guid ReleaseVersionId { get; set; }
 
-        public Release Release { get; set; }
+        public ReleaseVersion ReleaseVersion { get; set; }
 
         public int Order { get; set; }
 

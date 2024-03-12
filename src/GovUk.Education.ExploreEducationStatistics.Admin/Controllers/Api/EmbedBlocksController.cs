@@ -22,34 +22,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _embedBlockService = embedBlockService;
         }
 
-        [HttpPost("release/{releaseId:guid}/embed-blocks")]
+        [HttpPost("release/{releaseVersionId:guid}/embed-blocks")]
         public async Task<ActionResult<EmbedBlockLinkViewModel>> CreateEmbedBlockBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             EmbedBlockCreateRequest request)
         {
             return await _embedBlockService
-                .Create(releaseId, request)
+                .Create(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/embed-blocks/{contentBlockId:guid}")]
+        [HttpPut("release/{releaseVersionId:guid}/embed-blocks/{contentBlockId:guid}")]
         public async Task<ActionResult<EmbedBlockLinkViewModel>> UpdateEmbedBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid contentBlockId,
             EmbedBlockUpdateRequest request)
         {
             return await _embedBlockService
-                .Update(releaseId, contentBlockId, request)
+                .Update(releaseVersionId: releaseVersionId,
+                    contentBlockId: contentBlockId,
+                    request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/embed-blocks/{contentBlockId:guid}")]
+        [HttpDelete("release/{releaseVersionId:guid}/embed-blocks/{contentBlockId:guid}")]
         public async Task<ActionResult<Unit>> DeleteEmbedBlock(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid contentBlockId)
         {
             return await _embedBlockService
-                .Delete(releaseId, contentBlockId)
+                .Delete(releaseVersionId: releaseVersionId,
+                    contentBlockId: contentBlockId)
                 .HandleFailuresOrOk();
         }
     }

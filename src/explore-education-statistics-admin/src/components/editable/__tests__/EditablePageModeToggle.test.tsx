@@ -22,7 +22,7 @@ describe('EditablePageModeToggle', () => {
     expect(options[1]).toEqual(screen.getByLabelText('Preview content'));
   });
 
-  test('deso not render the edit content option when canUpdateRelease is false', () => {
+  test('does not render the edit content option when canUpdateRelease is false', () => {
     render(<EditablePageModeToggle canUpdateRelease={false} />);
 
     const group = screen.getByRole('group', { name: 'Change page view' });

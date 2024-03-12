@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             params PublicationRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            var allPublicationRoles = GetEnumValues<PublicationRole>();
+            var allPublicationRoles = GetEnums<PublicationRole>();
             var userId = Guid.NewGuid();
 
             await allPublicationRoles

@@ -13,14 +13,14 @@ public class TimePeriodRangeBound
 {
     public required TimeIdentifier Code { get; set; }
 
-    public required int Year { get; set; }
+    public required string Period { get; set; }
 
     public static TimePeriodRangeBound Create(TimePeriodMeta meta)
     {
         return new TimePeriodRangeBound
         {
             Code = meta.Code,
-            Year = meta.Year
+            Period = meta.Period
         };
     }
 }

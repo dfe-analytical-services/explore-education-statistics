@@ -183,8 +183,6 @@ Validate Related information section and links exist
     ...    ${relatedInformation}
 
 Validate data sets list
-    [Tags]    Local    Dev
-
     user checks list has x items    testid:data-sets-list    10
 
     ${dataSet}=    user gets testid element    data-set-summary-${SUBJECT_NAME_3}
@@ -206,33 +204,27 @@ Validate zip contains correct files
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
 Validate sort controls exist
-    [Tags]    Local    Dev
     user checks radio is checked    Newest
     user checks page contains radio    Oldest
     user checks page contains radio    A to Z
 
 Validate theme filter exists
-    [Tags]    Local    Dev
     user checks select contains option    id:theme    All themes
     user checks select contains option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks select contains option    id:theme    ${ROLE_PERMISSIONS_THEME_TITLE}
 
 Validate publication filter exists
-    [Tags]    Local    Dev
     user checks select contains option    id:publication    All publications
 
 Validate release filter exists
-    [Tags]    Local    Dev
     user checks select contains option    id:release    Latest releases
     user checks select contains option    id:release    All releases
 
 Filter by theme
-    [Tags]    Local    Dev
     user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page contains button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
 
 Filter by publication
-    [Tags]    Local    Dev
     user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user waits until page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
@@ -240,19 +232,16 @@ Filter by publication
     user checks page contains button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Filter by all releases
-    [Tags]    Local    Dev
     user chooses select option    id:release    All releases
     user checks page contains button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove theme filter
-    [Tags]    Local    Dev
     user clicks button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user checks page does not contain button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
 
 Remove publication filter
-    [Tags]    Local    Dev
     user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
@@ -261,7 +250,6 @@ Remove publication filter
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Remove release filter
-    [Tags]    Local    Dev
     user chooses select option    id:theme    ${PUPILS_AND_SCHOOLS_THEME_TITLE}
     user chooses select option    id:publication    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user clicks button    ${PUPIL_ABSENCE_RELEASE_NAME}
@@ -270,7 +258,6 @@ Remove release filter
     user checks page does not contain button    ${PUPIL_ABSENCE_RELEASE_NAME}
 
 Clear all filters
-    [Tags]    Local    Dev
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
@@ -286,7 +273,6 @@ Clear all filters
     user checks page does not contain button    Clear filters
 
 Searching
-    [Tags]    Local    Dev
     user clicks element    id:searchForm-search
     user presses keys    Exclusions by geographic level
     user clicks button    Search
@@ -294,6 +280,21 @@ Searching
     user checks list item contains    testid:data-sets-list    1    Exclusions by geographic level
 
 Removing search
-    [Tags]    Local    Dev
     user clicks button    Exclusions by geographic level
     user checks page does not contain button    Exclusions by geographic level
+
+Navigate to data set page
+    user clicks link    ${SUBJECT_NAME_3}
+    user waits until h1 is visible    ${SUBJECT_NAME_3}    %{WAIT_MEDIUM}
+    user waits until page contains title caption    Data set from Test theme    %{WAIT_MEDIUM}
+    user checks page contains    Latest data
+    user checks page contains    ${PUBLICATION_NAME}
+    user checks page contains    ${RELEASE_NAME}
+
+Validate zip contains correct files
+    [Documentation]    EES-4147
+    user clicks button containing text    Download data set (ZIP)
+
+    sleep    8    # wait for file to download
+    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
+    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}

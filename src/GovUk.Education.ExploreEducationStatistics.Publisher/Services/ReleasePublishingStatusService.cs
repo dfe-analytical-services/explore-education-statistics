@@ -1,10 +1,10 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -32,24 +32,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task<ReleasePublishingStatus> CreateAsync(
-            Guid releaseId, 
+            Guid releaseVersionId,
             Guid releaseStatusId,
-            ReleasePublishingStatusState state, 
+            ReleasePublishingStatusState state,
             bool immediate,
-            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
+            IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
-            var release = await GetReleaseAsync(releaseId);
-            var publish = immediate ? null : release.PublishScheduled;
-            var releaseStatus = new ReleasePublishingStatus(release.Publication.Slug, publish, release.Id,
-                releaseStatusId, release.Slug, state, immediate, logMessages);
+            var releaseVersion = await _context.ReleaseVersions
+                .AsNoTracking()
+                .Include(rv => rv.Publication)
+                .FirstAsync(rv => rv.Id == releaseVersionId);
+
+            var releaseStatus = new ReleasePublishingStatus(publicationSlug: releaseVersion.Publication.Slug,
+                publish: immediate ? null : releaseVersion.PublishScheduled,
+                releaseVersionId: releaseVersion.Id,
+                releaseStatusId: releaseStatusId,
+                releaseSlug: releaseVersion.Slug,
+                state,
+                immediate: immediate,
+                logMessages);
+
             var tableResult = await GetTable().ExecuteAsync(TableOperation.Insert(releaseStatus));
             return tableResult.Result as ReleasePublishingStatus;
         }
 
-        public async Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId)
+        public async Task<ReleasePublishingStatus> GetAsync(Guid releaseVersionId,
+            Guid releaseStatusId)
         {
             var tableResult = await GetTable().ExecuteAsync(
-                TableOperation.Retrieve<ReleasePublishingStatus>(releaseId.ToString(), releaseStatusId.ToString(),
+                TableOperation.Retrieve<ReleasePublishingStatus>(releaseVersionId.ToString(),
+                    releaseStatusId.ToString(),
                     new List<string>
                     {
                         nameof(ReleasePublishingStatus.Created),
@@ -88,11 +100,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
 
-        public async Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId,
+        public async Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseVersionId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {
             var filter = TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                QueryComparisons.Equal, releaseId.ToString());
+                QueryComparisons.Equal, releaseVersionId.ToString());
 
             if (overallStages.Any())
             {
@@ -119,11 +131,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await ExecuteQueryAsync(query);
         }
 
-        public async Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseId)
+        public async Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseVersionId)
         {
             var query = new TableQuery<ReleasePublishingStatus>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                    QueryComparisons.Equal, releaseId.ToString()));
+                    QueryComparisons.Equal, releaseVersionId.ToString()));
 
             var result = await ExecuteQueryAsync(query);
             return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
@@ -134,9 +146,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
         }
 
-        public async Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusState state)
+        public async Task UpdateStateAsync(Guid releaseVersionId,
+            Guid releaseStatusId,
+            ReleasePublishingStatusState state)
         {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            await UpdateRowAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId,
+                row =>
             {
                 row.State = state;
                 return row;
@@ -144,12 +160,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         public async Task UpdateContentStageAsync(
-            Guid releaseId, 
+            Guid releaseVersionId,
             Guid releaseStatusId,
             ReleasePublishingStatusContentStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            await UpdateRowAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId,
+                row =>
             {
                 row.State.Content = stage;
                 row.AppendLogMessage(logMessage);
@@ -157,11 +175,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateFilesStageAsync(Guid releaseId, Guid releaseStatusId,
+        public async Task UpdateFilesStageAsync(Guid releaseVersionId,
+            Guid releaseStatusId,
             ReleasePublishingStatusFilesStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            await UpdateRowAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId,
+                row =>
             {
                 row.State.Files = stage;
                 row.AppendLogMessage(logMessage);
@@ -169,10 +190,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdatePublishingStageAsync(Guid releaseId, Guid releaseStatusId,
-            ReleasePublishingStatusPublishingStage stage, ReleasePublishingStatusLogMessage logMessage = null)
+        public async Task UpdatePublishingStageAsync(Guid releaseVersionId,
+            Guid releaseStatusId,
+            ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
+            await UpdateRowAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId,
+                row =>
             {
                 row.State.Publishing = stage;
                 row.AppendLogMessage(logMessage);
@@ -181,13 +206,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         }
 
         private async Task UpdateRowAsync(
-            Guid releaseId, 
+            Guid releaseVersionId,
             Guid releaseStatusId,
-            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction, 
+            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction,
             int retry = 0)
         {
             var table = GetTable();
-            var releaseStatus = await GetAsync(releaseId, releaseStatusId);
+            var releaseStatus = await GetAsync(releaseVersionId: releaseVersionId,
+                releaseStatusId: releaseStatusId);
 
             try
             {
@@ -200,7 +226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     _logger.LogDebug("Precondition failure as expected. ETag does not match");
                     if (retry++ < 5)
                     {
-                        await UpdateRowAsync(releaseId, releaseStatusId, updateFunction, retry);
+                        await UpdateRowAsync(releaseVersionId: releaseVersionId,
+                            releaseStatusId: releaseStatusId,
+                            updateFunction,
+                            retry);
                     }
                     else
                     {
@@ -212,14 +241,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     throw;
                 }
             }
-        }
-
-        private Task<Release> GetReleaseAsync(Guid releaseId)
-        {
-            return _context.Releases
-                .AsNoTracking()
-                .Include(release => release.Publication)
-                .SingleAsync(release => release.Id == releaseId);
         }
 
         private CloudTable GetTable()

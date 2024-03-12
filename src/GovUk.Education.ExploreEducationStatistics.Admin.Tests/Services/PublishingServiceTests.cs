@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RetryReleasePublishing()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ApprovalStatus = Approved
             };
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Releases.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             storageQueueService.Setup(
                     mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
                         It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseId == release.Id)))
+                            message.ReleaseVersionId == releaseVersion.Id)))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -49,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishingService = BuildPublishingService(contentDbContext: context,
                     storageQueueService: storageQueueService.Object);
 
-                var result = await publishingService.RetryReleasePublishing(release.Id);
+                var result = await publishingService.RetryReleasePublishing(releaseVersion.Id);
 
                 storageQueueService.Verify(
                     mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
                         It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseId == release.Id)), Times.Once());
+                            message.ReleaseVersionId == releaseVersion.Id)), Times.Once());
 
                 result.AssertRight();
             }
@@ -83,18 +83,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ReleaseChanged()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var releaseStatus = new ReleaseStatus
             {
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Releases.AddAsync(release);
-                await context.ReleaseStatus.AddAsync(releaseStatus);
+                context.ReleaseVersions.Add(releaseVersion);
+                context.ReleaseStatus.Add(releaseStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             storageQueueService.Setup(
                     mock => mock.AddMessageAsync(NotifyChangeQueue,
                         It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseId == release.Id
+                            message.ReleaseVersionId == releaseVersion.Id
                             && message.ReleaseStatusId == releaseStatus.Id
                             && message.Immediate)))
                 .Returns(Task.CompletedTask);
@@ -114,12 +114,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     storageQueueService: storageQueueService.Object);
 
                 var result = await publishingService
-                    .ReleaseChanged(release.Id, releaseStatus.Id, true);
+                    .ReleaseChanged(releaseVersion.Id, releaseStatus.Id, true);
 
                 storageQueueService.Verify(
                     mock => mock.AddMessageAsync(NotifyChangeQueue,
                         It.Is<NotifyChangeMessage>(message =>
-                            message.ReleaseId == release.Id
+                            message.ReleaseVersionId == releaseVersion.Id
                             && message.ReleaseStatusId == releaseStatus.Id
                             && message.Immediate)), Times.Once());
 

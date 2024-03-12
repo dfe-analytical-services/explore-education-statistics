@@ -20,7 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
-            Guid releaseId,
+            Guid releaseVersionId,
             string content,
             IReadOnlySet<Guid> filterIds,
             IReadOnlySet<Guid> filterGroupIds,
@@ -63,10 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlySet<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(() => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
-                    releaseId,
+                    releaseVersionId,
                     subjectIds,
                     filterIds,
                     filterGroupIds,
@@ -75,17 +75,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var releaseHasFootnotes = await _context.ReleaseFootnote
-                        .AnyAsync(rf => rf.ReleaseId == releaseId);
+                        .AnyAsync(rf => rf.ReleaseVersionId == releaseVersionId);
 
                     var order = releaseHasFootnotes
                         ? await _context.ReleaseFootnote
                             .Include(rf => rf.Footnote)
-                            .Where(rf => rf.ReleaseId == releaseId)
+                            .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                             .MaxAsync(rf => rf.Footnote.Order) + 1
                         : 0;
 
                     var footnote = await _footnoteRepository.CreateFootnote(
-                        releaseId,
+                        releaseVersionId,
                         content,
                         filterIds: filterIds,
                         filterGroupIds: filterGroupIds,
@@ -94,28 +94,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectIds: subjectIds,
                         order);
 
-                    await _dataBlockService.InvalidateCachedDataBlocks(releaseId);
-                    return await GetFootnote(releaseId, footnote.Id);
+                    await _dataBlockService.InvalidateCachedDataBlocks(releaseVersionId);
+                    return await GetFootnote(releaseVersionId, footnote.Id);
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid footnoteId)
+        public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseVersionId, Guid footnoteId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId))
                 .OnSuccessVoid(async footnote =>
                 {
-                    await _footnoteRepository.DeleteFootnote(releaseId: releaseId,
+                    await _footnoteRepository.DeleteFootnote(releaseVersionId: releaseVersionId,
                         footnoteId: footnote.Id);
 
-                    await _dataBlockService.InvalidateCachedDataBlocks(releaseId);
-                }));
+                    await _dataBlockService.InvalidateCachedDataBlocks(releaseVersionId);
+                });
         }
 
         public async Task<Either<ActionResult, Footnote>> UpdateFootnote(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid footnoteId,
             string content,
             IReadOnlySet<Guid> filterIds,
@@ -125,22 +125,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlySet<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
-                    releaseId,
+                    releaseVersionId,
                     subjectIds,
                     filterIds,
                     filterGroupIds,
                     filterItemIds,
                     indicatorIds))
-                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote)
+                .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote))
                 .OnSuccess(async footnote =>
                 {
                     // NOTE: At the time of writing, footnotes are now always exclusive to a particular release, but
                     // in the past this wasn't always the case.
                     // TODO EES-2979 Remove this check once all footnotes only belong to one release
-                    if (await _footnoteRepository.IsFootnoteExclusiveToRelease(releaseId, footnote.Id))
+                    if (await _footnoteRepository.IsFootnoteExclusiveToRelease(releaseVersionId: releaseVersionId,
+                            footnoteId: footnote.Id))
                     {
                         _context.Update(footnote);
 
@@ -159,10 +160,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one
                     // release If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
-                    await _footnoteRepository.DeleteReleaseFootnoteLink(releaseId, footnote.Id);
+                    await _footnoteRepository.DeleteReleaseFootnoteLink(releaseVersionId: releaseVersionId,
+                        footnoteId: footnote.Id);
 
                     return await _footnoteRepository.CreateFootnote(
-                        releaseId,
+                        releaseVersionId,
                         content,
                         filterIds: filterIds,
                         filterGroupIds: filterGroupIds,
@@ -171,15 +173,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         subjectIds: subjectIds,
                         footnote.Order);
                 })
-                    .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
+                .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseVersionId));
         }
 
-        public async Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseVersionId,
             FootnotesUpdateRequest request)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => ValidateFootnoteIdsForRelease(releaseId, request.FootnoteIds))
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(() => ValidateFootnoteIdsForRelease(releaseVersionId, request.FootnoteIds))
                 .OnSuccessVoid(async _ =>
                 {
                     // Set the order of each footnote based on the order observed in the request
@@ -193,19 +195,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         });
                     await _context.SaveChangesAsync();
                 })
-                .OnSuccessVoid(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId));
+                .OnSuccessVoid(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseVersionId));
         }
 
-        public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid footnoteId)
+        public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseVersionId, Guid footnoteId)
         {
             return _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess<ActionResult, Release, Footnote>(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess<ActionResult, ReleaseVersion, Footnote>(async release =>
                     {
                         var footnote = await _footnoteRepository.GetFootnote(footnoteId);
 
-                        if (footnote.Releases.All(rf => rf.ReleaseId != release.Id))
+                        if (footnote.Releases.All(rf => rf.ReleaseVersionId != release.Id))
                         {
                             return new NotFoundResult();
                         }
@@ -215,12 +217,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseId)
+        public async Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseVersionId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseId));
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseVersionId));
         }
 
         private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId,
@@ -340,11 +342,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateFootnoteIdsForRelease(
-            Guid releaseId,
+            Guid releaseVersionId,
             IEnumerable<Guid> footnoteIds)
         {
             var allReleaseFootnoteIds = await _context.ReleaseFootnote
-                .Where(rf => rf.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                 .Select(rf => rf.FootnoteId)
                 .ToListAsync();
 
@@ -357,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
-            Guid releaseId,
+            Guid releaseVersionId,
             IReadOnlySet<Guid> subjectIds,
             IReadOnlySet<Guid> filterIds,
             IReadOnlySet<Guid> filterGroupIds,
@@ -365,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlySet<Guid> indicatorIds)
         {
             IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(
-                releaseId,
+                releaseVersionId,
                 HydrateReleaseSubjects);
 
             if (!AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects)

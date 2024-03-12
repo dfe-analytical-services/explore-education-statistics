@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
-            IReleasePublishingStatusService releasePublishingStatusService, 
+            IReleasePublishingStatusService releasePublishingStatusService,
             IPublishingCompletionService publishingCompletionService)
         {
             _publishingService = publishingService;
@@ -56,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     try
                     {
-                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseId);
-                        await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseId);
+                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseVersionId);
+                        await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseVersionId);
                         return true;
                     }
                     catch (Exception e)
@@ -85,43 +85,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 logger.LogError(e, "Exception occured while completing publishing in {FunctionName}",
                     executionContext.FunctionName);
-                
+
                 await UpdatePublishingStage(
-                    successfulReleases, 
+                    successfulReleases,
                     ReleasePublishingStatusPublishingStage.Failed,
                     new ReleasePublishingStatusLogMessage($"Failed during completion of the Publishing process: {e.Message}"));
             }
-            
+
             logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
         private async Task UpdateFilesStage(
-            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
             ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
             await releaseStatuses
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(status => 
+                .ForEachAwaitAsync(status =>
                     _releasePublishingStatusService.UpdateFilesStageAsync(
-                        status.releaseId, 
-                        status.releaseStatusId, 
-                        stage, 
+                        releaseVersionId: status.releaseVersionId,
+                        releaseStatusId: status.releaseStatusId,
+                        stage,
                         logMessage));
         }
-        
+
         private async Task UpdatePublishingStage(
-            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
             ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
             await releaseStatuses
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(status => 
+                .ForEachAwaitAsync(status =>
                     _releasePublishingStatusService.UpdatePublishingStageAsync(
-                        status.releaseId, 
-                        status.releaseStatusId, 
-                        stage, 
+                        releaseVersionId: status.releaseVersionId,
+                        releaseStatusId: status.releaseStatusId,
+                        stage,
                         logMessage));
         }
     }

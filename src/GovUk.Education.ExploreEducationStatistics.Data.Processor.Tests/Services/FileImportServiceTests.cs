@@ -22,12 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
     public class FileImportServiceTests
     {
         private static readonly List<DataImportStatus> FinishedStatuses = EnumUtil
-            .GetEnumValues<DataImportStatus>()
+            .GetEnums<DataImportStatus>()
             .Where(status => status.IsFinished())
             .ToList();
 
         private static readonly List<DataImportStatus> AbortingStatuses = EnumUtil
-            .GetEnumValues<DataImportStatus>()
+            .GetEnums<DataImportStatus>()
             .Where(status => status.IsAborting())
             .ToList();
 

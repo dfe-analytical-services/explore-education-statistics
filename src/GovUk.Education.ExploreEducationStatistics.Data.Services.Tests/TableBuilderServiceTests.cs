@@ -51,12 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -246,12 +246,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -292,13 +292,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             // Set up a ReleaseSubject that references a non-existent publication
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(Guid.NewGuid()));
 
@@ -335,8 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Set up a ReleaseSubject that references a non-existent release
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease());
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion());
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -372,12 +372,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -455,12 +455,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectResultMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
-                            releaseSubject.ReleaseId,
+                            releaseSubject.ReleaseVersionId,
                             query,
                             It.IsAny<IList<Observation>>()
                         )
@@ -601,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subjectResultMetaService: subjectResultMetaService.Object
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseId, query);
+                var result = await service.Query(releaseSubject.ReleaseVersionId, query);
 
                 VerifyAllMocks(observationService, subjectResultMetaService);
 
@@ -645,12 +645,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -690,12 +690,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -735,12 +735,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -800,7 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = await service.Query(releaseSubject.ReleaseId, query);
+                var result = await service.Query(releaseSubject.ReleaseVersionId, query);
 
                 VerifyAllMocks(filterItemRepository);
 
@@ -893,9 +893,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
-                    .WithId(publication.Releases[0].Id)
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
+                    .WithId(publication.ReleaseVersions[0].Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(_fixture.DefaultSubject()
                     .WithFilters(filters)
@@ -977,7 +977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(
                         s => s.GetSubjectCsvMeta(
                             It.Is<ReleaseSubject>(rs =>
-                                rs.ReleaseId == releaseSubject.ReleaseId
+                                rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                                 && rs.SubjectId == releaseSubject.SubjectId),
                             query,
                             It.IsAny<IList<Observation>>(),
@@ -1013,8 +1013,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Set up a ReleaseSubject that references a non-existent release
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease());
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion());
 
             var contextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -1054,12 +1054,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -1102,12 +1102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -1187,7 +1187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             var filters = _fixture.DefaultFilter()
                 .ForIndex(0, s =>
@@ -1253,8 +1253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(_fixture.DefaultSubject()
@@ -1334,7 +1334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(
                         s => s.GetSubjectCsvMeta(
                             It.Is<ReleaseSubject>(rs =>
-                                rs.ReleaseId == releaseSubject.ReleaseId
+                                rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                                 && rs.SubjectId == releaseSubject.SubjectId),
                             query,
                             It.IsAny<IList<Observation>>(),
@@ -1352,7 +1352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
-                var result = await service.QueryToCsvStream(releaseSubject.ReleaseId, query, stream);
+                var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
                 VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1373,12 +1373,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id))
                 .WithSubject(_fixture
@@ -1470,7 +1470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(
                         s => s.GetSubjectCsvMeta(
                             It.Is<ReleaseSubject>(rs =>
-                                rs.ReleaseId == releaseSubject.ReleaseId
+                                rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                                 && rs.SubjectId == releaseSubject.SubjectId),
                             query,
                             It.IsAny<IList<Observation>>(),
@@ -1488,7 +1488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
-                var result = await service.QueryToCsvStream(releaseSubject.ReleaseId, query, stream);
+                var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
                 VerifyAllMocks(observationService, subjectCsvMetaService);
 
@@ -1509,12 +1509,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -1557,12 +1557,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -1590,7 +1590,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
-                var result = await service.QueryToCsvStream(releaseSubject.ReleaseId, query, stream);
+                var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
                 result.AssertNotFound();
             }
@@ -1605,12 +1605,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .DefaultReleaseParent(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             ReleaseSubject releaseSubject = _fixture
                 .DefaultReleaseSubject()
-                .WithRelease(_fixture
-                    .DefaultStatsRelease()
+                .WithReleaseVersion(_fixture
+                    .DefaultStatsReleaseVersion()
                     .WithId(releaseVersion.Id)
                     .WithPublicationId(publication.Id));
 
@@ -1671,7 +1671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 using var stream = new MemoryStream();
 
-                var result = await service.QueryToCsvStream(releaseSubject.ReleaseId, query, stream);
+                var result = await service.QueryToCsvStream(releaseSubject.ReleaseVersionId, query, stream);
 
                 VerifyAllMocks(filterItemRepository);
 
@@ -1697,7 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
@@ -1709,7 +1709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(Strict),
                 subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                releaseRepository ?? new ReleaseRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext ?? Mock.Of<ContentDbContext>()),
                 options ?? DefaultOptions()
             );
         }

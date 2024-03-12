@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         }
 
         public async Task<ReleaseFile> Create(
-            Guid releaseId,
+            Guid releaseVersionId,
             string filename,
             long contentLength,
             string contentType,
@@ -47,14 +47,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             var releaseFile = new ReleaseFile
             {
-                ReleaseId = releaseId,
+                ReleaseVersionId = releaseVersionId,
                 Name = name,
                 Summary = summary,
                 File = new File
                 {
                     Id = newFileId ?? Guid.NewGuid(),
                     CreatedById = createdById,
-                    RootPath = releaseId,
+                    RootPath = releaseVersionId,
                     Filename = filename,
                     ContentLength = contentLength,
                     ContentType = contentType,
@@ -67,9 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return created;
         }
 
-        public async Task Delete(Guid releaseId, Guid fileId)
+        public async Task Delete(Guid releaseVersionId,
+            Guid fileId)
         {
-            var releaseFileToRemove = await Find(releaseId, fileId);
+            var releaseFileToRemove = await Find(releaseVersionId, fileId);
 
             if (releaseFileToRemove != null)
             {
@@ -79,51 +80,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             }
         }
 
-        public async Task<ReleaseFile?> Find(Guid releaseId, Guid fileId)
+        public async Task<ReleaseFile?> Find(Guid releaseVersionId,
+            Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(releaseFile => releaseFile.File.CreatedBy)
                 .SingleOrDefaultAsync(releaseFile =>
-                    releaseFile.ReleaseId == releaseId
+                    releaseFile.ReleaseVersionId == releaseVersionId
                     && releaseFile.FileId == fileId);
         }
 
-        public async Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, ReleaseFile>> FindOrNotFound(Guid releaseVersionId,
+            Guid fileId)
         {
-            return await Find(releaseId, fileId) ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
+            return await Find(releaseVersionId, fileId) ?? new Either<ActionResult, ReleaseFile>(new NotFoundResult());
         }
 
-        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseId, params FileType[] types)
+        public async Task<List<ReleaseFile>> GetByFileType(Guid releaseVersionId,
+            params FileType[] types)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(f => f.File)
                 .Where(releaseFile =>
-                    releaseFile.ReleaseId == releaseId
+                    releaseFile.ReleaseVersionId == releaseVersionId
                     && types.Contains(releaseFile.File.Type))
                 .ToListAsync();
         }
 
-        public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseId, Guid fileId)
+        public async Task<bool> FileIsLinkedToOtherReleases(Guid releaseVersionId,
+            Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
                 .AsQueryable()
                 .AnyAsync(releaseFile =>
-                    releaseFile.ReleaseId != releaseId
+                    releaseFile.ReleaseVersionId != releaseVersionId
                     && releaseFile.FileId == fileId);
         }
 
-        public async Task<ReleaseFile> Update(Guid releaseId,
+        public async Task<ReleaseFile> Update(Guid releaseVersionId,
             Guid fileId,
             Guid? newFileId = null,
             string? name = null,
             string? fileName = null,
             string? summary = null)
         {
-            // Ensure file is linked to the Release by getting the ReleaseFile first
+            // Ensure file is linked to the ReleaseVersion by getting the ReleaseFile first
             var releaseFile = await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .SingleAsync(rf =>
-                    rf.ReleaseId == releaseId
+                    rf.ReleaseVersionId == releaseVersionId
                     && rf.FileId == fileId);
 
             _contentDbContext.Update(releaseFile);

@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseApprovalServicePermissionTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication(),
@@ -35,20 +35,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleaseStatuses()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Release>(r => r.Id == _release.Id, CanViewReleaseStatusHistory)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanViewReleaseStatusHistory)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(_release);
+                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
-                        return await service.ListReleaseStatuses(_release.Id);
+                        return await service.ListReleaseStatuses(_releaseVersion.Id);
                     }
                 });
         }
@@ -57,13 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_Draft()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Release>(r => r.Id == _release.Id, CanMarkSpecificReleaseAsDraft)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanMarkSpecificReleaseAsDraft)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(_release);
+                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
 
                         return await service.CreateReleaseStatus(
-                            _release.Id,
+                            _releaseVersion.Id,
                             new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -86,13 +86,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_HigherLevelReview()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Release>(r => r.Id == _release.Id, CanSubmitSpecificReleaseToHigherReview)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanSubmitSpecificReleaseToHigherReview)
                 .AssertForbidden(async userService =>
                     {
                         var contentDbContextId = Guid.NewGuid().ToString();
                         await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                         {
-                            await contentDbContext.AddRangeAsync(_release);
+                            contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
                             await contentDbContext.SaveChangesAsync();
                         }
 
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             var service = BuildService(contentDbContext: contentDbContext, userService.Object);
 
                             return await service.CreateReleaseStatus(
-                                _release.Id,
+                                _releaseVersion.Id,
                                 new ReleaseStatusCreateRequest
                                 {
                                     ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
@@ -116,13 +116,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_Approve()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Release>(r => r.Id == _release.Id, CanApproveSpecificRelease)
+                .SetupResourceCheckToFailWithMatcher<ReleaseVersion>(rv => rv.Id == _releaseVersion.Id, CanApproveSpecificRelease)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(_release);
+                        contentDbContext.ReleaseVersions.AddRange(_releaseVersion);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildService(contentDbContext: contentDbContext, userService.Object);
                         return await service.CreateReleaseStatus(
-                            _release.Id,
+                            _releaseVersion.Id,
                             new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Approved

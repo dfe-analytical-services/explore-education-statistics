@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -9,19 +9,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 
 public record PrivateSubjectMetaCacheKey : IBlobCacheKey
 {
-    private Guid ReleaseId { get; }
+    private Guid ReleaseVersionId { get; }
     private Guid SubjectId { get; }
 
-    public PrivateSubjectMetaCacheKey(Guid releaseId, Guid subjectId)
+    public PrivateSubjectMetaCacheKey(Guid releaseVersionId, Guid subjectId)
     {
-        ReleaseId = releaseId;
+        ReleaseVersionId = releaseVersionId;
         SubjectId = subjectId;
     }
 
     public IBlobContainer Container => PrivateContent;
 
     public string Key => PrivateContentSubjectMetaPath(
-        ReleaseId,
+        ReleaseVersionId,
         SubjectId
     );
 }

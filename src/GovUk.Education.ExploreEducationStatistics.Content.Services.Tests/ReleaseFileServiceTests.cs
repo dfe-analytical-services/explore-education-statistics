@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -42,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task StreamFile()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -53,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -67,8 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -82,7 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
 
-                var result = await service.StreamFile(release.Id, releaseFile.File.Id);
+                var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
+                    fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var releaseFile = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -129,13 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task StreamFile_ReleaseFileNotFound()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -143,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.StreamFile(release.Id, Guid.NewGuid());
+                var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
+                    fileId: Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task StreamFile_BlobDoesNotExist()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -163,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -176,8 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -190,7 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object);
 
-                var result = await service.StreamFile(release.Id, releaseFile.File.Id);
+                var result = await service.StreamFile(releaseVersionId: releaseVersion.Id,
+                    fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
 
@@ -201,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_ValidFileTypes()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -212,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -222,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -236,8 +238,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -258,11 +260,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .Setup(
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         ListOf(releaseFile1.FileId))
                 )
-                .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
-                .Callback<Stream, Release, IEnumerable<Guid>?>(
+                .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+                .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
@@ -279,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -307,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_DataGuidanceForMultipleDataFiles()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -318,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -328,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -342,8 +344,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -364,11 +366,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .Setup(
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         ListOf(releaseFile1.FileId, releaseFile2.FileId))
                 )
-                .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
-                .Callback<Stream, Release, IEnumerable<Guid>?>(
+                .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+                .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
@@ -385,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -413,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_OrderedAlphabetically()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -424,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -434,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -444,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile3 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -458,8 +460,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -490,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -517,7 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersInvalidFileTypes()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -528,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -538,7 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -548,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile3 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -558,7 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile4 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -573,8 +575,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -592,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -610,7 +612,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersFilesNotInBlobStorage()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -621,7 +623,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -631,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -646,8 +648,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -669,7 +671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -687,7 +689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_FiltersFilesForOtherReleases()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -699,7 +701,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // Files are for other releases
             var releaseFile1 = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -709,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -724,8 +726,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -743,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds
                 );
@@ -761,7 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_Empty()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -774,7 +776,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -790,7 +792,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
-                var result = await service.ZipFilesToStream(release.Id, stream, fileIds);
+                var result = await service.ZipFilesToStream(releaseVersion.Id, stream, fileIds);
 
                 MockUtils.VerifyAllMocks(publicBlobStorageService);
 
@@ -806,7 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_Cancelled()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -817,7 +819,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -827,7 +829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -842,8 +844,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -876,7 +878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream,
                     fileIds: fileIds,
                     cancellationToken: tokenSource.Token
@@ -898,7 +900,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_NoCachedAllFilesZip()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -909,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -919,7 +921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             };
             var releaseFile2 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -933,8 +935,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -949,7 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
-            var allFilesZipPath = release.AllFilesZipPath();
+            var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
             // No 'All files' zip can be found in blob storage - not cached
             publicBlobStorageService
@@ -976,11 +978,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .Setup(
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
-                        It.Is<Release>(r => r.Id == release.Id),
+                        It.Is<ReleaseVersion>(rv => rv.Id == releaseVersion.Id),
                         ListOf(releaseFile1.FileId))
                 )
-                .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
-                .Callback<Stream, Release, IEnumerable<Guid>?>(
+                .Returns<Stream, ReleaseVersion, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
+                .Callback<Stream, ReleaseVersion, IEnumerable<Guid>?>(
                     (stream, _, _) => { stream.WriteText("Test data guidance blob"); }
                 );
 
@@ -995,7 +997,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream
                 );
 
@@ -1022,7 +1024,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_CachedAllFilesZip()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -1035,13 +1037,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            var allFilesZipPath = release.AllFilesZipPath();
+            var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
             // 'All files' zip is in blob storage - cached
             publicBlobStorageService
@@ -1069,7 +1071,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream
                 );
 
@@ -1085,7 +1087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task ZipFilesToStream_NoFileIds_StaleCachedAllFilesZip()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -1096,7 +1098,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new Model.File
                 {
                     RootPath = Guid.NewGuid(),
@@ -1111,14 +1113,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            var allFilesZipPath = release.AllFilesZipPath();
+            var allFilesZipPath = releaseVersion.AllFilesZipPath();
 
             // 'All files' zip is in blob storage - cached, but stale
             publicBlobStorageService
@@ -1163,7 +1165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.ZipFilesToStream(
-                    releaseId: release.Id,
+                    releaseVersionId: releaseVersion.Id,
                     outputStream: stream
                 );
 

@@ -46,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Status = Approved,
                 Published = DateTime.Today.AddDays(-1),
                 PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
-                ScheduledWithRelease = new Release(),
-                ScheduledWithReleaseId = Guid.NewGuid(),
+                ScheduledWithReleaseVersion = new ReleaseVersion(),
+                ScheduledWithReleaseVersionId = Guid.NewGuid(),
 
                 // versioning fields
                 Version = 1,
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Include(m => m.Notes)
                     .Include(m => m.MethodologyContent)
                     .Include(m => m.CreatedBy)
-                    .Include(m => m.ScheduledWithRelease)
+                    .Include(m => m.ScheduledWithReleaseVersion)
                     .SingleAsync(m => m.Id == amendmentId);
 
                 Assert.True(amendment.Amendment);
@@ -118,8 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Draft, amendment.Status);
                 Assert.Null(amendment.Published);
                 Assert.Equal(MethodologyPublishingStrategy.Immediately, amendment.PublishingStrategy);
-                Assert.Null(amendment.ScheduledWithRelease);
-                Assert.Null(amendment.ScheduledWithReleaseId);
+                Assert.Null(amendment.ScheduledWithReleaseVersion);
+                Assert.Null(amendment.ScheduledWithReleaseVersionId);
 
                 // Check versioning fields.
                 Assert.Equal(originalVersion.Version + 1, amendment.Version);

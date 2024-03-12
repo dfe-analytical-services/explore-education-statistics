@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,7 +40,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
@@ -78,24 +77,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
-                .ReturnsAsync((Release?) null);
+                .ReturnsAsync((ReleaseVersion?) null);
 
             subjectRepository
                 .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId, default))
                 .ReturnsAsync(_publicationId);
 
-            var service = BuildService(releaseRepository: releaseRepository.Object,
+            var service = BuildService(releaseVersionRepository: releaseVersionRepository.Object,
                 subjectRepository: subjectRepository.Object);
 
             var result = await service.CreatePermalink(request);
 
             MockUtils.VerifyAllMocks(
-                releaseRepository,
+                releaseVersionRepository,
                 subjectRepository);
 
             result.AssertNotFound();
@@ -219,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ToList()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -231,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = release
+                LatestPublishedReleaseVersion = releaseVersion
             };
 
             var csvMeta = new PermalinkCsvMetaViewModel
@@ -349,11 +348,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(csvMeta);
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseVersionRepository = new Mock<IReleaseVersionRepository>(MockBehavior.Strict);
 
-            releaseRepository
+            releaseVersionRepository
                 .Setup(s => s.GetLatestPublishedReleaseVersion(_publicationId, default))
-                .ReturnsAsync(release);
+                .ReturnsAsync(releaseVersion);
 
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
@@ -364,15 +363,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             tableBuilderService
-                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(releaseVersion.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, subject.Id));
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, subject.Id));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -384,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
-                    releaseRepository: releaseRepository.Object,
+                    releaseVersionRepository: releaseVersionRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
@@ -394,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService,
-                    releaseRepository,
+                    releaseVersionRepository,
                     subjectRepository,
                     tableBuilderService);
 
@@ -427,7 +426,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
                 Assert.Equal("Test publication", permalink.PublicationTitle);
                 Assert.Equal("Test data set", permalink.DataSetTitle);
-                Assert.Equal(release.Id, permalink.ReleaseId);
+                Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
                 Assert.Equal(subject.Id, permalink.SubjectId);
 
                 Assert.False(permalink.MigratedFromLegacy);
@@ -551,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ToList()
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -563,7 +562,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = release
+                LatestPublishedReleaseVersion = releaseVersion
             };
 
             var csvMeta = new PermalinkCsvMetaViewModel
@@ -599,7 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var request = new PermalinkCreateRequest
             {
-                ReleaseId = release.Id,
+                ReleaseId = releaseVersion.Id,
                 Configuration = new TableBuilderConfiguration
                 {
                     TableHeaders = new TableHeaders()
@@ -684,15 +683,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             tableBuilderService
-                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(releaseVersion.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, subject.Id));
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, subject.Id));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -743,7 +742,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
                 Assert.Equal("Test publication", permalink.PublicationTitle);
                 Assert.Equal("Test data set", permalink.DataSetTitle);
-                Assert.Equal(release.Id, permalink.ReleaseId);
+                Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
                 Assert.Equal(subject.Id, permalink.SubjectId);
 
                 Assert.False(permalink.MigratedFromLegacy);
@@ -753,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
@@ -765,7 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = release
+                LatestPublishedReleaseVersion = releaseVersion
             };
 
             var permalink = new Permalink
@@ -787,10 +786,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, permalink.SubjectId));
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -904,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsForMultipleReleaseVersions()
         {
-            var previousVersion = new Release
+            var previousVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -914,7 +913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 PreviousVersionId = null
             };
 
-            var latestVersion = new Release
+            var latestVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -927,7 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = latestVersion
+                LatestPublishedReleaseVersion = latestVersion
             };
 
             var permalink = new Permalink
@@ -938,10 +937,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.AddRange(previousVersion, latestVersion);
+                contentDbContext.ReleaseFiles.AddRange(
                     ReleaseDataFile(previousVersion, permalink.SubjectId),
                     ReleaseDataFile(latestVersion, permalink.SubjectId)
                 );
@@ -974,7 +973,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsNotForLatestRelease_OlderByYear()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -983,7 +982,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var latestRelease = new Release
+            var latestReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -995,7 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = latestRelease
+                LatestPublishedReleaseVersion = latestReleaseVersion
             };
 
             var permalink = new Permalink
@@ -1006,10 +1005,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, permalink.SubjectId));
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion, latestReleaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1039,7 +1038,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsNotForLatestRelease_OlderByTimePeriod()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -1048,7 +1047,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var latestRelease = new Release
+            var latestReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -1060,7 +1059,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = latestRelease
+                LatestPublishedReleaseVersion = latestReleaseVersion
             };
 
             var permalink = new Permalink
@@ -1071,10 +1070,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, permalink.SubjectId));
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion, latestReleaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1104,7 +1103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsNotForLatestReleaseVersion()
         {
-            var previousVersion = new Release
+            var previousVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -1114,7 +1113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 PreviousVersionId = null
             };
 
-            var latestVersion = new Release
+            var latestVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -1127,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = latestVersion
+                LatestPublishedReleaseVersion = latestVersion
             };
 
             var permalink = new Permalink
@@ -1138,10 +1137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(previousVersion,
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.AddRange(previousVersion, latestVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(previousVersion,
                     permalink.SubjectId));
 
                 await contentDbContext.SaveChangesAsync();
@@ -1172,7 +1171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetPermalink_SubjectIsFromSupersededPublication()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
@@ -1184,10 +1183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedRelease = release,
+                LatestPublishedReleaseVersion = releaseVersion,
                 SupersededBy = new Publication
                 {
-                    LatestPublishedReleaseId = Guid.NewGuid()
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                 }
             };
 
@@ -1199,10 +1198,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Permalinks.AddAsync(permalink);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, permalink.SubjectId));
+                contentDbContext.Permalinks.Add(permalink);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(ReleaseDataFile(releaseVersion, permalink.SubjectId));
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1310,11 +1309,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             }
         }
 
-        private static ReleaseFile ReleaseDataFile(Release release, Guid subjectId)
+        private static ReleaseFile ReleaseDataFile(ReleaseVersion releaseVersion, Guid subjectId)
         {
             return new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     SubjectId = subjectId,
@@ -1329,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             IPermalinkCsvMetaService? permalinkCsvMetaService = null,
             IPublicBlobStorageService? publicBlobStorageService = null,
             IFrontendService? frontendService = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             ISubjectRepository? subjectRepository = null,
             IPublicationRepository? publicationRepository = null)
         {
@@ -1343,7 +1342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 frontendService ?? Mock.Of<IFrontendService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict)
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(MockBehavior.Strict)
             );
         }
     }

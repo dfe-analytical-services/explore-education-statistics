@@ -31,18 +31,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _dataGuidanceDataSetService = dataGuidanceDataSetService;
         }
 
-        public async Task<Stream> WriteToStream(Stream stream, Release release, IList<Guid>? dataFileIds = null)
+        public async Task<Stream> WriteToStream(Stream stream,
+            ReleaseVersion releaseVersion,
+            IList<Guid>? dataFileIds = null)
         {
             // Make sure publication has been hydrated
-            await _contentDbContext.Entry(release)
-                .Reference(r => r.Publication)
+            await _contentDbContext.Entry(releaseVersion)
+                .Reference(rv => rv.Publication)
                 .LoadAsync();
 
-            var dataSets = await ListDataSets(release, dataFileIds);
+            var dataSets = await ListDataSets(releaseVersion, dataFileIds);
 
             await using var file = new StreamWriter(stream, leaveOpen: stream.CanRead);
 
-            await DoWrite(file, release, dataSets);
+            await DoWrite(file, releaseVersion, dataSets);
 
             await file.FlushAsync();
 
@@ -55,14 +57,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         private async Task<List<DataGuidanceDataSetViewModel>> ListDataSets(
-            Release release,
+            ReleaseVersion releaseVersion,
             IList<Guid>? dataFileIds = null)
         {
-            var dataSets = await _dataGuidanceDataSetService.ListDataSets(release.Id, dataFileIds);
+            var dataSets = await _dataGuidanceDataSetService.ListDataSets(releaseVersion.Id, dataFileIds);
 
             if (dataSets.IsLeft)
             {
-                throw new ArgumentException($"Could not find data sets for release: {release.Id}");
+                throw new ArgumentException($"Could not find data sets for release version: {releaseVersion.Id}");
             }
 
             return dataSets.Right;
@@ -70,25 +72,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private static async Task DoWrite(
             TextWriter file,
-            Release release,
+            ReleaseVersion releaseVersion,
             IList<DataGuidanceDataSetViewModel> dataSets)
         {
             // Add header information including publication/release title
-            await file.WriteLineAsync(release.Publication.Title);
+            await file.WriteLineAsync(releaseVersion.Publication.Title);
             await file.WriteLineAsync(
                 TimePeriodLabelFormatter.Format(
-                    release.Year,
-                    release.TimePeriodCoverage,
+                    releaseVersion.Year,
+                    releaseVersion.TimePeriodCoverage,
                     TimePeriodLabelFormat.FullLabel
                 )
             );
 
-            if (!release.DataGuidance.IsNullOrWhitespace())
+            if (!releaseVersion.DataGuidance.IsNullOrWhitespace())
             {
                 await file.WriteLineAsync();
 
                 // Add the release's guidance content
-                var guidance = await HtmlToTextUtils.HtmlToText(release.DataGuidance);
+                var guidance = await HtmlToTextUtils.HtmlToText(releaseVersion.DataGuidance);
                 await file.WriteAsync(guidance);
                 await file.WriteLineAsync();
             }

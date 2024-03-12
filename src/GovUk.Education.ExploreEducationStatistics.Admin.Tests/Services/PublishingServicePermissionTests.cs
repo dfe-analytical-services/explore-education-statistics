@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublishingServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -31,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publishingService = BuildPublishingService(mocks);
 
             AssertSecurityPoliciesChecked(service =>
-                    service.RetryReleasePublishing(_release.Id),
-                _release,
+                    service.RetryReleasePublishing(_releaseVersion.Id),
+                _releaseVersion,
                 mocks.UserService,
                 publishingService,
                 CanPublishSpecificRelease);
@@ -44,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var (storageQueueService, userService, logger) = mocks;
 
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(persistenceHelper, _release.Id, _release);
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
 
             return new PublishingService(persistenceHelper.Object,
                 storageQueueService.Object,

@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -17,58 +18,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     public class RelatedInformationService : IRelatedInformationService
     {
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper; 
-        private readonly IUserService _userService; 
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IUserService _userService;
 
-        public RelatedInformationService(ContentDbContext context, IPersistenceHelper<ContentDbContext> persistenceHelper, 
+        public RelatedInformationService(ContentDbContext context,
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
         }
-        
-        public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseId)
+
+        public Task<Either<ActionResult, List<Link>>> GetRelatedInformationAsync(Guid releaseVersionId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(release => release.RelatedInformation);
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(releaseVersion => releaseVersion.RelatedInformation);
         }
 
-        public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseId, CreateUpdateLinkRequest request)
+        public Task<Either<ActionResult, List<Link>>> AddRelatedInformationAsync(Guid releaseVersionId,
+            CreateUpdateLinkRequest request)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
-                    if (release.RelatedInformation == null)
+                    if (releaseVersion.RelatedInformation == null)
                     {
-                        release.RelatedInformation = new List<Link>();
+                        releaseVersion.RelatedInformation = new List<Link>();
                     }
-                    
-                    release.RelatedInformation.Add(new Link
+
+                    releaseVersion.RelatedInformation.Add(new Link
                     {
                         Id = Guid.NewGuid(),
                         Description = request.Description,
                         Url = request.Url
                     });
 
-                    _context.Releases.Update(release);
+                    _context.ReleaseVersions.Update(releaseVersion);
                     await _context.SaveChangesAsync();
-                    return release.RelatedInformation;
+                    return releaseVersion.RelatedInformation;
                 });
         }
-        
+
         public Task<Either<ActionResult, List<Link>>> UpdateRelatedInformationAsync(
-            Guid releaseId, Guid relatedInformationId, CreateUpdateLinkRequest request)
+            Guid releaseVersionId, Guid relatedInformationId, CreateUpdateLinkRequest request)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
-                    var toUpdate = release
+                    var toUpdate = releaseVersion
                         .RelatedInformation
                         .Find(item => item.Id == relatedInformationId);
 
@@ -80,25 +83,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     toUpdate.Description = request.Description;
                     toUpdate.Url = request.Url;
 
-                    _context.Releases.Update(release);
+                    _context.ReleaseVersions.Update(releaseVersion);
                     await _context.SaveChangesAsync();
-                    return release.RelatedInformation;
+                    return releaseVersion.RelatedInformation;
                 });
         }
-        
-        public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseId, Guid relatedInformationId)
+
+        public Task<Either<ActionResult, List<Link>>> DeleteRelatedInformationAsync(Guid releaseVersionId,
+            Guid relatedInformationId)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
-                    release.RelatedInformation.Remove(
-                        release.RelatedInformation.Find(item => item.Id == relatedInformationId));
+                    releaseVersion.RelatedInformation.Remove(
+                        releaseVersion.RelatedInformation.Find(item => item.Id == relatedInformationId));
 
-                    _context.Releases.Update(release);
+                    _context.ReleaseVersions.Update(releaseVersion);
                     await _context.SaveChangesAsync();
-                    return release.RelatedInformation;
+                    return releaseVersion.RelatedInformation;
                 });
         }
     }

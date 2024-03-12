@@ -915,6 +915,11 @@ user navigates to public frontend
     enable basic auth headers
     go to    ${URL}
 
+user navigates to
+    [Arguments]    ${URL}
+    enable basic auth headers
+    go to    ${URL}
+
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
     IF    '${variable_value}'=='${EMPTY}'

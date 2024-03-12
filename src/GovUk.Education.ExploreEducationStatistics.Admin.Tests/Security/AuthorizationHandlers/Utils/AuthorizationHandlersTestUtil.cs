@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             object entity,
             SecurityClaimTypes[] claimsExpectedToSucceed)
         {
-            return GetEnumValues<SecurityClaimTypes>()
+            return GetEnums<SecurityClaimTypes>()
                 .Select(
                     claim =>
                     {
@@ -118,26 +118,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         public static void ForEachSecurityClaim(Action<SecurityClaimTypes> action)
         {
-            GetEnumValues<SecurityClaimTypes>().ForEach(action.Invoke);
+            GetEnums<SecurityClaimTypes>().ForEach(action.Invoke);
         }
 
         public static Task ForEachSecurityClaimAsync(Func<SecurityClaimTypes, Task> action)
         {
-            return GetEnumValues<SecurityClaimTypes>()
+            return GetEnums<SecurityClaimTypes>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(action.Invoke);
         }
 
         public static Task ForEachReleaseRoleAsync(Func<ReleaseRole, Task> action)
         {
-            return GetEnumValues<ReleaseRole>()
+            return GetEnums<ReleaseRole>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(action.Invoke);
         }
 
         public static Task ForEachPublicationRoleAsync(Func<PublicationRole, Task> action)
         {
-            return GetEnumValues<PublicationRole>()
+            return GetEnums<PublicationRole>()
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(action.Invoke);
         }

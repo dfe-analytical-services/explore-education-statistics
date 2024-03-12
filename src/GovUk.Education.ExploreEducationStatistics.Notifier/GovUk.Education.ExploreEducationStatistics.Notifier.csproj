@@ -4,7 +4,14 @@
     <LangVersion>10.0</LangVersion>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <Nullable>enable</Nullable>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
+
+  <ItemGroup>
+      <CompilerVisibleProperty Include="RootNamespace" />
+      <CompilerVisibleProperty Include="ProjectDir" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />

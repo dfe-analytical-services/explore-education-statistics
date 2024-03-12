@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
         }
 
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication()
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             releaseFileService
-                .Setup(s => s.StreamFile(_release.Id, fileId))
+                .Setup(s => s.StreamFile(_releaseVersion.Id, fileId))
                 .ReturnsAsync(
                     new FileStreamResult(stream, MediaTypeNames.Application.Pdf)
                     {
@@ -55,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 );
 
             var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{_release.Id}/files/{fileId}");
+                .GetAsync($"/api/releases/{_releaseVersion.Id}/files/{fileId}");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             releaseFileService
                 .Setup(
                     s => s.ZipFilesToStream(
-                        _release.Id,
+                        _releaseVersion.Id,
                         It.IsAny<Stream>(),
                         It.Is<IEnumerable<Guid>>(
                             ids => ids.SequenceEqual(ListOf(fileId1, fileId2))),
@@ -90,11 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 );
 
             var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{_release.Id}/files?fileIds={fileId1},{fileId2}");
+                .GetAsync($"/api/releases/{_releaseVersion.Id}/files?fileIds={fileId1},{fileId2}");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             releaseFileService
                 .Setup(
                     s => s.ZipFilesToStream(
-                        _release.Id,
+                        _releaseVersion.Id,
                         It.IsAny<Stream>(),
                         null,
                         It.IsAny<CancellationToken>()
@@ -121,11 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 );
 
             var client = SetupApp(releaseFileService: releaseFileService.Object)
-                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .AddContentDbTestData(context => context.ReleaseVersions.Add(_releaseVersion))
                 .CreateClient();
 
             var response = await client
-                .GetAsync($"/api/releases/{_release.Id}/files");
+                .GetAsync($"/api/releases/{_releaseVersion.Id}/files");
 
             MockUtils.VerifyAllMocks(releaseFileService);
 

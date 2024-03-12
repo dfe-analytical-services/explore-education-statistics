@@ -45,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [FunctionName("PublishStagedReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishScheduledReleases([TimerTrigger("%PublishReleaseContentCronSchedule%")]
-            TimerInfo timer,
+        public async Task PublishScheduledReleases([TimerTrigger("%PublishReleaseContentCronSchedule%")] TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -54,13 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            var publishedReleaseIds = await PublishScheduledReleases((await QueryScheduledReleasesForToday()).ToArray());
+            var publishedReleaseVersionIds =
+                await PublishScheduledReleases((await QueryScheduledReleasesForToday()).ToArray());
 
             logger.LogInformation(
-                "{FunctionName} completed.  Published Releases {ReleaseIds}.  " +
+                "{FunctionName} completed.  Published release versions [{ReleaseVersionIds}].  " +
                 "Will be scheduled again to run at {NextDateTime}",
                 executionContext.FunctionName,
-                publishedReleaseIds.JoinToString(','),
+                publishedReleaseVersionIds.JoinToString(','),
                 timer.FormatNextOccurrences(1));
         }
 
@@ -73,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
         /// </remarks>
         /// <param name="request">
-        /// An optional JSON request body with a "ReleaseIds" array can be included in the POST request to limit the
-        /// scope of the Function to only operate upon the provided Release Ids.
+        /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
+        /// the scope of the Function to only operate upon the provided release version id's.
         /// </param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
@@ -91,20 +91,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            var releaseIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseIds;
-            
-            var scheduled = releaseIds?.Length > 0 
+            var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
+
+            var scheduled = releaseVersionIds?.Length > 0
                 ? (await QueryScheduledReleasesForTodayOrFuture())
-                    .Where(releaseStatus => releaseIds.Contains(releaseStatus.ReleaseId))
+                .Where(releaseStatus => releaseVersionIds.Contains(releaseStatus.ReleaseVersionId))
                 : await QueryScheduledReleasesForToday();
 
-            var publishedReleaseIds = await PublishScheduledReleases(scheduled.ToArray());
+            var publishedReleaseVersionIds = await PublishScheduledReleases(scheduled.ToArray());
 
-            logger.LogInformation("{FunctionName} completed. Published Releases [{ReleaseIds}]",
+            logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
                 executionContext.FunctionName,
-                publishedReleaseIds.JoinToString(','));
+                publishedReleaseVersionIds.JoinToString(','));
 
-            return new ManualTriggerResponse(publishedReleaseIds);
+            return new ManualTriggerResponse(publishedReleaseVersionIds);
         }
 
         private async Task<Guid[]> PublishScheduledReleases(ReleasePublishingStatus[] scheduled)
@@ -123,10 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             // Finalise publishing of these releases
             await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                scheduled.Select(status => (status.ReleaseId, status.Id)));
+                scheduled.Select(status => (status.ReleaseVersionId, ReleaseStatusId: status.Id)));
 
             return scheduled
-                .Select(releaseStatus => releaseStatus.ReleaseId)
+                .Select(releaseStatus => releaseStatus.ReleaseVersionId)
                 .ToArray();
         }
 
@@ -152,15 +152,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await _releasePublishingStatusService.UpdateContentStageAsync(
-                status.ReleaseId,
-                status.Id,
+                releaseVersionId: status.ReleaseVersionId,
+                releaseStatusId: status.Id,
                 stage,
                 logMessage);
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
-        private record ManualTriggerRequest(Guid[] ReleaseIds);
+        private record ManualTriggerRequest(Guid[] ReleaseVersionIds);
 
-        public record ManualTriggerResponse(Guid[] ReleaseIds);
+        public record ManualTriggerResponse(Guid[] ReleaseVersionIds);
     }
 }

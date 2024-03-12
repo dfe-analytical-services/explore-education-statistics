@@ -79,9 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _locationOptions = locationOptions.Value;
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId,
+            Guid subjectId)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
+            return await _releaseSubjectService.Find(subjectId: subjectId,
+                    releaseVersionId: releaseVersionId)
                 .OnSuccess(GetSubjectMeta);
         }
 
@@ -91,22 +93,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseId,
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseVersionId,
             ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return await _releaseSubjectService.Find(subjectId: query.SubjectId, releaseId: releaseId)
+            return await _releaseSubjectService.Find(subjectId: query.SubjectId,
+                    releaseVersionId: releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
                     GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             List<FilterUpdateViewModel> request)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
+            return await _releaseSubjectService.Find(subjectId: subjectId, releaseVersionId: releaseVersionId)
                 .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
                 .OnSuccessVoid(async rs =>
                 {
@@ -124,16 +127,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
-                    await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
+                    await InvalidateCachedReleaseSubjectMetadata(releaseVersionId: releaseVersionId,
+                        subjectId: subjectId);
                 });
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectIndicators(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
+            return await _releaseSubjectService.Find(subjectId: subjectId,
+                    releaseVersionId: releaseVersionId)
                 .OnSuccessDo(() => ValidateIndicatorGroupsForSubject(subjectId, request))
                 .OnSuccessVoid(async releaseSubject =>
                 {
@@ -146,7 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
-                    await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
+                    await InvalidateCachedReleaseSubjectMetadata(releaseVersionId: releaseVersionId,
+                        subjectId: subjectId);
                 });
         }
 
@@ -285,9 +291,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseId, Guid subjectId)
+        private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseVersionId, Guid subjectId)
         {
-            return _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseId, subjectId));
+            return _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersionId, subjectId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(

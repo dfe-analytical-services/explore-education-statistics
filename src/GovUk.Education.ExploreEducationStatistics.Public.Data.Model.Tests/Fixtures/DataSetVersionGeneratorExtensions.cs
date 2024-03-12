@@ -45,11 +45,6 @@ public static class DataSetVersionGeneratorExtensions
         Guid csvFileId)
         => generator.ForInstance(s => s.SetCsvFileId(csvFileId));
 
-    public static Generator<DataSetVersion> WithParquetFilename(
-        this Generator<DataSetVersion> generator,
-        string parquetFilename)
-        => generator.ForInstance(s => s.SetParquetFilename(parquetFilename));
-
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
         int major,
@@ -58,13 +53,13 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithPublished(
         this Generator<DataSetVersion> generator,
-        DateTimeOffset publishedDate)
-        => generator.ForInstance(s => s.SetPublished(publishedDate));
+        DateTimeOffset published)
+        => generator.ForInstance(s => s.SetPublished(published));
 
-    public static Generator<DataSetVersion> WithUnpublished(
+    public static Generator<DataSetVersion> WithWithdrawn(
         this Generator<DataSetVersion> generator,
-        DateTimeOffset unpublishedDate)
-        => generator.ForInstance(s => s.SetUnpublished(unpublishedDate));
+        DateTimeOffset withdrawn)
+        => generator.ForInstance(s => s.SetWithdrawn(withdrawn));
 
     public static Generator<DataSetVersion> WithStatus(
         this Generator<DataSetVersion> generator,
@@ -74,11 +69,20 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithStatusPublished(this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetStatusPublished());
 
-    public static Generator<DataSetVersion> WithStatusStaged(this Generator<DataSetVersion> generator)
-        => generator.ForInstance(s => s.SetStatusStaged());
+    public static Generator<DataSetVersion> WithStatusDraft(this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetStatusDraft());
 
-    public static Generator<DataSetVersion> WithStatusUnpublished(this Generator<DataSetVersion> generator)
-        => generator.ForInstance(s => s.SetStatusUnpublished());
+    public static Generator<DataSetVersion> WithStatusProcessing(this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetStatusProcessing());
+
+    public static Generator<DataSetVersion> WithStatusFailed(this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetStatusFailed());
+
+    public static Generator<DataSetVersion> WithStatusMapping(this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetStatusMapping());
+
+    public static Generator<DataSetVersion> WithStatusWithdrawn(this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetStatusWithdrawn());
 
     public static Generator<DataSetVersion> WithTotalResults(
         this Generator<DataSetVersion> generator,
@@ -144,12 +148,11 @@ public static class DataSetVersionGeneratorExtensions
             .SetDefault(dsv => dsv.Id)
             .SetDefault(dsv => dsv.DataSetId)
             .SetDefault(dsv => dsv.CsvFileId)
-            .SetDefault(dsv => dsv.ParquetFilename)
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
             .Set(dsv => dsv.TotalResults, f => f.Random.Long(min: 10000, max: 10_000_000))
-            .Set(dsv => dsv.Status, DataSetVersionStatus.Staged);
+            .Set(dsv => dsv.Status, DataSetVersionStatus.Draft);
 
     public static InstanceSetters<DataSetVersion> SetDataSet(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -167,11 +170,6 @@ public static class DataSetVersionGeneratorExtensions
         this InstanceSetters<DataSetVersion> instanceSetter,
         Guid csvFileId)
         => instanceSetter.Set(dsv => dsv.CsvFileId, csvFileId);
-
-    public static InstanceSetters<DataSetVersion> SetParquetFilename(
-        this InstanceSetters<DataSetVersion> instanceSetter,
-        string parquetFilename)
-        => instanceSetter.Set(dsv => dsv.ParquetFilename, parquetFilename);
 
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -191,19 +189,41 @@ public static class DataSetVersionGeneratorExtensions
         => instanceSetter
             .SetStatus(DataSetVersionStatus.Published)
             .SetPublished(DateTimeOffset.UtcNow)
-            .SetUnpublished(null);
+            .SetWithdrawn(null);
 
-    public static InstanceSetters<DataSetVersion> SetStatusStaged(this InstanceSetters<DataSetVersion> instanceSetter)
-        => instanceSetter
-            .SetStatus(DataSetVersionStatus.Staged)
-            .SetUnpublished(null)
-            .SetPublished(null);
 
-    public static InstanceSetters<DataSetVersion> SetStatusUnpublished(
+    public static InstanceSetters<DataSetVersion> SetStatusProcessing(
         this InstanceSetters<DataSetVersion> instanceSetter)
         => instanceSetter
-            .SetStatus(DataSetVersionStatus.Unpublished)
-            .SetUnpublished(DateTimeOffset.UtcNow)
+            .SetStatus(DataSetVersionStatus.Processing)
+            .SetWithdrawn(null)
+            .SetPublished(null);
+
+    public static InstanceSetters<DataSetVersion> SetStatusFailed(
+        this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter
+            .SetStatus(DataSetVersionStatus.Failed)
+            .SetWithdrawn(null)
+            .SetPublished(null);
+
+    public static InstanceSetters<DataSetVersion> SetStatusMapping(
+        this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter
+            .SetStatus(DataSetVersionStatus.Mapping)
+            .SetWithdrawn(null)
+            .SetPublished(null);
+
+    public static InstanceSetters<DataSetVersion> SetStatusDraft(this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter
+            .SetStatus(DataSetVersionStatus.Draft)
+            .SetWithdrawn(null)
+            .SetPublished(null);
+
+    public static InstanceSetters<DataSetVersion> SetStatusWithdrawn(
+        this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter
+            .SetStatus(DataSetVersionStatus.Withdrawn)
+            .SetWithdrawn(DateTimeOffset.UtcNow)
             .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-1));
 
     public static InstanceSetters<DataSetVersion> SetPublished(
@@ -211,10 +231,10 @@ public static class DataSetVersionGeneratorExtensions
         DateTimeOffset? published)
         => instanceSetter.Set(dsv => dsv.Published, published);
 
-    public static InstanceSetters<DataSetVersion> SetUnpublished(
+    public static InstanceSetters<DataSetVersion> SetWithdrawn(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        DateTimeOffset? unpublished)
-        => instanceSetter.Set(dsv => dsv.Unpublished, unpublished);
+        DateTimeOffset? withdrawn)
+        => instanceSetter.Set(dsv => dsv.Withdrawn, withdrawn);
 
     public static InstanceSetters<DataSetVersion> SetTotalResults(
         this InstanceSetters<DataSetVersion> instanceSetter,

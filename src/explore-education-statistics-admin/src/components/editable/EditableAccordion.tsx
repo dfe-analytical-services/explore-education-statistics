@@ -79,41 +79,39 @@ const EditableAccordion = (props: EditableAccordionProps) => {
     );
   }, [isReordering, props, sections]);
 
-  if (editingMode !== 'edit') {
-    return <Accordion {...props}>{children}</Accordion>;
-  }
-
   return (
     <div className={styles.container}>
-      <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-bottom-3">
-        <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-          {sectionName}
-        </h2>
+      {editingMode === 'edit' && (
+        <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-bottom-3">
+          <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
+            {sectionName}
+          </h2>
 
-        {sections.length > 1 &&
-          (!isReordering ? (
-            <Button
-              variant="secondary"
-              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-              id={`${id}-reorder`}
-              onClick={toggleReordering.on}
-            >
-              Reorder<span className="govuk-visually-hidden"> sections</span>
-            </Button>
-          ) : (
-            <Button
-              className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
-              onClick={saveOrder}
-            >
-              Save order
-            </Button>
-          ))}
-      </div>
+          {sections.length > 1 &&
+            (!isReordering ? (
+              <Button
+                variant="secondary"
+                className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+                id={`${id}-reorder`}
+                onClick={toggleReordering.on}
+              >
+                Reorder<span className="govuk-visually-hidden"> sections</span>
+              </Button>
+            ) : (
+              <Button
+                className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+                onClick={saveOrder}
+              >
+                Save order
+              </Button>
+            ))}
+        </div>
+      )}
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable
           droppableId={id}
-          isDropDisabled={!isReordering}
+          isDropDisabled={editingMode !== 'edit' || !isReordering}
           type="accordion"
         >
           {(droppableProvided, snapshot) => (
@@ -131,16 +129,17 @@ const EditableAccordion = (props: EditableAccordionProps) => {
           )}
         </Droppable>
       </DragDropContext>
-
-      <div>
-        <Button
-          onClick={onAddSection}
-          className={styles.addSectionButton}
-          disabled={isReordering}
-        >
-          Add new section
-        </Button>
-      </div>
+      {editingMode === 'edit' && (
+        <div>
+          <Button
+            onClick={onAddSection}
+            className={styles.addSectionButton}
+            disabled={isReordering}
+          >
+            Add new section
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -25,46 +25,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _preReleaseSummaryService = preReleaseSummaryService;
         }
 
-        [HttpGet("release/{releaseId:guid}/prerelease-users")]
-        public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/prerelease-users")]
+        public async Task<ActionResult<List<PreReleaseUserViewModel>>> GetPreReleaseUsers(Guid releaseVersionId)
         {
             return await _preReleaseUserService
-                .GetPreReleaseUsers(releaseId)
+                .GetPreReleaseUsers(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/prerelease")]
-        public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/prerelease")]
+        public async Task<ActionResult<PreReleaseSummaryViewModel>> GetPreReleaseSummaryAsync(Guid releaseVersionId)
         {
             return await _preReleaseSummaryService
-                .GetPreReleaseSummaryViewModelAsync(releaseId)
+                .GetPreReleaseSummaryViewModelAsync(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/prerelease-users-plan")]
+        [HttpPost("release/{releaseVersionId:guid}/prerelease-users-plan")]
         public async Task<ActionResult<PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
-            Guid releaseId, [FromBody] PreReleaseUserInviteViewModel viewModel)
+            Guid releaseVersionId, [FromBody] PreReleaseUserInviteViewModel viewModel)
         {
             return await _preReleaseUserService
-                .GetPreReleaseUsersInvitePlan(releaseId, viewModel.Emails)
+                .GetPreReleaseUsersInvitePlan(releaseVersionId, viewModel.Emails)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/prerelease-users")]
+        [HttpPost("release/{releaseVersionId:guid}/prerelease-users")]
         public async Task<ActionResult<List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
-            Guid releaseId, [FromBody] PreReleaseUserInviteViewModel viewModel)
+            Guid releaseVersionId, [FromBody] PreReleaseUserInviteViewModel viewModel)
         {
             return await _preReleaseUserService
-                .InvitePreReleaseUsers(releaseId, viewModel.Emails)
+                .InvitePreReleaseUsers(releaseVersionId, viewModel.Emails)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/prerelease-users")]
+        [HttpDelete("release/{releaseVersionId:guid}/prerelease-users")]
         public async Task<ActionResult> RemovePreReleaseUser(
-            Guid releaseId, [FromBody] PreReleaseUserRemoveRequest request)
+            Guid releaseVersionId, [FromBody] PreReleaseUserRemoveRequest request)
         {
             return await _preReleaseUserService
-                .RemovePreReleaseUser(releaseId, request.Email)
+                .RemovePreReleaseUser(releaseVersionId, request.Email)
                 .HandleFailuresOrNoContent();
         }
     }

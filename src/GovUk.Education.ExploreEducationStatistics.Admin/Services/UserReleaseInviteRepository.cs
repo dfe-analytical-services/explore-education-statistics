@@ -1,10 +1,9 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task Create(Guid releaseId,
+        public async Task Create(Guid releaseVersionId,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
@@ -32,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 new UserReleaseInvite
                 {
                     Email = email.ToLower(),
-                    ReleaseId = releaseId,
+                    ReleaseVersionId = releaseVersionId,
                     Role = releaseRole,
                     EmailSent = emailSent,
                     Created = createdDate ?? DateTime.UtcNow,
@@ -43,21 +42,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task CreateManyIfNotExists(List<Guid> releaseIds,
+        public async Task CreateManyIfNotExists(List<Guid> releaseVersionIds,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
             Guid createdById,
             DateTime? createdDate = null)
         {
-            var invites = await releaseIds
+            var invites = await releaseVersionIds
                 .ToAsyncEnumerable()
-                .WhereAwait(async releaseId => !await UserHasInvite(releaseId, email, releaseRole))
-                .Select(releaseId =>
+                .WhereAwait(async releaseVersionId => !await UserHasInvite(releaseVersionId, email, releaseRole))
+                .Select(releaseVersionId =>
                     new UserReleaseInvite
                     {
                         Email = email.ToLower(),
-                        ReleaseId = releaseId,
+                        ReleaseVersionId = releaseVersionId,
                         Role = releaseRole,
                         EmailSent = emailSent,
                         Created = createdDate ?? DateTime.UtcNow,
@@ -69,12 +68,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task Remove(Guid releaseId, string email, ReleaseRole role)
+        public async Task Remove(Guid releaseVersionId,
+            string email,
+            ReleaseRole role)
         {
             var invites = await _contentDbContext.UserReleaseInvites
                 .AsQueryable()
                 .Where(uri =>
-                    uri.ReleaseId == releaseId
+                    uri.ReleaseVersionId == releaseVersionId
                     && uri.Role == role
                     && uri.Email == email) // DB comparison is case insensitive
                 .ToListAsync();
@@ -82,48 +83,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
-        public async Task<bool> UserHasInvite(Guid releaseId, string email, ReleaseRole role)
+        public async Task<bool> UserHasInvite(Guid releaseVersionId,
+            string email,
+            ReleaseRole role)
         {
             return await _contentDbContext
                 .UserReleaseInvites
                 .AsQueryable()
                 .AnyAsync(i =>
-                    i.ReleaseId == releaseId
+                    i.ReleaseVersionId == releaseVersionId
                     && i.Email.ToLower().Equals(email.ToLower())
                     && i.Role == role);
         }
 
-        public async Task<bool> UserHasInvites(List<Guid> releaseIds, string email, ReleaseRole role)
+        public async Task<bool> UserHasInvites(List<Guid> releaseVersionIds,
+            string email,
+            ReleaseRole role)
         {
-            var inviteReleaseIds = await _contentDbContext
+            var inviteReleaseVersionIds = await _contentDbContext
                 .UserReleaseInvites
                 .AsQueryable()
                 .Where(i =>
-                    releaseIds.Contains(i.ReleaseId)
+                    releaseVersionIds.Contains(i.ReleaseVersionId)
                     && i.Email.ToLower().Equals(email.ToLower())
                     && i.Role == role)
-                .Select(i => i.ReleaseId)
+                .Select(i => i.ReleaseVersionId)
                 .ToListAsync();
 
-            return releaseIds.All(releaseId => inviteReleaseIds.Contains(releaseId));
+            return releaseVersionIds.All(releaseVersionId => inviteReleaseVersionIds.Contains(releaseVersionId));
         }
 
         public async Task RemoveByPublication(Publication publication, string email, ReleaseRole role)
         {
             _contentDbContext.Update(publication);
             await _contentDbContext.Entry(publication)
-                .Collection(p => p.Releases)
+                .Collection(p => p.ReleaseVersions)
                 .LoadAsync();
 
-            var releaseIds = publication.Releases
-                .Select(r => r.Id)
+            var releaseVersionIds = publication.ReleaseVersions
+                .Select(rv => rv.Id)
                 .ToList();
 
             var invites = await _contentDbContext
                 .UserReleaseInvites
                 .AsQueryable()
                 .Where(i =>
-                    releaseIds.Contains(i.ReleaseId)
+                    releaseVersionIds.Contains(i.ReleaseVersionId)
                     && i.Email.ToLower().Equals(email.ToLower())
                     && i.Role == role)
                 .ToListAsync();

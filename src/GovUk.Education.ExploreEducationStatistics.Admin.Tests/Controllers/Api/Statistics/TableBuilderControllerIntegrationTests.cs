@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
         }
 
-        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
         private static readonly ObservationQueryContext ObservationQueryContext = new()
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
             tableBuilderService
                 .Setup(s => s.Query(
-                    ReleaseId,
+                    ReleaseVersionId,
                     ItIs.DeepEqualTo(ObservationQueryContext),
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .CreateClient();
 
             var response = await client.PostAsync(
-                $"/api/data/tablebuilder/release/{ReleaseId}",
+                $"/api/data/tablebuilder/release/{ReleaseVersionId}",
                 new JsonNetContent(ObservationQueryContext));
 
             VerifyAllMocks(tableBuilderService);
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
             tableBuilderService
                 .Setup(s => s.QueryToCsvStream(
-                    ReleaseId,
+                    ReleaseVersionId,
                     ItIs.DeepEqualTo(ObservationQueryContext),
                     It.IsAny<Stream>(),
                     It.IsAny<CancellationToken>()))
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .CreateClient();
 
             var response = await client.PostAsync(
-                $"/api/data/tablebuilder/release/{ReleaseId}",
+                $"/api/data/tablebuilder/release/{ReleaseVersionId}",
                 content: new JsonNetContent(ObservationQueryContext),
                 headers: new Dictionary<string, string>
                 {

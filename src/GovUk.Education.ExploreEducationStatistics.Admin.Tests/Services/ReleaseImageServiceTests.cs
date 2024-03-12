@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -39,11 +39,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Stream()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -59,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.AddAsync(releaseFile);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -74,7 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.File.Id);
+                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                    fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -91,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseFile = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -121,13 +122,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Stream_ReleaseFileNotFound()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -135,7 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext);
 
-                var result = await service.Stream(release.Id, Guid.NewGuid());
+                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                    fileId: Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -144,11 +146,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Stream_BlobDoesNotExist()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -162,8 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.AddAsync(releaseFile);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.ReleaseFiles.Add(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -176,7 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
                     privateBlobStorageService: privateBlobStorageService.Object);
 
-                var result = await service.Stream(release.Id, releaseFile.File.Id);
+                var result = await service.Stream(releaseVersionId: releaseVersion.Id,
+                    fileId: releaseFile.File.Id);
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService);
 
@@ -189,13 +192,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             const string filename = "image.png";
 
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -206,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
-                        path.Contains(FilesPath(release.Id, Image))),
+                        path.Contains(FilesPath(releaseVersion.Id, Image))),
                     formFile
                 )).Returns(Task.CompletedTask);
 
@@ -220,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
-                var result = await service.Upload(release.Id, formFile);
+                var result = await service.Upload(releaseVersion.Id, formFile);
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
@@ -232,12 +235,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
-                            path.Contains(FilesPath(release.Id, Image))),
+                            path.Contains(FilesPath(releaseVersion.Id, Image))),
                         formFile
                     ), Times.Once);
 
                 Assert.True(result.Right.ContainsKey("default"));
-                Assert.Contains($"/api/releases/{release.Id}/images/", result.Right["default"]);
+                Assert.Contains($"/api/releases/{releaseVersion.Id}/images/", result.Right["default"]);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -245,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseFile = await contentDbContext.ReleaseFiles
                     .Include(mf => mf.File)
                     .SingleOrDefaultAsync(mf =>
-                        mf.ReleaseId == release.Id
+                        mf.ReleaseVersionId == releaseVersion.Id
                         && mf.File.Filename == filename
                         && mf.File.Type == Image
                     );

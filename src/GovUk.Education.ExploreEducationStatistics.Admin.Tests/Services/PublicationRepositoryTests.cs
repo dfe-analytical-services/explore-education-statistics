@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new()
                 {
-                    Release = new Release
+                    ReleaseVersion = new ReleaseVersion
                     {
                         ReleaseName = "2012",
                         TimePeriodCoverage = AcademicYear,
@@ -96,15 +96,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, result.Count);
 
                 Assert.Equal("Related publication 2", result[0].Title);
-                Assert.Empty(result[0].Releases);  // ListPublicationsForUser doesn't hydrate releases
+                Assert.Empty(result[0].ReleaseVersions); // ListPublicationsForUser doesn't hydrate releases
                 Assert.Empty(result[0].Methodologies); // ListPublicationsForUser doesn't hydrate methodologies
 
                 Assert.Equal("Related publication 3", result[1].Title);
-                Assert.Empty(result[1].Releases);
+                Assert.Empty(result[1].ReleaseVersions);
                 Assert.Empty(result[1].Methodologies);
 
                 Assert.Equal("Related publication 1", result[2].Title);
-                Assert.Empty(result[2].Releases);
+                Assert.Empty(result[2].ReleaseVersions);
                 Assert.Empty(result[2].Methodologies);
             }
         }
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new()
                 {
-                    Release = new Release
+                    ReleaseVersion = new ReleaseVersion
                     {
                         ReleaseName = "2014",
                         TimePeriodCoverage = AcademicYear,
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 new()
                 {
-                    Release = new Release
+                    ReleaseVersion = new ReleaseVersion
                     {
                         ReleaseName = "2012",
                         TimePeriodCoverage = AcademicYear,
@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 new()
                 {
-                    Release = new Release
+                    ReleaseVersion = new ReleaseVersion
                     {
                         ReleaseName = "2020",
                         TimePeriodCoverage = AcademicYear,
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 new()
                 {
-                    Release = new Release
+                    ReleaseVersion = new ReleaseVersion
                     {
                         ReleaseName = "2011",
                         TimePeriodCoverage = AcademicYear,
@@ -239,22 +239,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Exists(pub => pub.Title == "Release PrereleaseViewer publication"));
 
                 Assert.Equal("Publication Owner publication", result[0].Title);
-                Assert.Empty(result[0].Releases);   // ListPublicationsForUser doesn't hydrate releases
+                Assert.Empty(result[0].ReleaseVersions); // ListPublicationsForUser doesn't hydrate releases
 
                 Assert.Equal("Publication Approver publication", result[1].Title);
-                Assert.Empty(result[1].Releases);
+                Assert.Empty(result[1].ReleaseVersions);
 
                 Assert.Equal("Publication Owner publication 2", result[2].Title);
-                Assert.Empty(result[2].Releases);
+                Assert.Empty(result[2].ReleaseVersions);
 
                 Assert.Equal("Release Contributor publication", result[3].Title);
-                Assert.Empty(result[3].Releases);
+                Assert.Empty(result[3].ReleaseVersions);
 
                 Assert.Equal("Release Viewer publication", result[4].Title);
-                Assert.Empty(result[4].Releases);
+                Assert.Empty(result[4].ReleaseVersions);
 
                 Assert.Equal("Release Contributor publication 2", result[5].Title);
-                Assert.Empty(result[5].Releases);
+                Assert.Empty(result[5].ReleaseVersions);
             }
         }
 
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRole = new UserReleaseRole
             {
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ReleaseName = "2011",
                     TimePeriodCoverage = AcademicYear,
@@ -289,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Unrelated publication 2",
-                    Releases = new List<Release>
+                    ReleaseVersions = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRole = new UserReleaseRole
             {
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
                     ReleaseName = "2011",
                     TimePeriodCoverage = AcademicYear,
@@ -354,7 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication
                 {
                     Title = "Related publication 2",
-                    Releases = new List<Release>
+                    ReleaseVersions = new List<ReleaseVersion>
                     {
                         new()
                         {
@@ -410,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = topic,
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 ReleaseName = "2011",
                 TimePeriodCoverage = AcademicYear,
@@ -421,13 +421,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 new()
                 {
-                    Release = release,
+                    ReleaseVersion = releaseVersion,
                     User = user,
                     Role = ReleaseRole.Contributor
                 },
                 new()
                 {
-                    Release = release,
+                    ReleaseVersion = releaseVersion,
                     User = user,
                     Role = ReleaseRole.Lead
                 }
@@ -444,12 +444,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                contentDbContext.Users.Add(user);
+                contentDbContext.Topics.Add(topic);
+                contentDbContext.Publications.Add(publication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                contentDbContext.UserPublicationRoles.AddRange(userPublicationRoles);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -461,8 +461,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var resultPublication = Assert.Single(publications);
                 Assert.Equal("Publication", resultPublication.Title);
 
-                var resultRelease = Assert.Single(resultPublication.Releases);
-                Assert.Equal("Academic year 2011/12", resultRelease.Title);
+                var resultReleaseVersion = Assert.Single(resultPublication.ReleaseVersions);
+                Assert.Equal("Academic year 2011/12", resultReleaseVersion.Title);
             }
         }
 

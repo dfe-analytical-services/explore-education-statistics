@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 public abstract record PaginatedListViewModel<T>
@@ -7,26 +5,13 @@ public abstract record PaginatedListViewModel<T>
     /// <summary>
     /// The list of results for this page.
     /// </summary>
-    public List<T> Results { get; }
+    public required List<T> Results { get; init; }
 
     /// <summary>
     /// Provides metadata for use in pagination.
     /// </summary>
-    public PagingViewModel Paging { get; }
-
-    public PaginatedListViewModel(List<T> results, int totalResults, int page, int pageSize)
-    {
-        Results = results;
-        Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults);
-    }
-
-    [JsonConstructor]
-    public PaginatedListViewModel(List<T> results, PagingViewModel paging)
-    {
-        Results = results;
-        Paging = paging;
-    }
-};
+    public required PagingViewModel Paging { get; init; }
+}
 
 public record PagingViewModel
 {

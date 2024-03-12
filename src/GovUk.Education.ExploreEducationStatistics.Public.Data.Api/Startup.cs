@@ -7,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -117,6 +119,8 @@ public class Startup
             httpClient.BaseAddress = new Uri(contentApiOptions.Url);
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
+
+        services.AddSecurity();
 
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();

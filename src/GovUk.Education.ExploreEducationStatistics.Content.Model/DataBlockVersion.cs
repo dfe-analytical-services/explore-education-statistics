@@ -17,9 +17,9 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DataBlockParent DataBlockParent { get; set; }
 
-    public Guid ReleaseId { get; set; }
+    public Guid ReleaseVersionId { get; set; }
 
-    public Release Release { get; set; }
+    public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
     public Guid ContentBlockId { get; set; }
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -15,7 +15,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -30,9 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that users with the "UpdateAllReleases" claim can assign pre release contacts to a release
                 // that's unapproved
                 await AssertHandlerSucceedsWithCorrectClaims
-                    <Release, AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                    <ReleaseVersion, AssignPrereleaseContactsToSpecificReleaseRequirement>(
                         CreateHandler,
-                        new Release
+                        new ReleaseVersion
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft
                         },
@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that users with the "UpdateAllReleases" claim can assign pre release contacts to a release
                 // that's approved
                 await AssertHandlerSucceedsWithCorrectClaims
-                    <Release, AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                    <ReleaseVersion, AssignPrereleaseContactsToSpecificReleaseRequirement>(
                         CreateHandler,
-                        new Release
+                        new ReleaseVersion
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved
                         },
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_NotApproved()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Publication = new Publication
                     {
@@ -75,19 +75,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Add(release);
+                        contentDbContext.Add(releaseVersion);
                         contentDbContext.SaveChanges();
 
                         return CreateHandler(contentDbContext);
                     },
-                    release,
+                    releaseVersion,
                     PublicationRole.Owner, PublicationRole.Approver);
             }
 
             [Fact]
             public async Task AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler_Approved()
             {
-                var release = new Release
+                var releaseVersion = new ReleaseVersion
                 {
                     Publication = new Publication
                     {
@@ -102,12 +102,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Add(release);
+                        contentDbContext.Add(releaseVersion);
                         contentDbContext.SaveChanges();
 
                         return CreateHandler(contentDbContext);
                     },
-                    release,
+                    releaseVersion,
                     PublicationRole.Owner, PublicationRole.Approver);
             }
         }
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
                     CreateHandler,
-                    new Release
+                    new ReleaseVersion
                     {
                         Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Approved
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(contentDbContext),
+                    new ReleaseVersionRepository(contentDbContext),
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
                     Mock.Of<IPreReleaseService>(Strict))

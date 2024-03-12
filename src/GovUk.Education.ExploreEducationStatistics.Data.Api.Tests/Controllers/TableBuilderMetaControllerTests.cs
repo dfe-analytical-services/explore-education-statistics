@@ -19,13 +19,13 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
-        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
         private static readonly ObservationQueryContext QueryContext = new()
@@ -36,9 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_LatestRelease()
         {
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = ReleaseId,
+                Id = ReleaseVersionId,
                 Slug = "release-slug",
                 Publication = new Publication
                 {
@@ -48,17 +48,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseId = ReleaseId,
+                ReleaseVersionId = ReleaseVersionId,
                 SubjectId = SubjectId
             };
 
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
+            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
+            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
@@ -85,9 +85,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_SpecificRelease()
         {
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = ReleaseId,
+                Id = ReleaseVersionId,
                 Slug = "release-slug",
                 Publication = new Publication
                 {
@@ -97,17 +97,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseId = ReleaseId,
+                ReleaseVersionId = ReleaseVersionId,
                 SubjectId = SubjectId
             };
 
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
+            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
+            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
@@ -118,14 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Returns(Task.CompletedTask);
 
             mocks.releaseSubjectService
-                .Setup(s => s.Find(SubjectId, ReleaseId))
+                .Setup(s => s.Find(SubjectId, ReleaseVersionId))
                 .ReturnsAsync(releaseSubject);
 
             mocks.subjectMetaService
                 .Setup(s => s.GetSubjectMeta(releaseSubject))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.GetSubjectMeta(ReleaseId, SubjectId);
+            var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
+                subjectId: SubjectId);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
@@ -152,10 +153,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks.releaseSubjectService
-                .Setup(mock => mock.Find(SubjectId, ReleaseId))
+                .Setup(mock => mock.Find(SubjectId, ReleaseVersionId))
                 .ReturnsAsync(new NotFoundResult());
 
-            var result = await controller.GetSubjectMeta(ReleaseId, SubjectId);
+            var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
+                subjectId: SubjectId);
             VerifyAllMocks(mocks);
 
             result.AssertNotFoundResult();
@@ -188,18 +190,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken))
+                .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken);
+            var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
         }
 
-        private static SubjectMetaCacheKey GetCacheKey(Release release, ReleaseSubject releaseSubject)
+        private static SubjectMetaCacheKey GetCacheKey(ReleaseVersion releaseVersion, ReleaseSubject releaseSubject)
         {
-            return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
+            return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Publication.Slug,
+                releaseSlug: releaseVersion.Slug,
+                releaseSubject.SubjectId);
         }
 
         private static (TableBuilderMetaController controller, (

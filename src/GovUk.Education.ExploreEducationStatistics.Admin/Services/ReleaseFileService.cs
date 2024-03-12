@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -76,12 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId,
+        public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseVersionId,
             Guid fileId,
             params FileType[] allowedFileTypes)
         {
-            // Ensure file is linked to the Release by getting the ReleaseFile first
-            var releaseFile = await _releaseFileRepository.Find(releaseId, fileId);
+            // Ensure file is linked to the release version by getting the ReleaseFile first
+            var releaseFile = await _releaseFileRepository.Find(releaseVersionId, fileId);
 
             if (releaseFile == null)
             {
@@ -96,31 +96,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFile.File;
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
             Guid fileId,
             bool forceDelete = false)
         {
-            return await Delete(releaseId, new List<Guid>
+            return await Delete(releaseVersionId, new List<Guid>
             {
                 fileId
             }, forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
             IEnumerable<Guid> fileIds,
             bool forceDelete = false)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(async releaseVersion =>
+                    await _userService.CheckCanUpdateReleaseVersion(releaseVersion, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
-                    await fileIds.Select(fileId => CheckFileExists(releaseId, fileId, DeletableFileTypes)).OnSuccessAll())
+                    await fileIds.Select(fileId => CheckFileExists(releaseVersionId: releaseVersionId,
+                        fileId: fileId,
+                        DeletableFileTypes)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
                     {
-                        await _releaseFileRepository.Delete(releaseId, file.Id);
-                        if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, file.Id))
+                        await _releaseFileRepository.Delete(releaseVersionId: releaseVersionId,
+                            fileId: file.Id);
+                        if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(
+                                releaseVersionId: releaseVersionId,
+                                fileId: file.Id))
                         {
                             await _privateBlobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
@@ -132,24 +138,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false)
+        public async Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId, bool forceDelete = false)
         {
-            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, DeletableFileTypes);
+            var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, DeletableFileTypes);
 
-            return await Delete(releaseId,
+            return await Delete(releaseVersionId,
                 releaseFiles.Select(releaseFile => releaseFile.File.Id),
                 forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseId,
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> ListAll(Guid releaseVersionId,
             params FileType[] types)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, types);
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, types);
 
                     return releaseFiles
                         .Select(releaseFile => releaseFile.ToFileInfo())
@@ -159,21 +165,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseVersionId, Guid fileId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseId, fileId))
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseVersionId: releaseVersionId,
+                    fileId: fileId))
                 .OnSuccess(releaseFile => releaseFile.ToFileInfo());
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseVersionId, Guid fileId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => CheckFileExists(releaseId, fileId))
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(_ => CheckFileExists(releaseVersionId: releaseVersionId, fileId: fileId))
                 .OnSuccessCombineWith(file =>
                     _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
                 .OnSuccess(fileAndStream =>
@@ -187,20 +194,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
-            Guid releaseId,
+            Guid releaseVersionId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(
-                    releaseId,
-                    q => q.Include(r => r.Publication)
+            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+                    releaseVersionId,
+                    q => q.Include(rv => rv.Publication)
                 )
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccessVoid(
                     async release =>
                     {
-                        var query = QueryZipReleaseFiles(releaseId);
+                        var query = QueryZipReleaseFiles(releaseVersionId);
 
                         if (fileIds != null)
                         {
@@ -218,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task DoZipFilesToStream(
             List<ReleaseFile> releaseFiles,
-            Release release,
+            ReleaseVersion releaseVersion,
             Stream outputStream,
             CancellationToken cancellationToken)
         {
@@ -256,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     stream: entryStream,
                     cancellationToken: cancellationToken
                 );
-                
+
                 releaseFilesWithZipEntries.Add(releaseFile);
             }
 
@@ -274,18 +281,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Select(rf => rf.FileId)
                     .ToList();
 
-                await _dataGuidanceFileWriter.WriteToStream(entryStream, release, dataFileIds);
+                await _dataGuidanceFileWriter.WriteToStream(entryStream, releaseVersion, dataFileIds);
             }
         }
 
-        public Task<Either<ActionResult, Unit>> UpdateDataFileDetails(Guid releaseId, Guid fileId, ReleaseDataFileUpdateRequest update)
+        public Task<Either<ActionResult, Unit>> UpdateDataFileDetails(Guid releaseVersionId,
+            Guid fileId,
+            ReleaseDataFileUpdateRequest update)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ =>
                     _persistenceHelper.CheckEntityExists<ReleaseFile>(q => q
-                        .Where(rf => rf.ReleaseId == releaseId
+                        .Where(rf => rf.ReleaseVersionId == releaseVersionId
                                      && rf.FileId == fileId
                                      && rf.File.Type == FileType.Data)))
                 .OnSuccessVoid(
@@ -298,14 +307,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
+        public async Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
                 .OnSuccess(async _ =>
                 {
-                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, Ancillary);
+                    var releaseFiles = await _releaseFileRepository.GetByFileType(releaseVersionId, Ancillary);
 
                     var filesWithMetadata = await releaseFiles
                         .SelectAsync(async releaseFile => await ToAncillaryFileInfo(releaseFile));
@@ -317,12 +326,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, FileInfo>> UploadAncillary(
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseAncillaryFileUploadRequest upload)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(upload.File, Ancillary))
                 .OnSuccess(async () =>
                 {
@@ -331,14 +340,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _privateBlobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: FileExtensions.Path(
-                            rootPath: releaseId,
+                            rootPath: releaseVersionId,
                             type: Ancillary,
                             fileId: newFileId),
                         file: upload.File);
 
                     var releaseFile = await _releaseFileRepository.Create(
                         newFileId: newFileId,
-                        releaseId: releaseId,
+                        releaseVersionId: releaseVersionId,
                         filename: upload.File.FileName,
                         contentLength: upload.File.Length,
                         contentType: upload.File.ContentType,
@@ -354,19 +363,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, FileInfo>> UpdateAncillary(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid fileId,
             ReleaseAncillaryFileUpdateRequest request)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(_ => _persistenceHelper.CheckEntityExists<ReleaseFile>(query =>
                     query
                         .Include(rf => rf.File)
                         .Where(rf =>
                             rf.FileId == fileId
-                            && rf.ReleaseId == releaseId
+                            && rf.ReleaseVersionId == releaseVersionId
                             && rf.File.Type == Ancillary))
                 )
                 .OnSuccessDo(async _ =>
@@ -388,14 +397,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _privateBlobStorageService.UploadFile(
                             containerName: PrivateReleaseFiles,
                             path: FileExtensions.Path(
-                                rootPath: releaseId,
+                                rootPath: releaseVersionId,
                                 type: Ancillary,
                                 fileId: newFileId),
                             file: request.File);
 
                         var newFile = await _fileRepository.Create(
                             newFileId: newFileId,
-                            releaseId: releaseId,
+                            releaseVersionId: releaseVersionId,
                             filename: request.File.FileName,
                             contentLength: request.File.Length,
                             contentType: request.File.ContentType,
@@ -408,7 +417,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         _contentDbContext.Update(releaseFile);
                         await _contentDbContext.SaveChangesAsync();
 
-                        if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, oldFile.Id))
+                        if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(
+                                releaseVersionId: releaseVersionId,
+                                fileId: oldFile.Id))
                         {
                             await _privateBlobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
@@ -429,23 +440,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
+        public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseVersionId,
             IFormFile formFile,
             Guid? replacingId = null)
         {
             return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Chart))
                 .OnSuccess(async () =>
                 {
                     var releaseFile = replacingId.HasValue
                         ? await _releaseFileRepository.Update(
-                            releaseId: releaseId,
+                            releaseVersionId: releaseVersionId,
                             fileId: replacingId.Value,
                             fileName: formFile.FileName)
                         : await _releaseFileRepository.Create(
-                            releaseId: releaseId,
+                            releaseVersionId: releaseVersionId,
                             filename: formFile.FileName,
                             contentLength: formFile.Length,
                             contentType: formFile.ContentType,
@@ -478,13 +489,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFile.ToFileInfo();
         }
 
-        private IQueryable<ReleaseFile> QueryZipReleaseFiles(Guid releaseId)
+        private IQueryable<ReleaseFile> QueryZipReleaseFiles(Guid releaseVersionId)
         {
             return _contentDbContext.ReleaseFiles
-                .Include(f => f.Release)
-                .ThenInclude(r => r.Publication)
+                .Include(f => f.ReleaseVersion)
+                .ThenInclude(rv => rv.Publication)
                 .Include(f => f.File)
-                .Where(releaseFile => releaseFile.ReleaseId == releaseId
+                .Where(releaseFile => releaseFile.ReleaseVersionId == releaseVersionId
                                       && AllowedZipFileTypes.Contains(releaseFile.File.Type));
         }
     }

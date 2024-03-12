@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -19,10 +19,10 @@ public static class ReleaseStatusGeneratorExtensions
             .Set(rs => rs.Created, f => f.Date.Past())
             .SetDefault(rs => rs.CreatedById);
 
-    public static Generator<ReleaseStatus> WithRelease(
+    public static Generator<ReleaseStatus> WithReleaseVersion(
         this Generator<ReleaseStatus> generator,
-        Release release)
-        => generator.ForInstance(s => s.SetRelease(release));
+        ReleaseVersion releaseVersion)
+        => generator.ForInstance(s => s.SetReleaseVersion(releaseVersion));
 
     public static Generator<ReleaseStatus> WithApprovalStatus(
         this Generator<ReleaseStatus> generator,
@@ -48,16 +48,16 @@ public static class ReleaseStatusGeneratorExtensions
         return generator.ForInstance(s => s.SetCreatedBy(createdBy));
     }
 
-    public static InstanceSetters<ReleaseStatus> SetRelease(
+    public static InstanceSetters<ReleaseStatus> SetReleaseVersion(
         this InstanceSetters<ReleaseStatus> setters,
-        Release release)
-        => setters.Set(rs => rs.Release, release)
-            .SetReleaseId(release.Id);
+        ReleaseVersion releaseVersion)
+        => setters.Set(rs => rs.ReleaseVersion, releaseVersion)
+            .SetReleaseVersionId(releaseVersion.Id);
 
-    public static InstanceSetters<ReleaseStatus> SetReleaseId(
+    public static InstanceSetters<ReleaseStatus> SetReleaseVersionId(
         this InstanceSetters<ReleaseStatus> setters,
-        Guid releaseId)
-        => setters.Set(rs => rs.ReleaseId, releaseId);
+        Guid releaseVersionId)
+        => setters.Set(rs => rs.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<ReleaseStatus> SetApprovalStatus(
         this InstanceSetters<ReleaseStatus> setters,

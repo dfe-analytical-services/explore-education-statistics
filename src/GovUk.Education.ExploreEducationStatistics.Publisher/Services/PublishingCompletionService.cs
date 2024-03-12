@@ -19,7 +19,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IMethodologyService _methodologyService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-    private readonly IReleaseRepository _releaseRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
     private readonly IRedirectsCacheService _redirectsCacheService;
@@ -30,7 +30,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService,
         IPublicationCacheService publicationCacheService,
-        IReleaseRepository releaseRepository,
+        IReleaseVersionRepository releaseVersionRepository,
         IReleaseService releaseService,
         IRedirectsCacheService redirectsCacheService)
     {
@@ -40,17 +40,19 @@ public class PublishingCompletionService : IPublishingCompletionService
         _notificationsService = notificationsService;
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
-        _releaseRepository = releaseRepository;
+        _releaseVersionRepository = releaseVersionRepository;
         _releaseService = releaseService;
         _redirectsCacheService = redirectsCacheService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
-        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds)
+        IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releaseVersionAndReleaseStatusIds)
     {
-        var releaseStatuses = await releaseAndReleaseStatusIds
+        var releaseStatuses = await releaseVersionAndReleaseStatusIds
             .ToAsyncEnumerable()
-            .SelectAwait(async status => await _releasePublishingStatusService.GetAsync(status.ReleaseId, status.ReleaseStatusId))
+            .SelectAwait(async status =>
+                await _releasePublishingStatusService.GetAsync(releaseVersionId: status.ReleaseVersionId,
+                    releaseStatusId: status.ReleaseStatusId))
             .ToArrayAsync();
 
         await CompletePublishingIfAllPriorStagesComplete(releaseStatuses);
@@ -72,25 +74,25 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(status => _releasePublishingStatusService
                 .UpdatePublishingStageAsync(
-                    status.ReleaseId,
-                    status.Id,
+                    releaseVersionId: status.ReleaseVersionId,
+                    releaseStatusId: status.Id,
                     ReleasePublishingStatusPublishingStage.Started));
 
-        var releaseIdsToUpdate = prePublishingStagesComplete
-            .Select(status => status.ReleaseId)
+        var releaseVersionIdsToUpdate = prePublishingStagesComplete
+            .Select(status => status.ReleaseVersionId)
             .ToArray();
 
-        await releaseIdsToUpdate
+        await releaseVersionIdsToUpdate
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(releaseId => _releaseService.CompletePublishing(releaseId, DateTime.UtcNow));
 
-        await releaseIdsToUpdate
+        await releaseVersionIdsToUpdate
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async releaseId =>
             {
-                var release = await _releaseService.Get(releaseId);
+                var releaseVersion = await _releaseService.Get(releaseId);
                 var methodologyVersions =
-                    await _methodologyService.GetLatestVersionByRelease(release);
+                    await _methodologyService.GetLatestVersionByRelease(releaseVersion);
 
                 if (!methodologyVersions.Any())
                 {
@@ -100,7 +102,7 @@ public class PublishingCompletionService : IPublishingCompletionService
                 foreach (var methodologyVersion in methodologyVersions)
                 {
                     // WARN: This must be called before PublicationRepository#UpdateLatestPublishedRelease
-                    if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
+                    if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
                     {
                         await _methodologyService.Publish(methodologyVersion);
                     }
@@ -108,9 +110,9 @@ public class PublishingCompletionService : IPublishingCompletionService
             });
 
         var directlyRelatedPublicationIds = await _contentDbContext
-            .Releases
-            .Where(r => releaseIdsToUpdate.Contains(r.Id))
-            .Select(r => r.PublicationId)
+            .ReleaseVersions
+            .Where(rv => releaseVersionIdsToUpdate.Contains(rv.Id))
+            .Select(rv => rv.PublicationId)
             .Distinct()
             .ToListAsync();
 
@@ -131,10 +133,10 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(publicationSlug => _publicationCacheService.UpdatePublication(publicationSlug));
 
-        await _contentService.DeletePreviousVersionsDownloadFiles(releaseIdsToUpdate);
-        await _contentService.DeletePreviousVersionsContent(releaseIdsToUpdate);
+        await _contentService.DeletePreviousVersionsDownloadFiles(releaseVersionIdsToUpdate);
+        await _contentService.DeletePreviousVersionsContent(releaseVersionIdsToUpdate);
 
-        await _notificationsService.NotifySubscribersIfApplicable(releaseIdsToUpdate);
+        await _notificationsService.NotifySubscribersIfApplicable(releaseVersionIdsToUpdate);
 
         // Update the cached trees in case any methodologies/publications
         // are now accessible for the first time after publishing these releases
@@ -146,8 +148,8 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(status => _releasePublishingStatusService
                 .UpdatePublishingStageAsync(
-                    status.ReleaseId,
-                    status.Id,
+                    releaseVersionId: status.ReleaseVersionId,
+                    releaseStatusId: status.Id,
                     ReleasePublishingStatusPublishingStage.Complete));
     }
 
@@ -156,8 +158,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         var publication = await _contentDbContext.Publications
             .SingleAsync(p => p.Id == publicationId);
 
-        var latestPublishedReleaseVersion = await _releaseRepository.GetLatestPublishedReleaseVersion(publicationId);
-        publication.LatestPublishedReleaseId = latestPublishedReleaseVersion!.Id;
+        var latestPublishedReleaseVersion = await _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId);
+        publication.LatestPublishedReleaseVersionId = latestPublishedReleaseVersion!.Id;
 
         _contentDbContext.Update(publication);
         await _contentDbContext.SaveChangesAsync();

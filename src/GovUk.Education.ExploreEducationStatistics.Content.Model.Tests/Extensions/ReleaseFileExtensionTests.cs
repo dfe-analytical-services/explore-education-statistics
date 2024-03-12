@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         {
             var releaseFile = new ReleaseFile
             {
-                ReleaseId = Guid.NewGuid(),
+                ReleaseVersionId = Guid.NewGuid(),
                 File = new File
                 {
                     Id = Guid.NewGuid(),
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            Assert.Equal($"{releaseFile.ReleaseId}/ancillary/{releaseFile.File.Id}", releaseFile.PublicPath());
+            Assert.Equal($"{releaseFile.ReleaseVersionId}/ancillary/{releaseFile.File.Id}", releaseFile.PublicPath());
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         {
             var releaseFile = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Name = "Test ancillary file",
                 Summary = "Test summary",
                 File = new File
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         {
             var releaseFile = new ReleaseFile
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Name = "Test ancillary file",
                 File = new File
                 {

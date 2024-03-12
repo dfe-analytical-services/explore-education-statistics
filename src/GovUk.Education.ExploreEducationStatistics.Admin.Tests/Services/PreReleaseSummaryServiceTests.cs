@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContactId = contact.Id
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2020",
@@ -41,9 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext("PreReleaseSummaryViewModel"))
             {
-                context.Add(contact);
-                context.Add(publication);
-                context.Add(release);
+                context.Contacts.Add(contact);
+                context.Publications.Add(publication);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -53,12 +54,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PersistenceHelper<ContentDbContext>(context),
                     MockUtils.AlwaysTrueUserService().Object);
 
-                var viewModel = (await preReleaseSummaryService.GetPreReleaseSummaryViewModelAsync(release.Id)).Right;
+                var viewModel = (await preReleaseSummaryService.GetPreReleaseSummaryViewModelAsync(releaseVersion.Id))
+                    .Right;
                 Assert.Equal(contact.TeamEmail, viewModel.ContactEmail);
                 Assert.Equal(publication.Slug, viewModel.PublicationSlug);
                 Assert.Equal(publication.Title, viewModel.PublicationTitle);
-                Assert.Equal(release.Title, viewModel.ReleaseTitle);
-                Assert.Equal(release.Slug, viewModel.ReleaseSlug);
+                Assert.Equal(releaseVersion.Title, viewModel.ReleaseTitle);
+                Assert.Equal(releaseVersion.Slug, viewModel.ReleaseSlug);
             }
         }
     }

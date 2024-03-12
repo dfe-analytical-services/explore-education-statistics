@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-    
+
 public class ContentSectionRepository : IContentSectionRepository
 {
     private readonly ContentDbContext _contentDbContext;
@@ -18,11 +18,11 @@ public class ContentSectionRepository : IContentSectionRepository
         _contentDbContext = contentDbContext;
     }
 
-    public async Task<List<T>> GetAllContentBlocks<T>(Guid releaseId) where T : ContentBlock
+    public async Task<List<T>> GetAllContentBlocks<T>(Guid releaseVersionId) where T : ContentBlock
     {
         return await _contentDbContext
             .ContentBlocks
-            .Where(block => block.ReleaseId == releaseId)
+            .Where(block => block.ReleaseVersionId == releaseVersionId)
             .OfType<T>()
             .ToListAsync();
     }

@@ -35,15 +35,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -52,15 +52,15 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
+            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(ListOf(new DataBlockViewModel
                 {
                     Id = dataBlockVersion.Id
@@ -68,7 +68,7 @@ public class KeyStatisticServiceTests
 
             dataBlockService.Setup(s =>
                     s.IsUnattachedDataBlock(
-                        release.Id,
+                        releaseVersion.Id,
                         It.Is<DataBlockVersion>(db => db.Id == dataBlockVersion.Id)))
                 .ReturnsAsync(true);
 
@@ -76,7 +76,7 @@ public class KeyStatisticServiceTests
                 dataBlockService: dataBlockService.Object);
 
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticDataBlockCreateRequest
                 {
                     DataBlockId = dataBlockVersion.Id,
@@ -106,7 +106,7 @@ public class KeyStatisticServiceTests
             Assert.Equal(dataBlockVersion.Id, keyStatDataBlock.DataBlockId);
             Assert.Equal(dataBlockParent.Id, keyStatDataBlock.DataBlockParentId);
 
-            Assert.Equal(release.Id, keyStatDataBlock.ReleaseId);
+            Assert.Equal(releaseVersion.Id, keyStatDataBlock.ReleaseVersionId);
             Assert.Equal("trend", keyStatDataBlock.Trend);
             Assert.Equal("guidanceTitle", keyStatDataBlock.GuidanceTitle);
             Assert.Equal("guidanceText", keyStatDataBlock.GuidanceText);
@@ -121,21 +121,21 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_Order()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
         var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
-        release.KeyStatistics = new List<KeyStatistic>
+        releaseVersion.KeyStatistics = new List<KeyStatistic>
         {
             new KeyStatisticText { Order = 0 },
             new KeyStatisticText { Order = 1 },
@@ -145,8 +145,8 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
@@ -155,7 +155,7 @@ public class KeyStatisticServiceTests
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
 
             dataBlockService
-                .Setup(s => s.GetUnattachedDataBlocks(release.Id))
+                .Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(ListOf(new DataBlockViewModel
                 {
                     Id = dataBlockVersion.Id
@@ -163,7 +163,7 @@ public class KeyStatisticServiceTests
 
             dataBlockService
                 .Setup(s => s.IsUnattachedDataBlock(
-                    release.Id,
+                    releaseVersion.Id,
                     It.Is<DataBlockVersion>(db => db.Id == dataBlockVersion.Id)))
                 .ReturnsAsync(true);
 
@@ -171,7 +171,7 @@ public class KeyStatisticServiceTests
                 dataBlockService: dataBlockService.Object);
 
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticDataBlockCreateRequest
                 {
                     DataBlockId = dataBlockVersion.Id,
@@ -204,7 +204,7 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(dataBlockVersion.Id, keyStatDataBlock.DataBlockId);
 
-            Assert.Equal(release.Id, keyStatDataBlock.ReleaseId);
+            Assert.Equal(releaseVersion.Id, keyStatDataBlock.ReleaseVersionId);
             Assert.Null(keyStatDataBlock.Trend);
             Assert.Null(keyStatDataBlock.GuidanceTitle);
             Assert.Null(keyStatDataBlock.GuidanceText);
@@ -219,15 +219,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_NoRelease()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -236,8 +236,8 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockVersions.AddRangeAsync(dataBlockVersion);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockVersions.AddRange(dataBlockVersion);
             await context.SaveChangesAsync();
         }
 
@@ -258,15 +258,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_NoDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -275,8 +275,8 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockVersions.AddRangeAsync(dataBlockVersion);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockVersions.AddRange(dataBlockVersion);
             await context.SaveChangesAsync();
         }
 
@@ -284,7 +284,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticDataBlockCreateRequest
                 {
                     DataBlockId = Guid.NewGuid(),
@@ -297,15 +297,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_DataBlockAttachedToContent()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -314,15 +314,15 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
+            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(releaseVersion.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
@@ -332,7 +332,7 @@ public class KeyStatisticServiceTests
 
             dataBlockService.Setup(s =>
                     s.IsUnattachedDataBlock(
-                        release.Id,
+                        releaseVersion.Id,
                         It.Is<DataBlockVersion>(db => db.Id == dataBlockVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -340,7 +340,7 @@ public class KeyStatisticServiceTests
                 dataBlockService: dataBlockService.Object);
 
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticDataBlockCreateRequest
                 {
                     DataBlockId = dataBlockVersion.Id,
@@ -353,12 +353,12 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticText()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -367,7 +367,7 @@ public class KeyStatisticServiceTests
             var keyStatisticService = SetupKeyStatisticService(context);
 
             var result = await keyStatisticService.CreateKeyStatisticText(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticTextCreateRequest
                 {
                     Title = "title",
@@ -397,7 +397,7 @@ public class KeyStatisticServiceTests
 
             Assert.Equal("title", keyStatText.Title);
             Assert.Equal("Over 9000!", keyStatText.Statistic);
-            Assert.Equal(release.Id, keyStatText.ReleaseId);
+            Assert.Equal(releaseVersion.Id, keyStatText.ReleaseVersionId);
             Assert.Equal("trend", keyStatText.Trend);
             Assert.Equal("guidanceTitle", keyStatText.GuidanceTitle);
             Assert.Equal("guidanceText", keyStatText.GuidanceText);
@@ -412,12 +412,12 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticText_NoRelease()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -439,7 +439,7 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticText_Order()
     {
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
             KeyStatistics = new List<KeyStatistic>
             {
@@ -452,7 +452,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -461,7 +461,7 @@ public class KeyStatisticServiceTests
             var keyStatisticService = SetupKeyStatisticService(context);
 
             var result = await keyStatisticService.CreateKeyStatisticText(
-                release.Id,
+                releaseVersion.Id,
                 new KeyStatisticTextCreateRequest
                 {
                     Title = "title",
@@ -494,15 +494,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -510,7 +510,7 @@ public class KeyStatisticServiceTests
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = release.Id,
+            ReleaseVersionId = releaseVersion.Id,
             DataBlockId = dataBlockVersion.Id,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -521,13 +521,13 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        release.KeyStatistics = ListOf<KeyStatistic>(keyStatisticDataBlock);
+        releaseVersion.KeyStatistics = ListOf<KeyStatistic>(keyStatisticDataBlock);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
@@ -535,7 +535,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticDataBlock.Id,
                 new KeyStatisticDataBlockUpdateRequest
                 {
@@ -564,7 +564,7 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(dataBlockVersion.Id, keyStatDataBlock.DataBlockId);
 
-            Assert.Equal(release.Id, keyStatDataBlock.ReleaseId);
+            Assert.Equal(releaseVersion.Id, keyStatDataBlock.ReleaseVersionId);
             Assert.Equal("new trend", keyStatDataBlock.Trend);
             Assert.Equal("new guidanceTitle", keyStatDataBlock.GuidanceTitle);
             Assert.Equal("new guidanceText", keyStatDataBlock.GuidanceText);
@@ -580,12 +580,12 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock_NoRelease()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
         var dataBlockId = Guid.NewGuid();
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             DataBlockId = dataBlockId,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -594,9 +594,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
@@ -604,14 +604,14 @@ public class KeyStatisticServiceTests
         };
         var dataBlock = new DataBlock
         {
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.ContentBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.ContentBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -635,12 +635,12 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock_NoKeyStatisticDataBlock()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
         var dataBlockId = Guid.NewGuid();
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             DataBlockId = dataBlockId,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -649,9 +649,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
@@ -659,14 +659,14 @@ public class KeyStatisticServiceTests
         };
         var dataBlock = new DataBlock
         {
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -674,7 +674,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 Guid.NewGuid(),
                 new KeyStatisticDataBlockUpdateRequest
                 {
@@ -690,10 +690,10 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticDataBlock_KeyStatWrongType()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
         var keyStatisticText = new KeyStatisticText
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             Title = "title",
             Statistic = "Over 9000",
             Trend = "trend",
@@ -703,9 +703,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticText,
@@ -715,7 +715,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -723,7 +723,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticDataBlock(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticText.Id,
                 new KeyStatisticDataBlockUpdateRequest
                 {
@@ -739,11 +739,11 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticText()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
 
         var keyStatisticText = new KeyStatisticText
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             Title = "title",
             Statistic = "statistic",
             Trend = "trend",
@@ -755,9 +755,9 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticText,
@@ -767,7 +767,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -775,7 +775,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticText(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticText.Id,
                 new KeyStatisticTextUpdateRequest
                 {
@@ -804,7 +804,7 @@ public class KeyStatisticServiceTests
             var keyStat = Assert.Single(keyStatistics);
             var keyStatText = Assert.IsType<KeyStatisticText>(keyStat);
 
-            Assert.Equal(release.Id, keyStatText.ReleaseId);
+            Assert.Equal(releaseVersion.Id, keyStatText.ReleaseVersionId);
             Assert.Equal("new title", keyStatText.Title);
             Assert.Equal("new statistic", keyStatText.Statistic);
             Assert.Equal("new trend", keyStatText.Trend);
@@ -821,11 +821,11 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticText_NoRelease()
     {
-        var releaseId = Guid.NewGuid();
+        var rele = Guid.NewGuid();
 
         var keyStatisticText = new KeyStatisticText
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = rele,
             Title = "title",
             Statistic = "statistic",
             Trend = "trend",
@@ -835,9 +835,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = rele,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticText,
@@ -847,7 +847,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -873,11 +873,11 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticText_NoKeyStatisticText()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
 
         var keyStatisticText = new KeyStatisticText
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             Title = "title",
             Statistic = "statistic",
             Trend = "trend",
@@ -887,9 +887,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticText,
@@ -899,7 +899,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -907,7 +907,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticText(
-                release.Id,
+                releaseVersion.Id,
                 Guid.NewGuid(),
                 new KeyStatisticTextUpdateRequest
                 {
@@ -925,12 +925,12 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task UpdateKeyStatisticText_KeyStatWrongType()
     {
-        var releaseId = Guid.NewGuid();
+        var releaseVersionId = Guid.NewGuid();
         var dataBlockId = Guid.NewGuid();
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = releaseId,
+            ReleaseVersionId = releaseVersionId,
             DataBlockId = dataBlockId,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -939,9 +939,9 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
-            Id = releaseId,
+            Id = releaseVersionId,
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
@@ -949,14 +949,14 @@ public class KeyStatisticServiceTests
         };
         var dataBlock = new DataBlock
         {
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.ContentBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.ContentBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -964,7 +964,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.UpdateKeyStatisticText(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticDataBlock.Id,
                 new KeyStatisticTextUpdateRequest
                 {
@@ -983,15 +983,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticDataBlock()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -999,7 +999,7 @@ public class KeyStatisticServiceTests
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = release.Id,
+            ReleaseVersionId = releaseVersion.Id,
             DataBlockId = dataBlockVersion.Id,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -1010,7 +1010,7 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        release.KeyStatistics = ListOf<KeyStatistic>(
+        releaseVersion.KeyStatistics = ListOf<KeyStatistic>(
             new KeyStatisticText(),
             keyStatisticDataBlock,
             new KeyStatisticText());
@@ -1018,8 +1018,8 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
@@ -1027,7 +1027,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Delete(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticDataBlock.Id);
 
             result.AssertRight();
@@ -1048,15 +1048,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_KeyStatisticText()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var keyStatisticText = new KeyStatisticText
         {
             Title = "title",
             Statistic = "Over 9000",
-            ReleaseId = release.Id,
+            ReleaseVersionId = releaseVersion.Id,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
             GuidanceText = "guidanceText",
@@ -1064,7 +1064,7 @@ public class KeyStatisticServiceTests
             Updated = null,
         };
 
-        release.KeyStatistics = ListOf<KeyStatistic>(
+        releaseVersion.KeyStatistics = ListOf<KeyStatistic>(
             new KeyStatisticText(),
             keyStatisticText,
             new KeyStatisticDataBlock());
@@ -1072,7 +1072,7 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
+            context.ReleaseVersions.AddRange(releaseVersion);
             await context.SaveChangesAsync();
         }
 
@@ -1080,7 +1080,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Delete(
-                release.Id,
+                releaseVersion.Id,
                 keyStatisticText.Id);
 
             result.AssertRight();
@@ -1097,15 +1097,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_NoRelease()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -1113,7 +1113,7 @@ public class KeyStatisticServiceTests
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = release.Id,
+            ReleaseVersionId = releaseVersion.Id,
             DataBlockId = dataBlockVersion.Id,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -1127,8 +1127,8 @@ public class KeyStatisticServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockVersions.AddRangeAsync(dataBlockVersion);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockVersions.AddRange(dataBlockVersion);
             await context.SaveChangesAsync();
         }
 
@@ -1146,15 +1146,15 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task Delete_NoKeyStatistic()
     {
-        var release = _fixture
-            .DefaultRelease()
+        var releaseVersion = _fixture
+            .DefaultReleaseVersion()
             .Generate();
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
             .WithLatestPublishedVersion(_fixture
                 .DefaultDataBlockVersion()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .Generate())
             .Generate();
 
@@ -1162,7 +1162,7 @@ public class KeyStatisticServiceTests
 
         var keyStatisticDataBlock = new KeyStatisticDataBlock
         {
-            ReleaseId = release.Id,
+            ReleaseVersionId = releaseVersion.Id,
             DataBlockId = dataBlockVersion.Id,
             Trend = "trend",
             GuidanceTitle = "guidanceTitle",
@@ -1173,13 +1173,13 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        release.KeyStatistics = ListOf<KeyStatistic>(keyStatisticDataBlock);
+        releaseVersion.KeyStatistics = ListOf<KeyStatistic>(keyStatisticDataBlock);
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.DataBlockParents.AddRangeAsync(dataBlockParent);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.DataBlockParents.AddRange(dataBlockParent);
             await context.SaveChangesAsync();
         }
 
@@ -1187,7 +1187,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Delete(
-                release.Id,
+                releaseVersion.Id,
                 Guid.NewGuid());
 
             result.AssertNotFound();
@@ -1224,7 +1224,7 @@ public class KeyStatisticServiceTests
             UpdatedById = Guid.NewGuid(),
         };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
             KeyStatistics = new List<KeyStatistic>
             {
@@ -1234,14 +1234,14 @@ public class KeyStatisticServiceTests
         var dataBlock = new DataBlock
         {
             Id = dataBlockId,
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.ContentBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.ContentBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1249,7 +1249,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Reorder(
-                release.Id,
+                releaseVersion.Id,
                 new List<Guid>
                 {
                     keyStat0.Id,
@@ -1311,7 +1311,7 @@ public class KeyStatisticServiceTests
         var keyStat2 = new KeyStatisticText { Order = 2 };
         var keyStat3 = new KeyStatisticDataBlock { Order = 3 };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
             KeyStatistics = new List<KeyStatistic>
             {
@@ -1321,24 +1321,23 @@ public class KeyStatisticServiceTests
         var dataBlock = new DataBlock
         {
             Id = dataBlockId,
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.ContentBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.ContentBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
-
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var invalidKeyStatId = Guid.NewGuid();
             var result = await keyStatisticService.Reorder(
-                release.Id,
+                releaseVersion.Id,
                 new List<Guid>
                 {
                     keyStat0.Id,
@@ -1379,7 +1378,7 @@ public class KeyStatisticServiceTests
         var keyStat2 = new KeyStatisticText { Order = 2 };
         var keyStat3 = new KeyStatisticDataBlock { Order = 3 };
 
-        var release = new Release
+        var releaseVersion = new ReleaseVersion
         {
             KeyStatistics = new List<KeyStatistic>
             {
@@ -1389,14 +1388,14 @@ public class KeyStatisticServiceTests
         var dataBlock = new DataBlock
         {
             Id = dataBlockId,
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.Releases.AddRangeAsync(release);
-            await context.ContentBlocks.AddRangeAsync(dataBlock);
+            context.ReleaseVersions.AddRange(releaseVersion);
+            context.ContentBlocks.AddRange(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1405,7 +1404,7 @@ public class KeyStatisticServiceTests
         {
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Reorder(
-                release.Id,
+                releaseVersion.Id,
                 new List<Guid>
                 {
                     keyStat0.Id,

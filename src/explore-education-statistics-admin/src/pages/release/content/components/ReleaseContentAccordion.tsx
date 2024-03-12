@@ -11,6 +11,7 @@ interface ReleaseContentAccordionProps {
   release: EditableRelease;
   sectionName: string;
   transformFeaturedTableLinks?: (url: string, text: string) => void;
+  onSectionOpen: ({ id, title }: { id: string; title: string }) => void;
 }
 
 const ReleaseContentAccordion = ({
@@ -18,6 +19,7 @@ const ReleaseContentAccordion = ({
   id = 'releaseMainContent',
   sectionName,
   transformFeaturedTableLinks,
+  onSectionOpen,
 }: ReleaseContentAccordionProps) => {
   const { addContentSection, updateContentSectionsOrder } =
     useReleaseContentActions();
@@ -50,6 +52,7 @@ const ReleaseContentAccordion = ({
       sectionName={sectionName}
       onReorder={reorderAccordionSections}
       onAddSection={addAccordionSection}
+      onSectionOpen={onSectionOpen}
     >
       {orderBy(release.content, 'order').map(section => (
         <ReleaseContentAccordionSection

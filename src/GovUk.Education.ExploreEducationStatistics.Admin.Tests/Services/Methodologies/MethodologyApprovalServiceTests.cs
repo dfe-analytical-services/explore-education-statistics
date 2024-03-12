@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
             }
 
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
             }
 
@@ -603,7 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.False(updatedMethodologyVersion.Published.HasValue);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
@@ -704,7 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 updatedMethodologyVersion.Published.AssertUtcNow();
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
@@ -727,7 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingImmediateStrategy_ScheduledWithReleaseIsCleared()
         {
-            var scheduledWithRelease = new Release
+            var scheduledWithRelease = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -746,7 +746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     })
                 },
                 // Existing ScheduledWithRelease should be cleared
-                ScheduledWithRelease = scheduledWithRelease
+                ScheduledWithReleaseVersion = scheduledWithRelease
             };
 
             var request = new MethodologyApprovalUpdateRequest
@@ -792,7 +792,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -805,7 +805,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Approved, updatedMethodologyVersion.Status);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseId);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersionId);
             }
         }
 
@@ -817,7 +817,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Publication title"
             };
 
-            var scheduledWithRelease = new Release
+            var scheduledWithReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -844,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
-                WithReleaseId = scheduledWithRelease.Id,
+                WithReleaseId = scheduledWithReleaseVersion.Id,
                 Status = Approved,
             };
 
@@ -852,9 +852,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Publications.AddAsync(publication);
-                await context.MethodologyVersions.AddAsync(methodologyVersion);
-                await context.Releases.AddAsync(scheduledWithRelease);
+                context.Publications.Add(publication);
+                context.MethodologyVersions.Add(methodologyVersion);
+                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -887,9 +887,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
 
-                Assert.NotNull(updatedMethodologyVersion.ScheduledWithRelease);
-                Assert.Equal(scheduledWithRelease.Id, updatedMethodologyVersion.ScheduledWithRelease!.Id);
-                Assert.Equal(scheduledWithRelease.Title, updatedMethodologyVersion.ScheduledWithRelease.Title);
+                Assert.NotNull(updatedMethodologyVersion.ScheduledWithReleaseVersion);
+                Assert.Equal(scheduledWithReleaseVersion.Id, updatedMethodologyVersion.ScheduledWithReleaseVersion!.Id);
+                Assert.Equal(scheduledWithReleaseVersion.Title, updatedMethodologyVersion.ScheduledWithReleaseVersion.Title);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -902,7 +902,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Approved, updatedMethodologyVersion.Status);
                 Assert.Equal(WithRelease, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Equal(scheduledWithRelease.Id, updatedMethodologyVersion.ScheduledWithReleaseId);
+                Assert.Equal(scheduledWithReleaseVersion.Id, updatedMethodologyVersion.ScheduledWithReleaseVersionId);
                 updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
@@ -981,7 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }
             };
 
-            // Create a request with a random release Id that won't exist
+            // Create a request with a random release version Id that won't exist
             var request = new MethodologyApprovalUpdateRequest
             {
                 LatestInternalReleaseNote = "Test approval",
@@ -1017,8 +1017,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Publication title"
             };
 
-            // Create a release that is already published which the methodology cannot be made dependant on
-            var scheduledWithRelease = new Release
+            // Create a release version that is already published which the methodology cannot be made dependant on
+            var scheduledWithReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -1046,7 +1046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
-                WithReleaseId = scheduledWithRelease.Id,
+                WithReleaseId = scheduledWithReleaseVersion.Id,
                 Status = Approved,
             };
 
@@ -1054,9 +1054,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Publications.AddAsync(publication);
-                await context.MethodologyVersions.AddAsync(methodologyVersion);
-                await context.Releases.AddAsync(scheduledWithRelease);
+                context.Publications.Add(publication);
+                context.MethodologyVersions.Add(methodologyVersion);
+                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1072,8 +1072,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateApprovalStatus_ApprovingUsingWithReleaseStrategy_ReleaseNotRelated()
         {
-            // Release is not from the same publication as the one linked to the methodology
-            var scheduledWithRelease = new Release
+            // Release version is not from the same publication as the one linked to the methodology
+            var scheduledWithReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication(),
@@ -1100,7 +1100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestInternalReleaseNote = "Test approval",
                 PublishingStrategy = WithRelease,
-                WithReleaseId = scheduledWithRelease.Id,
+                WithReleaseId = scheduledWithReleaseVersion.Id,
                 Status = Approved
             };
 
@@ -1108,8 +1108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.MethodologyVersions.AddAsync(methodologyVersion);
-                await context.Releases.AddAsync(scheduledWithRelease);
+                context.MethodologyVersions.Add(methodologyVersion);
+                context.ReleaseVersions.Add(scheduledWithReleaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -1185,7 +1185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
@@ -1307,10 +1307,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseVersion);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var updatedMethodologyVersion = await context

@@ -1,10 +1,9 @@
 using System;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+
+public interface INotificationsService
 {
-    public interface INotificationsService
-    {
-        Task NotifySubscribersIfApplicable(params Guid[] releaseIds);
-    }
+    Task NotifySubscribersIfApplicable(params Guid[] releaseVersionIds);
 }

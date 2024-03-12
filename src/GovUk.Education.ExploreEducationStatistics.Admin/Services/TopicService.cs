@@ -190,7 +190,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(IEnumerable<Guid> publicationIds)
+        private async Task<Either<ActionResult, Unit>> DeleteMethodologiesForPublications(
+            IEnumerable<Guid> publicationIds)
         {
             var methodologyIdsToDelete = await _contentContext
                 .PublicationMethodologies
@@ -214,35 +215,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             publications.ForEach(publication =>
             {
-                publication.LatestPublishedRelease = null;
-                publication.LatestPublishedReleaseId = null;
+                publication.LatestPublishedReleaseVersion = null;
+                publication.LatestPublishedReleaseVersionId = null;
             });
 
             await _contentContext.SaveChangesAsync();
 
             // Some Content Db Releases may be soft-deleted and therefore not visible.
             // Ignore the query filter to make sure they are found
-            var releaseIdsToDelete = _contentContext
-                .Releases
+            var releaseVersionIdsToDelete = _contentContext
+                .ReleaseVersions
                 .IgnoreQueryFilters()
-                .Where(r => publicationIds.Contains(r.PublicationId))
-                .Select(release => new IdAndPreviousVersionIdPair<string>(release.Id.ToString(), release.PreviousVersionId != null ? release.PreviousVersionId.ToString() : null))
+                .Where(rv => publicationIds.Contains(rv.PublicationId))
+                .Select(rv => new IdAndPreviousVersionIdPair<string>(rv.Id.ToString(),
+                    rv.PreviousVersionId != null ? rv.PreviousVersionId.ToString() : null))
                 .ToList();
 
-            var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
-                .Sort(releaseIdsToDelete)
+            var releaseVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
+                .Sort(releaseVersionIdsToDelete)
                 .Select(ids => Guid.Parse(ids.Id))
                 .ToList();
 
             // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
             // deleted releases that were left scheduled
-            await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseIdsInDeleteOrder);
+            await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseVersionIdsInDeleteOrder);
 
-            return await releaseIdsInDeleteOrder
+            return await releaseVersionIdsInDeleteOrder
                 .Select(DeleteContentAndStatsRelease)
                 .OnSuccessAll()
                 .OnSuccessVoid();
-
         }
 
         private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
@@ -258,19 +259,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
 
-        private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseId)
+        private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseVersionId)
         {
-            var contentRelease = await _contentContext
-                .Releases
+            var contentReleaseVersion = await _contentContext
+                .ReleaseVersions
                 .IgnoreQueryFilters()
-                .SingleAsync(r => r.Id == releaseId);
+                .SingleAsync(rv => rv.Id == releaseVersionId);
 
-            if (!contentRelease.SoftDeleted)
+            if (!contentReleaseVersion.SoftDeleted)
             {
                 var removeReleaseFilesAndCachedContent =
-                    await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
-                        .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
-                        .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId));
+                    await _releaseDataFileService.DeleteAll(releaseVersionId, forceDelete: true)
+                        .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseVersionId, forceDelete: true))
+                        .OnSuccessDo(() => DeleteCachedReleaseContent(releaseVersionId));
 
                 if (removeReleaseFilesAndCachedContent.IsLeft)
                 {
@@ -278,32 +279,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            await RemoveReleaseDependencies(releaseId);
-            await DeleteStatsDbRelease(releaseId);
+            await RemoveReleaseDependencies(releaseVersionId);
+            await DeleteStatsDbRelease(releaseVersionId);
 
-            _contentContext.Releases.Remove(contentRelease);
+            _contentContext.ReleaseVersions.Remove(contentReleaseVersion);
             await _contentContext.SaveChangesAsync();
 
             return Unit.Instance;
         }
 
-        private Task DeleteCachedReleaseContent(Guid releaseId)
+        private Task DeleteCachedReleaseContent(Guid releaseVersionId)
         {
-            return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseId));
+            return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
         }
 
-        private async Task DeleteStatsDbRelease(Guid releaseId)
+        private async Task DeleteStatsDbRelease(Guid releaseVersionId)
         {
             var statsRelease = await _statisticsContext
-                .Release
+                .ReleaseVersion
                 .AsQueryable()
-                .SingleOrDefaultAsync(r => r.Id == releaseId);
+                .SingleOrDefaultAsync(rv => rv.Id == releaseVersionId);
 
             if (statsRelease != null)
             {
-                await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseId: statsRelease.Id,
+                await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseVersionId: statsRelease.Id,
                     softDeleteOrphanedSubjects: false);
-                _statisticsContext.Release.Remove(statsRelease);
+                _statisticsContext.ReleaseVersion.Remove(statsRelease);
                 await _statisticsContext.SaveChangesAsync();
             }
         }
@@ -332,18 +333,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return values.Include(p => p.Publications);
         }
 
-        private async Task RemoveReleaseDependencies(Guid releaseId)
+        private async Task RemoveReleaseDependencies(Guid releaseVersionId)
         {
             var keyStats = _contentContext
                 .KeyStatistics
-                .Where(ks => ks.ReleaseId == releaseId);
+                .Where(ks => ks.ReleaseVersionId == releaseVersionId);
 
             _contentContext.KeyStatistics.RemoveRange(keyStats);
 
             var dataBlockVersions = await _contentContext
                 .DataBlockVersions
                 .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId)
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
                 .ToListAsync();
 
             var dataBlockParents = dataBlockVersions

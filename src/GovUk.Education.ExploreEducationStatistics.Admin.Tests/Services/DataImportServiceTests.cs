@@ -19,7 +19,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -28,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CancelImport()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var file = new File
             {
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
                 {
-                    Release = release,
+                    ReleaseVersion = releaseVersion,
                     File = file
                 });
                 await contentDbContext.DataImports.AddAsync(import);
@@ -57,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
             var queueService = new Mock<IStorageQueueService>(Strict);
 
-            releaseFileService.Setup(s => s.CheckFileExists(release.Id,
+            releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
                     file.Id,
                     FileType.Data))
                 .ReturnsAsync(file);
@@ -79,8 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     queueService: queueService.Object,
                     userService: userService.Object);
 
-                var result = await service.CancelImport(release.Id, file.Id);
-                
+                var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id);
+
                 MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
 
                 result.AssertRight();
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CancelFileImportButNotAllowed()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var file = new File
             {
@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.ReleaseFiles.AddAsync(new ReleaseFile
                 {
-                    Release = release,
+                    ReleaseVersion = releaseVersion,
                     File = file
                 });
                 await contentDbContext.DataImports.AddAsync(import);
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userService = new Mock<IUserService>(Strict);
             var queueService = new Mock<IStorageQueueService>(Strict);
 
-            releaseFileService.Setup(s => s.CheckFileExists(release.Id,
+            releaseFileService.Setup(s => s.CheckFileExists(releaseVersion.Id,
                     file.Id,
                     FileType.Data))
                 .ReturnsAsync(file);
@@ -136,10 +136,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     queueService: queueService.Object,
                     userService: userService.Object);
 
-                var result = await service.CancelImport(release.Id, file.Id);
-                
+                var result = await service.CancelImport(releaseVersionId: releaseVersion.Id,
+                    fileId: file.Id);
+
                 MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
-                
+
                 result.AssertForbidden();
             }
         }
@@ -147,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task HasIncompleteImports_NoReleaseFiles()
         {
-            var release1 = new Release();
-            var release2 = new Release();
+            var releaseVersion1 = new ReleaseVersion();
+            var releaseVersion2 = new ReleaseVersion();
 
             var release2File1 = new File
             {
@@ -170,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        Release = release2,
+                        ReleaseVersion = releaseVersion2,
                         File = release2File1
                     });
                 await contentDbContext.DataImports.AddRangeAsync(release2Import1);
@@ -181,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-                var result = await service.HasIncompleteImports(release1.Id);
+                var result = await service.HasIncompleteImports(releaseVersion1.Id);
                 Assert.False(result);
             }
         }
@@ -189,8 +190,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task HasIncompleteImports_ReleaseHasCompletedImports()
         {
-            var release1 = new Release();
-            var release2 = new Release();
+            var release1 = new ReleaseVersion();
+            var release2 = new ReleaseVersion();
 
             var release1File1 = new File
             {
@@ -234,17 +235,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        Release = release1,
+                        ReleaseVersion = release1,
                         File = release1File1
                     },
                     new ReleaseFile
                     {
-                        Release = release1,
+                        ReleaseVersion = release1,
                         File = release1File2
                     },
                     new ReleaseFile
                     {
-                        Release = release2,
+                        ReleaseVersion = release2,
                         File = release2File1
                     });
                 await contentDbContext.DataImports.AddRangeAsync(release1Import1, release1Import2, release2Import1);
@@ -263,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task HasIncompleteImports_ReleaseHasIncompleteImports()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var file1 = new File
             {
@@ -294,12 +295,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         File = file1
                     },
                     new ReleaseFile
                     {
-                        Release = release,
+                        ReleaseVersion = releaseVersion,
                         File = file2
                     });
                 await contentDbContext.DataImports.AddRangeAsync(import1, import2);
@@ -310,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext);
 
-                var result = await service.HasIncompleteImports(release.Id);
+                var result = await service.HasIncompleteImports(releaseVersion.Id);
                 Assert.True(result);
             }
         }

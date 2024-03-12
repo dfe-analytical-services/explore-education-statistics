@@ -5,20 +5,19 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+
+public interface IReleaseService
 {
-    public interface IReleaseService
-    {
-        Task<Release> Get(Guid id);
+    Task<ReleaseVersion> Get(Guid releaseVersionId);
 
-        Task<IEnumerable<Release>> List(IEnumerable<Guid> ids);
+    Task<IEnumerable<ReleaseVersion>> List(IEnumerable<Guid> releaseVersionIds);
 
-        Task<IEnumerable<Release>> GetAmendedReleases(IEnumerable<Guid> releaseIds);
+    Task<IEnumerable<ReleaseVersion>> GetAmendedReleases(IEnumerable<Guid> releaseVersionIds);
 
-        Task<List<File>> GetFiles(Guid releaseId, params FileType[] types);
+    Task<List<File>> GetFiles(Guid releaseVersionId, params FileType[] types);
 
-        Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
+    Task<ReleaseVersion> GetLatestReleaseVersion(Guid publicationId, IEnumerable<Guid> includedReleaseVersionIds);
 
-        Task CompletePublishing(Guid releaseId, DateTime actualPublishedDate);
-    }
+    Task CompletePublishing(Guid releaseVersionId, DateTime actualPublishedDate);
 }

@@ -19,6 +19,7 @@ dfe-meta.db
 ## CSharp
 
 *.sln.DotSettings.user
+dotnet-format-report.json
 
 ## Javascript
 

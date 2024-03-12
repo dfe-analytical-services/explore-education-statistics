@@ -22,84 +22,99 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _contentService = contentService;
         }
 
-        [HttpPut("release/{releaseId:guid}/content/sections/order")]
+        [HttpPut("release/{releaseVersionId:guid}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
-            Guid releaseId, Dictionary<Guid, int> newSectionOrder)
+            Guid releaseVersionId, Dictionary<Guid, int> newSectionOrder)
         {
             return await _contentService
-                .ReorderContentSections(releaseId, newSectionOrder)
+                .ReorderContentSections(releaseVersionId, newSectionOrder)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/content/sections/add")]
+        [HttpPost("release/{releaseVersionId:guid}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
-            Guid releaseId, ContentSectionAddRequest request = null)
+            Guid releaseVersionId, ContentSectionAddRequest request = null)
         {
             return await _contentService
-                .AddContentSectionAsync(releaseId, request)
+                .AddContentSectionAsync(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/heading")]
+        [HttpPut("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/heading")]
         public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
-            Guid releaseId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
+            Guid releaseVersionId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
             return await _contentService
-                .UpdateContentSectionHeading(releaseId, contentSectionId, request.Heading)
+                .UpdateContentSectionHeading(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    request.Heading)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/content/section/{contentSectionId:guid}")]
+        [HttpDelete("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(
-            Guid releaseId, Guid contentSectionId)
+            Guid releaseVersionId, Guid contentSectionId)
         {
             return await _contentService
-                .RemoveContentSection(releaseId, contentSectionId)
+                .RemoveContentSection(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/order")]
+        [HttpPut("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/blocks/order")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> ReorderContentBlocks(
-            Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+            Guid releaseVersionId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
             return await _contentService
-                .ReorderContentBlocks(releaseId, contentSectionId, newBlocksOrder)
+                .ReorderContentBlocks(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    newBlocksOrder)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/add")]
+        [HttpPost("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/blocks/add")]
         public async Task<ActionResult<IContentBlockViewModel>> AddContentBlock(
-            Guid releaseId, Guid contentSectionId, ContentBlockAddRequest request)
+            Guid releaseVersionId, Guid contentSectionId, ContentBlockAddRequest request)
         {
             return await _contentService
-                .AddContentBlock(releaseId, contentSectionId, request)
+                .AddContentBlock(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
+        [HttpDelete(
+            "release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> RemoveContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId)
+            Guid releaseVersionId, Guid contentSectionId, Guid contentBlockId)
         {
             return await _contentService
-                .RemoveContentBlock(releaseId, contentSectionId, contentBlockId)
+                .RemoveContentBlock(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    contentBlockId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
+        [HttpPut("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
+            Guid releaseVersionId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
             return await _contentService
-                .UpdateTextBasedContentBlock(releaseId, contentSectionId, contentBlockId, request)
+                .UpdateTextBasedContentBlock(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    contentBlockId: contentBlockId,
+                    request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/attach")]
+        [HttpPost("release/{releaseVersionId:guid}/content/section/{contentSectionId:guid}/blocks/attach")]
         public async Task<ActionResult<DataBlockViewModel>> AttachDataBlock(
-            Guid releaseId, Guid contentSectionId, DataBlockAttachRequest request)
+            Guid releaseVersionId, Guid contentSectionId, DataBlockAttachRequest request)
         {
             return await _contentService
-                .AttachDataBlock(releaseId, contentSectionId, request)
+                .AttachDataBlock(releaseVersionId: releaseVersionId,
+                    contentSectionId: contentSectionId,
+                    request)
                 .HandleFailuresOrOk();
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -21,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseImageService = releaseImageService;
         }
 
-        [HttpPost("releases/{releaseId:guid}/images")]
+        [HttpPost("releases/{releaseVersionId:guid}/images")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseId, IFormFile file)
+        public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseVersionId, IFormFile file)
         {
             return await _releaseImageService
-                .Upload(releaseId, file)
+                .Upload(releaseVersionId, file)
                 .HandleFailuresOrOk();
         }
 
@@ -37,15 +37,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         /// Anonymous access is allowed here since these requests have no authentication token.
         /// Adding one would require parsing the HTML into React DOM nodes.
         /// </summary>
-        /// <param name="releaseId"></param>
+        /// <param name="releaseVersionId"></param>
         /// <param name="fileId"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [HttpGet("releases/{releaseId:guid}/images/{fileId:guid}")]
-        public async Task<ActionResult> Stream(Guid releaseId, Guid fileId)
+        [HttpGet("releases/{releaseVersionId:guid}/images/{fileId:guid}")]
+        public async Task<ActionResult> Stream(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseImageService
-                .Stream(releaseId: releaseId, fileId: fileId)
+                .Stream(releaseVersionId: releaseVersionId, fileId: fileId)
                 .HandleFailures();
         }
     }

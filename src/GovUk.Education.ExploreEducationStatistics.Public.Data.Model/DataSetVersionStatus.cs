@@ -5,8 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum DataSetVersionStatus
 {
-    Staged,
+    Processing,
+    Failed,
+    Mapping,
+    Draft,
     Published,
     Deprecated,
-    Unpublished
+    Withdrawn
 }

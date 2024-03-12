@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -21,12 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
 public class SubjectCsvMetaServicePermissionTests
 {
-    private static readonly Guid ReleaseId = Guid.NewGuid();
+    private static readonly Guid ReleaseVersionId = Guid.NewGuid();
     private static readonly Guid SubjectId = Guid.NewGuid();
 
     private static readonly ReleaseSubject ReleaseSubject = new()
     {
-        ReleaseId = ReleaseId,
+        ReleaseVersionId = ReleaseVersionId,
         SubjectId = SubjectId
     };
 

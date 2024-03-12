@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.AddRangeAsync(
                     new UserReleaseRole
                     {
-                        Release = new Release
+                        ReleaseVersion = new ReleaseVersion
                         {
                             Publication = new Publication
                             {
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new UserReleaseRole
                     {
                         UserId = userId,
-                        Release = new Release
+                        ReleaseVersion = new ReleaseVersion
                         {
                             Publication = new Publication
                             {

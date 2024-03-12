@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -21,29 +21,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _releaseNoteService = releaseNoteService;
         }
 
-        [HttpPost("release/{releaseId:guid}/content/release-note")]
+        [HttpPost("release/{releaseVersionId:guid}/content/release-note")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(ReleaseNoteSaveRequest saveRequest,
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releaseNoteService
-                .AddReleaseNoteAsync(releaseId, saveRequest)
+                .AddReleaseNoteAsync(releaseVersionId, saveRequest)
                 .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
         }
 
-        [HttpPut("release/{releaseId:guid}/content/release-note/{releaseNoteId:guid}")]
+        [HttpPut("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
-            ReleaseNoteSaveRequest saveRequest, Guid releaseId, Guid releaseNoteId)
+            ReleaseNoteSaveRequest saveRequest, Guid releaseVersionId, Guid releaseNoteId)
         {
             return await _releaseNoteService
-                .UpdateReleaseNoteAsync(releaseId, releaseNoteId, saveRequest)
+                .UpdateReleaseNoteAsync(releaseVersionId: releaseVersionId,
+                    releaseNoteId: releaseNoteId,
+                    saveRequest)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/content/release-note/{releaseNoteId:guid}")]
-        public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseId, Guid releaseNoteId)
+        [HttpDelete("release/{releaseVersionId:guid}/content/release-note/{releaseNoteId:guid}")]
+        public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseVersionId,
+            Guid releaseNoteId)
         {
             return await _releaseNoteService
-                .DeleteReleaseNoteAsync(releaseId, releaseNoteId)
+                .DeleteReleaseNoteAsync(releaseVersionId: releaseVersionId,
+                    releaseNoteId: releaseNoteId)
                 .HandleFailuresOrOk();
         }
     }

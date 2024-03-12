@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -16,27 +16,27 @@ public static class ReleaseParentGeneratorExtensions
         bool draftVersion = false,
         int? year = null)
     {
-        Release? previousVersion = null;
+        ReleaseVersion? previousVersion = null;
         return fixture.Generator<ReleaseParent>()
             .WithDefaults()
-            .WithReleases(releaseParentContext => fixture
-                .DefaultRelease()
+            .WithVersions(releaseParentContext => fixture
+                .DefaultReleaseVersion()
                 .ForInstance(s => s
-                    .Set(r => r.ReleaseName,
+                    .Set(rv => rv.ReleaseName,
                         year != null ? year.ToString() : $"{2000 + releaseParentContext.FixtureTypeIndex}")
                     .Set(p => p.Slug,
-                        (_, release, _) => NamingUtils.SlugFromTitle(release.YearTitle))
-                    .Set(r => r.Version,
+                        (_, releaseVersion, _) => NamingUtils.SlugFromTitle(releaseVersion.YearTitle))
+                    .Set(rv => rv.Version,
                         (_, _, context) => context.Index))
                 .ForRange(..publishedVersions, s => s
                     .SetApprovalStatus(ReleaseApprovalStatus.Approved)
-                    .Set(r => r.Published, (f, rel) =>
+                    .Set(rv => rv.Published, (f, rel) =>
                         rel.Version == 0
                             ? f.Date.Past()
                             : f.Date.Between(previousVersion!.Published!.Value, DateTime.UtcNow)))
                 .ForRange(1.., s => s
                     .SetPreviousVersion(previousVersion))
-                .FinishWith(release => previousVersion = release)
+                .FinishWith(releaseVersion => previousVersion = releaseVersion)
                 .Generate(draftVersion ? publishedVersions + 1 : publishedVersions));
     }
 
@@ -49,15 +49,15 @@ public static class ReleaseParentGeneratorExtensions
             .Set(rp => rp.Created, f => f.Date.Past())
             .Set(rp => rp.Updated, (f, rp) => f.Date.Soon(refDate: rp.Created));
 
-    public static Generator<ReleaseParent> WithReleases(
+    public static Generator<ReleaseParent> WithVersions(
         this Generator<ReleaseParent> generator,
-        Func<SetterContext, IEnumerable<Release>> releases)
-        => generator.ForInstance(s => s.SetReleases(releases.Invoke));
+        Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
+        => generator.ForInstance(s => s.SetVersions(releaseVersions.Invoke));
 
-    public static Generator<ReleaseParent> WithReleases(
+    public static Generator<ReleaseParent> WithVersions(
         this Generator<ReleaseParent> generator,
-        IEnumerable<Release> releases)
-        => generator.ForInstance(s => s.SetReleases(releases));
+        IEnumerable<ReleaseVersion> releaseVersions)
+        => generator.ForInstance(s => s.SetVersions(releaseVersions));
 
     public static Generator<ReleaseParent> WithCreated(
         this Generator<ReleaseParent> generator,
@@ -73,24 +73,24 @@ public static class ReleaseParentGeneratorExtensions
         return generator.ForInstance(s => s.SetUpdated(updated));
     }
 
-    public static InstanceSetters<ReleaseParent> SetReleases(
+    public static InstanceSetters<ReleaseParent> SetVersions(
         this InstanceSetters<ReleaseParent> setters,
-        IEnumerable<Release> releases)
-        => setters.SetReleases(_ => releases);
+        IEnumerable<ReleaseVersion> releaseVersions)
+        => setters.SetVersions(_ => releaseVersions);
 
-    private static InstanceSetters<ReleaseParent> SetReleases(
+    private static InstanceSetters<ReleaseParent> SetVersions(
         this InstanceSetters<ReleaseParent> setters,
-        Func<SetterContext, IEnumerable<Release>> releases)
+        Func<SetterContext, IEnumerable<ReleaseVersion>> releaseVersions)
         => setters.Set(
-            p => p.Releases,
+            p => p.Versions,
             (_, releaseParent, context) =>
             {
-                var list = releases.Invoke(context).ToList();
+                var list = releaseVersions.Invoke(context).ToList();
 
-                list.ForEach(release =>
+                list.ForEach(releaseVersion =>
                 {
-                    release.ReleaseParent = releaseParent;
-                    release.ReleaseParentId = releaseParent.Id;
+                    releaseVersion.ReleaseParent = releaseParent;
+                    releaseVersion.ReleaseParentId = releaseParent.Id;
                 });
 
                 return list;

@@ -5,9 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
     public class PublishReleaseFilesMessage
     {
-        public IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> Releases;
+        public IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> Releases;
 
-        public PublishReleaseFilesMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        public PublishReleaseFilesMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases)
         {
             Releases = releases;
         }

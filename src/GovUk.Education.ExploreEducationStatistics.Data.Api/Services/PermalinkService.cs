@@ -11,8 +11,8 @@ using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IFrontendService _frontendService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
 
         public PermalinkService(
             ContentDbContext contentDbContext,
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IFrontendService frontendService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
-            IReleaseRepository releaseRepository)
+            IReleaseVersionRepository releaseVersionRepository)
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _frontendService = frontendService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
@@ -86,10 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
-            return await (request.ReleaseId ?? await FindLatestPublishedReleaseId(request.Query.SubjectId))
-                .OnSuccess(releaseId =>
+            return await (request.ReleaseId ?? await FindLatestPublishedReleaseVersionId(request.Query.SubjectId))
+                .OnSuccess(releaseVersionId =>
                 {
-                    return _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
+                    return _tableBuilderService.Query(releaseVersionId, request.Query, cancellationToken)
                         .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                         {
                             var frontendTableTask = _frontendService.CreateTable(
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                             var permalink = new Permalink
                             {
-                                ReleaseId = releaseId,
+                                ReleaseVersionId = releaseVersionId,
                                 SubjectId = request.Query.SubjectId,
                                 PublicationTitle = subjectMeta.PublicationName,
                                 DataSetTitle = subjectMeta.SubjectName,
@@ -300,13 +300,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseId(Guid subjectId)
+        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
         {
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId =>
-                    _releaseRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
-                .OnSuccess(release => release.Id);
+                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
+                .OnSuccess(releaseVersion => releaseVersion.Id);
         }
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
@@ -316,12 +316,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var releasesWithSubject = await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
-                .Include(rf => rf.Release)
+                .Include(rf => rf.ReleaseVersion)
                 .Where(rf =>
                     rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data
-                    && rf.Release.Published.HasValue && DateTime.UtcNow >= rf.Release.Published.Value)
-                .Select(rf => rf.Release)
+                    && rf.ReleaseVersion.Published.HasValue && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
+                .Select(rf => rf.ReleaseVersion)
                 .ToListAsync();
 
             if (releasesWithSubject.Count == 0)
@@ -330,20 +330,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             var publication = await _contentDbContext.Publications
-                .Include(p => p.LatestPublishedRelease)
+                .Include(p => p.LatestPublishedReleaseVersion)
                 .SingleAsync(p => p.Id == releasesWithSubject.First().PublicationId);
 
-            var latestPublishedRelease = publication.LatestPublishedRelease;
+            var latestPublishedReleaseVersion = publication.LatestPublishedReleaseVersion;
 
-            if (latestPublishedRelease != null && releasesWithSubject.All(r =>
-                    r.Year != latestPublishedRelease.Year
-                    || r.TimePeriodCoverage != latestPublishedRelease.TimePeriodCoverage))
+            if (latestPublishedReleaseVersion != null && releasesWithSubject.All(rv =>
+                    rv.Year != latestPublishedReleaseVersion.Year
+                    || rv.TimePeriodCoverage != latestPublishedReleaseVersion.TimePeriodCoverage))
             {
                 return PermalinkStatus.NotForLatestRelease;
             }
 
-            if (latestPublishedRelease != null
-                && releasesWithSubject.All(r => r.Id != latestPublishedRelease.Id))
+            if (latestPublishedReleaseVersion != null
+                && releasesWithSubject.All(rv => rv.Id != latestPublishedReleaseVersion.Id))
             {
                 return PermalinkStatus.SubjectReplacedOrRemoved;
             }

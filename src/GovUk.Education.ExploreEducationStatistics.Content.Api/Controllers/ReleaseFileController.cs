@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -31,15 +30,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseId}/files/{fileId}")]
-        public async Task<ActionResult> Stream(string releaseId, string fileId)
+        [HttpGet("releases/{releaseVersionId}/files/{fileId}")]
+        public async Task<ActionResult> Stream(string releaseVersionId, string fileId)
         {
-            if (Guid.TryParse(releaseId, out var releaseGuid) &&
-                Guid.TryParse(fileId, out var fileGuid))
+            if (Guid.TryParse(releaseVersionId, out var releaseVersionIdGuid) &&
+                Guid.TryParse(fileId, out var fileIdGuid))
             {
-                return await _persistenceHelper.CheckEntityExists<Release>(releaseGuid)
-                    .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
-                    .OnSuccess(release =>  _releaseFileService.StreamFile(release.Id, fileGuid))
+                return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionIdGuid)
+                    .OnSuccessDo(rv => this.CacheWithLastModified(rv.Published))
+                    .OnSuccess(rv =>  _releaseFileService.StreamFile(releaseVersionId: rv.Id,
+                        fileId: fileIdGuid))
                     .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
                     .HandleFailures();
             }
@@ -48,21 +48,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseId:guid}/files")]
+        [HttpGet("releases/{releaseVersionId:guid}/files")]
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task StreamFilesToZip(
-            Guid releaseId,
+            Guid releaseVersionId,
             [FromQuery] IList<Guid>? fileIds = null)
         {
-            await _persistenceHelper.CheckEntityExists<Release>(
-                    releaseId,
-                    q => q.Include(r => r.Publication)
+            await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+                    releaseVersionId,
+                    q => q.Include(rv => rv.Publication)
                 )
-                .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
+                .OnSuccessDo(releaseVersion => this.CacheWithLastModified(releaseVersion.Published))
                 .OnSuccess(
-                    async release =>
+                    async releaseVersion =>
                     {
-                        var filename = $"{release.Publication.Slug}_{release.Slug}.zip";
+                        var filename = $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
                         Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         // This is more efficient and means the user doesn't have
                         // to spend time waiting for the download to initiate.
                         return await _releaseFileService.ZipFilesToStream(
-                            releaseId: releaseId,
+                            releaseVersionId: releaseVersionId,
                             outputStream: Response.BodyWriter.AsStream(),
                             fileIds: fileIds,
                             cancellationToken: HttpContext.RequestAborted

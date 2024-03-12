@@ -36,22 +36,23 @@ public class DataBlockService : IDataBlockService
     }
 
     public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid dataBlockVersionId)
     {
-        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
-            .OnSuccess(_userService.CheckCanViewRelease)
-            .OnSuccess(() => CheckDataBlockVersionExists(releaseId, dataBlockVersionId))
-            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseId, dataBlock.Query));
+        return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
+            .OnSuccess(() => CheckDataBlockVersionExists(releaseVersionId: releaseVersionId,
+                dataBlockVersionId: dataBlockVersionId))
+            .OnSuccess(dataBlock => _tableBuilderService.Query(releaseVersionId, dataBlock.Query));
     }
 
     private async Task<Either<ActionResult, DataBlockVersion>> CheckDataBlockVersionExists(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid dataBlockVersionId)
     {
         return await _contentDbContext
             .DataBlockVersions
-            .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+            .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId
                                        && dataBlockVersion.Id == dataBlockVersionId)
             .SingleOrDefaultAsync()
             .OrNotFound();

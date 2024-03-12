@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ public class ContentBlockServiceTests
     [Fact]
     public async Task DeleteContentBlockAndReorder_EmbedBlockLink()
     {
-        var release = new Release();
+        var releaseVersion = new ReleaseVersion();
         var contentBlockId = Guid.NewGuid();
         var embedBlockId = Guid.NewGuid();
 
@@ -43,7 +44,7 @@ public class ContentBlockServiceTests
         {
             Id = Guid.NewGuid(),
             Content = contentBlocks,
-            Release = release
+            ReleaseVersion = releaseVersion
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -104,7 +105,7 @@ public class ContentBlockServiceTests
                 new HtmlBlock { Order = 4, },
                 new HtmlBlock { Order = 5, },
             },
-            Release = new Release()
+            ReleaseVersion = new ReleaseVersion()
         };
 
         var contentBlocks = contentSection.Content;
@@ -166,7 +167,7 @@ public class ContentBlockServiceTests
                 new HtmlBlock { Order = 4, },
                 new HtmlBlock { Order = 5, },
             },
-            Release = new Release()
+            ReleaseVersion = new ReleaseVersion()
         };
 
         var contentBlocks = contentSection.Content;
@@ -226,7 +227,7 @@ public class ContentBlockServiceTests
                 new HtmlBlock(),
                 new HtmlBlock(),
             },
-            Release = new Release()
+            ReleaseVersion = new ReleaseVersion()
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -261,6 +262,7 @@ public class ContentBlockServiceTests
             Assert.Empty(embedBlocks);
         }
     }
+
     private static ContentBlockService SetupContentBlockService(ContentDbContext contentDbContext)
     {
         return new ContentBlockService(contentDbContext);

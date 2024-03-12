@@ -22,9 +22,9 @@ public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DataBlockParent DataBlockParent { get; set; } = null!;
 
-    public Guid ReleaseId { get; set; }
+    public Guid ReleaseVersionId { get; set; }
 
-    public Release Release { get; set; } = null!;
+    public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
     public DateTime Created { get; set; }
 

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,22 +9,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IUserReleaseRoleRepository
     {
         Task<UserReleaseRole> Create(Guid userId,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role,
             Guid createdById);
 
         Task<UserReleaseRole> CreateIfNotExists(Guid userId,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role,
             Guid createdById);
 
         Task CreateManyIfNotExists(List<Guid> userIds,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role,
             Guid createdById);
 
         Task CreateManyIfNotExists(Guid userId,
-            List<Guid> releaseIds,
+            List<Guid> releaseVersionIds,
             ReleaseRole role,
             Guid createdById);
 
@@ -37,21 +37,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role, Guid deletedById);
 
         Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
-        
+
         Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
-            Guid releaseId);
-        
+            Guid releaseVersionId);
+
         Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId,
             Guid publicationId);
 
-        Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude);
+        Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId,
+            ReleaseRole[]? rolesToInclude);
 
         Task<bool> HasUserReleaseRole(Guid userId,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role);
 
         Task<bool> HasUserReleaseRole(string email,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role);
     }
 }

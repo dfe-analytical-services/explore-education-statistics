@@ -57,16 +57,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 1`] = `
       >
         Indicator value 1
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         35
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         no data
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         315
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         no data
       </td>
     </tr>
@@ -78,16 +78,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 1`] = `
       >
         Indicator value 2
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         18,015
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         18,350
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         106,720
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         107,995
       </td>
     </tr>
@@ -99,16 +99,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 1`] = `
       >
         Indicator value 3
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         6,790
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         6,190
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         68,685
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         58,435
       </td>
     </tr>
@@ -173,16 +173,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 2`] = `
       >
         Indicator value 1
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         35
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         no data
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         315
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         no data
       </td>
     </tr>
@@ -194,16 +194,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 2`] = `
       >
         Indicator value 2
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         18,015
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         18,350
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         106,720
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         107,995
       </td>
     </tr>
@@ -215,16 +215,16 @@ exports[`MultiHeaderTable can render a complicated table with nesting 2`] = `
       >
         Indicator value 3
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         6,790
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         6,190
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         68,685
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         58,435
       </td>
     </tr>
@@ -263,10 +263,10 @@ exports[`MultiHeaderTable can render basic table 1`] = `
       >
         Row header
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         425,590
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         425,591
       </td>
     </tr>
@@ -305,10 +305,10 @@ exports[`MultiHeaderTable can render basic table 2`] = `
       >
         Row header
       </th>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         425,590
       </td>
-      <td class="govuk-table__cell--numeric">
+      <td class="govuk-table__cell--numeric dfe-white-space--nowrap">
         425,591
       </td>
     </tr>
