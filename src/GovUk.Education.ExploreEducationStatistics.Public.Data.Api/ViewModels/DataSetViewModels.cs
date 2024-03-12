@@ -1,4 +1,3 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
@@ -75,7 +74,6 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -112,7 +110,6 @@ public class DataSetVersionViewModel
     /// 
     /// Minor versions should not cause issues in the functionality of existing code.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 
     /// <summary>
@@ -152,7 +149,6 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -189,7 +185,6 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the geographic levels associated with the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -275,7 +270,6 @@ public record IndicatorMetaViewModel
     /// - `£m`
     /// - `pp`
     /// </summary>
-    [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
     public required IndicatorUnit? Unit { get; init; }
 
     /// <summary>
@@ -289,29 +283,6 @@ public record IndicatorMetaViewModel
 /// </summary>
 public record LocationLevelMetaViewModel
 {
-    /// <summary>
-    /// A geographic level that locations are grouped by.
-    /// 
-    /// Available options:
-    /// - `Country`
-    /// - `EnglishDevolvedArea`
-    /// - `LocalAuthority`
-    /// - `LocalAuthorityDistrict`
-    /// - `LocalEnterprisePartnership`
-    /// - `Institution`
-    /// - `MayoralCombinedAuthority`
-    /// - `MultiAcademyTrust`
-    /// - `OpportunityArea`
-    /// - `ParliamentaryConstituency`
-    /// - `PlanningArea`
-    /// - `Provider`
-    /// - `Region`
-    /// - `RscRegion`
-    /// - `School`
-    /// - `Sponsor`
-    /// - `Ward`
-    /// </summary>
-    [JsonConverter(typeof(EnumToEnumLabelJsonConverter<GeographicLevel>))]
     public required GeographicLevel Level { get; init; }
 
     /// <summary>
@@ -400,114 +371,6 @@ public record LocationSchoolOptionMetaViewModel : LocationOptionMetaViewModel
 /// </summary>
 public record TimePeriodMetaViewModel
 {
-    /// <summary>
-    /// The code describing a time period. This can be one of the following:
-    /// - `AY` - Academic year
-    /// - `AYQ1-4` - Academic year quarter 1 to 4
-    /// - `CY` - Calendar year
-    /// - `RY` - Reporting year
-    /// - `P1` - Part 1 (April to September)
-    /// - `P2` - Part 2 (October to March)
-    /// - `FY` - Financial year
-    /// - `FYQ1-4` - Financial year quarter 1 to 4
-    /// - `TYQ1-4` - Tax year quarter 1 to 4
-    /// - `W1-52` - Week 1 to 52
-    /// - `M1-12` - Month 1 to 12
-    /// 
-    /// Available options:
-    /// - `AY`
-    /// - `AYQ1`
-    /// - `AYQ2`
-    /// - `AYQ3`
-    /// - `AYQ4`
-    /// - `CY`
-    /// - `CYQ1`
-    /// - `CYQ2`
-    /// - `CYQ3`
-    /// - `CYQ4`
-    /// - `P1`
-    /// - `P2`
-    /// - `FY`
-    /// - `FYQ1`
-    /// - `FYQ2`
-    /// - `FYQ3`
-    /// - `FYQ4`
-    /// - `TY`
-    /// - `TYQ1`
-    /// - `TYQ2`
-    /// - `TYQ3`
-    /// - `TYQ4`
-    /// - `RY`
-    /// - `T1`
-    /// - `T1T2`
-    /// - `T2`
-    /// - `T3`
-    /// - `W1`
-    /// - `W2`
-    /// - `W3`
-    /// - `W4`
-    /// - `W5`
-    /// - `W6`
-    /// - `W7`
-    /// - `W8`
-    /// - `W9`
-    /// - `W10`
-    /// - `W11`
-    /// - `W12`
-    /// - `W13`
-    /// - `W14`
-    /// - `W15`
-    /// - `W16`
-    /// - `W17`
-    /// - `W18`
-    /// - `W19`
-    /// - `W20`
-    /// - `W21`
-    /// - `W22`
-    /// - `W23`
-    /// - `W24`
-    /// - `W25`
-    /// - `W26`
-    /// - `W27`
-    /// - `W28`
-    /// - `W29`
-    /// - `W30`
-    /// - `W31`
-    /// - `W32`
-    /// - `W33`
-    /// - `W34`
-    /// - `W35`
-    /// - `W36`
-    /// - `W37`
-    /// - `W38`
-    /// - `W39`
-    /// - `W40`
-    /// - `W41`
-    /// - `W42`
-    /// - `W43`
-    /// - `W44`
-    /// - `W45`
-    /// - `W46`
-    /// - `W47`
-    /// - `W48`
-    /// - `W49`
-    /// - `W50`
-    /// - `W51`
-    /// - `W52`
-    /// - `M1`
-    /// - `M2`
-    /// - `M3`
-    /// - `M4`
-    /// - `M5`
-    /// - `M6`
-    /// - `M7`
-    /// - `M8`
-    /// - `M9`
-    /// - `M10`
-    /// - `M11`
-    /// - `M12`
-    /// </summary>
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
     public TimeIdentifier? Code { get; init; }
 
     /// <summary>

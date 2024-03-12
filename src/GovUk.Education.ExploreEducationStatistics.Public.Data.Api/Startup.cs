@@ -7,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -16,6 +14,8 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
@@ -52,11 +52,6 @@ public class Startup
             options.EnableEndpointRouting = false;
         });
 
-        services.ConfigureHttpJsonOptions(options =>
-        {
-            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
-
         services
             .AddControllers(options =>
             {
@@ -68,6 +63,14 @@ public class Startup
             {
                 // Disables default model validation. Use FluentValidation instead.
                 options.SuppressModelStateInvalidFilter = true;
+            })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new EnumToEnumValueJsonConverter<GeographicLevel>());
+                options.JsonSerializerOptions.Converters.Add(new EnumToEnumLabelJsonConverter<IndicatorUnit>());
+                options.JsonSerializerOptions.Converters.Add(new EnumToEnumValueJsonConverter<TimeIdentifier>());
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
         services.AddProblemDetails();
