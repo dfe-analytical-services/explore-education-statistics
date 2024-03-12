@@ -18,9 +18,6 @@ param containerAppName string
 @description('Specifies the container port.')
 param containerAppTargetPort int = 80
 
-@description('Select if you want to use a public dummy image to start the container app.')
-param useDummyImage bool
-
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
 @allowed([
   '1'
@@ -66,7 +63,7 @@ param tagValues object
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
-var containerImageName = useDummyImage == true ? 'mcr.microsoft.com/azuredocs/aci-helloworld' : '${acrLoginServer}/${containerAppImageName}'
+var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerEnvName = '${resourcePrefix}-cae-${containerAppName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
 var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
@@ -90,7 +87,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 @description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!useDummyImage) {
+resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(resourceGroup().id, managedIdentity.id, acrPullRole)
   properties: {
     roleDefinitionId: acrPullRole
