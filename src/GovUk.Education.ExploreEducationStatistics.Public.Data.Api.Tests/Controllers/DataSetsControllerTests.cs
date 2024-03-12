@@ -837,7 +837,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             foreach (var locationMetaViewModel in content.Locations)
             {
-                var locationMeta = Assert.Single(dataSetVersion.LocationMetas, fm => fm.Level == locationMetaViewModel.Level);
+                var locationMeta = Assert.Single(
+                    dataSetVersion.LocationMetas, 
+                    fm => fm.Level == locationMetaViewModel.Level);
 
                 var allLocationMetaLinks = locationMeta.Options.SelectMany(fom => fom.MetaLinks);
 
@@ -854,30 +856,53 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     switch (locationOptionMeta)
                     {
                         case LocationCodedOptionMeta locationCodedOptionMeta:
-                            var locationCodedOptionMetaViewModel = Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
+                            var locationCodedOptionMetaViewModel =
+                                Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
                             Assert.Equal(locationCodedOptionMeta.Label, locationCodedOptionMetaViewModel.Label);
                             Assert.Equal(locationCodedOptionMeta.Code, locationCodedOptionMetaViewModel.Code);
                             break;
                         case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
-                            var locationLocalAuthorityOptionMetaViewModel = Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(locationLocalAuthorityOptionMeta.Label, locationLocalAuthorityOptionMetaViewModel.Label);
-                            Assert.Equal(locationLocalAuthorityOptionMeta.Code, locationLocalAuthorityOptionMetaViewModel.Code);
-                            Assert.Equal(locationLocalAuthorityOptionMeta.OldCode, locationLocalAuthorityOptionMetaViewModel.OldCode);
+                            var locationLocalAuthorityOptionMetaViewModel = 
+                                Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(
+                                locationLocalAuthorityOptionMeta.Label, 
+                                locationLocalAuthorityOptionMetaViewModel.Label);
+                            Assert.Equal(
+                                locationLocalAuthorityOptionMeta.Code, 
+                                locationLocalAuthorityOptionMetaViewModel.Code);
+                            Assert.Equal(
+                                locationLocalAuthorityOptionMeta.OldCode, 
+                                locationLocalAuthorityOptionMetaViewModel.OldCode);
                             break;
                         case LocationProviderOptionMeta locationProviderOptionMeta:
-                            var locationProviderOptionMetaViewModel = Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(locationProviderOptionMeta.Label, locationProviderOptionMetaViewModel.Label);
-                            Assert.Equal(locationProviderOptionMeta.Ukprn, locationProviderOptionMetaViewModel.Ukprn);
+                            var locationProviderOptionMetaViewModel = 
+                                Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(
+                                locationProviderOptionMeta.Label, 
+                                locationProviderOptionMetaViewModel.Label);
+                            Assert.Equal(
+                                locationProviderOptionMeta.Ukprn, 
+                                locationProviderOptionMetaViewModel.Ukprn);
                             break;
                         case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
-                            var locationRscRegionOptionMetaViewModel = Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(locationRscRegionOptionMeta.Label, locationRscRegionOptionMetaViewModel.Label);
+                            var locationRscRegionOptionMetaViewModel = 
+                                Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(
+                                locationRscRegionOptionMeta.Label, 
+                                locationRscRegionOptionMetaViewModel.Label);
                             break;
                         case LocationSchoolOptionMeta locationSchoolOptionMeta:
-                            var locationSchoolOptionMetaViewModel = Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(locationSchoolOptionMeta.Label, locationSchoolOptionMetaViewModel.Label);
-                            Assert.Equal(locationSchoolOptionMeta.Urn, locationSchoolOptionMetaViewModel.Urn);
-                            Assert.Equal(locationSchoolOptionMeta.LaEstab, locationSchoolOptionMetaViewModel.LaEstab);
+                            var locationSchoolOptionMetaViewModel = 
+                                Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
+                            Assert.Equal(
+                                locationSchoolOptionMeta.Label, 
+                                locationSchoolOptionMetaViewModel.Label);
+                            Assert.Equal(
+                                locationSchoolOptionMeta.Urn, 
+                                locationSchoolOptionMetaViewModel.Urn);
+                            Assert.Equal(
+                                locationSchoolOptionMeta.LaEstab, 
+                                locationSchoolOptionMetaViewModel.LaEstab);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -903,7 +928,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     tp => tp.Code == timePeriod.Code
                     && tp.Period == timePeriod.Period);
 
-                Assert.Equal(TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code), timePeriod.Label);
+                Assert.Equal(
+                    TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code), 
+                    timePeriod.Label);
             }
         }
 
@@ -958,7 +985,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 ))
                 .GenerateList();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.AddRange(dataSetVersions));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+                context.DataSetVersions.AddRange(dataSetVersions));
 
             var response = await GetMeta(dataSet.Id, "2.0");
 
@@ -1019,7 +1047,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 ))
                 .GenerateList();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.AddRange(dataSetVersions));
+            await TestApp.AddTestData<PublicDataDbContext>(context => 
+                context.DataSetVersions.AddRange(dataSetVersions));
 
             var response = await GetMeta(dataSet.Id);
 

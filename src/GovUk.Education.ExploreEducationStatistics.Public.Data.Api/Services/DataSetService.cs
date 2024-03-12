@@ -97,11 +97,11 @@ internal class DataSetService : IDataSetService
         var totalResults = await queryable.CountAsync();
 
         var dataSetVersions = (await queryable
-            .OrderByDescending(dsv => dsv.VersionMajor)
-            .ThenByDescending(dsv => dsv.VersionMinor)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync())
+                .OrderByDescending(dsv => dsv.VersionMajor)
+                .ThenByDescending(dsv => dsv.VersionMinor)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync())
             .Select(MapDataSetVersion)
             .ToList();
 
@@ -251,7 +251,9 @@ internal class DataSetService : IDataSetService
         };
     }
 
-    private static FilterOptionMetaViewModel MapFilterOptionMeta(FilterMeta filterMeta, FilterOptionMeta filterOptionMeta)
+    private static FilterOptionMetaViewModel MapFilterOptionMeta(
+        FilterMeta filterMeta, 
+        FilterOptionMeta filterOptionMeta)
     {
         var publicId = filterOptionMeta.MetaLinks.Single(ml => ml.MetaId == filterMeta.Id).PublicId;
 
@@ -283,7 +285,9 @@ internal class DataSetService : IDataSetService
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationMeta locationMeta, LocationOptionMeta locationOptionMeta)
+    private static LocationOptionMetaViewModel MapLocationOptionMeta(
+        LocationMeta locationMeta, 
+        LocationOptionMeta locationOptionMeta)
     {
         var publicId = locationOptionMeta.MetaLinks.Single(ml => ml.MetaId == locationMeta.Id).PublicId;
 
