@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class ReleaseParent : ICreatedUpdatedTimestamps<DateTime, DateTime?>
+public class Release : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; set; }
 
