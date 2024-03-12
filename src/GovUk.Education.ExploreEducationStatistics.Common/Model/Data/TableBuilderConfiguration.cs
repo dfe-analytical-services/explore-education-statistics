@@ -1,8 +1,7 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+
+public class TableBuilderConfiguration
 {
-    public class TableBuilderConfiguration
-    {
-        public TableHeaders TableHeaders { get; set; } = new();
-    }
+    public TableHeaders TableHeaders { get; set; } = new();
 }
