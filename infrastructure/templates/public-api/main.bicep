@@ -37,9 +37,6 @@ param postgreSqlFirewallRules {
   endIpAddress: string
 }[] = []
 
-@description('Container App : Select if you want to use a public dummy image to start the container app.')
-param useDummyImage bool = true
-
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
@@ -55,6 +52,9 @@ param resourceTags {
 
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
+
+@description('Build number of the current pipeline run.')
+param buildNumber string
 
 var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = '${subscription}saeescoredw'
@@ -147,9 +147,8 @@ module apiContainerAppModule 'components/containerApp.bicep' = {
     location: location
     containerAppName: 'api'
     acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
+    containerAppImageName: 'ees-public-api:${buildNumber}'
     containerAppTargetPort: 80
-    useDummyImage: useDummyImage
     dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey

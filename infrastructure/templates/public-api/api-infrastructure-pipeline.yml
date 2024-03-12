@@ -91,7 +91,8 @@ stages:
           --parameters \
               resourceTags='$(resourceTags)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
-              postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+              buildNumber='$(Build.BuildNumber)'
 
 - stage: DeployDev
   displayName: 'Deploy to Development'
@@ -120,9 +121,10 @@ stages:
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
                 --parameters \
-                resourceTags='$(resourceTags)' \
-                postgreSqlAdminName='$(postgreSqlAdminName)' \
-                postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    resourceTags='$(resourceTags)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    buildNumber='$(Build.BuildNumber)'
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
@@ -152,7 +154,8 @@ stages:
                 --parameters \
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    buildNumber='$(Build.BuildNumber)'
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
@@ -183,7 +186,8 @@ stages:
                 --parameters \
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    buildNumber='$(Build.BuildNumber)'
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
@@ -214,4 +218,5 @@ stages:
                 --parameters \
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    buildNumber='$(Build.BuildNumber)'
