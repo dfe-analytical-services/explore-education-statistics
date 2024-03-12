@@ -115,17 +115,8 @@ internal class DataSetService : IDataSetService
     public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(Guid dataSetId, string? dataSetVersion = null)
     {
         return await GetVersionWithMeta(dataSetId, dataSetVersion)
+            .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapVersionMeta);
-    }
-
-    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(Guid dataSetId)
-    {
-        return await _publicDataDbContext.DataSets
-            .Include(ds => ds.LatestVersion)
-            .Where(ds => ds.Id == dataSetId)
-            .Where(ds => ds.Status == DataSetStatus.Published
-                || ds.Status == DataSetStatus.Deprecated)
-            .SingleOrNotFound();
     }
 
     private static DataSetViewModel MapDataSet(DataSet dataSet)
@@ -188,7 +179,7 @@ internal class DataSetService : IDataSetService
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,
-            Unpublished = dataSetVersion.Withdrawn,
+            Withdrawn = dataSetVersion.Withdrawn,
             Notes = dataSetVersion.Notes,
             TotalResults = dataSetVersion.TotalResults,
             TimePeriods = MapTimePeriods(dataSetVersion.MetaSummary.TimePeriodRange),
@@ -234,10 +225,7 @@ internal class DataSetService : IDataSetService
             .Include(dsv => dsv.IndicatorMetas)
             .Include(dsv => dsv.TimePeriodMetas)
             .AsSplitQuery()
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.Status == DataSetVersionStatus.Published
-                || dsv.Status == DataSetVersionStatus.Unpublished
-                || dsv.Status == DataSetVersionStatus.Deprecated);
+            .Where(dsv => dsv.DataSetId == dataSetId);
     }
 
     private DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)

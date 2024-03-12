@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -10,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Drawing.Printing;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -282,7 +280,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(
                 dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                result.Unpublished?.ToUnixTimeSeconds()
+                result.Withdrawn?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
@@ -354,6 +352,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
         [InlineData(DataSetVersionStatus.Draft)]
         public async Task DataSetVersionUnavailable_Returns200_EmptyList(DataSetVersionStatus dataSetVersionStatus)
         {
@@ -582,7 +583,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(
                 dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                content.Unpublished?.ToUnixTimeSeconds()
+                content.Withdrawn?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, content.Notes);
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
@@ -1030,7 +1031,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Unpublished)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         public async Task VersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
         {
@@ -1060,8 +1061,11 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Staged)]
-        public async Task VersionNotAvailable_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        public async Task VersionNotAvailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -1082,7 +1086,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
 
-            response.AssertNotFound();
+            response.AssertForbidden();
         }
 
         [Fact]
