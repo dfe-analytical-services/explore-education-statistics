@@ -80,7 +80,7 @@ describe('EditableKeyStatDataBlock', () => {
     dataBlockParentId: 'block-1',
   };
 
-  test('renders preview correctly', async () => {
+  test('renders correctly when `isEditing` is false', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
@@ -89,15 +89,12 @@ describe('EditableKeyStatDataBlock', () => {
       <EditableKeyStatDataBlock
         releaseId="release-1"
         keyStat={keyStatDataBlock}
+        onRemove={noop}
         onSubmit={noop}
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-    });
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
     expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
       '608,180',
@@ -105,23 +102,61 @@ describe('EditableKeyStatDataBlock', () => {
     expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
       'DataBlock trend',
     );
-
     expect(
       screen.getByRole('button', {
         name: 'DataBlock guidance title',
       }),
     ).toBeInTheDocument();
-
     expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
       'DataBlock guidance text',
     );
+
+    expect(
+      screen.queryByRole('button', { name: /Edit/ }),
+    ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', { name: /Remove/ }),
     ).not.toBeInTheDocument();
   });
 
-  test('renders preview correctly without trend', async () => {
+  test('renders correctly when `isEditing` is true', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
+
+    render(
+      <EditableKeyStatDataBlock
+        isEditing
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        onRemove={noop}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'DataBlock trend',
+    );
+    expect(
+      screen.getByRole('button', {
+        name: 'DataBlock guidance title',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
+      'DataBlock guidance text',
+    );
+
+    expect(screen.getByRole('button', { name: /Edit/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
+  });
+
+  test('does not render the trend when `trend` is undefined', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
@@ -130,39 +165,17 @@ describe('EditableKeyStatDataBlock', () => {
       <EditableKeyStatDataBlock
         releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, trend: undefined }}
+        onRemove={noop}
         onSubmit={noop}
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-    });
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
-    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
-
-    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-      '608,180',
-    );
     expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-
-    expect(
-      screen.getByRole('button', {
-        name: 'DataBlock guidance title',
-      }),
-    ).toBeInTheDocument();
-
-    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-      'DataBlock guidance text',
-    );
-
-    expect(
-      screen.queryByRole('button', { name: /Remove/ }),
-    ).not.toBeInTheDocument();
   });
 
-  test('renders preview correctly without guidanceTitle', async () => {
+  test('renders the default guidance title when `guidanceTitle` is undefined', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
@@ -171,39 +184,24 @@ describe('EditableKeyStatDataBlock', () => {
       <EditableKeyStatDataBlock
         releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceTitle: undefined }}
+        onRemove={noop}
         onSubmit={noop}
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-    });
-
-    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-      '608,180',
-    );
-    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-      'DataBlock trend',
-    );
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
         name: 'Help for DataBlock indicator',
       }),
     ).toBeInTheDocument();
-
     expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
       'DataBlock guidance text',
     );
-
-    expect(
-      screen.queryByRole('button', { name: /Remove/ }),
-    ).not.toBeInTheDocument();
   });
 
-  test('renders preview correctly without guidanceText', async () => {
+  test('does not render the guidance when `guidanceText` is undefined', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
@@ -212,39 +210,25 @@ describe('EditableKeyStatDataBlock', () => {
       <EditableKeyStatDataBlock
         releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceText: undefined }}
+        onRemove={noop}
         onSubmit={noop}
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-    });
-
-    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-      '608,180',
-    );
-    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-      'DataBlock trend',
-    );
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
         name: 'DataBlock guidance title',
       }),
     ).not.toBeInTheDocument();
-
     expect(
       screen.queryByTestId('keyStat-guidanceText'),
     ).not.toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('button', { name: /Remove/ }),
-    ).not.toBeInTheDocument();
   });
 
-  test('clicking `Remove` button calls `onRemove` handler', async () => {
+  test('clicking the remove button calls the `onRemove` handler', async () => {
+    const user = userEvent.setup();
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
     );
@@ -261,11 +245,9 @@ describe('EditableKeyStatDataBlock', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Remove/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', {
         name: 'Remove key statistic: DataBlock indicator',
       }),
@@ -276,282 +258,119 @@ describe('EditableKeyStatDataBlock', () => {
     });
   });
 
-  describe('when editing', () => {
-    test('renders edit form correctly', async () => {
-      tableBuilderService.getDataBlockTableData.mockResolvedValue(
-        testTableDataResponse,
-      );
+  test('clicking the edit button shows the form', async () => {
+    const user = userEvent.setup();
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
-      render(
-        <EditableKeyStatDataBlock
-          releaseId="release-1"
-          keyStat={keyStatDataBlock}
-          isEditing
-          onSubmit={noop}
-        />,
-      );
+    render(
+      <EditableKeyStatDataBlock
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+        onRemove={noop}
+        onSubmit={noop}
+      />,
+    );
 
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
-      await userEvent.click(
-        screen.getByRole('button', {
-          name: 'Edit key statistic: DataBlock indicator',
-        }),
-      );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit key statistic: DataBlock indicator',
+      }),
+    );
 
-      await waitFor(() => {
-        expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-          'DataBlock indicator',
-        );
-      });
+    expect(await screen.findByLabelText('Trend')).toBeInTheDocument();
 
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
+    expect(
+      screen.queryByRole('button', { name: /Edit/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Remove/ }),
+    ).not.toBeInTheDocument();
+  });
 
-      expect(screen.getByLabelText('Trend')).toHaveValue('DataBlock trend');
+  test('clicking the cancel button toggles back to preview', async () => {
+    const user = userEvent.setup();
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
 
-      expect(screen.getByLabelText('Guidance title')).toHaveValue(
-        'DataBlock guidance title',
-      );
+    render(
+      <EditableKeyStatDataBlock
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+        onRemove={noop}
+        onSubmit={noop}
+      />,
+    );
 
-      expect(screen.getByLabelText('Guidance text')).toHaveTextContent(
-        'DataBlock guidance text',
-      );
+    expect(await screen.findByText('DataBlock indicator')).toBeInTheDocument();
 
-      expect(screen.getByRole('button', { name: /Save/ })).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit key statistic: DataBlock indicator',
+      }),
+    );
 
-      expect(
-        screen.getByRole('button', { name: /Cancel/ }),
-      ).toBeInTheDocument();
+    expect(await screen.findByLabelText('Trend')).toBeInTheDocument();
 
-      expect(
-        screen.queryByRole('button', {
-          name: 'Edit key statistic: Text title',
-        }),
-      ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-      expect(
-        screen.queryByRole('button', { name: /Remove/ }),
-      ).not.toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('button', {
+        name: 'Edit key statistic: DataBlock indicator',
+      }),
+    ).toBeInTheDocument();
 
-    test('submitting edit form calls `onSubmit` handler with updated values', async () => {
-      tableBuilderService.getDataBlockTableData.mockResolvedValue(
-        testTableDataResponse,
-      );
+    expect(screen.getByRole('button', { name: /Remove/ })).toBeInTheDocument();
 
-      const onSubmit = jest.fn();
+    expect(screen.queryByLabelText('Trend')).not.toBeInTheDocument();
+  });
 
-      render(
-        <EditableKeyStatDataBlock
-          releaseId="release-1"
-          keyStat={keyStatDataBlock}
-          isEditing
-          onSubmit={onSubmit}
-        />,
-      );
+  test('can click the remove button when data block fails to load', async () => {
+    const user = userEvent.setup();
+    tableBuilderService.getDataBlockTableData.mockRejectedValue(
+      new Error('Something went wrong'),
+    );
 
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
+    const onRemove = jest.fn();
 
-      await userEvent.click(
-        screen.getByRole('button', {
-          name: 'Edit key statistic: DataBlock indicator',
-        }),
-      );
+    render(
+      <EditableKeyStatDataBlock
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        onRemove={onRemove}
+        onSubmit={noop}
+      />,
+    );
 
-      await waitFor(() => {
-        expect(screen.getByLabelText('Trend')).toBeInTheDocument();
-      });
+    expect(
+      await screen.findByText('Could not load key statistic'),
+    ).toBeInTheDocument();
 
-      await userEvent.clear(screen.getByLabelText('Trend'));
-      await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
+    expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('keyStat-statistic')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('keyStat-guidanceText'),
+    ).not.toBeInTheDocument();
 
-      await userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
-        screen.getByLabelText('Guidance title'),
-        'New guidance title',
-      );
+    expect(
+      screen.queryByRole('button', { name: 'Edit' }),
+    ).not.toBeInTheDocument();
 
-      await userEvent.clear(screen.getByLabelText('Guidance text'));
-      await userEvent.type(
-        screen.getByLabelText('Guidance text'),
-        'New guidance text',
-      );
+    expect(onRemove).not.toHaveBeenCalled();
 
-      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove key statistic',
+      }),
+    );
 
-      await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalledWith<KeyStatDataBlockFormValues[]>({
-          trend: 'New trend',
-          guidanceTitle: 'New guidance title',
-          guidanceText: 'New guidance text',
-        });
-      });
-    });
-
-    test('submitting edit form calls `onSubmit` handler with trimmed updated guidance title', async () => {
-      tableBuilderService.getDataBlockTableData.mockResolvedValue(
-        testTableDataResponse,
-      );
-
-      const onSubmit = jest.fn();
-
-      render(
-        <EditableKeyStatDataBlock
-          releaseId="release-1"
-          keyStat={keyStatDataBlock}
-          isEditing
-          onSubmit={onSubmit}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
-
-      await userEvent.click(
-        screen.getByRole('button', {
-          name: 'Edit key statistic: DataBlock indicator',
-        }),
-      );
-
-      await waitFor(() => {
-        expect(screen.getByLabelText('Trend')).toBeInTheDocument();
-      });
-
-      await userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
-        screen.getByLabelText('Guidance title'),
-        '  New guidance title  ',
-      );
-
-      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
-
-      await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalledWith<KeyStatDataBlockFormValues[]>({
-          trend: 'DataBlock trend',
-          guidanceTitle: 'New guidance title',
-          guidanceText: 'DataBlock guidance text',
-        });
-      });
-    });
-
-    test('clicking `Cancel` button toggles back to preview', async () => {
-      tableBuilderService.getDataBlockTableData.mockResolvedValue(
-        testTableDataResponse,
-      );
-
-      render(
-        <EditableKeyStatDataBlock
-          releaseId="release-1"
-          keyStat={keyStatDataBlock}
-          isEditing
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
-
-      await userEvent.click(
-        screen.getByRole('button', {
-          name: 'Edit key statistic: DataBlock indicator',
-        }),
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText('Cancel')).toBeInTheDocument();
-      });
-
-      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-      await waitFor(() => {
-        expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
-      });
-
-      expect(screen.queryByLabelText('Trend')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Guidance title')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('Guidance text')).not.toBeInTheDocument();
-
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'DataBlock trend',
-      );
-
-      expect(
-        screen.getByRole('button', {
-          name: 'DataBlock guidance title',
-        }),
-      ).toBeInTheDocument();
-      expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-        'DataBlock guidance text',
-      );
-
-      expect(
-        screen.queryByRole('button', { name: /Edit/ }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: /Remove/ }),
-      ).not.toBeInTheDocument();
-
-      expect(
-        keyStatisticService.updateKeyStatisticDataBlock,
-      ).not.toHaveBeenCalled();
-    });
-
-    test('can click `Remove` button when data block fails to load', async () => {
-      tableBuilderService.getDataBlockTableData.mockRejectedValue(
-        new Error('Something went wrong'),
-      );
-
-      const onRemove = jest.fn();
-
-      render(
-        <EditableKeyStatDataBlock
-          releaseId="release-1"
-          keyStat={keyStatDataBlock}
-          onRemove={onRemove}
-          onSubmit={noop}
-        />,
-      );
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Could not load key statistic'),
-        ).toBeInTheDocument();
-      });
-
-      expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-statistic')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('button', { name: 'Edit' }),
-      ).not.toBeInTheDocument();
-
-      expect(onRemove).not.toHaveBeenCalled();
-
-      await userEvent.click(
-        screen.getByRole('button', {
-          name: 'Remove key statistic',
-        }),
-      );
-
-      expect(onRemove).toBeCalledTimes(1);
-    });
+    expect(onRemove).toBeCalledTimes(1);
   });
 });

@@ -35,6 +35,8 @@ describe('ReleasePreReleaseAccessPage', () => {
       ).toBeInTheDocument();
     });
 
+    expect(await screen.findByText('Pre-release users')).toBeInTheDocument();
+
     expect(
       screen.getByRole('tab', { name: 'Pre-release users' }),
     ).toBeInTheDocument();

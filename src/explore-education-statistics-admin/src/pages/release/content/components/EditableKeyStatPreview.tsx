@@ -11,7 +11,7 @@ export interface EditableKeyStatDisplayProps
   extends OmitStrict<KeyStatProps, 'children' | 'includeWrapper'> {
   isReordering: boolean;
   isEditing: boolean;
-  onRemove?: () => void;
+  onRemove: () => void;
   onEdit: () => void;
 }
 
@@ -32,11 +32,9 @@ export default function EditableKeyStatPreview({
             Edit <VisuallyHidden> key statistic: {title}</VisuallyHidden>
           </Button>
 
-          {onRemove && (
-            <Button variant="secondary" onClick={onRemove}>
-              Remove <VisuallyHidden> key statistic: {title}</VisuallyHidden>
-            </Button>
-          )}
+          <Button variant="secondary" onClick={onRemove}>
+            Remove <VisuallyHidden> key statistic: {title}</VisuallyHidden>
+          </Button>
         </ButtonGroup>
       )}
     </KeyStat>

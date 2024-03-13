@@ -8,7 +8,7 @@ interface Props {
 
 const ErrorMessage = ({ children, id }: Props) => {
   return (
-    <span className="govuk-error-message" id={id}>
+    <span className="govuk-error-message" id={id} data-testid={id}>
       <VisuallyHidden>Error: </VisuallyHidden>
       {children}
     </span>
