@@ -141,14 +141,21 @@ public record SetterContext
     /// <summary>
     /// The instance's index in the generated sequence.
     /// </summary>
-    public int Index { get; }
+    public readonly int Index;
+
+    /// <summary>
+    /// The associated fixture for this generator (if there is one).
+    /// If no associated fixture, this will be null.
+    /// </summary>
+    public readonly DataFixture? Fixture;
 
     private readonly int? _fixtureTypeIndex;
     private readonly int? _fixtureIndex;
 
-    public SetterContext(int index, int? fixtureTypeIndex, int? fixtureIndex)
+    public SetterContext(int index, DataFixture? fixture, int? fixtureTypeIndex, int? fixtureIndex)
     {
         Index = index;
+        Fixture = fixture;
         _fixtureTypeIndex = fixtureTypeIndex;
         _fixtureIndex = fixtureIndex;
     }
