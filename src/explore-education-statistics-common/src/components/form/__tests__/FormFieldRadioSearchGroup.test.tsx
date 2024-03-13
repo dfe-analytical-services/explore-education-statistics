@@ -230,9 +230,9 @@ describe('FormFieldRadioSearchGroup', () => {
         </Formik>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -314,10 +314,6 @@ describe('FormFieldRadioSearchGroup', () => {
   });
 
   describe('search', () => {
-    beforeEach(() => {
-      jest.useFakeTimers();
-    });
-
     test('providing a search term filters the radios', async () => {
       render(
         <Formik
@@ -346,7 +342,10 @@ describe('FormFieldRadioSearchGroup', () => {
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument();
+      });
+
       const radios = screen.getAllByRole('radio');
       expect(radios).toHaveLength(2);
       expect(radios[0]).toHaveAttribute('value', '2');
@@ -386,7 +385,10 @@ describe('FormFieldRadioSearchGroup', () => {
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Radio 3')).not.toBeInTheDocument();
+      });
+
       expect(screen.getAllByRole('radio')).toHaveLength(2);
       expect(radio1.checked).toBe(true);
       expect(radio2.checked).toBe(false);

@@ -4,9 +4,8 @@ import FiltersForm, {
   FilterFormSubmitHandler,
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
-import LocationFiltersForm, {
-  LocationFiltersFormSubmitHandler,
-} from '@common/modules/table-tool/components/LocationFiltersForm';
+import { LocationFiltersFormSubmitHandler } from '@common/modules/table-tool/components/LocationFiltersForm';
+import LocationStep from '@common/modules/table-tool/components/LocationStep';
 import PreviousStepModalConfirm from '@common/modules/table-tool/components/PreviousStepModalConfirm';
 import PublicationForm, {
   PublicationFormSubmitHandler,
@@ -468,7 +467,7 @@ export default function TableToolWizard({
             </WizardStep>
             <WizardStep size="l" onBack={handleLocationStepBack}>
               {stepProps => (
-                <LocationFiltersForm
+                <LocationStep
                   {...stepProps}
                   initialValues={state.query.locationIds}
                   options={state.subjectMeta.locations}

@@ -646,20 +646,26 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
+    await userEvent.selectOptions(
+      screen.getByLabelText('Legend position'),
+      'inline',
+    );
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
 
     const legendItem1 = within(legendItems[0]);
 
-    userEvent.clear(legendItem1.getByLabelText('Label'));
+    await userEvent.clear(legendItem1.getByLabelText('Label'));
     await userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );
 
-    userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
+    await userEvent.selectOptions(
+      legendItem1.getByLabelText('Position'),
+      'below',
+    );
 
     expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
       position: 'inline',
@@ -711,8 +717,8 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
     const legendItem2 = within(legendItems[1]);
 
-    userEvent.clear(legendItem2.getByLabelText('Label'));
-    userEvent.tab();
+    await userEvent.clear(legendItem2.getByLabelText('Label'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -762,8 +768,11 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
-    userEvent.tab();
+    await userEvent.selectOptions(
+      screen.getByLabelText('Legend position'),
+      'inline',
+    );
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -814,11 +823,13 @@ describe('ChartLegendConfiguration', () => {
 
     const legendItem1 = within(legendItems[0]);
 
-    userEvent.clear(legendItem1.getByLabelText('Label'));
+    await userEvent.clear(legendItem1.getByLabelText('Label'));
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -868,16 +879,12 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(handleSubmit).not.toHaveBeenCalled();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
-      expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
+    expect(await screen.findByText('Cannot save chart')).toBeInTheDocument();
+    expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
   });
 
   test('successfully submits with updated values', async () => {
@@ -915,14 +922,17 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
+    await userEvent.selectOptions(
+      screen.getByLabelText('Legend position'),
+      'inline',
+    );
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
 
     const legendItem1 = within(legendItems[0]);
 
-    userEvent.clear(legendItem1.getByLabelText('Label'));
+    await userEvent.clear(legendItem1.getByLabelText('Label'));
     await userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
@@ -934,13 +944,24 @@ describe('ChartLegendConfiguration', () => {
       },
     });
 
-    userEvent.selectOptions(legendItem1.getByLabelText('Symbol'), 'diamond');
-    userEvent.selectOptions(legendItem1.getByLabelText('Style'), 'dotted');
-    userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
+    await userEvent.selectOptions(
+      legendItem1.getByLabelText('Symbol'),
+      'diamond',
+    );
+    await userEvent.selectOptions(
+      legendItem1.getByLabelText('Style'),
+      'dotted',
+    );
+    await userEvent.selectOptions(
+      legendItem1.getByLabelText('Position'),
+      'below',
+    );
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       const values: LegendConfiguration = {

@@ -174,7 +174,7 @@ describe('ReorderIndicatorsList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const indicatorsList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[0],
@@ -204,7 +204,7 @@ describe('ReorderIndicatorsList', () => {
       expect(screen.getByTestId('reorder-list'));
     });
     const indicatorsList = screen.getByTestId('reorder-list');
-    userEvent.click(
+    await userEvent.click(
       screen.getAllByRole('button', {
         name: 'Reorder options within this group',
       })[0],
@@ -215,7 +215,7 @@ describe('ReorderIndicatorsList', () => {
     });
 
     expect(within(indicatorsList).getByRole('list'));
-    userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.queryByText('Category 1 Item 1')).not.toBeInTheDocument();
     expect(within(indicatorsList).queryByRole('list')).not.toBeInTheDocument();
   });
@@ -234,7 +234,7 @@ describe('ReorderIndicatorsList', () => {
     await waitFor(() => {
       expect(screen.getByTestId('reorder-list'));
     });
-    userEvent.click(screen.getByRole('button', { name: 'Save order' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save order' }));
 
     const expectedRequest = [
       {

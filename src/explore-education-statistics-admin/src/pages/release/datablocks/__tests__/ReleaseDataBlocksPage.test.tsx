@@ -352,7 +352,7 @@ describe('ReleaseDataBlocksPage', () => {
 
     const buttons = screen.getAllByRole('button', { name: 'Delete block' });
 
-    userEvent.click(buttons[0]);
+    await userEvent.click(buttons[0]);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -385,7 +385,7 @@ describe('ReleaseDataBlocksPage', () => {
 
     const buttons = screen.getAllByRole('button', { name: 'Delete block' });
 
-    userEvent.click(buttons[0]);
+    await userEvent.click(buttons[0]);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -393,7 +393,7 @@ describe('ReleaseDataBlocksPage', () => {
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -415,7 +415,7 @@ describe('ReleaseDataBlocksPage', () => {
 
     const buttons = screen.getAllByRole('button', { name: 'Delete block' });
 
-    userEvent.click(buttons[0]);
+    await userEvent.click(buttons[0]);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -423,7 +423,7 @@ describe('ReleaseDataBlocksPage', () => {
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

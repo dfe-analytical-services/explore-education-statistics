@@ -14,7 +14,7 @@ import { Form, Formik, FormikProps } from 'formik';
 import compact from 'lodash/compact';
 import last from 'lodash/last';
 import React, { useCallback, useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 
 interface FormValues {
   rowGroups: Filter[][];

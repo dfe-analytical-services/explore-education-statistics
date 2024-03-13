@@ -146,17 +146,17 @@ describe('FormTextInput', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('trims on blur by default', () => {
+  test('trims on blur by default', async () => {
     render(
       <FormBaseInput id="test-input" label="Test input" name="testInput" />,
     );
 
-    userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
+    await userEvent.tab();
     expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
   });
 
-  test('does not trim on blur when `trimValue` is false', () => {
+  test('does not trim on blur when `trimValue` is false', async () => {
     render(
       <FormBaseInput
         id="test-input"
@@ -166,19 +166,25 @@ describe('FormTextInput', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Test input'), '   do not trim me  ');
-    userEvent.tab();
+    await userEvent.type(
+      screen.getByLabelText('Test input'),
+      '   do not trim me  ',
+    );
+    await userEvent.tab();
     expect(screen.getByLabelText('Test input')).toHaveValue(
       '   do not trim me  ',
     );
   });
 
-  test('does not trim when enter is pressed and `trimValue` is false', () => {
+  test('does not trim when enter is pressed and `trimValue` is false', async () => {
     render(
       <FormBaseInput id="test-input" label="Test input" name="testInput" />,
     );
 
-    userEvent.type(screen.getByLabelText('Test input'), '  trim me  {enter}');
+    await userEvent.type(
+      screen.getByLabelText('Test input'),
+      '  trim me  {enter}',
+    );
     expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
   });
 });

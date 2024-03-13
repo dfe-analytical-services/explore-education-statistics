@@ -203,9 +203,9 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Approved for publication'));
-    userEvent.click(screen.getByLabelText('Internal note'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Approved for publication'));
+    await userEvent.click(screen.getByLabelText('Internal note'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -232,9 +232,9 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('With a specific release'));
-    userEvent.click(screen.getByLabelText('Select release'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('With a specific release'));
+    await userEvent.click(screen.getByLabelText('Select release'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -261,7 +261,9 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Update status' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -303,7 +305,9 @@ describe('MethodologyStatusForm', () => {
       'test-release-1',
     ]);
 
-    userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Update status' }),
+    );
 
     const expectedValues: MethodologyStatusFormValues = {
       latestInternalReleaseNote: 'Test release note',

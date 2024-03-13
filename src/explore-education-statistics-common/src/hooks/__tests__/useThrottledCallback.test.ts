@@ -1,5 +1,5 @@
 import useThrottledCallback from '@common/hooks/useThrottledCallback';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 describe('useThrottledCallback', () => {
   beforeEach(() => {

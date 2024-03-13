@@ -168,7 +168,7 @@ describe('FormFieldRadioGroup', () => {
 
     expect(radio.checked).toBe(false);
 
-    userEvent.click(radio);
+    await userEvent.click(radio);
 
     expect(radio.checked).toBe(true);
   });
@@ -199,7 +199,7 @@ describe('FormFieldRadioGroup', () => {
     expect(radio1.checked).toBe(true);
     expect(radio2.checked).toBe(false);
 
-    userEvent.click(radio2);
+    await userEvent.click(radio2);
 
     expect(radio1.checked).toBe(false);
     expect(radio2.checked).toBe(true);
@@ -239,7 +239,7 @@ describe('FormFieldRadioGroup', () => {
 
       expect(screen.queryByText('Select an option')).toBeNull();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
@@ -269,8 +269,8 @@ describe('FormFieldRadioGroup', () => {
         </FormProvider>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
@@ -313,7 +313,11 @@ describe('FormFieldRadioGroup', () => {
             test: Yup.string().ensure().required('Select an option'),
           })}
         >
-          <RHFForm id="testForm" onSubmit={Promise.resolve}>
+          <RHFForm
+            id="testForm"
+            showErrorSummary={false}
+            onSubmit={Promise.resolve}
+          >
             <RHFFormFieldRadioGroup
               name="test"
               id="radios"
@@ -336,7 +340,7 @@ describe('FormFieldRadioGroup', () => {
       expect(radio.checked).toBe(false);
       expect(screen.queryByText('Select an option')).toBeNull();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       expect(radio.checked).toBe(false);
       expect(screen.queryByText('Select an option')).toBeNull();

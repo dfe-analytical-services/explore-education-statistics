@@ -260,7 +260,9 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -286,13 +288,21 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Subtitle'), 'This is the subtitle');
-    userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
-    userEvent.type(screen.getByLabelText('Width (pixels)'), '500');
+    await userEvent.type(
+      screen.getByLabelText('Subtitle'),
+      'This is the subtitle',
+    );
+    await userEvent.type(
+      screen.getByLabelText('Alt text'),
+      'This is the alt text',
+    );
+    await userEvent.type(screen.getByLabelText('Width (pixels)'), '500');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -321,7 +331,10 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
+    await userEvent.type(
+      screen.getByLabelText('Alt text'),
+      'This is the alt text',
+    );
 
     await waitFor(() => {
       expect(handleChange).toHaveBeenCalledWith({
@@ -375,10 +388,15 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByLabelText('Set an alternative title'));
-    userEvent.type(screen.getByLabelText('Enter chart title'), 'The title');
+    await userEvent.click(screen.getByLabelText('Set an alternative title'));
+    await userEvent.type(
+      screen.getByLabelText('Enter chart title'),
+      'The title',
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -405,13 +423,16 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByLabelText('Show data labels'));
+    await userEvent.click(screen.getByLabelText('Show data labels'));
 
-    userEvent.selectOptions(screen.getByLabelText('Data label position'), [
-      'below',
-    ]);
+    await userEvent.selectOptions(
+      screen.getByLabelText('Data label position'),
+      ['below'],
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -439,13 +460,14 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByLabelText('Show data labels'));
+    await userEvent.click(screen.getByLabelText('Show data labels'));
 
-    userEvent.selectOptions(screen.getByLabelText('Data label position'), [
-      'below',
-    ]);
+    await userEvent.selectOptions(
+      screen.getByLabelText('Data label position'),
+      ['below'],
+    );
 
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(

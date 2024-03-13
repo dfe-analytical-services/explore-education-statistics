@@ -157,9 +157,11 @@ describe('PublicationReleaseAccess', () => {
       expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove User 1' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Remove User 1' }),
+    );
 
-    userEvent.click(
+    await userEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
         name: 'Confirm',
       }),
@@ -193,11 +195,11 @@ describe('PublicationReleaseAccess', () => {
       expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Cancel invite for user2@test.com' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
         name: 'Confirm',
       }),

@@ -18,7 +18,7 @@ export interface KeyStatisticDataBlockUpdateRequest {
   guidanceText?: string;
 }
 
-interface KeyStatisticTextSaveRequest {
+export interface KeyStatisticTextSaveRequest {
   title: string;
   statistic: string;
   trend?: string;

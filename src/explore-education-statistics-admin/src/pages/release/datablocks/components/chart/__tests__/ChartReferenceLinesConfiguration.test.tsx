@@ -343,8 +343,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       referenceLines.queryByText('Enter position'),
     ).not.toBeInTheDocument();
 
-    userEvent.click(referenceLines.getByLabelText('Position'));
-    userEvent.tab();
+    await userEvent.click(referenceLines.getByLabelText('Position'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter position')).toBeInTheDocument();
@@ -372,8 +372,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       ),
     ).not.toBeInTheDocument();
 
-    userEvent.type(referenceLines.getByLabelText('Position'), '50500');
-    userEvent.tab();
+    await userEvent.type(referenceLines.getByLabelText('Position'), '50500');
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -405,8 +405,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       ),
     ).not.toBeInTheDocument();
 
-    userEvent.type(referenceLines.getByLabelText('Y axis position'), '50500');
-    userEvent.tab();
+    await userEvent.type(
+      referenceLines.getByLabelText('Y axis position'),
+      '50500',
+    );
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -436,12 +439,13 @@ describe('ChartReferenceLinesConfiguration', () => {
       referenceLines.queryByText('Enter a percentage between 0 and 100%'),
     ).not.toBeInTheDocument();
 
-    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
-      'custom',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('X axis position'),
+      ['custom'],
+    );
 
-    userEvent.type(referenceLines.getByLabelText(/Percent/), '101');
-    userEvent.tab();
+    await userEvent.type(referenceLines.getByLabelText(/Percent/), '101');
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -467,8 +471,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     expect(referenceLines.queryByText('Enter label')).not.toBeInTheDocument();
 
-    userEvent.click(referenceLines.getByLabelText('Label'));
-    userEvent.tab();
+    await userEvent.click(referenceLines.getByLabelText('Label'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter label')).toBeInTheDocument();
@@ -493,9 +497,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
-      'between-data-points',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('X axis position'),
+      ['between-data-points'],
+    );
 
     expect(
       referenceLines.queryByText('Enter start point'),
@@ -504,15 +509,15 @@ describe('ChartReferenceLinesConfiguration', () => {
       referenceLines.queryByText('Enter end point'),
     ).not.toBeInTheDocument();
 
-    userEvent.click(referenceLines.getByLabelText('Start point'));
-    userEvent.tab();
+    await userEvent.click(referenceLines.getByLabelText('Start point'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter start point')).toBeInTheDocument();
     });
 
-    userEvent.click(referenceLines.getByLabelText('End point'));
-    userEvent.tab();
+    await userEvent.click(referenceLines.getByLabelText('End point'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter end point')).toBeInTheDocument();
@@ -537,22 +542,24 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
-      'between-data-points',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('X axis position'),
+      ['between-data-points'],
+    );
 
     expect(
       referenceLines.queryByText('End point cannot match start point'),
     ).not.toBeInTheDocument();
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Start point'), [
-      '2014_AY',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('Start point'),
+      ['2014_AY'],
+    );
 
-    userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
       '2014_AY',
     ]);
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -589,9 +596,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       ),
     ).not.toBeInTheDocument();
 
-    userEvent.type(referenceLines.getByLabelText('Position'), '10');
-    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
-    userEvent.click(referenceLines.getByRole('button', { name: 'Add line' }));
+    await userEvent.type(referenceLines.getByLabelText('Position'), '10');
+    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    await userEvent.click(
+      referenceLines.getByRole('button', { name: 'Add line' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -622,7 +631,9 @@ describe('ChartReferenceLinesConfiguration', () => {
     ).not.toBeInTheDocument();
     expect(referenceLines.queryByText('Enter label')).not.toBeInTheDocument();
 
-    userEvent.click(referenceLines.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(
+      referenceLines.getByRole('button', { name: 'Add line' }),
+    );
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter position')).toBeInTheDocument();
@@ -695,7 +706,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       '2014_AY',
     ]);
 
@@ -703,7 +714,7 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -744,13 +755,13 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       'state-funded-primary',
     ]);
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -791,14 +802,14 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(
+    await userEvent.selectOptions(
       referenceLines.getByLabelText('Position'),
       barnsleyId,
     );
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -839,13 +850,13 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       'authorised-absence-sessions',
     ]);
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -882,7 +893,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -916,18 +927,20 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       '2014_AY',
     ]);
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     expect(referenceLines.getByLabelText('Style')).toHaveValue('dashed');
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Style'), ['none']);
+    await userEvent.selectOptions(referenceLines.getByLabelText('Style'), [
+      'none',
+    ]);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -961,17 +974,19 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+    await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
 
-    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
-      'between-data-points',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('X axis position'),
+      ['between-data-points'],
+    );
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Start point'), [
-      '2014_AY',
-    ]);
+    await userEvent.selectOptions(
+      referenceLines.getByLabelText('Start point'),
+      ['2014_AY'],
+    );
 
-    userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
       '2015_AY',
     ]);
 
@@ -979,7 +994,7 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -1043,16 +1058,16 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+    await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       '2014_AY',
     ]);
-    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    userEvent.type(referenceLines.getByLabelText('Label width'), '99');
+    await userEvent.type(referenceLines.getByLabelText('Label width'), '99');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -1091,7 +1106,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     const rows = referenceLines.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[1]).getByRole('button', { name: 'Remove line' }),
     );
 
@@ -1133,7 +1148,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     const rows = referenceLines.getAllByRole('row');
     expect(rows).toHaveLength(5);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[2]).getByRole('button', { name: 'Remove line' }),
     );
 
@@ -1177,7 +1192,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     const rows = referenceLines.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[2]).getByRole('button', { name: 'Remove line' }),
     );
 
@@ -1218,7 +1233,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     const rows = referenceLines.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[2]).getByRole('button', { name: 'Remove line' }),
     );
 
@@ -1253,7 +1268,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     const rows = referenceLines.getAllByRole('row');
     expect(rows).toHaveLength(5);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[2]).getByRole('button', { name: 'Remove line' }),
     );
 
@@ -1281,14 +1296,14 @@ describe('ChartReferenceLinesConfiguration', () => {
       />,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Position'), '2015_AY');
-    userEvent.type(screen.getByLabelText('Label'), 'Test label');
-    userEvent.type(screen.getByLabelText('Y axis position'), '20000');
-    userEvent.selectOptions(screen.getByLabelText('Style'), 'dashed');
+    await userEvent.selectOptions(screen.getByLabelText('Position'), '2015_AY');
+    await userEvent.type(screen.getByLabelText('Label'), 'Test label');
+    await userEvent.type(screen.getByLabelText('Y axis position'), '20000');
+    await userEvent.selectOptions(screen.getByLabelText('Style'), 'dashed');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -1318,17 +1333,17 @@ describe('ChartReferenceLinesConfiguration', () => {
         onChange={handleSubmit}
       />,
     );
-    userEvent.type(screen.getByLabelText('Position'), '40000');
-    userEvent.type(screen.getByLabelText('Label'), 'Test label');
-    userEvent.selectOptions(screen.getByLabelText('X axis position'), [
+    await userEvent.type(screen.getByLabelText('Position'), '40000');
+    await userEvent.type(screen.getByLabelText('Label'), 'Test label');
+    await userEvent.selectOptions(screen.getByLabelText('X axis position'), [
       'custom',
     ]);
 
-    userEvent.type(screen.getByLabelText(/Percent/), '75');
+    await userEvent.type(screen.getByLabelText(/Percent/), '75');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -1365,26 +1380,31 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit line' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit line' }),
+    );
 
-    userEvent.type(within(rows[1]).getByLabelText('Label'), ' edited');
-
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Save' }));
+    await userEvent.type(within(rows[1]).getByLabelText('Label'), ' edited');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Save' }),
+    );
+
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
-      expect(handleSubmit).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
-      >([
-        {
-          label: 'Test label 1 edited',
-          labelWidth: undefined,
-          position: '2014_AY',
-          style: 'dashed',
-        },
-      ]);
     });
+
+    expect(handleSubmit).toHaveBeenCalledWith<
+      Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+    >([
+      {
+        label: 'Test label 1 edited',
+        labelWidth: undefined,
+        position: '2014_AY',
+        style: 'dashed',
+      },
+    ]);
   });
 });

@@ -18,14 +18,16 @@ describe('FiltersMobile', () => {
     expect(screen.queryByText('10 results')).not.toBeInTheDocument();
   });
 
-  test('renders the modal trigger button', () => {
+  test('renders the modal trigger button', async () => {
     render(
       <FiltersMobile title="Test title" totalResults={10}>
         <p>The filters</p>
       </FiltersMobile>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Filter results' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Filter results' }),
+    );
 
     expect(screen.getByText('10 results')).toBeInTheDocument();
     expect(screen.getByText('The filters')).toBeInTheDocument();

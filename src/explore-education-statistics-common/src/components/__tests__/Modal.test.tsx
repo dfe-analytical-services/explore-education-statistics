@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 describe('Modal', () => {
-  test('clicking the trigger button opens the modal', () => {
+  test('clicking the trigger button opens the modal', async () => {
     render(
       <Modal
         triggerButton={<button type="button">Open</button>}
@@ -19,7 +19,7 @@ describe('Modal', () => {
       screen.queryByRole('heading', { name: 'Test modal' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(
@@ -27,7 +27,7 @@ describe('Modal', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking the close button closes the modal', () => {
+  test('clicking the close button closes the modal', async () => {
     render(
       <Modal
         showClose
@@ -44,7 +44,7 @@ describe('Modal', () => {
       screen.getByRole('heading', { name: 'Test modal' }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(
@@ -132,7 +132,7 @@ describe('Modal', () => {
 
     expect(onOpen).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(onOpen).toHaveBeenCalled();
@@ -156,7 +156,7 @@ describe('Modal', () => {
 
     expect(onExit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     await waitFor(() => {
       expect(onExit).toHaveBeenCalled();

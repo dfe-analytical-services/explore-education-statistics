@@ -349,7 +349,7 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete files',
         }),
@@ -433,7 +433,7 @@ describe('ReleaseDataUploadsSection', () => {
         }),
       ).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         within(sections[1]).getByRole('button', {
           name: 'Delete files',
         }),
@@ -445,7 +445,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
@@ -554,8 +554,8 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      userEvent.click(screen.getByLabelText('Subject title'));
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('Subject title'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -582,13 +582,13 @@ describe('ReleaseDataUploadsSection', () => {
         'Test data 1',
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
       );
 
-      userEvent.click(screen.getByLabelText('Subject title'));
+      await userEvent.click(screen.getByLabelText('Subject title'));
 
       await waitFor(() => {
         expect(
@@ -610,7 +610,7 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -654,8 +654,8 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      userEvent.click(screen.getByLabelText('ZIP file'));
-      userEvent.click(
+      await userEvent.click(screen.getByLabelText('ZIP file'));
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -718,12 +718,15 @@ describe('ReleaseDataUploadsSection', () => {
         'Test title',
       );
 
-      userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
-      userEvent.upload(
+      await userEvent.upload(
+        screen.getByLabelText('Upload data file'),
+        dataFile,
+      );
+      await userEvent.upload(
         screen.getByLabelText('Upload metadata file'),
         metadataFile,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -818,10 +821,10 @@ describe('ReleaseDataUploadsSection', () => {
         'Test zip title',
       );
 
-      userEvent.click(screen.getByLabelText('ZIP file'));
+      await userEvent.click(screen.getByLabelText('ZIP file'));
 
-      userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
-      userEvent.click(
+      await userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -919,12 +922,15 @@ describe('ReleaseDataUploadsSection', () => {
         'Test title',
       );
 
-      userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
-      userEvent.upload(
+      await userEvent.upload(
+        screen.getByLabelText('Upload data file'),
+        dataFile,
+      );
+      await userEvent.upload(
         screen.getByLabelText('Upload metadata file'),
         metadataFile,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -986,10 +992,10 @@ describe('ReleaseDataUploadsSection', () => {
         'Test title',
       );
 
-      userEvent.click(screen.getByLabelText('ZIP file'));
+      await userEvent.click(screen.getByLabelText('ZIP file'));
 
-      userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
-      userEvent.click(
+      await userEvent.upload(screen.getByLabelText('Upload ZIP file'), zipFile);
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Upload data files',
         }),
@@ -1117,7 +1123,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1165,7 +1171,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1174,7 +1180,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(
@@ -1216,7 +1222,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1225,7 +1231,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
@@ -1264,7 +1270,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const section = getAccordionSection(0);
 
-      userEvent.click(section.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(
@@ -1273,7 +1279,7 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).toHaveBeenCalledWith(

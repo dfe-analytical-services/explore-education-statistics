@@ -35,8 +35,8 @@ describe('DataBlockDetailsForm', () => {
   test('shows validation error if name is empty', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Name'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Name'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -48,8 +48,8 @@ describe('DataBlockDetailsForm', () => {
   test('shows validation error if table title is empty', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Table title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Table title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -61,14 +61,14 @@ describe('DataBlockDetailsForm', () => {
   test('shows validation error if no name when featured table checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
     expect(screen.getByLabelText('Featured table name')).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Featured table name'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Featured table name'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -91,7 +91,7 @@ describe('DataBlockDetailsForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
@@ -99,7 +99,9 @@ describe('DataBlockDetailsForm', () => {
 
     await userEvent.type(screen.getByLabelText('Featured table name'), '     ');
 
-    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save data block' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -111,7 +113,7 @@ describe('DataBlockDetailsForm', () => {
   test('shows validation error if no description when featured table checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
@@ -119,8 +121,8 @@ describe('DataBlockDetailsForm', () => {
       screen.getByLabelText('Featured table description'),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Featured table description'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Featured table description'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -134,10 +136,12 @@ describe('DataBlockDetailsForm', () => {
   test('submitting form with invalid values and featured table checked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
-    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save data block' }),
+    );
 
     await waitFor(() => {
       const alert = screen.getByRole('alert');
@@ -170,7 +174,9 @@ describe('DataBlockDetailsForm', () => {
   test('submitting form with invalid values and featured table unchecked shows error messages', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save data block' }),
+    );
 
     await waitFor(() => {
       const alert = screen.getByRole('alert');
@@ -197,7 +203,7 @@ describe('DataBlockDetailsForm', () => {
     await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
     await userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
@@ -212,7 +218,9 @@ describe('DataBlockDetailsForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save data block' }),
+    );
 
     const expected: DataBlockDetailsFormValues = {
       name: 'Test name',
@@ -236,7 +244,7 @@ describe('DataBlockDetailsForm', () => {
     await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
     await userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
@@ -251,7 +259,9 @@ describe('DataBlockDetailsForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save data block' }),
+    );
 
     const expected: DataBlockDetailsFormValues = {
       name: 'Test name',

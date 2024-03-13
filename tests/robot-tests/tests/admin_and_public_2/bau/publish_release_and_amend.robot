@@ -152,6 +152,7 @@ Add data block to first accordion section
 
 Verify data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls down    100
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}

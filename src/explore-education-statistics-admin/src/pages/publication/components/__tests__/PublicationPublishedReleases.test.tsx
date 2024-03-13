@@ -274,7 +274,7 @@ describe('PublicationPublishedReleases', () => {
     expect(screen.getByText('Published releases (5 of 7)'));
     expect(screen.getAllByRole('row')).toHaveLength(6);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Show 2 more published releases' }),
     );
     await waitFor(() => {
@@ -349,7 +349,7 @@ describe('PublicationPublishedReleases', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(6);
 
-    userEvent.click(
+    await userEvent.click(
       within(rows[1]).getByRole('button', { name: 'Amend Release 1' }),
     );
 
@@ -363,7 +363,7 @@ describe('PublicationPublishedReleases', () => {
       modal.getByText('Confirm you want to amend this published release'),
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       modal.getByRole('button', {
         name: 'Confirm',
       }),

@@ -511,7 +511,9 @@ describe('FindStatisticsPage', () => {
 
     render(<FindStatisticsPage />);
 
-    userEvent.click(screen.getByRole('button', { name: 'Filter results' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Filter results' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -558,7 +560,7 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(3);
 
     // Add release type filter
-    userEvent.click(screen.getByLabelText('Ad hoc statistics'));
+    await userEvent.click(screen.getByLabelText('Ad hoc statistics'));
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -581,7 +583,7 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(2);
 
     // Add theme filter
-    userEvent.click(screen.getByLabelText('Theme 1'));
+    await userEvent.click(screen.getByLabelText('Theme 1'));
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -649,7 +651,7 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(1);
 
     // remove release type filter
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Remove filter: National statistics',
       }),
@@ -682,7 +684,7 @@ describe('FindStatisticsPage', () => {
     ).toHaveLength(2);
 
     // Remove theme filter
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Remove filter: Theme 2' }),
     );
 
@@ -739,8 +741,8 @@ describe('FindStatisticsPage', () => {
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(3);
 
-    userEvent.type(screen.getByLabelText('Search'), 'Find me');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(screen.getByLabelText('Search'), 'Find me');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
     expect(mockRouter).toMatchObject({
       pathname: '/find-statistics',
@@ -791,7 +793,7 @@ describe('FindStatisticsPage', () => {
       within(screen.getByTestId('publicationsList')).getAllByRole('listitem'),
     ).toHaveLength(1);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Remove filter: Find me',
       }),
@@ -844,7 +846,7 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
-    userEvent.click(sortGroup.getByLabelText('A to Z'));
+    await userEvent.click(sortGroup.getByLabelText('A to Z'));
 
     await waitFor(() => {
       expect(mockRouter).toMatchObject({
@@ -894,8 +896,8 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
-    userEvent.type(screen.getByLabelText('Search'), 'Find me');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(screen.getByLabelText('Search'), 'Find me');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
     await waitFor(() => {
       expect(screen.getByText('2 results')).toBeInTheDocument();
@@ -953,7 +955,7 @@ describe('FindStatisticsPage', () => {
     expect(sortOptions[3]).toEqual(sortGroup.getByLabelText('Relevance'));
     expect(sortOptions[3]).toBeChecked();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Remove filter: Find me',
       }),
@@ -1010,7 +1012,9 @@ describe('FindStatisticsPage', () => {
     const publicationsList = within(screen.getByTestId('publicationsList'));
     expect(publicationsList.getAllByRole('listitem')).toHaveLength(2);
 
-    userEvent.click(screen.getByRole('button', { name: 'Clear all filters' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Clear all filters' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('30 results')).toBeInTheDocument();

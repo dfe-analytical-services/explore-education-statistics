@@ -27,7 +27,7 @@ export default function RHFFormFieldCheckboxGroup<
   ...props
 }: Props<TFormValues>) {
   const {
-    formState: { errors, submitCount },
+    formState: { errors },
     register,
     setValue,
     trigger,
@@ -61,7 +61,6 @@ export default function RHFFormFieldCheckboxGroup<
           options,
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}

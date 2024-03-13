@@ -12,8 +12,8 @@ describe('LegacyReleaseForm', () => {
 
     const description = screen.getByLabelText('Description');
 
-    userEvent.click(description);
-    userEvent.tab();
+    await userEvent.click(description);
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -29,8 +29,8 @@ describe('LegacyReleaseForm', () => {
 
     expect(screen.queryByText('Enter a URL')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('URL'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('URL'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -47,7 +47,7 @@ describe('LegacyReleaseForm', () => {
     expect(screen.queryByText('Enter a valid URL')).not.toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText('URL'), 'not a url');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -72,7 +72,7 @@ describe('LegacyReleaseForm', () => {
 
       render(<LegacyReleaseForm onSubmit={handleSubmit} />);
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -93,7 +93,7 @@ describe('LegacyReleaseForm', () => {
         'Test description',
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -115,7 +115,7 @@ describe('LegacyReleaseForm', () => {
       );
       await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -153,9 +153,9 @@ describe('LegacyReleaseForm', () => {
 
       render(<LegacyReleaseForm onSubmit={handleSubmit} />);
 
-      userEvent.clear(screen.getByLabelText('Description'));
+      await userEvent.clear(screen.getByLabelText('Description'));
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -180,7 +180,7 @@ describe('LegacyReleaseForm', () => {
         />,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),
@@ -213,7 +213,7 @@ describe('LegacyReleaseForm', () => {
       await userEvent.type(screen.getByLabelText('URL'), '/updated');
       await userEvent.type(screen.getByLabelText('Order'), '0');
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Save legacy release',
         }),

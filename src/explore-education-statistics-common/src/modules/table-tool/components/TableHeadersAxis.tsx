@@ -13,7 +13,7 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 import { useFormContext } from 'react-hook-form';
 
 interface Props {

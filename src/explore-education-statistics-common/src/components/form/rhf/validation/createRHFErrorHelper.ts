@@ -5,16 +5,19 @@ import {
   FieldErrors,
   FieldNamesMarkedBoolean,
   FieldValues,
+  Path,
 } from 'react-hook-form';
 
 export default function createRHFErrorHelper<TFormValues extends FieldValues>({
-  touchedFields,
   errors,
+  initialTouched = [],
   isSubmitted = false,
+  touchedFields,
 }: {
-  touchedFields: Partial<Readonly<FieldNamesMarkedBoolean<TFormValues>>>;
   errors: FieldErrors<TFormValues>;
+  initialTouched?: Path<TFormValues>[];
   isSubmitted?: boolean;
+  touchedFields: Partial<Readonly<FieldNamesMarkedBoolean<TFormValues>>>;
 }) {
   const getAllErrors = (
     errorGroup: FieldErrors<TFormValues> | FieldError,
@@ -23,7 +26,9 @@ export default function createRHFErrorHelper<TFormValues extends FieldValues>({
     return Object.entries(errorGroup).reduce((acc, [key, error]) => {
       const errorKey = keyPrefix ? `${keyPrefix}.${key}` : key;
 
-      const isTouched = get(touchedFields, errorKey, false);
+      const isTouched =
+        initialTouched?.includes(key as Path<TFormValues>) ||
+        get(touchedFields, errorKey, false);
 
       // If the form isn't submitted, only show errors for touched fields.
       if ((!isSubmitted && !isTouched) || typeof error === 'undefined') {

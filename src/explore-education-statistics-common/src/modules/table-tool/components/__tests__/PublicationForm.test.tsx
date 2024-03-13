@@ -216,10 +216,6 @@ describe('PublicationForm', () => {
     goToPreviousStep: task => task?.(),
   };
 
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
   test('renders the form with the search form, themes list and empty publications list', () => {
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
@@ -271,7 +267,11 @@ describe('PublicationForm', () => {
       'find me',
     );
 
-    jest.runOnlyPendingTimers();
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument(),
+    );
 
     const publicationRadios = within(
       screen.getByRole('group', {
@@ -307,8 +307,6 @@ describe('PublicationForm', () => {
       'Publication 11',
     );
 
-    jest.runOnlyPendingTimers();
-
     const publicationRadios = within(
       screen.getByRole('group', {
         name: /Select a publication/,
@@ -329,7 +327,11 @@ describe('PublicationForm', () => {
       'find me',
     );
 
-    jest.runOnlyPendingTimers();
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument(),
+    );
 
     const publicationRadios = within(
       screen.getByRole('group', {
@@ -361,7 +363,11 @@ describe('PublicationForm', () => {
       'FiND Me',
     );
 
-    jest.runOnlyPendingTimers();
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument(),
+    );
 
     const publicationRadios = within(
       screen.getByRole('group', {
@@ -389,7 +395,9 @@ describe('PublicationForm', () => {
 
     await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
 
-    jest.runOnlyPendingTimers();
+    expect(
+      await screen.findByText('No publications found'),
+    ).toBeInTheDocument();
 
     const publicationRadios = within(
       screen.getByRole('group', {
@@ -397,20 +405,23 @@ describe('PublicationForm', () => {
       }),
     ).queryAllByRole('radio');
     expect(publicationRadios).toHaveLength(0);
-
-    expect(screen.getByText('No publications found')).toBeInTheDocument();
   });
 
   test('does not throw error if regex sensitive search term is used', async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ delay: null });
+
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search publications'), '[');
+    await user.type(screen.getByLabelText('Search publications'), '[[');
 
     expect(() => {
       jest.runOnlyPendingTimers();
     }).not.toThrow();
+
+    jest.useRealTimers();
   });
 
   test('renders empty message when there are no themes', () => {
@@ -431,7 +442,7 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Theme 4',
       }),
@@ -475,7 +486,7 @@ describe('PublicationForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Theme 5',
       }),
@@ -532,7 +543,7 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Theme 4',
       }),
@@ -544,7 +555,7 @@ describe('PublicationForm', () => {
       ).not.toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Publication 9',
       }),
@@ -576,7 +587,7 @@ describe('PublicationForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Theme 4',
       }),
@@ -588,13 +599,13 @@ describe('PublicationForm', () => {
       ).not.toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Publication 9',
       }),
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await flushPromises();
 

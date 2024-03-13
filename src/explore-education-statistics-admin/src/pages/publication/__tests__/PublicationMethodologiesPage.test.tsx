@@ -188,7 +188,7 @@ describe('PublicationMethodologiesPage', () => {
         expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Create new methodology' }),
       );
 
@@ -430,7 +430,7 @@ describe('PublicationMethodologiesPage', () => {
           'cell',
         );
 
-        userEvent.click(
+        await userEvent.click(
           within(row1Cells[4]).getByRole('button', {
             name: 'Delete draft Methodology 1',
           }),
@@ -467,7 +467,7 @@ describe('PublicationMethodologiesPage', () => {
         const row1Cells = within(screen.getAllByRole('row')[1]).getAllByRole(
           'cell',
         );
-        userEvent.click(
+        await userEvent.click(
           within(row1Cells[4]).getByRole('button', {
             name: 'Delete draft Methodology 1',
           }),
@@ -475,7 +475,7 @@ describe('PublicationMethodologiesPage', () => {
 
         const modal = within(screen.getByRole('dialog'));
 
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+        await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
           expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
@@ -683,7 +683,6 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amending a methodology', () => {
       test('shows the confirm modal when clicking the amend button', async () => {
-        renderPage();
         methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1, draft => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
@@ -692,23 +691,24 @@ describe('PublicationMethodologiesPage', () => {
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
-        await waitFor(() =>
-          expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
-        );
+        expect(
+          await screen.findByText('Manage methodologies'),
+        ).toBeInTheDocument();
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', { name: 'Amend Methodology 1' }),
         );
 
-        const modal = within(screen.getByRole('dialog'));
         expect(
-          modal.getByText(
+          await screen.findByText(
             'Confirm you want to amend this published methodology',
           ),
         ).toBeInTheDocument();
 
         expect(
-          modal.getByRole('button', { name: 'Confirm' }),
+          within(screen.getByRole('dialog')).getByRole('button', {
+            name: 'Confirm',
+          }),
         ).toBeInTheDocument();
       });
 
@@ -761,11 +761,11 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', { name: 'Amend Methodology 1' }),
         );
         const modal = within(screen.getByRole('dialog'));
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+        await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
           expect(
@@ -792,7 +792,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Cancel amendment for Methodology 1',
           }),
@@ -829,7 +829,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Cancel amendment for Methodology 1',
           }),
@@ -841,7 +841,7 @@ describe('PublicationMethodologiesPage', () => {
 
         const modal = within(screen.getByRole('dialog'));
 
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+        await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
           expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
@@ -1194,7 +1194,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove Methodology 2',
           }),
@@ -1227,7 +1227,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove Methodology 2',
           }),
@@ -1235,7 +1235,7 @@ describe('PublicationMethodologiesPage', () => {
 
         const modal = within(screen.getByRole('dialog'));
 
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+        await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
           expect(publicationService.dropMethodology).toHaveBeenCalledWith(
@@ -1387,7 +1387,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove External methodolology title',
           }),
@@ -1427,7 +1427,7 @@ describe('PublicationMethodologiesPage', () => {
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
         );
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove External methodolology title',
           }),
@@ -1435,7 +1435,7 @@ describe('PublicationMethodologiesPage', () => {
 
         const modal = within(screen.getByRole('dialog'));
 
-        userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+        await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
           expect(

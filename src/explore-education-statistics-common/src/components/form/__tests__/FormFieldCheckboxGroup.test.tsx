@@ -157,7 +157,7 @@ describe('FormFieldCheckboxGroup', () => {
     );
   });
 
-  test('checking option checks it', () => {
+  test('checking option checks it', async () => {
     render(
       <Formik
         initialValues={{
@@ -184,12 +184,12 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox.checked).toBe(false);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(true);
   });
 
-  test('un-checking option un-checks it', () => {
+  test('un-checking option un-checks it', async () => {
     render(
       <Formik
         initialValues={{
@@ -216,12 +216,12 @@ describe('FormFieldCheckboxGroup', () => {
 
     expect(checkbox.checked).toBe(true);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(false);
   });
 
-  test('clicking `Select all 3 options` button checks all values', () => {
+  test('clicking `Select all 3 options` button checks all values', async () => {
     render(
       <Formik
         initialValues={{
@@ -253,14 +253,14 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
 
-    userEvent.click(screen.getByText('Select all 3 options'));
+    await userEvent.click(screen.getByText('Select all 3 options'));
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
   });
 
-  test('clicking `Unselect all 3 options` button un-checks all values', () => {
+  test('clicking `Unselect all 3 options` button un-checks all values', async () => {
     render(
       <Formik
         initialValues={{
@@ -292,7 +292,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     );
 
@@ -301,7 +301,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox3.checked).toBe(false);
   });
 
-  test('checking all options renders the `Unselect all 3 options` button', () => {
+  test('checking all options renders the `Unselect all 3 options` button', async () => {
     render(
       <Formik
         initialValues={{
@@ -337,9 +337,9 @@ describe('FormFieldCheckboxGroup', () => {
       screen.queryByRole('button', { name: 'Unselect all 3 options' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(checkbox1);
-    userEvent.click(checkbox2);
-    userEvent.click(checkbox3);
+    await userEvent.click(checkbox1);
+    await userEvent.click(checkbox2);
+    await userEvent.click(checkbox3);
 
     expect(checkbox1.checked).toBe(true);
     expect(checkbox2.checked).toBe(true);
@@ -352,7 +352,7 @@ describe('FormFieldCheckboxGroup', () => {
     ).toBeInTheDocument();
   });
 
-  test('un-checking any options renders the `Select all 3 options` button', () => {
+  test('un-checking any options renders the `Select all 3 options` button', async () => {
     render(
       <Formik
         initialValues={{
@@ -386,7 +386,7 @@ describe('FormFieldCheckboxGroup', () => {
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     ).toBeInTheDocument();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(false);
     expect(
@@ -463,7 +463,7 @@ describe('FormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
@@ -498,8 +498,8 @@ describe('FormFieldCheckboxGroup', () => {
         </Formik>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -534,8 +534,8 @@ describe('FormFieldCheckboxGroup', () => {
         </Formik>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -580,7 +580,7 @@ describe('FormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(checkbox.checked).toBe(false);
 
@@ -625,7 +625,7 @@ describe('FormFieldCheckboxGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(checkbox.checked).toBe(false);
 

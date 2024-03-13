@@ -33,9 +33,12 @@ describe('PublicationLegacyReleaseCreatePage', () => {
   test('handles successfully submitting the form', async () => {
     renderPage(testPublication);
 
-    userEvent.type(screen.getByLabelText('Description'), 'Test description');
-    userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
-    userEvent.click(
+    await userEvent.type(
+      screen.getByLabelText('Description'),
+      'Test description',
+    );
+    await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Save legacy release',
       }),

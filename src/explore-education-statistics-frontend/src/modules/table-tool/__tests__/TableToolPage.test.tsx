@@ -380,7 +380,9 @@ describe('TableToolPage', () => {
       }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('radio', { name: 'Pupils and schools' }));
+    await userEvent.click(
+      screen.getByRole('radio', { name: 'Pupils and schools' }),
+    );
 
     // Check there is only one radio for the publication;
     const publicationRadios = within(

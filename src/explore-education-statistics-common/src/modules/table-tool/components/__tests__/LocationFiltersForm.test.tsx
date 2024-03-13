@@ -1,6 +1,11 @@
 import LocationFiltersForm from '@common/modules/table-tool/components/LocationFiltersForm';
-import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { SubjectMeta } from '@common/services/tableBuilderService';
+import {
+  testLocationsFlat,
+  testLocationsNested,
+  testSchools,
+} from '@common/modules/table-tool/components/__tests__/__data__/testLocationFilters.data';
+import { testWizardStepProps } from '@common/modules/table-tool/components/__tests__/__data__/testWizardStepProps';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -8,141 +13,6 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('LocationFiltersForm', () => {
-  const testWizardStepProps: InjectedWizardProps = {
-    currentStep: 1,
-    isActive: true,
-    isEnabled: true,
-    isLoading: false,
-    stepNumber: 1,
-    setCurrentStep: (step, task) => task?.(),
-    goToNextStep: task => task?.(),
-    goToPreviousStep: task => task?.(),
-    shouldScroll: false,
-  };
-
-  const testLocationsFlat: SubjectMeta['locations'] = {
-    country: {
-      legend: 'Country',
-      options: [
-        {
-          id: 'country-1',
-          label: 'Country 1',
-          value: 'country-1',
-        },
-      ],
-    },
-    localAuthority: {
-      legend: 'Local authority',
-      options: [
-        {
-          id: 'local-authority-1',
-          label: 'Local authority 1',
-          value: 'local-authority-1',
-        },
-        {
-          id: 'local-authority-2',
-          label: 'Local authority 2',
-          value: 'local-authority-2',
-        },
-        {
-          id: 'local-authority-3',
-          label: 'Local authority 3',
-          value: 'local-authority-3',
-        },
-      ],
-    },
-    region: {
-      legend: 'Region',
-      options: [
-        {
-          id: 'region-1',
-          label: 'Region 1',
-          value: 'region-1',
-        },
-        {
-          id: 'region-2',
-          label: 'Region 2',
-          value: 'region-2',
-        },
-      ],
-    },
-  };
-
-  const testLocationsNested: SubjectMeta['locations'] = {
-    country: {
-      legend: 'Country',
-      options: [
-        {
-          id: 'country-1',
-          label: 'Country 1',
-          value: 'country-1',
-        },
-      ],
-    },
-    localAuthority: {
-      legend: 'Local authority',
-      options: [
-        {
-          label: 'Region 1',
-          value: 'region-1',
-          level: 'Region',
-          options: [
-            {
-              id: 'local-authority-1',
-              label: 'Local authority 1',
-              value: 'local-authority-1',
-            },
-            {
-              id: 'local-authority-2',
-              label: 'Local authority 2',
-              value: 'local-authority-2',
-            },
-          ],
-        },
-        {
-          label: 'Region 2',
-          value: 'region-2',
-          level: 'Region',
-          options: [
-            {
-              id: 'local-authority-3',
-              label: 'Local authority 3',
-              value: 'local-authority-3',
-            },
-            {
-              id: 'local-authority-4',
-              label: 'Local authority 4',
-              value: 'local-authority-4',
-            },
-          ],
-        },
-      ],
-    },
-  };
-
-  const testSchools: SubjectMeta['locations'] = {
-    school: {
-      legend: 'Schools',
-      options: [
-        {
-          label: 'LA 1',
-          level: 'localAuthority',
-          options: [
-            { id: 'school-id-1', label: 'School 1', value: '000001' },
-            { id: 'school-id-2', label: 'School 2', value: '000002' },
-          ],
-          value: 'la1',
-        },
-        {
-          label: 'LA 2',
-          level: 'localAuthority',
-          options: [{ id: 'school-id-3', label: 'School 3', value: '000003' }],
-          value: 'la2',
-        },
-      ],
-    },
-  };
-
   test('renders flat location group options correctly', () => {
     render(
       <LocationFiltersForm
@@ -328,7 +198,7 @@ describe('LocationFiltersForm', () => {
 
     const searchInput = screen.getByLabelText(/Search options/);
 
-    userEvent.type(searchInput, 'school');
+    await userEvent.type(searchInput, 'school');
 
     await waitFor(() => {
       expect(screen.getByText('Select all 3 options')).toBeInTheDocument();
@@ -374,7 +244,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes[2]).not.toBeChecked();
   });
 
-  test('selecting options shows the number of selected options for each location group', () => {
+  test('selecting options shows the number of selected options for each location group', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -383,7 +253,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 2'));
 
     expect(
       screen.getByRole('button', {
@@ -391,9 +261,9 @@ describe('LocationFiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Region 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Region 2'));
 
     expect(
       screen.getByRole('button', {
@@ -414,7 +284,7 @@ describe('LocationFiltersForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('selecting options shows the number of selected options for each location group (with nested groups)', () => {
+  test('selecting options shows the number of selected options for each location group (with nested groups)', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -423,7 +293,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 2'));
+    await userEvent.click(screen.getByLabelText('Local authority 2'));
 
     expect(
       screen.getByRole('button', {
@@ -431,8 +301,8 @@ describe('LocationFiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
 
     expect(
       screen.getByRole('button', {
@@ -456,7 +326,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Next step',
       }),
@@ -597,86 +467,6 @@ describe('LocationFiltersForm', () => {
     expect(localAuthority.getByLabelText('Local authority 1')).toBeChecked();
   });
 
-  test('renders a read-only view of selected options when no longer the current step', async () => {
-    const { rerender } = render(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        options={testLocationsFlat}
-        onSubmit={noop}
-      />,
-    );
-
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Region 1'));
-    userEvent.click(screen.getByLabelText('Region 2'));
-
-    await rerender(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        isActive={false}
-        options={testLocationsFlat}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-
-    const countryChoices = within(screen.getByTestId('Country')).getAllByRole(
-      'listitem',
-    );
-
-    expect(countryChoices).toHaveLength(1);
-    expect(countryChoices[0]).toHaveTextContent('Country 1');
-
-    const regionChoices = within(screen.getByTestId('Region')).getAllByRole(
-      'listitem',
-    );
-
-    expect(regionChoices).toHaveLength(2);
-    expect(regionChoices[0]).toHaveTextContent('Region 1');
-    expect(regionChoices[1]).toHaveTextContent('Region 2');
-  });
-
-  test('renders a read-only view of selected options (from nested groups) when no longer the current step', async () => {
-    const { rerender } = render(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        options={testLocationsNested}
-        onSubmit={noop}
-      />,
-    );
-
-    userEvent.click(screen.getByLabelText('Country 1'));
-    userEvent.click(screen.getByLabelText('Local authority 1'));
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-
-    await rerender(
-      <LocationFiltersForm
-        {...testWizardStepProps}
-        isActive={false}
-        options={testLocationsNested}
-        onSubmit={noop}
-      />,
-    );
-
-    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-
-    const countryChoices = within(screen.getByTestId('Country')).getAllByRole(
-      'listitem',
-    );
-
-    expect(countryChoices).toHaveLength(1);
-    expect(countryChoices[0]).toHaveTextContent('Country 1');
-
-    const localAuthorityChoices = within(
-      screen.getByTestId('Local authority'),
-    ).getAllByRole('listitem');
-
-    expect(localAuthorityChoices).toHaveLength(2);
-    expect(localAuthorityChoices[0]).toHaveTextContent('Local authority 1');
-    expect(localAuthorityChoices[1]).toHaveTextContent('Local authority 3');
-  });
-
   test('clicking `Next step` calls `onSubmit` with correct values', async () => {
     const handleSubmit = jest.fn();
     render(
@@ -687,10 +477,10 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Region 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Region 1'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     const expected = {
       locationIds: ['local-authority-3', 'region-1'],
@@ -712,11 +502,11 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Local authority 1'));
-    userEvent.click(screen.getByLabelText('Local authority 3'));
-    userEvent.click(screen.getByLabelText('Country 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 1'));
+    await userEvent.click(screen.getByLabelText('Local authority 3'));
+    await userEvent.click(screen.getByLabelText('Country 1'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     const expected = {
       locationIds: ['country-1', 'local-authority-1', 'local-authority-3'],

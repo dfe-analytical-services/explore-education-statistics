@@ -120,7 +120,7 @@ describe('MethodologyPage', () => {
     });
     const navLinks = within(primaryNav).getAllByRole('link');
 
-    userEvent.click(navLinks[1]);
+    await userEvent.click(navLinks[1]);
 
     await waitFor(() => {
       expect(
@@ -131,7 +131,7 @@ describe('MethodologyPage', () => {
       expect(navLinks[2]).not.toHaveAttribute('aria-current');
     });
 
-    userEvent.click(navLinks[2]);
+    await userEvent.click(navLinks[2]);
 
     await waitFor(() => {
       expect(

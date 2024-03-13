@@ -157,7 +157,7 @@ describe('RHFFormFieldSelect', () => {
 
     expect(select.value).toBe('');
 
-    userEvent.selectOptions(select, '1');
+    await userEvent.selectOptions(select, '1');
 
     await waitFor(() => {
       expect(select.value).toBe('1');
@@ -221,9 +221,9 @@ describe('RHFFormFieldSelect', () => {
       expect(select.value).toBe('1');
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      userEvent.selectOptions(select, '');
+      await userEvent.selectOptions(select, '');
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(select.value).toBe('');
@@ -265,7 +265,7 @@ describe('RHFFormFieldSelect', () => {
 
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(screen.getByText('Select an option')).toBeInTheDocument();
@@ -302,7 +302,7 @@ describe('RHFFormFieldSelect', () => {
       expect(select.value).toBe('1');
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      userEvent.selectOptions(select, '');
+      await userEvent.selectOptions(select, '');
 
       await waitFor(() => {
         expect(select.value).toBe('');
@@ -320,7 +320,11 @@ describe('RHFFormFieldSelect', () => {
             test: Yup.string().required('Select an option'),
           })}
         >
-          <RHFForm id="testForm" onSubmit={Promise.resolve}>
+          <RHFForm
+            id="testForm"
+            showErrorSummary={false}
+            onSubmit={Promise.resolve}
+          >
             <RHFFormFieldSelect
               name="test"
               id="customId"
@@ -344,7 +348,7 @@ describe('RHFFormFieldSelect', () => {
       expect(select.value).toBe('');
       expect(screen.queryByText('Select an option')).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByText('Submit'));
+      await userEvent.click(screen.getByText('Submit'));
 
       await waitFor(() => {
         expect(select.value).toBe('');

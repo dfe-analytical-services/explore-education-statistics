@@ -16,36 +16,36 @@ describe('SearchForm', () => {
     expect(screen.getByLabelText('Search')).toHaveValue('find me');
   });
 
-  test('calls onSubmit when submitted with a valid length string', () => {
+  test('calls onSubmit when submitted with a valid length string', async () => {
     const handleSubmit = jest.fn();
     render(<SearchForm onSubmit={handleSubmit} />);
-    userEvent.type(screen.getByLabelText('Search'), 'find me');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(screen.getByLabelText('Search'), 'find me');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(handleSubmit).toHaveBeenCalledWith('find me');
   });
 
-  test('does not call onSubmit and shows and error when submitted with an invalid length string', () => {
+  test('does not call onSubmit and shows and error when submitted with an invalid length string', async () => {
     const handleSubmit = jest.fn();
     render(<SearchForm onSubmit={handleSubmit} />);
-    userEvent.type(screen.getByLabelText('Search'), 'fi');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(screen.getByLabelText('Search'), 'fi');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(handleSubmit).not.toHaveBeenCalled();
     expect(
       screen.getByText('Search must be at least 3 characters'),
     ).toBeInTheDocument();
   });
 
-  test('removes the validation error when the input becomes valid', () => {
+  test('removes the validation error when the input becomes valid', async () => {
     const handleSubmit = jest.fn();
     render(<SearchForm onSubmit={handleSubmit} />);
-    userEvent.type(screen.getByLabelText('Search'), 'fi');
-    userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    await userEvent.type(screen.getByLabelText('Search'), 'fi');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(handleSubmit).not.toHaveBeenCalled();
     expect(
       screen.getByText('Search must be at least 3 characters'),
     ).toBeInTheDocument();
 
-    userEvent.type(screen.getByLabelText('Search'), 'fin');
+    await userEvent.type(screen.getByLabelText('Search'), 'fin');
     expect(
       screen.queryByText('Search must be at least 3 characters'),
     ).not.toBeInTheDocument();

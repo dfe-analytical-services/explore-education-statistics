@@ -15,7 +15,7 @@ describe('EditableBlockWrapper', () => {
     expect(screen.getByText('Child block')).toBeInTheDocument();
   });
 
-  test('renders the edit block button and calls `onEdit` when clicked when `onEdit` is provided', () => {
+  test('renders the edit block button and calls `onEdit` when clicked when `onEdit` is provided', async () => {
     const handleEdit = jest.fn();
     render(
       <EditableBlockWrapper onEdit={handleEdit}>
@@ -24,7 +24,7 @@ describe('EditableBlockWrapper', () => {
     );
 
     expect(handleEdit).not.toHaveBeenCalled();
-    userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
     expect(handleEdit).toHaveBeenCalled();
   });
 
@@ -78,7 +78,7 @@ describe('EditableBlockWrapper', () => {
     ).toBeInTheDocument();
   });
 
-  test('calls `onEmbedBlockEdit` when the edit dashboard button is clicked', () => {
+  test('calls `onEmbedBlockEdit` when the edit dashboard button is clicked', async () => {
     const handleEmbedBlockEdit = jest.fn();
     render(
       <EditableBlockWrapper onEmbedBlockEdit={handleEmbedBlockEdit}>
@@ -88,7 +88,9 @@ describe('EditableBlockWrapper', () => {
 
     expect(handleEmbedBlockEdit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit embedded URL' }),
+    );
 
     expect(handleEmbedBlockEdit).toHaveBeenCalled();
   });
@@ -126,7 +128,7 @@ describe('EditableBlockWrapper', () => {
       </EditableBlockWrapper>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -135,7 +137,7 @@ describe('EditableBlockWrapper', () => {
     });
 
     expect(handleDelete).not.toHaveBeenCalled();
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     expect(handleDelete).toHaveBeenCalled();
   });
 

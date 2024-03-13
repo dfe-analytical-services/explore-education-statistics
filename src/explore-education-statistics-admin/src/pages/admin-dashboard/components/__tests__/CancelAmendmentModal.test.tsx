@@ -16,7 +16,7 @@ describe('CancelAmendmentModal', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(
@@ -46,7 +46,7 @@ describe('CancelAmendmentModal', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(
@@ -73,13 +73,13 @@ describe('CancelAmendmentModal', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(screen.getByText('Confirm')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Confirm',
       }),
@@ -102,13 +102,13 @@ describe('CancelAmendmentModal', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Cancel',
       }),

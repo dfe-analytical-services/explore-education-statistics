@@ -37,10 +37,10 @@ describe('DataSetSummary', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the expanded view when show more details is clicked', () => {
+  test('renders the expanded view when show more details is clicked', async () => {
     render(<DataSetSummary dataSet={testDataSetSummaries[0]} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Show more details about Data set 1',
       }),

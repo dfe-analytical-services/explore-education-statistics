@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import FormCheckboxSearchSubGroups from '../FormCheckboxSearchSubGroups';
@@ -243,8 +243,6 @@ describe('FormCheckboxSearchSubGroups', () => {
   });
 
   test('providing a search term renders only relevant checkboxes', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
@@ -273,7 +271,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     await userEvent.type(screen.getByLabelText('Search options'), '2');
 
-    jest.runAllTimers();
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     const checkboxes = screen.getAllByLabelText(
       /Checkbox/,
@@ -284,8 +284,6 @@ describe('FormCheckboxSearchSubGroups', () => {
   });
 
   test('does not throw error if search term that is invalid regex is used', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
@@ -312,9 +310,11 @@ describe('FormCheckboxSearchSubGroups', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search options'), '[');
+    await userEvent.type(screen.getByLabelText('Search options'), '[[');
 
-    jest.runAllTimers();
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     const checkboxes = screen.queryAllByLabelText(
       /Checkbox/,
@@ -324,8 +324,6 @@ describe('FormCheckboxSearchSubGroups', () => {
   });
 
   test('providing a search term does not remove checkboxes that have already been checked', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormCheckboxSearchSubGroups
         name="testCheckboxes"
@@ -356,7 +354,9 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     await userEvent.type(searchInput, '2');
 
-    jest.runAllTimers();
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     const checkboxes = screen.getAllByLabelText(
       /Checkbox/,

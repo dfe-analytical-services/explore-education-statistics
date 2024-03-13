@@ -4,12 +4,12 @@ import {
 } from '@admin/contexts/ReleaseContentHubContext';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import { HubConnectionState } from '@microsoft/signalr';
-import { renderHook } from '@testing-library/react-hooks';
-import React, { FC } from 'react';
+import { renderHook, waitFor } from '@testing-library/react';
+import React, { FC, ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
-const wrapper: FC = ({ children }) => (
+const wrapper: FC = ({ children }: { children?: ReactNode }) => (
   <ReleaseContentHubContextProvider releaseId="release-1">
     {children}
   </ReleaseContentHubContextProvider>
@@ -35,14 +35,13 @@ describe('ReleaseContentHubContext', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
 
-    const { result, waitForNextUpdate } = renderHook(
-      () => useReleaseContentHubContext(),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useReleaseContentHubContext(), {
+      wrapper,
+    });
 
-    await waitForNextUpdate();
-
-    expect(result.current.status).toBe(HubConnectionState.Connected);
+    await waitFor(() => {
+      expect(result.current.status).toBe(HubConnectionState.Connected);
+    });
   });
 
   test('joins release group when Connected', async () => {
@@ -54,10 +53,7 @@ describe('ReleaseContentHubContext', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Disconnected);
 
-    const { waitForNextUpdate } = renderHook(
-      () => useReleaseContentHubContext(),
-      { wrapper },
-    );
+    renderHook(() => useReleaseContentHubContext(), { wrapper });
 
     expect(connectionMock.send).not.toHaveBeenCalled();
 
@@ -65,9 +61,9 @@ describe('ReleaseContentHubContext', () => {
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
 
-    await waitForNextUpdate();
-
-    expect(connectionMock.send).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(connectionMock.send).toHaveBeenCalledTimes(1);
+    });
     expect(connectionMock.send).toHaveBeenCalledWith<SendParameters>(
       'JoinReleaseGroup',
       {
@@ -85,21 +81,26 @@ describe('ReleaseContentHubContext', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Disconnected);
 
-    const { waitForNextUpdate, unmount } = renderHook(
-      () => useReleaseContentHubContext(),
-      { wrapper },
-    );
+    const { unmount } = renderHook(() => useReleaseContentHubContext(), {
+      wrapper,
+    });
 
     expect(connectionMock.send).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(50);
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
-    await waitForNextUpdate();
+
+    await waitFor(() => {
+      expect(connectionMock.send).toHaveBeenCalledTimes(1);
+    });
 
     unmount();
 
-    expect(connectionMock.send).toHaveBeenCalledTimes(2);
+    await waitFor(() => {
+      expect(connectionMock.send).toHaveBeenCalledTimes(2);
+    });
+
     expect(connectionMock.send).toHaveBeenNthCalledWith<SendParameters>(
       1,
       'JoinReleaseGroup',
@@ -121,25 +122,23 @@ describe('ReleaseContentHubContext', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Disconnected);
 
-    const { waitForNextUpdate, unmount } = renderHook(
-      () => useReleaseContentHubContext(),
-      { wrapper },
-    );
+    const { unmount } = renderHook(() => useReleaseContentHubContext(), {
+      wrapper,
+    });
 
     expect(connectionMock.send).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(50);
 
     stateSpy.mockReturnValue(HubConnectionState.Connected);
-
-    await waitForNextUpdate();
-
+    await waitFor(() => {
+      // Only joins, does not leave
+      expect(connectionMock.send).toHaveBeenCalledTimes(1);
+    });
     stateSpy.mockReturnValue(HubConnectionState.Disconnected);
 
     unmount();
 
-    // Only joins, does not leave
-    expect(connectionMock.send).toHaveBeenCalledTimes(1);
     expect(connectionMock.send).toHaveBeenNthCalledWith<SendParameters>(
       1,
       'JoinReleaseGroup',

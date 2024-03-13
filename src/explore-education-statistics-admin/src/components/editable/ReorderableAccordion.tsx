@@ -14,7 +14,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import styles from './ReorderableAccordion.module.scss';
 import {
   DraggableAccordionSectionProps,

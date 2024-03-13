@@ -141,7 +141,7 @@ describe('ReleaseStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -164,8 +164,8 @@ describe('ReleaseStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Academic year 2019/20'));
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByLabelText('Academic year 2019/20'));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<

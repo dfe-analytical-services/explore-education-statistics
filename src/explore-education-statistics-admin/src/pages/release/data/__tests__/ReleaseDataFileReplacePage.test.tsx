@@ -542,7 +542,7 @@ describe('ReleaseDataFileReplacePage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Cancel data replacement' }),
     );
 
@@ -552,7 +552,7 @@ describe('ReleaseDataFileReplacePage', () => {
 
     expect(releaseDataFileService.deleteDataFiles).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
         name: 'Confirm',
       }),
@@ -613,7 +613,7 @@ describe('ReleaseDataFileReplacePage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Cancel data replacement' }),
     );
 
@@ -676,7 +676,7 @@ describe('ReleaseDataFileReplacePage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Cancel data replacement' }),
     );
 

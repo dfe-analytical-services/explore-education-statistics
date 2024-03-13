@@ -30,11 +30,13 @@ describe('ContentHtml', () => {
       name: 'Absence (show glossary term definition)',
     });
 
-    userEvent.click(glossaryButton);
+    await userEvent.click(glossaryButton);
 
     await waitFor(() => {
-      expect(getEntry).toHaveBeenCalled();
+      expect(screen.getByText('Absence body')).toBeInTheDocument();
     });
+
+    expect(getEntry).toHaveBeenCalled();
 
     const modal = within(screen.getByRole('dialog'));
     expect(
@@ -62,15 +64,17 @@ describe('ContentHtml', () => {
     const glossaryButton = screen.getByRole('button', {
       name: 'Absence (show glossary term definition)',
     });
-    userEvent.click(glossaryButton);
+    await userEvent.click(glossaryButton);
 
     await waitFor(() => {
-      expect(getEntry).toHaveBeenCalled();
+      expect(screen.getByText('Absence body')).toBeInTheDocument();
     });
+
+    expect(getEntry).toHaveBeenCalled();
 
     const modal = within(screen.getByRole('dialog'));
     const closeButton = modal.getByRole('button', { name: 'Close' });
-    userEvent.click(closeButton);
+    await userEvent.click(closeButton);
 
     await waitFor(() => {
       expect(closeButton).not.toBeInTheDocument();

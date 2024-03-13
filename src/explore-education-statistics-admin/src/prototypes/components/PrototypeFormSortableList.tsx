@@ -17,7 +17,7 @@ import {
   Draggable,
   DraggableStateSnapshot,
   Droppable,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 
 const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 

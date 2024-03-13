@@ -102,7 +102,7 @@ describe('PublicationAccessForm', () => {
       target: { value: testRoles[2] },
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Add publication access' }),
     );
 
@@ -131,7 +131,7 @@ describe('PublicationAccessForm', () => {
 
     const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
 
-    userEvent.click(removeButtons[0]);
+    await userEvent.click(removeButtons[0]);
 
     await waitFor(() => {
       expect(handleRemove).toHaveBeenCalledWith(

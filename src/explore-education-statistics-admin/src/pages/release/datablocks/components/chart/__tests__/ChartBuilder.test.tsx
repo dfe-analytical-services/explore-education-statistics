@@ -63,7 +63,7 @@ describe('ChartBuilder', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the chart preview and tabs, with configuration selected, when a chart type is selected', () => {
+  test('renders the chart preview and tabs, with configuration selected, when a chart type is selected', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
@@ -78,7 +78,7 @@ describe('ChartBuilder', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Line' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
     expect(
       screen.getByRole('button', { name: 'Chart preview' }),
@@ -110,6 +110,7 @@ describe('ChartBuilder', () => {
 
   describe('data sets', () => {
     test('adding data sets', async () => {
+      const user = userEvent.setup();
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
@@ -124,43 +125,33 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      await user.click(screen.getByRole('button', { name: 'Line' }));
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Data sets', {
-            selector: '[role="tab"]',
-          }),
-        ).toBeInTheDocument();
-      });
+      expect(await screen.findByText('Chart preview')).toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
+      await user.click(screen.getByRole('tab', { name: 'Data sets' }));
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
-
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Characteristic'),
         'ethnicity-major-chinese',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('School type'),
         'state-funded-primary',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'authorised-absence-sessions',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         '{"level":"localAuthority","value":"barnet"}',
       );
-      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+      await user.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
-      await waitFor(() => {
-        expect(screen.getByText('Remove all')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('Remove all')).toBeInTheDocument();
 
       const tableRows = screen.getAllByRole('row');
       expect(tableRows).toHaveLength(2);
@@ -168,36 +159,34 @@ describe('ChartBuilder', () => {
         'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet, 2014/15)',
       );
 
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Characteristic'),
         'ethnicity-major-chinese',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('School type'),
         'state-funded-secondary',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'authorised-absence-sessions',
       );
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Location'),
         '{"level":"localAuthority","value":"barnet"}',
       );
-      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+      await user.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
-      await waitFor(() => {
-        expect(screen.getByText('Reorder data sets')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('Reorder data sets')).toBeInTheDocument();
 
       const updatedTableRows = screen.getAllByRole('row');
       expect(updatedTableRows).toHaveLength(3);
       expect(updatedTableRows[2]).toHaveTextContent(
         'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, Barnet, 2014/15)',
       );
-    }, 20000);
+    });
 
     test('removing a data set', async () => {
       render(
@@ -214,7 +203,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
       await waitFor(() => {
         expect(
@@ -224,19 +213,24 @@ describe('ChartBuilder', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
+      await userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
       expect(
         screen.getByRole('heading', { name: 'Data sets' }),
       ).toBeInTheDocument();
 
-      userEvent.selectOptions(
+      await userEvent.selectOptions(
         screen.getByLabelText('Indicator'),
         'authorised-absence-sessions',
       );
-      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+      await userEvent.selectOptions(
+        screen.getByLabelText('Time period'),
+        '2014_AY',
+      );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Add data set' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Remove all')).toBeInTheDocument();
@@ -257,7 +251,7 @@ describe('ChartBuilder', () => {
         'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded secondary, All locations, 2014/15)',
       );
 
-      userEvent.click(
+      await userEvent.click(
         within(tableRows[2]).getByRole('button', { name: 'Remove' }),
       );
 
@@ -272,6 +266,7 @@ describe('ChartBuilder', () => {
     });
 
     test('removing all data sets', async () => {
+      const user = userEvent.setup();
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
@@ -286,7 +281,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      await user.click(screen.getByRole('button', { name: 'Line' }));
 
       await waitFor(() => {
         expect(
@@ -296,19 +291,19 @@ describe('ChartBuilder', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
+      await user.click(screen.getByRole('tab', { name: 'Data sets' }));
 
       expect(
         screen.getByRole('heading', { name: 'Data sets' }),
       ).toBeInTheDocument();
 
-      userEvent.selectOptions(
+      await user.selectOptions(
         screen.getByLabelText('Indicator'),
         'authorised-absence-sessions',
       );
-      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+      await user.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+      await user.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         expect(screen.getByText('Remove all')).toBeInTheDocument();
@@ -329,13 +324,13 @@ describe('ChartBuilder', () => {
         'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded secondary, All locations, 2014/15)',
       );
 
-      userEvent.click(
+      await user.click(
         screen.getByRole('button', { name: 'Remove all data sets' }),
       );
 
       const modal = within(screen.getByRole('dialog'));
       expect(modal.getByText('Remove all data sets')).toBeInTheDocument();
-      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+      await user.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(

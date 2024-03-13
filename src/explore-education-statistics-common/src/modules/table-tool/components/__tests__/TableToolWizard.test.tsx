@@ -443,9 +443,9 @@ describe('TableToolWizard', () => {
 
     // Change subject at Step 2
     const subjectRadios = screen.getAllByLabelText(/Subject/);
-    userEvent.click(subjectRadios[1]);
+    await userEvent.click(subjectRadios[1]);
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     // Step 3
     await waitFor(() => {
@@ -463,8 +463,8 @@ describe('TableToolWizard', () => {
     expect(localAuthorityCheckboxes[0]).not.toBeChecked();
     expect(localAuthorityCheckboxes[1]).not.toBeChecked();
 
-    userEvent.click(localAuthorityCheckboxes[0]);
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(localAuthorityCheckboxes[0]);
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     // Step 4
     await waitFor(() => {
@@ -481,9 +481,13 @@ describe('TableToolWizard', () => {
     ).getAllByRole('option') as HTMLOptionElement[];
     expect(endDateOptions[0].selected).toBe(true);
 
-    userEvent.selectOptions(screen.getByLabelText('Start date'), ['2013_AY']);
-    userEvent.selectOptions(screen.getByLabelText('End date'), ['2013_AY']);
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.selectOptions(screen.getByLabelText('Start date'), [
+      '2013_AY',
+    ]);
+    await userEvent.selectOptions(screen.getByLabelText('End date'), [
+      '2013_AY',
+    ]);
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     // Step 5
     await waitFor(() => {
@@ -536,13 +540,13 @@ describe('TableToolWizard', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByText('Step 4')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -584,13 +588,13 @@ describe('TableToolWizard', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByText('Step 5')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -633,13 +637,13 @@ describe('TableToolWizard', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByText('Step 5')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();

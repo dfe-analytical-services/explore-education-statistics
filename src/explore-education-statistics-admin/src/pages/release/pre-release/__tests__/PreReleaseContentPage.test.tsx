@@ -200,10 +200,11 @@ describe('PreReleaseContentPage', () => {
     expect(contentAccordionSections).toHaveLength(2);
 
     expect(
-      within(contentAccordionSections[0]).getByRole('button', {
+      await within(contentAccordionSections[0]).findByRole('button', {
         name: /Section 1/,
       }),
     ).toBeInTheDocument();
+
     expect(
       within(contentAccordionSections[0]).getByText('Section 1 content'),
     ).toBeInTheDocument();
@@ -235,6 +236,12 @@ describe('PreReleaseContentPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Academic year 2020/21')).toBeInTheDocument();
     });
+
+    expect(
+      await screen.findByRole('button', {
+        name: /Section 1/,
+      }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', { name: 'featured table link' }),

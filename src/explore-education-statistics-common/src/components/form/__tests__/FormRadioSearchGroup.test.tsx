@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import FormRadioSearchGroup from '@common/components/form//FormRadioSearchGroup';
@@ -6,10 +6,6 @@ import FormRadioSearchGroup from '@common/components/form//FormRadioSearchGroup'
 jest.mock('lodash/debounce');
 
 describe('FormRadioSearchGroup', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
   test('renders list of radio buttons in correct order', () => {
     const { container } = render(
       <FormRadioSearchGroup
@@ -53,7 +49,9 @@ describe('FormRadioSearchGroup', () => {
 
     await userEvent.type(searchInput, '2');
 
-    jest.runAllTimers();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Test radio 3')).not.toBeInTheDocument();
+    });
 
     const radios = screen.getAllByLabelText(/Test radio/) as HTMLInputElement[];
 
@@ -78,22 +76,14 @@ describe('FormRadioSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    await userEvent.type(searchInput, '[');
+    await userEvent.type(searchInput, '[[');
 
-    expect(() => {
-      jest.runAllTimers();
-    }).not.toThrow();
-
-    const radios = screen.queryAllByLabelText(
-      /Test radio/,
-    ) as HTMLInputElement[];
-
-    expect(radios).toHaveLength(0);
+    await waitFor(() => {
+      expect(screen.queryAllByLabelText(/Test radio/)).toHaveLength(0);
+    });
   });
 
   test('providing a search term does not remove radio buttons that have already been checked', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormRadioSearchGroup
         name="testRadios"
@@ -116,8 +106,9 @@ describe('FormRadioSearchGroup', () => {
 
     await userEvent.type(searchInput, '2');
 
-    jest.runAllTimers();
-
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Test radio 3')).not.toBeInTheDocument();
+    });
     const radios = screen.getAllByLabelText(/Test radio/) as HTMLInputElement[];
 
     expect(radios).toHaveLength(2);
@@ -144,13 +135,12 @@ describe('FormRadioSearchGroup', () => {
 
     await userEvent.type(searchInput, 'Not there');
 
-    jest.runAllTimers();
+    expect(await screen.findByText('No results found')).toBeInTheDocument();
 
     const radios = screen.queryAllByLabelText(
       /Test radio/,
     ) as HTMLInputElement[];
 
     expect(radios).toHaveLength(0);
-    expect(screen.getByText('No results found')).toBeInTheDocument();
   });
 });

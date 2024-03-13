@@ -15,7 +15,7 @@ import Yup from '@common/validation/yup';
 import compact from 'lodash/compact';
 import last from 'lodash/last';
 import React, { useCallback, useMemo, useState } from 'react';
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { UseFormReturn } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 
