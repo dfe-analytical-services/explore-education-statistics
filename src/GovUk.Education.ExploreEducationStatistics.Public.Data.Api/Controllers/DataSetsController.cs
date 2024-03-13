@@ -88,6 +88,7 @@ public class DataSetsController : ControllerBase
     [HttpGet("{dataSetId:guid}/meta")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
+    [SwaggerResponse(403)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetMetaViewModel>> GetMeta(
         [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] [FromQuery] string? dataSetVersion,
