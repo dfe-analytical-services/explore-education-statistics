@@ -26,12 +26,16 @@ parameters:
     displayName: The current Azure subscription 
     type: string
     default: 'AzureConnection'
+  - name: buildNumberOverride
+    displayName: The build number of the main EES build that triggered this pipeline
+    type: string
+    default: null
 
 variables:
   - group: EES Bicep Infrastructure common
   - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-dw')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4806-build-and-deploy-container-app')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -50,6 +54,8 @@ variables:
     value: $(paramDirectory)/main-preprod.bicepparam
   - name: prodParamFile
     value: $(paramDirectory)/main-prod.bicepparam
+  - name: buildNumber
+    value: $[ coalesce( ${{ parameters.buildNumberOverride }}, variables['Build.BuildNumber'] ) ]
 
 pool:
 #  vmImage: $(vmImageName)
@@ -92,7 +98,7 @@ stages:
               resourceTags='$(resourceTags)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              buildNumber='$(Build.BuildNumber)'
+              buildNumber='$(variables.buildNumber)'
 
 - stage: DeployDev
   displayName: 'Deploy to Development'

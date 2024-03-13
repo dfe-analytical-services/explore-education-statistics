@@ -54,11 +54,11 @@ param resourceTags {
 param dateProvisioned string = utcNow('u')
 
 @description('Build number of the current pipeline run.')
-param buildNumber string
+param buildNumber string?
 
 var resourcePrefix = '${subscription}-ees-publicapi'
-var storageAccountName = '${subscription}saeescoredw'
-var keyVaultName = '${subscription}-kv-ees-01dw'
+var storageAccountName = 's101d01saeescoredw'
+var keyVaultName = 's101d01-kv-ees-01dw'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -73,7 +73,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: 'eesacr'
+  name: 'eesacrdw'
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
