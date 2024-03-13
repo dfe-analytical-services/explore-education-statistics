@@ -56,6 +56,9 @@ param dateProvisioned string = utcNow('u')
 @description('Build number of the current pipeline run.')
 param buildNumber string?
 
+@description('Have database users been added to PSQL yet for Container App and Function App?')
+param psqlDbUsersAdded bool = true
+
 var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = 's101d01saeescoredw'
 var keyVaultName = 's101d01-kv-ees-01dw'
@@ -140,7 +143,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = {
+module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
@@ -162,7 +165,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = {
 }
 
 // Deploy data-processing Function.
-module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = {
+module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = if (psqlDbUsersAdded) {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     resourcePrefix: resourcePrefix

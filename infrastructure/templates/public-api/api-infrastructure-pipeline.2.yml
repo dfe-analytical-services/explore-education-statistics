@@ -30,6 +30,9 @@ parameters:
     displayName: The build number of the main EES build that triggered this pipeline
     type: string
     default: null
+  - name: psqlDbUsersAdded
+    displayName: Have database users been added to PSQL yet for Container App and Function App?
+    default: false
 
 variables:
   - group: EES Bicep Infrastructure common
@@ -98,7 +101,8 @@ stages:
               resourceTags='$(resourceTags)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              buildNumber='$(variables.buildNumber)'
+              buildNumber='$(variables.buildNumber)' \
+              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployDev
   displayName: 'Deploy to Development'
@@ -130,7 +134,8 @@ stages:
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    buildNumber='$(Build.BuildNumber)'
+                    buildNumber='$(variables.buildNumber)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
@@ -161,7 +166,8 @@ stages:
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    buildNumber='$(Build.BuildNumber)'
+                    buildNumber='$(variables.buildNumber)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
@@ -193,7 +199,8 @@ stages:
                     resourceTags='$(resourceTags)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    buildNumber='$(Build.BuildNumber)'
+                    buildNumber='$(variables.buildNumber)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
@@ -226,3 +233,4 @@ stages:
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     buildNumber='$(Build.BuildNumber)'
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
