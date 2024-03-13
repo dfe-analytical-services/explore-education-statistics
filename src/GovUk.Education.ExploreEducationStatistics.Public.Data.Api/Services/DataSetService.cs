@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
