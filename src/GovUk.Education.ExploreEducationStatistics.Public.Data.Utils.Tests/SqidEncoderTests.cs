@@ -1,6 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Tests;
-
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Utils;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Tests;
 
 public abstract class SqidEncoderTests
 {

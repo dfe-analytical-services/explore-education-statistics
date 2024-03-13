@@ -1,6 +1,6 @@
 using Sqids;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 public static class SqidEncoder
 {
