@@ -168,7 +168,7 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    functionAppName: 'data-processor'
+    functionAppName: 'dataset-processor'
     storageAccountConnectionString: storageAccountConnectionString
     dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
     tagValues: tagValues
