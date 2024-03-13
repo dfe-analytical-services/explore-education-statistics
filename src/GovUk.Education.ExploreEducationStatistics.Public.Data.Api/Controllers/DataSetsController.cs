@@ -29,6 +29,7 @@ public class DataSetsController : ControllerBase
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
+    [SwaggerResponse(403)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
@@ -47,6 +48,7 @@ public class DataSetsController : ControllerBase
     [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [SwaggerResponse(403)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetVersionViewModel>> GetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
@@ -67,6 +69,7 @@ public class DataSetsController : ControllerBase
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400)]
+    [SwaggerResponse(403)]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListVersions(
         [FromQuery] DataSetVersionListRequest request,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
