@@ -16,13 +16,15 @@ import logger from '@common/services/logger';
 import formatContentLink from '@common/utils/url/formatContentLink';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { Formik, FormikHelpers } from 'formik';
-import React, { useCallback, useRef } from 'react';
-import { useIdleTimer } from 'react-idle-timer';
 import sanitizeHtml, {
   SanitizeHtmlOptions,
+  commentTagAttributes,
+  commentTags,
   defaultSanitizeOptions,
 } from '@common/utils/sanitizeHtml';
+import { Formik, FormikHelpers } from 'formik';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { useIdleTimer } from 'react-idle-timer';
 
 interface FormValues {
   content: string;
@@ -83,10 +85,35 @@ const EditableContentForm = ({
     onIdle,
   });
 
+  const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
+    return {
+      ...defaultSanitizeOptions,
+      allowedTags: [
+        ...(defaultSanitizeOptions.allowedTags ?? []),
+        ...commentTags,
+      ],
+      allowedAttributes: {
+        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+        ...commentTagAttributes,
+      },
+      transformTags: {
+        a: (tagName, attribs) => {
+          return {
+            tagName,
+            attribs: {
+              ...attribs,
+              href: formatContentLink(attribs.href),
+            },
+          };
+        },
+      },
+    };
+  }, []);
+
   const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
     useAsyncCallback(
       async (nextContent: string) => {
-        await onAutoSave?.(nextContent);
+        await onAutoSave?.(sanitizeHtml(nextContent, sanitizeOptions));
       },
       [onAutoSave],
     );
@@ -94,21 +121,6 @@ const EditableContentForm = ({
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
       try {
-        const sanitizeOptions: SanitizeHtmlOptions = {
-          ...defaultSanitizeOptions,
-          transformTags: {
-            a: (tagName, attribs) => {
-              return {
-                tagName,
-                attribs: {
-                  ...attribs,
-                  href: formatContentLink(attribs.href),
-                },
-              };
-            },
-          },
-        };
-
         await clearPendingDeletions?.();
         await onSubmit(sanitizeHtml(values.content, sanitizeOptions));
       } catch (err) {
@@ -116,7 +128,7 @@ const EditableContentForm = ({
         helpers.setFieldError('content', 'Could not save content');
       }
     },
-    [clearPendingDeletions, onSubmit],
+    [clearPendingDeletions, sanitizeOptions, onSubmit],
   );
 
   return (

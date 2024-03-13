@@ -65,6 +65,15 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   parseStyleAttributes: false,
 };
 
+export const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
+  'comment-start': ['name'],
+  'comment-end': ['name'],
+  'resolvedcomment-start': ['name'],
+  'resolvedcomment-end': ['name'],
+};
+
+export const commentTags = Object.keys(commentTagAttributes);
+
 export default function sanitizeHtml(
   dirtyHtml: string,
   { filterTags, ...options }: SanitizeHtmlOptions = defaultSanitizeOptions,
