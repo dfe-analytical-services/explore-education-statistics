@@ -33,8 +33,7 @@ export default function UserTestingBanner() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Share your feedback <strong>in an interview</strong> to help us
-            improve this service
+            Share your feedback to help us improve this service
           </Link>
         </p>
       </Banner>
