@@ -51,8 +51,11 @@ param minReplica int = 1
 param maxReplica int = 3
 
 @description('Specifies the database connection string')
-@secure()
-param dbConnectionString string
+param appSettings {
+  name: string
+  @secure()
+  value: string
+}[]
 
 @description('Specifies the subnet id')
 param subnetId string
@@ -63,10 +66,12 @@ param tagValues object
 @description('The Application Insights key that is associated with this resource')
 param applicationInsightsKey string
 
+@description('An existing Managed Identity with which to associate this Container App')
+param managedIdentity object?
+
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
 var containerEnvName = '${resourcePrefix}-cae-${containerAppName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
-var userIdentityName = '${resourcePrefix}-id-${containerAppName}'
 var containerLogName = '${resourcePrefix}-log-${containerAppName}'
 var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
@@ -81,17 +86,12 @@ resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   tags: tagValues
 }
 
-resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: userIdentityName
-  location: location
-}
-
 @description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, managedIdentity.id, acrPullRole)
+resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (managedIdentity != null) {
+  name: guid(resourceGroup().id, managedIdentity!.id, acrPullRole)
   properties: {
     roleDefinitionId: acrPullRole
-    principalId: managedIdentity.properties.principalId
+    principalId: managedIdentity!.properties.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -121,15 +121,19 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
   tags: tagValues
 }
 
+
+
+var containerAppIdentity = managedIdentity != null ? {
+  type: 'UserAssigned'
+  userAssignedIdentities: {
+    '${managedIdentity!.id}': {}
+  }
+} : {}
+
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerApplicationName
   location: location
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentity.id}': {}
-    }
-  }
+  identity: containerAppIdentity
   properties: {
     managedEnvironmentId: containerAppEnvironment.id
     configuration: {
@@ -152,12 +156,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
         {
           name: containerAppName 
           image: containerImageName
-          env: [
-            {
-              name: 'dbConnectionString'
-              value: dbConnectionString
-            }
-          ]
+          env: appSettings
           resources: {
             cpu: json(cpuCore)
             memory: '${memorySize}Gi'

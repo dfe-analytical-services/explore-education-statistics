@@ -75,8 +75,8 @@ var databaseServerName = empty(serverName)
   ? '${resourcePrefix}-psql-server2'
   : '${resourcePrefix}-psql-server2-${serverName}'
 
-var connectionStringSecretName = '${databaseServerName}-connectionString'
-var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
+var adminConnectionStringSecretName = '${databaseServerName}-adminConnectionString'
+var adminConnectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};Port=5432;User Id=${adminName};Password=${adminPassword}'
 
 // In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
 // with "postgres.database.azure.com".
@@ -145,9 +145,9 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
   params: {
     keyVaultName: keyVaultName
     isEnabled: true
-    secretValue: connectionString 
+    secretValue: adminConnectionString
     contentType: 'text/plain'
-    secretName: connectionStringSecretName
+    secretName: adminConnectionStringSecretName
   }
 }
 
@@ -155,4 +155,6 @@ module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
 
 @description('Connection String Secrets.')
-output connectionStringSecretName string = connectionStringSecretName
+output adminConnectionStringSecretName string = adminConnectionStringSecretName
+
+output managedIdentityConnectionStringTemplate string = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};Database=[database_name];Port=5432;User Id=[managed_identity_client_id];Password=[access_token]'

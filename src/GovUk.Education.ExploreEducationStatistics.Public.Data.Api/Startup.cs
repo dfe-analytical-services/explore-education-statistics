@@ -111,8 +111,9 @@ public class Startup
                     var accessToken = sqlServerTokenProvider.GetToken(
                         new Azure.Core.TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
 
-                    var connectionStringWithAccessToken =
-                        connectionString.Replace("[access_token]", accessToken);
+                    var connectionStringWithAccessToken = connectionString
+                        .Replace("[access_token]", accessToken)
+                        .Replace("[managed_identity_client_id]", _configuration.GetValue<string>("ManagedIdentityClientId"));
 
                     var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
 

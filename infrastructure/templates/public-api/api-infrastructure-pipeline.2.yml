@@ -38,7 +38,7 @@ variables:
   - group: EES Bicep Infrastructure common
   - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4806-build-and-deploy-container-app')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4683-amend-psql-server-name')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
