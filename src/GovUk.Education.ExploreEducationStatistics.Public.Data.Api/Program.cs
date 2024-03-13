@@ -27,16 +27,7 @@ builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).Ful
 builder.Logging.AddAzureWebAppDiagnostics();
 
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.DescribeAllParametersInCamelCase();
-    options.UseOneOfForPolymorphism();
-    options.UseAllOfForInheritance();
-    options.SelectSubTypesUsing(baseType =>
-    {
-        return typeof(Startup).Assembly.GetTypes().Where(type => type.IsSubclassOf(baseType));
-    });
-});
+builder.Services.AddSwaggerGen();
 
 var startup = new Startup(builder.Configuration, builder.Environment);
 
