@@ -1,16 +1,9 @@
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
-using Sqids;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.Tests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Utils;
 
 public abstract class SqidEncoderTests
 {
-    private readonly SqidsEncoder<int> _sqidsEncoder = new(new()
-    {
-        Alphabet = "UjIo1rQXDHTmNsy6p4SlAtO0uqhfCiexFMVc5nG3v2Bbz8dKgWJRa79PZYwkEL",
-        MinLength = 5,
-    });
-
     public class EncodeTests() : SqidEncoderTests
     {
         [Fact]
@@ -18,9 +11,7 @@ public abstract class SqidEncoderTests
         {
             var encodedNumber = SqidEncoder.Encode(1);
 
-            var expected = _sqidsEncoder.Encode(1);
-
-            Assert.Equal(expected, encodedNumber);
+            Assert.Equal("dP0Zw", encodedNumber);
         }
     }
 
@@ -49,22 +40,28 @@ public abstract class SqidEncoderTests
             Assert.Equal(60, decodedCanonicalId);
         }
 
-        [Fact]
-        public void InvalidSqid_Throws()
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("-")]
+        [InlineData("!")]
+        [InlineData("#")]
+        [InlineData(":")]
+        [InlineData(",")]
+        [InlineData("abc!")]
+        [InlineData("abc ")]
+        [InlineData(" abc")]
+        public void InvalidSqid_Throws(string invalidSqid)
         {
-            var invalidSqid = "-";
-
             Assert.Throws<InvalidOperationException>(() => SqidEncoder.DecodeSingleNumber(invalidSqid));
         }
 
         [Theory]
-        [InlineData(1, 1)]
-        [InlineData(1, 1, 1)]
-        public void SqidRepresentsMultipleNumbers_Throws(params int[] numbers)
+        [InlineData("emuRS")] // represents [1, 1]
+        [InlineData("mU9kKE")] // represents [1, 1, 1]
+        public void SqidRepresentsMultipleNumbers_Throws(string sqid)
         {
-            var encodedNumber = _sqidsEncoder.Encode(numbers);
-
-            Assert.Throws<InvalidOperationException>(() => SqidEncoder.DecodeSingleNumber(encodedNumber));
+            Assert.Throws<InvalidOperationException>(() => SqidEncoder.DecodeSingleNumber(sqid));
         }
     }
 
@@ -103,11 +100,19 @@ public abstract class SqidEncoderTests
             Assert.Equal(0, decodedNumber);
         }
 
-        [Fact]
-        public void InvalidSqid_ReturnsFalse()
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("-")]
+        [InlineData("!")]
+        [InlineData("#")]
+        [InlineData(":")]
+        [InlineData(",")]
+        [InlineData("abc!")]
+        [InlineData("abc ")]
+        [InlineData(" abc")]
+        public void InvalidSqid_ReturnsFalse(string invalidSqid)
         {
-            var invalidSqid = "-";
-
             var successful = SqidEncoder.TryDecodeSingleNumber(invalidSqid, out var decodedNumber);
 
             Assert.False(successful);
@@ -115,13 +120,11 @@ public abstract class SqidEncoderTests
         }
 
         [Theory]
-        [InlineData(1, 1)]
-        [InlineData(1, 1, 1)]
-        public void SqidRepresentsMultipleNumbers_Throws(params int[] numbers)
+        [InlineData("emuRS")] // represents [1, 1]
+        [InlineData("mU9kKE")] // represents [1, 1, 1]
+        public void SqidRepresentsMultipleNumbers_ReturnsFalse(string sqid)
         {
-            var encodedNumber = _sqidsEncoder.Encode(numbers);
-
-            var successful = SqidEncoder.TryDecodeSingleNumber(encodedNumber, out var decodedNumber);
+            var successful = SqidEncoder.TryDecodeSingleNumber(sqid, out var decodedNumber);
 
             Assert.False(successful);
             Assert.Equal(0, decodedNumber);
