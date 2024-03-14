@@ -116,9 +116,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListVersionsTests : DataSetsControllerTests
+    public class ListDataSetVersionsTests : DataSetsControllerTests
     {
-        public ListVersionsTests(TestApplicationFactory testApp) : base(testApp)
+        public ListDataSetVersionsTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
@@ -154,7 +154,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 context.DataSetVersions.AddRange(dataSetVersions);
             });
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize);
@@ -203,7 +203,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 context.DataSetVersions.AddRange(dataSetVersions);
             });
 
-            var page1Response = await ListVersions(
+            var page1Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 3);
@@ -215,7 +215,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             Assert.Equal("3.0", page1Content.Results[1].Number);
             Assert.Equal("2.1", page1Content.Results[2].Number);
 
-            var page2Response = await ListVersions(
+            var page2Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 2,
                 pageSize: 3);
@@ -256,7 +256,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -335,7 +335,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet1.Id,
                 page: 1,
                 pageSize: 1);
@@ -374,7 +374,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -397,7 +397,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -436,7 +436,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.AddRange(dataSetVersions));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize);
@@ -455,7 +455,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(-1)]
         public async Task PageTooSmall_Returns400(int page)
         {
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: Guid.NewGuid(),
                 page: page,
                 pageSize: 1);
@@ -473,7 +473,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(21)]
         public async Task PageSizeOutOfBounds_Returns400(int pageSize)
         {
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: Guid.NewGuid(),
                 page: 1,
                 pageSize: pageSize);
@@ -496,7 +496,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await ListVersions(dataSetId: dataSet.Id);
+            var response = await ListDataSetVersions(dataSetId: dataSet.Id);
 
             response.AssertForbidden();
         }
@@ -519,7 +519,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> ListVersions(
+        private async Task<HttpResponseMessage> ListDataSetVersions(
             Guid dataSetId,
             int? page = null,
             int? pageSize = null)
@@ -538,9 +538,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetVersionTests : DataSetsControllerTests
+    public class GetDataSetVersionTests : DataSetsControllerTests
     {
-        public GetVersionTests(TestApplicationFactory testApp) : base(testApp)
+        public GetDataSetVersionTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
@@ -568,7 +568,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version);
 
             var content = response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
 
@@ -625,7 +625,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version);
 
             response.AssertForbidden();
         }
@@ -654,7 +654,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet2.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet2.Id, dataSetVersion.Version);
 
             response.AssertNotFound();
         }
@@ -668,7 +668,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await GetVersion(dataSet.Id, "1.0");
+            var response = await GetDataSetVersion(dataSet.Id, "1.0");
 
             response.AssertNotFound();
         }
@@ -693,12 +693,12 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(Guid.NewGuid(), dataSetVersion.Version);
+            var response = await GetDataSetVersion(Guid.NewGuid(), dataSetVersion.Version);
 
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetVersion(Guid dataSetId, string dataSetVersion)
+        private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetId, string dataSetVersion)
         {
             var client = TestApp.CreateClient();
 
@@ -708,9 +708,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetMetaTests : DataSetsControllerTests
+    public class GetDataSetMetaTests : DataSetsControllerTests
     {
-        public GetMetaTests(TestApplicationFactory testApp) : base(testApp)
+        public GetDataSetMetaTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
@@ -805,7 +805,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetMeta(dataSet.Id, dataSetVersion.Version);
 
             var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
@@ -817,17 +817,19 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 Assert.Equal(filterMeta.Hint, filterMetaViewModel.Hint);
                 Assert.Equal(filterMeta.Label, filterMetaViewModel.Label);
 
-                var allFilterMetaLinks = filterMeta.Options.SelectMany(fom => fom.MetaLinks);
+                var allFilterMetaLinks = filterMeta.Options
+                    .SelectMany(o => o.MetaLinks)
+                    .ToList();
 
                 foreach (var filterOptionMetaViewModel in filterMetaViewModel.Options)
                 {
                     var filterOptionMetaLink = Assert.Single(
                         allFilterMetaLinks,
-                        foml => SqidEncoder.Encode(foml.PublicId) == filterOptionMetaViewModel.Id);
+                        link => link.PublicId == filterOptionMetaViewModel.Id);
 
                     var filterOptionMeta = Assert.Single(
                         filterMeta.Options,
-                        fom => fom.Id == filterOptionMetaLink.OptionId);
+                        o => o.Id == filterOptionMetaLink.OptionId);
 
                     Assert.Equal(filterOptionMeta.Label, filterOptionMetaViewModel.Label);
                     Assert.Equal(filterOptionMeta.IsAggregate, filterOptionMetaViewModel.IsAggregate);
@@ -840,68 +842,52 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     dataSetVersion.LocationMetas, 
                     fm => fm.Level == locationMetaViewModel.Level);
 
-                var allLocationMetaLinks = locationMeta.Options.SelectMany(fom => fom.MetaLinks);
+                var allLocationMetaLinks = locationMeta.Options
+                    .SelectMany(o => o.MetaLinks)
+                    .ToList();
 
                 foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                 {
                     var locationOptionMetaLink = Assert.Single(
                         allLocationMetaLinks,
-                        foml => SqidEncoder.Encode(foml.PublicId) == locationOptionMetaViewModel.Id);
+                        link => link.PublicId == locationOptionMetaViewModel.Id);
 
                     var locationOptionMeta = Assert.Single(
                         locationMeta.Options,
-                        fom => fom.Id == locationOptionMetaLink.OptionId);
+                        o => o.Id == locationOptionMetaLink.OptionId);
 
                     switch (locationOptionMeta)
                     {
-                        case LocationCodedOptionMeta locationCodedOptionMeta:
-                            var locationCodedOptionMetaViewModel =
+                        case LocationCodedOptionMeta codedMeta:
+                            var codedViewModel =
                                 Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(locationCodedOptionMeta.Label, locationCodedOptionMetaViewModel.Label);
-                            Assert.Equal(locationCodedOptionMeta.Code, locationCodedOptionMetaViewModel.Code);
+                            Assert.Equal(codedMeta.Label, codedViewModel.Label);
+                            Assert.Equal(codedMeta.Code, codedViewModel.Code);
                             break;
-                        case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
-                            var locationLocalAuthorityOptionMetaViewModel = 
+                        case LocationLocalAuthorityOptionMeta localAuthorityMeta:
+                            var localAuthorityViewModel = 
                                 Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(
-                                locationLocalAuthorityOptionMeta.Label, 
-                                locationLocalAuthorityOptionMetaViewModel.Label);
-                            Assert.Equal(
-                                locationLocalAuthorityOptionMeta.Code, 
-                                locationLocalAuthorityOptionMetaViewModel.Code);
-                            Assert.Equal(
-                                locationLocalAuthorityOptionMeta.OldCode, 
-                                locationLocalAuthorityOptionMetaViewModel.OldCode);
+                            Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
+                            Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
+                            Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
                             break;
-                        case LocationProviderOptionMeta locationProviderOptionMeta:
-                            var locationProviderOptionMetaViewModel = 
+                        case LocationProviderOptionMeta providerMeta:
+                            var providerViewModel = 
                                 Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(
-                                locationProviderOptionMeta.Label, 
-                                locationProviderOptionMetaViewModel.Label);
-                            Assert.Equal(
-                                locationProviderOptionMeta.Ukprn, 
-                                locationProviderOptionMetaViewModel.Ukprn);
+                            Assert.Equal(providerMeta.Label, providerViewModel.Label);
+                            Assert.Equal(providerMeta.Ukprn, providerViewModel.Ukprn);
                             break;
-                        case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
-                            var locationRscRegionOptionMetaViewModel = 
+                        case LocationRscRegionOptionMeta rscRegionMeta:
+                            var rscRegionViewModel = 
                                 Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(
-                                locationRscRegionOptionMeta.Label, 
-                                locationRscRegionOptionMetaViewModel.Label);
+                            Assert.Equal(rscRegionMeta.Label, rscRegionViewModel.Label);
                             break;
-                        case LocationSchoolOptionMeta locationSchoolOptionMeta:
-                            var locationSchoolOptionMetaViewModel = 
+                        case LocationSchoolOptionMeta schoolMeta:
+                            var schoolViewModel = 
                                 Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
-                            Assert.Equal(
-                                locationSchoolOptionMeta.Label, 
-                                locationSchoolOptionMetaViewModel.Label);
-                            Assert.Equal(
-                                locationSchoolOptionMeta.Urn, 
-                                locationSchoolOptionMetaViewModel.Urn);
-                            Assert.Equal(
-                                locationSchoolOptionMeta.LaEstab, 
-                                locationSchoolOptionMetaViewModel.LaEstab);
+                            Assert.Equal(schoolMeta.Label, schoolViewModel.Label);
+                            Assert.Equal(schoolMeta.Urn, schoolViewModel.Urn);
+                            Assert.Equal(schoolMeta.LaEstab, schoolViewModel.LaEstab);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -950,44 +936,52 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSetId(dataSet.Id)
-                .ForIndex(0, dsv => dsv.SetVersionNumber(1, 0))
-                .ForIndex(0, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 1")
-                    ]
-                ))
-                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
-                .ForIndex(1, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 2")
-                    ]
-                ))
-                .ForIndex(2, dsv => dsv.SetVersionNumber(2, 0))
-                .ForIndex(2, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 3")
-                    ]
-                ))
-                .ForIndex(3, dsv => dsv.SetVersionNumber(2, 1))
-                .ForIndex(3, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 4")
-                    ]
-                ))
+                .ForIndex(0, dsv => dsv
+                    .SetVersionNumber(1, 0)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 1")
+                        ]
+                    )
+                )
+                .ForIndex(1, dsv => dsv
+                    .SetVersionNumber(1, 1)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 2")
+                        ]
+                    )
+                )
+                .ForIndex(2, dsv => dsv
+                    .SetVersionNumber(2, 0)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 3")
+                        ]
+                    )
+                )
+                .ForIndex(3, dsv => dsv
+                    .SetVersionNumber(2, 1)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 4")
+                        ]
+                    )
+                )
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersions.AddRange(dataSetVersions));
 
-            var response = await GetMeta(dataSet.Id, "2.0");
+            var response = await GetDataSetMeta(dataSet.Id, "2.0");
 
             var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
@@ -1012,44 +1006,52 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSetId(dataSet.Id)
-                .ForIndex(0, dsv => dsv.SetVersionNumber(1, 0))
-                .ForIndex(0, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 1")
-                    ]
-                ))
-                .ForIndex(1, dsv => dsv.SetVersionNumber(1, 1))
-                .ForIndex(1, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 2")
-                    ]
-                ))
-                .ForIndex(2, dsv => dsv.SetVersionNumber(2, 0))
-                .ForIndex(2, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 3")
-                    ]
-                ))
-                .ForIndex(3, dsv => dsv.SetVersionNumber(2, 1))
-                .ForIndex(3, dsv => dsv.SetFilterMetas(() =>
-                    [
-                        DataFixture
-                        .DefaultFilterMeta()
-                        .WithLabel("filter 4")
-                    ]
-                ))
+                .ForIndex(0, dsv => dsv
+                    .SetVersionNumber(1, 0)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 1")
+                        ]
+                    )
+                )
+                .ForIndex(1, dsv => dsv
+                    .SetVersionNumber(1, 1)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 2")
+                        ]
+                    )
+                )
+                .ForIndex(2, dsv => dsv
+                    .SetVersionNumber(2, 0)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 3")
+                        ]
+                    )
+                )
+                .ForIndex(3, dsv => dsv
+                    .SetVersionNumber(2, 1)
+                    .SetFilterMetas(() =>
+                        [
+                            DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 4")
+                        ]
+                    )
+                )
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context => 
                 context.DataSetVersions.AddRange(dataSetVersions));
 
-            var response = await GetMeta(dataSet.Id);
+            var response = await GetDataSetMeta(dataSet.Id);
 
             var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
@@ -1081,7 +1083,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetMeta(dataSet.Id, dataSetVersion.Version);
 
             var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
@@ -1112,7 +1114,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetMeta(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetMeta(dataSet.Id, dataSetVersion.Version);
 
             response.AssertForbidden();
         }
@@ -1141,7 +1143,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetMeta(dataSet2.Id, dataSetVersion.Version);
+            var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.Version);
 
             response.AssertNotFound();
         }
@@ -1155,7 +1157,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await GetMeta(dataSet.Id, "1.0");
+            var response = await GetDataSetMeta(dataSet.Id, "1.0");
 
             response.AssertNotFound();
         }
@@ -1163,12 +1165,12 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [Fact]
         public async Task DataSetDoesNotExist_Returns404()
         {
-            var response = await GetMeta(Guid.NewGuid());
+            var response = await GetDataSetMeta(Guid.NewGuid());
 
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetMeta(Guid dataSetId, string? dataSetVersion = null)
+        private async Task<HttpResponseMessage> GetDataSetMeta(Guid dataSetId, string? dataSetVersion = null)
         {
             var query = new Dictionary<string, string?>
             {
