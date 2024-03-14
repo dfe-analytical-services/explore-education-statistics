@@ -1,10 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
@@ -67,13 +67,13 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.LatestVersion.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 content.LatestVersion.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.LatestVersion.GeographicLevels);
@@ -82,9 +82,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(DataSetStatus.Staged)]
-        [InlineData(DataSetStatus.Unpublished)]
-        public async Task DataSetNotAvailable_Returns404(DataSetStatus dataSetStatus)
+        [InlineData(DataSetStatus.Draft)]
+        [InlineData(DataSetStatus.Withdrawn)]
+        public async Task DataSetNotAvailable_Returns403(DataSetStatus dataSetStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -94,7 +94,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var response = await GetDataSet(dataSet.Id);
 
-            response.AssertNotFound();
+            response.AssertForbidden();
         }
 
         [Fact]
@@ -229,7 +229,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Unpublished)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         public async Task DataSetVersionIsAvailable_Returns200_CorrectViewModel(DataSetVersionStatus dataSetVersionStatus)
         {
@@ -249,8 +249,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 .WithPublished(DateTimeOffset.UtcNow)
                 .WithDataSetId(dataSet.Id);
 
-            DataSetVersion dataSetVersion = dataSetVersionStatus == DataSetVersionStatus.Unpublished
-                ? dataSetVersionGenerator.WithUnpublished(DateTimeOffset.UtcNow)
+            DataSetVersion dataSetVersion = dataSetVersionStatus == DataSetVersionStatus.Withdrawn
+                ? dataSetVersionGenerator.WithWithdrawn(DateTimeOffset.UtcNow)
                 : dataSetVersionGenerator;
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
@@ -277,19 +277,19 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 result.Published.ToUnixTimeSeconds()
             );
             Assert.Equal(
-                dataSetVersion.Unpublished?.ToUnixTimeSeconds(),
+                dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
                 result.Unpublished?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 result.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, result.GeographicLevels);
@@ -350,7 +350,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Staged)]
+        [InlineData(DataSetVersionStatus.Draft)]
         public async Task DataSetVersionUnavailable_Returns200_EmptyList(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
@@ -481,6 +481,22 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             validationProblem.AssertHasInclusiveBetweenError("pageSize");
         }
 
+        [Theory]
+        [InlineData(DataSetStatus.Draft)]
+        [InlineData(DataSetStatus.Withdrawn)]
+        public async Task UnavailableDataSet_Returns503(DataSetStatus status)
+        {
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatus(status);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await ListVersions(dataSetId: dataSet.Id);
+
+            response.AssertForbidden();
+        }
+
         [Fact]
         public async Task InvalidDataSetId_Returns404()
         {
@@ -526,7 +542,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
-        [InlineData(DataSetVersionStatus.Unpublished)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
         [InlineData(DataSetVersionStatus.Deprecated)]
         public async Task VersionIsAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
         {
@@ -561,19 +577,19 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 content.Published.ToUnixTimeSeconds()
             );
             Assert.Equal(
-                dataSetVersion.Unpublished?.ToUnixTimeSeconds(),
+                dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
                 content.Unpublished?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, content.Notes);
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.TimePeriods.Start);
             Assert.Equal(
-                TimePeriodFormatter.Format(
-                    dataSetVersion.MetaSummary.TimePeriodRange.End.Year,
+                TimePeriodFormatter.FormatLabel(
+                    dataSetVersion.MetaSummary.TimePeriodRange.End.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.End.Code),
                 content.TimePeriods.End);
             Assert.Equal(dataSetVersion.MetaSummary.GeographicLevels, content.GeographicLevels);
@@ -582,8 +598,11 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
-        [InlineData(DataSetVersionStatus.Staged)]
-        public async Task VersionNotAvailable_Returns404(DataSetVersionStatus dataSetVersionStatus)
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        public async Task VersionNotAvailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
         {
             DataSet dataSet = DataFixture
                 .DefaultDataSet()
@@ -604,7 +623,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
 
-            response.AssertNotFound();
+            response.AssertForbidden();
         }
 
         [Fact]

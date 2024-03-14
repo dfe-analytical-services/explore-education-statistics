@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public Guid SubjectId { get; set; }
 
-        public Release Release { get; set; } = null!;
+        public ReleaseVersion ReleaseVersion { get; set; } = null!;
 
-        public Guid ReleaseId { get; set; }
+        public Guid ReleaseVersionId { get; set; }
 
         public List<FilterSequenceEntry>? FilterSequence { get; set; }
 

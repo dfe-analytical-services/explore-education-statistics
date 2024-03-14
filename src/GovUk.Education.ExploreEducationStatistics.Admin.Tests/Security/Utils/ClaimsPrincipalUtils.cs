@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             // Give the BAU User the "BAU User" role, plus every Claim from the SecurityClaimTypes enum.
             var claims =
                 ListOf(RoleClaim(RoleNames.BauUser))
-                .Concat(EnumUtil.GetEnumValues<SecurityClaimTypes>().Select(SecurityClaim))
+                .Concat(EnumUtil.GetEnums<SecurityClaimTypes>().Select(SecurityClaim))
                 .Append(ScopeClaim(SecurityScopes.AccessAdminApiScope));
 
             return CreateClaimsPrincipal(

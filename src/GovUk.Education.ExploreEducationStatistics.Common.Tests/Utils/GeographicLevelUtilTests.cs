@@ -41,7 +41,7 @@ public static class GeographicLevelUtilTests
 
         public static IEnumerable<object[]> GeographicLevelColumns()
         {
-            return EnumUtil.GetEnumValues<GeographicLevel>()
+            return EnumUtil.GetEnums<GeographicLevel>()
                 .SelectMany(
                     level =>
                     {

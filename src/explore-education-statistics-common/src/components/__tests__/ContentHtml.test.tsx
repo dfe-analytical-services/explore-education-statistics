@@ -105,36 +105,29 @@ describe('ContentHtml', () => {
     ).toBeInTheDocument();
   });
 
-  test('fixes inaccessible table markup from CKEditor', () => {
-    const html = `
-      <figure class="table">
-        <table>
-          <tbody>
-          <tr>
-            <td>Test 1</td>
-            <td>Test 2</td>
-          </tr>
-          </tbody>
-        </table>
-        <figcaption>
-          Test <strong>bold</strong> caption
-        </figcaption>
-      </figure>
-    `;
-
-    const { container } = render(<ContentHtml html={html} />);
-
-    expect(container.innerHTML).toMatchInlineSnapshot(`
-      <div class="dfe-content">
-        <div class="tableContainer">
+  describe('formatting tables', () => {
+    test('removes figure and adds tabindex to table markup from CKEditor', () => {
+      const html = `
+        <figure class="table">
           <table>
-            <caption>
-              Test
-              <strong>
-                bold
-              </strong>
-              caption
-            </caption>
+            <tbody>
+            <tr>
+              <td>Test 1</td>
+              <td>Test 2</td>
+            </tr>
+            </tbody>
+          </table>
+        </figure>
+      `;
+
+      const { container } = render(<ContentHtml html={html} />);
+
+      expect(container.innerHTML).toMatchInlineSnapshot(`
+      <div class="dfe-content">
+        <div class="tableContainer"
+             tabindex="0"
+        >
+          <table>
             <tbody>
               <tr>
                 <td>
@@ -148,7 +141,56 @@ describe('ContentHtml', () => {
           </table>
         </div>
       </div>
-    `);
+      `);
+    });
+
+    test('fixes inaccessible table caption markup from CKEditor', () => {
+      const html = `
+        <figure class="table">
+          <table>
+            <tbody>
+            <tr>
+              <td>Test 1</td>
+              <td>Test 2</td>
+            </tr>
+            </tbody>
+          </table>
+          <figcaption>
+            Test <strong>bold</strong> caption
+          </figcaption>
+        </figure>
+      `;
+
+      const { container } = render(<ContentHtml html={html} />);
+
+      expect(container.innerHTML).toMatchInlineSnapshot(`
+        <div class="dfe-content">
+          <div class="tableContainer"
+               tabindex="0"
+          >
+            <table>
+              <caption>
+                Test
+                <strong>
+                  bold
+                </strong>
+                caption
+              </caption>
+              <tbody>
+                <tr>
+                  <td>
+                    Test 1
+                  </td>
+                  <td>
+                    Test 2
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `);
+    });
   });
 
   describe('formatting links', () => {

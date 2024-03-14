@@ -5,6 +5,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  label?: string;
   wide?: boolean;
   onClose?: () => void;
   testId?: string;
@@ -12,12 +13,18 @@ interface Props {
 
 export default function Banner({
   children,
+  label = 'banner',
   wide = false,
   onClose,
   testId,
 }: Props) {
   return (
-    <div className={styles.container} data-testid={testId}>
+    <div
+      className={styles.container}
+      data-testid={testId}
+      aria-label={label}
+      role="region"
+    >
       <div
         className={classNames('govuk-width-container', {
           'dfe-width-container--wide': wide,

@@ -13,15 +13,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
 
         Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(
-            Guid releaseId,
+            Guid releaseVersionId,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null);
 
-        Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId,
+        Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseVersionId,
             IDataArchiveFile archiveFile,
             File? replacingFile = null);
 
-        Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name);
+        Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseVersionId,
+            string name);
     }
 }

@@ -1,21 +1,20 @@
-﻿using System;
+using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+
+public class PublishReleaseContentMessage
 {
-    public class PublishReleaseContentMessage
+    public Guid ReleaseVersionId { get; set; }
+    public Guid ReleaseStatusId { get; set; }
+
+    public PublishReleaseContentMessage(Guid releaseVersionId, Guid releaseStatusId)
     {
-        public Guid ReleaseId { get; set; }
-        public Guid ReleaseStatusId { get; set; }
+        ReleaseVersionId = releaseVersionId;
+        ReleaseStatusId = releaseStatusId;
+    }
 
-        public PublishReleaseContentMessage(Guid releaseId, Guid releaseStatusId)
-        {
-            ReleaseId = releaseId;
-            ReleaseStatusId = releaseStatusId;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(ReleaseId)}: {ReleaseId}, {nameof(ReleaseStatusId)}: {ReleaseStatusId}";
-        }
+    public override string ToString()
+    {
+        return $"{nameof(ReleaseVersionId)}: {ReleaseVersionId}, {nameof(ReleaseStatusId)}: {ReleaseStatusId}";
     }
 }

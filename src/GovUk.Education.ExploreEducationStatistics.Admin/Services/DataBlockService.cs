@@ -20,7 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -53,18 +53,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Create(
-            Guid releaseId,
+            Guid releaseVersionId,
             DataBlockCreateViewModel dataBlockCreate)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccess(async _ =>
                 {
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
                     dataBlock.Id = Guid.NewGuid();
                     dataBlock.Created = DateTime.UtcNow;
-                    dataBlock.ReleaseId = releaseId;
+                    dataBlock.ReleaseVersionId = releaseVersionId;
 
                     var dataBlockVersion = new DataBlockVersion
                     {
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // Content model.
                         Id = dataBlock.Id,
                         ContentBlock = dataBlock,
-                        ReleaseId = releaseId,
+                        ReleaseVersionId = releaseVersionId,
                         Created = DateTime.UtcNow,
                         DataBlockParent = new()
                     };
@@ -90,12 +90,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId, Guid dataBlockVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccessDo(_userService.CheckCanUpdateRelease)
-                .OnSuccess(release => GetDeletePlan(release.Id, id))
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccessDo(_userService.CheckCanUpdateReleaseVersion)
+                .OnSuccess(releaseVersion => GetDeletePlan(releaseVersionId: releaseVersion.Id,
+                    dataBlockVersionId: dataBlockVersionId))
                 .OnSuccessVoid(DeleteDataBlocks);
         }
 
@@ -123,19 +124,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => DeleteDependentDataBlocks(deletePlan));
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseVersionId, Guid fileId)
         {
-            return await RemoveInfographicChartFromDataBlock(releaseId, id)
-                .OnSuccess(async () => await _releaseFileService.Delete(releaseId, id));
+            return await RemoveInfographicChartFromDataBlock(releaseVersionId: releaseVersionId, fileId: fileId)
+                .OnSuccess(async () =>
+                    await _releaseFileService.Delete(releaseVersionId: releaseVersionId, fileId: fileId));
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Get(Guid dataBlockVersionId)
         {
             return await GetDataBlockVersion(dataBlockVersionId)
-                .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewRelease(dataBlockVersion.Release))
+                .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewReleaseVersion(dataBlockVersion.ReleaseVersion))
                 .OnSuccess(async dataBlockVersion =>
                 {
-                    var releaseId = dataBlockVersion.ReleaseId;
+                    var releaseVersionId = dataBlockVersion.ReleaseVersionId;
 
                     var viewModel = _mapper.Map<DataBlockViewModel>(dataBlockVersion);
 
@@ -145,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     viewModel.DataSetName = await _context.ReleaseFiles
                         .Where(rf =>
-                            rf.ReleaseId == releaseId &&
+                            rf.ReleaseVersionId == releaseVersionId &&
                             rf.File.SubjectId == subjectId &&
                             rf.File.Type == FileType.Data)
                         .Select(rf => rf.Name)
@@ -164,21 +166,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseVersionId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
+            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                     {
-                        var dataBlocks = await ListDataBlocks(release.Id);
+                        var dataBlocks = await ListDataBlocks(releaseVersion.Id);
 
                         var dataBlockIdsAttachedToKeyStats = await _context.KeyStatisticsDataBlock
-                            .Where(ks => ks.ReleaseId == release.Id)
+                            .Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                             .Select(ks => ks.DataBlockId)
                             .ToListAsync();
 
                         var featuredTables = await _context.FeaturedTables
-                            .Where(ks => ks.ReleaseId == release.Id)
+                            .Where(ks => ks.ReleaseVersionId == releaseVersion.Id)
                             .ToListAsync();
 
                         return dataBlocks.Select(block =>
@@ -208,11 +210,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, DataBlockViewModel>> Update(
-            Guid id,
+            Guid dataBlockVersionId,
             DataBlockUpdateViewModel dataBlockUpdate)
         {
-            return await GetDataBlockVersion(id)
-                .OnSuccessDo(dataBlock => _userService.CheckCanUpdateRelease(dataBlock.Release))
+            return await GetDataBlockVersion(dataBlockVersionId)
+                .OnSuccessDo(dataBlock => _userService.CheckCanUpdateReleaseVersion(dataBlock.ReleaseVersion))
                 .OnSuccessDo(async dataBlockVersion =>
                 {
                     // TODO EES-753 Alter this when multiple charts are supported
@@ -223,7 +225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (infographicChart != null &&
                         infographicChart.FileId != updatedInfographicChart?.FileId)
                     {
-                        await _releaseFileService.Delete(dataBlockVersion.ReleaseId, new Guid(infographicChart.FileId));
+                        await _releaseFileService.Delete(releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                            fileId: new Guid(infographicChart.FileId));
                     }
 
                     _mapper.Map(dataBlockUpdate, dataBlockVersion.ContentBlock);
@@ -232,26 +235,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
                 })
-                .OnSuccessDo(dataBlock => InvalidateCachedDataBlock(dataBlock.ReleaseId, dataBlock.Id))
-                .OnSuccess(() => Get(id));
+                .OnSuccessDo(dataBlock => InvalidateCachedDataBlock(dataBlock.ReleaseVersionId, dataBlock.Id))
+                .OnSuccess(() => Get(dataBlockVersionId));
         }
 
-        public async Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid dataBlockId)
+        public async Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseVersionId,
+            Guid dataBlockVersionId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<DataBlockVersion>(
                     query => query
-                        .Include(dataBlockVersion => dataBlockVersion.Release)
+                        .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                         .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
                         .ThenInclude(dataBlock => dataBlock.ContentSection)
-                        .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
-                                                   && dataBlockVersion.Id == dataBlockId)
+                        .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId
+                                                   && dataBlockVersion.Id == dataBlockVersionId)
                 )
-                .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateRelease(dataBlockVersion.Release))
+                .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateReleaseVersion(dataBlockVersion.ReleaseVersion))
                 .OnSuccess(async dataBlockVersion =>
                     new DeleteDataBlockPlan
                     {
-                        ReleaseId = releaseId,
+                        ReleaseId = releaseVersionId,
                         DependentDataBlocks = new List<DependentDataBlock>
                         {
                             await CreateDependentDataBlock(dataBlockVersion)
@@ -261,20 +265,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
-            Guid releaseId,
+            Guid releaseVersionId,
             Guid dataBlockParentId)
         {
             return _context
                 .DataBlockVersions
-                .Include(dataBlockVersion => dataBlockVersion.Release)
-                .SingleOrDefaultAsync(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+                .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
+                .SingleOrDefaultAsync(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId
                                                           && dataBlockVersion.DataBlockParentId == dataBlockParentId)
                 .OrNotFound();
         }
 
-        public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject)
+        public async Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseVersionId, Subject? subject)
         {
-            var dataBlockVersions = subject == null ? new List<DataBlockVersion>() : GetDataBlockVersions(releaseId, subject.Id);
+            var dataBlockVersions = subject == null
+                ? new List<DataBlockVersion>()
+                : GetDataBlockVersions(releaseVersionId, subject.Id);
             var dependentBlocks = new List<DependentDataBlock>();
             foreach (var block in dataBlockVersions)
             {
@@ -283,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return new DeleteDataBlockPlan()
             {
-                ReleaseId = releaseId,
+                ReleaseId = releaseVersionId,
                 DependentDataBlocks = dependentBlocks
             };
         }
@@ -344,9 +350,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseId, Guid id)
+        private async Task<Either<ActionResult, bool>> RemoveInfographicChartFromDataBlock(Guid releaseVersionId,
+            Guid fileId)
         {
-            var dataBlockVersions = GetDataBlockVersions(releaseId);
+            var dataBlockVersions = GetDataBlockVersions(releaseVersionId);
 
             foreach (var dataBlockVersion in dataBlockVersions)
             {
@@ -355,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OfType<InfographicChart>()
                     .FirstOrDefault();
 
-                if (infoGraphicChart != null && infoGraphicChart.FileId == id.ToString())
+                if (infoGraphicChart != null && infoGraphicChart.FileId == fileId.ToString())
                 {
                     dataBlockVersion.Charts.Remove(infoGraphicChart);
                     _context.DataBlocks.Update(dataBlockVersion.ContentBlock);
@@ -414,11 +421,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private List<DataBlockVersion> GetDataBlockVersions(Guid releaseId, Guid? subjectId = null)
+        private List<DataBlockVersion> GetDataBlockVersions(Guid releaseVersionId, Guid? subjectId = null)
         {
             return _context
                 .DataBlockVersions
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId)
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseVersionId == releaseVersionId)
                 // Pull these results into memory so that the Query field (which is JSON) can be queried.
                 .ToList()
                 .Where(dataBlockVersion => subjectId == null || dataBlockVersion.Query.SubjectId == subjectId)
@@ -430,7 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<DataBlockVersion>(
                     query => query
-                        .Include(dataBlockVersion => dataBlockVersion.Release)
+                        .Include(dataBlockVersion => dataBlockVersion.ReleaseVersion)
                         .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockId)
                 );
         }
@@ -443,55 +450,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid();
         }
 
-        public async Task InvalidateCachedDataBlocks(Guid releaseId)
+        public async Task InvalidateCachedDataBlocks(Guid releaseVersionId)
         {
-            var dataBlocks = GetDataBlockVersions(releaseId);
+            var dataBlocks = GetDataBlockVersions(releaseVersionId);
             foreach (var dataBlock in dataBlocks)
             {
-                await InvalidateCachedDataBlock(releaseId, dataBlock.Id);
+                await InvalidateCachedDataBlock(releaseVersionId, dataBlock.Id);
             }
         }
 
-        private Task<Either<ActionResult, Unit>> InvalidateCachedDataBlock(Guid releaseId, Guid dataBlockId)
+        private Task<Either<ActionResult, Unit>> InvalidateCachedDataBlock(Guid releaseVersionId, Guid dataBlockId)
         {
             return _cacheKeyService
-                .CreateCacheKeyForDataBlock(releaseId, dataBlockId)
+                .CreateCacheKeyForDataBlock(releaseVersionId: releaseVersionId,
+                    dataBlockId: dataBlockId)
                 .OnSuccessVoid(_cacheService.DeleteItemAsync);
         }
 
-        public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseVersionId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
+            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(_userService.CheckCanViewReleaseVersion)
+                .OnSuccess(async releaseVersion =>
                 {
                     return await _context
                         .DataBlockVersions
-                        .Where(block => block.ReleaseId == release.Id)
+                        .Where(block => block.ReleaseVersionId == releaseVersion.Id)
                         .ToAsyncEnumerable()
-                        .WhereAwait(async dataBlockVersion => await IsUnattachedDataBlock(releaseId, dataBlockVersion))
+                        .WhereAwait(async dataBlockVersion =>
+                            await IsUnattachedDataBlock(releaseVersionId, dataBlockVersion))
                         .OrderBy(dataBlockVersion => dataBlockVersion.Name)
                         .Select(dataBlockVersion => _mapper.Map<DataBlockViewModel>(dataBlockVersion))
                         .ToListAsync();
                 });
         }
 
-        public async Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlockVersion dataBlockVersion)
+        public async Task<bool> IsUnattachedDataBlock(Guid releaseVersionId, DataBlockVersion dataBlockVersion)
         {
             return dataBlockVersion.ContentSectionId == null
                    && await _context.KeyStatisticsDataBlock
-                       .Where(ks =>ks.ReleaseId == releaseId)
+                       .Where(ks => ks.ReleaseVersionId == releaseVersionId)
                        .AllAsync(ks =>
                            ks.DataBlockId != dataBlockVersion.Id);
         }
 
-        public async Task<List<DataBlock>> ListDataBlocks(Guid releaseId)
+        public async Task<List<DataBlock>> ListDataBlocks(Guid releaseVersionId)
         {
             return await _context
-                    .ContentBlocks
-                    .Where(block => block.ReleaseId == releaseId)
-                    .OfType<DataBlock>()
-                    .ToListAsync();
+                .ContentBlocks
+                .Where(block => block.ReleaseVersionId == releaseVersionId)
+                .OfType<DataBlock>()
+                .ToListAsync();
         }
     }
 

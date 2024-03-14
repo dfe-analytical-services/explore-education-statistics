@@ -145,7 +145,7 @@ public class FixedInformationDataFileReader
         _timeIdentifierColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_identifier"));
         _yearColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_period"));
         _geographicLevelColumnIndex = csvHeaders.FindIndex(h => h.Equals("geographic_level"));
-        _locationColumnIndexes = EnumUtil.GetEnumValues<LocationColumn>().ToDictionary(
+        _locationColumnIndexes = EnumUtil.GetEnums<LocationColumn>().ToDictionary(
             enumValue => enumValue,
             enumValue => csvHeaders.FindIndex(h => h.Equals(enumValue.GetEnumLabel())));
     }

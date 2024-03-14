@@ -5,7 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Model</RootNamespace>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
+
+
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="JsonKnownTypes" Version="0.5.5" />

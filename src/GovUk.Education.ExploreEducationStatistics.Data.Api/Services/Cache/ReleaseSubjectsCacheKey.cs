@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -11,20 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache
         private string PublicationSlug { get; }
         private string ReleaseSlug { get; }
 
-        public Guid ReleaseId { get; }
+        public Guid ReleaseVersionId { get; }
 
-        public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug, Guid releaseId)
+        public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug, Guid releaseVersionId)
         {
             PublicationSlug = publicationSlug;
             ReleaseSlug = releaseSlug;
-            ReleaseId = releaseId;
+            ReleaseVersionId = releaseVersionId;
         }
 
         public ReleaseSubjectsCacheKey(ReleaseSubjectsCacheKey cacheKey)
         {
             PublicationSlug = cacheKey.PublicationSlug;
             ReleaseSlug = cacheKey.ReleaseSlug;
-            ReleaseId = cacheKey.ReleaseId;
+            ReleaseVersionId = cacheKey.ReleaseVersionId;
         }
 
         public IBlobContainer Container => BlobContainers.PublicContent;

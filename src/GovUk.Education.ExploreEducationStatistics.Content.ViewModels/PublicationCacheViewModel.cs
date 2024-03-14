@@ -17,7 +17,7 @@ public record PublicationCacheViewModel
 
     public PublicationSupersededByViewModel? SupersededBy { get; set; } = new();
 
-    public List<ReleaseTitleViewModel> Releases { get; init; } = new();
+    public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
     public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
 

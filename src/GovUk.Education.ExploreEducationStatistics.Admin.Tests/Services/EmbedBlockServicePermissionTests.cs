@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class EmbedBlockServicePermissionTests
 {
-    private readonly Release _release = new()
+    private readonly ReleaseVersion _releaseVersion = new()
     {
         Id = Guid.NewGuid()
     };
@@ -28,12 +28,12 @@ public class EmbedBlockServicePermissionTests
     public async Task Create()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupEmbedBlockService(userService: userService.Object);
-                    return service.Create(releaseId: _release.Id,
+                    return service.Create(releaseVersionId: _releaseVersion.Id,
                         request: new EmbedBlockCreateRequest
                         {
                             Title = "Test title",
@@ -48,12 +48,12 @@ public class EmbedBlockServicePermissionTests
     public async Task Update()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupEmbedBlockService(userService: userService.Object);
-                    return service.Update(releaseId: _release.Id,
+                    return service.Update(releaseVersionId: _releaseVersion.Id,
                         contentBlockId: Guid.NewGuid(),
                         request: new EmbedBlockUpdateRequest
                         {
@@ -68,12 +68,13 @@ public class EmbedBlockServicePermissionTests
     public async Task Delete()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
             .AssertForbidden(
                 userService =>
                 {
                     var service = SetupEmbedBlockService(userService: userService.Object);
-                    return service.Delete(releaseId: _release.Id, Guid.NewGuid());
+                    return service.Delete(releaseVersionId: _releaseVersion.Id,
+                        contentBlockId: Guid.NewGuid());
                 }
             );
     }
@@ -94,6 +95,6 @@ public class EmbedBlockServicePermissionTests
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
     {
-        return MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release);
+        return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id, _releaseVersion);
     }
 }

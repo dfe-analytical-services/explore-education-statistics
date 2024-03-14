@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<Location> Location { get; set; } = null!;
         public DbSet<Observation> Observation { get; set; } = null!;
         public DbSet<ObservationFilterItem> ObservationFilterItem { get; set; } = null!;
-        public DbSet<Release> Release { get; set; } = null!;
+        public DbSet<ReleaseVersion> ReleaseVersion { get; set; } = null!;
         public DbSet<Subject> Subject { get; set; } = null!;
         public DbSet<SubjectFootnote> SubjectFootnote { get; set; } = null!;
 
@@ -290,17 +290,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigurePublication(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Release>()
-                .HasIndex(data => data.PublicationId);
+            modelBuilder.Entity<ReleaseVersion>()
+                .HasIndex(rv => rv.PublicationId);
         }
 
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseSubject>()
-                .HasKey(item => new { item.ReleaseId, item.SubjectId });
+                .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.SubjectId });
 
             modelBuilder.Entity<ReleaseSubject>()
-                .HasOne(rs => rs.Release)
+                .HasOne(rs => rs.ReleaseVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -325,10 +325,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseFootnote>()
-                .HasKey(item => new { item.ReleaseId, item.FootnoteId });
+                .HasKey(item => new { ReleaseId = item.ReleaseVersionId, item.FootnoteId });
 
             modelBuilder.Entity<ReleaseFootnote>()
-                .HasOne(rf => rf.Release)
+                .HasOne(rf => rf.ReleaseVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -474,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Subject>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+                .HasQueryFilter(s => !s.SoftDeleted);
         }
 
         private static void ConfigureGeoJson(ModelBuilder modelBuilder)

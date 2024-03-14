@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         {
             var publication = new Publication
             {
-                LatestPublishedReleaseId = Guid.NewGuid()
+                LatestPublishedReleaseVersionId = Guid.NewGuid()
             };
 
             var handler = new ViewPublicationAuthorizationHandler();

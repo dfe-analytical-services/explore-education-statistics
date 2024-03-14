@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -19,7 +19,7 @@ public class PublicationRepository : IPublicationRepository
     public async Task<bool> IsPublished(Guid publicationId)
     {
         return await _contentDbContext.Publications
-            .AnyAsync(p => p.Id == publicationId && p.LatestPublishedReleaseId != null);
+            .AnyAsync(p => p.Id == publicationId && p.LatestPublishedReleaseVersionId != null);
     }
 
     public async Task<bool> IsSuperseded(Guid publicationId)
@@ -30,6 +30,6 @@ public class PublicationRepository : IPublicationRepository
             .Include(publication => publication.SupersededBy)
             .AnyAsync(publication => publication.Id == publicationId &&
                                      publication.SupersededBy != null &&
-                                     publication.SupersededBy.LatestPublishedReleaseId != null);
+                                     publication.SupersededBy.LatestPublishedReleaseVersionId != null);
     }
 }

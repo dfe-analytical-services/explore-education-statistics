@@ -7,7 +7,7 @@ public class ReleaseSeriesItem
 {
     public Guid Id { get; set; }
 
-    public Guid? ReleaseParentId { get; set; }
+    public Guid? ReleaseId { get; set; }
 
     public string? LegacyLinkUrl { get; set; }
     public string? LegacyLinkDescription { get; set; }

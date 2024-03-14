@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters;
 public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> where TEnum : Enum
 {
     private static readonly Dictionary<string, TEnum> Lookup =
-        EnumUtil.GetEnumValues<TEnum>().ToDictionary(value => value.GetEnumLabel().ToLower());
+        EnumUtil.GetEnums<TEnum>().ToDictionary(value => value.GetEnumLabel().ToLower());
 
     public EnumToEnumLabelConverter(
         ConverterMappingHints? mappingHints = null) :

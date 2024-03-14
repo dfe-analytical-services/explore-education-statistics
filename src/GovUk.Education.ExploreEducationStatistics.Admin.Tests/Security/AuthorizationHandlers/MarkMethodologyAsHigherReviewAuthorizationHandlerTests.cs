@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -423,7 +423,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             methodologyVersionRepository.Object,
             methodologyRepository.Object,
             new AuthorizationHandlerService(
-                new ReleaseRepository(InMemoryApplicationDbContext()),
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 userReleaseRoleRepository.Object,
                 userPublicationRoleRepository.Object,
                 Mock.Of<IPreReleaseService>(Strict))

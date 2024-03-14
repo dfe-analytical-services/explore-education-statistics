@@ -20,7 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -29,17 +29,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject()
             };
 
@@ -105,14 +105,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Data set 1",
                 File = new File
                 {
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseFile2 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Data set 2",
                 File = new File
                 {
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataGuidanceDataSetService, timePeriodService);
 
@@ -246,23 +246,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_FiltersPendingReplacementSubjects()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
             };
 
             var releaseSubject2Replacement = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
             };
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -272,14 +272,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 1",
                 File = new File
                 {
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Filename = "data2_replacement.csv",
                 Type = FileType.Data,
-                SubjectId =  releaseSubject2Replacement.Subject.Id,
+                SubjectId = releaseSubject2Replacement.Subject.Id,
                 Replacing = file2
             };
 
@@ -308,14 +308,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseFile2 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 2",
                 File = file2
             };
 
             var releaseFile2Replacement = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 2 Replacement",
                 File = file2Replacement
             };
@@ -361,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
 
                 var subjects = result.AssertRight();
 
@@ -377,11 +377,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_FiltersImportingSubjects()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid(),
@@ -404,15 +404,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
                 Name = "Data 1",
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -424,7 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile2 = new ReleaseFile
             {
                 Name = "Data 2",
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 File = new File
                 {
                     Filename = "data2.csv",
@@ -474,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
 
                 var subjects = result.AssertRight();
 
@@ -487,10 +487,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_FiltersSubjectsWithNoImport()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
             };
 
@@ -501,14 +501,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 1",
                 File = new File
                 {
@@ -521,8 +521,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(contentRelease);
-                await contentDbContext.AddRangeAsync(releaseFile);
+                contentDbContext.ReleaseVersions.Add(contentReleaseVersion);
+                contentDbContext.ReleaseFiles.AddRange(releaseFile);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -534,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
 
                 var subjects = result.AssertRight();
 
@@ -545,16 +545,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_FiltersSubjectsWithNoFileSubjectId()
         {
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId
+                Id = releaseVersionId
             };
 
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -572,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.AddRangeAsync(releaseFile);
                 await contentDbContext.AddRangeAsync(import);
                 await contentDbContext.SaveChangesAsync();
@@ -582,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.ListSubjects(release.Id);
+                var result = await service.ListSubjects(releaseVersion.Id);
 
                 var subjects = result.AssertRight();
 
@@ -593,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_FilterOrder()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
 
             var subject1Filter1Id = Guid.NewGuid();
             var subject1Filter2Id = Guid.NewGuid();
@@ -601,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
                 FilterSequence = new List<FilterSequenceEntry>
                 {
@@ -652,14 +652,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 1",
                 File = new File
                 {
@@ -705,7 +705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
                 var subjects = result.AssertRight();
                 var subject = Assert.Single(subjects);
 
@@ -719,7 +719,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListSubjects_IndicatorOrder()
         {
-            var statisticsRelease = new Data.Model.Release();
+            var statisticsReleaseVersion = new Data.Model.ReleaseVersion();
 
             var subject1Indicator1 = new Indicator
             {
@@ -739,7 +739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
                 IndicatorSequence = new List<IndicatorGroupSequenceEntry>
                 {
@@ -782,14 +782,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Release
+            var contentReleaseVersion = new ReleaseVersion
             {
-                Id = statisticsRelease.Id,
+                Id = statisticsReleaseVersion.Id,
             };
 
             var releaseFile1 = new ReleaseFile
             {
-                Release = contentRelease,
+                ReleaseVersion = contentReleaseVersion,
                 Name = "Subject 1",
                 File = new File
                 {
@@ -835,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = await service.ListSubjects(contentRelease.Id);
+                var result = await service.ListSubjects(contentReleaseVersion.Id);
                 var subjects = result.AssertRight();
                 var subject = Assert.Single(subjects);
 
@@ -849,13 +849,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListFeaturedTables()
         {
-            var releaseId = Guid.NewGuid();
-            var release = new Release { Id = releaseId };
-            var statRelease = new Data.Model.Release { Id = releaseId };
+            var releaseVersionId = Guid.NewGuid();
+            var releaseVersion = new ReleaseVersion { Id = releaseVersionId };
+            var statsReleaseVersion = new Data.Model.ReleaseVersion { Id = releaseVersionId };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = statRelease,
+                ReleaseVersion = statsReleaseVersion,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -863,7 +863,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = statRelease,
+                ReleaseVersion = statsReleaseVersion,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -873,7 +873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Name = "Data 1",
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -884,7 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile2 = new ReleaseFile
             {
                 Name = "Data 2",
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data2.csv",
@@ -911,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     SubjectId = releaseSubject1.Subject.Id,
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
             var featuredTable1 = new FeaturedTable
             {
@@ -927,7 +927,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     SubjectId = releaseSubject2.Subject.Id,
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
             var featuredTable2 = new FeaturedTable
             {
@@ -963,7 +963,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await service.ListFeaturedTables(release.Id);
+                var result = await service.ListFeaturedTables(releaseVersion.Id);
 
                 var featuredTables = result.AssertRight();
 
@@ -986,17 +986,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListFeaturedTables_FiltersImportingSubjects()
         {
-            var releaseId = Guid.NewGuid();
-            var release = new Release
+            var releaseVersionId = Guid.NewGuid();
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId
+                Id = releaseVersionId
             };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
+                ReleaseVersion = new Data.Model.ReleaseVersion
                 {
-                    Id = releaseId
+                    Id = releaseVersionId
                 },
                 Subject = new Subject
                 {
@@ -1007,7 +1007,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Name = "Data 1",
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -1036,7 +1036,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.AddAsync(releaseFile1);
                 await contentDbContext.AddAsync(import1);
                 await contentDbContext.AddRangeAsync(dataBlock1);
@@ -1057,7 +1057,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await service.ListFeaturedTables(release.Id);
+                var result = await service.ListFeaturedTables(releaseVersion.Id);
 
                 var featuredTables = result.AssertRight();
 
@@ -1068,17 +1068,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListFeaturedTables_FiltersNonFeaturedTables()
         {
-            var releaseId = Guid.NewGuid();
-            var release = new Release
+            var releaseVersionId = Guid.NewGuid();
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId
+                Id = releaseVersionId
             };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
+                ReleaseVersion = new Data.Model.ReleaseVersion
                 {
-                    Id = releaseId
+                    Id = releaseVersionId
                 },
                 Subject = new Subject
                 {
@@ -1089,7 +1089,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Name = "Data 1",
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -1118,7 +1118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.AddAsync(releaseFile1);
                 await contentDbContext.AddAsync(import1);
                 await contentDbContext.AddRangeAsync(dataBlock1);
@@ -1139,7 +1139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await service.ListFeaturedTables(release.Id);
+                var result = await service.ListFeaturedTables(releaseVersion.Id);
 
                 var featuredTables = result.AssertRight();
 
@@ -1150,17 +1150,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task ListFeaturedTables_FiltersNonMatchingSubjects()
         {
-            var releaseId = Guid.NewGuid();
-            var release = new Release
+            var releaseVersionId = Guid.NewGuid();
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId
+                Id = releaseVersionId
             };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
+                ReleaseVersion = new Data.Model.ReleaseVersion
                 {
-                    Id = releaseId
+                    Id = releaseVersionId
                 },
                 Subject = new Subject
                 {
@@ -1171,7 +1171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Name = "Data 1",
-                Release = release,
+                ReleaseVersion = releaseVersion,
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -1228,7 +1228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext
                 );
 
-                var result = await service.ListFeaturedTables(release.Id);
+                var result = await service.ListFeaturedTables(releaseVersion.Id);
 
                 var featuredTables = result.AssertRight();
 

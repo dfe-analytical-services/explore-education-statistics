@@ -4,8 +4,14 @@
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10.0</LangVersion>
         <IsPackable>false</IsPackable>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
+    <ItemGroup>
+        <CompilerVisibleProperty Include="RootNamespace" />
+        <CompilerVisibleProperty Include="ProjectDir" />
+    </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="AspectInjector" Version="2.8.2" />
         <PackageReference Include="Bogus" Version="34.0.2" />

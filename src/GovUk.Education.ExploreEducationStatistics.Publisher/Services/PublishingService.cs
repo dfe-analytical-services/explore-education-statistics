@@ -57,10 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await PublishMethodologyFiles(methodology);
         }
 
-        public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId)
+        public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseVersionId)
         {
-            var release = await _releaseService.Get(releaseId);
-            var methodologyVersions = await _methodologyService.GetLatestVersionByRelease(release);
+            var releaseVersion = await _releaseService.Get(releaseVersionId);
+            var methodologyVersions = await _methodologyService.GetLatestVersionByRelease(releaseVersion);
 
             if (!methodologyVersions.Any())
             {
@@ -69,26 +69,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var methodologyVersion in methodologyVersions)
             {
-                if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
+                if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, releaseVersion))
                 {
                     await PublishMethodologyFiles(methodologyVersion);
                 }
             }
         }
 
-        public async Task PublishReleaseFiles(Guid releaseId)
+        public async Task PublishReleaseFiles(Guid releaseVersionId)
         {
-            var release = await _releaseService.Get(releaseId);
+            var releaseVersion = await _releaseService.Get(releaseVersionId);
 
             var files = await _releaseService.GetFiles(
-                releaseId,
+                releaseVersionId,
                 Ancillary,
                 Chart,
                 FileType.Data,
                 Image
             );
 
-            var destinationDirectoryPath = $"{release.Id}/";
+            var destinationDirectoryPath = $"{releaseVersion.Id}/";
 
             // Delete any existing blobs in public storage
             await _publicBlobStorageService.DeleteBlobs(

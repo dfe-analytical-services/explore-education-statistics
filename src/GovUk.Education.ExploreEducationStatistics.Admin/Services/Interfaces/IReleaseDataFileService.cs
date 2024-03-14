@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,27 +11,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseDataFileService
     {
-        Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid id, bool forceDelete = false);
+        Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+            Guid fileId,
+            bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> Delete(Guid releaseId, IEnumerable<Guid> ids, bool forceDelete = false);
+        Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+            IEnumerable<Guid> fileIds,
+            bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
+        Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId,
+            bool forceDelete = false);
 
-        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
+            Guid fileId);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId);
+        Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
 
         Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
-            Guid releaseId,
+            Guid releaseVersionId,
             List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
+        Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
             Guid? replacingFileId = null,
             string? subjectName = null);
 
-        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseId,
+        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
             IFormFile zipFormFile,
             Guid? replacingFileId = null,
             string? subjectName = null);

@@ -33,7 +33,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var publications = await _context.Publications
-            .Include(p => p.Releases)
+            .Include(p => p.ReleaseVersions)
             .Include(p => p.LegacyReleases.OrderBy(lr => lr.Order))
             .ToListAsync(cancellationToken);
 
@@ -43,7 +43,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
 
         foreach (var publication in publications)
         {
-            if (!publication.Releases.Any() && !publication.LegacyReleases.Any()) continue;
+            if (!publication.ReleaseVersions.Any() && !publication.LegacyReleases.Any()) continue;
 
             var currentOrder = 0;
             publication.ReleaseSeriesView = new();
@@ -60,13 +60,14 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                 legacyReleasesReordered++;
             }
 
+            // @MarkFix this can be fixed now we've got release/releaseVersion?
             // Get a list of original releases
-            var releases = publication.Releases
+            var releaseVersions = publication.ReleaseVersions
                 .OrderByDescending(release => release.Year)
                 .ThenByDescending(release => release.TimePeriodCoverage);
 
             // Get the latest version of each release
-            var latestReleaseVersions = releases
+            var latestReleaseVersions = releaseVersions
                 .GroupBy(r => r.ReleaseName)
                 .Select(grouping => grouping
                     .OrderByDescending(r => r.Version)
@@ -78,7 +79,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                 if (latestRelease.Amendment && latestRelease.PreviousVersionId.HasValue)
                 {
                     // Add a ReleaseSeriesItem for the original
-                    var originalRelease = releases.First(r => r.Id == latestRelease.PreviousVersionId);
+                    var originalRelease = releaseVersions.First(r => r.Id == latestRelease.PreviousVersionId);
 
                     //publication.ReleaseSeriesView.Add(
                     //    new()

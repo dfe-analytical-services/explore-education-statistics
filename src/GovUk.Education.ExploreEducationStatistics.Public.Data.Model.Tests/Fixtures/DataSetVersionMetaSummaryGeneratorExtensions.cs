@@ -63,12 +63,7 @@ public static class DataSetVersionMetaSummaryGeneratorExtensions
 
     private static TimePeriodRange DefaultTimePeriodRange(Faker faker)
     {
-        var code = faker.PickRandom(
-            TimeIdentifier.AcademicYear,
-            TimeIdentifier.CalendarYear,
-            TimeIdentifier.FinancialYear,
-            TimeIdentifier.TaxYear
-        );
+        const TimeIdentifier code = TimeIdentifier.CalendarYear;
 
         var startYear = 2000 + faker.Random.Int(0, 12);
         var endYear = startYear + faker.Random.Int(0, 12);
@@ -78,12 +73,12 @@ public static class DataSetVersionMetaSummaryGeneratorExtensions
             Start = new TimePeriodRangeBound
             {
                 Code = code,
-                Year = startYear
+                Period = startYear.ToString()
             },
             End = new TimePeriodRangeBound
             {
                 Code = code,
-                Year = endYear
+                Period = endYear.ToString()
             }
         };
     }

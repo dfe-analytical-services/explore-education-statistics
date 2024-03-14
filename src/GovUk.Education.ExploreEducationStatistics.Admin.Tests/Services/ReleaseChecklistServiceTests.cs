@@ -22,7 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication();
 
-            var originalRelease = new Release
+            var originalReleaseVersion = new ReleaseVersion
             {
                 Publication = publication,
                 Version = 0,
@@ -49,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = publication,
-                PreviousVersion = originalRelease,
+                PreviousVersion = originalReleaseVersion,
                 Version = 1,
                 Created = DateTime.UtcNow.AddMonths(-1),
                 GenericContent = new List<ContentSection>
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.Releases.AddRangeAsync(originalRelease, release);
+                context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -127,15 +127,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                     .ReturnsAsync(new List<MethodologyVersion>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(release.Id))
+                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(release.Id))
+                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<File>
                         {
@@ -144,11 +144,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 dataImportService
-                    .Setup(s => s.HasIncompleteImports(release.Id))
+                    .Setup(s => s.HasIncompleteImports(releaseVersion.Id))
                     .ReturnsAsync(true);
 
                 dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(release.Id, default))
+                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyVersionRepository: methodologyVersionRepository.Object
                 );
 
-                var result = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataImportService,
                     dataGuidanceService,
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithNoDataFiles()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -211,19 +211,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                     .ReturnsAsync(new List<MethodologyVersion>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(release.Id))
+                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(release.Id))
+                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(release.Id, default))
+                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataGuidanceService: dataGuidanceService.Object
                 );
 
-                var result = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataGuidanceService,
                     methodologyVersionRepository,
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithDataFiles()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -285,11 +285,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                     .ReturnsAsync(new List<MethodologyVersion>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(release.Id))
+                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<File>
                         {
@@ -311,11 +311,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(release.Id, default))
+                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 footnoteRepository
-                    .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
+                    .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<Subject>
                         {
@@ -324,11 +324,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(release.Id))
+                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 dataBlockService
-                    .Setup(s => s.ListDataBlocks(release.Id))
+                    .Setup(s => s.ListDataBlocks(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<DataBlock>
                         {
@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataBlockService: dataBlockService.Object
                 );
 
-                var result = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataBlockService,
                     footnoteRepository,
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_AllWarningsWithUnapprovedMethodology()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication()
             };
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -399,19 +399,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                     .ReturnsAsync(AsList(methodologyVersion));
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(release.Id))
+                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(release.Id))
+                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(release.Id, default))
+                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -421,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataGuidanceService: dataGuidanceService.Object
                 );
 
-                var result = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataGuidanceService,
                     methodologyVersionRepository,
@@ -454,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Status = Approved
             };
 
-            var originalRelease = new Release
+            var originalReleaseVersion = new ReleaseVersion
             {
                 Publication = publication,
                 Version = 0,
@@ -463,10 +463,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlockId = Guid.NewGuid();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = publication,
-                PreviousVersion = originalRelease,
+                PreviousVersion = originalReleaseVersion,
                 Version = 1,
                 Created = DateTime.UtcNow.AddMonths(-1),
                 DataGuidance = "Test guidance",
@@ -555,8 +555,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.Releases.AddRangeAsync(originalRelease, release);
-                await context.FeaturedTables.AddRangeAsync(featuredTable);
+                context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
+                context.FeaturedTables.AddRange(featuredTable);
                 await context.SaveChangesAsync();
             }
 
@@ -574,11 +574,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                     .ReturnsAsync(ListOf(methodologyVersion));
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(release.Id))
+                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<File>
                         {
@@ -593,19 +593,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(release.Id))
+                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(release.Id, default))
+                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(Unit.Instance);
 
                 footnoteRepository
-                    .Setup(r => r.GetSubjectsWithNoFootnotes(release.Id))
+                    .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
                     .ReturnsAsync(new List<Subject>());
 
                 dataBlockService
-                    .Setup(s => s.ListDataBlocks(release.Id))
+                    .Setup(s => s.ListDataBlocks(releaseVersion.Id))
                     .ReturnsAsync(
                         new List<DataBlock>
                         {
@@ -624,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
-                var result = await service.GetChecklist(release.Id);
+                var result = await service.GetChecklist(releaseVersion.Id);
 
                 var checklist = result.AssertRight();
 
@@ -643,13 +643,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetChecklist_NotFound()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(release);
+                context.ReleaseVersions.Add(releaseVersion);
                 await context.SaveChangesAsync();
             }
 

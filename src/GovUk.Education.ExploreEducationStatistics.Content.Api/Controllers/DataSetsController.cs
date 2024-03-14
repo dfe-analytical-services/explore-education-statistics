@@ -37,7 +37,7 @@ public class DataSetsController : ControllerBase
             .ListDataSets(
                 themeId: request.ThemeId,
                 publicationId: request.PublicationId,
-                releaseId: request.ReleaseId,
+                releaseVersionId: request.ReleaseId,
                 request.LatestOnly,
                 request.SearchTerm,
                 request.OrderBy,
@@ -48,13 +48,13 @@ public class DataSetsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("releases/{releaseId:guid}/data-sets/{fileId:guid}")]
+    [HttpGet("releases/{releaseVersionId:guid}/data-sets/{fileId:guid}")]
     public async Task<ActionResult<DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseId,
+        Guid releaseVersionId,
         Guid fileId)
     {
         return await _dataSetService
-            .GetDataSet(releaseId: releaseId, fileId: fileId)
+            .GetDataSet(releaseVersionId: releaseVersionId, fileId: fileId)
             .HandleFailuresOrOk();
     }
 }

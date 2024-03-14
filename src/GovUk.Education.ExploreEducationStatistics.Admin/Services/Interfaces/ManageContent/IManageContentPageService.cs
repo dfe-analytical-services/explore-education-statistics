@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -9,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IManageContentPageService
     {
         Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
-            Guid releaseId, bool isPrerelease = false);
+            Guid releaseVersionId,
+            bool isPrerelease = false);
     }
 }

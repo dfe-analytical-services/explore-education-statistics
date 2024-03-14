@@ -59,15 +59,15 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -80,7 +80,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(ReleaseId: publication1.Releases[0].Id);
+                var query = new DataSetsListRequest(ReleaseId: publication1.ReleaseVersions[0].Id);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
@@ -98,15 +98,15 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -137,7 +137,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     // Publications have different themes
                     .WithTopics(_fixture.DefaultTopic()
@@ -147,8 +147,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -182,16 +182,16 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                            .DefaultRelease(publishedVersions: 1, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
-                var release2Version1Files = GenerateDataSetsForRelease(publication.Releases[1]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release2Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -206,7 +206,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication.Releases[1].Id,
+                    ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
                 };
                 var response = await ListDataSets(client, query);
@@ -229,16 +229,16 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // The 2021/22 Academic year will be the latest release in reverse chronological order.
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2021),
+                            .DefaultRelease(publishedVersions: 1, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
-                var release2Version1Files = GenerateDataSetsForRelease(publication.Releases[1]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release2Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -253,7 +253,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication.Releases[1].Id,
+                    ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = true
                 };
                 var response = await ListDataSets(client, query);
@@ -276,20 +276,20 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has a published and unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication1Release1Version2Files = GenerateDataSetsForRelease(publication1.Releases[1]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release1Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -305,7 +305,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication1.Releases[1].Id,
+                    ReleaseId = publication1.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
                 };
                 var response = await ListDataSets(client, query);
@@ -327,14 +327,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // Set up a publication with a release that has 2 published versions
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
-                var release1Version2Files = GenerateDataSetsForRelease(publication.Releases[1]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version2Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -349,7 +349,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication.Releases[0].Id,
+                    ReleaseId = publication.ReleaseVersions[0].Id,
                     LatestOnly = latestOnly
                 };
                 var response = await ListDataSets(client, query);
@@ -370,19 +370,19 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -412,11 +412,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .DefaultPublication()
                     // Index 0 has an unpublished release version
                     // Index 1 has a published release version
-                    .ForIndex(0, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .ForIndex(0, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1)))
-                    .ForIndex(1, p => p.SetReleaseParents(_fixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .ForIndex(1, p => p.SetReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1)))
                     // Publications have different themes
                     .WithTopics(_fixture.DefaultTopic()
@@ -426,8 +426,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -455,12 +455,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -472,7 +472,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
-                    publication.Releases,
+                    publication.ReleaseVersions,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -501,18 +501,18 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
-                    publication.Releases,
+                    publication.ReleaseVersions,
                     release1Version1Files);
 
                 var client = BuildApp(contentDbContext.Object)
@@ -539,23 +539,23 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // reverse chronological order with a published release version for both publications.
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2022),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2022),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2021),
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2021),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020)))
+                            .DefaultRelease(publishedVersions: 1, year: 2020)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication1Release2Version1Files = GenerateDataSetsForRelease(publication1.Releases[1]);
-                var publication1Release2Version2Files = GenerateDataSetsForRelease(publication1.Releases[2]);
-                var publication1Release2Version3Files = GenerateDataSetsForRelease(publication1.Releases[3]);
-                var publication1Release3Version1Files = GenerateDataSetsForRelease(publication1.Releases[4]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release2Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication1Release2Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[2]);
+                var publication1Release2Version3Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[3]);
+                var publication1Release3Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[4]);
 
                 var publication1ReleaseFiles = publication1Release1Version1Files
                     .Concat(publication1Release2Version1Files)
@@ -564,11 +564,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication1Release3Version1Files)
                     .ToList();
 
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
-                var publication2Release2Version1Files = GenerateDataSetsForRelease(publication2.Releases[1]);
-                var publication2Release2Version2Files = GenerateDataSetsForRelease(publication2.Releases[2]);
-                var publication2Release2Version3Files = GenerateDataSetsForRelease(publication2.Releases[3]);
-                var publication2Release3Version1Files = GenerateDataSetsForRelease(publication2.Releases[4]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication2Release2Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[1]);
+                var publication2Release2Version2Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[2]);
+                var publication2Release2Version3Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[3]);
+                var publication2Release3Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[4]);
 
                 var publication2ReleaseFiles = publication2Release1Version1Files
                     .Concat(publication2Release2Version1Files)
@@ -613,23 +613,23 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 // unpublished versions
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_ => ListOf<ReleaseParent>(
+                    .WithReleases(_ => ListOf<Release>(
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true),
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true),
                         _fixture
-                            .DefaultReleaseParent(publishedVersions: 1)))
+                            .DefaultRelease(publishedVersions: 1)))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication1Release2Version1Files = GenerateDataSetsForRelease(publication1.Releases[1]);
-                var publication1Release2Version2Files = GenerateDataSetsForRelease(publication1.Releases[2]);
-                var publication1Release2Version3Files = GenerateDataSetsForRelease(publication1.Releases[3]);
-                var publication1Release3Version1Files = GenerateDataSetsForRelease(publication1.Releases[4]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release2Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication1Release2Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[2]);
+                var publication1Release2Version3Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[3]);
+                var publication1Release3Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[4]);
 
                 var publication1ReleaseFiles = publication1Release1Version1Files
                     .Concat(publication1Release2Version1Files)
@@ -638,11 +638,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication1Release3Version1Files)
                     .ToList();
 
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
-                var publication2Release2Version1Files = GenerateDataSetsForRelease(publication2.Releases[1]);
-                var publication2Release2Version2Files = GenerateDataSetsForRelease(publication2.Releases[2]);
-                var publication2Release2Version3Files = GenerateDataSetsForRelease(publication2.Releases[3]);
-                var publication2Release3Version1Files = GenerateDataSetsForRelease(publication2.Releases[4]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication2Release2Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[1]);
+                var publication2Release2Version2Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[2]);
+                var publication2Release2Version3Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[3]);
+                var publication2Release3Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[4]);
 
                 var publication2ReleaseFiles = publication2Release1Version1Files
                     .Concat(publication2Release2Version1Files)
@@ -688,15 +688,15 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1.Releases[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2.Releases[0]);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -740,12 +740,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply a descending sequence of titles to the data set files
                 release1Version1Files[0].Name = "b";
@@ -784,12 +784,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply an ascending sequence of titles to the data set files
                 release1Version1Files[0].Name = "a";
@@ -831,12 +831,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply a descending natural order to the data set files
                 release1Version1Files[0].Order = 1;
@@ -851,7 +851,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication.Releases[0].Id,
+                    ReleaseId = publication.ReleaseVersions[0].Id,
                     OrderBy = DataSetsListRequestOrderBy.Natural,
                     Sort = sortOrder
                 };
@@ -877,12 +877,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply an ascending natural order to the data set files
                 release1Version1Files[0].Order = 0;
@@ -897,7 +897,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    ReleaseId = publication.Releases[0].Id,
+                    ReleaseId = publication.ReleaseVersions[0].Id,
                     OrderBy = DataSetsListRequestOrderBy.Natural,
                     Sort = SortOrder.Desc
                 };
@@ -924,22 +924,22 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1 = publication1.Releases[0];
-                var publication2Release1Version1 = publication2.Releases[0];
+                var publication1Release1Version1 = publication1.ReleaseVersions[0];
+                var publication2Release1Version1 = publication2.ReleaseVersions[0];
 
                 // Apply a descending sequence of published dates to the releases
                 publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
                 publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1Release1Version1);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2Release1Version1);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1Release1Version1);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2Release1Version1);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -985,22 +985,22 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
                     // Publications each have a published release version
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()))
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1 = publication1.Releases[0];
-                var publication2Release1Version1 = publication2.Releases[0];
+                var publication1Release1Version1 = publication1.ReleaseVersions[0];
+                var publication2Release1Version1 = publication2.ReleaseVersions[0];
 
                 // Apply an ascending sequence of published dates to the releases
                 publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
                 publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
 
-                var publication1Release1Version1Files = GenerateDataSetsForRelease(publication1Release1Version1);
-                var publication2Release1Version1Files = GenerateDataSetsForRelease(publication2Release1Version1);
+                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1Release1Version1);
+                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2Release1Version1);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1042,12 +1042,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0], numberOfDataSets: 3);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -1060,7 +1060,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
-                    publication.Releases,
+                    publication.ReleaseVersions,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -1098,12 +1098,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0], numberOfDataSets: 3);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -1116,7 +1116,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
-                    publication.Releases,
+                    publication.ReleaseVersions,
                     release1Version1Files,
                     freeTextRanks);
 
@@ -1158,7 +1158,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1166,13 +1166,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForRelease(supersedingPublication.Releases[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForRelease(supersededPublication.Releases[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1205,7 +1205,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1213,13 +1213,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForRelease(supersedingPublication.Releases[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForRelease(supersededPublication.Releases[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1252,7 +1252,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication supersedingPublication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
@@ -1260,13 +1260,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 Publication supersededPublication = _fixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForRelease(supersedingPublication.Releases[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForRelease(supersededPublication.Releases[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1527,12 +1527,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 Publication publication = _fixture
                     .DefaultPublication()
-                    .WithReleaseParents(_fixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForRelease(publication.Releases[0]);
+                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
 
                 release1Version1Files.ForEach(releaseFile =>
                 {
@@ -1592,8 +1592,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var (releaseFile, viewModel) = tuple;
 
-                var release = releaseFile.Release;
-                var publication = release.Publication;
+                var releaseVersion = releaseFile.ReleaseVersion;
+                var publication = releaseVersion.Publication;
                 var theme = publication.Topic.Theme;
 
                 Assert.Multiple(
@@ -1603,35 +1603,36 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal("csv", viewModel.FileExtension),
                     () => Assert.Equal(releaseFile.Name, viewModel.Title),
                     () => Assert.Equal(releaseFile.Summary, viewModel.Content),
-                    () => Assert.Equal(release.Id, viewModel.Release.Id),
-                    () => Assert.Equal(release.Title, viewModel.Release.Title),
+                    () => Assert.Equal(releaseVersion.Id, viewModel.Release.Id),
+                    () => Assert.Equal(releaseVersion.Title, viewModel.Release.Title),
                     () => Assert.Equal(publication.Id, viewModel.Publication.Id),
                     () => Assert.Equal(publication.Title, viewModel.Publication.Title),
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
-                    () => Assert.Equal(release.Id == publication.LatestPublishedReleaseId, viewModel.LatestData),
-                    () => Assert.Equal(releaseFile.Release.Published!.Value, viewModel.Published)
+                    () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId, viewModel.LatestData),
+                    () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published)
                 );
             });
         }
 
-        private List<ReleaseFile> GenerateDataSetsForRelease(Release release, int numberOfDataSets = 2)
+        private List<ReleaseFile> GenerateDataSetsForReleaseVersion(ReleaseVersion releaseVersion,
+            int numberOfDataSets = 2)
         {
             return _fixture.DefaultReleaseFile()
-                .WithRelease(release)
+                .WithReleaseVersion(releaseVersion)
                 .WithFiles(_fixture.DefaultFile()
                     .GenerateList(numberOfDataSets))
                 .GenerateList();
         }
 
         private static Mock<ContentDbContext> ContentDbContextMock(
-            IEnumerable<Release>? releases = null,
+            IEnumerable<ReleaseVersion>? releaseVersions = null,
             IEnumerable<ReleaseFile>? releaseFiles = null,
             IEnumerable<FreeTextRank>? freeTextRanks = null)
         {
             var contentDbContext = new Mock<ContentDbContext>();
-            contentDbContext.Setup(context => context.Releases)
-                .Returns((releases ?? Array.Empty<Release>()).AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.ReleaseVersions)
+                .Returns((releaseVersions ?? Array.Empty<ReleaseVersion>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFiles)
                 .Returns((releaseFiles ?? Array.Empty<ReleaseFile>()).AsQueryable().BuildMockDbSet().Object);
             contentDbContext.Setup(context => context.ReleaseFilesFreeTextTable(It.IsAny<string>()))
@@ -1650,14 +1651,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task FetchDataSetDetails_Success()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[0])
+                .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
             var client = BuildApp()
@@ -1667,7 +1668,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
 
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetDetailsViewModel>();
@@ -1681,12 +1682,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             Assert.Equal(file.Filename, viewModel.File.Name);
             Assert.Equal(file.DisplaySize(), viewModel.File.Size);
 
-            Assert.Equal(releaseFile.ReleaseId, viewModel.Release.Id);
-            Assert.Equal(releaseFile.Release.Title, viewModel.Release.Title);
-            Assert.Equal(releaseFile.Release.Slug, viewModel.Release.Slug);
-            Assert.Equal(releaseFile.Release.Type, viewModel.Release.Type);
+            Assert.Equal(releaseFile.ReleaseVersionId, viewModel.Release.Id);
+            Assert.Equal(releaseFile.ReleaseVersion.Title, viewModel.Release.Title);
+            Assert.Equal(releaseFile.ReleaseVersion.Slug, viewModel.Release.Slug);
+            Assert.Equal(releaseFile.ReleaseVersion.Type, viewModel.Release.Type);
             Assert.True(viewModel.Release.IsLatestPublishedRelease);
-            Assert.Equal(releaseFile.Release.Published, viewModel.Release.Published);
+            Assert.Equal(releaseFile.ReleaseVersion.Published, viewModel.Release.Published);
 
             Assert.Equal(publication.Id, viewModel.Release.Publication.Id);
             Assert.Equal(publication.Title, viewModel.Release.Publication.Title);
@@ -1698,14 +1699,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task NoRelease_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[0])
+                .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
             var client = BuildApp()
@@ -1726,14 +1727,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task NoFile_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[0])
+                .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
             var client = BuildApp()
@@ -1743,7 +1744,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{publication.Releases[0].Id}/data-sets/{Guid.NewGuid()}";
+            var uri = $"/api/releases/{publication.ReleaseVersions[0].Id}/data-sets/{Guid.NewGuid()}";
 
             var response = await client.GetAsync(uri);
 
@@ -1754,14 +1755,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task ReleaseNotPublished_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
 
             ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[0])
+                .WithReleaseVersion(publication.ReleaseVersions[0])
                 .WithFile(_fixture.DefaultFile());
 
             var client = BuildApp()
@@ -1771,7 +1772,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1782,8 +1783,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         public async Task AmendmentNotPublished_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
-                .WithReleaseParents(
-                    _fixture.DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: true)
                         .Generate(1))
                 .WithTopic(_fixture.DefaultTopic()
                     .WithTheme(_fixture.DefaultTheme()));
@@ -1791,15 +1792,15 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             File file = _fixture.DefaultFile();
 
             ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[0]) // the previous published version
+                .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version
                 .WithFile(file);
 
             ReleaseFile releaseFile1 = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[1]) // the latest published version
+                .WithReleaseVersion(publication.ReleaseVersions[1]) // the latest published version
                 .WithFile(file);
 
             ReleaseFile releaseFile2 = _fixture.DefaultReleaseFile()
-                .WithRelease(publication.Releases[2]) // the draft version
+                .WithReleaseVersion(publication.ReleaseVersions[2]) // the draft version
                 .WithFile(file);
 
             var client = BuildApp()
@@ -1809,7 +1810,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{publication.Releases[2].Id}/data-sets/{releaseFile2.FileId}";
+            var uri = $"/api/releases/{publication.ReleaseVersions[2].Id}/data-sets/{releaseFile2.FileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1824,12 +1825,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             .ResetDbContexts()
             .ConfigureServices(services =>
             {
-                services.AddTransient<IReleaseRepository>(s => new ReleaseRepository(
+                services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
                     contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
                 services.AddTransient<IDataSetService>(
                     s => new DataSetService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
-                        s.GetRequiredService<IReleaseRepository>()));
+                        s.GetRequiredService<IReleaseVersionRepository>()));
             });
     }
 }

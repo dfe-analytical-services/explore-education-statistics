@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendReleaseRoleEmail()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication
@@ -125,10 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var expectedValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://admin-uri/publication/{release.Publication.Id}/release/{release.Id}/summary"},
-                {"role", Contributor.ToString()},
-                {"publication", "Test Publication"},
-                {"release", "December 2020"}
+                {
+                    "url",
+                    $"https://admin-uri/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                },
+                { "role", Contributor.ToString() },
+                { "publication", "Test Publication" },
+                { "release", "December 2020" }
             };
 
             var emailService = new Mock<IEmailService>(Strict);
@@ -143,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            var result = service.SendReleaseRoleEmail("test@test.com", release, Contributor);
+            var result = service.SendReleaseRoleEmail("test@test.com", releaseVersion, Contributor);
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -162,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void SendReleaseHigherReviewEmail()
         {
             const string expectedTemplateId = "notify-release-higher-reviewers-template-id";
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication
@@ -173,12 +176,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseName = "2020",
                 TimePeriodCoverage = December
             };
-            
+
             var expectedValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://admin-uri/publication/{release.Publication.Id}/release/{release.Id}/summary"},
-                {"publication", release.Publication.Title},
-                {"release", release.Title},
+                {
+                    "url",
+                    $"https://admin-uri/publication/{releaseVersion.Publication.Id}/release/{releaseVersion.Id}/summary"
+                },
+                { "publication", releaseVersion.Publication.Title },
+                { "release", releaseVersion.Title },
             };
 
             var emailService = new Mock<IEmailService>(Strict);
@@ -193,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            var result = service.SendReleaseHigherReviewEmail("test@test.com", release);
+            var result = service.SendReleaseHigherReviewEmail("test@test.com", releaseVersion);
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -270,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IEmailService? emailService = null,
             IConfiguration? configuration = null)
         {
-            return new (
+            return new(
                 emailService ?? Mock.Of<IEmailService>(Strict),
                 configuration ?? ConfigurationMock().Object);
         }

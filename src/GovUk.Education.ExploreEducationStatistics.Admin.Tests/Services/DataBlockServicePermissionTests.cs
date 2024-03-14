@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class DataBlockServicePermissionTests
     {
-        private static readonly Release Release = new()
+        private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -32,14 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly DataBlockVersion DataBlockVersion = new()
         {
             Id = Guid.NewGuid(),
-            Release = Release
+            ReleaseVersion = ReleaseVersion
         };
 
         [Fact]
         public async Task Get()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -52,12 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetDeletePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.GetDeletePlan(Release.Id, DataBlockVersion.Id);
+                        return service.GetDeletePlan(ReleaseVersion.Id, DataBlockVersion.Id);
                     });
         }
 
@@ -65,12 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Create()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Create(Release.Id, new DataBlockCreateViewModel());
+                        return service.Create(ReleaseVersion.Id, new DataBlockCreateViewModel());
                     });
         }
 
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Update()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -91,12 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Delete()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(Release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Delete(Release.Id, DataBlockVersion.Id);
+                        return service.Delete(ReleaseVersion.Id, DataBlockVersion.Id);
                     });
         }
 
@@ -104,12 +104,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetUnattachedDataBlocks()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.GetUnattachedDataBlocks(Release.Id);
+                        return service.GetUnattachedDataBlocks(ReleaseVersion.Id);
                     }
                 );
         }
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelperMock()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(persistenceHelper, Release.Id, Release);
+            MockUtils.SetupCall(persistenceHelper, ReleaseVersion.Id, ReleaseVersion);
             MockUtils.SetupCall<ContentDbContext, DataBlockVersion>(persistenceHelper, DataBlockVersion);
             return persistenceHelper;
         }

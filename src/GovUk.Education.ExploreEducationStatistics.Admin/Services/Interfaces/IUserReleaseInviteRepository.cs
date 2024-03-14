@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,27 +8,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserReleaseInviteRepository
     {
-        Task Create(Guid releaseId,
+        Task Create(Guid releaseVersionId,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
             Guid createdById,
             DateTime? createdDate = null);
 
-        Task CreateManyIfNotExists(List<Guid> releaseIds,
+        Task CreateManyIfNotExists(List<Guid> releaseVersionIds,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
             Guid createdById,
             DateTime? createdDate = null);
 
-        Task Remove(Guid releaseId, string email, ReleaseRole role);
+        Task Remove(Guid releaseVersionId,
+            string email,
+            ReleaseRole role);
 
-        Task<bool> UserHasInvite(Guid releaseId, string email, ReleaseRole role);
+        Task<bool> UserHasInvite(Guid releaseVersionId,
+            string email,
+            ReleaseRole role);
 
-        Task<bool> UserHasInvites(List<Guid> releaseIds, string email, ReleaseRole role);
+        Task<bool> UserHasInvites(List<Guid> releaseVersionIds,
+            string email,
+            ReleaseRole role);
 
-        Task RemoveByPublication(Publication publication, string email, ReleaseRole role);
+        Task RemoveByPublication(Publication publication,
+            string email,
+            ReleaseRole role);
 
         Task<List<UserReleaseInvite>> ListByEmail(string email);
     }

@@ -54,7 +54,7 @@ public static class LocationMetaGeneratorExtensions
         => setters
             .Set(
                 m => m.Level,
-                (_, _, context) => GeographicLevelUtils.Levels[context.Index % GeographicLevelUtils.Levels.Length]
+                (_, _, context) => GeographicLevelUtils.Levels[context.Index % GeographicLevelUtils.Levels.Count]
             );
 
     public static InstanceSetters<LocationMeta> SetDataSetVersion(

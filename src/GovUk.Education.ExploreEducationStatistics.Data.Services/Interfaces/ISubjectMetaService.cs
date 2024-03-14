@@ -14,19 +14,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ISubjectMetaService
     {
-        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId);
+        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId,
+            Guid subjectId);
 
         Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject);
 
-        Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseId,
+        Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseVersionId,
             ObservationQueryContext query,
             CancellationToken cancellationToken);
 
-        Task<Either<ActionResult, Unit>> UpdateSubjectFilters(Guid releaseId,
+        Task<Either<ActionResult, Unit>> UpdateSubjectFilters(Guid releaseVersionId,
             Guid subjectId,
             List<FilterUpdateViewModel> request);
 
-        Task<Either<ActionResult, Unit>> UpdateSubjectIndicators(Guid releaseId,
+        Task<Either<ActionResult, Unit>> UpdateSubjectIndicators(Guid releaseVersionId,
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request);
     }

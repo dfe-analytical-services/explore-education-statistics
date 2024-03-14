@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static readonly Guid FootnoteId = Guid.NewGuid();
 
-        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
 
         public FootnoteControllerTests()
         {
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             footnoteService.Setup(s => s.CreateFootnote(
-                    ReleaseId,
+                    ReleaseVersionId,
                     "Sample footnote",
                     It.IsAny<IReadOnlySet<Guid>>(),
                     It.IsAny<IReadOnlySet<Guid>>(),
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .ReturnsAsync(footnote);
 
             footnoteService.Setup(s => s.UpdateFootnote(
-                    ReleaseId,
+                    ReleaseVersionId,
                     FootnoteId,
                     "Updated sample footnote",
                     It.IsAny<IReadOnlySet<Guid>>(),
@@ -79,15 +79,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Subjects = new List<SubjectFootnote>()
                 });
 
-            footnoteService.Setup(s => s.GetFootnotes(ReleaseId))
+            footnoteService.Setup(s => s.GetFootnotes(ReleaseVersionId))
                 .ReturnsAsync(new List<Footnote>
                 {
                     footnote
                 });
 
-            footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
+            footnoteService.Setup(s => s.DeleteFootnote(ReleaseVersionId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
-            releaseService.Setup(s => s.ListSubjects(ReleaseId))
+            releaseService.Setup(s => s.ListSubjects(ReleaseVersionId))
                 .ReturnsAsync(
                     subjectIds
                         .Select(
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateFootnote()
         {
-            var result = await _controller.CreateFootnote(ReleaseId,
+            var result = await _controller.CreateFootnote(ReleaseVersionId,
                 new FootnoteCreateRequest
                 {
                     Content = "Sample footnote",
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetFootnotes()
         {
-            var result = await _controller.GetFootnotes(ReleaseId);
+            var result = await _controller.GetFootnotes(ReleaseVersionId);
 
             result.AssertOkResult();
         }
@@ -198,8 +198,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task UpdateFootnote()
         {
-            var result = await _controller.UpdateFootnote(ReleaseId,
-                FootnoteId,
+            var result = await _controller.UpdateFootnote(releaseVersionId: ReleaseVersionId,
+                footnoteId: FootnoteId,
                 new FootnoteUpdateRequest
                 {
                     Content = "Updated sample footnote",

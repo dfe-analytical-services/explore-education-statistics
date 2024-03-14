@@ -92,7 +92,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
                     predicate: rf =>
                         rf.File.SubjectId == releaseSubject.SubjectId
                         && rf.File.Type == FileType.Data
-                        && rf.ReleaseId == releaseSubject.ReleaseId,
+                        && rf.ReleaseVersionId == releaseSubject.ReleaseVersionId,
                     cancellationToken: cancellationToken
                 );
 
@@ -102,8 +102,9 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         {
             _logger.LogError(
                 exception,
-                message: "Could not get file for release subject (ReleaseId = {ReleaseId}, SubjectId = {SubjectId})",
-                releaseSubject.ReleaseId, releaseSubject.SubjectId);
+                message:
+                "Could not get file for release subject (ReleaseVersionId = {ReleaseVersionId}, SubjectId = {SubjectId})",
+                releaseSubject.ReleaseVersionId, releaseSubject.SubjectId);
 
             return null;
         }

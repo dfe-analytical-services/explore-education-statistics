@@ -36,24 +36,4 @@ public record PublicationSummaryViewModel
 /// <summary>
 /// A paginated list of publication summaries.
 /// </summary>
-public record PublicationPaginatedListViewModel : PaginatedListViewModel<PublicationSummaryViewModel>
-{
-    public PublicationPaginatedListViewModel(
-        List<PublicationSummaryViewModel> results,
-        int totalResults,
-        int page,
-        int pageSize)
-        : base(
-            results: results,
-            totalResults: totalResults,
-            page: page,
-            pageSize: pageSize)
-    {
-    }
-
-    [JsonConstructor]
-    public PublicationPaginatedListViewModel(List<PublicationSummaryViewModel> results, PagingViewModel paging)
-        : base(results, paging)
-    {
-    }
-}
+public record PublicationPaginatedListViewModel : PaginatedListViewModel<PublicationSummaryViewModel>;

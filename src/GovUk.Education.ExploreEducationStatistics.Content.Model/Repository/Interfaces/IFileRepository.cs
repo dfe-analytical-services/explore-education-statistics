@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
@@ -11,7 +12,7 @@ public interface IFileRepository
     public Task<File> Get(Guid id);
 
     Task<File> Create(
-        Guid releaseId,
+        Guid releaseVersionId,
         string filename,
         long contentLength,
         string contentType,

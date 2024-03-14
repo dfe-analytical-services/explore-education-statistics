@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task GetLatestVersionByRelease()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Publication = new Publication
                 {
@@ -111,13 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
+            methodologyVersionRepository.Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
                 .ReturnsAsync(methodologies);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository.Object);
 
-                var result = await service.GetLatestVersionByRelease(release);
+                var result = await service.GetLatestVersionByRelease(releaseVersion);
 
                 Assert.Equal(methodologies, result);
             }
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var methodologyService = SetupMethodologyService(contentDbContext);
             var result = await methodologyService.IsBeingPublishedAlongsideRelease(
                 methodologyVersion,
-                new Release());
+                new ReleaseVersion());
             Assert.False(result);
         }
 
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublishingStrategy = Immediately,
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 PublicationId = Guid.NewGuid(),
             };
@@ -166,14 +166,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(release.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
                 publicationRepository: publicationRepository.Object);
             var result = await methodologyService.IsBeingPublishedAlongsideRelease(
                 methodologyVersion,
-                release);
+                releaseVersion);
             Assert.True(result);
         }
 
@@ -186,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 PublishingStrategy = Immediately,
             };
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 PublicationId = Guid.NewGuid(),
             };
@@ -194,21 +194,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(release.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
                 .ReturnsAsync(true);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
                 publicationRepository: publicationRepository.Object);
             var result = await methodologyService.IsBeingPublishedAlongsideRelease(
                 methodologyVersion,
-                release);
+                releaseVersion);
             Assert.False(result);
         }
 
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_WithRelease()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
@@ -218,27 +218,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = release.Id,
+                ScheduledWithReleaseVersionId = releaseVersion.Id,
             };
 
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(release.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
                 publicationRepository: publicationRepository.Object);
             var result = await methodologyService.IsBeingPublishedAlongsideRelease(
                 methodologyVersion,
-                release);
+                releaseVersion);
             Assert.True(result);
         }
 
         [Fact]
         public async Task IsBeingPublishedAlongsideRelease_WithRelease_IncorrectRelease()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 PublicationId = Guid.NewGuid(),
@@ -248,20 +248,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = Guid.NewGuid(),
+                ScheduledWithReleaseVersionId = Guid.NewGuid(),
             };
 
             await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
-            publicationRepository.Setup(mock => mock.IsPublished(release.PublicationId))
+            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
                 .ReturnsAsync(false);
 
             var methodologyService = SetupMethodologyService(contentDbContext,
                 publicationRepository: publicationRepository.Object);
             var result = await methodologyService.IsBeingPublishedAlongsideRelease(
                 methodologyVersion,
-                release);
+                releaseVersion);
             Assert.False(result);
         }
 

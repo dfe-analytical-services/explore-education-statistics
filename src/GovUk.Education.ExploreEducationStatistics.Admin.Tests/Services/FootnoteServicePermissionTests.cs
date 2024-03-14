@@ -20,13 +20,13 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class FootnoteServicePermissionTests
     {
-        private static readonly Release Release = new()
+        private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .CreateFootnote(
-                        Release.Id,
+                        ReleaseVersion.Id,
                         "",
                         filterIds: SetOf<Guid>(),
                         filterGroupIds: SetOf<Guid>(),
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         indicatorIds: SetOf<Guid>(),
                         subjectIds: SetOf(Subject.Id)
                     ),
-                Release,
+                ReleaseVersion,
                 SecurityPolicies.CanUpdateSpecificRelease
             );
         }
@@ -73,9 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .DeleteFootnote(
-                        releaseId: Release.Id,
+                        releaseVersionId: ReleaseVersion.Id,
                         footnoteId: Footnote.Id),
-                Release,
+                ReleaseVersion,
                 SecurityPolicies.CanUpdateSpecificRelease
             );
         }
@@ -86,9 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .GetFootnote(
-                        releaseId: Release.Id,
+                        releaseVersionId: ReleaseVersion.Id,
                         footnoteId: Footnote.Id),
-                Release,
+                ReleaseVersion,
                 ContentSecurityPolicies.CanViewSpecificRelease
             );
         }
@@ -98,8 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await AssertSecurityPolicyChecked(
                 service => service
-                    .GetFootnotes(Release.Id),
-                Release,
+                    .GetFootnotes(ReleaseVersion.Id),
+                ReleaseVersion,
                 ContentSecurityPolicies.CanViewSpecificRelease
             );
         }
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .UpdateFootnote(
-                        releaseId: Release.Id,
+                        releaseVersionId: ReleaseVersion.Id,
                         footnoteId: Footnote.Id,
                         "",
                         filterIds: SetOf<Guid>(),
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         indicatorIds: SetOf<Guid>(),
                         subjectIds: SetOf(Subject.Id)
                     ),
-                Release,
+                ReleaseVersion,
                 SecurityPolicies.CanUpdateSpecificRelease
             );
         }
@@ -130,13 +130,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .UpdateFootnotes(
-                        Release.Id,
+                        ReleaseVersion.Id,
                         new FootnotesUpdateRequest
                         {
                             FootnoteIds = new List<Guid>()
                         }
                     ),
-                Release,
+                ReleaseVersion,
                 SecurityPolicies.CanUpdateSpecificRelease
             );
         }
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IReleaseSubjectRepository>) Mocks()
         {
             return (
-                MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
+                MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion),
                 new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
                 MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),

@@ -133,21 +133,21 @@ public class FileStoragePathUtilsTests
 
         [Theory]
         [ClassData(typeof(TestData))]
-        public void PrivateContentDataBlockPath(Guid releaseId,
+        public void PrivateContentDataBlockPath(Guid releaseVersionId,
             Guid dataBlockId)
         {
-            Assert.Equal($"releases/{releaseId}/data-blocks/{dataBlockId}.json",
-                FileStoragePathUtils.PrivateContentDataBlockPath(releaseId: releaseId,
+            Assert.Equal($"releases/{releaseVersionId}/data-blocks/{dataBlockId}.json",
+                FileStoragePathUtils.PrivateContentDataBlockPath(releaseVersionId: releaseVersionId,
                     dataBlockId: dataBlockId));
         }
 
         [Theory]
         [ClassData(typeof(TestData))]
-        public void PrivateContentSubjectMetaPath(Guid releaseId,
+        public void PrivateContentSubjectMetaPath(Guid releaseVersionId,
             Guid subjectId)
         {
-            Assert.Equal($"releases/{releaseId}/subject-meta/{subjectId}.json",
-                FileStoragePathUtils.PrivateContentSubjectMetaPath(releaseId: releaseId,
+            Assert.Equal($"releases/{releaseVersionId}/subject-meta/{subjectId}.json",
+                FileStoragePathUtils.PrivateContentSubjectMetaPath(releaseVersionId: releaseVersionId,
                     subjectId: subjectId));
         }
     }

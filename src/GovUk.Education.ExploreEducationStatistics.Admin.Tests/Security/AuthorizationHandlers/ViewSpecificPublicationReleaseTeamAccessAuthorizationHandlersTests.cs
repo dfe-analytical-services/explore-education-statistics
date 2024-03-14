@@ -96,7 +96,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     {
         return new ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
             new AuthorizationHandlerService(
-                new ReleaseRepository(InMemoryApplicationDbContext()),
+                new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
                 Mock.Of<IPreReleaseService>(Strict)));

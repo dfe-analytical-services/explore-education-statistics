@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,24 +11,24 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class UserReleaseRoleRepository :
-        AbstractUserResourceRoleRepository<UserReleaseRole, Release, ReleaseRole>, IUserReleaseRoleRepository
+        AbstractUserResourceRoleRepository<UserReleaseRole, ReleaseVersion, ReleaseRole>, IUserReleaseRoleRepository
     {
         public UserReleaseRoleRepository(ContentDbContext contentDbContext) : base(contentDbContext)
         {
         }
 
-        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseId)
+        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseVersionId)
         {
             return ContentDbContext
                 .UserReleaseRoles
-                .Where(role => role.ReleaseId == releaseId);
+                .Where(role => role.ReleaseVersionId == releaseVersionId);
         }
 
-        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceIds(List<Guid> releaseIds)
+        protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceIds(List<Guid> releaseVersionIds)
         {
             return ContentDbContext
                 .UserReleaseRoles
-                .Where(role => releaseIds.Contains(role.ReleaseId));
+                .Where(role => releaseVersionIds.Contains(role.ReleaseVersionId));
         }
 
         public async Task RemoveAllForPublication(Guid userId, Publication publication, ReleaseRole role,
@@ -37,17 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentDbContext.Update(publication);
             await ContentDbContext
                 .Entry(publication)
-                .Collection(p => p.Releases)
+                .Collection(p => p.ReleaseVersions)
                 .LoadAsync();
-            var allReleaseIds = publication
-                .Releases // Remove on previous release versions as well
-                .Select(r => r.Id)
+            var allReleaseVersionIds = publication
+                .ReleaseVersions // Remove on previous release versions as well
+                .Select(rv => rv.Id)
                 .ToList();
             var userReleaseRoles = await ContentDbContext.UserReleaseRoles
                 .AsQueryable()
                 .Where(urr =>
                     urr.UserId == userId
-                    && allReleaseIds.Contains(urr.ReleaseId)
+                    && allReleaseVersionIds.Contains(urr.ReleaseVersionId)
                     && urr.Role == role)
                 .ToListAsync();
             await RemoveMany(userReleaseRoles, deletedById);
@@ -58,39 +58,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return GetDistinctResourceRolesByUser(userId);
         }
 
-        public Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseId)
+        public Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseVersionId)
         {
-            return GetAllResourceRolesByUserAndResource(userId, releaseId);
+            return GetAllResourceRolesByUserAndResource(userId, releaseVersionId);
         }
 
         public Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
         {
             return ContentDbContext
                 .UserReleaseRoles
-                .Where(role => role.UserId == userId && role.Release.PublicationId == publicationId)
+                .Where(role => role.UserId == userId && role.ReleaseVersion.PublicationId == publicationId)
                 .Select(role => role.Role)
                 .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
         {
-            return await GetResourceRole(userId, releaseId, role);
+            return await GetResourceRole(userId, releaseVersionId, role);
         }
 
-        public Task<bool> HasUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public Task<bool> HasUserReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
         {
-            return UserHasRoleOnResource(userId, releaseId, role);
+            return UserHasRoleOnResource(userId, releaseVersionId, role);
         }
 
-        public Task<bool> HasUserReleaseRole(string email, Guid releaseId, ReleaseRole role)
+        public Task<bool> HasUserReleaseRole(string email, Guid releaseVersionId, ReleaseRole role)
         {
-            return UserHasRoleOnResource(email, releaseId, role);
+            return UserHasRoleOnResource(email, releaseVersionId, role);
         }
 
-        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude)
+        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseVersionId, ReleaseRole[]? rolesToInclude)
         {
-            return ListResourceRoles(releaseId, rolesToInclude);
+            return ListResourceRoles(releaseVersionId, rolesToInclude);
         }
     }
 }

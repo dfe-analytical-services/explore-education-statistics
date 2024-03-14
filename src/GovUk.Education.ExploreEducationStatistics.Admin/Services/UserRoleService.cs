@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<UsersAndRolesDbContext> _usersAndRolesPersistenceHelper;
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IUserService _userService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
             IUserService userService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesPersistenceHelper = usersAndRolesPersistenceHelper;
             _emailTemplateService = emailTemplateService;
             _userService = userService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
@@ -110,30 +110,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseVersionId, ReleaseRole role)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<Release>(releaseId, query => query
-                    .Include(r => r.Publication))
-                .OnSuccess(release =>
-                    _userService.CheckCanUpdateReleaseRole(release.Publication, role)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query
+                    .Include(rv => rv.Publication))
+                .OnSuccess(releaseVersion =>
+                    _userService.CheckCanUpdateReleaseRole(releaseVersion.Publication, role)
                     .OnSuccess(async () =>
                     {
                         return await _usersAndRolesPersistenceHelper
                             .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                            .OnSuccessDo(_ => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
+                            .OnSuccessDo(_ => ValidateReleaseRoleCanBeAdded(userId: userId,
+                                releaseVersionId: releaseVersionId,
+                                role))
                             .OnSuccess(async user =>
                             {
                                 await _userReleaseRoleRepository.Create(
-                                    userId,
-                                    release.Id,
+                                    userId: userId,
+                                    releaseVersionId: releaseVersion.Id,
                                     role,
                                     createdById: _userService.GetUserId());
 
                                 var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
                                 await UpgradeToGlobalRoleIfRequired(globalRole, user);
 
-                                return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
+                                return _emailTemplateService.SendReleaseRoleEmail(user.Email, releaseVersion, role);
                             });
                     })
                 );
@@ -393,25 +395,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var allReleaseRoles = await _contentDbContext.UserReleaseRoles
-                        .Include(userReleaseRole => userReleaseRole.Release)
-                        .ThenInclude(release => release.Publication)
+                        .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion.Publication)
                         .Where(userReleaseRole => userReleaseRole.UserId == userId)
                         .ToListAsync();
 
                     var latestReleaseRoles = await allReleaseRoles
                         .ToAsyncEnumerable()
                         .WhereAwait(async userReleaseRole =>
-                            await _releaseRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseId))
-                        .OrderBy(userReleaseRole => userReleaseRole.Release.Publication.Title)
-                        .ThenBy(userReleaseRole => userReleaseRole.Release.Year)
-                        .ThenBy(userReleaseRole => userReleaseRole.Release.TimePeriodCoverage)
+                            await _releaseVersionRepository.IsLatestReleaseVersion(userReleaseRole.ReleaseVersionId))
+                        .OrderBy(userReleaseRole => userReleaseRole.ReleaseVersion.Publication.Title)
+                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.Year)
+                        .ThenBy(userReleaseRole => userReleaseRole.ReleaseVersion.TimePeriodCoverage)
                         .ToListAsync();
 
                     return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
                         {
                             Id = userReleaseRole.Id,
-                            Publication = userReleaseRole.Release.Publication.Title,
-                            Release = userReleaseRole.Release.Title,
+                            Publication = userReleaseRole.ReleaseVersion.Publication.Title,
+                            Release = userReleaseRole.ReleaseVersion.Title,
                             Role = userReleaseRole.Role
                         })
                         .ToList();
@@ -441,16 +443,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId, query => query
                     .Include(userReleaseRole => userReleaseRole.User)
-                    .Include(userReleaseRole => userReleaseRole.Release)
-                    .ThenInclude(release => release.Publication))
+                    .Include(userReleaseRole => userReleaseRole.ReleaseVersion)
+                    .ThenInclude(releaseVersion => releaseVersion.Publication))
                 .OnSuccess(async userReleaseRole =>
                 {
                     return await _userService
-                        .CheckCanUpdateReleaseRole(userReleaseRole.Release.Publication, userReleaseRole.Role)
+                        .CheckCanUpdateReleaseRole(userReleaseRole.ReleaseVersion.Publication, userReleaseRole.Role)
                         .OnSuccessVoid(async () =>
                         {
                             await _userReleaseInviteRepository.Remove(
-                                userReleaseRole.Release.Id, userReleaseRole.User.Email, userReleaseRole.Role);
+                                userReleaseRole.ReleaseVersion.Id, userReleaseRole.User.Email, userReleaseRole.Role);
 
                             await _userReleaseRoleRepository.Remove(userReleaseRole,
                                 deletedById: _userService.GetUserId());
@@ -525,10 +527,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateReleaseRoleCanBeAdded(Guid userId,
-            Guid releaseId,
+            Guid releaseVersionId,
             ReleaseRole role)
         {
-            if (await _userReleaseRoleRepository.HasUserReleaseRole(userId, releaseId, role))
+            if (await _userReleaseRoleRepository.HasUserReleaseRole(userId, releaseVersionId, role))
             {
                 return ValidationActionResult(UserAlreadyHasResourceRole);
             }

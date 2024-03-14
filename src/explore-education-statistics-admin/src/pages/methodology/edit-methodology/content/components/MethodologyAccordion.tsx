@@ -12,6 +12,7 @@ export interface MethodologyAccordionProps {
   sectionKey: ContentSectionKeys;
   title: string;
   methodology: MethodologyContent;
+  onSectionOpen: ({ id, title }: { id: string; title: string }) => void;
 }
 
 const MethodologyAccordion = ({
@@ -19,6 +20,7 @@ const MethodologyAccordion = ({
   methodology,
   id = `methodologyAccordion-${sectionKey}`,
   title,
+  onSectionOpen,
 }: MethodologyAccordionProps) => {
   const { editingMode } = useEditingContext();
   const { addContentSection, updateContentSectionsOrder } =
@@ -65,6 +67,7 @@ const MethodologyAccordion = ({
       sectionName={title}
       onAddSection={onAddSection}
       onReorder={reorderAccordionSections}
+      onSectionOpen={onSectionOpen}
     >
       {methodology[sectionKey].map(section => (
         <MethodologyAccordionSection

@@ -46,17 +46,17 @@ public record ReleaseSummaryViewModel
         Publication = new PublicationSummaryViewModel(publication);
     }
 
-    public ReleaseSummaryViewModel(Release release, bool latestPublishedRelease)
+    public ReleaseSummaryViewModel(ReleaseVersion releaseVersion, bool latestPublishedRelease)
     {
-        Id = release.Id;
-        Title = release.Title;
-        Slug = release.Slug;
-        YearTitle = release.YearTitle;
-        CoverageTitle = release.TimePeriodCoverage.GetEnumLabel();
-        Published = release.Published;
-        ReleaseName = release.ReleaseName;
-        NextReleaseDate = release.NextReleaseDate;
-        Type = release.Type;
+        Id = releaseVersion.Id;
+        Title = releaseVersion.Title;
+        Slug = releaseVersion.Slug;
+        YearTitle = releaseVersion.YearTitle;
+        CoverageTitle = releaseVersion.TimePeriodCoverage.GetEnumLabel();
+        Published = releaseVersion.Published;
+        ReleaseName = releaseVersion.ReleaseName;
+        NextReleaseDate = releaseVersion.NextReleaseDate;
+        Type = releaseVersion.Type;
         LatestRelease = latestPublishedRelease;
     }
 }

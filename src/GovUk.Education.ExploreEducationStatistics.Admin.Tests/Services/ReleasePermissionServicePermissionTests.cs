@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,13 +13,13 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleasePermissionServicePermissionTests
     {
-        private static readonly Release Release = new()
+        private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid()
         };
@@ -27,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Publication Publication = new()
         {
             Id = Guid.NewGuid(),
-            Releases = new List<Release>
+            ReleaseVersions = new List<ReleaseVersion>
             {
-                Release
+                ReleaseVersion
             }
         };
         
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.ListReleaseRoles(Release.Id, new [] { Contributor });
+                        return await service.ListReleaseRoles(ReleaseVersion.Id, new [] { Contributor });
                     }
                 });
         }
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.ListReleaseInvites(Release.Id);
+                        return await service.ListReleaseInvites(ReleaseVersion.Id);
                     }
                 });
         }
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.UpdateReleaseContributors(Release.Id, new List<Guid>());
+                        return await service.UpdateReleaseContributors(ReleaseVersion.Id, new List<Guid>());
                     }
                 });
         }
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                new ReleaseRepository(contentDbContext),
+                new ReleaseVersionRepository(contentDbContext),
                 new UserReleaseRoleRepository(contentDbContext),
                 new UserReleaseInviteRepository(contentDbContext),
                 userService

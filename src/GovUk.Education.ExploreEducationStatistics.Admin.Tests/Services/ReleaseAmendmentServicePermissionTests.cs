@@ -19,27 +19,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseAmendmentServicePermissionTests
     {
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication(),
-            ReleaseParent = new ReleaseParent()
+            Release = new Release()
         };
 
         [Fact]
         public async Task CreateReleaseAmendment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanMakeAmendmentOfSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanMakeAmendmentOfSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         using var contentDbContext = InMemoryApplicationDbContext();
-                        contentDbContext.Releases.Add(_release);
+                        contentDbContext.ReleaseVersions.Add(_releaseVersion);
                         contentDbContext.SaveChanges();
 
                         var service = BuildService(userService.Object, contentDbContext);
-                        return service.CreateReleaseAmendment(_release.Id);
+                        return service.CreateReleaseAmendment(_releaseVersion.Id);
                     }
                 );
         }

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -21,8 +21,8 @@ public class SubjectRepositoryTests
         {
             ReleaseSubject releaseSubject = _dataFixture
                 .DefaultReleaseSubject()
-                .WithRelease(_dataFixture
-                    .DefaultStatsRelease());
+                .WithReleaseVersion(_dataFixture
+                    .DefaultStatsReleaseVersion());
 
             var contextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -36,7 +36,7 @@ public class SubjectRepositoryTests
                 var service = BuildService(statisticsDbContext);
 
                 var result = await service.FindPublicationIdForSubject(releaseSubject.SubjectId);
-                Assert.Equal(releaseSubject.Release.PublicationId, result);
+                Assert.Equal(releaseSubject.ReleaseVersion.PublicationId, result);
             }
         }
 

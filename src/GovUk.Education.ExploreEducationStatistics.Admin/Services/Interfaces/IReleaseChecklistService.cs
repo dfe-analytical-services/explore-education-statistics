@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,14 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IReleaseChecklistService
 {
-    public interface IReleaseChecklistService
-    {
-        Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseId);
+    Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId);
 
-        Task<List<ReleaseChecklistIssue>> GetErrors(Release release);
+    Task<List<ReleaseChecklistIssue>> GetErrors(ReleaseVersion releaseVersion);
 
-        Task<List<ReleaseChecklistIssue>> GetWarnings(Release release);
-    }
+    Task<List<ReleaseChecklistIssue>> GetWarnings(ReleaseVersion releaseVersion);
 }

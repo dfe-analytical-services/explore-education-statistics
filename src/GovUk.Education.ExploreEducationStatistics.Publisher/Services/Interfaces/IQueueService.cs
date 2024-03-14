@@ -1,17 +1,17 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+
+public interface IQueueService
 {
-    public interface IQueueService
-    {
-        Task QueueGenerateStagedReleaseContentMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
+    Task QueueGenerateStagedReleaseContentMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases);
 
-        Task QueuePublishReleaseContentMessage(Guid releaseId, Guid releaseStatusId);
-        
-        Task QueuePublishReleaseFilesMessage(Guid releaseId, Guid releaseStatusId);
+    Task QueuePublishReleaseContentMessage(Guid releaseVersionId, Guid releaseStatusId);
 
-        Task QueuePublishReleaseFilesMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
-    }
+    Task QueuePublishReleaseFilesMessage(Guid releaseVersionId, Guid releaseStatusId);
+
+    Task QueuePublishReleaseFilesMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases);
 }

@@ -83,8 +83,8 @@ const ReleaseContentPageLoaded = () => {
 
             <div
               className={classNames({
-                [styles.container]: editingMode === 'edit',
-                'govuk-width-container': editingMode !== 'table-preview',
+                [`govuk-width-container ${styles.container}`]:
+                  editingMode !== 'table-preview',
               })}
             >
               <div

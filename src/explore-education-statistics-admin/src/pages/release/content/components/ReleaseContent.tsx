@@ -30,7 +30,8 @@ import ScrollableContainer from '@common/components/ScrollableContainer';
 import Tag from '@common/components/Tag';
 import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
-import React, { useCallback, useMemo } from 'react';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 
 interface MethodologyLink {
@@ -46,8 +47,12 @@ const ReleaseContent = ({
 }) => {
   const config = useConfig();
   const location = useLocation();
-  const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
-    useEditingContext();
+  const {
+    editingMode,
+    setActiveSection,
+    unsavedBlocks,
+    unsavedCommentDeletions,
+  } = useEditingContext();
   const { release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 
@@ -121,6 +126,34 @@ const ReleaseContent = ({
     release.publication.releases.length +
     release.publication.legacyReleases.length;
 
+  const [handleScroll] = useDebouncedCallback(() => {
+    const sections = document.querySelectorAll('[data-scroll]');
+
+    // Set a section as active when it's in the top third of the page.
+    const buffer = window.innerHeight / 3;
+    const scrollPosition = window.scrollY + buffer;
+
+    sections.forEach(section => {
+      if (section) {
+        const { height } = section.getBoundingClientRect();
+        const { offsetTop } = section as HTMLElement;
+        const offsetBottom = offsetTop + height;
+
+        if (scrollPosition > offsetTop && scrollPosition < offsetBottom) {
+          setActiveSection(section.id);
+        }
+      }
+    });
+  }, 100);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+
   return (
     <>
       <RouteLeavingGuard
@@ -155,6 +188,7 @@ const ReleaseContent = ({
                 Sign up for email alerts
               </a>
             }
+            trackScroll
           />
 
           <div id="releaseSummary" data-testid="release-summary">
@@ -437,6 +471,8 @@ const ReleaseContent = ({
               />
             ) : null
           }
+          trackScroll
+          onSectionOpen={({ id }) => setActiveSection(id)}
         />
       )}
       {editingMode === 'edit' &&
@@ -452,6 +488,7 @@ const ReleaseContent = ({
         release={release}
         sectionName="Contents"
         transformFeaturedTableLinks={transformFeaturedTableLinks}
+        onSectionOpen={({ id }) => setActiveSection(id)}
       />
 
       <ReleaseHelpAndSupportSection
@@ -471,6 +508,7 @@ const ReleaseContent = ({
             )}
           </>
         )}
+        trackScroll
       />
       <PrintThisPage />
     </>

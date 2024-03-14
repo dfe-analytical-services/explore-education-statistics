@@ -18,6 +18,7 @@ interface Props {
   renderDownloadLink: (file: FileInfo) => ReactNode;
   renderRelatedDashboards?: ReactNode;
   showDownloadFilesList?: boolean;
+  trackScroll?: boolean;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
 }
 
@@ -31,6 +32,7 @@ const ReleaseDataAndFiles = ({
   renderDownloadLink,
   renderRelatedDashboards,
   showDownloadFilesList = false,
+  trackScroll = false,
   onSectionOpen,
 }: Props) => {
   const dataFiles = orderBy(
@@ -50,54 +52,59 @@ const ReleaseDataAndFiles = ({
 
   return (
     <>
-      <h2 className="govuk-heading-m" id="explore-data-and-files">
-        Explore data and files used in this release
-      </h2>
+      <div
+        id="data-and-files-section"
+        data-scroll={trackScroll ? true : undefined}
+      >
+        <h2 className="govuk-heading-m" id="explore-data-and-files">
+          Explore data and files used in this release
+        </h2>
 
-      <ChevronGrid testId="data-and-files">
-        <ChevronCard
-          description="View tables that we have built for you, or create your own tables from open data using our table tool"
-          link={renderCreateTablesLink}
-        />
-        {downloadFiles && (
-          <>
-            <ChevronCard
-              description="Browse and download open data files from this release in our data catalogue"
-              descriptionAfter={
-                showDownloadFilesList &&
-                dataFiles.length > 0 && (
-                  <Details
-                    summary="Download files"
-                    className="govuk-!-margin-bottom-0 govuk-!-margin-top-2 dfe-position--relative"
-                  >
-                    <ul className="govuk-list" data-testid="data-files">
-                      {dataFiles.map(file => (
-                        <li key={file.id}>{renderDownloadLink(file)}</li>
-                      ))}
-                    </ul>
-                  </Details>
-                )
-              }
-              link={renderDataCatalogueLink}
-            />
-
-            {hasDataGuidance && (
+        <ChevronGrid testId="data-and-files">
+          <ChevronCard
+            description="View tables that we have built for you, or create your own tables from open data using our table tool"
+            link={renderCreateTablesLink}
+          />
+          {downloadFiles && (
+            <>
               <ChevronCard
-                description="Learn more about the data files used in this release using our online guidance"
-                link={renderDataGuidanceLink}
+                description="Browse and download open data files from this release in our data catalogue"
+                descriptionAfter={
+                  showDownloadFilesList &&
+                  dataFiles.length > 0 && (
+                    <Details
+                      summary="Download files"
+                      className="govuk-!-margin-bottom-0 govuk-!-margin-top-2 dfe-position--relative"
+                    >
+                      <ul className="govuk-list" data-testid="data-files">
+                        {dataFiles.map(file => (
+                          <li key={file.id}>{renderDownloadLink(file)}</li>
+                        ))}
+                      </ul>
+                    </Details>
+                  )
+                }
+                link={renderDataCatalogueLink}
               />
-            )}
 
-            {hasAllFilesButton && (
-              <ChevronCard
-                description="Download all data available in this release as a compressed ZIP file"
-                link={renderAllFilesLink}
-                noChevron
-              />
-            )}
-          </>
-        )}
-      </ChevronGrid>
+              {hasDataGuidance && (
+                <ChevronCard
+                  description="Learn more about the data files used in this release using our online guidance"
+                  link={renderDataGuidanceLink}
+                />
+              )}
+
+              {hasAllFilesButton && (
+                <ChevronCard
+                  description="Download all data available in this release as a compressed ZIP file"
+                  link={renderAllFilesLink}
+                  noChevron
+                />
+              )}
+            </>
+          )}
+        </ChevronGrid>
+      </div>
 
       {(ancillaryFiles.length > 0 || renderRelatedDashboards) && (
         <Accordion
@@ -109,30 +116,37 @@ const ReleaseDataAndFiles = ({
             <AccordionSection
               id="supporting-files"
               heading="Additional supporting files"
+              trackScroll
             >
-              <p>
-                All supporting files from this release are listed for individual
-                download below:
-              </p>
-              <ul className="govuk-list" data-testid="other-files">
-                {ancillaryFiles.map(file => (
-                  <li
-                    key={file.id}
-                    className={`${styles.listItem} govuk-!-margin-bottom-4`}
-                  >
-                    <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
-                      {renderDownloadLink(file)}
-                    </h3>
-                    {file.summary && <p>{file.summary}</p>}
-                  </li>
-                ))}
-              </ul>
+              <div
+                data-scroll={trackScroll ? true : undefined}
+                id="supporting-files-inner"
+              >
+                <p>
+                  All supporting files from this release are listed for
+                  individual download below:
+                </p>
+                <ul className="govuk-list" data-testid="other-files">
+                  {ancillaryFiles.map(file => (
+                    <li
+                      key={file.id}
+                      className={`${styles.listItem} govuk-!-margin-bottom-4`}
+                    >
+                      <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
+                        {renderDownloadLink(file)}
+                      </h3>
+                      {file.summary && <p>{file.summary}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </AccordionSection>
           )}
           {renderRelatedDashboards && (
             <AccordionSection
               id="related-dashboards"
               heading="View related dashboard(s)"
+              trackScroll
             >
               {renderRelatedDashboards}
             </AccordionSection>

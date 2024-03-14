@@ -16,11 +16,13 @@ public static class DataBlockVersionGeneratorExtensions
     public static Generator<DataBlockVersion> WithDefaults(this Generator<DataBlockVersion> generator)
         => generator.ForInstance(d => d.SetDefaults());
 
-    public static Generator<DataBlockVersion> WithRelease(this Generator<DataBlockVersion> generator, Release release)
-        => generator.ForInstance(d => d.SetRelease(release));
+    public static Generator<DataBlockVersion> WithReleaseVersion(this Generator<DataBlockVersion> generator,
+        ReleaseVersion releaseVersion)
+        => generator.ForInstance(d => d.SetReleaseVersion(releaseVersion));
 
-    public static Generator<DataBlockVersion> WithReleaseId(this Generator<DataBlockVersion> generator, Guid releaseId)
-        => generator.ForInstance(d => d.SetReleaseId(releaseId));
+    public static Generator<DataBlockVersion> WithReleaseVersionId(this Generator<DataBlockVersion> generator,
+        Guid releaseVersionId)
+        => generator.ForInstance(d => d.SetReleaseVersionId(releaseVersionId));
 
     public static Generator<DataBlockVersion> WithSubjectId(this Generator<DataBlockVersion> generator, Guid subjectId)
         => generator.ForInstance(d => d.SetSubjectId(subjectId));
@@ -31,13 +33,16 @@ public static class DataBlockVersionGeneratorExtensions
     public static Generator<DataBlockVersion> WithVersion(this Generator<DataBlockVersion> generator, int version)
         => generator.ForInstance(d => d.SetVersion(version));
 
-    public static Generator<DataBlockVersion> WithQuery(this Generator<DataBlockVersion> generator, ObservationQueryContext query)
+    public static Generator<DataBlockVersion> WithQuery(this Generator<DataBlockVersion> generator,
+        ObservationQueryContext query)
         => generator.ForInstance(d => d.SetQuery(query));
 
-    public static Generator<DataBlockVersion> WithTable(this Generator<DataBlockVersion> generator, TableBuilderConfiguration table)
+    public static Generator<DataBlockVersion> WithTable(this Generator<DataBlockVersion> generator,
+        TableBuilderConfiguration table)
         => generator.ForInstance(d => d.SetTable(table));
 
-    public static Generator<DataBlockVersion> WithCharts(this Generator<DataBlockVersion> generator, List<IChart> charts)
+    public static Generator<DataBlockVersion> WithCharts(this Generator<DataBlockVersion> generator,
+        List<IChart> charts)
         => generator.ForInstance(d => d.SetCharts(charts));
 
     public static Generator<DataBlockVersion> WithName(this Generator<DataBlockVersion> generator, string? name)
@@ -84,11 +89,11 @@ public static class DataBlockVersionGeneratorExtensions
                 {
                     Rows = new List<TableHeader>
                     {
-                        new (Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                     },
                     Columns = new List<TableHeader>
                     {
-                        new (Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                        new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
                     }
                 }
             })
@@ -100,21 +105,20 @@ public static class DataBlockVersionGeneratorExtensions
                         Id = Guid.NewGuid(),
                         Content = $"{dataBlockVersion.Name} comment {num}"
                     })
-                .ToList())
-        ;
+                .ToList());
 
-    public static InstanceSetters<DataBlockVersion> SetRelease(
+    public static InstanceSetters<DataBlockVersion> SetReleaseVersion(
         this InstanceSetters<DataBlockVersion> setters,
-        Release release)
+        ReleaseVersion releaseVersion)
         => setters
-            .Set(d => d.Release, release)
-            .SetReleaseId(release.Id)
-            .Set((_, d, _) => release.DataBlockVersions.Add(d));
+            .Set(d => d.ReleaseVersion, releaseVersion)
+            .SetReleaseVersionId(releaseVersion.Id)
+            .Set((_, d, _) => releaseVersion.DataBlockVersions.Add(d));
 
-    public static InstanceSetters<DataBlockVersion> SetReleaseId(
+    public static InstanceSetters<DataBlockVersion> SetReleaseVersionId(
         this InstanceSetters<DataBlockVersion> setters,
-        Guid releaseId)
-        => setters.Set(d => d.ReleaseId, releaseId);
+        Guid releaseVersionId)
+        => setters.Set(d => d.ReleaseVersionId, releaseVersionId);
 
     public static InstanceSetters<DataBlockVersion> SetOrder(
         this InstanceSetters<DataBlockVersion> setters,

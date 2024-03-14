@@ -52,7 +52,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Url = ""
             }
         },
-        Releases = new List<ReleaseTitleViewModel>
+        Releases = new List<ReleaseVersionTitleViewModel>
         {
             new()
             {

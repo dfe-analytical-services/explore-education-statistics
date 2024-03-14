@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         private static readonly Guid ContentSectionId = Guid.NewGuid();
         private static readonly Guid ContentBlockId = Guid.NewGuid();
 
-        private readonly Release _release = new()
+        private readonly ReleaseVersion _releaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Content = ListOf(
@@ -50,13 +50,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task AddComment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupCommentService(userService: userService.Object);
                         return service.AddComment(
-                            _release.Id,
+                            _releaseVersion.Id,
                             ContentSectionId,
                             ContentBlockId,
                             new CommentSaveRequest());
@@ -125,8 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
+            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
             MockUtils.SetupCall(mock, _comment.Id, _comment);
             return mock;
         }

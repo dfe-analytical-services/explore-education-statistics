@@ -36,6 +36,7 @@ interface Props {
   renderReleaseNotes: ReactNode;
   renderStatusTags: ReactNode;
   renderSubscribeLink: ReactNode;
+  trackScroll?: boolean;
   onShowReleaseTypeModal?: () => void;
 }
 
@@ -49,10 +50,11 @@ export default function ReleaseSummarySection({
   renderReleaseNotes,
   renderStatusTags,
   renderSubscribeLink,
+  trackScroll = false,
   onShowReleaseTypeModal,
 }: Props) {
   return (
-    <>
+    <div data-scroll={trackScroll ? true : undefined} id="summary-section">
       <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
         <div>{renderStatusTags}</div>
         {releaseTypesToIcons[releaseType] && (
@@ -111,6 +113,6 @@ export default function ReleaseSummarySection({
           {renderSubscribeLink}
         </SummaryListItem>
       </SummaryList>
-    </>
+    </div>
   );
 }

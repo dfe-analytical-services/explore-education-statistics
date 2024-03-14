@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task NotifySubscribersIfApplicable()
         {
-            var release1 = new Release
+            var release1Version = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             };
 
-            var release2 = new Release
+            var release2Version = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2001",
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             };
 
-            var amendedRelease1 = new Release
+            var amendedReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2002",
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2, amendedRelease1);
+                contentDbContext.ReleaseVersions.AddRange(release1Version, release2Version, amendedReleaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -102,7 +102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var notificationsService = BuildNotificationsService(
                     contentDbContext, storageQueueService.Object);
 
-                await notificationsService.NotifySubscribersIfApplicable(release1.Id, release2.Id, amendedRelease1.Id);
+                await notificationsService.NotifySubscribersIfApplicable(release1Version.Id,
+                    release2Version.Id,
+                    amendedReleaseVersion.Id);
 
                 storageQueueService.Verify(mock => mock.AddMessages(
                     ReleaseNotificationQueue,
@@ -110,22 +112,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     {
                         new()
                         {
-                            PublicationId = release1.Publication.Id,
-                            PublicationName = release1.Publication.Title,
-                            PublicationSlug = release1.Publication.Slug,
-                            ReleaseName = release1.Title,
-                            ReleaseSlug = release1.Slug,
+                            PublicationId = release1Version.Publication.Id,
+                            PublicationName = release1Version.Publication.Title,
+                            PublicationSlug = release1Version.Publication.Slug,
+                            ReleaseName = release1Version.Title,
+                            ReleaseSlug = release1Version.Slug,
                             Amendment = false,
                             UpdateNote = "No update note provided.",
                             SupersededPublications = new List<IdTitleViewModel>(),
                         },
                         new()
                         {
-                            PublicationId = amendedRelease1.Publication.Id,
-                            PublicationName = amendedRelease1.Publication.Title,
-                            PublicationSlug = amendedRelease1.Publication.Slug,
-                            ReleaseName = amendedRelease1.Title,
-                            ReleaseSlug = amendedRelease1.Slug,
+                            PublicationId = amendedReleaseVersion.Publication.Id,
+                            PublicationName = amendedReleaseVersion.Publication.Title,
+                            PublicationSlug = amendedReleaseVersion.Publication.Slug,
+                            ReleaseName = amendedReleaseVersion.Title,
+                            ReleaseSlug = amendedReleaseVersion.Slug,
                             Amendment = true,
                             UpdateNote = "latest update note",
                             SupersededPublications = new List<IdTitleViewModel>(),
@@ -139,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task NotifySubscribersIfApplicable_HasSupersededPublication()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
@@ -160,14 +162,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Id = Guid.NewGuid(),
                 Title = "pub2 title",
                 Slug = "pub2-slug",
-                SupersededBy = release.Publication,
+                SupersededBy = releaseVersion.Publication,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.Publications.AddAsync(supersededPublication);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
+                contentDbContext.Publications.Add(supersededPublication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -182,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var notificationsService = BuildNotificationsService(
                     contentDbContext, storageQueueService.Object);
 
-                await notificationsService.NotifySubscribersIfApplicable(release.Id);
+                await notificationsService.NotifySubscribersIfApplicable(releaseVersion.Id);
 
                 storageQueueService.Verify(mock => mock.AddMessages(
                     ReleaseNotificationQueue,
@@ -190,11 +192,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     {
                         new()
                         {
-                            PublicationId = release.Publication.Id,
-                            PublicationName = release.Publication.Title,
-                            PublicationSlug = release.Publication.Slug,
-                            ReleaseName = release.Title,
-                            ReleaseSlug = release.Slug,
+                            PublicationId = releaseVersion.Publication.Id,
+                            PublicationName = releaseVersion.Publication.Title,
+                            PublicationSlug = releaseVersion.Publication.Slug,
+                            ReleaseName = releaseVersion.Title,
+                            ReleaseSlug = releaseVersion.Slug,
                             Amendment = false,
                             UpdateNote = "No update note provided.",
                             SupersededPublications = new List<IdTitleViewModel>

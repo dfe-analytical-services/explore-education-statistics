@@ -28,7 +28,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid()
+                                LatestPublishedReleaseVersionId = Guid.NewGuid()
                             }
                         }
                     }
@@ -47,7 +47,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid()
+                                LatestPublishedReleaseVersionId = Guid.NewGuid()
                             }
                         }
                     }
@@ -66,7 +66,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid()
+                                LatestPublishedReleaseVersionId = Guid.NewGuid()
                             }
                         }
                     }
@@ -141,7 +141,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = null
+                                LatestPublishedReleaseVersionId = null
                             }
                         }
                     }
@@ -159,7 +159,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid()
+                                LatestPublishedReleaseVersionId = Guid.NewGuid()
                             }
                         }
                     },
@@ -207,11 +207,11 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid(),
+                                LatestPublishedReleaseVersionId = Guid.NewGuid(),
                                 SupersededBy = new Publication
                                 {
                                     // Superseding publication is published
-                                    LatestPublishedReleaseId = Guid.NewGuid()
+                                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                                 }
                             }
                         }
@@ -234,11 +234,11 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid(),
+                                LatestPublishedReleaseVersionId = Guid.NewGuid(),
                                 SupersededBy = new Publication
                                 {
                                     // Superseding publication is not published
-                                    LatestPublishedReleaseId = null
+                                    LatestPublishedReleaseVersionId = null
                                 }
                             }
                         }
@@ -261,7 +261,7 @@ public class ThemeServiceTests
                         {
                             new()
                             {
-                                LatestPublishedReleaseId = Guid.NewGuid()
+                                LatestPublishedReleaseVersionId = Guid.NewGuid()
                             }
                         }
                     },

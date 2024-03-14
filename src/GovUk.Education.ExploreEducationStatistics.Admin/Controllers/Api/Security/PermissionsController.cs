@@ -32,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileService releaseFileService,
             IUserService userService,
-            IPreReleaseService preReleaseService, 
-            IUserPublicationRoleRepository publicationRoleRepository, 
+            IPreReleaseService preReleaseService,
+            IUserPublicationRoleRepository publicationRoleRepository,
             IUserReleaseRoleRepository releaseRoleRepository)
         {
             _persistenceHelper = persistenceHelper;
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
             // which would potentially be overwhelming. 
             var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
-            
+
             return new GlobalPermissionsViewModel(
                 CanAccessSystem: await _userService.CheckCanAccessSystem().IsRight(),
                 CanAccessAnalystPages: await _userService.CheckCanAccessAnalystPages().IsRight(),
@@ -72,27 +72,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
         }
 
-        [HttpGet("permissions/release/{releaseId:guid}/update")]
-        public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseId)
+        [HttpGet("permissions/release/{releaseVersionId:guid}/update")]
+        public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseVersionId)
         {
-            return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanUpdateRelease);
+            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanUpdateReleaseVersion);
         }
 
         public record ReleaseStatusPermissionsViewModel(
             bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
 
-        [HttpGet("permissions/release/{releaseId:guid}/status")]
-        public async Task<ActionResult<ReleaseStatusPermissionsViewModel>> GetReleaseStatusPermissions(Guid releaseId)
+        [HttpGet("permissions/release/{releaseVersionId:guid}/status")]
+        public async Task<ActionResult<ReleaseStatusPermissionsViewModel>> GetReleaseStatusPermissions(
+            Guid releaseVersionId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release, Guid>(releaseId)
-                .OnSuccess(async release =>
+            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(releaseVersionId)
+                .OnSuccess(async releaseVersion =>
                 {
                     var canMarkDraft = await _userService
-                        .CheckCanMarkReleaseAsDraft(release);
+                        .CheckCanMarkReleaseVersionAsDraft(releaseVersion);
                     var canMarkHigherReview = await _userService
-                        .CheckCanSubmitReleaseForHigherReview(release);
+                        .CheckCanSubmitReleaseVersionForHigherReview(releaseVersion);
                     var canMarkApproved = await _userService
-                        .CheckCanApproveRelease(release);
+                        .CheckCanApproveReleaseVersion(releaseVersion);
 
                     return new ReleaseStatusPermissionsViewModel(
                         CanMarkDraft: canMarkDraft.IsRight,
@@ -104,31 +105,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                     false, false, false));
         }
 
-        [HttpGet("permissions/release/{releaseId:guid}/data/{fileId:guid}")]
-        public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseId, Guid fileId)
+        [HttpGet("permissions/release/{releaseVersionId:guid}/data/{fileId:guid}")]
+        public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseFileService
                 .CheckFileExists(
-                    releaseId: releaseId,
+                    releaseVersionId: releaseVersionId,
                     fileId: fileId,
                     FileType.Data)
                 .OnSuccess(_userService.GetDataFilePermissions)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("permissions/release/{releaseId:guid}/amend")]
-        public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseId)
+        [HttpGet("permissions/release/{releaseVersionId:guid}/amend")]
+        public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseVersionId)
         {
-            return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanMakeAmendmentOfRelease);
+            return CheckPolicyAgainstEntity<ReleaseVersion>(releaseVersionId, _userService.CheckCanMakeAmendmentOfRelease);
         }
 
-        [HttpGet("permissions/release/{releaseId:guid}/prerelease/status")]
-        public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseId)
+        [HttpGet("permissions/release/{releaseVersionId:guid}/prerelease/status")]
+        public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseVersionId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
+                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewPreReleaseSummary)
-                .OnSuccess(release => _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow))
+                .OnSuccess(releaseVersion => _preReleaseService.GetPreReleaseWindowStatus(releaseVersion, UtcNow))
                 .HandleFailuresOrOk();
         }
 
@@ -163,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                         CanMarkApproved: canMarkApproved.IsRight
                     );
                 })
-                .OrElse (() => new MethodologyApprovalStatusPermissions(
+                .OrElse(() => new MethodologyApprovalStatusPermissions(
                     false, false, false));
         }
 

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("publications/{publicationId:guid}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListLatestReleaseSubjects(Guid publicationId)
         {
-            return await GetLatestPublishedReleaseId(publicationId)
+            return await GetLatestPublishedReleaseVersionId(publicationId)
                 .OnSuccess(_cacheKeyService.CreateCacheKeyForReleaseSubjects)
                 .OnSuccess(ListLatestReleaseSubjects)
                 .HandleFailuresOrOk();
@@ -47,15 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListLatestReleaseFeaturedTables(
             Guid publicationId)
         {
-            return await GetLatestPublishedReleaseId(publicationId)
+            return await GetLatestPublishedReleaseVersionId(publicationId)
                 .OnSuccess(_releaseService.ListFeaturedTables)
                 .HandleFailuresOrOk();
         }
 
-        private Task<Either<ActionResult, Guid>> GetLatestPublishedReleaseId(Guid publicationId)
+        private Task<Either<ActionResult, Guid>> GetLatestPublishedReleaseVersionId(Guid publicationId)
         {
             return _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(publication => publication.LatestPublishedReleaseId ??
+                .OnSuccess(publication => publication.LatestPublishedReleaseVersionId ??
                                           new Either<ActionResult, Guid>(new NotFoundResult()));
         }
 
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private async Task<Either<ActionResult, List<SubjectViewModel>>> ListLatestReleaseSubjects(
             ReleaseSubjectsCacheKey cacheKey)
         {
-            return await _releaseService.ListSubjects(cacheKey.ReleaseId);
+            return await _releaseService.ListSubjects(cacheKey.ReleaseVersionId);
         }
     }
 }

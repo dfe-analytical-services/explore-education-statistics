@@ -14,13 +14,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using Moq;
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -552,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? context = null,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
@@ -566,7 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

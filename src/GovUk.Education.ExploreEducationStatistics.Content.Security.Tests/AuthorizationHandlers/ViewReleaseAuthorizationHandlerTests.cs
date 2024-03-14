@@ -23,11 +23,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -53,11 +53,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -83,11 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1, draftVersion: true)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(r => r is { Published: null, Version: 1 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -113,11 +113,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single(r => r is { Published: not null, Version: 0 });
+            var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
 
             var contextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = BuildHandler(contentDbContext);
 
-                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(releaseVersion);
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(releaseVersion);
 
                 await handler.HandleAsync(authContext);
 
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
             var handler = BuildHandler(contentDbContext);
 
-            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(new Release
+            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, ReleaseVersion>(new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             });
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
         private static ViewReleaseAuthorizationHandler BuildHandler(ContentDbContext contentDbContext)
         {
             return new ViewReleaseAuthorizationHandler(
-                new ReleaseRepository(contentDbContext)
+                new ReleaseVersionRepository(contentDbContext)
             );
         }
     }

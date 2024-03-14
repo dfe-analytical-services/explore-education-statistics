@@ -1,0 +1,115 @@
+@import '~govuk-frontend/govuk/base';
+
+.option {
+  align-items: center;
+  background: govuk-colour('white');
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  display: flex;
+  min-height: 60px;
+  padding: govuk-spacing(2) govuk-spacing(1);
+  user-select: none;
+
+  &:hover {
+    background: govuk-colour('light-grey');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: $govuk-focus-width * -1;
+  }
+
+  .isDraggingOver & {
+    background: transparent;
+  }
+
+  &.isDragging,
+  &.isSelected {
+    background: govuk-colour('white');
+    border-bottom: transparent;
+    outline: govuk-colour('blue') solid $govuk-focus-width;
+  }
+
+  &.isSelected:not(.isDragging) {
+    background: govuk-colour('blue');
+    color: govuk-colour('white');
+  }
+
+  &.isGhosted {
+    cursor: auto;
+    opacity: 0.5;
+  }
+
+  &.isDraggedOutside {
+    border: 0;
+    opacity: 0.2;
+    outline: none;
+  }
+}
+
+.isActive {
+  align-items: normal;
+  padding-bottom: 54px;
+
+  &:hover {
+    background: govuk-colour('white');
+  }
+}
+
+.optionLabel {
+  display: flex;
+  padding-right: 76px;
+  word-break: break-word;
+}
+
+.dragIcon {
+  flex-shrink: 0;
+  margin: 0.3rem 0.2rem 0 0;
+}
+
+.selectedCount {
+  align-items: center;
+  background: govuk-colour('yellow');
+  border: $govuk-focus-width solid govuk-colour('black');
+  color: govuk-colour('black');
+  display: flex;
+  justify-content: center;
+  padding: govuk-spacing(1) govuk-spacing(2);
+  position: absolute;
+  right: -#{govuk-spacing(5)};
+  top: -#{govuk-spacing(5)};
+}
+
+.container {
+  position: relative;
+}
+
+.controls {
+  position: absolute;
+  right: 5px;
+  top: govuk-spacing(2);
+}
+
+.controlsActive {
+  bottom: govuk-spacing(2);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 govuk-spacing(2) 0 govuk-spacing(4);
+  position: absolute;
+  width: 100%;
+}
+
+.arrow {
+  transform: rotate(90deg);
+}
+
+.buttonGroup {
+  flex-direction: row;
+  margin-bottom: 0;
+}
+
+.doneButton {
+  width: auto;
+}

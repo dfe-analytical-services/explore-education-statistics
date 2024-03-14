@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                 .AddScoped<IPublicationRepository, PublicationRepository>()
-                .AddScoped<IReleaseRepository, ReleaseRepository>()
+                .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                 .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                 .AddScoped<IRedirectsService, RedirectsService>();
 

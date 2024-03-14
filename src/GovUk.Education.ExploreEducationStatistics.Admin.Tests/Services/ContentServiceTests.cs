@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,13 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetContentBlocks_NoContentSections()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
                 Assert.True(result.IsRight);
 
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetContentBlocks_NoContentBlocks()
         {
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
                 Content = ListOf(
                     new ContentSection
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
                 Assert.True(result.IsRight);
 
@@ -97,11 +97,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetContentBlocks()
         {
-            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
 
-            var release = new Release
+            var releaseVersion = new ReleaseVersion
             {
-                Id = releaseId,
+                Id = releaseVersionId,
                 Content = ListOf(
                     new ContentSection
                     {
@@ -111,20 +111,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new HtmlBlock
                             {
                                 Body = "Test html block 1",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             },
                             new HtmlBlock
                             {
                                 Body = "Test html block 2",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             },
                             new DataBlock
                             {
                                 Name = "Test data block 1",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             }
                         ),
-                        ReleaseId = releaseId
+                        ReleaseVersionId = releaseVersionId
                     },
                     new ContentSection
                     {
@@ -134,20 +134,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new HtmlBlock
                             {
                                 Body = "Test html block 3",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             },
                             new HtmlBlock
                             {
                                 Body = "Test html block 4",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             },
                             new DataBlock
                             {
                                 Name = "Test data block 2",
-                                ReleaseId = releaseId
+                                ReleaseVersionId = releaseVersionId
                             }
                         ),
-                        ReleaseId = releaseId
+                        ReleaseVersionId = releaseVersionId
                     }
                 )
             };
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -163,15 +163,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
 
-                var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
+                var result = await service.GetContentBlocks<HtmlBlock>(releaseVersion.Id);
 
                 var contentBlocks = result.AssertRight();
 
                 Assert.Equal(4, contentBlocks.Count);
-                Assert.Equal(release.Content[0].Content[0].Id, contentBlocks[0].Id);
-                Assert.Equal(release.Content[0].Content[1].Id, contentBlocks[1].Id);
-                Assert.Equal(release.Content[1].Content[0].Id, contentBlocks[2].Id);
-                Assert.Equal(release.Content[1].Content[1].Id, contentBlocks[3].Id);
+                Assert.Equal(releaseVersion.Content[0].Content[0].Id, contentBlocks[0].Id);
+                Assert.Equal(releaseVersion.Content[0].Content[1].Id, contentBlocks[1].Id);
+                Assert.Equal(releaseVersion.Content[1].Content[0].Id, contentBlocks[2].Id);
+                Assert.Equal(releaseVersion.Content[1].Content[1].Id, contentBlocks[3].Id);
 
                 Assert.Equal("Test html block 1", contentBlocks[0].Body);
                 Assert.Equal("Test html block 2", contentBlocks[1].Body);
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveContentSection()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var contentSectionToRemove = new ContentSection
             {
@@ -192,40 +192,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new HtmlBlock
                     {
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new DataBlock
                     {
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new EmbedBlockLink
                     {
                         EmbedBlock = new EmbedBlock(),
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     }
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentSection2 = new ContentSection
             {
                 Order = 2,
                 Content = new List<ContentBlock>(),
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentSection3 = new ContentSection
             {
                 Order = 3,
                 Content = new List<ContentBlock>(),
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.ContentSections.AddRangeAsync(
+                contentDbContext.ReleaseVersions.AddRange(releaseVersion);
+                contentDbContext.ContentSections.AddRange(
                     contentSectionToRemove, contentSection2, contentSection3);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -234,8 +234,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentSection(
-                    contentSectionToRemove.ReleaseId,
-                    contentSectionToRemove.Id);
+                    releaseVersionId: contentSectionToRemove.ReleaseVersionId,
+                    contentSectionId: contentSectionToRemove.Id);
 
                 var contentSectionList = result.AssertRight();
 
@@ -253,11 +253,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, contentSections.Count);
 
                 Assert.Equal(contentSection2.Id, contentSections[0].Id);
-                Assert.Equal(contentSection2.ReleaseId, contentSections[0].ReleaseId);
+                Assert.Equal(contentSection2.ReleaseVersionId, contentSections[0].ReleaseVersionId);
                 Assert.Equal(1, contentSections[0].Order);
 
                 Assert.Equal(contentSection3.Id, contentSections[1].Id);
-                Assert.Equal(contentSection3.ReleaseId, contentSections[1].ReleaseId);
+                Assert.Equal(contentSection3.ReleaseVersionId, contentSections[1].ReleaseVersionId);
                 Assert.Equal(2, contentSections[1].Order);
 
                 var contentBlocks = contentDbContext.ContentBlocks.ToList();
@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new HtmlBlock(),
                 },
-                Release = new Release()
+                ReleaseVersion = new ReleaseVersion()
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -304,18 +304,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveContentSection_ContentSectionBelongsToAnotherRelease()
         {
-            var release = new Release();
-            var otherRelease = new Release();
+            var releaseVersion = new ReleaseVersion();
+            var otherReleaseVersion = new ReleaseVersion();
             var relatedContentSection = new ContentSection
             {
                 Content = new List<ContentBlock>
                 {
                     new HtmlBlock
                     {
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     }
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
             var unrelatedContentSection = new ContentSection
             {
@@ -324,10 +324,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new HtmlBlock
                     {
-                        Release = otherRelease
+                        ReleaseVersion = otherReleaseVersion
                     },
                 },
-                Release = otherRelease
+                ReleaseVersion = otherReleaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -342,8 +342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentSection(
-                    release.Id,
-                    unrelatedContentSection.Id);
+                    releaseVersionId: releaseVersion.Id,
+                    contentSectionId: unrelatedContentSection.Id);
 
                 result.AssertNotFound();
             }
@@ -402,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataBlockVersion.ContentBlock,
                     new HtmlBlock { Order = 2 },
                 },
-                Release = new Release()
+                ReleaseVersion = new ReleaseVersion()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -417,9 +417,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentBlock(
-                    contentSection.ReleaseId,
-                    contentSectionId,
-                    blockToRemove.Id);
+                    releaseVersionId: contentSection.ReleaseVersionId,
+                    contentSectionId: contentSectionId,
+                    contentBlockId: blockToRemove.Id);
 
                 var viewModelList = result.AssertRight();
 
@@ -465,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new DataBlock(),
                     new HtmlBlock(),
                 },
-                Release = new Release()
+                ReleaseVersion = new ReleaseVersion()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -490,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveContentBlock_NoContentSection()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
             var contentBlockId = Guid.NewGuid();
             var contentSection = new ContentSection
             {
@@ -499,15 +499,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new HtmlBlock
                     {
                         Id = contentBlockId,
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new DataBlock
                     {
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     },
                     new HtmlBlock
                     {
-                        Release = release
+                        ReleaseVersion = releaseVersion
                     }
                 },
             };
@@ -523,9 +523,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentBlock(
-                    contentSection.ReleaseId,
-                    Guid.NewGuid(),
-                    contentBlockId);
+                    releaseVersionId: contentSection.ReleaseVersionId,
+                    contentSectionId: Guid.NewGuid(),
+                    contentBlockId: contentBlockId);
 
                 result.AssertNotFound();
             }
@@ -546,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new DataBlock(),
                     new HtmlBlock(),
                 },
-                Release = new Release()
+                ReleaseVersion = new ReleaseVersion()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -560,9 +560,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentBlock(
-                    contentSection.ReleaseId,
-                    contentSection.Id,
-                    Guid.NewGuid());
+                    releaseVersionId: contentSection.ReleaseVersionId,
+                    contentSectionId: contentSection.Id,
+                    contentBlockId: Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -571,7 +571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveContentBlock_BlockAttachedToIncorrectSection()
         {
-            var release = new Release();
+            var releaseVersion = new ReleaseVersion();
 
             var incorrectContentBlockId = Guid.NewGuid();
             var incorrectContentSection = new ContentSection
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new HtmlBlock { Id = incorrectContentBlockId },
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentSection = new ContentSection
@@ -589,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new HtmlBlock(),
                 },
-                Release = release
+                ReleaseVersion = releaseVersion
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -604,9 +604,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentBlock(
-                    contentSection.ReleaseId,
-                    contentSection.Id,
-                    incorrectContentBlockId);
+                    releaseVersionId: contentSection.ReleaseVersionId,
+                    contentSectionId: contentSection.Id,
+                    contentBlockId: incorrectContentBlockId);
 
                 result.AssertNotFound();
             }
@@ -615,8 +615,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AttachDataBlock()
         {
-            var release = _fixture
-                .DefaultRelease()
+            var releaseVersion = _fixture
+                .DefaultReleaseVersion()
                 .Generate();
 
             var dataBlockParent = _fixture
@@ -624,12 +624,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithLatestPublishedVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithOrder(1)
-                    .WithRelease(release))
+                    .WithReleaseVersion(releaseVersion))
                 .Generate();
 
             var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
-            release.Content = _fixture
+            releaseVersion.Content = _fixture
                 .DefaultContentSection()
                 .WithContentBlocks(_fixture
                     .DefaultHtmlBlock()
@@ -649,11 +649,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupContentService(contentDbContext: contentDbContext);
-                var result = await service.AttachDataBlock(release.Id, release.Content[0].Id, new DataBlockAttachRequest
-                {
-                    ContentBlockId = dataBlockVersion.Id,
-                    Order = 3
-                });
+                var result = await service.AttachDataBlock(releaseVersionId: releaseVersion.Id,
+                    contentSectionId: releaseVersion.Content[0].Id,
+                    new DataBlockAttachRequest
+                    {
+                        ContentBlockId = dataBlockVersion.Id,
+                        Order = 3
+                    });
 
                 var DataBlockViewModel = result.AssertRight();
                 Assert.Equal(dataBlockVersion.Id, DataBlockViewModel.Id);

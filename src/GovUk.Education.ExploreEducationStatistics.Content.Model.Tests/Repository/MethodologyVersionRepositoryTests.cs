@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            LatestPublishedRelease = new Release()
+                            LatestPublishedReleaseVersion = new ReleaseVersion()
                         },
                         Methodology = methodology
                     });
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            LatestPublishedRelease = new Release()
+                            LatestPublishedReleaseVersion = new ReleaseVersion()
                         },
                         Methodology = methodology
                     });
@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            LatestPublishedRelease = new Release()
+                            LatestPublishedReleaseVersion = new ReleaseVersion()
                         },
                         Methodology = methodology
                     });
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var methodology1 = new Methodology
@@ -684,7 +684,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var methodology1 = new Methodology
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var methodology = new Methodology
@@ -825,7 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1008,7 +1008,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1038,7 +1038,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         [Fact]
         public async Task IsToBePublished_ApprovedAndScheduledWithLiveRelease()
         {
-            var liveRelease = new Release
+            var liveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow
@@ -1048,14 +1048,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id
             };
 
             var publicationMethodology = new PublicationMethodology
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1067,8 +1067,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(liveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.Add(liveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1096,7 +1096,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1123,7 +1123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         [Fact]
         public async Task IsToBePublished_ScheduledWithLiveReleaseButNotApprovedIsNotAccessible()
         {
-            var liveRelease = new Release
+            var liveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow
@@ -1133,14 +1133,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Status = Draft,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id
             };
 
             var publicationMethodology = new PublicationMethodology
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1152,8 +1152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(liveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.Add(liveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1168,7 +1168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         [Fact]
         public async Task IsToBePublished_ApprovedButScheduledWithNonLiveReleaseIsNotAccessible()
         {
-            var nonLiveRelease = new Release
+            var nonLiveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -1177,14 +1177,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = nonLiveRelease.Id
+                ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
             };
 
             var publicationMethodology = new PublicationMethodology
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1196,8 +1196,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(nonLiveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.Add(nonLiveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1246,7 +1246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1283,7 +1283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         public async Task
             IsToBePublished_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
         {
-            var nonLiveRelease = new Release
+            var nonLiveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -1311,7 +1311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = latestPublishedVersion.Id,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = nonLiveRelease.Id,
+                ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
                 Status = Approved,
                 Version = 2
             };
@@ -1320,7 +1320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1332,8 +1332,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(nonLiveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.Add(nonLiveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1357,7 +1357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         [Fact]
         public async Task IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsDraft()
         {
-            var liveRelease = new Release
+            var liveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow
@@ -1368,7 +1368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = null,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id,
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
                 Status = Approved,
                 Version = 0
             };
@@ -1378,7 +1378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = previousVersion.Id,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id,
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
                 Status = Approved,
                 Version = 1
             };
@@ -1388,7 +1388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = latestPublishedVersion.Id,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id,
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
                 Status = Draft,
                 Version = 2
             };
@@ -1397,7 +1397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1409,8 +1409,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(liveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.Add(liveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1435,13 +1435,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         public async Task
             IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
         {
-            var liveRelease = new Release
+            var liveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow
             };
 
-            var nonLiveRelease = new Release
+            var nonLiveReleaseVersion = new ReleaseVersion
             {
                 Id = Guid.NewGuid()
             };
@@ -1460,7 +1460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = previousVersion.Id,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = liveRelease.Id,
+                ScheduledWithReleaseVersionId = liveReleaseVersion.Id,
                 Status = Approved,
                 Version = 1
             };
@@ -1470,7 +1470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = Guid.NewGuid(),
                 PreviousVersionId = latestPublishedVersion.Id,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = nonLiveRelease.Id,
+                ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id,
                 Status = Approved,
                 Version = 2
             };
@@ -1479,7 +1479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1491,8 +1491,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(liveRelease, nonLiveRelease);
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                contentDbContext.ReleaseVersions.AddRange(liveReleaseVersion, nonLiveReleaseVersion);
+                contentDbContext.PublicationMethodologies.Add(publicationMethodology);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1527,7 +1527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = null
+                    LatestPublishedReleaseVersion = null
                 },
                 Methodology = new Methodology
                 {
@@ -1561,14 +1561,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Status = Approved,
                 PublishingStrategy = WithRelease,
-                ScheduledWithReleaseId = Guid.NewGuid()
+                ScheduledWithReleaseVersionId = Guid.NewGuid()
             };
 
             var publicationMethodology = new PublicationMethodology
             {
                 Publication = new Publication
                 {
-                    LatestPublishedRelease = new Release()
+                    LatestPublishedReleaseVersion = new ReleaseVersion()
                 },
                 Methodology = new Methodology
                 {
@@ -1592,6 +1592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     service.IsToBePublished(methodologyVersion));
             }
         }
+
         private static MethodologyVersionRepository BuildMethodologyVersionRepository(
             ContentDbContext contentDbContext,
             IMethodologyRepository? methodologyRepository = null)

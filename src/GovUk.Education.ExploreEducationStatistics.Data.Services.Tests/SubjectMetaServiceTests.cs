@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
-using ContentRelease = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var service = BuildSubjectMetaService(
                 statisticsDbContext);
 
-            var result = await service.GetSubjectMeta(releaseId: Guid.NewGuid(),
+            var result = await service.GetSubjectMeta(releaseVersionId: Guid.NewGuid(),
                 subjectId: Guid.NewGuid());
 
             result.AssertNotFound();
@@ -61,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -104,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.GetSubjectMeta(releaseId: releaseSubject.ReleaseId,
+                var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
                         subjectId: releaseSubject.SubjectId))
                     .AssertRight();
 
@@ -128,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -233,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(releaseId: releaseSubject.ReleaseId,
+                var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
                         subjectId: releaseSubject.SubjectId))
                     .AssertRight();
 
@@ -270,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Regional", regions.Legend);
 
                 Assert.Equal(3, regions.Options.Count);
-                
+
                 var regionOption1 = regions.Options[0];
                 Assert.Equal(locations[1].Id, regionOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
@@ -336,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -369,7 +368,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.FilterSubjectMeta(releaseSubject.ReleaseId, query, cancellationToken))
+                var result =
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -386,17 +386,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task FilterSubjectMeta_LatestRelease_EmptyModelReturned()
         {
-            var release = new ContentRelease
+            var releaseVersion = new Content.Model.ReleaseVersion
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow.AddDays(-1)
             };
-            
+
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release
+                ReleaseVersion = new ReleaseVersion
                 {
-                    Id = release.Id
+                    Id = releaseVersion.Id
                 },
                 Subject = new Subject()
             };
@@ -411,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddAsync(release);
+                contentDbContext.ReleaseVersions.Add(releaseVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = subject
             };
 
@@ -584,7 +584,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext,
                     timePeriodService: timePeriodService.Object);
 
-                var result = (await service.FilterSubjectMeta(releaseSubject.ReleaseId, query, cancellationToken))
+                var result =
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(timePeriodService);
@@ -614,7 +615,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = subject
             };
 
@@ -727,7 +728,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
-                var result = (await service.FilterSubjectMeta(releaseSubject.ReleaseId, query, cancellationToken))
+                var result =
+                    (await service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, cancellationToken))
                     .AssertRight();
 
                 VerifyAllMocks(
@@ -841,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
         {
-            var statisticsRelease = new Release();
+            var statisticsReleaseVersion = new ReleaseVersion();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -849,7 +851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                ReleaseVersion = statisticsReleaseVersion,
                 Subject = subject
             };
 
@@ -873,7 +875,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => service.FilterSubjectMeta(releaseSubject.ReleaseId, query, default));
+                    () => service.FilterSubjectMeta(releaseSubject.ReleaseVersionId, query, default));
 
                 Assert.Equal("Unable to determine which SubjectMeta information has requested " +
                              "(Parameter 'subjectMetaStep')", exception.Message);
@@ -885,7 +887,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -972,7 +974,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
             cacheService
-                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
+                    releaseSubject.ReleaseVersionId,
                     releaseSubject.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -986,7 +989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -999,7 +1002,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 var savedSequence = savedReleaseSubject.FilterSequence;
@@ -1045,7 +1048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1128,7 +1131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1141,7 +1144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1154,7 +1157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1230,7 +1233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1243,7 +1246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1256,7 +1259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1325,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1338,7 +1341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1351,7 +1354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1431,7 +1434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1444,7 +1447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1457,7 +1460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1530,7 +1533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1543,7 +1546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1556,7 +1559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1622,7 +1625,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1635,7 +1638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1649,7 +1652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1666,7 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: Guid.NewGuid(),
+                    releaseVersionId: Guid.NewGuid(),
                     subjectId: releaseSubject.SubjectId,
                     new List<FilterUpdateViewModel>
                     {
@@ -1683,7 +1686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1697,7 +1700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1714,7 +1717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var result = await service.UpdateSubjectFilters(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: Guid.NewGuid(),
                     new List<FilterUpdateViewModel>
                     {
@@ -1731,7 +1734,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1744,7 +1747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1798,7 +1801,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
             cacheService
-                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(
+                    releaseSubject.ReleaseVersionId,
                     releaseSubject.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -1812,7 +1816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1825,7 +1829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 var savedSequence = savedReleaseSubject.IndicatorSequence;
@@ -1855,7 +1859,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1917,7 +1921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1930,7 +1934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -1943,7 +1947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -1998,7 +2002,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -2011,7 +2015,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -2024,7 +2028,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -2083,7 +2087,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -2096,7 +2100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -2109,7 +2113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -2161,7 +2165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -2174,7 +2178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -2188,7 +2192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -2205,7 +2209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: Guid.NewGuid(),
+                    releaseVersionId: Guid.NewGuid(),
                     subjectId: releaseSubject.SubjectId,
                     new List<IndicatorGroupUpdateViewModel>
                     {
@@ -2222,7 +2226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
@@ -2236,7 +2240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release(),
+                ReleaseVersion = new ReleaseVersion(),
                 Subject = new Subject()
             };
 
@@ -2253,7 +2257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseId: releaseSubject.ReleaseId,
+                    releaseVersionId: releaseSubject.ReleaseVersionId,
                     subjectId: Guid.NewGuid(),
                     new List<IndicatorGroupUpdateViewModel>
                     {
@@ -2270,7 +2274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseId == releaseSubject.ReleaseId
+                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
                     && rs.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched

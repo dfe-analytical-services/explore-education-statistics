@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -28,9 +29,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
-using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using IPublicationRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -659,7 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 SupersededBy = new Publication
                 {
-                    LatestPublishedReleaseId = Guid.NewGuid()
+                    LatestPublishedReleaseVersionId = Guid.NewGuid()
                 }
             };
 
@@ -698,7 +698,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SupersededBy = new Publication
                 {
                     // Superseding publication doesn't have a published release
-                    LatestPublishedReleaseId = null
+                    LatestPublishedReleaseVersionId = null
                 }
             };
 
@@ -1120,7 +1120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                LatestPublishedRelease = new Release(),
+                LatestPublishedReleaseVersion = new ReleaseVersion(),
                 SupersededBy = supersedingPublicationToRemove,
             };
 
@@ -1257,7 +1257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                LatestPublishedRelease = new Release(),
+                LatestPublishedReleaseVersion = new ReleaseVersion(),
             };
 
             var methodologyVersionId = Guid.NewGuid();
@@ -1448,7 +1448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Test topic",
                     Theme = new Theme(),
                 },
-                LatestPublishedRelease = new Release()
+                LatestPublishedReleaseVersion = new ReleaseVersion()
             };
 
             var supersededPublication1 = new Publication
@@ -1581,7 +1581,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Current title",
                 Slug = "current-title",
                 Topic = topic,
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
             {
@@ -1679,7 +1679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Title",
                 Slug = "title",
                 Topic = topic,
-                LatestPublishedReleaseId = Guid.NewGuid(),
+                LatestPublishedReleaseVersionId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
             {
@@ -2418,13 +2418,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2444,9 +2444,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2022, Version: 1 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2021, Version: 0 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2020, Version: 1 }).Id
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 }).Id,
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2456,11 +2456,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
-            var releaseVersion = publication.Releases.Single();
+            var releaseVersion = publication.ReleaseVersions.Single();
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2503,13 +2503,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2530,7 +2530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 //Assert.False(releases[0].IsDraft); // @MarkFix
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2022, Version: 1 }).Id
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
             }
         }
@@ -2540,13 +2540,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf<ReleaseParent>(
+                .WithReleases(ListOf<Release>(
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true, year: 2020),
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true, year: 2020),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                     _dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2, year: 2022)));
+                        .DefaultRelease(publishedVersions: 2, year: 2022)));
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -2566,8 +2566,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(new[]
                 {
-                    publication.Releases.Single(r => r is { Year: 2021, Version: 0 }).Id,
-                    publication.Releases.Single(r => r is { Year: 2020, Version: 1 }).Id
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
+                    publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
                 //Assert.True(releases[0].IsDraft); // @MarkFix
                 //Assert.True(releases[1].IsDraft);
@@ -2579,8 +2579,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
@@ -2614,8 +2614,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                     .Generate(1));
 
             var contextId = Guid.NewGuid().ToString();
@@ -2645,8 +2645,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(_dataFixture
-                    .DefaultReleaseParent(publishedVersions: 2)
+                .WithReleases(_dataFixture
+                    .DefaultRelease(publishedVersions: 2)
                     .Generate(4));
 
             var contextId = Guid.NewGuid().ToString();
@@ -2685,7 +2685,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(expectedTotalResults, pagedResult.Paging.TotalResults);
 
                     var expectedLatestReleaseVersionIds = years.Select(year =>
-                        publication.Releases.Single(r => r.Year == year && r.Version == 1).Id).ToArray();
+                        publication.ReleaseVersions.Single(rv => rv.Year == year && rv.Version == 1).Id).ToArray();
 
                     Assert.Equal(expectedLatestReleaseVersionIds, pagedResult.Results.Select(r => r.Id).ToArray());
                 }
@@ -2907,7 +2907,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
@@ -2919,7 +2919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
-                releaseRepository ?? new ReleaseRepository(context),
+                releaseVersionRepository ?? new Content.Model.Repository.ReleaseVersionRepository(context),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

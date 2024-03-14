@@ -1,0 +1,30 @@
+@import '~govuk-frontend/govuk/base';
+
+.info {
+  background-color: govuk-colour('light-grey');
+
+  margin-bottom: govuk-spacing(4);
+  padding: govuk-spacing(3);
+
+  @include govuk-media-query($from: tablet) {
+    align-items: center;
+    display: flex;
+  }
+}
+
+.infoSectionHeading {
+  color: govuk-colour('dark-grey');
+  display: block;
+
+  @include govuk-media-query($until: tablet) {
+    margin-top: govuk-spacing(2);
+  }
+}
+
+.infoDownloadButton {
+  margin-left: auto;
+
+  @include govuk-media-query($until: tablet) {
+    margin-top: govuk-spacing(2);
+  }
+}

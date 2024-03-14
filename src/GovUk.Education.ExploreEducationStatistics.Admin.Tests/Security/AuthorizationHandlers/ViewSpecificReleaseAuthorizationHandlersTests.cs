@@ -20,14 +20,14 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class ViewSpecificReleaseAuthorizationHandlersTests
     {
-        private static readonly Release Release = new()
+        private static readonly ReleaseVersion ReleaseVersion = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication
@@ -43,13 +43,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
                 // (and no other claim allows this)
-                await AssertHandlerSucceedsWithCorrectClaims<Release, ViewReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<ReleaseVersion, ViewReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Attach(Release);
+                        contentDbContext.Attach(ReleaseVersion);
                         return CreateHandler(contentDbContext);
                     },
-                    Release,
+                    ReleaseVersion,
                     claimsExpectedToSucceed: AccessAllReleases);
             }
         }
@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Attach(Release);
+                        contentDbContext.Attach(ReleaseVersion);
                         return CreateHandler(contentDbContext);
                     },
-                    Release,
+                    ReleaseVersion,
                     rolesExpectedToSucceed: new [] {
                         PublicationRole.Owner,
                         PublicationRole.Approver
@@ -82,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
                     contentDbContext =>
                     {
-                        contentDbContext.Attach(Release);
+                        contentDbContext.Attach(ReleaseVersion);
                         return CreateHandler(contentDbContext);
                     },
-                    Release,
+                    ReleaseVersion,
                     rolesExpectedToSucceed: new[]
                     {
                         ReleaseRole.Viewer,
@@ -102,13 +102,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var successScenario = new ReleaseHandlerTestScenario
                 {
-                    Entity = Release,
+                    Entity = ReleaseVersion,
                     User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
                     UserReleaseRoles = new List<UserReleaseRole>
                     {
                         new()
                         {
-                            ReleaseId = Release.Id,
+                            ReleaseVersionId = ReleaseVersion.Id,
                             UserId = userId,
                             Role = ReleaseRole.PrereleaseViewer
                         }
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
                 preReleaseService
-                    .Setup(s => s.GetPreReleaseWindowStatus(Release, It.IsAny<DateTime>()))
+                    .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
                     .Returns(new PreReleaseWindowStatus
                     {
                         Access = PreReleaseAccess.Within
@@ -143,13 +143,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var failureScenario = new ReleaseHandlerTestScenario
                 {
-                    Entity = Release,
+                    Entity = ReleaseVersion,
                     User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
                     UserReleaseRoles = new List<UserReleaseRole>
                     {
                         new()
                         {
-                            ReleaseId = Release.Id,
+                            ReleaseVersionId = ReleaseVersion.Id,
                             UserId = userId,
                             Role = ReleaseRole.PrereleaseViewer
                         }
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         "current time"
                 };
 
-                await GetEnumValues<PreReleaseAccess>()
+                await GetEnums<PreReleaseAccess>()
                     .Where(value => value != PreReleaseAccess.Within)
                     .ToList()
                     .ToAsyncEnumerable()
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
                         preReleaseService
-                            .Setup(s => s.GetPreReleaseWindowStatus(Release, It.IsAny<DateTime>()))
+                            .Setup(s => s.GetPreReleaseWindowStatus(ReleaseVersion, It.IsAny<DateTime>()))
                             .Returns(new PreReleaseWindowStatus
                             {
                                 Access = access
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                             contentDbContext =>
                             {
-                                contentDbContext.Attach(Release);
+                                contentDbContext.Attach(ReleaseVersion);
                                 return CreateHandler(contentDbContext, preReleaseService.Object);
                             },
                             failureScenario);
@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             return new ViewSpecificReleaseAuthorizationHandler(
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(contentDbContext),
+                    new ReleaseVersionRepository(contentDbContext),
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
                     preReleaseService ?? new PreReleaseService(Options.Create(new PreReleaseOptions

@@ -9,7 +9,11 @@
   position: relative;
 
   @include govuk-media-query($from: desktop) {
-    width: 320px;
+    width: 364px;
+
+    &.groupActive {
+      width: 460px;
+    }
   }
 
   legend {
@@ -18,13 +22,17 @@
     width: 100%;
   }
 
+  &.showMovingControls {
+    background: govuk-colour('white');
+  }
+
   &.focused {
     border-color: transparent;
     outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 
   &.dragEnabled:hover {
-    background: govuk-colour('light-grey');
+    border-color: govuk-colour('blue');
     // Fallback if grab is unsupported
     cursor: move;
     cursor: grab;

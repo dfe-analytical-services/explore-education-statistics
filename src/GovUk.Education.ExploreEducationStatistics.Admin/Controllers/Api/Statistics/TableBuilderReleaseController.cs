@@ -22,19 +22,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseService = releaseService;
         }
 
-        [HttpGet("data/releases/{releaseId:guid}/subjects")]
-        public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
+        [HttpGet("data/releases/{releaseVersionId:guid}/subjects")]
+        public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseVersionId)
         {
             return await _releaseService
-                .ListSubjects(releaseId)
+                .ListSubjects(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("data/releases/{releaseId:guid}/featured-tables")]
-        public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
+        [HttpGet("data/releases/{releaseVersionId:guid}/featured-tables")]
+        public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseVersionId)
         {
             return await _releaseService
-                .ListFeaturedTables(releaseId)
+                .ListFeaturedTables(releaseVersionId)
                 .HandleFailuresOrOk();
         }
     }

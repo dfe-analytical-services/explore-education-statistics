@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -151,7 +152,9 @@ public class SeedDataCommand : ICommand
                 "--schema", "public",
                 "--username", "postgres",
                 "--host", "db",
-                "--port", "5432"
+                "--port", "5432",
+                "--clean",
+                "--if-exists",
             ])
             .WithEnvironmentVariables(env => env
                 .Set("PGPASSWORD", "password"))
@@ -165,6 +168,7 @@ public class SeedDataCommand : ICommand
     private class Seeder
     {
         private const string FiltersDuckDbTable = "filters";
+        private const string TimePeriodsDuckDbTable = "time_periods";
 
         private readonly DataSetSeed _seed;
         private readonly PublicDataDbContext _dbContext;
@@ -266,11 +270,23 @@ public class SeedDataCommand : ICommand
         {
             var totalResults = await _duckDb.QuerySingleAsync<int>($"SELECT COUNT(*) FROM '{_dataFilePath}'");
 
-            var timePeriods = (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
+            var geographicLevels = (await _duckDb.QueryAsync<string>(
+                    new CommandDefinition(
+                        $"""
+                         SELECT DISTINCT geographic_level
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
+                         """,
+                        cancellationToken: _cancellationToken
+                    )
+                ))
+                .Select(EnumToEnumLabelConverter<GeographicLevel>.FromProvider)
+                .ToList();
+
+            var timePeriods = (await _duckDb.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
                          SELECT DISTINCT time_period, time_identifier
-                         FROM '{_dataFilePath}'
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
                          ORDER BY time_period
                          """,
                         cancellationToken: _cancellationToken
@@ -278,12 +294,12 @@ public class SeedDataCommand : ICommand
                 ))
                 .Select(
                     row => (
-                        Year: row.TimePeriod,
-                        TimeIdentifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
+                        Period: TimePeriodFormatter.FormatFromCsv(row.TimePeriod),
+                        Identifier: EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(row.TimeIdentifier)
                     )
                 )
-                .OrderBy(tuple => tuple.Year)
-                .ThenBy(tuple => tuple.TimeIdentifier)
+                .OrderBy(tuple => tuple.Period)
+                .ThenBy(tuple => tuple.Identifier)
                 .ToList();
 
             var dataSetVersion = new DataSetVersion
@@ -293,7 +309,6 @@ public class SeedDataCommand : ICommand
                 VersionMinor = 0,
                 Status = DataSetVersionStatus.Published,
                 Notes = string.Empty,
-                ParquetFilename = string.Empty,
                 CsvFileId = Guid.NewGuid(),
                 DataSetId = _seed.DataSet.Id,
                 TotalResults = totalResults,
@@ -303,13 +318,13 @@ public class SeedDataCommand : ICommand
                     {
                         Start = new TimePeriodRangeBound
                         {
-                            Year = timePeriods[0].Year,
-                            Code = timePeriods[0].TimeIdentifier
+                            Period = timePeriods[0].Period,
+                            Code = timePeriods[0].Identifier
                         },
                         End = new TimePeriodRangeBound
                         {
-                            Year = timePeriods[^1].Year,
-                            Code = timePeriods[^1].TimeIdentifier
+                            Period = timePeriods[^1].Period,
+                            Code = timePeriods[^1].Identifier
                         },
                     },
                     Filters = metaFileRows
@@ -326,7 +341,12 @@ public class SeedDataCommand : ICommand
                         .OrderBy(row => row.Label)
                         .Select(row => row.Label)
                         .ToList(),
-                    GeographicLevels = ListGeographicLevels(allowedColumns)
+                    GeographicLevels = geographicLevels
+                },
+                GeographicLevelMeta = new GeographicLevelMeta
+                {
+                    DataSetVersionId = _seed.DataSetVersionId,
+                    Levels = geographicLevels
                 },
                 Published = _seed.DataSet.Published,
             };
@@ -480,9 +500,9 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateLocationMetas(IReadOnlySet<string> allowedColumns)
         {
-            var geographicLevels = ListGeographicLevels(allowedColumns);
+            var levels = ListLocationLevels(allowedColumns);
 
-            var metas = geographicLevels
+            var metas = levels
                 .Select(level => new LocationMeta
                 {
                     DataSetVersionId = _seed.DataSetVersionId,
@@ -640,7 +660,7 @@ public class SeedDataCommand : ICommand
             };
         }
 
-        private List<GeographicLevel> ListGeographicLevels(IReadOnlySet<string> allowedColumns)
+        private List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
         {
             return allowedColumns
                 .Where(col => CsvColumnsToGeographicLevel.ContainsKey(col))
@@ -652,11 +672,11 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateTimePeriodMeta()
         {
-            var metas = (await _duckDb.QueryAsync<(int TimePeriod, string TimeIdentifier)>(
+            var metas = (await _duckDb.QueryAsync<(string TimePeriod, string TimeIdentifier)>(
                     new CommandDefinition(
                         $"""
                          SELECT DISTINCT time_period, time_identifier
-                         FROM '{_dataFilePath}'
+                         FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true)
                          ORDER BY time_period
                          """,
                         cancellationToken: _cancellationToken
@@ -666,11 +686,11 @@ public class SeedDataCommand : ICommand
                     tuple => new TimePeriodMeta
                     {
                         DataSetVersionId = _seed.DataSetVersionId,
-                        Year = tuple.TimePeriod,
+                        Period = TimePeriodFormatter.FormatFromCsv(tuple.TimePeriod),
                         Code = EnumToEnumLabelConverter<TimeIdentifier>.FromProvider(tuple.TimeIdentifier)
                     }
                 )
-                .OrderBy(meta => meta.Year)
+                .OrderBy(meta => meta.Period)
                 .ThenBy(meta => meta.Code)
                 .ToList();
 
@@ -703,8 +723,7 @@ public class SeedDataCommand : ICommand
             string[] columns =
             [
                 "id UINTEGER PRIMARY KEY",
-                "time_period VARCHAR",
-                "time_identifier VARCHAR",
+                "time_period_id INTEGER",
                 "geographic_level VARCHAR",
                 ..version.LocationMetas.Select(location => $"{GetDuckDbLocationTableName(location)}_id INTEGER"),
                 ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\" INTEGER"),
@@ -716,8 +735,7 @@ public class SeedDataCommand : ICommand
             string[] insertColumns =
             [
                 "nextval('data_seq') AS id",
-                "data_source.time_period",
-                "data_source.time_identifier",
+                "time_periods.id AS time_period_id",
                 "data_source.geographic_level",
                 ..version.LocationMetas.Select(
                     location =>
@@ -750,10 +768,14 @@ public class SeedDataCommand : ICommand
                 ..version.FilterMetas.Select(
                     filter => $"""
                                LEFT JOIN {FiltersDuckDbTable} AS "{filter.PublicId}"
-                               ON "{filter.PublicId}".public_id = '{filter.PublicId}'
+                               ON "{filter.PublicId}".column_name = '{filter.PublicId}'
                                AND "{filter.PublicId}".label = data_source."{filter.PublicId}"
                                """
-                )
+                ),
+                """
+                JOIN time_periods ON time_periods.period = data_source.time_period 
+                AND time_periods.identifier = data_source.time_identifier
+                """
             ];
 
             await _duckDb.ExecuteAsync(
@@ -772,8 +794,11 @@ public class SeedDataCommand : ICommand
                 )
             );
 
-            // Finish up by outputting Parquet file
+            await OutputParquetFiles();
+        }
 
+        private async Task OutputParquetFiles()
+        {
             var projectRootPath = PathUtils.ProjectRootPath;
             var parquetDir = Path.Combine(projectRootPath, "data", "public-api-parquet");
 
@@ -804,17 +829,32 @@ public class SeedDataCommand : ICommand
 
             Directory.CreateDirectory(versionDir);
 
-            var outputPath = Path.Combine(versionDir, "data.parquet");
-
             await _duckDb.ExecuteAsync(
                 new CommandDefinition(
-                    $"COPY data TO '{outputPath}' (FORMAT PARQUET, COMPRESSION ZSTD)",
+                    $"EXPORT DATABASE '{versionDir}' (FORMAT PARQUET, CODEC ZSTD)",
                     cancellationToken: _cancellationToken
                 )
             );
+
+            // Convert absolute paths in load.sql to relative paths otherwise
+            // these refer to the machine that the script was ran on.
+
+            var loadSqlFilePath = Path.Combine(versionDir, "load.sql");
+
+            var newLines = (await File.ReadAllLinesAsync(loadSqlFilePath, _cancellationToken))
+                .Select(line => line.Replace($"{versionDir}{Path.DirectorySeparatorChar}", ""));
+
+            await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
         }
 
         private async Task CreateDuckDbMetaTables(DataSetVersion version)
+        {
+            await CreateDuckDbLocationMetaTables(version);
+            await CreateDuckDbFilterMetaTable(version);
+            await CreateDuckDbTimePeriodMetaTable(version);
+        }
+
+        private async Task CreateDuckDbLocationMetaTables(DataSetVersion version)
         {
             foreach (var location in version.LocationMetas)
             {
@@ -822,8 +862,9 @@ public class SeedDataCommand : ICommand
 
                 string[] locationCols =
                 [
-                    "id INTEGER",
+                    "id INTEGER PRIMARY KEY",
                     "name VARCHAR",
+                    "public_id INTEGER",
                     ..GetDuckDbLocationCodeColumns(location.Level).Select(col => $"{col.Name} VARCHAR")
                 ];
 
@@ -838,13 +879,15 @@ public class SeedDataCommand : ICommand
                 using var appender = _duckDb.CreateAppender(table: locationTable);
 
                 var insertRow = appender.CreateRow();
+                var id = 1;
 
-                foreach (var link in location.OptionLinks)
+                foreach (var link in location.OptionLinks.OrderBy(l => l.Option.Label))
                 {
-                    insertRow.AppendValue(link.PublicId);
-                    insertRow.AppendValue(link.Option.Label);
-
                     var option = link.Option;
+
+                    insertRow.AppendValue(id++);
+                    insertRow.AppendValue(option.Label);
+                    insertRow.AppendValue(link.PublicId);
 
                     switch (option)
                     {
@@ -867,31 +910,69 @@ public class SeedDataCommand : ICommand
                     insertRow.EndRow();
                 }
             }
+        }
 
+        private async Task CreateDuckDbFilterMetaTable(DataSetVersion version)
+        {
             await _duckDb.ExecuteAsync(
                 $"""
-                CREATE TABLE {FiltersDuckDbTable}(
-                    id INTEGER,
-                    label VARCHAR,
-                    public_id VARCHAR
-                )
-                """
+                 CREATE TABLE {FiltersDuckDbTable}(
+                     id INTEGER PRIMARY KEY,
+                     label VARCHAR,
+                     public_id INTEGER,
+                     column_name VARCHAR
+                 )
+                 """
             );
+
+            var id = 1;
 
             foreach (var filter in version.FilterMetas)
             {
                 using var appender = _duckDb.CreateAppender(table: FiltersDuckDbTable);
 
-                foreach (var link in filter.OptionLinks)
+                foreach (var link in filter.OptionLinks.OrderBy(l => l.Option.Label))
                 {
                     var insertRow = appender.CreateRow();
 
-                    insertRow.AppendValue(link.PublicId);
+                    insertRow.AppendValue(id++);
                     insertRow.AppendValue(link.Option.Label);
+                    insertRow.AppendValue(link.PublicId);
                     insertRow.AppendValue(filter.PublicId);
 
                     insertRow.EndRow();
                 }
+            }
+        }
+
+        private async Task CreateDuckDbTimePeriodMetaTable(DataSetVersion version)
+        {
+            await _duckDb.ExecuteAsync(
+                $"""
+                 CREATE TABLE {TimePeriodsDuckDbTable}(
+                     id INTEGER PRIMARY KEY,
+                     period VARCHAR,
+                     identifier VARCHAR
+                 )
+                 """
+            );
+
+            using var appender = _duckDb.CreateAppender(table: TimePeriodsDuckDbTable);
+
+            var timePeriods = version.TimePeriodMetas
+                .OrderBy(tp => tp.Period)
+                .ThenBy(tp => tp.Code);
+
+            var id = 1;
+
+            foreach (var timePeriod in timePeriods)
+            {
+                var insertRow = appender.CreateRow();
+
+                insertRow.AppendValue(id++);
+                insertRow.AppendValue(TimePeriodFormatter.FormatToCsv(timePeriod.Period));
+                insertRow.AppendValue(timePeriod.Code.GetEnumLabel());
+                insertRow.EndRow();
             }
         }
 

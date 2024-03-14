@@ -15,7 +15,7 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required TimeIdentifier Code { get; set; }
 
-    public required int Year { get; set; }
+    public required string Period { get; set; }
 
     public DateTimeOffset Created { get; set; }
 
@@ -29,7 +29,7 @@ public class TimePeriodMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(10);
 
-            builder.HasIndex(o => new { o.DataSetVersionId, o.Code, o.Year })
+            builder.HasIndex(o => new { o.DataSetVersionId, o.Code, o.Period })
                 .IsUnique();
         }
     }

@@ -38,8 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 await SeedDatabase(publication, _contentDbContextId);
@@ -52,7 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Title, publicationViewModel.Title);
                 Assert.Equal(publication.Slug, publicationViewModel.Slug);
                 Assert.Equal(publication.Summary, publicationViewModel.Summary);
-                Assert.Equal(publication.LatestPublishedRelease!.Published!.Value, publicationViewModel.Published);
+                Assert.Equal(publication.LatestPublishedReleaseVersion!.Published!.Value,
+                    publicationViewModel.Published);
             }
 
             [Fact]
@@ -60,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
                 await SeedDatabase(publication, _contentDbContextId);
@@ -134,13 +135,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(ListOf<ReleaseParent>(
+                    .WithReleases(ListOf<Release>(
                         _dataFixture
-                            .DefaultReleaseParent(publishedVersions: 1, year: 2020),
+                            .DefaultRelease(publishedVersions: 1, year: 2020),
                         _dataFixture
-                            .DefaultReleaseParent(publishedVersions: 0, draftVersion: true, year: 2021),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                         _dataFixture
-                            .DefaultReleaseParent(publishedVersions: 2, draftVersion: true, year: 2022)))
+                            .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
                     .WithLegacyReleases(ListOf(_legacyRelease))
@@ -150,8 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             .DefaultTheme()));
 
                 // Expect the latest published release versions in reverse chronological order
-                var expectedReleaseVersion1 = publication.Releases.Single(r => r is { Year: 2022, Version: 1 });
-                var expectedReleaseVersion2 = publication.Releases.Single(r => r is { Year: 2020, Version: 0 });
+                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -222,14 +223,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication supersedingPublication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
@@ -269,14 +270,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication supersedingPublication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
                 Publication publication = _dataFixture
                     .DefaultPublication()
                     .WithSupersededBy(supersedingPublication)
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
@@ -312,8 +313,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
@@ -369,8 +370,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var (publication1, publication2, publication3) = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .Generate(3)
                     .ToTuple3();
@@ -454,8 +455,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultTopic()
                         .WithPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 1)
+                            .WithReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 1)
                                 .Generate(1))
                             .Generate(1))
                         .Generate(1)))
@@ -504,8 +505,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultTopic()
                         .WithPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 1)
+                            .WithReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 1)
                                 .Generate(1))
                             .Generate(1))
                         .Generate(1)))
@@ -513,11 +514,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultTopic()
                         .WithPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(ListOf<ReleaseParent>(
+                            .WithReleases(ListOf<Release>(
                                 _dataFixture
-                                    .DefaultReleaseParent(publishedVersions: 1),
+                                    .DefaultRelease(publishedVersions: 1),
                                 _dataFixture
-                                    .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                                    .DefaultRelease(publishedVersions: 0, draftVersion: true)
                             ))
                             .Generate(1))
                         .Generate(1)))
@@ -531,8 +532,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .DefaultTopic()
                         .WithPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                            .WithReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                                 .Generate(1))
                             .Generate(1))
                         .Generate(1)))
@@ -584,8 +585,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             .DefaultPublication()
                             // Index 0 has a published release
                             // Index 1 has no releases
-                            .ForIndex(0, s => s.SetReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 1)
+                            .ForIndex(0, s => s.SetReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 1)
                                 .Generate(1)))
                             .Generate(2))
                         .Generate(1));
@@ -621,14 +622,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         // Index 1 has a publication with an unpublished release
                         .ForIndex(0, s => s.SetPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 1)
+                            .WithReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 1)
                                 .Generate(1))
                             .Generate(1)))
                         .ForIndex(1, s => s.SetPublications(_dataFixture
                             .DefaultPublication()
-                            .WithReleaseParents(_dataFixture
-                                .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                            .WithReleases(_dataFixture
+                                .DefaultRelease(publishedVersions: 0, draftVersion: true)
                                 .Generate(1))
                             .Generate(1)))
                         .Generate(2));
@@ -665,8 +666,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(2));
 
                 Theme theme = _dataFixture
@@ -681,7 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        Release = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Data
@@ -690,7 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Older release has no data
                     new()
                     {
-                        Release = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -734,8 +735,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(2));
 
                 Theme theme = _dataFixture
@@ -750,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        Release = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -759,7 +760,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Older release has data, so the publication is visible
                     new()
                     {
-                        Release = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Data
@@ -803,9 +804,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(ListOf<ReleaseParent>(
-                        _dataFixture.DefaultReleaseParent(publishedVersions: 0, draftVersion: true),
-                        _dataFixture.DefaultReleaseParent(publishedVersions: 1)));
+                    .WithReleases(ListOf<Release>(
+                        _dataFixture.DefaultRelease(publishedVersions: 0, draftVersion: true),
+                        _dataFixture.DefaultRelease(publishedVersions: 1)));
 
                 Theme theme = _dataFixture
                     .DefaultTheme()
@@ -819,7 +820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Latest release has no data
                     new()
                     {
-                        Release = publication.Releases[1],
+                        ReleaseVersion = publication.ReleaseVersions[1],
                         File = new File
                         {
                             Type = FileType.Ancillary
@@ -828,7 +829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // Unpublished release has data but this shouldn't alter anything
                     new()
                     {
-                        Release = publication.Releases[0],
+                        ReleaseVersion = publication.ReleaseVersions[0],
                         File = new File
                         {
                             Type = FileType.Data
@@ -869,15 +870,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Publication supersedingPublication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture.DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture.DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 var (publication1, publication2) = _dataFixture
                     .DefaultPublication()
                     // Both publications have published releases
                     // Index 1 is superseded
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1))
                     .ForIndex(1, s => s.SetSupersededBy(supersedingPublication))
                     .Generate(2)
@@ -938,7 +939,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Slug = "publication-a",
                     Title = "Publication A",
                     Summary = "Publication A summary",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = new DateTime(2020, 1, 1)
@@ -950,7 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Slug = "publication-b",
                     Title = "Publication B",
                     Summary = "Publication B summary",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
                         Published = new DateTime(2021, 1, 1)
@@ -962,7 +963,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Slug = "publication-c",
                     Title = "Publication C",
                     Summary = "Publication C summary",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
                         Published = new DateTime(2022, 1, 1)
@@ -1053,7 +1054,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1064,7 +1065,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = null
+                    LatestPublishedReleaseVersion = null
                 };
 
                 var themes = new List<Theme>
@@ -1111,7 +1112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1122,7 +1123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1133,14 +1134,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedReleaseId = null
+                    LatestPublishedReleaseVersionId = null
                 };
 
                 // Not published (superseded by publicationB which is published)
                 var publicationD = new Publication
                 {
                     Title = "Publication D",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1152,7 +1153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationE = new Publication
                 {
                     Title = "Publication E",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1208,7 +1209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1218,7 +1219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1254,7 +1255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 new()
                                 {
                                     Title = "Publication C",
-                                    LatestPublishedRelease = new Release
+                                    LatestPublishedReleaseVersion = new ReleaseVersion
                                     {
                                         Type = AdHocStatistics,
                                         Published = new DateTime(2022, 1, 1)
@@ -1298,7 +1299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1308,7 +1309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1318,7 +1319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1328,7 +1329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationD = new Publication
                 {
                     Title = "Publication D",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1388,7 +1389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1398,7 +1399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
                         Published = DateTime.UtcNow
@@ -1408,7 +1409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
                         Published = DateTime.UtcNow
@@ -1474,21 +1475,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task Search_SortByRelevance_Desc()
             {
-                var releaseA = new Release
+                var releaseVersionA = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
                 };
 
-                var releaseB = new Release
+                var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
                 };
 
-                var releaseC = new Release
+                var releasedVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
@@ -1509,24 +1510,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
-                    LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedRelease = releaseB,
+                    LatestPublishedReleaseVersionId = releaseVersionB.Id,
+                    LatestPublishedReleaseVersion = releaseVersionB,
                     Topic = topic
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
-                    LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedRelease = releaseC,
+                    LatestPublishedReleaseVersionId = releasedVersionC.Id,
+                    LatestPublishedReleaseVersion = releasedVersionC,
                     Topic = topic
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
-                    LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedRelease = releaseA,
+                    LatestPublishedReleaseVersionId = releaseVersionA.Id,
+                    LatestPublishedReleaseVersion = releaseVersionA,
                     Topic = topic
                 },
             };
@@ -1570,21 +1571,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task Search_SortByRelevance_Asc()
             {
-                var releaseA = new Release
+                var releaseVersionA = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
                 };
 
-                var releaseB = new Release
+                var releaseVersionB = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
                 };
 
-                var releaseC = new Release
+                var releaseVersionC = new ReleaseVersion
                 {
                     Id = Guid.NewGuid(),
                     Type = NationalStatistics,
@@ -1605,24 +1606,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
-                    LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedRelease = releaseB,
+                    LatestPublishedReleaseVersionId = releaseVersionB.Id,
+                    LatestPublishedReleaseVersion = releaseVersionB,
                     Topic = topic
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
-                    LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedRelease = releaseC,
+                    LatestPublishedReleaseVersionId = releaseVersionC.Id,
+                    LatestPublishedReleaseVersion = releaseVersionC,
                     Topic = topic
                 },
                 new()
                 {
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
-                    LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedRelease = releaseA,
+                    LatestPublishedReleaseVersionId = releaseVersionA.Id,
+                    LatestPublishedReleaseVersion = releaseVersionA,
                     Topic = topic
                 },
             };
@@ -1666,19 +1667,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task SortByPublished_Desc()
             {
-                var releaseA = new Release
+                var releaseVersionA = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2020, 1, 1)
                 };
 
-                var releaseB = new Release
+                var releaseVersionB = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2021, 1, 1)
                 };
 
-                var releaseC = new Release
+                var releaseVersionC = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2022, 1, 1)
@@ -1687,19 +1688,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = releaseA
+                    LatestPublishedReleaseVersion = releaseVersionA
                 };
 
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = releaseB
+                    LatestPublishedReleaseVersion = releaseVersionB
                 };
 
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = releaseC
+                    LatestPublishedReleaseVersion = releaseVersionC
                 };
 
                 var themes = new List<Theme>
@@ -1757,19 +1758,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             [Fact]
             public async Task SortByPublished_Asc()
             {
-                var releaseA = new Release
+                var releaseVersionA = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2020, 1, 1)
                 };
 
-                var releaseB = new Release
+                var releaseVersionB = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2021, 1, 1)
                 };
 
-                var releaseC = new Release
+                var releaseVersionC = new ReleaseVersion
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2022, 1, 1)
@@ -1778,19 +1779,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = releaseA
+                    LatestPublishedReleaseVersion = releaseVersionA
                 };
 
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = releaseB
+                    LatestPublishedReleaseVersion = releaseVersionB
                 };
 
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = releaseC
+                    LatestPublishedReleaseVersion = releaseVersionC
                 };
 
                 var themes = new List<Theme>
@@ -1851,7 +1852,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1861,7 +1862,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
                         Published = DateTime.UtcNow
@@ -1871,7 +1872,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
                         Published = DateTime.UtcNow
@@ -1936,7 +1937,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationA = new Publication
                 {
                     Title = "Publication A",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = NationalStatistics,
                         Published = DateTime.UtcNow
@@ -1946,7 +1947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationB = new Publication
                 {
                     Title = "Publication B",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = OfficialStatistics,
                         Published = DateTime.UtcNow
@@ -1956,7 +1957,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationC = new Publication
                 {
                     Title = "Publication C",
-                    LatestPublishedRelease = new Release
+                    LatestPublishedReleaseVersion = new ReleaseVersion
                     {
                         Type = AdHocStatistics,
                         Published = DateTime.UtcNow
@@ -2019,7 +2020,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
             IPublicationRepository? publicationRepository = null,
-            IReleaseRepository? releaseRepository = null)
+            IReleaseVersionRepository? releaseVersionRepository = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
@@ -2027,7 +2028,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseRepository ?? new ReleaseRepository(contentDbContext)
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext)
             );
         }
     }

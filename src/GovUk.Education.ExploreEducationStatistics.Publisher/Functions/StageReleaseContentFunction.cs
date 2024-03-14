@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
                 }).GetNextOccurrence(DateTime.UtcNow);
                 await _contentService.UpdateContentStaged(nextScheduledPublishingTime,
-                    message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
+                    message.Releases.Select(tuple => tuple.ReleaseVersionId).ToArray());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)

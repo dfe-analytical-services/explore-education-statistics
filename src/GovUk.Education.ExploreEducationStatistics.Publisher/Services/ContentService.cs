@@ -42,112 +42,115 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicationCacheService = publicationCacheService;
         }
 
-        public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
+        public async Task DeletePreviousVersionsContent(params Guid[] releaseVersionIds)
         {
-            var releases = await _releaseService.GetAmendedReleases(releaseIds);
+            var releaseVersions = await _releaseService.GetAmendedReleases(releaseVersionIds);
 
-            foreach (var release in releases)
+            foreach (var releaseVersion in releaseVersions)
             {
-                var previousRelease = release.PreviousVersion;
+                var previousReleaseVersion = releaseVersion.PreviousVersion;
 
-                if (previousRelease == null)
+                if (previousReleaseVersion == null)
                 {
                     break;
                 }
 
                 // Delete any lazily-cached results that are owned by the previous Release
-                await DeleteLazilyCachedReleaseResults(previousRelease.Id, release.Publication.Slug, previousRelease.Slug);
+                await DeleteLazilyCachedReleaseResults(previousReleaseVersion.Id, releaseVersion.Publication.Slug, previousReleaseVersion.Slug);
 
                 // Delete content which hasn't been overwritten because the Slug has changed
-                if (release.Slug != previousRelease.Slug)
+                if (releaseVersion.Slug != previousReleaseVersion.Slug)
                 {
                     await _publicBlobStorageService.DeleteBlob(
                         PublicContent,
-                        PublicContentReleasePath(release.Publication.Slug, previousRelease.Slug)
+                        PublicContentReleasePath(releaseVersion.Publication.Slug, previousReleaseVersion.Slug)
                     );
                 }
             }
         }
 
-        private async Task DeleteLazilyCachedReleaseResults(Guid releaseId, string publicationSlug, string releaseSlug)
+        private async Task DeleteLazilyCachedReleaseResults(Guid releaseVersionId,
+            string publicationSlug,
+            string releaseSlug)
         {
-            await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseId));
+            await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
 
             await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
             await _publicBlobCacheService.DeleteItemAsync(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
             await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
-        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
+        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseVersionIds)
         {
-            var releases = await _releaseService.List(releaseIds);
+            var releaseVersions = await _releaseService.List(releaseVersionIds);
 
-            foreach (var release in releases)
+            foreach (var releaseVersion in releaseVersions)
             {
-                if (release.PreviousVersion != null)
+                if (releaseVersion.PreviousVersion != null)
                 {
                     await _publicBlobStorageService.DeleteBlobs(
                         containerName: PublicReleaseFiles,
-                        directoryPath: $"{release.PreviousVersion.Id}/");
+                        directoryPath: $"{releaseVersion.PreviousVersion.Id}/");
                 }
             }
         }
 
-        public async Task UpdateContent(params Guid[] releaseIds)
+        public async Task UpdateContent(params Guid[] releaseVersionIds)
         {
-            var releases = (await _releaseService
-                    .List(releaseIds))
+            var releaseVersions = (await _releaseService
+                    .List(releaseVersionIds))
                 .ToList();
 
-            foreach (var release in releases)
+            foreach (var releaseVersion in releaseVersions)
             {
                 await _releaseCacheService.UpdateRelease(
-                    release.Id,
-                    publicationSlug: release.Publication.Slug,
-                    releaseSlug: release.Slug);
+                    releaseVersion.Id,
+                    publicationSlug: releaseVersion.Publication.Slug,
+                    releaseSlug: releaseVersion.Slug);
             }
 
-            var publications = releases
-                .Select(release => release.Publication)
+            var publications = releaseVersions
+                .Select(rv => rv.Publication)
                 .DistinctByProperty(publication => publication.Id)
                 .ToList();
 
             foreach (var publication in publications)
             {
-                // Cache the latest release for the publication as a separate cache entry
-                var latestRelease = await _releaseService.GetLatestRelease(publication.Id, releaseIds);
+                // Cache the latest release version for the publication as a separate cache entry
+                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
                 await _releaseCacheService.UpdateRelease(
-                    latestRelease.Id,
+                    latestReleaseVersion.Id,
                     publicationSlug: publication.Slug);
             }
         }
 
-        public async Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseIds)
+        public async Task UpdateContentStaged(DateTime expectedPublishDate,
+            params Guid[] releaseVersionIds)
         {
-            var releases = (await _releaseService
-                    .List(releaseIds))
+            var releaseVersions = (await _releaseService
+                    .List(releaseVersionIds))
                 .ToList();
 
-            foreach (var release in releases)
+            foreach (var releaseVersion in releaseVersions)
             {
                 await _releaseCacheService.UpdateReleaseStaged(
-                    release.Id,
+                    releaseVersion.Id,
                     expectedPublishDate,
-                    publicationSlug: release.Publication.Slug,
-                    releaseSlug: release.Slug);
+                    publicationSlug: releaseVersion.Publication.Slug,
+                    releaseSlug: releaseVersion.Slug);
             }
 
-            var publications = releases
-                .Select(release => release.Publication)
+            var publications = releaseVersions
+                .Select(rv => rv.Publication)
                 .DistinctByProperty(publication => publication.Id)
                 .ToList();
 
             foreach (var publication in publications)
             {
-                // Cache the latest release for the publication as a separate cache entry
-                var latestRelease = await _releaseService.GetLatestRelease(publication.Id, releaseIds);
+                // Cache the latest release version for the publication as a separate cache entry
+                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
                 await _releaseCacheService.UpdateReleaseStaged(
-                    latestRelease.Id,
+                    latestReleaseVersion.Id,
                     expectedPublishDate,
                     publicationSlug: publication.Slug);
             }

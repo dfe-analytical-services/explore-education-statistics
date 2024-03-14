@@ -8,7 +8,7 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { render as baseRender, screen, within } from '@testing-library/react';
+import { render as baseRender, screen } from '@testing-library/react';
 import React from 'react';
 
 describe('TableHeadersReorderableList', () => {
@@ -19,11 +19,10 @@ describe('TableHeadersReorderableList', () => {
       screen.getByRole('group', { name: 'Category group' }),
     ).toBeInTheDocument();
 
-    // Draggable items are buttons
-    const buttons = screen.getAllByRole('button');
+    const buttons = screen.getAllByTestId('reorderable-item');
     expect(buttons).toHaveLength(2);
-    expect(within(buttons[0]).getByText('Category 1'));
-    expect(within(buttons[1]).getByText('Category 2'));
+    expect(buttons[0]).toHaveTextContent('Category 1');
+    expect(buttons[1]).toHaveTextContent('Category 2');
   });
 });
 

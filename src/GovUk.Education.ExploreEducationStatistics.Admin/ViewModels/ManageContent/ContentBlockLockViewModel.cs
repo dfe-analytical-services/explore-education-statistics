@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 public record ContentBlockLockViewModel(
     Guid Id,
     Guid SectionId,
-    Guid ReleaseId,
+    Guid ReleaseVersionId,
     DateTimeOffset Locked,
     DateTimeOffset LockedUntil,
     UserDetailsViewModel LockedBy);

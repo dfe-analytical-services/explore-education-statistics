@@ -22,9 +22,9 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 {
     private const string PublicationSlug = "publication-slug";
     private const string ReleaseSlug = "2022";
-    private static readonly Guid ReleaseId = Guid.NewGuid();
+    private static readonly Guid ReleaseVersionId = Guid.NewGuid();
 
-    private readonly ReleaseCacheViewModel _releaseViewModel = new(ReleaseId)
+    private readonly ReleaseCacheViewModel _releaseViewModel = new(ReleaseVersionId)
     {
         NextReleaseDate = new PartialDate(),
         Published = DateTime.UtcNow,
@@ -233,7 +233,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, null))
+            .Setup(s => s.GetRelease(ReleaseVersionId, null))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -243,7 +243,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var service = BuildService(releaseService: releaseService.Object);
 
         var result = await service.UpdateRelease(
-            ReleaseId,
+            ReleaseVersionId,
             publicationSlug: PublicationSlug,
             releaseSlug: ReleaseSlug);
 
@@ -262,7 +262,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, null))
+            .Setup(s => s.GetRelease(ReleaseVersionId, null))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -272,7 +272,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var service = BuildService(releaseService: releaseService.Object);
 
         var result = await service.UpdateRelease(
-            ReleaseId,
+            ReleaseVersionId,
             publicationSlug: PublicationSlug);
 
         // There should be no attempt on the cache service to get the cached resource
@@ -291,7 +291,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, expectedPublishDate))
+            .Setup(s => s.GetRelease(ReleaseVersionId, expectedPublishDate))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -301,7 +301,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var service = BuildService(releaseService: releaseService.Object);
 
         var result = await service.UpdateReleaseStaged(
-            ReleaseId,
+            ReleaseVersionId,
             expectedPublishDate,
             publicationSlug: PublicationSlug,
             releaseSlug: ReleaseSlug);
@@ -322,7 +322,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, expectedPublishDate))
+            .Setup(s => s.GetRelease(ReleaseVersionId, expectedPublishDate))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -332,7 +332,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var service = BuildService(releaseService: releaseService.Object);
 
         var result = await service.UpdateReleaseStaged(
-            ReleaseId,
+            ReleaseVersionId,
             expectedPublishDate,
             publicationSlug: PublicationSlug);
 

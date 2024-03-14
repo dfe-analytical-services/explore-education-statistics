@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectCsvMetaService _subjectCsvMetaService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly TableBuilderOptions _options;
 
         public TableBuilderService(
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectCsvMetaService subjectCsvMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IReleaseRepository releaseRepository,
+            IReleaseVersionRepository releaseVersionRepository,
             IOptions<TableBuilderOptions> options)
         {
             _context = context;
@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectCsvMetaService = subjectCsvMetaService;
             _subjectRepository = subjectRepository;
             _userService = userService;
-            _releaseRepository = releaseRepository;
+            _releaseVersionRepository = releaseVersionRepository;
             _options = options.Value;
         }
 
@@ -75,16 +75,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            return await FindLatestPublishedReleaseId(queryContext.SubjectId)
-                .OnSuccess(releaseId => Query(releaseId, queryContext, cancellationToken));
+            return await FindLatestPublishedReleaseVersionId(queryContext.SubjectId)
+                .OnSuccess(releaseVersionId => Query(releaseVersionId, queryContext, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            Guid releaseId,
+            Guid releaseVersionId,
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            return await CheckReleaseSubjectExists(queryContext.SubjectId, releaseId)
+            return await CheckReleaseSubjectExists(subjectId: queryContext.SubjectId,
+                    releaseVersionId: releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccessDo(() => CheckQueryHasValidTableSize(queryContext))
                 .OnSuccess(() => ListQueryObservations(queryContext, cancellationToken))
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     return await _subjectResultMetaService
-                        .GetSubjectMeta(releaseId, queryContext, observations)
+                        .GetSubjectMeta(releaseVersionId, queryContext, observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {
                             return new TableBuilderResultViewModel
@@ -114,17 +115,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await FindLatestPublishedReleaseId(queryContext.SubjectId)
+            return await FindLatestPublishedReleaseVersionId(queryContext.SubjectId)
                 .OnSuccessVoid(releaseId => QueryToCsvStream(releaseId, queryContext, stream, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> QueryToCsvStream(
-            Guid releaseId,
+            Guid releaseVersionId,
             ObservationQueryContext queryContext,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await CheckReleaseSubjectExists(queryContext.SubjectId, releaseId)
+            return await CheckReleaseSubjectExists(subjectId: queryContext.SubjectId,
+                    releaseVersionId: releaseVersionId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccessDo(() => CheckQueryHasValidTableSize(queryContext))
                 .OnSuccess(releaseSubject => ListQueryObservations(queryContext, cancellationToken)
@@ -196,20 +198,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             );
         }
 
-        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseId(Guid subjectId)
+        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseVersionId(Guid subjectId)
         {
             return await _subjectRepository.FindPublicationIdForSubject(subjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId =>
-                    _releaseRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
-                .OnSuccess(release => release.Id);
+                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(publicationId).OrNotFound())
+                .OnSuccess(releaseVersion => releaseVersion.Id);
         }
 
-        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseId)
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,
+            Guid releaseVersionId)
         {
             return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
                 query => query
-                    .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
+                    .Where(rs => rs.ReleaseVersionId == releaseVersionId && rs.SubjectId == subjectId)
             );
         }
 

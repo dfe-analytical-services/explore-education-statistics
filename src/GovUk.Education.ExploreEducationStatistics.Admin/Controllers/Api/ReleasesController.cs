@@ -59,70 +59,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}")]
-        public async Task<ActionResult<ReleaseViewModel>> DeleteRelease(Guid releaseId)
+        [HttpDelete("release/{releaseVersionId:guid}")]
+        public async Task<ActionResult<ReleaseViewModel>> DeleteRelease(Guid releaseVersionId)
         {
             return await _releaseService
-                .DeleteRelease(releaseId)
+                .DeleteRelease(releaseVersionId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpPost("release/{releaseId:guid}/amendment")]
-        public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseId)
+        [HttpPost("release/{releaseVersionId:guid}/amendment")]
+        public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseVersionId)
         {
             return await _releaseAmendmentService
-                .CreateReleaseAmendment(releaseId)
+                .CreateReleaseAmendment(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data/{fileId:guid}")]
+        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseId, Guid fileId)
+        public async Task<ActionResult<DataFileInfo>> GetDataFileInfo(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseDataFileService
-                .GetInfo(releaseId, fileId)
+                .GetInfo(releaseVersionId, fileId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data")]
+        [HttpGet("release/{releaseVersionId:guid}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseId)
+        public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseVersionId)
         {
             return await _releaseDataFileService
-                .ListAll(releaseId)
+                .ListAll(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/data/order")]
+        [HttpPut("release/{releaseVersionId:guid}/data/order")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseId,
+        public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseVersionId,
             List<Guid> fileIds)
         {
             return await _releaseDataFileService
-                .ReorderDataFiles(releaseId, fileIds)
+                .ReorderDataFiles(releaseVersionId, fileIds)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/data")]
+        [HttpPost("release/{releaseVersionId:guid}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseId,
+        public async Task<ActionResult<DataFileInfo>> AddDataFilesAsync(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
             [FromQuery(Name = "title")] string subjectName,
             IFormFile file,
             IFormFile metaFile)
         {
             return await _releaseDataFileService
-                .Upload(releaseId: releaseId,
+                .Upload(releaseVersionId: releaseVersionId,
                     dataFormFile: file,
                     metaFormFile: metaFile,
                     replacingFileId: replacingFileId,
@@ -130,66 +130,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId:guid}/zip-data")]
+        [HttpPost("release/{releaseVersionId:guid}/zip-data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseId,
+        public async Task<ActionResult<DataFileInfo>> AddDataZipFileAsync(Guid releaseVersionId,
             [FromQuery(Name = "replacingFileId")] Guid? replacingFileId,
             [FromQuery(Name = "title")] string subjectName,
             IFormFile zipFile)
         {
             return await _releaseDataFileService
-                .UploadAsZip(releaseId: releaseId,
+                .UploadAsZip(releaseVersionId: releaseVersionId,
                     zipFormFile: zipFile,
                     replacingFileId: replacingFileId,
                     subjectName: subjectName)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}")]
-        public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseId)
+        [HttpGet("releases/{releaseVersionId:guid}")]
+        public async Task<ActionResult<ReleaseViewModel>> GetRelease(Guid releaseVersionId)
         {
             return await _releaseService
-                .GetRelease(releaseId)
+                .GetRelease(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}/status")]
-        public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseId)
+        [HttpGet("releases/{releaseVersionId:guid}/status")]
+        public async Task<ActionResult<List<ReleaseStatusViewModel>>> ListReleaseStatuses(Guid releaseVersionId)
         {
             return await _releaseApprovalService
-                .ListReleaseStatuses(releaseId)
+                .ListReleaseStatuses(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}/publication-status")]
+        [HttpGet("releases/{releaseVersionId:guid}/publication-status")]
         public async Task<ActionResult<ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releaseService
-                .GetReleasePublicationStatus(releaseId)
+                .GetReleasePublicationStatus(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId:guid}")]
+        [HttpPut("releases/{releaseVersionId:guid}")]
         public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releaseService
-                .UpdateRelease(releaseId, request)
+                .UpdateRelease(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseId:guid}/status")]
+        [HttpPost("releases/{releaseVersionId:guid}/status")]
         public async Task<ActionResult<ReleaseViewModel>> CreateReleaseStatus(ReleaseStatusCreateRequest request,
-            Guid releaseId)
+            Guid releaseVersionId)
         {
             return await _releaseApprovalService
-                .CreateReleaseStatus(releaseId, request)
-                .OnSuccess(_ => _releaseService.GetRelease(releaseId))
+                .CreateReleaseStatus(releaseVersionId, request)
+                .OnSuccess(_ => _releaseService.GetRelease(releaseVersionId))
                 .HandleFailuresOrOk();
         }
 
@@ -226,68 +226,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data/{fileId:guid}/import/status")]
-        public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
+        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/import/status")]
+        public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseVersionId, Guid fileId)
         {
             return _releaseService
-                .GetDataFileImportStatus(releaseId, fileId)
+                .GetDataFileImportStatus(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId)
+        [HttpGet("release/{releaseVersionId:guid}/delete-plan")]
+        public async Task<ActionResult<DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId)
         {
             return await _releaseService
-                .GetDeleteReleasePlan(releaseId)
+                .GetDeleteReleasePlan(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data/{fileId:guid}/delete-plan")]
-        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
+        [HttpGet("release/{releaseVersionId:guid}/data/{fileId:guid}/delete-plan")]
+        public async Task<ActionResult<DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseService
-                .GetDeleteDataFilePlan(releaseId, fileId)
+                .GetDeleteDataFilePlan(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId:guid}/data/{fileId:guid}")]
-        public async Task<ActionResult> DeleteDataFiles(Guid releaseId, Guid fileId)
+        [HttpDelete("release/{releaseVersionId:guid}/data/{fileId:guid}")]
+        public async Task<ActionResult> DeleteDataFiles(Guid releaseVersionId, Guid fileId)
         {
             return await _releaseService
-                .RemoveDataFiles(releaseId, fileId)
+                .RemoveDataFiles(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpPost("release/{releaseId:guid}/data/{fileId:guid}/import/cancel")]
-        public async Task<ActionResult> CancelFileImport(Guid releaseId, Guid fileId)
+        [HttpPost("release/{releaseVersionId:guid}/data/{fileId:guid}/import/cancel")]
+        public async Task<ActionResult> CancelFileImport(Guid releaseVersionId, Guid fileId)
         {
             return await _dataImportService
-                .CancelImport(releaseId, fileId)
+                .CancelImport(releaseVersionId: releaseVersionId,
+                    fileId: fileId)
                 .HandleFailuresOr(_ => new AcceptedResult());
         }
 
-        [HttpGet("releases/{releaseId:guid}/stage-status")]
-        public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseId)
+        [HttpGet("releases/{releaseVersionId:guid}/stage-status")]
+        public async Task<ActionResult<ReleasePublishingStatusViewModel>> GetReleaseStatusesAsync(Guid releaseVersionId)
         {
             return await _releasePublishingStatusService
-                .GetReleaseStatusAsync(releaseId)
+                .GetReleaseStatusAsync(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId:guid}/checklist")]
-        public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseId)
+        [HttpGet("releases/{releaseVersionId:guid}/checklist")]
+        public async Task<ActionResult<ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
         {
             return await _releaseChecklistService
-                .GetChecklist(releaseId)
+                .GetChecklist(releaseVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("releases/{releaseId:guid}/published")]
-        public async Task<ActionResult> UpdateReleasePublished(Guid releaseId,
+        [HttpPatch("releases/{releaseVersionId:guid}/published")]
+        public async Task<ActionResult> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request)
         {
             return await _releaseService
-                .UpdateReleasePublished(releaseId, request)
+                .UpdateReleasePublished(releaseVersionId, request)
                 .HandleFailuresOrNoContent();
         }
     }

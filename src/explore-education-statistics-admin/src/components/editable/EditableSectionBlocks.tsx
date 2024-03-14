@@ -5,7 +5,7 @@ import { EditableBlock } from '@admin/services/types/content';
 import InsetText from '@common/components/InsetText';
 import reorder from '@common/utils/reorder';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import React, { Fragment, ReactNode, useCallback } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 
 export interface EditableSectionBlockProps<
   T extends EditableBlock = EditableBlock,
@@ -41,7 +41,13 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
     return blocks.length > 0 ? (
       <>
         {blocks.map(block => (
-          <Fragment key={block.id}>{renderBlock(block)}</Fragment>
+          <div
+            data-scroll
+            id={`editableSectionBlocks-${block.id}`}
+            key={block.id}
+          >
+            {renderBlock(block)}
+          </div>
         ))}
       </>
     ) : (
@@ -55,16 +61,20 @@ const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <BlockDroppable droppable={isReordering} droppableId={sectionId}>
+      <BlockDroppable
+        droppable={isReordering && editingMode === 'edit'}
+        droppableId={sectionId}
+      >
         {blocks.map((block, index) => (
           <div
             key={block.id}
             id={`editableSectionBlocks-${block.id}`}
             className="govuk-!-margin-bottom-9"
+            data-scroll
             data-testid="editableSectionBlock"
           >
             <BlockDraggable
-              draggable={isReordering}
+              draggable={isReordering && editingMode === 'edit'}
               draggableId={block.id}
               key={block.id}
               index={index}

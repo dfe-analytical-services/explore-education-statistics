@@ -15,17 +15,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate);
 
-        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId);
+        Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseVersionId);
 
-        Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId);
+        Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id);
+        Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(Guid releaseId);
+        Task<Either<ActionResult, ReleasePublicationStatusViewModel>>
+            GetReleasePublicationStatus(Guid releaseVersionId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateRequest request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseVersionId, ReleaseUpdateRequest request);
 
-        Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseId,
+        Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseVersionId,
             ReleasePublishedUpdateRequest request);
 
         Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId);
@@ -37,10 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
-        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseVersionId, Guid fileId);
 
-        Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, Unit>> RemoveDataFiles(Guid releaseVersionId, Guid fileId);
 
-        Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId);
+        Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseVersionId,
+            Guid fileId);
     }
 }

@@ -21,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _replacementService = replacementService;
         }
 
-        [HttpGet("releases/{releaseId:guid}/data/{fileId:guid}/replacement-plan/{replacementFileId:guid}")]
-        public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseId,
+        [HttpGet("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement-plan/{replacementFileId:guid}")]
+        public async Task<ActionResult<DataReplacementPlanViewModel>> GetReplacementPlan(Guid releaseVersionId,
             Guid fileId,
             Guid replacementFileId)
         {
             return await _replacementService.GetReplacementPlan(
-                    releaseId: releaseId,
+                    releaseVersionId: releaseVersionId,
                     originalFileId: fileId,
                     replacementFileId: replacementFileId
                 )
@@ -35,13 +35,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseId:guid}/data/{fileId:guid}/replacement/{replacementFileId:guid}")]
-        public async Task<ActionResult<Unit>> Replace(Guid releaseId,
+        [HttpPost("releases/{releaseVersionId:guid}/data/{fileId:guid}/replacement/{replacementFileId:guid}")]
+        public async Task<ActionResult<Unit>> Replace(Guid releaseVersionId,
             Guid fileId,
             Guid replacementFileId)
         {
             return await _replacementService.Replace(
-                    releaseId: releaseId,
+                    releaseVersionId: releaseVersionId,
                     originalFileId: fileId,
                     replacementFileId: replacementFileId
                 )

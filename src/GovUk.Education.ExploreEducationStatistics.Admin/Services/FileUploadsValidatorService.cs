@@ -38,12 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         // We cannot rely on the normal upload validation as we want this to be an atomic operation for both files.
         public async Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(
-            Guid releaseId,
+            Guid releaseVersionId,
             IFormFile dataFile,
             IFormFile metaFile,
             File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId,
+            return await ValidateDataFileNames(releaseVersionId,
                     dataFileName: dataFile.FileName,
                     metaFileName: metaFile.FileName,
                     replacingFile)
@@ -52,12 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
-            Guid releaseId,
+            Guid releaseVersionId,
             IDataArchiveFile archiveFile,
             File? replacingFile = null)
         {
             return await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize)
-                .OnSuccess(async _ => await ValidateDataFileNames(releaseId,
+                .OnSuccess(async _ => await ValidateDataFileNames(releaseVersionId,
                     dataFileName: archiveFile.DataFileName,
                     metaFileName: archiveFile.MetaFileName,
                     replacingFile));
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-            
+
             if (file.Length > MaxFileSize)
             {
                 return ValidationActionResult(FileSizeLimitExceeded);
@@ -89,7 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
+        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseVersionId,
+            string name)
         {
             if (!name.Any())
             {
@@ -104,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var subjectNameExists = _context.ReleaseFiles
                 .Include(rf => rf.File)
                 .Any(rf =>
-                    rf.ReleaseId == releaseId
+                    rf.ReleaseVersionId == releaseVersionId
                     && rf.File.Type == FileType.Data
                     && rf.Name == name);
             if (subjectNameExists)
@@ -127,19 +128,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                    filename.IndexOfAny(Path.GetInvalidFileNameChars()) > -1;
         }
 
-        private bool IsFileExisting(Guid releaseId, FileType type, string name)
+        private bool IsFileExisting(Guid releaseVersionId,
+            FileType type,
+            string name)
         {
             return _context
                 .ReleaseFiles
                 .Include(rf => rf.File)
-                .Where(rf => rf.ReleaseId == releaseId)
+                .Where(rf => rf.ReleaseVersionId == releaseVersionId)
                 .ToList()
                 .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
                            && rf.File.Type == type);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(
-            Guid releaseId,
+            Guid releaseVersionId,
             string dataFileName,
             string metaFileName,
             File? replacingFile)
@@ -183,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return filenamesValid.Left;
             }
 
-            if (IsFileExisting(releaseId, FileType.Data, dataFileName) &&
+            if (IsFileExisting(releaseVersionId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
                 return ValidationActionResult(DataFilenameNotUnique);
@@ -244,7 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errorMessages.Add(MetaFilenameTooLong);
             }
 
-            if (errorMessages.Any()) {
+            if (errorMessages.Any())
+            {
                 return ValidationActionResult(errorMessages);
             }
 

@@ -9,7 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 
 public interface IReleaseSubjectService
 {
-    Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId, Guid? releaseId = null);
+    Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId,
+        Guid? releaseVersionId = null);
 
     Task<ReleaseSubject?> FindForLatestPublishedVersion(Guid subjectId);
 }

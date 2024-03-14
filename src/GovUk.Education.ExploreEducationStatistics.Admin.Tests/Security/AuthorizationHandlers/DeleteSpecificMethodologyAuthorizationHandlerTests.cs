@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodologyAmendment()
             {
-                await GetEnumValues<PublicationRole>()
+                await GetEnums<PublicationRole>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async role =>
                     {
@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var handler = new DeleteSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
                 new AuthorizationHandlerService(
-                    new ReleaseRepository(InMemoryApplicationDbContext()),
+                    new ReleaseVersionRepository(InMemoryApplicationDbContext()),
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));

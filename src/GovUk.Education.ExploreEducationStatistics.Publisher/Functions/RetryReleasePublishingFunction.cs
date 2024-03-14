@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -48,27 +48,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            var releaseStatus = await _releasePublishingStatusService.GetLatestAsync(message.ReleaseId);
+            var releaseStatus = await _releasePublishingStatusService.GetLatestAsync(message.ReleaseVersionId);
 
             if (releaseStatus == null)
             {
                 logger.LogError(
-                    "Latest status not found for Release: {0} while attempting to retry",
-                    message.ReleaseId);
+                    "Latest status not found for ReleaseVersion: {0} while attempting to retry",
+                    message.ReleaseVersionId);
             }
             else
             {
                 if (!ValidStates.Contains(releaseStatus.State.Overall))
                 {
-                    logger.LogError("Can only attempt a retry of Release: {0} if the latest " +
+                    logger.LogError("Can only attempt a retry of ReleaseVersion: {0} if the latest " +
                                     "status is in ({1}). Found: {2}",
-                        message.ReleaseId,
+                        message.ReleaseVersionId,
                         string.Join(", ", ValidStates),
                         releaseStatus.State.Overall);
                 }
                 else
                 {
-                    await _queueService.QueuePublishReleaseContentMessage(message.ReleaseId, releaseStatus.Id);
+                    await _queueService.QueuePublishReleaseContentMessage(releaseVersionId: message.ReleaseVersionId,
+                        releaseStatusId: releaseStatus.Id);
                 }
             }
 

@@ -16,10 +16,12 @@ export type EditingMode = 'preview' | 'table-preview' | 'edit';
 export type BlockCommentIds = Dictionary<string[]>;
 
 export interface EditingContextState {
+  activeSection?: string;
   addUnsavedBlock: (blockId: string) => void;
   clearUnsavedCommentDeletions: (blockId: string) => void;
   editingMode: EditingMode;
   removeUnsavedBlock: (blockId: string) => void;
+  setActiveSection: (sectionId: string) => void;
   setEditingMode: (mode: EditingMode) => void;
   totalUnresolvedComments: number;
   totalUnsavedBlocks: number;
@@ -39,6 +41,7 @@ export const EditingContext = createContext<EditingContextState>({
   clearUnsavedCommentDeletions: noop,
   editingMode: 'preview',
   removeUnsavedBlock: noop,
+  setActiveSection: noop,
   setEditingMode: noop,
   totalUnsavedBlocks: 0,
   totalUnresolvedComments: 0,
@@ -70,6 +73,9 @@ export const EditingContextProvider = ({
 }: EditingContextProviderProps) => {
   const [editingMode, setEditingMode] =
     useState<EditingMode>(initialEditingMode);
+
+  const [activeSection, setActiveSection] = useState<string>();
+
   const [unresolvedComments, setUnresolvedComments] = useState<BlockCommentIds>(
     initialUnresolvedComments,
   );
@@ -166,10 +172,12 @@ export const EditingContextProvider = ({
       };
 
     return {
+      activeSection,
       addUnsavedBlock,
+      clearUnsavedCommentDeletions,
       editingMode,
       removeUnsavedBlock,
-      clearUnsavedCommentDeletions,
+      setActiveSection,
       setEditingMode,
       totalUnresolvedComments,
       totalUnsavedBlocks,
@@ -180,6 +188,7 @@ export const EditingContextProvider = ({
       updateUnsavedCommentDeletions,
     };
   }, [
+    activeSection,
     editingMode,
     totalUnsavedBlocks,
     totalUnresolvedComments,

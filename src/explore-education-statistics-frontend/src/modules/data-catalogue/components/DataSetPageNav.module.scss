@@ -1,0 +1,10 @@
+@import '~govuk-frontend/govuk/base';
+
+.navContainer {
+  @include govuk-media-query($from: tablet) {
+    border-bottom: 0;
+    max-height: 100vh;
+    position: sticky;
+    top: govuk-spacing(4);
+  }
+}
