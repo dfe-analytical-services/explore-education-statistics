@@ -14,7 +14,6 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=                            UI tests-publish publication update %{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL_ENDING}=               /methodology/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
-${PUBLIC_METHODOLOGY_UPDATED_URL_ENDING}=       /methodology/methodology-update
 ${PUBLICATION_NAME_UPDATED}=                    ${PUBLICATION_NAME} updated
 ${PUBLIC_PUBLICATION_URL_ENDING}=               /find-statistics/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
 ${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}=      https://dev.explore-education-statistics.service.gov.uk${PUBLIC_PUBLICATION_URL_ENDING}
@@ -121,7 +120,7 @@ Validate publication details are updated on public page
     user checks page contains    Contact name updated
     user checks page contains    04321 4321
 
-Navigate to methodology page and click on amendment button
+Create methodology amendment in Admin
     user navigates to methodologies on publication page    ${PUBLICATION_NAME_UPDATED}
     user waits until page contains element    xpath://h2[contains(text(),'Manage methodologies')]
     user clicks button    Amend
@@ -136,7 +135,7 @@ Update methodology details
     user enters text into element    id:updateMethodologyForm-title    ${PUBLICATION_NAME}-methodology update
     user clicks button    Update methodology
 
-Naviagate to sign-off page and approve the methodology immediately
+Navigate to sign-off page and approve the methodology immediately
     user clicks link    Sign off
     User clicks button    Edit status
     user clicks radio    Approved for publication
@@ -144,13 +143,12 @@ Naviagate to sign-off page and approve the methodology immediately
     user clicks radio    Immediately
     user clicks button    Update status
     user waits until page contains    Approved
-    sleep    100
+    sleep    2    # Wait for methodology to be published
 
-Validate methodology re-directs works for the updated publication
-    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-updated
-    user waits until h1 is visible    methodology update
-    user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_UPDATED_URL_ENDING}
-    sleep    10
+Validate methodology re-directs works for the updated publication methodology
+    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user waits until h1 is visible    ${PUBLICATION_NAME}-methodology update
+    user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-methodology-update
 
 User creates a new release with different academic year
     user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
