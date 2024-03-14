@@ -4,7 +4,6 @@ using AngleSharp.Io;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -14,8 +13,6 @@ using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
@@ -66,10 +63,6 @@ public class Startup
             })
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.Converters.Add(new EnumToEnumValueJsonConverter<GeographicLevel>());
-                options.JsonSerializerOptions.Converters.Add(new EnumToEnumLabelJsonConverter<IndicatorUnit>());
-                options.JsonSerializerOptions.Converters.Add(new EnumToEnumValueJsonConverter<TimeIdentifier>());
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 

@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels.Converters;
@@ -74,6 +75,7 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -149,6 +151,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -185,6 +188,7 @@ public record DataSetMetaViewModel
     /// <summary>
     /// All the geographic levels associated with the data set.
     /// </summary>
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -270,6 +274,7 @@ public record IndicatorMetaViewModel
     /// - `£m`
     /// - `pp`
     /// </summary>
+    [JsonConverter(typeof(EnumToEnumLabelJsonConverter<IndicatorUnit>))]
     public required IndicatorUnit? Unit { get; init; }
 
     /// <summary>
@@ -283,6 +288,7 @@ public record IndicatorMetaViewModel
 /// </summary>
 public record LocationLevelMetaViewModel
 {
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
     public required GeographicLevel Level { get; init; }
 
     /// <summary>
@@ -371,6 +377,7 @@ public record LocationSchoolOptionMetaViewModel : LocationOptionMetaViewModel
 /// </summary>
 public record TimePeriodMetaViewModel
 {
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
     public TimeIdentifier? Code { get; init; }
 
     /// <summary>

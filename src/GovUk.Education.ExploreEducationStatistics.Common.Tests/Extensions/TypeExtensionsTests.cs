@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -141,6 +142,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
                 Assert.Single(path);
                 Assert.Equal(typeof(ActionResult), path[0]);
+            }
+        }
+
+        public class IsNullableTypeTests
+        {
+            [Fact]
+            public void NullableValueTypes_ReturnsTrue()
+            {
+                var properties = typeof(NullableValueTypesClass)
+                    .GetProperties();
+
+                foreach (var property in properties)
+                {
+                    var isNullableType = property.PropertyType.IsNullableType();
+
+                    Assert.True(isNullableType);
+                }
+            }
+
+            [Fact]
+            public void NonNullableValueTypes_ReturnsFalse()
+            {
+                var properties = typeof(NonNullableValueTypesClass)
+                    .GetProperties();
+
+                foreach (var property in properties)
+                {
+                    var isNullableType = property.PropertyType.IsNullableType();
+
+                    Assert.False(isNullableType);
+                }
+            }
+
+            [Fact]
+            public void ReferenceType_ReturnsFalse()
+            {
+                var isNullableType = typeof(NullableReferenceTypeClass)
+                    .GetProperty(nameof(NullableReferenceTypeClass.NonNullableReferenceType))!
+                    .PropertyType
+                    .IsNullableType();
+
+                Assert.False(isNullableType);
+            }
+
+            [Fact]
+            public void NullableReferenceType_ReturnsFalse()
+            {
+                var isNullableType = typeof(NullableReferenceTypeClass)
+                    .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
+                    .PropertyType
+                    .IsNullableType();
+
+                Assert.False(isNullableType);
+            }
+
+            private class NullableValueTypesClass
+            {
+                public int? NullableInteger { get; set; }
+                public double? NullableDouble { get; set; }
+                public TestEnum? NullableEnum { get; set; }
+                public bool? NullableBool { get; set; }
+                public char? NullableChar { get; set; }
+            };
+
+            private class NonNullableValueTypesClass
+            {
+                public int NonNullableInteger { get; set; }
+                public double NonNullableDouble { get; set; }
+                public TestEnum NonNullableEnum { get; set; }
+                public bool NonNullableBool { get; set; }
+                public char NonNullableChar { get; set; }
+            };
+
+            private class NullableReferenceTypeClass
+            {
+                public NullableReferenceTypeClass NonNullableReferenceType { get; set; } = new();
+                public NullableReferenceTypeClass? NullableReferenceType { get; set; }
+            };
+
+            private enum TestEnum
+            {
             }
         }
     }
