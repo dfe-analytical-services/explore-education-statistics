@@ -24,24 +24,38 @@ export const testPublication: Publication = {
       order: 3,
     },
   ],
-  legacyReleases: [
+  releaseSeriesView: [
+    {
+      id: 'release-2',
+      isLegacyLink: false,
+      description: 'Academic year 2018/19',
+      publicationSlug: 'pupil-absence-in-schools-in-england',
+      releaseSlug: '2018-19',
+    },
     {
       id: 'legacy-release-3',
+      isLegacyLink: true,
       description: 'Academic year 2014/15',
-      url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
-      order: 4,
+      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+    },
+    {
+      id: 'release-1',
+      isLegacyLink: false,
+      description: 'Academic year 2017/18',
+      publicationSlug: 'pupil-absence-in-schools-in-england',
+      releaseSlug: '2017-18',
     },
     {
       id: 'legacy-release-2',
+      isLegacyLink: true,
       description: 'Academic year 2013/14',
-      url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
-      order: 1,
+      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     },
     {
       id: 'legacy-release-1',
+      isLegacyLink: true,
       description: 'Academic year 2012/13',
-      url: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
-      order: 0,
+      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
     },
   ],
   topic: {

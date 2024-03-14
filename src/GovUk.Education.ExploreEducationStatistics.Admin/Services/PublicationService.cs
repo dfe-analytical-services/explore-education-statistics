@@ -544,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(request => new ReleaseSeriesItem
                         {
                             Id = request.Id,
-                            ReleaseId = request.ReleaseParentId,
+                            ReleaseId = request.ReleaseId,
                             LegacyLinkDescription = request.LegacyLinkDescription,
                             LegacyLinkUrl = request.LegacyLinkUrl,
                         }).ToList();

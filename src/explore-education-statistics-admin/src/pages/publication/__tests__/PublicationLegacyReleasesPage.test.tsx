@@ -4,12 +4,12 @@ import { testPublication } from '@admin/pages/publication/__data__/testPublicati
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService, {
   PublicationWithPermissions,
-  ReleaseSeriesItem,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import {ReleaseSeriesItem} from "@common/services/publicationService";
 
 jest.mock('@admin/services/publicationService');
 
@@ -20,34 +20,22 @@ const publicationService = _publicationService as jest.Mocked<
 describe('PublicationLegacyReleasesPage', () => {
   const testReleaseSeries: ReleaseSeriesItem[] = [
     {
-      description: 'Legacy release 3',
       id: 'legacy-release-3',
-      order: 3,
-      url: 'http://gov.uk/3',
-      isDraft: false,
-      isLegacy: true,
-      isAmendment: false,
-      isLatest: false,
+      isLegacyLink: true,
+      description: 'Legacy release 3',
+      legacyLinkUrl: 'http://gov.uk/3',
     },
     {
-      description: 'Legacy release 2',
       id: 'legacy-release-2',
-      order: 2,
-      url: 'http://gov.uk/2',
-      isDraft: false,
-      isLegacy: true,
-      isAmendment: false,
-      isLatest: false,
+      isLegacyLink: true,
+      description: 'Legacy release 2',
+      legacyLinkUrl: 'http://gov.uk/2',
     },
     {
-      description: 'Legacy release 1',
       id: 'legacy-release-1',
-      order: 1,
-      url: 'http://gov.uk/1',
-      isDraft: false,
-      isLegacy: true,
-      isAmendment: false,
-      isLatest: false,
+      isLegacyLink: true,
+      description: 'Legacy release 1',
+      legacyLinkUrl: 'http://gov.uk/1',
     },
   ];
 

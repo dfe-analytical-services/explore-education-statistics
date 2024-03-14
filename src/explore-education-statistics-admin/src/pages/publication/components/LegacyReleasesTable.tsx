@@ -7,9 +7,7 @@ import {
   publicationEditLegacyReleaseRoute,
   PublicationEditLegacyReleaseRouteParams,
 } from '@admin/routes/publicationRoutes';
-import publicationService, {
-  ReleaseSeriesItem,
-} from '@admin/services/publicationService';
+import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -25,6 +23,7 @@ import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useConfig } from '@admin/contexts/ConfigContext';
+import {ReleaseSeriesItem} from "@common/services/publicationService";
 
 interface Props {
   canManageLegacyReleases: boolean;
@@ -245,13 +244,12 @@ const LegacyReleasesTable = ({
                                     nextReleaseSeries.map(item => ({
                                       // @MarkFix abstract this mapping out?
                                       id: item.id,
-                                      releaseParentId: !item.isLegacyLink
-                                        ? item.releaseParentId
+                                      releaseId: !item.isLegacyLink
+                                        ? item.releaseId
                                         : undefined,
-                                      legacyLinkDescription:
-                                        item.isLegacyLink
-                                          ? item.description
-                                          : undefined,
+                                      legacyLinkDescription: item.isLegacyLink
+                                        ? item.description
+                                        : undefined,
                                       legacyLinkUrl: item.isLegacyLink
                                         ? item.legacyLinkUrl
                                         : undefined,
@@ -292,8 +290,8 @@ const LegacyReleasesTable = ({
                 publicationId,
                 releaseSeries.map(seriesItem => ({
                   id: seriesItem.id,
-                  releaseParentId: !seriesItem.isLegacyLink
-                    ? seriesItem.releaseParentId
+                  releaseId: !seriesItem.isLegacyLink
+                    ? seriesItem.releaseId
                     : undefined,
                   legacyLinkDescription: seriesItem.isLegacyLink
                     ? seriesItem.description

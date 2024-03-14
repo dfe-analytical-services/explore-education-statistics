@@ -2,7 +2,6 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
 import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
@@ -45,7 +44,6 @@ const ReleaseContent = ({
 }: {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
-  const config = useConfig();
   const location = useLocation();
   const {
     editingMode,
@@ -98,6 +96,8 @@ const ReleaseContent = ({
 
   const { publication } = release;
 
+  const releaseSeries = release.publication.releaseSeriesView; // @MarkFix take out current release?
+
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
     const methodologies = publication.methodologies.map(methodology => ({
       key: methodology.id,
@@ -121,10 +121,6 @@ const ReleaseContent = ({
       file.type === 'Data' ||
       (file.type === 'Ancillary' && file.name !== 'All files'),
   );
-
-  const releaseCount =
-    release.publication.releases.length +
-    release.publication.legacyReleases.length;
 
   const [handleScroll] = useDebouncedCallback(() => {
     const sections = document.querySelectorAll('[data-scroll]');
@@ -325,7 +321,7 @@ const ReleaseContent = ({
               </li>
             </ul>
 
-            {!!releaseCount && (
+            {!!releaseSeries.length && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
@@ -333,30 +329,24 @@ const ReleaseContent = ({
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View releases (${releaseCount})`}
+                  summary={`View releases (${releaseSeries.length})`} // @MarkFix right length?
                 >
-                  {/* @MarkFix change to use publication.ReleaseSeries */}
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...release.publication.releases.map(
-                          ({ id, title, slug }) => (
-                            <li key={id} data-testid="other-release-item">
+                        ...releaseSeries.map(({ id, isLegacyLink, description, legacyLinkUrl, publicationSlug, releaseSlug}) => (
+                          <li key={id} data-testid="other-release-item">
+                            {isLegacyLink ? (
+                              <a href={legacyLinkUrl}>{description}</a>
+                            ) : (
                               <Link
-                                to={`${config?.publicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                                to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
                               >
-                                {title}
+                                {description}
                               </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link to={url}>{description}</Link>
-                            </li>
-                          ),
-                        ),
+                            )}
+                          </li>
+                        )),
                       ]}
                     </ul>
                   </ScrollableContainer>

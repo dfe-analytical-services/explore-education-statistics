@@ -7,7 +7,6 @@ import {
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
   PublicationWithPermissions,
-  ReleaseSeriesItem,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,6 +14,7 @@ import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
+import {ReleaseSeriesItem} from "@common/services/publicationService";
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -35,7 +35,7 @@ describe('PublicationLegacyReleaseEditPage', () => {
       isLegacyLink: false,
       description: 'Academic Year 2000/01',
 
-      releaseParentId: 'release-parent-1',
+      releaseId: 'release-parent-1',
       publicationSlug: 'publication-slug',
       releaseSlug: 'release-slug',
     },
@@ -98,7 +98,7 @@ describe('PublicationLegacyReleaseEditPage', () => {
           {
             id: 'release-1',
 
-            releaseParentId: 'release-parent-1',
+            releaseId: 'release-parent-1',
           },
           {
             id: 'legacy-release-2',

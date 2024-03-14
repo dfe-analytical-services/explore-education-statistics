@@ -118,14 +118,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
         _context.ReleaseVersions.Add(amendmentReleaseVersion);
 
-        //await _publicationReleaseSeriesViewService.CreateForAmendRelease( // @MarkFix just remove?
-        //    originalRelease.PublicationId,
-        //    releaseAmendmentId);
-
-        // What to do about ReleaseStatuses? @MarkFix old comment - investigate
-
-        // What to do about ReleaseStatuses?
-
         await _context.SaveChangesAsync();
         return amendmentReleaseVersion;
     }

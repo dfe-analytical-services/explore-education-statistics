@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -18,7 +19,7 @@ public record PublicationViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
+    public List<ReleaseSeriesItem> ReleaseSeriesView { get; init; } = new(); // @MarkFix should be view model?
 
     public TopicViewModel Topic { get; init; } = null!;
 
@@ -42,7 +43,7 @@ public record PublicationViewModel
         IsSuperseded = publication.IsSuperseded;
         SupersededBy = publication.SupersededBy;
         Releases = publication.Releases;
-        LegacyReleases = publication.LegacyReleases;
+        ReleaseSeriesView = publication.ReleaseSeriesView;
         Topic = publication.Topic;
         Contact = publication.Contact;
         ExternalMethodology = publication.ExternalMethodology;

@@ -43,15 +43,6 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             Url = ""
         },
         LatestReleaseId = Guid.NewGuid(),
-        LegacyReleases = new List<LegacyReleaseViewModel>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Description = "",
-                Url = ""
-            }
-        },
         Releases = new List<ReleaseVersionTitleViewModel>
         {
             new()
@@ -61,14 +52,16 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        //ReleaseSeriesView = new() // @MarkFix
-        //{
-        //    new()
-        //    {
-        //        ReleaseId = Guid.NewGuid(),
-        //        Order = 1
-        //    }
-        //},
+        ReleaseSeriesView = new() // @MarkFix
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                ReleaseId = null,
+                LegacyLinkUrl = "http://test.com/",
+                LegacyLinkDescription = "legacy link description",
+            }
+        },
         Topic = new TopicViewModel(new ThemeViewModel(
             Guid.NewGuid(),
             Slug: "",

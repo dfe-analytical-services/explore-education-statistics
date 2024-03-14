@@ -25,12 +25,7 @@ export interface Publication {
     title: string;
     order: number;
   }[];
-  legacyReleases: {
-    id: string;
-    description: string;
-    url: string;
-    order: number;
-  }[];
+  releaseSeriesView: ReleaseSeriesItem[];
   topic: {
     theme: {
       title: string;
@@ -43,6 +38,19 @@ export interface Publication {
   isSuperseded?: boolean;
   supersededBy?: PublicationSupersededBy;
 }
+
+export interface ReleaseSeriesItem {
+  id: string;
+  isLegacyLink: boolean;
+  description: string;
+
+  releaseId?: string;
+  publicationSlug?: string;
+  releaseSlug?: string;
+
+  legacyLinkUrl?: string;
+}
+
 
 export interface PublicationSummary {
   id: string;

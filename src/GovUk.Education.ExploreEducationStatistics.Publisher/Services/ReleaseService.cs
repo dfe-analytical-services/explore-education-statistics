@@ -87,10 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             releaseVersion.Published =
                 await _releaseVersionRepository.GetPublishedDate(releaseVersion.Id, actualPublishedDate);
 
-            //await _publicationReleaseSeriesViewService.UpdateForPublishRelease( // @MarkFix not required I think?
-            //    release.PublicationId,
-            //    releaseId);
-
             await UpdatePublishedDataBlockVersions(releaseVersion);
 
             await _contentDbContext.SaveChangesAsync();

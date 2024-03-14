@@ -2,7 +2,7 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { PublicationSummary } from '@common/services/publicationService';
+import {PublicationSummary, ReleaseSeriesItem} from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
 import { isAxiosError } from 'axios';
@@ -75,18 +75,6 @@ export interface PublicationCreateRequest {
   topicId: string;
 }
 
-export interface ReleaseSeriesItem {
-  id: string;
-  isLegacyLink: boolean;
-  description: string;
-
-  releaseParentId?: string;
-  publicationSlug?: string;
-  releaseSlug?: string;
-
-  legacyLinkUrl?: string;
-}
-
 export interface ReleaseSeriesLegacyLinkAddRequest {
   description: string;
   url: string;
@@ -96,7 +84,7 @@ export interface UpdateReleaseSeriesItem {
   // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
   id: string;
 
-  releaseParentId?: string;
+  releaseId?: string;
 
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;

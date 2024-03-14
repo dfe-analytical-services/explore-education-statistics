@@ -35,41 +35,9 @@ interface Props {
   release: Release;
 }
 
-interface ReleaseSeriesItem {
-  id: string;
-  title: string;
-  url: string;
-  order: number;
-  isLegacy: boolean;
-}
-
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
-  const otherPublicationReleases = release.publication.releases.filter(
-    r => r.id !== release.id,
-  );
+  const releaseSeries = release.publication.releaseSeriesView; // @MarkFix take out current release?
 
-  let releaseSeries: ReleaseSeriesItem[] = [];
-  otherPublicationReleases.forEach(opr => {
-    releaseSeries.push({
-      id: opr.id,
-      title: opr.title,
-      url: opr.slug,
-      order: opr.order,
-      isLegacy: false,
-    });
-  });
-
-  release.publication.legacyReleases.forEach(lr => {
-    releaseSeries.push({
-      id: lr.id,
-      title: lr.description,
-      url: lr.url,
-      order: lr.order,
-      isLegacy: true,
-    });
-  });
-
-  releaseSeries = orderBy(releaseSeries, cr => cr.order, 'desc');
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
@@ -362,15 +330,15 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...releaseSeries.map(({ id, url, title, isLegacy }) => (
+                        ...releaseSeries.map(({ id, isLegacyLink, description, legacyLinkUrl, publicationSlug, releaseSlug}) => (
                           <li key={id} data-testid="other-release-item">
-                            {isLegacy ? (
-                              <a href={url}>{title}</a>
+                            {isLegacyLink ? (
+                              <a href={legacyLinkUrl}>{description}</a>
                             ) : (
                               <Link
-                                to={`/find-statistics/${release.publication.slug}/${url}`}
+                                to={`/find-statistics/${publicationSlug}/${releaseSlug}`} // @MarkFix do we need to pass publicationSlug here, we have it at release.publication.slug? - same for other pages
                               >
-                                {title}
+                                {description}
                               </Link>
                             )}
                           </li>

@@ -1,11 +1,11 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
-import { ReleaseSeriesItem } from '@admin/services/publicationService';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
+import { ReleaseSeriesItem } from '@common/services/publicationService';
 
 // jest.mock('@admin/services/legacyReleaseService'); // @MarkFix remove
 // const legacyReleaseService = _legacyReleaseService as jest.Mocked<

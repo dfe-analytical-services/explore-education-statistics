@@ -13,7 +13,7 @@ public class ReleaseSeriesLegacyLinkAddRequest
 public class ReleaseSeriesItemUpdateRequest
 {
     public Guid Id { get; set; }
-    public Guid? ReleaseParentId { get; set; }
+    public Guid? ReleaseId { get; set; }
 
     public string? LegacyLinkDescription { get; set; }
     public string? LegacyLinkUrl { get; set; }

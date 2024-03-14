@@ -19,8 +19,6 @@ public record PublicationCacheViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
-
     public TopicViewModel Topic { get; init; } = null!;
 
     public ContactViewModel Contact { get; init; } = null!;

@@ -85,7 +85,7 @@ const defaultPublication: Publication = {
     teamName: 'Team name',
   },
   id: 'publication-id',
-  legacyReleases: [],
+  releaseSeriesView: [],
   methodologies: [
     {
       id: 'methodology-id',

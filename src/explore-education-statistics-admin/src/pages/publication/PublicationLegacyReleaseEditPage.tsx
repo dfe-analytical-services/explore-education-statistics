@@ -22,12 +22,12 @@ const PublicationLegacyReleaseEditPage = ({
     publicationService.getReleaseSeriesView(publicationId),
   );
 
-  let itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
+  const itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
   if (isLoading || releaseSeries === undefined || itemIndex === undefined || itemIndex === -1) { // @MarkFix
     return <LoadingSpinner />;
   }
 
-  if (releaseSeries[itemIndex!].releaseParentId !== undefined) {
+  if (releaseSeries[itemIndex!].releaseId !== undefined) {
     // @MarkFix
     return <p>Cannot edit this release series item!</p>;
   }
@@ -61,8 +61,8 @@ const PublicationLegacyReleaseEditPage = ({
               releaseSeries.map(seriesItem => ({
                 // @MarkFix abstract out mapping (as similar happens in LegacyReleasesTable)
                 id: seriesItem.id,
-                releaseParentId: !seriesItem.isLegacyLink
-                  ? seriesItem.releaseParentId
+                releaseId: !seriesItem.isLegacyLink
+                  ? seriesItem.releaseId
                   : undefined,
                 legacyLinkDescription: seriesItem.isLegacyLink
                   ? seriesItem.description
