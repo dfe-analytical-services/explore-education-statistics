@@ -16,7 +16,7 @@
 
     <ItemGroup>
         <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
-        <PackageReference Include="linq2db.EntityFrameworkCore" Version="8.0.0" />
+        <PackageReference Include="linq2db.EntityFrameworkCore" Version="8.1.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3">
           <PrivateAssets>all</PrivateAssets>

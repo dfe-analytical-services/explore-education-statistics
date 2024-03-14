@@ -27,8 +27,8 @@
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3" PrivateAssets="all" />
-    <PackageReference Include="GovukNotify" Version="6.1.0" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.52" />
+    <PackageReference Include="GovukNotify" Version="7.0.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
     <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.3" />
@@ -44,8 +44,8 @@
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Thinktecture.EntityFrameworkCore.SqlServer" Version="8.1.1" />
-    <PackageReference Include="Cronos" Version="0.7.1" />
-    <PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
+    <PackageReference Include="Cronos" Version="0.8.4" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.17.2" />
   </ItemGroup>
 
   <ItemGroup>

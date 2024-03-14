@@ -11,7 +11,6 @@
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests</RootNamespace>
     </PropertyGroup>
 
-
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
@@ -22,14 +21,14 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
         <PackageReference Include="RichardSzalay.MockHttp" Version="7.0.0" />
-        <PackageReference Include="Testcontainers" Version="3.6.0" />
-        <PackageReference Include="Testcontainers.PostgreSql" Version="3.6.0" />
-        <PackageReference Include="xunit" Version="2.6.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+        <PackageReference Include="Testcontainers" Version="3.8.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
+        <PackageReference Include="xunit" Version="2.7.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.0">
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
