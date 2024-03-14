@@ -142,6 +142,11 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   ]
 }
 
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: '${resourcePrefix}-id-api'
+  location: location
+}
+
 // Deploy main Public API Container App.
 module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
   name: 'apiContainerAppDeploy'
@@ -152,7 +157,13 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api:${buildNumber}'
     containerAppTargetPort: 80
-    dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
+    managedIdentity: apiContainerAppManagedIdentity
+    appSettings: [
+      {
+        name: 'ConnectionStrings:PublicDataDb'
+        value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_api'), '[managed_identity_client_id]', apiContainerAppManagedIdentity.id)
+      }
+    ]
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.apiContainerAppSubnetRef
@@ -172,7 +183,7 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
     location: location
     functionAppName: 'dataset-processor'
     storageAccountConnectionString: storageAccountConnectionString
-    dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
+    dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate)
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
