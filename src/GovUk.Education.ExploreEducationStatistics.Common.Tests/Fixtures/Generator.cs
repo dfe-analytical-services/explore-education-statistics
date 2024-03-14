@@ -237,6 +237,7 @@ public class Generator<T> where T : class
                 instance,
                 new SetterContext(
                     index: index,
+                    fixture: _fixture,
                     fixtureTypeIndex: fixtureTypeIndex,
                     fixtureIndex: fixtureIndex
                 )
@@ -292,6 +293,7 @@ public class Generator<T> where T : class
                     instance,
                     new SetterContext(
                         index: index,
+                        fixture: _fixture,
                         fixtureTypeIndex: fixtureTypeIndex,
                         fixtureIndex: fixtureIndex
                     )

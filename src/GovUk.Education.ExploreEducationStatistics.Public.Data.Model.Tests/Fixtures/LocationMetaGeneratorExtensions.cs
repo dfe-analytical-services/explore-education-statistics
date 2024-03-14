@@ -14,13 +14,13 @@ public static class LocationMetaGeneratorExtensions
         where TOptionMeta : LocationOptionMeta
         => fixture.Generator<LocationMeta>()
             .WithDefaults()
-            .WithOptions(fixture.Generator<TOptionMeta>().Generate(options));
-
+            .WithOptions(() => fixture.Generator<TOptionMeta>().GenerateList(options));
 
     public static Generator<LocationMeta> DefaultLocationMeta(this DataFixture fixture, int options)
         => fixture.Generator<LocationMeta>()
             .WithDefaults()
-            .WithOptions(fixture.DefaultLocationCodedOptionMeta().Generate(options));
+            .WithOptions(() => fixture.DefaultLocationCodedOptionMeta().GenerateList(options));
+
 
     public static Generator<LocationMeta> WithDefaults(this Generator<LocationMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
@@ -77,8 +77,22 @@ public static class LocationMetaGeneratorExtensions
     public static InstanceSetters<LocationMeta> SetOptions(
         this InstanceSetters<LocationMeta> setters,
         Func<IEnumerable<LocationOptionMeta>> options)
-        => setters.Set(m => m.Options, () => options().ToList());
-    
+        => setters
+            .Set((_, m, context) =>
+            {
+                m.Options = options().ToList();
+
+                if (context.Fixture is not null)
+                {
+                    m.OptionLinks = m.Options
+                        .Select(o => context.Fixture
+                            .DefaultLocationOptionMetaLink()
+                            .WithOption(o)
+                            .Generate())
+                        .ToList();
+                }
+            });
+
     public static InstanceSetters<LocationMeta> SetOptionLinks(
         this InstanceSetters<LocationMeta> setters,
         Func<IEnumerable<LocationOptionMetaLink>> links)

@@ -452,11 +452,14 @@ public class SeedDataCommand : ICommand
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
 
+                var startIndex = await _dbContext.FilterOptionMetaLinks.CountAsync(token: _cancellationToken);
+
                 var current = 0;
                 const int batchSize = 1000;
 
                 while (current < options.Count)
                 {
+                    var batchStartIndex = startIndex + current;
                     var batch = options
                         .Skip(current)
                         .Take(batchSize)
@@ -472,8 +475,9 @@ public class SeedDataCommand : ICommand
                     var links = await optionTable
                         .Where(o =>
                             batchRowKeys.Contains(o.Label + ',' + (o.IsAggregate == true ? "True" : "" )))
-                        .Select(option => new FilterOptionMetaLink
+                        .Select((option, index) => new FilterOptionMetaLink
                         {
+                            PublicId = SqidEncoder.Encode(batchStartIndex + index),
                             MetaId = meta.Id,
                             OptionId = option.Id
                         })
@@ -553,12 +557,15 @@ public class SeedDataCommand : ICommand
                     .InsertWhenNotMatched()
                     .MergeAsync(_cancellationToken);
 
+                var startIndex = await _dbContext.LocationOptionMetaLinks.CountAsync(token: _cancellationToken);
+
                 var current = 0;
 
                 const int batchSize = 1000;
 
                 while (current < options.Count)
                 {
+                    var batchStartIndex = startIndex + current;
                     var batch = options
                         .Skip(current)
                         .Take(batchSize)
@@ -595,8 +602,9 @@ public class SeedDataCommand : ICommand
                                      (o.Ukprn ?? "null")
                                 )
                         )
-                        .Select(option => new LocationOptionMetaLink
+                        .Select((option, index) => new LocationOptionMetaLink
                         {
+                            PublicId = SqidEncoder.Encode(batchStartIndex + index),
                             MetaId = meta.Id,
                             OptionId = option.Id
                         })
@@ -864,7 +872,7 @@ public class SeedDataCommand : ICommand
                 [
                     "id INTEGER PRIMARY KEY",
                     "name VARCHAR",
-                    "public_id INTEGER",
+                    "public_id VARCHAR",
                     ..GetDuckDbLocationCodeColumns(location.Level).Select(col => $"{col.Name} VARCHAR")
                 ];
 
@@ -919,7 +927,7 @@ public class SeedDataCommand : ICommand
                  CREATE TABLE {FiltersDuckDbTable}(
                      id INTEGER PRIMARY KEY,
                      label VARCHAR,
-                     public_id INTEGER,
+                     public_id VARCHAR,
                      column_name VARCHAR
                  )
                  """
