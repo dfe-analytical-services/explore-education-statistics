@@ -10,8 +10,6 @@ const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const referrerPolicy = require('referrer-policy');
 
-const seoRedirects = require('./redirects');
-
 loadEnvConfig(__dirname);
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
@@ -110,11 +108,6 @@ async function startServer() {
       '/download-latest-data',
       '/data-catalogue',
     );
-
-    const urlMatch = seoRedirects.find(source => source.from === req.url);
-    if (urlMatch !== undefined) {
-      newUri = urlMatch.to;
-    }
 
     if (newUri !== req.url) {
       return res.redirect(301, newUri);
