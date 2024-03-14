@@ -1,9 +1,9 @@
-import PublicationLegacyReleaseEditPage from '@admin/pages/publication/PublicationLegacyReleaseEditPage';
+import PublicationEditReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import {
   PublicationEditLegacyReleaseRouteParams,
-  publicationEditLegacyReleaseRoute,
+  publicationEditReleaseSeriesLegacyLinkRoute,
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
   PublicationWithPermissions,
@@ -21,7 +21,7 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-describe('PublicationLegacyReleaseEditPage', () => {
+describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
   const releaseSeries: ReleaseSeriesItem[] = [
     {
       id: 'legacy-release-1',
@@ -122,7 +122,7 @@ function renderPage(
     <MemoryRouter
       initialEntries={[
         generatePath<PublicationEditLegacyReleaseRouteParams>(
-          publicationEditLegacyReleaseRoute.path,
+          publicationEditReleaseSeriesLegacyLinkRoute.path,
           {
             publicationId: publication.id,
             legacyReleaseId,
@@ -136,8 +136,8 @@ function renderPage(
         onReload={noop}
       >
         <Route
-          path={publicationEditLegacyReleaseRoute.path}
-          component={PublicationLegacyReleaseEditPage}
+          path={publicationEditReleaseSeriesLegacyLinkRoute.path}
+          component={PublicationEditReleaseSeriesLegacyLinkPage}
         />
       </PublicationContextProvider>
     </MemoryRouter>,

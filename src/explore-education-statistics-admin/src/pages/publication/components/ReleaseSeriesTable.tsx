@@ -2,9 +2,9 @@ import DraggableItem from '@admin/components/DraggableItem';
 import DroppableArea from '@admin/components/DroppableArea';
 import Link from '@admin/components/Link';
 import {
-  publicationCreateLegacyReleaseRoute,
+  publicationCreateReleaseLegacyLinkRoute,
   PublicationRouteParams,
-  publicationEditLegacyReleaseRoute,
+  publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationEditLegacyReleaseRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
@@ -14,7 +14,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import reorder from '@common/utils/reorder';
-import styles from '@admin/pages/publication/components/LegacyReleasesTable.module.scss';
+import styles from '@admin/pages/publication/components/ReleaseSeriesTable.module.scss';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -26,13 +26,12 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import {ReleaseSeriesItem} from "@common/services/publicationService";
 
 interface Props {
-  canManageLegacyReleases: boolean;
+  canManageReleaseSeries: boolean;
   releaseSeries: ReleaseSeriesItem[];
   publicationId: string;
 }
-const LegacyReleasesTable = ({
-  // @MarkFix rename
-  canManageLegacyReleases,
+const ReleaseSeriesTable = ({
+  canManageReleaseSeries,
   releaseSeries: initialReleaseSeries,
   publicationId,
 }: Props) => {
@@ -52,7 +51,7 @@ const LegacyReleasesTable = ({
         will be shown on the publication.
       </p>
 
-      {canManageLegacyReleases && !isReordering && (
+      {canManageReleaseSeries && !isReordering && (
         <ButtonGroup>
           <ModalConfirm
             confirmText="OK"
@@ -61,7 +60,7 @@ const LegacyReleasesTable = ({
             onConfirm={() => {
               history.push(
                 generatePath<PublicationRouteParams>(
-                  publicationCreateLegacyReleaseRoute.path,
+                  publicationCreateReleaseLegacyLinkRoute.path,
                   {
                     publicationId,
                   },
@@ -122,7 +121,7 @@ const LegacyReleasesTable = ({
                     {isReordering && <th>Sort</th>}
                     <th>Description</th>
                     <th>URL</th>
-                    {canManageLegacyReleases && !isReordering && (
+                    {canManageReleaseSeries && !isReordering && (
                       <th>Actions</th>
                     )}
                   </tr>
@@ -191,7 +190,7 @@ const LegacyReleasesTable = ({
                         )}
                       </td>
 
-                      {canManageLegacyReleases && !isReordering && (
+                      {canManageReleaseSeries && !isReordering && (
                         <td>
                           {seriesItem.isLegacyLink && (
                             <ButtonGroup className="govuk-!-margin-bottom-0">
@@ -209,7 +208,7 @@ const LegacyReleasesTable = ({
                                 onConfirm={() => {
                                   history.push(
                                     generatePath<PublicationEditLegacyReleaseRouteParams>(
-                                      publicationEditLegacyReleaseRoute.path,
+                                      publicationEditReleaseSeriesLegacyLinkRoute.path,
                                       {
                                         publicationId,
                                         legacyReleaseId: seriesItem.id,
@@ -322,4 +321,4 @@ const LegacyReleasesTable = ({
   );
 };
 
-export default LegacyReleasesTable;
+export default ReleaseSeriesTable;

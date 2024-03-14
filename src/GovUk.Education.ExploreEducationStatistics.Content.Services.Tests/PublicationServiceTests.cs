@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion1.Id, publicationViewModel.Releases[0].Id);
                     Assert.Equal(expectedReleaseVersion1.Slug, publicationViewModel.Releases[0].Slug);
                     Assert.Equal(expectedReleaseVersion1.Title, publicationViewModel.Releases[0].Title);
-                    //var releaseSeriesItem1 = publicationViewModel.ReleaseSeriesView.Find(ro => ro.ReleaseId == expectedReleaseVersion1.Id)!; // @MarkFix
+                    //var releaseSeriesItem1 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == expectedReleaseVersion1.Id)!; // @MarkFix
                     //Assert.False(releaseSeriesItem1.IsAmendment);
                     //Assert.False(releaseSeriesItem1.IsDraft);
                     //Assert.False(releaseSeriesItem1.IsLegacy);
@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion2.Id, publicationViewModel.Releases[1].Id);
                     Assert.Equal(expectedReleaseVersion2.Slug, publicationViewModel.Releases[1].Slug);
                     Assert.Equal(expectedReleaseVersion2.Title, publicationViewModel.Releases[1].Title);
-                    //var releaseSeriesItem2 = publicationViewModel.ReleaseSeriesView.Find(ro => ro.ReleaseId == expectedReleaseVersion2.Id)!; // @MarkFix
+                    //var releaseSeriesItem2 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == expectedReleaseVersion2.Id)!; // @MarkFix
                     //Assert.False(releaseSeriesItem2.IsAmendment);
                     //Assert.False(releaseSeriesItem2.IsDraft);
                     //Assert.False(releaseSeriesItem2.IsLegacy);
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     //Assert.Equal(_legacyRelease.Id, publicationViewModel.LegacyReleases[0].Id);
                     //Assert.Equal(_legacyRelease.Description, _legacyRelease.Description);
                     //Assert.Equal(_legacyRelease.Url, publicationViewModel.LegacyReleases[0].Url);
-                    //var releaseSeriesItem3 = publicationViewModel.ReleaseSeriesView.Find(ro => ro.ReleaseId == _legacyRelease.Id)!; // @MarkFix
+                    //var releaseSeriesItem3 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == _legacyRelease.Id)!; // @MarkFix
                     //Assert.False(releaseSeriesItem3.IsAmendment);
                     //Assert.False(releaseSeriesItem3.IsDraft);
                     //Assert.True(releaseSeriesItem3.IsLegacy);

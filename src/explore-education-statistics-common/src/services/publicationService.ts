@@ -19,13 +19,12 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  releases: {
+  releases: { // @MarkFix
     id: string;
     slug: string;
     title: string;
-    order: number;
   }[];
-  releaseSeriesView: ReleaseSeriesItem[];
+  releaseSeries: ReleaseSeriesItem[];
   topic: {
     theme: {
       title: string;

@@ -77,9 +77,9 @@ Update legacy release
     ${modal}=    user waits until modal is visible    Edit legacy release
     user clicks button    OK    ${modal}
 
-    user waits until page contains element    id:legacyReleaseForm-description
-    user enters text into element    id:legacyReleaseForm-description    ${UPDATED_DESCRIPTION}
-    user enters text into element    id:legacyReleaseForm-url    http://test2.com
+    user waits until page contains element    id:releaseLegacyLinkForm-description
+    user enters text into element    id:releaseLegacyLinkForm-description    ${UPDATED_DESCRIPTION}
+    user enters text into element    id:releaseLegacyLinkForm-url    http://test2.com
     user clicks button    Save legacy release
 
 Validate updated legacy release
@@ -178,9 +178,9 @@ user creates legacy release
     ${modal}=    user waits until modal is visible    Create legacy release
     user clicks button    OK    ${modal}
 
-    user waits until page contains element    id:legacyReleaseForm-description
-    user enters text into element    id:legacyReleaseForm-description    ${description}
-    user enters text into element    id:legacyReleaseForm-url    ${url}
+    user waits until page contains element    id:releaseLegacyLinkForm-description
+    user enters text into element    id:releaseLegacyLinkForm-description    ${description}
+    user enters text into element    id:releaseLegacyLinkForm-url    ${url}
     user clicks button    Save legacy release
     user waits until h2 is visible    Legacy releases
 

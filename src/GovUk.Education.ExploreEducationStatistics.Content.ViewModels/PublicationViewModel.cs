@@ -19,7 +19,7 @@ public record PublicationViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<ReleaseSeriesItem> ReleaseSeriesView { get; init; } = new(); // @MarkFix should be view model?
+    public List<ReleaseSeriesItem> ReleaseSeries { get; init; } = new(); // @MarkFix should be view model?
 
     public TopicViewModel Topic { get; init; } = null!;
 
@@ -43,7 +43,7 @@ public record PublicationViewModel
         IsSuperseded = publication.IsSuperseded;
         SupersededBy = publication.SupersededBy;
         Releases = publication.Releases;
-        ReleaseSeriesView = publication.ReleaseSeriesView;
+        ReleaseSeries = publication.ReleaseSeries;
         Topic = publication.Topic;
         Contact = publication.Contact;
         ExternalMethodology = publication.ExternalMethodology;

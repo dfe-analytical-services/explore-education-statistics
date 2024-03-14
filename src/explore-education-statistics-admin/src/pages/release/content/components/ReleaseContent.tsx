@@ -96,7 +96,7 @@ const ReleaseContent = ({
 
   const { publication } = release;
 
-  const releaseSeries = release.publication.releaseSeriesView; // @MarkFix take out current release?
+  const releaseSeries = release.publication.releaseSeries; // @MarkFix filter out current release from series?
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
     const methodologies = publication.methodologies.map(methodology => ({

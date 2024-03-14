@@ -92,7 +92,7 @@ describe('PreReleaseContentPage', () => {
       title: 'Publication 1',
       slug: 'publication-1',
       releases: [],
-      releaseSeriesView: [],
+      releaseSeries: [],
       topic: { theme: { title: 'Theme 1' } },
       contact: {
         contactName: 'John Smith',

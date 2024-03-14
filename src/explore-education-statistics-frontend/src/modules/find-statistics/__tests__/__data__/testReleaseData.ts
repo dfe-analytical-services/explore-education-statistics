@@ -6,25 +6,17 @@ export const testPublication: Publication = {
   slug: 'pupil-absence-in-schools-in-england',
   releases: [
     {
-      id: 'release-3',
+      id: 'release-2',
       slug: '2018-19',
       title: 'Academic year 2018/19',
-      order: 5,
-    },
-    {
-      id: 'release-2',
-      slug: '2017-18',
-      title: 'Academic year 2017/18',
-      order: 2,
     },
     {
       id: 'release-1',
-      slug: '2016-17',
-      title: 'Academic year 2016/17',
-      order: 3,
+      slug: '2017-18',
+      title: 'Academic year 2017/18',
     },
   ],
-  releaseSeriesView: [
+  releaseSeries: [
     {
       id: 'release-2',
       isLegacyLink: false,

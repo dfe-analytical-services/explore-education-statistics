@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanUpdateSpecificReleaseRole,
         CanCreatePublicationForSpecificTopic,
         CanViewReleaseTeamAccess,
+        CanManagePublicationReleaseSeries,
 
         /**
          * Release management
@@ -49,14 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanDeleteSpecificComment,
         CanCancelOngoingImports,
         CanViewReleaseStatusHistory,
-
-        /**
-         * Legacy release management
-         */
-        CanManageLegacyReleases, // @MarkFix rename and move
-        CanViewLegacyRelease,
-        CanUpdateLegacyRelease,
-        CanDeleteLegacyRelease,
 
         /**
          * Pre Release management

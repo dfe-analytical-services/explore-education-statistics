@@ -1,17 +1,17 @@
 import Link from '@admin/components/Link';
-import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
+import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import { publicationLegacyReleasesRoute } from '@admin/routes/publicationRoutes';
+import { publicationReleaseSeriesRoute } from '@admin/routes/publicationRoutes';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 import publicationService from "@admin/services/publicationService";
 
-const PublicationLegacyReleaseCreatePage = () => {
-  const { publicationId, publication } = usePublicationContext();
+const PublicationCreateReleaseSeriesLegacyLinkPage = () => {
+  const { publicationId } = usePublicationContext();
   const history = useHistory();
 
   const publicationEditPath = generatePath(
-    publicationLegacyReleasesRoute.path,
+    publicationReleaseSeriesRoute.path,
     {
       publicationId,
     },
@@ -20,14 +20,13 @@ const PublicationLegacyReleaseCreatePage = () => {
   return (
     <>
       <h2>Create legacy release</h2>
-      <LegacyReleaseForm
+      <ReleaseSeriesLegacyLinkForm
         cancelButton={
           <Link unvisited to={publicationEditPath}>
             Cancel
           </Link>
         }
         onSubmit={async values => {
-          // @MarkFix maybe we want to fetch the ReleaseSeries from frontend context and just use UpdateReleaseSeries instead?
           await publicationService.addReleaseSeriesLegacyLink(publicationId, {
             description: values.description,
             url: values.url,
@@ -40,4 +39,4 @@ const PublicationLegacyReleaseCreatePage = () => {
   );
 };
 
-export default PublicationLegacyReleaseCreatePage;
+export default PublicationCreateReleaseSeriesLegacyLinkPage;

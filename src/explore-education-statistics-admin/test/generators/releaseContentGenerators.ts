@@ -85,7 +85,6 @@ const defaultPublication: Publication = {
     teamName: 'Team name',
   },
   id: 'publication-id',
-  releaseSeriesView: [],
   methodologies: [
     {
       id: 'methodology-id',
@@ -93,14 +92,8 @@ const defaultPublication: Publication = {
       slug: 'methodology-slug',
     },
   ],
-  releases: [
-    {
-      id: 'previous-release-id',
-      slug: 'previous-release-slug',
-      title: 'Previous release title',
-      order: 1,
-    },
-  ],
+  releases: [],
+  releaseSeries: [],
   slug: 'publication-slug',
   title: 'Publication title',
   topic: { theme: { title: 'Test theme' } },

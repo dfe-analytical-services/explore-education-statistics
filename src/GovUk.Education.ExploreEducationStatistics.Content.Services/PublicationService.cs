@@ -224,7 +224,7 @@ public class PublicationService : IPublicationService
                 .GroupBy(rv => rv.ReleaseName).Select(grouping => grouping.OrderByDescending(r => r.Version).First())
                 .Select(releaseVersion => new ReleaseVersionTitleViewModel(releaseVersion))
                 .ToList(),
-            ReleaseSeriesView = publication.ReleaseSeriesView
+            ReleaseSeries = publication.ReleaseSeries
         };
     }
 

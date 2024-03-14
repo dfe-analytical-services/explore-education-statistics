@@ -142,13 +142,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = otherReleaseVersion.Title,
                             })
                             .ToList(),
-                        LegacyReleases = rv.Publication.LegacyReleases
-                            .OrderByDescending(legacyRelease => legacyRelease.Order)
-                            .Select(legacy => new ManageContentPageViewModel.LegacyReleaseViewModel
+                        ReleaseSeries = rv.Publication.ReleaseSeries
+                            .Select(rsi => new ReleaseSeriesItemViewModel
                             {
-                                Id = legacy.Id,
-                                Description = legacy.Description,
-                                Url = legacy.Url,
+                                Id = rsi.Id,
+                                IsLegacyLink = rsi.ReleaseId == null,
+                                Description = rsi.LegacyLinkDescription ?? rv.Title,
+
+                                ReleaseId = rsi.ReleaseId,
+                                PublicationSlug = rv.Publication.Slug,
+                                ReleaseSlug = rv.Slug,
+
+                                LegacyLinkUrl = rsi.LegacyLinkUrl,
                             })
                             .ToList(),
                         ExternalMethodology = rv.Publication.ExternalMethodology != null

@@ -339,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .IsRequired(false);
 
             modelBuilder.Entity<Publication>()
-                .Property(p => p.ReleaseSeriesView)
+                .Property(p => p.ReleaseSeries)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ReleaseSeriesItem>>(v));

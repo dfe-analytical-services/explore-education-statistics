@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record ReleaseVersionTitleViewModel
+public record ReleaseVersionTitleViewModel // @MarkFix can be remove as we can use ReleaseSeries instead?
 {
     public ReleaseVersionTitleViewModel()
     {
@@ -15,7 +15,7 @@ public record ReleaseVersionTitleViewModel
         Slug = releaseVersion.Slug;
 
         // @MarkFix check we can remove this
-        //var releaseSeriesItem = release.Publication.ReleaseSeriesView.First(rsi => rsi.ReleaseParentId == release.ReleaseParentId);
+        //var releaseSeriesItem = release.Publication.ReleaseSeries.First(rsi => rsi.ReleaseParentId == release.ReleaseParentId);
 
         //Order = releaseSeriesItem.Order;
     }

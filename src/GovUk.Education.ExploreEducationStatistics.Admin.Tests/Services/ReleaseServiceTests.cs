@@ -97,16 +97,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         //    await using (var context = InMemoryApplicationDbContext(contextId))
         //    {
-        //        var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
+        //        var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict);
 
-        //        publicationReleaseSeriesViewService.Setup(s => s.CreateForCreateRelease(
+        //        publicationReleaseSeriesService.Setup(s => s.CreateForCreateRelease(
         //            It.IsAny<Guid>(),
         //            It.IsAny<Guid>()))
         //        .Returns(Task.CompletedTask);
 
         //        var releaseService = BuildReleaseService(
         //            context,
-        //            publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
+        //            publicationReleaseSeriesService: publicationReleaseSeriesService.Object);
 
         //        // Act
         //        var result = (await releaseService.CreateRelease(
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         //        )).AssertRight();
 
         //        // Assert
-        //        VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        VerifyAllMocks(publicationReleaseSeriesService);
         //        Assert.Equal("Academic year 2018/19", result.Title);
         //        Assert.Equal("2018/19", result.YearTitle);
         //        Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
@@ -252,16 +252,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         //    await using (var context = InMemoryApplicationDbContext(contextId))
         //    {
-        //        var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict);
+        //        var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict);
 
-        //        publicationReleaseSeriesViewService.Setup(s => s.CreateForCreateRelease(
+        //        publicationReleaseSeriesService.Setup(s => s.CreateForCreateRelease(
         //            It.IsAny<Guid>(),
         //            It.IsAny<Guid>()))
         //        .Returns(Task.CompletedTask);
 
         //        var releaseService = BuildReleaseService(
         //            context,
-        //            publicationReleaseSeriesViewService: publicationReleaseSeriesViewService.Object);
+        //            publicationReleaseSeriesService: publicationReleaseSeriesService.Object);
 
         //        // Act
         //        var result = await releaseService.CreateRelease(
@@ -278,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         //        // Assert
         //        var newReleaseVersion = result.AssertRight();
         //        newReleaseVersionId = newReleaseVersion.Id;
-        //        VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        VerifyAllMocks(publicationReleaseSeriesService);
         //    }
 
         //    await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1273,7 +1273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
 
-            //publicationReleaseSeriesViewService.Setup(s => s.DeleteForDeleteRelease( // @MarkFix
+            //publicationReleaseSeriesService.Setup(s => s.DeleteForDeleteRelease( // @MarkFix
             //        It.IsAny<Guid>(),
             //        It.IsAny<Guid>()))
             //    .Returns(Task.CompletedTask);

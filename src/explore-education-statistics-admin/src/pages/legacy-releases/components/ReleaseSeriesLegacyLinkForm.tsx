@@ -11,7 +11,7 @@ interface FormValues {
   url: string;
 }
 
-const formId = 'legacyReleaseForm';
+const formId = 'releaseSeriesLegacyLinkForm';
 
 interface Props {
   cancelButton?: ReactNode;
@@ -19,7 +19,7 @@ interface Props {
   onSubmit: (values: FormValues) => void;
 }
 
-const LegacyReleaseForm = ({
+const ReleaseSeriesLegacyLinkForm = ({
   cancelButton,
   initialValues = {
     description: '',
@@ -63,4 +63,4 @@ const LegacyReleaseForm = ({
   );
 };
 
-export default LegacyReleaseForm;
+export default ReleaseSeriesLegacyLinkForm;

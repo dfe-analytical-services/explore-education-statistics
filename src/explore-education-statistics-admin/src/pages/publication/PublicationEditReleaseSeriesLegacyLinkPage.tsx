@@ -1,9 +1,9 @@
 import Link from '@admin/components/Link';
-import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
+import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import {
   PublicationEditLegacyReleaseRouteParams,
-  publicationLegacyReleasesRoute,
+  publicationReleaseSeriesRoute,
 } from '@admin/routes/publicationRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -11,7 +11,7 @@ import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 import publicationService from '@admin/services/publicationService';
 
-const PublicationLegacyReleaseEditPage = ({
+const PublicationEditReleaseSeriesLegacyLinkPage = ({
   match,
 }: RouteComponentProps<PublicationEditLegacyReleaseRouteParams>) => {
   const { legacyReleaseId } = match.params;
@@ -33,7 +33,7 @@ const PublicationLegacyReleaseEditPage = ({
   }
 
   const publicationEditPath = generatePath(
-    publicationLegacyReleasesRoute.path,
+    publicationReleaseSeriesRoute.path,
     {
       publicationId,
     },
@@ -43,7 +43,7 @@ const PublicationLegacyReleaseEditPage = ({
     <>
       <h2>Edit legacy release</h2>
       {releaseSeries && (
-        <LegacyReleaseForm
+        <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: releaseSeries[itemIndex!].description,
             url: releaseSeries[itemIndex!].legacyLinkUrl!,
@@ -59,7 +59,7 @@ const PublicationLegacyReleaseEditPage = ({
             await publicationService.updateReleaseSeriesView(
               publicationId,
               releaseSeries.map(seriesItem => ({
-                // @MarkFix abstract out mapping (as similar happens in LegacyReleasesTable)
+                // @MarkFix abstract out mapping (as similar happens in ReleaseSeriesTable)
                 id: seriesItem.id,
                 releaseId: !seriesItem.isLegacyLink
                   ? seriesItem.releaseId
@@ -81,4 +81,4 @@ const PublicationLegacyReleaseEditPage = ({
   );
 };
 
-export default PublicationLegacyReleaseEditPage;
+export default PublicationEditReleaseSeriesLegacyLinkPage;

@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //    //var publication = new Publication
         //    //{
         //    //    ReleaseVersions = new() { releaseVersion },
-        //    //    ReleaseSeriesView = new() { releaseSeriesItem }
+        //    //    ReleaseSeries = new() { releaseSeriesItem }
         //    //};
 
         //    var originalDataBlockParents = _fixture
@@ -249,20 +249,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         //    {
-        //       // var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict); // @MarkFix
+        //       // var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict); // @MarkFix
 
-        //       // publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
+        //       // publicationReleaseSeriesService.Setup(s => s.UpdateForPublishRelease(
         //       //     It.IsAny<Guid>(),
         //       //     It.IsAny<Guid>()))
         //       // .Returns(Task.CompletedTask);
 
-        //       var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesViewService.Object); // @MarkFix
+        //       var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesService.Object); // @MarkFix
 
         //        // Act
         //        await service.CompletePublishing(releaseVersion.Id, actualPublishedDate);
 
         //        //// Assert // @MarkFix
-        //        //VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        //VerifyAllMocks(publicationReleaseSeriesService);
         //    }
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -331,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //    //var publication = new Publication
         //    //{
         //    //    ReleaseVersions = new() { previousReleaseVersion, releaseVersion },
-        //    //    ReleaseSeriesView = new() { releaseSeriesItem }
+        //    //    ReleaseSeries = new() { releaseSeriesItem }
         //    //};
 
         //    // Generate Data Blocks for both the previous Release version and for the new Amendment.
@@ -358,20 +358,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         //    {
-        //       // var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict); // @MarkFix
+        //       // var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict); // @MarkFix
 
-        //       // publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
+        //       // publicationReleaseSeriesService.Setup(s => s.UpdateForPublishRelease(
         //       //     It.IsAny<Guid>(),
         //       //     It.IsAny<Guid>()))
         //       // .Returns(Task.CompletedTask);
 
-        //       var service = BuildReleaseService(contentDbContext); // , publicationReleaseSeriesViewService.Object); // @MarkFix
+        //       var service = BuildReleaseService(contentDbContext); // , publicationReleaseSeriesService.Object); // @MarkFix
 
         //        // Act
         //        await service.CompletePublishing(releaseVersion.Id, DateTime.UtcNow);
 
         //        //// Assert // @MarkFix
-        //        //VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        //VerifyAllMocks(publicationReleaseSeriesService);
         //    }
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //    //var publication = new Publication
         //    //{
         //    //    ReleaseVersions = new() { previousReleaseVersion, releaseVersion },
-        //    //    ReleaseSeriesView = new() { releaseSeriesItem }
+        //    //    ReleaseSeries = new() { releaseSeriesItem }
         //    //};
 
         //    // Generate Data Blocks for both the previous Release version and for the new Amendment.
@@ -468,20 +468,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         //    {
-        //        //var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict); // @MarkFix
+        //        //var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict); // @MarkFix
 
-        //        //publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
+        //        //publicationReleaseSeriesService.Setup(s => s.UpdateForPublishRelease(
         //        //    It.IsAny<Guid>(),
         //        //    It.IsAny<Guid>()))
         //        //.Returns(Task.CompletedTask);
 
-        //        var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesViewService.Object); // @MarkFix
+        //        var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesService.Object); // @MarkFix
 
         //        // Act
         //        await service.CompletePublishing(releaseVersion.Id, DateTime.UtcNow);
 
         //        //// Assert // @MarkFix
-        //        //VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        //VerifyAllMocks(publicationReleaseSeriesService);
         //    }
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -540,7 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //    //var publication = new Publication
         //    //{
         //    //    Releases = new() { previousRelease, release },
-        //    //    ReleaseSeriesView = new() { releaseSeriesItem }
+        //    //    ReleaseSeries = new() { releaseSeriesItem }
         //    //};
 
         //    var actualPublishedDate = DateTime.UtcNow;
@@ -556,20 +556,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         //    {
-        //        //var publicationReleaseSeriesViewService = new Mock<IPublicationReleaseSeriesViewService>(Strict); // @MarkFix
+        //        //var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict); // @MarkFix
 
-        //        //publicationReleaseSeriesViewService.Setup(s => s.UpdateForPublishRelease(
+        //        //publicationReleaseSeriesService.Setup(s => s.UpdateForPublishRelease(
         //        //    It.IsAny<Guid>(),
         //        //    It.IsAny<Guid>()))
         //        //.Returns(Task.CompletedTask);
 
-        //        var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesViewService.Object); // @MarkFix
+        //        var service = BuildReleaseService(contentDbContext); //, publicationReleaseSeriesService.Object); // @MarkFix
 
         //        // Act
         //        await service.CompletePublishing(releaseVersion.Id, actualPublishedDate);
 
         //        //// Assert // @MarkFix
-        //        //VerifyAllMocks(publicationReleaseSeriesViewService);
+        //        //VerifyAllMocks(publicationReleaseSeriesService);
         //    }
 
         //    await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

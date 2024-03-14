@@ -124,5 +124,5 @@ public interface IReleaseVersionRepository
         Guid publicationId,
         CancellationToken cancellationToken = default);
 
-    Task<ReleaseVersion> GetReleaseParentLatestReleaseVersion(Guid releaseId);
+    Task<ReleaseVersion> GetReleaseParentLatestReleaseVersion(Guid releaseId); // @MarkFix remove?
 }

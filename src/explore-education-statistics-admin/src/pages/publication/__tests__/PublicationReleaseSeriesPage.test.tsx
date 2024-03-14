@@ -1,4 +1,4 @@
-import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
+import PublicationReleaseSeriesPage from '@admin/pages/publication/PublicationReleaseSeriesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
@@ -17,7 +17,7 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-describe('PublicationLegacyReleasesPage', () => {
+describe('PublicationReleaseSeriesPage', () => {
   const testReleaseSeries: ReleaseSeriesItem[] = [
     {
       id: 'legacy-release-3',
@@ -88,7 +88,7 @@ function renderPage(publication: PublicationWithPermissions) {
           onPublicationChange={noop}
           onReload={noop}
         >
-          <PublicationLegacyReleasesPage />
+          <PublicationReleaseSeriesPage />
         </PublicationContextProvider>
       </TestConfigContextProvider>
     </MemoryRouter>,

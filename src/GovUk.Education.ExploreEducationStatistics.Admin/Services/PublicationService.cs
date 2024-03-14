@@ -440,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async publication =>
                 {
                     var result = new List<ReleaseSeriesItemViewModel>();
-                    foreach (var seriesItem in publication.ReleaseSeriesView)
+                    foreach (var seriesItem in publication.ReleaseSeries)
                     {
                         if (seriesItem.ReleaseId != null)
                         {
@@ -467,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Id = seriesItem.Id,
                                     IsLegacyLink = false,
                                     Description = latestParentVersion.Title,
-                                    ReleaseParentId = latestParentVersion.ReleaseId,
+                                    ReleaseId = latestParentVersion.ReleaseId,
                                     PublicationSlug = publication.Slug,
                                     ReleaseSlug = latestParentVersion.Slug,
                                 });
@@ -510,10 +510,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _context.Publications
                 .FirstOrNotFoundAsync(p => p.Id == publicationId)
-                .OnSuccess(_userService.CheckCanManageLegacyReleases)
+                .OnSuccess(_userService.CheckCanManageReleaseSeries)
                 .OnSuccess(async publication =>
                 {
-                    publication.ReleaseSeriesView.Add(new ReleaseSeriesItem
+                    publication.ReleaseSeries.Add(new ReleaseSeriesItem
                     {
                         Id = Guid.NewGuid(),
                         ReleaseId = null,
@@ -524,17 +524,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
-                    return publication.ReleaseSeriesView;
+                    return publication.ReleaseSeries;
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries(
+        public async Task<Either<ActionResult, List<ReleaseSeriesItem>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
             return await _context.Publications
                 .FirstOrNotFoundAsync(p => p.Id == publicationId)
-                .OnSuccess(_userService.CheckCanManageLegacyReleases)
+                .OnSuccess(_userService.CheckCanManageReleaseSeries)
                 .OnSuccess(async publication =>
                 {
                     // @MarkFix check updatedReleaseSeriesItems contains sole copy of each releaseParent with correct id
@@ -549,14 +549,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             LegacyLinkUrl = request.LegacyLinkUrl,
                         }).ToList();
 
-                    publication.ReleaseSeriesView = newReleaseSeries;
+                    publication.ReleaseSeries = newReleaseSeries;
                     _context.Publications.Update(publication);
 
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return updatedReleaseSeriesItems; // @MarkFix do we want to return ReleaseSeriesItemViewModels here?
+                    return newReleaseSeries; // @MarkFix do we want to return ReleaseSeriesItemViewModels here?
                 });
         }
 
@@ -638,7 +638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
 
-            //viewModel.Order = publication.ReleaseSeriesView.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0; // @MarkFix
+            //viewModel.Order = publication.ReleaseSeries.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0; // @MarkFix
             //viewModel.IsDraft = !release.Live;
 
             if (includePermissions)

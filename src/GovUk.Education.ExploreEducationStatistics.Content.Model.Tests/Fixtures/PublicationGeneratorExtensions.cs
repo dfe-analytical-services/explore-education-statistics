@@ -57,7 +57,7 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => generator.ForInstance(p => p.SetExternalMethodology(externalMethodology));
 
-    public static Generator<Publication> WithLegacyReleases(
+    public static Generator<Publication> WithLegacyReleases( // @MarkFix
         this Generator<Publication> generator,
         IEnumerable<LegacyRelease> legacyReleases)
         => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
@@ -120,13 +120,13 @@ public static class PublicationGeneratorExtensions
                         releaseVersion.PublicationId = publication.Id;
 
                         // @MarkFix
-                        //publication.ReleaseSeriesView.Add(new()
+                        //publication.ReleaseSeries.Add(new()
                         //{
                         //    ReleaseId = release.Id,
                         //    IsAmendment = release.Amendment,
                         //    IsDraft = !release.Published.HasValue,
                         //    IsLegacy = false,
-                        //    Order = publication.ReleaseSeriesView.Count + 1,
+                        //    Order = publication.ReleaseSeries.Count + 1,
                         //});
                     });
 
@@ -211,13 +211,13 @@ public static class PublicationGeneratorExtensions
                         legacyRelease.PublicationId = publication.Id;
 
                         // @MarkFix
-                        //publication.ReleaseSeriesView.Add(new()
+                        //publication.ReleaseSeries.Add(new()
                         //{
                         //    ReleaseId = legacyRelease.Id,
                         //    IsAmendment = false,
                         //    IsDraft = false,
                         //    IsLegacy = true,
-                        //    Order = publication.ReleaseSeriesView.Count + 1,
+                        //    Order = publication.ReleaseSeries.Count + 1,
                         //});
                     });
 

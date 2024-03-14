@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20240222121924_EES4770_AddPublicationReleaseSeriesViewColumn")]
-    partial class EES4770_AddPublicationReleaseSeriesViewColumn
+    [Migration("20240222121924_EES4770_AddPublicationReleaseSeriesColumn")]
+    partial class EES4770_AddPublicationReleaseSeriesColumn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -828,7 +828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedReleaseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReleaseSeriesView")
+                    b.Property<string>("ReleaseSeries")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

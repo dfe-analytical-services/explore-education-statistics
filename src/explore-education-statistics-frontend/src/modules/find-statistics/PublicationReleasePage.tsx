@@ -36,7 +36,7 @@ interface Props {
 }
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
-  const releaseSeries = release.publication.releaseSeriesView; // @MarkFix take out current release?
+  const releaseSeries = release.publication.releaseSeries; // @MarkFix we want to filter out the current release somewhere?
 
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to

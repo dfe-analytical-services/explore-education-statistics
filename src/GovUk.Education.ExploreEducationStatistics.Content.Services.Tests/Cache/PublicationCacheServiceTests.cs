@@ -52,7 +52,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        ReleaseSeriesView = new() // @MarkFix
+        ReleaseSeries = new() // @MarkFix
         {
             new()
             {

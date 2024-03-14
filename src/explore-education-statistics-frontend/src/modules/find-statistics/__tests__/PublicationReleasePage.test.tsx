@@ -349,7 +349,6 @@ describe('PublicationReleasePage', () => {
                 id: 'latest-release',
                 title: 'Latest Release Title',
                 slug: 'latest-release-slug',
-                order: 1,
               },
             ],
           },

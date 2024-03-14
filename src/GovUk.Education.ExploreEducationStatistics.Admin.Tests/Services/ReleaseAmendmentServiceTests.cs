@@ -1,4 +1,8 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -14,10 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -37,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseAmendment()
         {
-            // Arrange
             var originalCreatedBy = new User
             {
                 Id = Guid.NewGuid()
@@ -370,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // @MarkFix
-                //publicationReleaseSeriesViewService.Setup(s => s.CreateForAmendRelease(
+                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease(
                 //    It.IsAny<Guid>(),
                 //    It.IsAny<Guid>()))
                 //.Returns(Task.CompletedTask);
@@ -802,7 +801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 // @MarkFix
-                //publicationReleaseSeriesViewService.Setup(s => s.CreateForAmendRelease(
+                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease(
                 //    It.IsAny<Guid>(),
                 //    It.IsAny<Guid>()))
                 //.Returns(Task.CompletedTask);
@@ -875,7 +874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                //publicationReleaseSeriesViewService.Setup(s => s.CreateForAmendRelease( // @MarkFix
+                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
                 //    It.IsAny<Guid>(),
                 //    It.IsAny<Guid>()))
                 //.Returns(Task.CompletedTask);
@@ -926,7 +925,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                //publicationReleaseSeriesViewService.Setup(s => s.CreateForAmendRelease( // @MarkFix
+                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
                 //    It.IsAny<Guid>(),
                 //    It.IsAny<Guid>()))
                 //.Returns(Task.CompletedTask);
@@ -1024,7 +1023,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                //publicationReleaseSeriesViewService.Setup(s => s.CreateForAmendRelease( // @MarkFix
+                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
                 //    It.IsAny<Guid>(),
                 //    It.IsAny<Guid>()))
                 //.Returns(Task.CompletedTask);

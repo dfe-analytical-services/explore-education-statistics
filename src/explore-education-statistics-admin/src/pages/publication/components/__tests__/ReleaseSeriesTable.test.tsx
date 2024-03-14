@@ -1,4 +1,4 @@
-import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
+import ReleaseSeriesTable from '@admin/pages/publication/components/ReleaseSeriesTable';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
@@ -12,7 +12,7 @@ import { ReleaseSeriesItem } from '@common/services/publicationService';
 //  typeof _legacyReleaseService
 // >;
 
-describe('LegacyReleasesTable', () => {
+describe('ReleaseSeriesTable', () => {
   const testReleaseSeries: ReleaseSeriesItem[] = [
     // @MarkFix create isLegacyLink: false in here and test that
     {
@@ -65,8 +65,8 @@ describe('LegacyReleasesTable', () => {
     return; // @MarkFix
     render(
       <TestConfigContextProvider>
-        <LegacyReleasesTable
-          canManageLegacyReleases
+        <ReleaseSeriesTable
+          canManageReleaseSeries
           releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
         />
@@ -135,8 +135,8 @@ describe('LegacyReleasesTable', () => {
   test('shows a message when there are no legacy releases', () => {
     render(
       <TestConfigContextProvider>
-        <LegacyReleasesTable
-          canManageLegacyReleases
+        <ReleaseSeriesTable
+          canManageReleaseSeries
           releaseSeries={[]}
           publicationId={testPublicationId}
         />
@@ -164,8 +164,8 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <TestConfigContextProvider>
-            <LegacyReleasesTable
-              canManageLegacyReleases
+            <ReleaseSeriesTable
+              canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
@@ -197,8 +197,8 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <TestConfigContextProvider>
-            <LegacyReleasesTable
-              canManageLegacyReleases
+            <ReleaseSeriesTable
+              canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
@@ -226,8 +226,8 @@ describe('LegacyReleasesTable', () => {
     return; // @MarkFix
     render(
       <TestConfigContextProvider>
-        <LegacyReleasesTable
-          canManageLegacyReleases={false}
+        <ReleaseSeriesTable
+          canManageReleaseSeries={false}
           releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
         />
@@ -293,8 +293,8 @@ describe('LegacyReleasesTable', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
       render(
         <TestConfigContextProvider>
-          <LegacyReleasesTable
-            canManageLegacyReleases
+          <ReleaseSeriesTable
+            canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
@@ -325,8 +325,8 @@ describe('LegacyReleasesTable', () => {
     // test('sends the delete request and updates the releases table when confirm is clicked', async () => {
     //  render(
     //    <TestConfigContextProvider>
-    //      <LegacyReleasesTable
-    //        canManageLegacyReleases
+    //      <ReleaseSeriesTable
+    //        canManageReleaseSeries
     //        releaseSeries={testReleaseSeries}
     //        publicationId={testPublicationId}
     //      />
@@ -364,8 +364,8 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <TestConfigContextProvider>
-            <LegacyReleasesTable
-              canManageLegacyReleases
+            <ReleaseSeriesTable
+              canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
@@ -396,8 +396,8 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <TestConfigContextProvider>
-            <LegacyReleasesTable
-              canManageLegacyReleases
+            <ReleaseSeriesTable
+              canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
             />
@@ -422,8 +422,8 @@ describe('LegacyReleasesTable', () => {
     test('does not show button to create when user does not have permission to manage legacy releases', () => {
       render(
         <TestConfigContextProvider>
-          <LegacyReleasesTable
-            canManageLegacyReleases={false}
+          <ReleaseSeriesTable
+            canManageReleaseSeries={false}
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
@@ -440,8 +440,8 @@ describe('LegacyReleasesTable', () => {
     test('shows a warning modal when the reorder releases button is clicked', async () => {
       render(
         <TestConfigContextProvider>
-          <LegacyReleasesTable
-            canManageLegacyReleases
+          <ReleaseSeriesTable
+            canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
@@ -467,8 +467,8 @@ describe('LegacyReleasesTable', () => {
     test('shows the reordering UI when OK is clicked', async () => {
       render(
         <TestConfigContextProvider>
-          <LegacyReleasesTable
-            canManageLegacyReleases
+          <ReleaseSeriesTable
+            canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />
@@ -506,8 +506,8 @@ describe('LegacyReleasesTable', () => {
     test('does not show button to reorder when user does not have permission to manage legacy releases', () => {
       render(
         <TestConfigContextProvider>
-          <LegacyReleasesTable
-            canManageLegacyReleases={false}
+          <ReleaseSeriesTable
+            canManageReleaseSeries={false}
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
           />

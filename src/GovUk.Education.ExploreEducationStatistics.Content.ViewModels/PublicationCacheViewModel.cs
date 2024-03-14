@@ -19,11 +19,11 @@ public record PublicationCacheViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
+    public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = new();
+
     public TopicViewModel Topic { get; init; } = null!;
 
     public ContactViewModel Contact { get; init; } = null!;
 
     public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
-
-    public List<ReleaseSeriesItem> ReleaseSeriesView { get; set; } = new();
 }

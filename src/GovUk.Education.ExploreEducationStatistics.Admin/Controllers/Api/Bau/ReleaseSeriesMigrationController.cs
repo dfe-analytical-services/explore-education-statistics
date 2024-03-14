@@ -14,21 +14,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 [Route("api")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class ReleaseSeriesViewMigrationController : ControllerBase
+public class ReleaseSeriesMigrationController : ControllerBase
 {
     private readonly ContentDbContext _context;
     private readonly IPublicationCacheService _publicationCacheService;
 
-    public ReleaseSeriesViewMigrationController(
-        ContentDbContext context,
+    public ReleaseSeriesMigrationController( ContentDbContext context,
         IPublicationCacheService publicationCacheService)
     {
         _context = context;
         _publicationCacheService = publicationCacheService;
     }
 
-    [HttpPatch("bau/migrate-release-series-view")] // @MarkFix update this function after you've done with everything else
-    public async Task<ActionResult> MigrateReleaseSeriesView(
+    [HttpPatch("bau/migrate-release-series")] // @MarkFix update this function after you've done with everything else
+    public async Task<ActionResult> MigrateReleaseSeries(
         [FromQuery] bool dryRun = true,
         CancellationToken cancellationToken = default)
     {
@@ -46,11 +45,11 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
             if (!publication.ReleaseVersions.Any() && !publication.LegacyReleases.Any()) continue;
 
             var currentOrder = 0;
-            publication.ReleaseSeriesView = new();
+            publication.ReleaseSeries = new();
 
             foreach (var legacyRelease in publication.LegacyReleases)
             {
-                //publication.ReleaseSeriesView.Add(new()
+                //publication.ReleaseSeries.Add(new()
                 //{
                 //    ReleaseId = legacyRelease.Id,
                 //    Order = ++currentOrder, // Reassign counting upwards from 1 (fix any misnumbered, or starting from 0)
@@ -81,7 +80,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                     // Add a ReleaseSeriesItem for the original
                     var originalRelease = releaseVersions.First(r => r.Id == latestRelease.PreviousVersionId);
 
-                    //publication.ReleaseSeriesView.Add(
+                    //publication.ReleaseSeries.Add(
                     //    new()
                     //    {
                     //        ReleaseId = originalRelease.Id,
@@ -91,7 +90,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                     //    });
 
                     // Followed by a ReleaseSeriesItem for the amendment, with the same Order
-                    //publication.ReleaseSeriesView.Add(
+                    //publication.ReleaseSeries.Add(
                     //    new()
                     //    {
                     //        ReleaseId = latestRelease.Id,
@@ -105,7 +104,7 @@ public class ReleaseSeriesViewMigrationController : ControllerBase
                 else
                 {
                     // The release is the only active version, so just add a single ReleaseSeriesItem
-                    //publication.ReleaseSeriesView.Add(
+                    //publication.ReleaseSeries.Add(
                     //    new()
                     //    {
                     //        ReleaseId = latestRelease.Id,

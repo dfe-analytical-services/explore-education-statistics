@@ -610,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        CanManageLegacyReleases))
+                        CanManagePublicationReleaseSeries))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
@@ -641,7 +641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Permissions.CanAdoptMethodologies);
                 Assert.False(result.Permissions.CanCreateMethodologies);
                 Assert.False(result.Permissions.CanManageExternalMethodology);
-                Assert.True(result.Permissions.CanManageLegacyReleases);
+                Assert.True(result.Permissions.CanManageReleaseSeries);
                 Assert.True(result.Permissions.CanUpdateContact);
                 Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
             }
@@ -2693,7 +2693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         //[Fact] // @MarkFix
-        //public async Task GetReleaseSeriesView()
+        //public async Task GetReleaseSeries()
         //{
         //    // Arrange
         //    var publicationId = Guid.NewGuid();
@@ -2757,7 +2757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         //                ApprovalStatus = ReleaseApprovalStatus.Draft,
         //            },
         //        },
-        //        ReleaseSeriesView = new()
+        //        ReleaseSeries = new()
         //        {
         //            new()
         //            {
@@ -2851,7 +2851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
         //        // Act
-        //        var result = await publicationService.GetReleaseSeriesView(publication.Id);
+        //        var result = await publicationService.GetReleaseSeries(publication.Id);
 
         //        // Assert
         //        var viewModels = result.AssertRight();

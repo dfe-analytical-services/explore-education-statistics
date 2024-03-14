@@ -131,15 +131,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("api/publications/{publicationId:guid}/release-series-view")]
-        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> GetReleaseSeriesView(Guid publicationId)
+        [HttpGet("api/publications/{publicationId:guid}/release-series")]
+        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _publicationService
-                .GetReleaseSeriesView(publicationId)
+                .GetReleaseSeries(publicationId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("api/publications/{publicationId:guid}/release-series-view")]
+        [HttpPost("api/publications/{publicationId:guid}/release-series")]
         public async Task<ActionResult<List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest request)
@@ -149,8 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("api/publications/{publicationId:guid}/release-series-view")]
-        public async Task<ActionResult<List<ReleaseSeriesItemUpdateRequest>>> UpdateReleaseSeries( // @MarkFix return type
+        [HttpPatch("api/publications/{publicationId:guid}/release-series")] // @MarkFix should be a PUT?
+        public async Task<ActionResult<List<ReleaseSeriesItem>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {

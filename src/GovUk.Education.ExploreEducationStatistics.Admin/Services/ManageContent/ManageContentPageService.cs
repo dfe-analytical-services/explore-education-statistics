@@ -102,6 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
 
+                    // @MarkFix releaseViewModel.Publication.ReleaseSeries filter out unpublished releaseIds here?
+
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection
                     releaseViewModel.Content.ForEach(c => c.Content.ForEach(contentBlock =>

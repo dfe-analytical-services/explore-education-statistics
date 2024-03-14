@@ -106,7 +106,7 @@ public class PublicationControllerTests
     }
 
     [Fact]
-    public async Task GetReleaseSeriesView_ReturnsOk()
+    public async Task GetReleaseSeries_ReturnsOk()
     {
         // Arrange
         var templateReleaseResult =
@@ -116,14 +116,14 @@ public class PublicationControllerTests
         var publicationService = new Mock<IPublicationService>(Strict);
 
         publicationService
-            .Setup(s => s.GetReleaseSeriesView(
+            .Setup(s => s.GetReleaseSeries(
                 It.Is<Guid>(id => id == publicationId)))
             .ReturnsAsync(templateReleaseResult);
 
         var controller = BuildController(publicationService.Object);
 
         // Act
-        var result = await controller.GetReleaseSeriesView(publicationId);
+        var result = await controller.GetReleaseSeries(publicationId);
 
         // Assert
         MockUtils.VerifyAllMocks(publicationService);

@@ -1,4 +1,4 @@
-import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
+import PublicationCreateReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationCreateReleaseSeriesLegacyLinkPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { PublicationWithPermissions } from '@admin/services/publicationService';
@@ -12,8 +12,8 @@ import noop from 'lodash/noop';
 //  typeof _legacyReleaseService
 // >;
 
-describe('PublicationLegacyReleaseCreatePage', () => {
-  test('renders the create legacy release page', async () => {
+describe('PublicationCreateReleaseSeriesLegacyLinkPage', () => {
+  test('renders the create release series page', async () => {
     renderPage(testPublication);
 
     expect(screen.getByText('Create legacy release')).toBeInTheDocument();
@@ -37,7 +37,7 @@ function renderPage(publication: PublicationWithPermissions) {
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationLegacyReleaseCreatePage />
+        <PublicationCreateReleaseSeriesLegacyLinkPage />
       </PublicationContextProvider>
     </MemoryRouter>,
   );

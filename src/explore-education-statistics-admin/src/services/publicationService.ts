@@ -38,7 +38,7 @@ export interface PublicationPermissions {
   canAdoptMethodologies: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
-  canManageLegacyReleases: boolean;
+  canManageReleaseSeries: boolean;
   canUpdateContact: boolean;
   canUpdateContributorReleaseRole: boolean;
   canViewReleaseTeamAccess: boolean;
@@ -80,8 +80,7 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
   url: string;
 }
 
-export interface UpdateReleaseSeriesItem {
-  // @MarkFix rename to match backend's ReleaseSeriesItemUpdateRequest
+export interface ReleaseSeriesItemUpdateRequest {
   id: string;
 
   releaseId?: string;
@@ -212,25 +211,25 @@ const publicationService = {
   },
 
   getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
-    return client.get(`/publications/${publicationId}/release-series-view`);
+    return client.get(`/publications/${publicationId}/release-series`);
   },
 
   addReleaseSeriesLegacyLink(
     publicationId: string,
     newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
-  ): Promise<ReleaseSeriesItem[]> {
+  ): Promise<ReleaseSeriesItem[]> { // @MarkFix backend/frontend return type mismatch
     return client.post(
-      `publications/${publicationId}/release-series-view`,
+      `publications/${publicationId}/release-series`,
       newLegacyLink,
     );
   },
 
   updateReleaseSeriesView(
     publicationId: string,
-    legacyReleases: UpdateReleaseSeriesItem[],
-  ): Promise<UpdateReleaseSeriesItem[]> {
+    legacyReleases: ReleaseSeriesItemUpdateRequest[],
+  ): Promise<ReleaseSeriesItem[]> { // @MarkFix backend/frontend return type mismatch
     return client.patch(
-      `/publications/${publicationId}/release-series-view`,
+      `/publications/${publicationId}/release-series`,
       legacyReleases,
     );
   },

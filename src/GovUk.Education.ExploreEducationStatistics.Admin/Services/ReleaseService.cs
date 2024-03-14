@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.ReleaseVersions.AddAsync(newReleaseVersion);
 
                     // @MarkFix check this is right
-                    var releaseSeries = publication.ReleaseSeriesView;
+                    var releaseSeries = publication.ReleaseSeries;
                     releaseSeries.Insert(0, new ReleaseSeriesItem
                     {
                         Id = Guid.NewGuid(),
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var publication = await _context.Publications
                             .Where(p => p.Id == releaseVersions[0].PublicationId)
                             .SingleAsync();
-                        var releaseSeries = publication.ReleaseSeriesView;
+                        var releaseSeries = publication.ReleaseSeries;
                         var seriesItem = releaseSeries.Where(rsi => rsi.ReleaseId == release.ReleaseId)
                             .Single();
                         releaseSeries.Remove(seriesItem);
