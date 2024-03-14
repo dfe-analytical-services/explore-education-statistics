@@ -102,7 +102,6 @@ Check publication is updated on dashboard
     user selects dashboard theme and topic if possible
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
-    Sleep    10s
 
 Validate publication redirect works
     user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
@@ -176,7 +175,7 @@ Approve second release
     user clicks link    Sign off
     user approves release for immediate publication
 
-Check that first release exist in the front end and does not contains the latest data
+Check that first release does not contains the latest data
     user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2050-51-q1
     user checks page does not contain    This is the latest data
     user checks page contains    This is not the latest data
