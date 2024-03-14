@@ -1,18 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
+using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -109,7 +107,7 @@ public class Startup
                 {
                     var sqlServerTokenProvider = new DefaultAzureCredential();
                     var accessToken = sqlServerTokenProvider.GetToken(
-                        new Azure.Core.TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
+                        new TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
 
                     var connectionStringWithAccessToken =
                         connectionString.Replace("[access_token]", accessToken);
@@ -158,11 +156,6 @@ public class Startup
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseHttpsRedirection();
-            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
         // Rewrites

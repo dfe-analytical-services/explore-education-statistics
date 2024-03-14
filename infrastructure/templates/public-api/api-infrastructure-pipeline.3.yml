@@ -1,0 +1,36 @@
+trigger: none
+
+#trigger:
+#  batch: true
+#  branches:
+#    include:
+#    - master
+#    - dev
+#  paths:
+#    include:
+#    - infrastructure/public-api/*
+#pr: none
+
+# This defines the "Build.BuildNumber" variable available in the pipeline.
+name: $(Date:yyyyMMdd).$(Rev:r)
+
+variables:
+  - name: mainBuildNumber
+    value: $[ variables['Build.BuildNumber'] ]
+
+pool:
+#  vmImage: $(vmImageName)
+  name: dfe-development-dw agent pool
+
+stages:
+- stage: Build
+  jobs:
+  - job: CheckInfrastructure
+    steps:
+    - checkout: self
+    - task: CmdLine@2
+      displayName: 'List source files'
+      inputs:
+        script: |
+          echo "Structure of work folder of this pipeline:"
+          tree $(Build.SourcesDirectory)

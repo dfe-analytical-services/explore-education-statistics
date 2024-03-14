@@ -16,7 +16,7 @@ param containerAppImageName string
 param containerAppName string
 
 @description('Specifies the container port.')
-param containerAppTargetPort int = 80
+param containerAppTargetPort int = 8080
 
 @description('Number of CPU cores the container can use. Can be with a maximum of two decimals.')
 @allowed([
@@ -57,76 +57,22 @@ param appSettings {
   value: string
 }[]
 
-@description('Specifies the subnet id')
-param subnetId string
-
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-@description('The Application Insights key that is associated with this resource')
-param applicationInsightsKey string
+@description('An existing Managed Identity\'s Resource Id with which to associate this Container App')
+param managedIdentityId string?
 
-@description('An existing Managed Identity with which to associate this Container App')
-param managedIdentity object?
+@description('Id of the owning Container App Environment')
+param managedEnvironmentId string
 
 var containerImageName = '${acrLoginServer}/${containerAppImageName}'
-var containerEnvName = '${resourcePrefix}-cae-${containerAppName}'
 var containerApplicationName = toLower('${resourcePrefix}-ca-${containerAppName}')
-var containerLogName = '${resourcePrefix}-log-${containerAppName}'
-var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: containerLogName
-  location: location
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
-  }
-  tags: tagValues
-}
-
-@description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource managedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (managedIdentity != null) {
-  name: guid(resourceGroup().id, managedIdentity!.id, acrPullRole)
-  properties: {
-    roleDefinitionId: acrPullRole
-    principalId: managedIdentity!.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: containerEnvName
-  location: location
-  properties: {
-    vnetConfiguration: {
-      infrastructureSubnetId: subnetId
-    }
-    daprAIInstrumentationKey: applicationInsightsKey
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
-      }
-    }
-    workloadProfiles: [
-      {
-        name: 'Consumption'
-        workloadProfileType: 'Consumption'
-      }
-    ]
-  }
-  tags: tagValues
-}
-
-
-
-var containerAppIdentity = managedIdentity != null ? {
+var containerAppIdentity = managedIdentityId != null ? {
   type: 'UserAssigned'
   userAssignedIdentities: {
-    '${managedIdentity!.id}': {}
+    '${managedIdentityId}': {}
   }
 } : {
   type: 'SystemAssigned'
@@ -137,7 +83,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   location: location
   identity: containerAppIdentity
   properties: {
-    managedEnvironmentId: containerAppEnvironment.id
+    managedEnvironmentId: managedEnvironmentId
     configuration: {
       maxInactiveRevisions: 1
       activeRevisionsMode: 'Single'
@@ -152,6 +98,12 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           }
         ]
       }
+      registries: [
+        {
+          server: acrLoginServer
+          identity: managedIdentityId ?? ''
+        }
+      ]
     }
     template: {
       containers: [
@@ -187,4 +139,3 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
 
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
 output containerImage string = containerImageName
-output managedIdentityName string = managedIdentity.name
