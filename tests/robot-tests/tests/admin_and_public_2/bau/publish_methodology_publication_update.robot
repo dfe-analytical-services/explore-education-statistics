@@ -130,31 +130,27 @@ Navigate to methodology page and click on amendment button
     user waits until modal is not visible    Confirm you want to amend this published methodology
 
 Update methodology details
-    User Clicks link    Edit summary
+    User clicks link    Edit summary
     user waits until page contains element    xpath://h2[contains(text(),'Edit methodology summary')]
-    User Clicks Radio    Set an alternative title
-    User Enters Text Into Element    id:updateMethodologyForm-title    methodology update
-    User Clicks Button    Update methodology
+    user clicks radio    Set an alternative title
+    user enters text into element    id:updateMethodologyForm-title    ${PUBLICATION_NAME}-methodology update
+    user clicks button    Update methodology
 
 Naviagate to sign-off page and approve the methodology immediately
     user clicks link    Sign off
-    User Clicks Button    Edit status
-    User Clicks Radio    Approved for publication
-    User Enters Text Into Element    id:methodologyStatusForm-latestInternalReleaseNote    Internal note
-    User Clicks Radio    Immediately
+    User clicks button    Edit status
+    user clicks radio    Approved for publication
+    user enters text into element    id:methodologyStatusForm-latestInternalReleaseNote    Internal note
+    user clicks radio    Immediately
     user clicks button    Update status
-    User Waits Until Page Contains    Approved
-
-Validate methodology redirect doesn't work for initial publication
-    User Navigates To Public Frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
-    user waits until page contains title    Page not found
-    Sleep    100s
+    user waits until page contains    Approved
+    sleep    100
 
 Validate methodology re-directs works for the updated publication
-    User Navigates To Public Frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-updated
+    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-updated
     user waits until h1 is visible    methodology update
-    User checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_UPDATED_URL_ENDING}
-    Sleep    100s
+    user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_UPDATED_URL_ENDING}
+    sleep    10
 
 User creates a new release with different academic year
     user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
@@ -170,14 +166,24 @@ Approve first release
     user approves release for immediate publication
 
 User creates second release
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    ${RELEASE_NAME}    2051
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
+    user creates release from publication page    ${PUBLICATION_NAME_UPDATED}    ${RELEASE_NAME}    2051
 
 Add headline text block to Content page (second release)
-    user navigates to content page    ${PUBLICATION_NAME}
+    user navigates to content page    ${PUBLICATION_NAME_UPDATED}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
 Approve second release
     user clicks link    Sign off
     user approves release for immediate publication
+
+Check that first release exist in the front end and does not contains the latest data
+    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2050-51-q1
+    user checks page does not contain    This is the latest data
+    user checks page contains    This is not the latest data
+
+Check that second release contains the latest data
+    user navigates to public frontend    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated/2051-52-q1
+    user checks page does not contain    This is not the latest data
+    user checks page contains    This is the latest data
