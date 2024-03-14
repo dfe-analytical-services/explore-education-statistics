@@ -16,6 +16,7 @@
     "StatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;TrustServerCertificate=True;"
   },
   "Host": {
+    "LocalHttpPort": 7072,
     "CORS": "*"
   }
 }

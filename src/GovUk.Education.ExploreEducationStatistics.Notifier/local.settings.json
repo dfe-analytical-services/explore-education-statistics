@@ -18,6 +18,7 @@
   "ConnectionStrings": {
   },
   "Host": {
+    "LocalHttpPort": 7073,
     "CORS": "*"
   }
 }

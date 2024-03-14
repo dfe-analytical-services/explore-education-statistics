@@ -11,6 +11,7 @@
     "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;TrustServerCertificate=True;"
   },
   "Host": {
+    "LocalHttpPort": 7071,
     "CORS": "*"
   }
 }
