@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -32,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IDataBlockService _dataBlockService;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseFileService _releaseFileService;
+        private readonly IReleaseVersionRepository _releaseVersionRepository;
         private readonly IUserService _userService;
 
         public ManageContentPageService(
@@ -41,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IDataBlockService dataBlockService,
             IMethodologyVersionRepository methodologyVersionRepository,
             IReleaseFileService releaseFileService,
+            IReleaseVersionRepository releaseVersionRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
@@ -49,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _dataBlockService = dataBlockService;
             _methodologyVersionRepository = methodologyVersionRepository;
             _releaseFileService = releaseFileService;
+            _releaseVersionRepository = releaseVersionRepository;
             _userService = userService;
         }
 
@@ -97,16 +101,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             .ToListAsync();
                     }
 
-                    // Only show legacy links and published releases in ReleaseSeries
-                    releaseVersion.Publication.ReleaseSeries = releaseVersion.Publication.ReleaseSeries
-                        .Where(rsi =>
+                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
+
+                    // Hydrate ReleaseSeries
+                    var filteredReleaseSeries = releaseVersion.Publication.ReleaseSeries
+                        .Where(rsi => // only show items for legacy links and published releases
                             rsi.IsLegacyLink || releaseVersion.Publication.ReleaseVersions
                                 .Any(rv =>
                                         rsi.ReleaseId == rv.ReleaseId
                                         && rv.Live)
                         ).ToList();
+                    var publishedVersions =
+                        await _releaseVersionRepository
+                            .ListLatestPublishedReleaseVersions(releaseVersion.PublicationId);
+                    releaseViewModel.Publication.ReleaseSeries = filteredReleaseSeries
+                        .Select(rsi =>
+                        {
+                            var latestReleaseVersion = publishedVersions
+                                .Single(rv => rv.ReleaseId == rsi.ReleaseId);
 
-                    var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
+                            return new ReleaseSeriesItemViewModel
+                            {
+                                Id = rsi.Id,
+                                IsLegacyLink = rsi.IsLegacyLink,
+                                Description = rsi.LegacyLinkDescription ?? latestReleaseVersion.Title,
+
+                                ReleaseId = latestReleaseVersion.ReleaseId,
+                                PublicationSlug = latestReleaseVersion.Publication.Slug,
+                                ReleaseSlug = latestReleaseVersion.Slug,
+
+                                LegacyLinkUrl = rsi.LegacyLinkUrl,
+
+                            };
+                        }).ToList();
+
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);

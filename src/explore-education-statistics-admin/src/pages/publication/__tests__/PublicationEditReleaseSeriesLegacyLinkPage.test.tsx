@@ -2,7 +2,7 @@ import PublicationEditReleaseSeriesLegacyLinkPage from '@admin/pages/publication
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import {
-  PublicationEditLegacyReleaseRouteParams,
+  PublicationEditReleaseSeriesLegacyLinkRouteParams,
   publicationEditReleaseSeriesLegacyLinkRoute,
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
@@ -14,7 +14,7 @@ import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
-import {ReleaseSeriesItem} from "@common/services/publicationService";
+import { ReleaseSeriesItem } from '@common/services/publicationService';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -116,16 +116,16 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
 
 function renderPage(
   publication: PublicationWithPermissions,
-  legacyReleaseId: string,
+  releaseSeriesItemId: string,
 ) {
   render(
     <MemoryRouter
       initialEntries={[
-        generatePath<PublicationEditLegacyReleaseRouteParams>(
+        generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
           publicationEditReleaseSeriesLegacyLinkRoute.path,
           {
             publicationId: publication.id,
-            legacyReleaseId,
+            releaseSeriesItemId,
           },
         ),
       ]}

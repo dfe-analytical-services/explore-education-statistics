@@ -2,7 +2,7 @@ import Link from '@admin/components/Link';
 import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import {
-  PublicationEditLegacyReleaseRouteParams,
+  PublicationEditReleaseSeriesLegacyLinkRouteParams,
   publicationReleaseSeriesRoute,
 } from '@admin/routes/publicationRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -13,8 +13,8 @@ import publicationService from '@admin/services/publicationService';
 
 const PublicationEditReleaseSeriesLegacyLinkPage = ({
   match,
-}: RouteComponentProps<PublicationEditLegacyReleaseRouteParams>) => {
-  const { legacyReleaseId } = match.params;
+}: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) => {
+  const { releaseSeriesItemId } = match.params;
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 
@@ -22,7 +22,9 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
     publicationService.getReleaseSeries(publicationId),
   );
 
-  const itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
+  const itemIndex = releaseSeries?.findIndex(
+    rsi => rsi.id === releaseSeriesItemId,
+  );
   if (
     isLoading ||
     releaseSeries === undefined ||
@@ -49,7 +51,7 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: releaseSeries[itemIndex].description,
-            url: releaseSeries[itemIndex].legacyLinkUrl ?? "", // @MarkFix empty string should never happen
+            url: releaseSeries[itemIndex].legacyLinkUrl ?? '',
           }}
           cancelButton={
             <Link unvisited to={publicationEditPath}>

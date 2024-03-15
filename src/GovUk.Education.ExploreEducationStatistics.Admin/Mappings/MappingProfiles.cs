@@ -142,20 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = otherReleaseVersion.Title,
                             })
                             .ToList(),
-                        ReleaseSeries = rv.Publication.ReleaseSeries
-                            .Select(rsi => new ReleaseSeriesItemViewModel
-                            {
-                                Id = rsi.Id,
-                                IsLegacyLink = rsi.IsLegacyLink,
-                                Description = rsi.LegacyLinkDescription ?? rv.Title,
-
-                                ReleaseId = rsi.ReleaseId,
-                                PublicationSlug = rv.Publication.Slug,
-                                ReleaseSlug = rv.Slug,
-
-                                LegacyLinkUrl = rsi.LegacyLinkUrl,
-                            })
-                            .ToList(),
+                        ReleaseSeries = new List<ReleaseSeriesItemViewModel>(), // Must be hydrated after mapping
                         ExternalMethodology = rv.Publication.ExternalMethodology != null
                             ? new ExternalMethodology
                             {

@@ -59,7 +59,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Id = Guid.NewGuid(),
                 ReleaseId = null,
                 LegacyLinkUrl = "http://test.com/",
-                LegacyLinkDescription = "legacy link description",
+                Description = "legacy link description",
             }
         },
         Topic = new TopicViewModel(new ThemeViewModel(

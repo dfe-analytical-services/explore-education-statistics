@@ -16,9 +16,9 @@ export type PublicationRouteParams = {
   publicationId: string;
 };
 
-export type PublicationEditLegacyReleaseRouteParams = {
+export type PublicationEditReleaseSeriesLegacyLinkRouteParams = {
   publicationId: string;
-  legacyReleaseId: string;
+  releaseSeriesItemId: string;
 };
 
 export type PublicationTeamRouteParams = {
@@ -103,8 +103,9 @@ export const publicationCreateReleaseLegacyLinkRoute: PublicationRouteProps = {
   component: PublicationCreateReleaseSeriesLegacyLinkPage,
 };
 
-export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/legacy/:legacyReleaseId/edit',
-  title: 'Edit legacy release',
-  component: PublicationEditReleaseSeriesLegacyLinkPage,
-};
+export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
+  {
+    path: '/publication/:publicationId/legacy/:releaseSeriesItemId/edit',
+    title: 'Edit legacy release',
+    component: PublicationEditReleaseSeriesLegacyLinkPage,
+  };

@@ -93,7 +93,31 @@ public class PublicationService : IPublicationService
                             .Any(rv => rsi.ReleaseId == rv.ReleaseId)
                     ).ToList();
 
-                return BuildPublicationViewModel(publication, publishedReleaseVersions, isSuperseded, filteredReleaseSeries);
+                var publishedVersions =
+                    await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
+
+                var releaseSeriesItemViewModels = filteredReleaseSeries
+                    .Select(rsi =>
+                    {
+                        var latestReleaseVersion = publishedVersions
+                            .Single(rv => rv.ReleaseId == rsi.ReleaseId);
+
+                        return new ReleaseSeriesItemViewModel
+                        {
+                            Id = rsi.Id,
+                            IsLegacyLink = rsi.IsLegacyLink,
+                            Description = rsi.LegacyLinkDescription ?? latestReleaseVersion.Title,
+
+                            ReleaseId = latestReleaseVersion.ReleaseId,
+                            PublicationSlug = latestReleaseVersion.Publication.Slug,
+                            ReleaseSlug = latestReleaseVersion.Slug,
+
+                            LegacyLinkUrl = rsi.LegacyLinkUrl,
+
+                        };
+                    }).ToList();
+
+                return BuildPublicationViewModel(publication, publishedReleaseVersions, isSuperseded, releaseSeriesItemViewModels);
             });
     }
 
@@ -198,7 +222,7 @@ public class PublicationService : IPublicationService
         Publication publication,
         List<ReleaseVersion> releaseVersions,
         bool isSuperseded,
-        List<ReleaseSeriesItem> releaseSeries)
+        List<ReleaseSeriesItemViewModel> releaseSeries)
     {
         var topic = new TopicViewModel(new ThemeViewModel(
             publication.Topic.Theme.Id,
@@ -212,9 +236,6 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            //LegacyReleases = publication.LegacyReleases // @MarkFix can remove?
-            //    .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
-            //    .ToList(),
             Topic = topic,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null

@@ -5,7 +5,7 @@ import {
   publicationCreateReleaseLegacyLinkRoute,
   PublicationRouteParams,
   publicationEditReleaseSeriesLegacyLinkRoute,
-  PublicationEditLegacyReleaseRouteParams,
+  PublicationEditReleaseSeriesLegacyLinkRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -23,7 +23,7 @@ import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import {ReleaseSeriesItem} from "@common/services/publicationService";
+import { ReleaseSeriesItem } from '@common/services/publicationService';
 
 interface Props {
   canManageReleaseSeries: boolean;
@@ -207,11 +207,11 @@ const ReleaseSeriesTable = ({
                                 }
                                 onConfirm={() => {
                                   history.push(
-                                    generatePath<PublicationEditLegacyReleaseRouteParams>(
+                                    generatePath<PublicationEditReleaseSeriesLegacyLinkRouteParams>(
                                       publicationEditReleaseSeriesLegacyLinkRoute.path,
                                       {
                                         publicationId,
-                                        legacyReleaseId: seriesItem.id,
+                                        releaseSeriesItemId: seriesItem.id,
                                       },
                                     ),
                                   );

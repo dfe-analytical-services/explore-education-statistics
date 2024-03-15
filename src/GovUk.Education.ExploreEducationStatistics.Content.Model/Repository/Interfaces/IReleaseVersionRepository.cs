@@ -33,9 +33,14 @@ public interface IReleaseVersionRepository
         string releaseSlug,
         CancellationToken cancellationToken = default);
 
-    // @MarkFix <summary> etc.
+    /// <summary>
+    /// Retrieves the latest release version for a particular release.
+    /// </summary>
+    /// <param name="publicationId">The unique identifier of the publication.</param>
+    /// <param name="releaseId">The unique identifier of the release.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>The latest version from all releases in reverse chronological order that are associated with a publication.</returns>
     Task<ReleaseVersion?> GetLatestReleaseVersionForParent(
-        Guid publicationId,
         Guid releaseId,
         CancellationToken cancellationToken = default);
 
@@ -123,6 +128,4 @@ public interface IReleaseVersionRepository
     Task<List<ReleaseVersion>> ListLatestReleaseVersions(
         Guid publicationId,
         CancellationToken cancellationToken = default);
-
-    Task<ReleaseVersion> GetReleaseParentLatestReleaseVersion(Guid releaseId); // @MarkFix remove?
 }

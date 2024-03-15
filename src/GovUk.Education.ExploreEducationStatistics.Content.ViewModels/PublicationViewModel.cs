@@ -1,5 +1,4 @@
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -19,7 +18,7 @@ public record PublicationViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<ReleaseSeriesItem> ReleaseSeries { get; init; } = new(); // @MarkFix should be view model?
+    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = new();
 
     public TopicViewModel Topic { get; init; } = null!;
 

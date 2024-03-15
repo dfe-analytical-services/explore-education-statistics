@@ -476,26 +476,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                         else
                         {
-                            var latestParentVersion = await _releaseVersionRepository
+                            var latestVersion = await _releaseVersionRepository
                                 .GetLatestReleaseVersionForParent(
-                                    publication.Id, seriesItem.ReleaseId!.Value);
+                                    seriesItem.ReleaseId!.Value);
 
-                            if (latestParentVersion == null)
+                            if (latestVersion == null)
                             {
                                 throw new InvalidDataException(
                                     "ReleaseSeriesItem with ReleaseId set should have an associated " +
-                                            $"LatestReleaseVersion. Publication: {publication.Id} " +
+                                            $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
                                             $"ReleaseSeriesItem: {seriesItem.Id}");
+                            }
+
+                            if (latestVersion.PublicationId != publicationId)
+                            {
+                                throw new InvalidDataException(
+                                    "ReleaseSeriesItem belongs to different publication " +
+                                    $"ReleaseSeriesItem: {seriesItem.Id} Expected publication: {publicationId} " +
+                                    $"Actual publication: {latestVersion.PublicationId}");
                             }
 
                             result.Add(new ReleaseSeriesItemViewModel
                                 {
                                     Id = seriesItem.Id,
                                     IsLegacyLink = false,
-                                    Description = latestParentVersion.Title,
-                                    ReleaseId = latestParentVersion.ReleaseId,
+                                    Description = latestVersion.Title,
+                                    ReleaseId = latestVersion.ReleaseId,
                                     PublicationSlug = publication.Slug,
-                                    ReleaseSlug = latestParentVersion.Slug,
+                                    ReleaseSlug = latestVersion.Slug,
                                 });
                         }
                     }
@@ -544,14 +552,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     foreach (var seriesItem in updatedReleaseSeriesItems)
                     {
                         if (seriesItem.ReleaseId != null && (
-                                seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkDescription != null))
+                                seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkUrl != null))
                         {
                             throw new ArgumentException(
                                 $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
                         }
 
                         if (seriesItem.ReleaseId == null && (
-                                seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkDescription == null))
+                                seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkUrl == null))
                         {
                             throw new ArgumentException(
                                 $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
@@ -569,11 +577,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(rsi => rsi.ReleaseId!.Value)
                         .ToList();
 
-                    if (publicationReleaseIds.Count != updatedSeriesReleaseIds.Count ||
-                        !publicationReleaseIds.ContainsAll(updatedSeriesReleaseIds))
+                    if (!ComparerUtils.SequencesAreEqualIgnoringOrder(publicationReleaseIds, updatedSeriesReleaseIds))
                     {
                         throw new ArgumentException(
-                            $"Missing release in new release series. Expected ReleaseIds: {publicationReleaseIds}");
+                            $"Missing or duplicate release in new release series. Expected ReleaseIds: {publicationReleaseIds}");
                     }
 
                     // @MarkFix Check series item Ids haven't been changed? Do we care if they have?
@@ -676,10 +683,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             bool includePermissions)
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
-
-            //viewModel.Order = publication.ReleaseSeries.Find(ro => ro.ReleaseId == release.Id)?.Order ?? 0; // @MarkFix
-            //viewModel.IsDraft = !release.Live;
-
             if (includePermissions)
             {
                 viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);

@@ -84,18 +84,6 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<ReleaseVersion?> GetLatestReleaseVersionForParent(
-        Guid publicationId,
-        Guid releaseId,
-        CancellationToken cancellationToken = default)
-    {
-        var latestVersions = await _contentDbContext.ReleaseVersions
-                .LatestReleaseVersions(publicationId)
-                .ToListAsync(cancellationToken: cancellationToken);
-
-        return latestVersions.FirstOrDefault(rv => rv.ReleaseId == releaseId);
-    }
-
     public async Task<bool> IsLatestPublishedReleaseVersion(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default)
@@ -184,15 +172,17 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
                releaseVersion.Version;
     }
 
-    public async Task<ReleaseVersion> GetReleaseParentLatestReleaseVersion(Guid releaseId)
+    public async Task<ReleaseVersion?> GetLatestReleaseVersionForParent(
+        Guid releaseId,
+        CancellationToken cancellationToken = default)
     {
-        var maxVersion = await GetMaxVersionNumber(releaseId);
+        var maxVersion = await GetMaxVersionNumber(releaseId, cancellationToken: cancellationToken);
 
         return await _contentDbContext.ReleaseVersions
             .Where(rv =>
                 rv.ReleaseId == releaseId
                 && rv.Version == maxVersion)
-            .FirstAsync();
+            .FirstAsync(cancellationToken);
     }
 
     private async Task<int?> GetMaxVersionNumber(

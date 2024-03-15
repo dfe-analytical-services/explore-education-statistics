@@ -260,11 +260,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease( // @MarkFix update release version?
+        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(
             Guid releaseVersionId, ReleaseUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
-                .OnSuccess(async () => await CheckReleaseExists(releaseVersionId))
+                .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(async release =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
@@ -516,7 +516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseExists(Guid releaseVersionId)
+        private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(Guid releaseVersionId)
         {
             return await _context
                 .ReleaseVersions

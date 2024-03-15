@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -734,6 +735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IDataBlockService? dataBlockService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IReleaseFileService? releaseFileService = null,
+            Content.Model.Repository.Interfaces.IReleaseVersionRepository? releaseVersionRepository = null,
             IUserService? userService = null)
         {
             return new(
@@ -743,7 +745,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
+            userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
     }

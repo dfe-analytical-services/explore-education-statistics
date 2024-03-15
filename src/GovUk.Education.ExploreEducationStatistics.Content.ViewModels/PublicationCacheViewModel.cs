@@ -19,7 +19,7 @@ public record PublicationCacheViewModel
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<ReleaseSeriesItem> ReleaseSeries { get; set; } = new();
+    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; } = new();
 
     public TopicViewModel Topic { get; init; } = null!;
 
