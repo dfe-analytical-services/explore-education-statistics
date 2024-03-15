@@ -288,8 +288,8 @@ describe('FormFieldRadioGroup', () => {
         </Formik>,
       );
 
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(

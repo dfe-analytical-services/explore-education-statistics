@@ -1,16 +1,10 @@
-import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
 import RHFFormFieldCheckboxMenu from '@common/components/form/rhf/RHFFormFieldCheckboxMenu';
 import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
-import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
-import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
-  FilterOption,
   LocationOption,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -18,8 +12,7 @@ import locationLevelsMap from '@common/utils/locationLevelsMap';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
-import sortBy from 'lodash/sortBy';
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
@@ -33,7 +26,7 @@ export type LocationFiltersFormSubmitHandler = (values: {
   locationIds: string[];
 }) => void | Promise<void>;
 
-interface Props extends InjectedWizardProps {
+export interface LocationFiltersFormProps extends InjectedWizardProps {
   options: SubjectMeta['locations'];
   initialValues?: string[];
   onSubmit: LocationFiltersFormSubmitHandler;
@@ -44,17 +37,10 @@ const LocationFiltersForm = ({
   options,
   onSubmit,
   ...stepProps
-}: Props) => {
-  const { isActive, goToNextStep } = stepProps;
-  const levelKeys = Object.keys(options);
+}: LocationFiltersFormProps) => {
+  const { goToNextStep } = stepProps;
 
-  const stepHeading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading>
-      {levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
-        ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
-        : 'Choose locations'}
-    </WizardStepHeading>
-  );
+  const levelKeys = Object.keys(options);
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
 
@@ -136,7 +122,9 @@ const LocationFiltersForm = ({
         'required',
         'Select at least one location',
         (value: Dictionary<string[]>) =>
-          Object.values(value).some(groupOptions => groupOptions.length > 0),
+          Object.values(value).some(
+            groupOptions => groupOptions && groupOptions.length > 0,
+          ),
       ),
     });
   }, []);
@@ -154,147 +142,97 @@ const LocationFiltersForm = ({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset, trigger }) => {
+      {({ formState, trigger }) => {
+        const isInvalidOnEdit = !!(!formState.isValid && initialValues.length);
+
         const showError =
           !formState.isValid &&
           (Object.keys(formState.touchedFields).length > 0 ||
-            formState.isSubmitted);
+            formState.isSubmitted ||
+            isInvalidOnEdit);
 
         if (showError && !formState.errors.locations) {
           trigger('locations');
         }
 
-        if (isActive) {
-          return (
-            <RHFForm
-              id="locationFiltersForm"
-              showErrorSummary={showError}
-              onSubmit={handleSubmit}
+        return (
+          <RHFForm
+            id="locationFiltersForm"
+            initialTouched={initialValues.length ? ['locations'] : []}
+            showErrorSummary={showError}
+            onSubmit={handleSubmit}
+          >
+            <FormFieldset
+              id="levels"
+              legend={<LocationStepHeading {...stepProps} options={options} />}
+              hint="Select at least one"
+              error={
+                showError ? getErrorMessage(formState.errors, 'locations') : ''
+              }
             >
-              <FormFieldset
-                id="levels"
-                legend={stepHeading}
-                hint="Select at least one"
-                error={
-                  showError
-                    ? getErrorMessage(formState.errors, 'locations')
-                    : ''
-                }
-              >
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-half-from-desktop">
-                    {formOptions.map(([levelKey, level]) => {
-                      const hasSubGroups = level.options.some(
-                        option => option.options,
-                      );
-                      const searchOnly = levelKey === 'school';
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-half-from-desktop">
+                  {formOptions.map(([levelKey, level]) => {
+                    const hasSubGroups = level.options.some(
+                      option => option.options,
+                    );
+                    const searchOnly = levelKey === 'school';
 
-                      return hasSubGroups && !searchOnly ? (
-                        <RHFFormFieldCheckboxGroupsMenu
-                          key={levelKey}
-                          name={`locations.${levelKey}`}
-                          disabled={formState.isSubmitting}
-                          groupLabel={level.legend}
-                          legend={level.legend}
-                          open={hasSingleOption}
-                          order={[]}
-                          options={level.options.map(group => ({
-                            legend: group.label,
-                            options:
-                              group.options?.map(option => ({
+                    return hasSubGroups && !searchOnly ? (
+                      <RHFFormFieldCheckboxGroupsMenu
+                        key={levelKey}
+                        name={`locations.${levelKey}`}
+                        disabled={formState.isSubmitting}
+                        groupLabel={level.legend}
+                        legend={level.legend}
+                        open={hasSingleOption}
+                        order={[]}
+                        options={level.options.map(group => ({
+                          legend: group.label,
+                          options:
+                            group.options?.map(option => ({
+                              label: option.label,
+                              value: option.id ?? '',
+                            })) ?? [],
+                        }))}
+                      />
+                    ) : (
+                      <RHFFormFieldCheckboxMenu
+                        key={levelKey}
+                        name={`locations.${levelKey}`}
+                        disabled={formState.isSubmitting}
+                        groupLabel={level.legend}
+                        legend={level.legend}
+                        legendHidden
+                        open={hasSingleOption || searchOnly}
+                        order={searchOnly ? 'label' : []}
+                        options={
+                          searchOnly
+                            ? getSearchOnlyOptions(level.options, hasSubGroups)
+                            : level.options.map(option => ({
                                 label: option.label,
                                 value: option.id ?? '',
-                              })) ?? [],
-                          }))}
-                        />
-                      ) : (
-                        <RHFFormFieldCheckboxMenu
-                          key={levelKey}
-                          name={`locations.${levelKey}`}
-                          disabled={formState.isSubmitting}
-                          groupLabel={level.legend}
-                          legend={level.legend}
-                          legendHidden
-                          open={hasSingleOption || searchOnly}
-                          order={searchOnly ? 'label' : []}
-                          options={
-                            searchOnly
-                              ? getSearchOnlyOptions(
-                                  level.options,
-                                  hasSubGroups,
-                                )
-                              : level.options.map(option => ({
-                                  label: option.label,
-                                  value: option.id ?? '',
-                                }))
-                          }
-                          searchOnly={searchOnly}
-                          searchHelpText={
-                            searchOnly
-                              ? 'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.'
-                              : 'Search above and select at least one option before continuing to the next step.'
-                          }
-                          small
-                        />
-                      );
-                    })}
-                  </div>
+                              }))
+                        }
+                        searchOnly={searchOnly}
+                        searchHelpText={
+                          searchOnly
+                            ? 'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.'
+                            : 'Search above and select at least one option before continuing to the next step.'
+                        }
+                        small
+                      />
+                    );
+                  })}
                 </div>
-              </FormFieldset>
+              </div>
+            </FormFieldset>
 
-              <WizardStepFormActions
-                {...stepProps}
-                isSubmitting={formState.isSubmitting}
-              />
-            </RHFForm>
-          );
-        }
-
-        const values = getValues();
-
-        const locationLevels: Dictionary<FilterOption[]> = mapValues(
-          values.locations,
-          (locations, level) =>
-            locations.reduce<FilterOption[]>((acc, value) => {
-              const levelOptions = keyedOptions[level];
-              if (levelOptions && levelOptions[value]) {
-                acc.push(levelOptions[value]);
-              }
-
-              return acc;
-            }, []),
-        );
-
-        return (
-          <WizardStepSummary {...stepProps} goToButtonText="Edit locations">
-            {stepHeading}
-
-            <SummaryList noBorder>
-              {Object.entries(locationLevels)
-                .filter(
-                  ([levelKey, levelOptions]) =>
-                    levelOptions.length > 0 && options[levelKey],
-                )
-                .map(([levelKey, levelOptions]) => (
-                  <SummaryListItem
-                    term={options[levelKey].legend}
-                    key={levelKey}
-                  >
-                    <CollapsibleList
-                      id="locationsList"
-                      itemName="location"
-                      itemNamePlural="locations"
-                    >
-                      {sortBy(levelOptions, ['label']).map(level => (
-                        <li key={level.value}>{level.label}</li>
-                      ))}
-                    </CollapsibleList>
-                  </SummaryListItem>
-                ))}
-            </SummaryList>
-
-            <ResetFormOnPreviousStep {...stepProps} onReset={reset} />
-          </WizardStepSummary>
+            <WizardStepFormActions
+              {...stepProps}
+              isSubmitting={formState.isSubmitting}
+            />
+          </RHFForm>
         );
       }}
     </FormProvider>
@@ -302,3 +240,21 @@ const LocationFiltersForm = ({
 };
 
 export default LocationFiltersForm;
+
+export interface LocationStepHeadingProps extends InjectedWizardProps {
+  options: SubjectMeta['locations'];
+}
+
+export function LocationStepHeading(
+  stepProps: LocationStepHeadingProps,
+): ReactNode {
+  const { options } = stepProps;
+  const levelKeys = Object.keys(options);
+  return (
+    <WizardStepHeading {...stepProps} fieldsetHeading>
+      {levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
+        ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
+        : 'Choose locations'}
+    </WizardStepHeading>
+  );
+}

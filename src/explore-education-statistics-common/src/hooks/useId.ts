@@ -1,4 +1,4 @@
-import { useId as useAutoId } from '@reach/auto-id';
+import { useId as useAutoId } from 'react';
 
 export interface UseIdOptions {
   /**

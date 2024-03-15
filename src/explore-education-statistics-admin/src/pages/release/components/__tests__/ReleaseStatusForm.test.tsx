@@ -202,7 +202,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         approvalStatus: 'Draft',
@@ -225,7 +227,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByLabelText(
           'Ready for higher review (this will notify approvers)',
         ),
@@ -244,7 +246,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
@@ -275,8 +279,8 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('Internal note'));
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('Internal note'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -302,7 +306,9 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -330,7 +336,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('In draft'));
+      await userEvent.click(screen.getByLabelText('In draft'));
       await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
@@ -345,7 +351,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
@@ -505,8 +513,8 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('Internal note'));
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('Internal note'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -531,9 +539,9 @@ describe('ReleaseStatusForm', () => {
       );
 
       // Focus the field above before tabbing through the options
-      userEvent.click(screen.getByLabelText('Internal note'));
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('Internal note'));
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -557,11 +565,11 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('On a specific date'));
-      userEvent.tab();
-      userEvent.tab();
-      userEvent.tab();
-      userEvent.tab();
+      await userEvent.click(screen.getByLabelText('On a specific date'));
+      await userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -587,7 +595,9 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -621,7 +631,9 @@ describe('ReleaseStatusForm', () => {
           />,
         );
 
-        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+        await userEvent.click(
+          screen.getByRole('button', { name: 'Update status' }),
+        );
 
         await waitFor(() => {
           expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -654,7 +666,9 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -686,7 +700,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('In draft'));
+      await userEvent.click(screen.getByLabelText('In draft'));
       await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
@@ -701,7 +715,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
@@ -735,7 +751,7 @@ describe('ReleaseStatusForm', () => {
         'Test release note',
       );
 
-      userEvent.click(screen.getByLabelText('On a specific date'));
+      await userEvent.click(screen.getByLabelText('On a specific date'));
 
       const publishDate = within(
         screen.getByRole('group', { name: 'Publish date' }),
@@ -752,7 +768,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Confirm publish date')).toBeInTheDocument();
@@ -777,7 +795,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.click(screen.getByLabelText('On a specific date'));
+      await userEvent.click(screen.getByLabelText('On a specific date'));
 
       const publishDate = within(
         screen.getByRole('group', { name: 'Publish date' }),
@@ -794,7 +812,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -827,7 +847,7 @@ describe('ReleaseStatusForm', () => {
         'Test release note',
       );
 
-      userEvent.click(screen.getByLabelText('On a specific date'));
+      await userEvent.click(screen.getByLabelText('On a specific date'));
 
       const publishDate = within(
         screen.getByRole('group', { name: 'Publish date' }),
@@ -835,17 +855,22 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      userEvent.type(publishDate.getByLabelText('Day'), '10');
-      userEvent.type(publishDate.getByLabelText('Month'), '10');
-      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Confirm publish date')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(
@@ -859,7 +884,9 @@ describe('ReleaseStatusForm', () => {
         'Publish date cannot be scheduled',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Back to form' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Back to form' }),
+      );
 
       expect(
         screen.getByRole('link', {
@@ -888,7 +915,7 @@ describe('ReleaseStatusForm', () => {
         'Test release note',
       );
 
-      userEvent.click(screen.getByLabelText('On a specific date'));
+      await userEvent.click(screen.getByLabelText('On a specific date'));
 
       const publishDate = within(
         screen.getByRole('group', { name: 'Publish date' }),
@@ -912,7 +939,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
@@ -934,7 +963,7 @@ describe('ReleaseStatusForm', () => {
         'Confirm publish date',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
@@ -961,7 +990,7 @@ describe('ReleaseStatusForm', () => {
         'Test release note',
       );
 
-      userEvent.click(screen.getByLabelText('Immediately'));
+      await userEvent.click(screen.getByLabelText('Immediately'));
 
       const nextReleaseDate = within(
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
@@ -972,7 +1001,9 @@ describe('ReleaseStatusForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update status' }),
+      );
 
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
@@ -1045,7 +1076,7 @@ describe('ReleaseStatusForm', () => {
         expect(screen.getByLabelText('Update published date')).toBeChecked();
 
         // Toggle to Draft status and expect the options to not be rendered
-        userEvent.click(screen.getByLabelText('In draft'));
+        await userEvent.click(screen.getByLabelText('In draft'));
 
         expect(
           screen.queryByLabelText('Notify subscribers by email'),
@@ -1056,7 +1087,9 @@ describe('ReleaseStatusForm', () => {
         ).not.toBeInTheDocument();
 
         // Toggle back to Approved and expect the options have their default values
-        userEvent.click(screen.getByLabelText('Approved for publication'));
+        await userEvent.click(
+          screen.getByLabelText('Approved for publication'),
+        );
 
         expect(
           screen.getByLabelText('Notify subscribers by email'),
@@ -1091,7 +1124,7 @@ describe('ReleaseStatusForm', () => {
           ).not.toBeChecked();
         });
 
-        userEvent.click(screen.getByLabelText('Update published date'));
+        await userEvent.click(screen.getByLabelText('Update published date'));
 
         expect(
           screen.getByText(
@@ -1123,15 +1156,19 @@ describe('ReleaseStatusForm', () => {
           'Test release note',
         );
 
-        userEvent.click(screen.getByLabelText('Notify subscribers by email'));
+        await userEvent.click(
+          screen.getByLabelText('Notify subscribers by email'),
+        );
 
-        userEvent.click(screen.getByLabelText('Update published date'));
+        await userEvent.click(screen.getByLabelText('Update published date'));
 
-        userEvent.click(screen.getByLabelText('Immediately'));
+        await userEvent.click(screen.getByLabelText('Immediately'));
 
         expect(handleSubmit).not.toHaveBeenCalled();
 
-        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+        await userEvent.click(
+          screen.getByRole('button', { name: 'Update status' }),
+        );
 
         const expectedValues: ReleaseStatusFormValues = {
           internalReleaseNote: 'Test release note',

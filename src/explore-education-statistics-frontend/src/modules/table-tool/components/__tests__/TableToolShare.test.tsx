@@ -43,7 +43,7 @@ describe('TableToolShare', () => {
       <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Generate shareable link',
       }),
@@ -99,7 +99,7 @@ describe('TableToolShare', () => {
       <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Generate shareable link',
       }),
@@ -109,7 +109,7 @@ describe('TableToolShare', () => {
       expect(screen.getByText('Generated share link')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Copy link',
       }),

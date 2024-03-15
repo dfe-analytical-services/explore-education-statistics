@@ -42,7 +42,7 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'an');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'an');
 
     expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
@@ -54,7 +54,7 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
 
     await waitFor(() => {
       expect(screen.getByText('Antelope')).toBeInTheDocument();
@@ -76,14 +76,14 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
 
     await waitFor(() => {
       expect(screen.getByText('Antelope')).toBeInTheDocument();
     });
 
     const options = screen.getAllByRole('option');
-    userEvent.click(options[0]);
+    await userEvent.click(options[0]);
 
     expect(screen.getByLabelText('Link text')).toHaveValue('Antelope');
     expect(screen.getByText('Slug: antelope')).toBeInTheDocument();
@@ -97,18 +97,18 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
 
     await waitFor(() => {
       expect(screen.getByText('Antelope')).toBeInTheDocument();
     });
 
     const options = screen.getAllByRole('option');
-    userEvent.click(options[0]);
+    await userEvent.click(options[0]);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Insert' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -126,20 +126,20 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
 
     await waitFor(() => {
       expect(screen.getByText('Antelope')).toBeInTheDocument();
     });
 
     const options = screen.getAllByRole('option');
-    userEvent.click(options[0]);
+    await userEvent.click(options[0]);
 
-    userEvent.type(screen.getByLabelText('Link text'), ' edited');
+    await userEvent.type(screen.getByLabelText('Link text'), ' edited');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Insert' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -157,7 +157,7 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Insert' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
       expect(screen.getByText('Select a glossary entry')).toBeInTheDocument();
@@ -174,18 +174,18 @@ describe('GlossaryItemInsertForm ', () => {
       expect(screen.getByText('Glossary entry')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
+    await userEvent.type(screen.getByLabelText('Glossary entry'), 'ant');
 
     await waitFor(() => {
       expect(screen.getByText('Antelope')).toBeInTheDocument();
     });
 
     const options = screen.getAllByRole('option');
-    userEvent.click(options[0]);
+    await userEvent.click(options[0]);
 
-    userEvent.clear(screen.getByLabelText('Link text'));
+    await userEvent.clear(screen.getByLabelText('Link text'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Insert' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
       expect(screen.getByText('Enter link text')).toBeInTheDocument();

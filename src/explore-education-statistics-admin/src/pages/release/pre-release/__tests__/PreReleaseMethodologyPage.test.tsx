@@ -198,7 +198,7 @@ describe('PreReleaseMethodologyPage', () => {
     expect(contentAccordionSections).toHaveLength(2);
 
     expect(
-      within(contentAccordionSections[0]).getByRole('button', {
+      await within(contentAccordionSections[0]).findByRole('button', {
         name: /Section 1/,
       }),
     ).toBeInTheDocument();
@@ -244,7 +244,7 @@ describe('PreReleaseMethodologyPage', () => {
     expect(annexAccordionSections).toHaveLength(3);
 
     expect(
-      within(annexAccordionSections[0]).getByRole('button', {
+      await within(annexAccordionSections[0]).findByRole('button', {
         name: /Annex 1/,
       }),
     ).toBeInTheDocument();
@@ -329,7 +329,7 @@ describe('PreReleaseMethodologyPage', () => {
         expect(screen.getByText('Pupil absence statistics: methodology'));
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'See all notes (3)' }),
       );
 

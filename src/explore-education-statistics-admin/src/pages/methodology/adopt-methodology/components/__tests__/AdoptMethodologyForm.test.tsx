@@ -136,7 +136,7 @@ describe('AdoptMethodologyForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -160,10 +160,10 @@ describe('AdoptMethodologyForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Methodology 2'));
+    await userEvent.click(screen.getByLabelText('Methodology 2'));
     expect(screen.getByLabelText('Methodology 2')).toBeChecked();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({

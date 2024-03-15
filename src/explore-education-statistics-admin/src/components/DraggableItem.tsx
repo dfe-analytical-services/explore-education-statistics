@@ -1,7 +1,7 @@
 import styles from '@admin/components/DraggableItem.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable } from '@hello-pangea/dnd';
 
 export const DragHandle = ({ className }: { className?: string }) => (
   <span aria-hidden className={className ?? styles.dragHandle}>

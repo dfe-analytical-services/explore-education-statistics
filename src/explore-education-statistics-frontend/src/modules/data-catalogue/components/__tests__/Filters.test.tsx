@@ -96,13 +96,13 @@ describe('Filters', () => {
     expect(screen.getByLabelText('Publication')).not.toBeDisabled();
   });
 
-  test('calls the onChange handler when the theme filter is changed', () => {
+  test('calls the onChange handler when the theme filter is changed', async () => {
     const handleChange = jest.fn();
     render(<Filters themes={testThemes} onChange={handleChange} />);
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
+    await userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'themeId',
@@ -110,7 +110,7 @@ describe('Filters', () => {
     });
   });
 
-  test('calls the onChange handler when the publication filter is changed', () => {
+  test('calls the onChange handler when the publication filter is changed', async () => {
     const handleChange = jest.fn();
     render(
       <Filters
@@ -123,7 +123,7 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Publication'), [
+    await userEvent.selectOptions(screen.getByLabelText('Publication'), [
       'publication-2',
     ]);
 
@@ -133,7 +133,7 @@ describe('Filters', () => {
     });
   });
 
-  test('calls the onChange handler when the release filter is changed', () => {
+  test('calls the onChange handler when the release filter is changed', async () => {
     const handleChange = jest.fn();
     render(
       <Filters
@@ -147,7 +147,9 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Releases'), ['release-1']);
+    await userEvent.selectOptions(screen.getByLabelText('Releases'), [
+      'release-1',
+    ]);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'releaseId',

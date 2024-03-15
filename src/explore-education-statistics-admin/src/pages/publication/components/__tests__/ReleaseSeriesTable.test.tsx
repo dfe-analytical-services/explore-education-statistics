@@ -172,7 +172,7 @@ describe('ReleaseSeriesTable', () => {
           </TestConfigContextProvider>
         </Router>,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit Legacy release 3' }),
       );
       await waitFor(() => {
@@ -205,14 +205,14 @@ describe('ReleaseSeriesTable', () => {
           </TestConfigContextProvider>
         </Router>,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit Legacy release 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
       });
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'OK' }));
+      await userEvent.click(modal.getByRole('button', { name: 'OK' }));
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
@@ -300,7 +300,7 @@ describe('ReleaseSeriesTable', () => {
           />
         </TestConfigContextProvider>,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Delete Legacy release 3' }),
       );
       await waitFor(() => {
@@ -332,14 +332,14 @@ describe('ReleaseSeriesTable', () => {
     //      />
     //    </TestConfigContextProvider>,
     //  );
-    //  userEvent.click(
+    //  await userEvent.click(
     //    screen.getByRole('button', { name: 'Delete Legacy release 3' }),
     //  );
     //  await waitFor(() => {
     //    expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
     //  });
     //  const modal = within(screen.getByRole('dialog'));
-    //  userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    //  await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
     //  expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
     //    testReleaseSeries[4].id,
@@ -372,7 +372,7 @@ describe('ReleaseSeriesTable', () => {
           </TestConfigContextProvider>
         </Router>,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Create legacy release' }),
       );
       await waitFor(() => {
@@ -404,14 +404,14 @@ describe('ReleaseSeriesTable', () => {
           </TestConfigContextProvider>
         </Router>,
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Create legacy release' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
       });
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'OK' }));
+      await userEvent.click(modal.getByRole('button', { name: 'OK' }));
       await waitFor(() => {
         expect(history.location.pathname).toBe(
           `/publication/${testPublicationId}/legacy/create`,
@@ -447,7 +447,7 @@ describe('ReleaseSeriesTable', () => {
           />
         </TestConfigContextProvider>,
       );
-      userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
       });
@@ -474,12 +474,12 @@ describe('ReleaseSeriesTable', () => {
           />
         </TestConfigContextProvider>,
       );
-      userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
       });
       const modal = within(screen.getByRole('dialog'));
-      userEvent.click(modal.getByRole('button', { name: 'OK' }));
+      await userEvent.click(modal.getByRole('button', { name: 'OK' }));
 
       await waitFor(() => {
         expect(screen.getByText('Sort')).toBeInTheDocument();

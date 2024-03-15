@@ -34,7 +34,7 @@ describe('CommentsList', () => {
     expect(unresolvedComments[2]).toHaveTextContent('Comment 3');
   });
 
-  test('displays resolved comments', () => {
+  test('displays resolved comments', async () => {
     render(
       <CommentsContextProvider
         comments={testComments}
@@ -49,7 +49,7 @@ describe('CommentsList', () => {
       </CommentsContextProvider>,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Resolved comments (2)',
       }),

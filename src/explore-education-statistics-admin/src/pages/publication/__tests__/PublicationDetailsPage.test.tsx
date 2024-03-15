@@ -166,7 +166,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -231,7 +231,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -249,7 +249,7 @@ describe('PublicationDetailsPage', () => {
       expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
       expect(topics[1]).toHaveValue('theme-1-topic-2');
 
-      userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+      await userEvent.selectOptions(screen.getByLabelText('Select theme'), [
         'theme-2',
       ]);
 
@@ -271,7 +271,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -283,7 +283,7 @@ describe('PublicationDetailsPage', () => {
         'Publication 1',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       expect(screen.getByTestId('Publication title')).toHaveTextContent(
         'Publication 1',
@@ -312,7 +312,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -320,8 +320,8 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Publication title'));
-      userEvent.tab();
+      await userEvent.clear(screen.getByLabelText('Publication title'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -339,7 +339,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -349,8 +349,8 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Publication summary'));
-      userEvent.tab();
+      await userEvent.clear(screen.getByLabelText('Publication summary'));
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -368,7 +368,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -378,7 +378,7 @@ describe('PublicationDetailsPage', () => {
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -388,7 +388,7 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
@@ -406,7 +406,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -414,15 +414,15 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Publication title'));
-      userEvent.type(
+      await userEvent.clear(screen.getByLabelText('Publication title'));
+      await userEvent.type(
         screen.getByLabelText('Publication title'),
         'Publication 1 updated',
       );
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -452,7 +452,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -462,7 +462,7 @@ describe('PublicationDetailsPage', () => {
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -499,7 +499,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -507,15 +507,15 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Publication title'));
-      userEvent.type(
+      await userEvent.clear(screen.getByLabelText('Publication title'));
+      await userEvent.type(
         screen.getByLabelText('Publication title'),
         'Publication 1 updated',
       );
 
       expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -548,7 +548,7 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByText('Publication details')).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit publication details' }),
       );
 
@@ -556,22 +556,25 @@ describe('PublicationDetailsPage', () => {
         expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
-      userEvent.type(screen.getByLabelText('Publication title'), ' updated');
+      await userEvent.type(
+        screen.getByLabelText('Publication title'),
+        ' updated',
+      );
 
-      userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+      await userEvent.selectOptions(screen.getByLabelText('Select theme'), [
         'theme-2',
       ]);
 
-      userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+      await userEvent.selectOptions(screen.getByLabelText('Select topic'), [
         'theme-2-topic-2',
       ]);
 
-      userEvent.selectOptions(
+      await userEvent.selectOptions(
         screen.getByLabelText('Superseding publication'),
         ['publication-2'],
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
@@ -581,7 +584,7 @@ describe('PublicationDetailsPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(publicationService.updatePublication).toHaveBeenCalledWith<

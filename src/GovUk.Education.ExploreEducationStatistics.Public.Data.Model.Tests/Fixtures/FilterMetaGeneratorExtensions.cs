@@ -10,7 +10,7 @@ public static class FilterMetaGeneratorExtensions
     public static Generator<FilterMeta> DefaultFilterMeta(this DataFixture fixture, int options)
         => fixture.Generator<FilterMeta>()
             .WithDefaults()
-            .WithOptions(fixture.DefaultFilterOptionMeta().GenerateList(options));
+            .WithOptions(() => fixture.DefaultFilterOptionMeta().GenerateList(options));
 
     public static Generator<FilterMeta> WithDefaults(this Generator<FilterMeta> generator)
         => generator.ForInstance(s => s.SetDefaults());
@@ -72,8 +72,22 @@ public static class FilterMetaGeneratorExtensions
     public static InstanceSetters<FilterMeta> SetOptions(
         this InstanceSetters<FilterMeta> setters,
         Func<IEnumerable<FilterOptionMeta>> options)
-        => setters.Set(m => m.Options, _ => options().ToList());
-    
+        => setters
+            .Set((_, m, context) =>
+            {
+                m.Options = options().ToList();
+
+                if (context.Fixture is not null)
+                {
+                    m.OptionLinks = m.Options
+                        .Select(o => context.Fixture
+                            .DefaultFilterOptionMetaLink()
+                            .WithOption(o)
+                            .Generate())
+                        .ToList();
+                }
+            });
+
     public static InstanceSetters<FilterMeta> SetOptionLinks(
         this InstanceSetters<FilterMeta> setters,
         Func<IEnumerable<FilterOptionMetaLink>> links)

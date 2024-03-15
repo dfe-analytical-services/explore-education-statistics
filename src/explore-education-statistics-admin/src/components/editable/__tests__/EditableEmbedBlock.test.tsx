@@ -73,7 +73,7 @@ describe('EditableEmbedBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('shows the edit modal when the edit button is clicked', () => {
+  test('shows the edit modal when the edit button is clicked', async () => {
     render(
       <EditableEmbedBlock
         block={testEmbedBlock}
@@ -83,7 +83,9 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit embedded URL' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
     expect(
@@ -106,16 +108,18 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Edit embedded URL' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.type(modal.getByLabelText('Title'), '-edited');
-    userEvent.type(modal.getByLabelText('URL'), '-edited');
+    await userEvent.type(modal.getByLabelText('Title'), '-edited');
+    await userEvent.type(modal.getByLabelText('URL'), '-edited');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(modal.getByRole('button', { name: 'Save' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -139,7 +143,7 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
     const modal = within(screen.getByRole('dialog'));
     expect(
@@ -148,7 +152,7 @@ describe('EditableEmbedBlock', () => {
 
     expect(handleDelete).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(handleDelete).toHaveBeenCalled();

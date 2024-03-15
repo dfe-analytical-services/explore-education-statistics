@@ -77,9 +77,10 @@ describe('ReleaseStatusPage', () => {
     });
 
     expect(screen.getByTestId('Current status')).toHaveTextContent('Approved');
-    expect(screen.getByTestId('Release process status')).toHaveTextContent(
-      'Scheduled',
-    );
+    expect(
+      await screen.findByTestId('Release process status'),
+    ).toHaveTextContent('Scheduled');
+
     expect(screen.getByTestId('Scheduled release')).toHaveTextContent(
       '15 January 2021',
     );
@@ -101,7 +102,7 @@ describe('ReleaseStatusPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit release status' }),
     );
 

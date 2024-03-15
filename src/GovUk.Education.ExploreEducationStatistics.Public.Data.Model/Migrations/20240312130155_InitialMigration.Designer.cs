@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240311024812_InitialMigration")]
+    [Migration("20240312130155_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -299,11 +299,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("OptionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PublicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PublicId"));
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("MetaId", "OptionId");
 
@@ -482,11 +480,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("OptionId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PublicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PublicId"));
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("MetaId", "OptionId");
 

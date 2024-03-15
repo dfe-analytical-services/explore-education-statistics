@@ -136,7 +136,7 @@ describe('ReleaseDataAndFiles', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the download files list if showDataFileList is true', () => {
+  test('renders the download files list if showDataFileList is true', async () => {
     render(
       <ReleaseDataAndFiles
         downloadFiles={testRelease.downloadFiles}
@@ -150,7 +150,7 @@ describe('ReleaseDataAndFiles', () => {
       />,
     );
 
-    userEvent.click(screen.getByText('Download files'));
+    await userEvent.click(screen.getByText('Download files'));
 
     const downloadFiles = within(screen.getByTestId('data-files')).getAllByRole(
       'listitem',

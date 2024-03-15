@@ -561,7 +561,10 @@ Select a single indicator
 
 Select all filter 1's filters
     user opens details dropdown    Filter 1
-    user clicks button    Select all 7 options    css:#filtersForm-filters
+    user clicks category checkbox    Total    Total
+    user clicks category checkbox    Filter 1 group 2    F1G2-2
+    user clicks select all for category    Filter 1 group 1
+    user clicks select all for category    Filter 1 group 3
 
 Create table again
     user clicks element    id:filtersForm-submit

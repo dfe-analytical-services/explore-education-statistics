@@ -11,7 +11,6 @@ import React, {
 } from 'react';
 import noop from 'lodash/noop';
 
-// TO DO maybe rename the interaction stuff to be more obviously ckeditor related
 export type CurrentCommentInteraction =
   | { type: 'adding' | 'removing' | 'resolving' | 'unresolving'; id: string }
   | undefined;

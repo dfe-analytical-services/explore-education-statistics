@@ -193,7 +193,7 @@ describe('FormThemeTopicSelect', () => {
     expect(topics[1].selected).toBe(true);
   });
 
-  test('changing theme calls `onChange` handler with correct arguments', () => {
+  test('changing theme calls `onChange` handler with correct arguments', async () => {
     const handleChange = jest.fn();
 
     render(
@@ -207,13 +207,15 @@ describe('FormThemeTopicSelect', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Select theme'), ['theme-2']);
+    await userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+      'theme-2',
+    ]);
 
     expect(handleChange).toHaveBeenCalledTimes(1);
     expect(handleChange).toHaveBeenCalledWith('topic-3', 'theme-2');
   });
 
-  test('changing topic calls `onChange` handler with correct arguments', () => {
+  test('changing topic calls `onChange` handler with correct arguments', async () => {
     const handleChange = jest.fn();
 
     render(
@@ -227,7 +229,9 @@ describe('FormThemeTopicSelect', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Select topic'), ['topic-2']);
+    await userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+      'topic-2',
+    ]);
 
     expect(handleChange).toHaveBeenCalledTimes(1);
     expect(handleChange).toHaveBeenCalledWith('topic-2', 'theme-1');

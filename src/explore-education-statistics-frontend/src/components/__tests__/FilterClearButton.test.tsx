@@ -26,13 +26,13 @@ describe('FilterClearButton', () => {
     expect(button.getByText('Test name')).toBeInTheDocument();
   });
 
-  test('calls the click handler on click', () => {
+  test('calls the click handler on click', async () => {
     const handleClick = jest.fn();
     render(<FilterClearButton name="Test name" onClick={handleClick} />);
 
     expect(handleClick).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button'));
 
     expect(handleClick).toHaveBeenCalled();
   });

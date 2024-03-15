@@ -39,8 +39,8 @@ describe('RHFFormFieldDateInput', () => {
       </FormProvider>,
     );
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('Select a date')).toHaveAttribute(
@@ -115,8 +115,8 @@ describe('RHFFormFieldDateInput', () => {
       'testForm-startDate-year',
     );
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
@@ -159,8 +159,8 @@ describe('RHFFormFieldDateInput', () => {
       'startDate-year',
     );
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
@@ -209,8 +209,8 @@ describe('RHFFormFieldDateInput', () => {
       'testForm-customId-year',
     );
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
@@ -246,8 +246,8 @@ describe('RHFFormFieldDateInput', () => {
     );
     expect(group.getByLabelText('Year')).toHaveAttribute('id', 'customId-year');
 
-    userEvent.tab();
-    userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(group.getByText('Select a date')).toHaveAttribute(
@@ -281,7 +281,7 @@ describe('RHFFormFieldDateInput', () => {
     expect(screen.getByLabelText('Month')).toHaveValue(12);
     expect(screen.getByLabelText('Year')).toHaveValue(2020);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -314,7 +314,7 @@ describe('RHFFormFieldDateInput', () => {
     expect(screen.getByLabelText('Month')).toHaveValue(12);
     expect(screen.getByLabelText('Year')).toHaveValue(2020);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({ startDate: undefined });
@@ -341,7 +341,7 @@ describe('RHFFormFieldDateInput', () => {
 
     expect(screen.getByLabelText('Day')).toHaveValue(10);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({ startDate: undefined });
@@ -409,7 +409,7 @@ describe('RHFFormFieldDateInput', () => {
     expect(screen.getByLabelText('Month')).toHaveValue(6);
     expect(screen.getByLabelText('Year')).toHaveValue(2020);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -443,7 +443,7 @@ describe('RHFFormFieldDateInput', () => {
 
     expect(screen.getByLabelText('Day')).toHaveValue(15);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -479,7 +479,7 @@ describe('RHFFormFieldDateInput', () => {
     expect(screen.getByLabelText('Month')).toHaveValue(6);
     expect(screen.getByLabelText('Year')).toHaveValue(2020);
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({

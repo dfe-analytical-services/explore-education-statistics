@@ -69,7 +69,7 @@ describe('CommentAddForm', () => {
       'I am a comment',
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Add comment',
       }),
@@ -96,7 +96,7 @@ describe('CommentAddForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Add comment',
       }),
@@ -113,7 +113,7 @@ describe('CommentAddForm', () => {
     });
   });
 
-  test('calls the onCancel handler when the cancel button is clicked', () => {
+  test('calls the onCancel handler when the cancel button is clicked', async () => {
     const handleCancel = jest.fn();
 
     render(
@@ -125,7 +125,7 @@ describe('CommentAddForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Cancel',
       }),

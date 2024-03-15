@@ -185,7 +185,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
 
-    userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();

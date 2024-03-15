@@ -1,4 +1,3 @@
-import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
 import {
   matcherHint,
   printReceived,
@@ -7,7 +6,9 @@ import {
 
 const toHaveScrolledIntoView: jest.CustomMatcher =
   function toHaveScrolledIntoView(element: HTMLElement) {
-    checkHtmlElement(element, toHaveScrolledIntoView, this);
+    if (!(element instanceof window.HTMLElement)) {
+      throw new Error('Not a HTMLElement');
+    }
 
     const scrollIntoViewMock = element.scrollIntoView as jest.Mock;
 

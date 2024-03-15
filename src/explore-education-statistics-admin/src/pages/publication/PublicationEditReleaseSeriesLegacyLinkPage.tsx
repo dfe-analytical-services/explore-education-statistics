@@ -23,21 +23,24 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
   );
 
   const itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
-  if (isLoading || releaseSeries === undefined || itemIndex === undefined || itemIndex === -1) { // @MarkFix
+  if (
+    isLoading ||
+    releaseSeries === undefined ||
+    itemIndex === undefined ||
+    itemIndex === -1
+  ) {
+    // @MarkFix
     return <LoadingSpinner />;
   }
 
-  if (releaseSeries[itemIndex!].releaseId !== undefined) {
+  if (releaseSeries[itemIndex].releaseId !== undefined) {
     // @MarkFix
     return <p>Cannot edit this release series item!</p>;
   }
 
-  const publicationEditPath = generatePath(
-    publicationReleaseSeriesRoute.path,
-    {
-      publicationId,
-    },
-  );
+  const publicationEditPath = generatePath(publicationReleaseSeriesRoute.path, {
+    publicationId,
+  });
 
   return (
     <>
@@ -45,8 +48,8 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
       {releaseSeries && (
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
-            description: releaseSeries[itemIndex!].description,
-            url: releaseSeries[itemIndex!].legacyLinkUrl!,
+            description: releaseSeries[itemIndex].description,
+            url: releaseSeries[itemIndex].legacyLinkUrl!,
           }}
           cancelButton={
             <Link unvisited to={publicationEditPath}>
@@ -54,8 +57,8 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
             </Link>
           }
           onSubmit={async values => {
-            releaseSeries[itemIndex!].description = values.description;
-            releaseSeries[itemIndex!].legacyLinkUrl = values.url;
+            releaseSeries[itemIndex].description = values.description;
+            releaseSeries[itemIndex].legacyLinkUrl = values.url;
             await publicationService.updateReleaseSeriesView(
               publicationId,
               releaseSeries.map(seriesItem => ({

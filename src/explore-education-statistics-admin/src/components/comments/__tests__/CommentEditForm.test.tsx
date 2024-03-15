@@ -37,7 +37,7 @@ describe('CommentEditForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking cancel button calls the onCancel handler', () => {
+  test('clicking cancel button calls the onCancel handler', async () => {
     const handleCancel = jest.fn();
     render(
       <CommentEditForm
@@ -48,7 +48,7 @@ describe('CommentEditForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Cancel',
       }),
@@ -75,7 +75,7 @@ describe('CommentEditForm', () => {
       }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Update',
       }),
@@ -129,7 +129,7 @@ describe('CommentEditForm', () => {
       ' updated',
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Update',
       }),

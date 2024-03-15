@@ -64,8 +64,8 @@ describe('ReleaseDataFilePage', () => {
 
     await renderPage();
 
-    userEvent.clear(screen.getByLabelText('Title'));
-    userEvent.tab();
+    await userEvent.clear(screen.getByLabelText('Title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -82,7 +82,7 @@ describe('ReleaseDataFilePage', () => {
 
     await renderPage();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(
@@ -98,10 +98,10 @@ describe('ReleaseDataFilePage', () => {
 
     const input = screen.getByLabelText('Title');
 
-    userEvent.clear(input);
+    await userEvent.clear(input);
     await userEvent.type(input, 'Updated test data file');
 
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(releaseDataFileService.updateFile).toHaveBeenCalledWith<
@@ -119,7 +119,7 @@ describe('ReleaseDataFilePage', () => {
 
     await renderPage(history);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(

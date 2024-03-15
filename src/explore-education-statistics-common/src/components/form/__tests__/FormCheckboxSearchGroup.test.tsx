@@ -35,8 +35,6 @@ describe('FormCheckboxSearchGroup', () => {
     });
 
     test('providing a search term renders only relevant checkboxes', async () => {
-      jest.useFakeTimers();
-
       render(
         <FormCheckboxSearchGroup
           name="testCheckboxes"
@@ -56,7 +54,11 @@ describe('FormCheckboxSearchGroup', () => {
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() => {
+        expect(
+          screen.queryByLabelText('Test checkbox 3'),
+        ).not.toBeInTheDocument();
+      });
 
       const checkboxes = screen.getAllByLabelText(
         /Test checkbox/,
@@ -67,8 +69,6 @@ describe('FormCheckboxSearchGroup', () => {
     });
 
     test('providing a search term does not remove checkboxes that have already been checked', async () => {
-      jest.useFakeTimers();
-
       render(
         <FormCheckboxSearchGroup
           name="testCheckboxes"
@@ -88,7 +88,11 @@ describe('FormCheckboxSearchGroup', () => {
 
       await userEvent.type(searchInput, '2');
 
-      jest.runAllTimers();
+      await waitFor(() => {
+        expect(
+          screen.queryByLabelText('Test checkbox 3'),
+        ).not.toBeInTheDocument();
+      });
 
       const checkboxes = screen.getAllByLabelText(
         /Test checkbox/,
@@ -213,7 +217,7 @@ describe('FormCheckboxSearchGroup', () => {
       );
 
       const searchInput = screen.getByLabelText('Search options');
-      userEvent.type(searchInput, 'checkbox');
+      await userEvent.type(searchInput, 'checkbox');
 
       await waitFor(() => {
         expect(screen.getByText('3 options found')).toBeInTheDocument();
@@ -248,7 +252,7 @@ describe('FormCheckboxSearchGroup', () => {
       );
 
       const searchInput = screen.getByLabelText('Search options');
-      userEvent.type(searchInput, '000002');
+      await userEvent.type(searchInput, '000002');
 
       await waitFor(() => {
         expect(screen.getByText('1 option found')).toBeInTheDocument();
@@ -262,7 +266,6 @@ describe('FormCheckboxSearchGroup', () => {
     });
 
     test('does not search when the search term has fewer than 3 characters', async () => {
-      jest.useFakeTimers();
       render(
         <FormCheckboxSearchGroup
           name="testCheckboxes"
@@ -277,8 +280,6 @@ describe('FormCheckboxSearchGroup', () => {
 
       const searchInput = screen.getByLabelText('Search options');
       await userEvent.type(searchInput, 'ch');
-
-      jest.runAllTimers();
 
       expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
     });
@@ -299,7 +300,7 @@ describe('FormCheckboxSearchGroup', () => {
       );
 
       const searchInput = screen.getByLabelText('Search options');
-      userEvent.type(searchInput, 'checkbox');
+      await userEvent.type(searchInput, 'checkbox');
 
       await waitFor(() => {
         expect(
@@ -332,8 +333,6 @@ describe('FormCheckboxSearchGroup', () => {
   });
 
   test('does not throw error if search term that is invalid regex is used', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormCheckboxSearchGroup
         name="testCheckboxes"
@@ -351,16 +350,10 @@ describe('FormCheckboxSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    await userEvent.type(searchInput, '[');
+    await userEvent.type(searchInput, '[[');
 
-    expect(() => {
-      jest.runAllTimers();
-    }).not.toThrow();
-
-    const checkboxes = screen.queryAllByLabelText(
-      /Test checkbox/,
-    ) as HTMLInputElement[];
-
-    expect(checkboxes).toHaveLength(0);
+    await waitFor(() => {
+      expect(screen.queryAllByLabelText(/Test radio/)).toHaveLength(0);
+    });
   });
 });

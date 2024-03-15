@@ -13,7 +13,7 @@ import {
 import classNames from 'classnames';
 import { useField } from 'formik';
 import React, { useState } from 'react';
-import { Draggable, Droppable } from 'react-beautiful-dnd';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 
 const getGroupLegend = (group: Filter[]) => {
   if (group[0] instanceof CategoryFilter) {

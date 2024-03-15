@@ -8,7 +8,7 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';

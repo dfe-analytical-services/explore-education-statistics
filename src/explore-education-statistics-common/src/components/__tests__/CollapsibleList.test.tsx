@@ -1,5 +1,5 @@
 import CollapsibleList from '@common/components/CollapsibleList';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
@@ -142,7 +142,7 @@ describe('CollapsibleList', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking the "Show X more items" button reveals all items and changes the button text to "Hide X items"', () => {
+  test('clicking the "Show X more items" button reveals all items and changes the button text to "Hide X items"', async () => {
     render(
       <CollapsibleList id="test-id" collapseAfter={3}>
         <li>Item 1</li>
@@ -161,7 +161,9 @@ describe('CollapsibleList', () => {
     expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
     expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Show 2 more items' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Show 2 more items' }),
+    );
 
     const updatedListItems = screen.getAllByRole('listitem');
     expect(updatedListItems).toHaveLength(5);
@@ -175,7 +177,7 @@ describe('CollapsibleList', () => {
 
   test('clicking the "Hide X items" button hides items and changes the button text to "Show X more items"', async () => {
     render(
-      <CollapsibleList id="test-id" collapseAfter={3}>
+      <CollapsibleList id="test-id" collapseAfter={3} isCollapsed={false}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -184,21 +186,11 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(screen.getAllByRole('listitem')).toHaveLength(3);
-
-    userEvent.click(screen.getByRole('button', { name: 'Show 2 more items' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Hide 2 items')).toBeInTheDocument();
-    });
-
     expect(screen.getAllByRole('listitem')).toHaveLength(5);
 
-    userEvent.click(screen.getByRole('button', { name: 'Hide 2 items' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Hide 2 items' }));
 
-    await waitFor(() => {
-      expect(screen.getByText('Show 2 more items')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Show 2 more items')).toBeInTheDocument();
 
     const listItems = screen.getAllByRole('listitem');
     expect(listItems).toHaveLength(3);
@@ -237,7 +229,7 @@ describe('CollapsibleList', () => {
     ).toBeInTheDocument();
   });
 
-  test('setting itemName and itemNamePlural changes the button text', () => {
+  test('setting itemName and itemNamePlural changes the button text', async () => {
     render(
       <CollapsibleList
         id="test-id"
@@ -253,7 +245,7 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Show 2 more footnotes' }),
     );
 

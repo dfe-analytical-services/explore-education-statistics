@@ -756,7 +756,7 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('button', { name: /Data block 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
 
     expect(
       screen.getByRole('link', { name: 'Edit data block' }),
@@ -799,7 +799,7 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('button', { name: /Data block 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
     expect(
       screen.queryByRole('link', { name: 'Edit data block' }),
     ).not.toBeInTheDocument();
@@ -831,8 +831,10 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('button', { name: /Data block 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
-    userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
+    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete data block' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -867,16 +869,18 @@ describe('DataReplacementPlan', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/Data block 1/)).toBeInTheDocument();
+
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
 
     expect(
       screen.getByRole('button', { name: /Data block 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
-    userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
+    await userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete data block' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -894,16 +898,16 @@ describe('DataReplacementPlan', () => {
       footnotes: [],
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
-    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
-
-    await waitFor(() => {
+    await waitFor(() =>
       expect(
         screen.queryByText(/Are you sure you want to delete/),
-      ).toBeInTheDocument();
-    });
+      ).not.toBeInTheDocument(),
+    );
+
+    expect(dataBlockService.deleteDataBlock).toHaveBeenCalledTimes(1);
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(2);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -948,7 +952,7 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('button', { name: /Footnote 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
     expect(screen.getByRole('link', { name: 'Edit footnote' })).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/footnotes/footnote-1',
@@ -981,8 +985,10 @@ describe('DataReplacementPlan', () => {
       screen.getByRole('button', { name: /Footnote 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
-    userEvent.click(screen.getByRole('button', { name: 'Delete footnote' }));
+    await userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete footnote' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -1028,20 +1034,22 @@ describe('DataReplacementPlan', () => {
       expect(screen.getByText(/Footnote 1/)).toBeInTheDocument();
     });
 
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
+
     expect(
       screen.getByRole('button', { name: /Footnote 1/ }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
-    userEvent.click(screen.getByRole('button', { name: 'Delete footnote' }));
+    await userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete footnote' }),
+    );
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          'Are you sure you want to delete the following footnote?',
-        ),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText(
+        'Are you sure you want to delete the following footnote?',
+      ),
+    ).toBeInTheDocument();
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
@@ -1053,18 +1061,18 @@ describe('DataReplacementPlan', () => {
       footnotes: [testReplacementPlan.footnotes[1]],
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-    expect(footnoteService.deleteFootnote).toHaveBeenCalledTimes(1);
-    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
-
-    await waitFor(() => {
+    await waitFor(() =>
       expect(
         screen.queryByText(
           'Are you sure you want to delete the following footnote?',
         ),
-      ).not.toBeInTheDocument();
-    });
+      ).not.toBeInTheDocument(),
+    );
+
+    expect(footnoteService.deleteFootnote).toHaveBeenCalledTimes(1);
+    expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(2);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -1110,7 +1118,7 @@ describe('DataReplacementPlan', () => {
 
     expect(dataReplacementService.replaceData).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Confirm data replacement' }),
     );
 

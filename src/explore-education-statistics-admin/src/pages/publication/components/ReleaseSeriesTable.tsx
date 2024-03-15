@@ -17,7 +17,7 @@ import reorder from '@common/utils/reorder';
 import styles from '@admin/pages/publication/components/ReleaseSeriesTable.module.scss';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { generatePath } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';

@@ -124,7 +124,6 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
       role="tabpanel"
       tabindex="-1"
     >
-      
       <p>
         Test section 1 content
       </p>
@@ -137,7 +136,6 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
       role="tabpanel"
       tabindex="-1"
     >
-      
       <p>
         Test section 2 content
       </p>

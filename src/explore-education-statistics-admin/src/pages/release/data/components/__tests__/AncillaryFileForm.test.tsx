@@ -10,8 +10,8 @@ describe('AncillaryFileForm', () => {
   test('shows validation message if `title` field is empty', async () => {
     render(<AncillaryFileForm onSubmit={noop} />);
 
-    userEvent.clear(screen.getByLabelText('Title'));
-    userEvent.tab();
+    await userEvent.clear(screen.getByLabelText('Title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -43,9 +43,9 @@ describe('AncillaryFileForm', () => {
       />,
     );
 
-    userEvent.clear(screen.getByLabelText('Title'));
+    await userEvent.clear(screen.getByLabelText('Title'));
     await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -59,8 +59,8 @@ describe('AncillaryFileForm', () => {
   test('shows validation message if `summary` field is empty', async () => {
     render(<AncillaryFileForm onSubmit={noop} />);
 
-    userEvent.clear(screen.getByLabelText('Summary'));
-    userEvent.tab();
+    await userEvent.clear(screen.getByLabelText('Summary'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -76,8 +76,8 @@ describe('AncillaryFileForm', () => {
 
     render(<AncillaryFileForm onSubmit={noop} />);
 
-    userEvent.upload(screen.getByLabelText('Upload file'), testFile);
-    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.upload(screen.getByLabelText('Upload file'), testFile);
+    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(
@@ -91,7 +91,7 @@ describe('AncillaryFileForm', () => {
   test('shows validation messages if submitted form is invalid', async () => {
     render(<AncillaryFileForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(
@@ -118,11 +118,11 @@ describe('AncillaryFileForm', () => {
 
     const testFile = new File(['test'], 'test.txt');
 
-    userEvent.upload(screen.getByLabelText('Upload file'), testFile);
+    await userEvent.upload(screen.getByLabelText('Upload file'), testFile);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<

@@ -31,7 +31,6 @@ exports[`PageSearchForm renders results found in custom selectors 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
   <li
     aria-posinset="2"
@@ -98,7 +97,6 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
   <li
     aria-posinset="2"
@@ -124,7 +122,6 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
   <li
     aria-posinset="3"
@@ -150,7 +147,6 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
   <li
     aria-posinset="4"
@@ -176,7 +172,6 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
   <li
     aria-posinset="5"
@@ -202,7 +197,6 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
         </span>
       </span>
     </div>
-    
   </li>
 </ul>
 `;

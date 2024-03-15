@@ -42,7 +42,7 @@ describe('ReleasePreReleaseAccessPage', () => {
     expect(screen.getByLabelText('Url')).toBeInTheDocument();
 
     expect(
-      screen.getByLabelText('Invite new users by email'),
+      await screen.findByLabelText('Invite new users by email'),
     ).toBeInTheDocument();
 
     expect(
@@ -78,7 +78,9 @@ describe('ReleasePreReleaseAccessPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('tab', { name: 'Public access list' }));
+    await userEvent.click(
+      screen.getByRole('tab', { name: 'Public access list' }),
+    );
 
     await waitFor(() => {
       expect(

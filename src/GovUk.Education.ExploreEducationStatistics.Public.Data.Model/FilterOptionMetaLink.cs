@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class FilterOptionMetaLink
 {
-    public int PublicId { get; set; }
+    public required string PublicId { get; set; }
 
     public required int MetaId { get; set; }
 
@@ -19,9 +19,6 @@ public class FilterOptionMetaLink
     {
         public void Configure(EntityTypeBuilder<FilterOptionMetaLink> builder)
         {
-            builder.Property(l => l.PublicId)
-                .ValueGeneratedOnAdd();
-
             builder.HasIndex(l => l.PublicId);
 
             builder.HasIndex(l => new { l.MetaId, l.PublicId })

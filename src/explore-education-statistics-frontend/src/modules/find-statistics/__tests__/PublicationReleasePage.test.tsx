@@ -198,7 +198,7 @@ describe('PublicationReleasePage', () => {
 
     const details = within(usefulInfo.getByRole('group'));
 
-    userEvent.click(
+    await userEvent.click(
       details.getByRole('button', {
         name: 'View releases (5) for Pupil absence in schools in England',
       }),
@@ -368,7 +368,7 @@ describe('PublicationReleasePage', () => {
       '19 April 2018',
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: `See all updates (2) for Academic year 2016/17`,
       }),

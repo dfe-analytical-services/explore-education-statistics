@@ -203,7 +203,7 @@ describe('ChartAxisConfiguration', () => {
     expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
   });
 
-  test('calls `onChange` when form values change', () => {
+  test('calls `onChange` when form values change', async () => {
     const handleChange = jest.fn();
 
     render(
@@ -225,8 +225,8 @@ describe('ChartAxisConfiguration', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.clear(sizeInput);
-    userEvent.type(sizeInput, '20');
+    await userEvent.clear(sizeInput);
+    await userEvent.type(sizeInput, '20');
 
     expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
       ...testMajorAxisConfiguration,
@@ -250,9 +250,10 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.click(screen.getByLabelText('Custom'));
+    await userEvent.click(screen.getByLabelText('Custom'));
+    await userEvent.clear(screen.getByLabelText('Every nth value'));
     await userEvent.type(screen.getByLabelText('Every nth value'), 'x');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -262,8 +263,9 @@ describe('ChartAxisConfiguration', () => {
       screen.getByRole('link', { name: 'Enter tick spacing' }),
     ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
 
+    await userEvent.clear(screen.getByLabelText('Every nth value'));
     await userEvent.type(screen.getByLabelText('Every nth value'), '-1');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -291,7 +293,7 @@ describe('ChartAxisConfiguration', () => {
     );
 
     await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -317,13 +319,11 @@ describe('ChartAxisConfiguration', () => {
         />
       </ChartBuilderFormsContextProvider>,
     );
-
+    await userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
     await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
-    userEvent.tab();
+    await userEvent.tab();
 
-    await waitFor(() => {
-      expect(screen.getByText('There is a problem')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('There is a problem')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', { name: 'Size of axis must be positive' }),
@@ -352,7 +352,9 @@ describe('ChartAxisConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -377,12 +379,16 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
+    await userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
     await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '100');
 
-    userEvent.click(screen.getByRole('checkbox', { name: 'Sort ascending' }));
+    await userEvent.click(
+      screen.getByRole('checkbox', { name: 'Sort ascending' }),
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       const formValues: AxisConfiguration = {
@@ -427,9 +433,9 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('radio', { name: 'Locations' }));
+      await userEvent.click(screen.getByRole('radio', { name: 'Locations' }));
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -476,13 +482,13 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('radio', { name: 'Filters' }));
+      await userEvent.click(screen.getByRole('radio', { name: 'Filters' }));
 
-      userEvent.selectOptions(screen.getByLabelText('Select a filter'), [
+      await userEvent.selectOptions(screen.getByLabelText('Select a filter'), [
         'school_type',
       ]);
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -621,9 +627,9 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByLabelText('Group by filter groups'));
+      await userEvent.click(screen.getByLabelText('Group by filter groups'));
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -675,7 +681,7 @@ describe('ChartAxisConfiguration', () => {
       );
       expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+      await userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
         '2014_AY',
       ]);
 
@@ -684,7 +690,7 @@ describe('ChartAxisConfiguration', () => {
         'Test label',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       await waitFor(() => {
         expect(referenceLines.getByText('Test label')).toBeInTheDocument();
@@ -736,7 +742,7 @@ describe('ChartAxisConfiguration', () => {
         'Test label',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       await waitFor(() => {
         expect(referenceLines.getByText('Test label')).toBeInTheDocument();
@@ -773,7 +779,7 @@ describe('ChartAxisConfiguration', () => {
       );
       expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
 
-      userEvent.selectOptions(
+      await userEvent.selectOptions(
         referenceLinesSection.getByLabelText('Position'),
         ['2014_AY'],
       );
@@ -783,13 +789,14 @@ describe('ChartAxisConfiguration', () => {
         'I am label',
       );
 
-      userEvent.selectOptions(referenceLinesSection.getByLabelText('Style'), [
-        'dashed',
-      ]);
+      await userEvent.selectOptions(
+        referenceLinesSection.getByLabelText('Style'),
+        ['dashed'],
+      );
 
-      userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -858,7 +865,7 @@ describe('ChartAxisConfiguration', () => {
 
       expect(rows).toHaveLength(3);
 
-      userEvent.click(
+      await userEvent.click(
         within(rows[2]).getByRole('button', { name: /Remove line/ }),
       );
 
@@ -913,10 +920,10 @@ describe('ChartAxisConfiguration', () => {
 
       expect(rows).toHaveLength(3);
 
-      userEvent.click(
+      await userEvent.click(
         within(rows[1]).getByRole('button', { name: /Remove line/ }),
       );
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -980,7 +987,7 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 
@@ -1039,7 +1046,7 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
       );
 

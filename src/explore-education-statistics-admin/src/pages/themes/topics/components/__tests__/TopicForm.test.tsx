@@ -10,8 +10,8 @@ describe('ThemeForm', () => {
   test('shows validation error when there is no title', async () => {
     render(<TopicForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -29,7 +29,7 @@ describe('ThemeForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
 
     await waitFor(() => {
       expect(handleSubmit).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('ThemeForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
@@ -79,7 +79,7 @@ describe('ThemeForm', () => {
 
       await userEvent.clear(screen.getByLabelText('Title'));
 
-      userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
 
       await waitFor(() => {
         expect(handleSubmit).not.toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe('ThemeForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
 
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith({

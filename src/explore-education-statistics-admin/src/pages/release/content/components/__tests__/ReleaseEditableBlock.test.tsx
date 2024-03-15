@@ -201,7 +201,7 @@ describe('ReleaseEditableBlock', () => {
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
 
     await waitFor(() => {
       expect(screen.getByText('Save & close')).toBeInTheDocument();
@@ -254,7 +254,7 @@ describe('ReleaseEditableBlock', () => {
 
     expect(screen.getByText('Save & close')).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
 
     await waitFor(() => {
       expect(screen.getByText('Edit block')).toBeInTheDocument();
@@ -295,7 +295,7 @@ describe('ReleaseEditableBlock', () => {
 
     await userEvent.type(screen.getByRole('textbox'), 'test');
 
-    userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
 
     await waitFor(() => {
       expect(screen.getByText('Edit block')).toBeInTheDocument();
@@ -618,6 +618,8 @@ describe('ReleaseEditableBlock', () => {
     // Lock is about to expire
     mockDate.set('2022-02-16T12:09:00Z');
 
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+
     jest.useFakeTimers({
       doNotFake: ['Date'],
     });
@@ -674,7 +676,7 @@ describe('ReleaseEditableBlock', () => {
     expect(connectionMock.invoke).not.toHaveBeenCalled();
 
     // Interact with textbox
-    await userEvent.type(screen.getByRole('textbox'), 'Test text');
+    await user.type(screen.getByRole('textbox'), 'Test text');
 
     jest.advanceTimersByTime(60_000);
 
@@ -765,7 +767,7 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('clicking `Remove block` button shows confirmation modal', () => {
+  test('clicking `Remove block` button shows confirmation modal', async () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
@@ -776,7 +778,7 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -785,7 +787,7 @@ describe('ReleaseEditableBlock', () => {
     ).toBeInTheDocument();
   });
 
-  test('confirming removal of block calls service to delete block', () => {
+  test('confirming removal of block calls service to delete block', async () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
@@ -800,11 +802,11 @@ describe('ReleaseEditableBlock', () => {
       releaseContentService.deleteContentSectionBlock,
     ).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
     expect(
       releaseContentService.deleteContentSectionBlock,
@@ -900,7 +902,7 @@ describe('ReleaseEditableBlock', () => {
         screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
-      userEvent.click(
+      await userEvent.click(
         within(unresolvedComments[0]).getByRole('button', {
           name: 'Delete',
         }),
@@ -937,14 +939,14 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
-      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      await userEvent.clear(comment.getByRole('textbox'));
       await userEvent.type(
         comment.getByRole('textbox'),
         'Test updated content',
       );
 
-      userEvent.click(comment.getByRole('button', { name: 'Update' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Update' }));
 
       await waitFor(() => {
         expect(
@@ -980,7 +982,7 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
 
       await waitFor(() => {
         expect(
@@ -1016,7 +1018,7 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(resolvedComments[0]);
 
-      userEvent.click(
+      await userEvent.click(
         comment.getByRole('button', { name: 'Unresolve', hidden: true }),
       );
 
@@ -1048,7 +1050,9 @@ describe('ReleaseEditableBlock', () => {
         releaseContentCommentService.addContentSectionComment,
       ).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Add comment' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Add comment' }),
+      );
 
       await userEvent.type(
         screen.getByRole('textbox', {
@@ -1057,7 +1061,7 @@ describe('ReleaseEditableBlock', () => {
         'I am a comment',
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Add comment',
         }),
@@ -1129,7 +1133,7 @@ describe('ReleaseEditableBlock', () => {
         screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
-      userEvent.click(
+      await userEvent.click(
         within(unresolvedComments[0]).getByRole('button', {
           name: 'Delete',
         }),
@@ -1166,14 +1170,14 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
-      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      await userEvent.clear(comment.getByRole('textbox'));
       await userEvent.type(
         comment.getByRole('textbox'),
         'Test updated content',
       );
 
-      userEvent.click(comment.getByRole('button', { name: 'Update' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Update' }));
 
       await waitFor(() => {
         expect(
@@ -1209,7 +1213,7 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(unresolvedComments[0]);
 
-      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+      await userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
 
       await waitFor(() => {
         expect(
@@ -1245,7 +1249,7 @@ describe('ReleaseEditableBlock', () => {
 
       const comment = within(resolvedComments[0]);
 
-      userEvent.click(
+      await userEvent.click(
         comment.getByRole('button', { name: 'Unresolve', hidden: true }),
       );
 
@@ -1277,7 +1281,9 @@ describe('ReleaseEditableBlock', () => {
         releaseContentCommentService.addContentSectionComment,
       ).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Add comment' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Add comment' }),
+      );
 
       await userEvent.type(
         screen.getByRole('textbox', {
@@ -1286,7 +1292,7 @@ describe('ReleaseEditableBlock', () => {
         'I am a comment',
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Add comment',
         }),

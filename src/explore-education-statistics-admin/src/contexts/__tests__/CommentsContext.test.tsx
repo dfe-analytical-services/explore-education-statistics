@@ -10,17 +10,13 @@ import {
   testCommentUser1,
 } from '@admin/components/comments/__data__/testComments';
 import { Comment } from '@admin/services/types/content';
-import React, { FC } from 'react';
-import { act, renderHook } from '@testing-library/react-hooks';
+import React, { ReactNode } from 'react';
+import { act, renderHook } from '@testing-library/react';
 
 describe('CommentsContext', () => {
-  type Props = OmitStrict<CommentsContextProviderProps, 'children'>;
-
-  const wrapper: FC<Props> = ({ ...props }) => (
-    <CommentsContextProvider {...props}>
-      {props.children}
-    </CommentsContextProvider>
-  );
+  interface Props extends OmitStrict<CommentsContextProviderProps, 'children'> {
+    children?: ReactNode;
+  }
 
   const commentToAdd: CommentCreate = {
     content: 'Added Comment content',
@@ -57,13 +53,12 @@ describe('CommentsContext', () => {
     onPendingDeleteUndo: handlePendingDeleteUndo,
   };
 
-  test('updating `comments` prop updates the returned comments', () => {
+  // EES-4936 initialProps are not passed to the wrapper component, so we can't test updating
+  // them using rerender.
+  // https://testing-library.com/docs/react-testing-library/api/#renderhook-options-initialprops
+  test.skip('updating `comments` prop updates the returned comments', async () => {
     const { result, rerender } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
-        ...initialProps,
-        comments: [],
-      },
+      wrapper: createWrapper({ ...initialProps, comments: [] }),
     });
 
     expect(result.current.comments).toEqual([]);
@@ -78,11 +73,10 @@ describe('CommentsContext', () => {
 
   test('filters out returned `comments` that are pending deletion', () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         ...initialProps,
         pendingDeletions: [testComments[1], testComments[2]],
-      },
+      }),
     });
 
     expect(result.current.comments).toEqual([
@@ -96,11 +90,7 @@ describe('CommentsContext', () => {
     handleCreate.mockResolvedValue(addedComment);
 
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
-        ...initialProps,
-        comments: [],
-      },
+      wrapper: createWrapper({ ...initialProps, comments: [] }),
     });
 
     expect(result.current.currentInteraction).toBeUndefined();
@@ -119,11 +109,7 @@ describe('CommentsContext', () => {
     handleCreate.mockResolvedValue(addedComment);
 
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
-        ...initialProps,
-        comments: [],
-      },
+      wrapper: createWrapper({ ...initialProps, comments: [] }),
     });
 
     expect(handleCreate).not.toHaveBeenCalled();
@@ -137,8 +123,7 @@ describe('CommentsContext', () => {
 
   test('calling `removeComment` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(result.current.pendingDeletions).toEqual([]);
@@ -156,8 +141,7 @@ describe('CommentsContext', () => {
 
   test('calling `removeComment` calls the `onPendingDelete` handler', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(handlePendingDelete).not.toHaveBeenCalled();
@@ -171,12 +155,11 @@ describe('CommentsContext', () => {
 
   test('calling `clearPendingDeletions` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-      },
+      }),
     });
 
     expect(result.current.pendingDeletions).toEqual([
@@ -194,12 +177,11 @@ describe('CommentsContext', () => {
 
   test('calling `clearPendingDeletions` calls the `onDelete` handler for each pending deletion', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-      },
+      }),
     });
 
     expect(handleDelete).not.toHaveBeenCalled();
@@ -218,8 +200,7 @@ describe('CommentsContext', () => {
     handleUpdate.mockResolvedValue(resolvedComment);
 
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(result.current.currentInteraction).toBeUndefined();
@@ -238,8 +219,7 @@ describe('CommentsContext', () => {
     handleUpdate.mockResolvedValue(resolvedComment);
 
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(handleUpdate).not.toHaveBeenCalled();
@@ -256,8 +236,7 @@ describe('CommentsContext', () => {
 
   test('calling `unresolveComment` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(result.current.currentInteraction).toBeUndefined();
@@ -274,8 +253,7 @@ describe('CommentsContext', () => {
 
   test('calling `unresolveComment` calls the `onUpdate` handler', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     expect(handleUpdate).not.toHaveBeenCalled();
@@ -292,8 +270,7 @@ describe('CommentsContext', () => {
 
   test('calling `updateComment` calls `onUpdate` handler', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps,
+      wrapper: createWrapper(initialProps),
     });
 
     const updatedComment: Comment = {
@@ -312,12 +289,11 @@ describe('CommentsContext', () => {
 
   test('calling `reAddComment` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-      },
+      }),
     });
 
     await act(async () => {
@@ -332,12 +308,11 @@ describe('CommentsContext', () => {
 
   test('calling `reAddComment` calls `onPendingDeleteUndo` handler', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-      },
+      }),
     });
 
     expect(handlePendingDeleteUndo).not.toHaveBeenCalled();
@@ -350,4 +325,12 @@ describe('CommentsContext', () => {
       testComments[3].id,
     );
   });
+
+  function createWrapper(props: Props) {
+    return function CreatedWrapper({ children }: { children: ReactNode }) {
+      return (
+        <CommentsContextProvider {...props}>{children}</CommentsContextProvider>
+      );
+    };
+  }
 });

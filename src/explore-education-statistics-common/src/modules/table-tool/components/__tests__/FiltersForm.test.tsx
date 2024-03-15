@@ -2,10 +2,9 @@ import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMo
 import FiltersForm, {
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
-import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import { testWizardStepProps } from '@common/modules/table-tool/components/__tests__/__data__/testWizardStepProps';
 import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
-import { waitFor } from '@testing-library/dom';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { produce } from 'immer';
 import noop from 'lodash/noop';
@@ -252,18 +251,6 @@ describe('FiltersForm', () => {
     },
   };
 
-  const testWizardStepProps: InjectedWizardProps = {
-    currentStep: 1,
-    isActive: true,
-    isEnabled: true,
-    isLoading: false,
-    stepNumber: 1,
-    setCurrentStep: (step, task) => task?.(),
-    goToNextStep: task => task?.(),
-    goToPreviousStep: task => task?.(),
-    shouldScroll: false,
-  };
-
   const testSubject = {
     id: 'subject-1',
     name: 'Subject 1',
@@ -435,7 +422,7 @@ describe('FiltersForm', () => {
     expect(filterCheckboxes2[1]).not.toBeChecked();
   });
 
-  test('selecting options shows the number of selected options for each filter and indicator group', () => {
+  test('selecting options shows the number of selected options for each filter and indicator group', async () => {
     render(
       <FiltersForm
         {...testWizardStepProps}
@@ -445,7 +432,7 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await userEvent.click(screen.getByLabelText('State-funded secondary'));
 
     expect(
       screen.getByRole('button', {
@@ -453,9 +440,9 @@ describe('FiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Ethnicity Major Mixed Total'));
-    userEvent.click(screen.getByLabelText('Gender male'));
-    userEvent.click(screen.getByLabelText('Total'));
+    await userEvent.click(screen.getByLabelText('Ethnicity Major Mixed Total'));
+    await userEvent.click(screen.getByLabelText('Gender male'));
+    await userEvent.click(screen.getByLabelText('Total'));
 
     expect(
       screen.getByRole('button', {
@@ -463,8 +450,8 @@ describe('FiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    userEvent.click(screen.getByLabelText('Unauthorised absence rate'));
+    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await userEvent.click(screen.getByLabelText('Unauthorised absence rate'));
 
     expect(
       screen.getByRole('group', {
@@ -483,7 +470,7 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Create table',
       }),
@@ -592,14 +579,14 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('State-funded secondary'));
-    userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
 
     expect((screen.getByLabelText('Total') as HTMLInputElement).checked).toBe(
       false,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Create table',
       }),
@@ -622,9 +609,9 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('State-funded secondary'));
-    userEvent.click(screen.getByLabelText('Ethnicity Major Black Total'));
-    userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await userEvent.click(screen.getByLabelText('Ethnicity Major Black Total'));
+    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
 
     await rerender(
       <FiltersForm
@@ -665,11 +652,11 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('State-funded secondary'));
-    userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    userEvent.click(screen.getByLabelText('Total'));
+    await userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await userEvent.click(screen.getByLabelText('Total'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
@@ -712,11 +699,11 @@ describe('FiltersForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('State-funded secondary'));
-    userEvent.click(screen.getByLabelText('Number of excluded sessions'));
-    userEvent.click(screen.getByLabelText('Total'));
+    await userEvent.click(screen.getByLabelText('State-funded secondary'));
+    await userEvent.click(screen.getByLabelText('Number of excluded sessions'));
+    await userEvent.click(screen.getByLabelText('Total'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
@@ -939,13 +926,13 @@ describe('FiltersForm', () => {
       }),
     ).not.toBeVisible();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Expand all categories' }),
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Collapse all/)).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('button', { name: 'Collapse all categories' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('group', {
@@ -975,13 +962,13 @@ describe('FiltersForm', () => {
       }),
     ).toBeVisible();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Collapse all categories' }),
     );
 
-    await waitFor(() => {
-      expect(screen.getByText(/Expand all/)).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByRole('button', { name: 'Expand all categories' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('group', {

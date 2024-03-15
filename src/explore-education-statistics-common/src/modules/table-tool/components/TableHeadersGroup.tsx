@@ -5,7 +5,7 @@ import TableHeadersReorderableList from '@common/modules/table-tool/components/T
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable } from '@hello-pangea/dnd';
 
 interface Props {
   id: string;

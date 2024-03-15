@@ -18,7 +18,7 @@ import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import ContentHtml from '@common/components/ContentHtml';
 
 interface Props {

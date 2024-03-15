@@ -82,7 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
@@ -298,8 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     MetaId = table.Column<int>(type: "integer", nullable: false),
                     OptionId = table.Column<int>(type: "integer", nullable: false),
-                    PublicId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                    PublicId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -324,8 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     MetaId = table.Column<int>(type: "integer", nullable: false),
                     OptionId = table.Column<int>(type: "integer", nullable: false),
-                    PublicId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                    PublicId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

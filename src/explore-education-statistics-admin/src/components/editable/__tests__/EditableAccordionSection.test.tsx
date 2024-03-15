@@ -141,7 +141,7 @@ describe('EditableAccordionSection', () => {
         />,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Remove this section' }),
       );
 
@@ -180,7 +180,7 @@ describe('EditableAccordionSection', () => {
         />,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Remove this section' }),
       );
 
@@ -190,7 +190,7 @@ describe('EditableAccordionSection', () => {
 
       expect(handleRemoveSection).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       expect(handleRemoveSection).toHaveBeenCalledTimes(1);
     });
