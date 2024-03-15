@@ -210,7 +210,7 @@ const publicationService = {
     );
   },
 
-  getReleaseSeriesView(publicationId: string): Promise<ReleaseSeriesItem[]> {
+  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesItem[]> {
     return client.get(`/publications/${publicationId}/release-series`);
   },
 
@@ -224,13 +224,13 @@ const publicationService = {
     );
   },
 
-  updateReleaseSeriesView(
+  updateReleaseSeries(
     publicationId: string,
-    legacyReleases: ReleaseSeriesItemUpdateRequest[],
+    updatedReleaseSeries: ReleaseSeriesItemUpdateRequest[],
   ): Promise<ReleaseSeriesItem[]> { // @MarkFix backend/frontend return type mismatch
-    return client.patch(
+    return client.put(
       `/publications/${publicationId}/release-series`,
-      legacyReleases,
+      updatedReleaseSeries,
     );
   },
 

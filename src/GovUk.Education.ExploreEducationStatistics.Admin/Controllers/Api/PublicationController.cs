@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("api/publications/{publicationId:guid}/release-series")] // @MarkFix should be a PUT?
+        [HttpPut("api/publications/{publicationId:guid}/release-series")]
         public async Task<ActionResult<List<ReleaseSeriesItem>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)

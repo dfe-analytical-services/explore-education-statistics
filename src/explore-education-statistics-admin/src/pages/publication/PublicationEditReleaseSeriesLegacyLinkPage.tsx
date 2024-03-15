@@ -19,7 +19,7 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
   const history = useHistory();
 
   const { value: releaseSeries, isLoading } = useAsyncHandledRetry(() =>
-    publicationService.getReleaseSeriesView(publicationId),
+    publicationService.getReleaseSeries(publicationId),
   );
 
   const itemIndex = releaseSeries?.findIndex(rsi => rsi.id === legacyReleaseId);
@@ -49,7 +49,7 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: releaseSeries[itemIndex].description,
-            url: releaseSeries[itemIndex].legacyLinkUrl!,
+            url: releaseSeries[itemIndex].legacyLinkUrl ?? "", // @MarkFix empty string should never happen
           }}
           cancelButton={
             <Link unvisited to={publicationEditPath}>
@@ -59,7 +59,7 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
           onSubmit={async values => {
             releaseSeries[itemIndex].description = values.description;
             releaseSeries[itemIndex].legacyLinkUrl = values.url;
-            await publicationService.updateReleaseSeriesView(
+            await publicationService.updateReleaseSeries(
               publicationId,
               releaseSeries.map(seriesItem => ({
                 // @MarkFix abstract out mapping (as similar happens in ReleaseSeriesTable)

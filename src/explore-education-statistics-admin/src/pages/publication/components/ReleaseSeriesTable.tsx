@@ -238,7 +238,7 @@ const ReleaseSeriesTable = ({
                                     releaseSeries.filter(
                                       item => item.id !== seriesItem.id,
                                     );
-                                  await publicationService.updateReleaseSeriesView(
+                                  await publicationService.updateReleaseSeries(
                                     publicationId,
                                     nextReleaseSeries.map(item => ({
                                       // @MarkFix abstract this mapping out?
@@ -285,7 +285,7 @@ const ReleaseSeriesTable = ({
         <ButtonGroup>
           <Button
             onClick={async () => {
-              await publicationService.updateReleaseSeriesView(
+              await publicationService.updateReleaseSeries(
                 publicationId,
                 releaseSeries.map(seriesItem => ({
                   id: seriesItem.id,

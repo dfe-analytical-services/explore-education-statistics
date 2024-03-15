@@ -41,7 +41,7 @@ describe('PublicationReleaseSeriesPage', () => {
 
   test('renders the legacy releases page', async () => {
     return; // @MarkFix
-    publicationService.getReleaseSeriesView.mockResolvedValue(
+    publicationService.getReleaseSeries.mockResolvedValue(
       testReleaseSeries,
     );
 

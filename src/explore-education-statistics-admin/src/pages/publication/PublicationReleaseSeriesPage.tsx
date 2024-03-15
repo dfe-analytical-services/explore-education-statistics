@@ -12,7 +12,7 @@ const PublicationReleaseSeriesPage = () => {
   const { value: releaseSeries = [], isLoading } = useAsyncHandledRetry<
     ReleaseSeriesItem[]
   >(
-    async () => publicationService.getReleaseSeriesView(publicationId),
+    async () => publicationService.getReleaseSeries(publicationId),
     [publicationId],
   );
 

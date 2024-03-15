@@ -49,7 +49,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
   ];
 
   beforeEach(() => {
-    publicationService.getReleaseSeriesView.mockResolvedValue(releaseSeries);
+    publicationService.getReleaseSeries.mockResolvedValue(releaseSeries);
   });
 
   test('renders the edit legacy release page', async () => {
@@ -86,7 +86,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
     );
 
     await waitFor(() => {
-      expect(publicationService.updateReleaseSeriesView).toHaveBeenCalledWith(
+      expect(publicationService.updateReleaseSeries).toHaveBeenCalledWith(
         'publication-1',
         [
           {
