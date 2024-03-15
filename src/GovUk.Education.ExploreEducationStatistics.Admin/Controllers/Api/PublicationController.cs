@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink(
+        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest request)
         {
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesItem>>> UpdateReleaseSeries(
+        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {

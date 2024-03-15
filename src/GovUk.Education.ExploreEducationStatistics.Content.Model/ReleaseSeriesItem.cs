@@ -11,4 +11,6 @@ public class ReleaseSeriesItem
 
     public string? LegacyLinkUrl { get; set; }
     public string? LegacyLinkDescription { get; set; }
+
+    public bool IsLegacyLink => ReleaseId == null;
 }

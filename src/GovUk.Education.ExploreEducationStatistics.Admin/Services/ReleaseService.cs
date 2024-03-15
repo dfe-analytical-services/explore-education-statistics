@@ -164,9 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.ReleaseVersions.AddAsync(newReleaseVersion);
 
-                    // @MarkFix check this is right
-                    var releaseSeries = publication.ReleaseSeries;
-                    releaseSeries.Insert(0, new ReleaseSeriesItem
+                    publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
                     {
                         Id = Guid.NewGuid(),
                         ReleaseId = newReleaseVersion.ReleaseId,
@@ -201,15 +199,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
-                .OnSuccessVoid(async release =>
+                .OnSuccessVoid(async releaseVersion =>
                 {
-                    release.SoftDeleted = true;
-                    _context.Update(release);
+                    // NOTE: As only removing unapproved amendments, releaseVersion.Release will not be orphaned
+                    // and associated item in releaseVersion.Publication.ReleaseSeries will also not be orphaned
+                    // so no need to remove them.
+
+                    releaseVersion.SoftDeleted = true;
+                    _context.ReleaseVersions.Update(releaseVersion);
 
                     var roles = await _context
                         .UserReleaseRoles
@@ -242,22 +244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     });
 
                     _context.UpdateRange(methodologiesScheduledWithRelease);
-
-                    // @MarkFix all this needs refactoring
-                    var releaseVersions = await _context.ReleaseVersions
-                        .Where(rv => rv.ReleaseId == release.ReleaseId)
-                        .ToListAsync();
-                    if (releaseVersions.Count == 1)
-                    {
-                        var publication = await _context.Publications
-                            .Where(p => p.Id == releaseVersions[0].PublicationId)
-                            .SingleAsync();
-                        var releaseSeries = publication.ReleaseSeries;
-                        var seriesItem = releaseSeries.Where(rsi => rsi.ReleaseId == release.ReleaseId)
-                            .Single();
-                        releaseSeries.Remove(seriesItem);
-                        _context.Publications.Update(publication);
-                    }
 
                     await _context.SaveChangesAsync();
 

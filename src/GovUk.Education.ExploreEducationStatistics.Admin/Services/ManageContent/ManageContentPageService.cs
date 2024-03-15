@@ -97,12 +97,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             .ToListAsync();
                     }
 
+                    // Only show legacy links and published releases in ReleaseSeries
+                    releaseVersion.Publication.ReleaseSeries = releaseVersion.Publication.ReleaseSeries
+                        .Where(rsi =>
+                            rsi.IsLegacyLink || releaseVersion.Publication.ReleaseVersions
+                                .Any(rv =>
+                                        rsi.ReleaseId == rv.ReleaseId
+                                        && rv.Live)
+                        ).ToList();
+
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
-
-                    // @MarkFix releaseViewModel.Publication.ReleaseSeries filter out unpublished releaseIds here?
 
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection

@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             .Select(rsi => new ReleaseSeriesItemViewModel
                             {
                                 Id = rsi.Id,
-                                IsLegacyLink = rsi.ReleaseId == null,
+                                IsLegacyLink = rsi.IsLegacyLink,
                                 Description = rsi.LegacyLinkDescription ?? rv.Title,
 
                                 ReleaseId = rsi.ReleaseId,

@@ -81,9 +81,19 @@ public class PublicationService : IPublicationService
                     return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
                 }
 
+                var publishedReleaseVersions = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
+
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-                var publishedReleases = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
-                return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
+
+                // Only show legacy links and published releases in ReleaseSeries
+                var filteredReleaseSeries = publication.ReleaseSeries
+                    .Where(rsi =>
+                        rsi.IsLegacyLink
+                        || publishedReleaseVersions
+                            .Any(rv => rsi.ReleaseId == rv.ReleaseId)
+                    ).ToList();
+
+                return BuildPublicationViewModel(publication, publishedReleaseVersions, isSuperseded, filteredReleaseSeries);
             });
     }
 
@@ -187,7 +197,8 @@ public class PublicationService : IPublicationService
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
         List<ReleaseVersion> releaseVersions,
-        bool isSuperseded)
+        bool isSuperseded,
+        List<ReleaseSeriesItem> releaseSeries)
     {
         var topic = new TopicViewModel(new ThemeViewModel(
             publication.Topic.Theme.Id,
@@ -224,7 +235,7 @@ public class PublicationService : IPublicationService
                 .GroupBy(rv => rv.ReleaseName).Select(grouping => grouping.OrderByDescending(r => r.Version).First())
                 .Select(releaseVersion => new ReleaseVersionTitleViewModel(releaseVersion))
                 .ToList(),
-            ReleaseSeries = publication.ReleaseSeries
+            ReleaseSeries = releaseSeries,
         };
     }
 

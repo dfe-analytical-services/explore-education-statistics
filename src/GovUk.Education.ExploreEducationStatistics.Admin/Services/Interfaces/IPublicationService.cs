@@ -57,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(
             Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink(
+        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest newLegacyLink);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItem>>> UpdateReleaseSeries(
+        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
            Guid publicationId,
            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems);
     }

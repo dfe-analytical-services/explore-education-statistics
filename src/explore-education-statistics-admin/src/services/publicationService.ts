@@ -2,7 +2,10 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import {PublicationSummary, ReleaseSeriesItem} from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseSeriesItem,
+} from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
 import { isAxiosError } from 'axios';
@@ -217,7 +220,7 @@ const publicationService = {
   addReleaseSeriesLegacyLink(
     publicationId: string,
     newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
-  ): Promise<ReleaseSeriesItem[]> { // @MarkFix backend/frontend return type mismatch
+  ): Promise<ReleaseSeriesItem[]> {
     return client.post(
       `publications/${publicationId}/release-series`,
       newLegacyLink,
@@ -227,7 +230,7 @@ const publicationService = {
   updateReleaseSeries(
     publicationId: string,
     updatedReleaseSeries: ReleaseSeriesItemUpdateRequest[],
-  ): Promise<ReleaseSeriesItem[]> { // @MarkFix backend/frontend return type mismatch
+  ): Promise<ReleaseSeriesItem[]> {
     return client.put(
       `/publications/${publicationId}/release-series`,
       updatedReleaseSeries,

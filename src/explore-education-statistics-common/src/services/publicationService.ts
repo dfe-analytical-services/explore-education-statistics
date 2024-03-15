@@ -19,7 +19,8 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  releases: { // @MarkFix
+  releases: {
+    // @MarkFix redundant now we have releaseSeries?
     id: string;
     slug: string;
     title: string;
@@ -49,7 +50,6 @@ export interface ReleaseSeriesItem {
 
   legacyLinkUrl?: string;
 }
-
 
 export interface PublicationSummary {
   id: string;

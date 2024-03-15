@@ -440,6 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        // @MarkFix this needs tests
         public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _persistenceHelper
@@ -450,16 +451,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var result = new List<ReleaseSeriesItemViewModel>();
                     foreach (var seriesItem in publication.ReleaseSeries)
                     {
-                        if (seriesItem.ReleaseId != null)
+                        if (seriesItem.IsLegacyLink)
                         {
-                            // @MarkFix on public, we'll want to filter out non-live release parents
+                            if (seriesItem.LegacyLinkDescription == null)
+                            {
+                                throw new InvalidDataException(
+                                    $"LegacyLinkDescription should be set. PublicationId: {publication.Id}, ReleaseSeriesItem: {seriesItem.Id}");
+                            }
+
+                            if (seriesItem.LegacyLinkUrl == null)
+                            {
+                                throw new InvalidDataException(
+                                    $"LegacyLinkUrl should be set. PublicationId: {publication.Id}, ReleaseSeriesItem: {seriesItem.Id}");
+                            }
+
+                            result.Add(new ReleaseSeriesItemViewModel
+                            {
+                                Id = seriesItem.Id,
+                                IsLegacyLink = true,
+                                Description = seriesItem.LegacyLinkDescription!,
+                                LegacyLinkUrl = seriesItem.LegacyLinkUrl,
+                            });
+
+                        }
+                        else
+                        {
                             var latestParentVersion = await _releaseVersionRepository
                                 .GetLatestReleaseVersionForParent(
-                                    publication.Id, seriesItem.ReleaseId.Value);
+                                    publication.Id, seriesItem.ReleaseId!.Value);
 
                             if (latestParentVersion == null)
                             {
-                                throw new InvalidDataException("ReleaseSeriesItem with ReleaseParentId set should have an associated LatestReleaseVersion"); // @MarkFix improve message
+                                throw new InvalidDataException(
+                                    "ReleaseSeriesItem with ReleaseId set should have an associated " +
+                                            $"LatestReleaseVersion. Publication: {publication.Id} " +
+                                            $"ReleaseSeriesItem: {seriesItem.Id}");
                             }
 
                             result.Add(new ReleaseSeriesItemViewModel
@@ -471,31 +497,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     PublicationSlug = publication.Slug,
                                     ReleaseSlug = latestParentVersion.Slug,
                                 });
-
-                        }
-                        else // is legacy link
-                        {
-
-                            // @MarkFix check all prod legacy link descriptions/urls are not null/empty
-                            if (seriesItem.LegacyLinkDescription == null)
-                            {
-                                throw new InvalidDataException(
-                                    "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkDescription should be set"); // @MarkFix improve message?
-                            }
-
-                            if (seriesItem.LegacyLinkUrl == null)
-                            {
-                                throw new InvalidDataException(
-                                    "If ReleaseSeriesItem's ReleaseParentId is null, LegacyLinkUrl should be set"); // @MarkFix improve message?
-                            }
-
-                            result.Add(new ReleaseSeriesItemViewModel
-                            {
-                                Id = seriesItem.Id,
-                                IsLegacyLink = true,
-                                Description = seriesItem.LegacyLinkDescription,
-                                LegacyLinkUrl = seriesItem.LegacyLinkUrl,
-                            });
                         }
                     }
 
@@ -504,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // @MarkFix this needs tests
-        public async Task<Either<ActionResult, List<ReleaseSeriesItem>>> AddReleaseSeriesLegacyLink( // @MarkFix should return view models?
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
         {
@@ -524,11 +525,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
-                    return publication.ReleaseSeries;
+                    return await GetReleaseSeries(publication.Id)
+                        .OnSuccess(releaseSeries => releaseSeries);
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItem>>> UpdateReleaseSeries(
+        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
@@ -556,7 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return newReleaseSeries; // @MarkFix do we want to return ReleaseSeriesItemViewModels here?
+                    return await GetReleaseSeries(publication.Id)
+                        .OnSuccess(releaseSeries => releaseSeries);
                 });
         }
 
