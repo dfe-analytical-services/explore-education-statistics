@@ -33,11 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// Azure function which publishes the content for a Release at a scheduled time by moving it from a staging
+        /// Azure function which publishes the content for a release version at a scheduled time by moving it from a staging
         /// directory.
         /// </summary>
         /// <remarks>
-        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
         /// </remarks>
         /// <param name="timer"></param>
         /// <param name="executionContext"></param>
@@ -65,12 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// Azure function which publishes the content for a Release immediately by moving it from a staging
+        /// Azure function which publishes the content for a release version immediately by moving it from a staging
         /// directory. This function is manually triggered by an HTTP POST, and is disabled by default in production
         /// environments. 
         /// </summary>
         /// <remarks>
-        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
         /// </remarks>
         /// <param name="request">
         /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
@@ -79,9 +79,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("PublishStagedReleaseContentImmediately")]
+        [FunctionName("PublishStagedReleaseVersionContentImmediately")]
         // ReSharper disable once UnusedMember.Global
-        public async Task<ActionResult<ManualTriggerResponse>> PublishScheduledReleasesImmediately(
+        public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequest request,
             ExecutionContext executionContext,

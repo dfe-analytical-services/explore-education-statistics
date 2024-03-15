@@ -92,7 +92,7 @@
     "maxStatsDbSizeBytes": {
       "value": 268435456000
     },
-    "immediatePublicationOfScheduledReleasesEnabled": {
+    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
     }
   }

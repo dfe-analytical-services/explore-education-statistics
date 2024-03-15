@@ -131,18 +131,18 @@ def user_checks_dashboard_theme_topic_dropdowns_exist():
 
 
 def trigger_immediate_staging_of_scheduled_release(release_version_id):
-    stage_release_response = publisher_functions_client.post(
-        "/api/StageScheduledReleasesImmediately", {"releaseVersionIds": [release_version_id]}
+    stage_release_version_response = publisher_functions_client.post(
+        "/api/StageScheduledReleaseVersionsImmediately", {"releaseVersionIds": [release_version_id]}
     )
     assert (
-        stage_release_response.status_code < 300
-    ), f"Immediate staging of scheduled release API request failed with {stage_release_response.status_code} and {stage_release_response.text}"
+        stage_release_version_response.status_code < 300
+    ), f"Immediate staging of scheduled release version API request failed with {stage_release_version_response.status_code} and {stage_release_version_response.text}"
 
 
 def trigger_immediate_publishing_of_scheduled_release(release_version_id):
-    stage_release_response = publisher_functions_client.post(
-        "/api/PublishStagedReleaseContentImmediately", {"releaseVersionIds": [release_version_id]}
+    stage_release_version_response = publisher_functions_client.post(
+        "/api/PublishStagedReleaseVersionContentImmediately", {"releaseVersionIds": [release_version_id]}
     )
     assert (
-        stage_release_response.status_code < 300
-    ), f"Immediate publishing of staged release API request failed with {stage_release_response.status_code} and {stage_release_response.text}"
+        stage_release_version_response.status_code < 300
+    ), f"Immediate publishing of staged release version API request failed with {stage_release_version_response.status_code} and {stage_release_version_response.text}"
