@@ -24,6 +24,8 @@ public class LocationMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOf
 
     public DateTimeOffset? Updated { get; set; }
 
+    public static implicit operator GeographicLevel(LocationMeta meta) => meta.Level;
+
     internal class Config : IEntityTypeConfiguration<LocationMeta>
     {
         public void Configure(EntityTypeBuilder<LocationMeta> builder)
