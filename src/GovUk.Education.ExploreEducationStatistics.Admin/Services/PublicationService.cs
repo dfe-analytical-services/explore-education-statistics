@@ -535,12 +535,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
             return await _context.Publications
+                .Include(p => p.ReleaseVersions)
                 .FirstOrNotFoundAsync(p => p.Id == publicationId)
                 .OnSuccess(_userService.CheckCanManageReleaseSeries)
                 .OnSuccess(async publication =>
                 {
-                    // @MarkFix check updatedReleaseSeriesItems contains sole copy of each releaseParent with correct id
-                    // @MarkFix check each item has nothing else is set when ReleaseParentId is set
+                    // Check each updated series items fields are correctly set
+                    foreach (var seriesItem in updatedReleaseSeriesItems)
+                    {
+                        if (seriesItem.ReleaseId != null && (
+                                seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkDescription != null))
+                        {
+                            throw new ArgumentException(
+                                $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
+                        }
+
+                        if (seriesItem.ReleaseId == null && (
+                                seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkDescription == null))
+                        {
+                            throw new ArgumentException(
+                                $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
+                        }
+                    }
+
+                    // Check all publication releases are included in updatedReleaseSeriesItems
+                    var publicationReleaseIds = publication.ReleaseVersions
+                        .Select(rv => rv.ReleaseId)
+                        .Distinct()
+                        .ToList();
+
+                    var updatedSeriesReleaseIds = updatedReleaseSeriesItems
+                        .Where(rsi => rsi.ReleaseId != null)
+                        .Select(rsi => rsi.ReleaseId!.Value)
+                        .ToList();
+
+                    if (publicationReleaseIds.Count != updatedSeriesReleaseIds.Count ||
+                        !publicationReleaseIds.ContainsAll(updatedSeriesReleaseIds))
+                    {
+                        throw new ArgumentException(
+                            $"Missing release in new release series. Expected ReleaseIds: {publicationReleaseIds}");
+                    }
+
+                    // @MarkFix Check series item Ids haven't been changed? Do we care if they have?
 
                     var newReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
