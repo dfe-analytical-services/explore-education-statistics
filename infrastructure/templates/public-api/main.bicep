@@ -37,9 +37,6 @@ param postgreSqlFirewallRules {
   endIpAddress: string
 }[] = []
 
-@description('Container App : Select if you want to use a public dummy image to start the container app.')
-param useDummyImage bool = true
-
 @description('Tagging : Environment name e.g. Development. Used for tagging resources created by this infrastructure pipeline.')
 param environmentName string
 
@@ -56,20 +53,26 @@ param resourceTags {
 @description('Tagging : Date Provisioned. Used for tagging resources created by this infrastructure pipeline.')
 param dateProvisioned string = utcNow('u')
 
+@description('The tags of the Docker images to deploy.')
+param dockerImagesTag string?
+
+@description('Have database users been added to PSQL yet for Container App and Function App?')
+param psqlDbUsersAdded bool = true
+
+@description('Public URLs of other components in the service.')
+param publicUrls {
+  contentApi: string
+}?
+
 var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = '${subscription}saeescore'
-var keyVaultName = '${subscription}-kv-ees-01'
+var apiContainerAppName = 'api'
+var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
   DateProvisioned: dateProvisioned
 })
-
-// Reference the existing Key Vault resource as currently managed by the EES ARM template.
-resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
-  name: keyVaultName
-  scope: resourceGroup(resourceGroup().name)
-}
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
@@ -84,7 +87,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
 var storageAccountKey = storageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
 var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${storageAccountKey}'
-
 
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
@@ -116,68 +118,137 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
+// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
+// with "postgres.database.azure.com".
+resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'private.postgres.database.azure.com'
+  location: 'global'
+  resource vNetLink 'virtualNetworkLinks' = {
+    name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
+    location: 'global'
+    properties: {
+      registrationEnabled: false
+      virtualNetwork: {
+        id: vNetModule.outputs.vNetRef
+      }
+    }
+  }
+}
+
 // Deploy PostgreSQL Database.
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
+    createMode: psqlDbUsersAdded ? 'Update' : 'Default'
     adminName: postgreSqlAdminName!
     adminPassword: postgreSqlAdminPassword!
     dbSkuName: postgreSqlSkuName
     dbStorageSizeGB: postgreSqlStorageSizeGB
     dbAutoGrowStatus: postgreSqlAutoGrowStatus
-    keyVaultName: keyVaultName
+    postgreSqlVersion: '16'
     tagValues: tagValues
-    vNetId: vNetModule.outputs.vNetRef
+    privateDnsZoneId: postgreSqlPrivateDnsZone.id
     firewallRules: postgreSqlFirewallRules
     subnetId: vNetModule.outputs.postgreSqlSubnetRef
     databaseNames: ['public_data']
   }
-  dependsOn: [
-    vNetModule
-  ]
+}
+
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: apiContainerAppManagedIdentityName
+  location: location
+}
+
+var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+
+@description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
+resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(resourceGroup().id, apiContainerAppManagedIdentity.id, acrPullRole)
+  properties: {
+    roleDefinitionId: acrPullRole
+    principalId: apiContainerAppManagedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+  name: '${resourcePrefix}-log-${apiContainerAppName}'
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+  }
+  tags: tagValues
+}
+
+resource apiContainerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+  name: '${resourcePrefix}-cae-${apiContainerAppName}'
+  location: location
+  properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
+    }
+    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logAnalytics.properties.customerId
+        sharedKey: logAnalytics.listKeys().primarySharedKey
+      }
+    }
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
+  }
+  tags: tagValues
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = {
+module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    containerAppName: 'api'
+    containerAppName: apiContainerAppName
     acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: useDummyImage ? 'azuredocs/aci-helloworld' : 'real-container-image-name'
-    containerAppTargetPort: 80
-    useDummyImage: useDummyImage
-    dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
+    containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
+    managedIdentityId: apiContainerAppManagedIdentity.id
+    managedEnvironmentId: apiContainerAppEnvironment.id
+    appSettings: [
+      {
+        name: 'ConnectionStrings__PublicDataDb'
+        value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
+      }
+      {
+        name: 'AZURE_CLIENT_ID'
+        value: apiContainerAppManagedIdentity.properties.clientId
+      }
+      {
+        name: 'ContentApi__Url'
+        value: publicUrls!.contentApi
+      }
+    ]
     tagValues: tagValues
-    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
-    subnetId: vNetModule.outputs.apiContainerAppSubnetRef
   }
-  dependsOn: [
-    postgreSqlServerModule
-    applicationInsightsModule
-    vNetModule
-  ]
 }
 
 // Deploy data-processing Function.
-module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = {
+module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = if (psqlDbUsersAdded) {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
     location: location
     functionAppName: 'dataset-processor'
     storageAccountConnectionString: storageAccountConnectionString
-    dbConnectionString: keyVault.getSecret(postgreSqlServerModule.outputs.connectionStringSecretName)
+    dbConnectionString: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
   }
-  dependsOn: [
-    postgreSqlServerModule
-    applicationInsightsModule
-    vNetModule
-  ]
 }
