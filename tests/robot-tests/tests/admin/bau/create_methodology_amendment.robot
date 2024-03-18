@@ -68,6 +68,7 @@ Create Methodology with some content and images
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 2    2
     ...    Adding Methodology annex 2 text block 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user scrolls up    100
     user adds image to accordion section text block    Methodology annex section 2    2    test-infographic.png
     ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 

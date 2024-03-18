@@ -184,6 +184,7 @@ Add embedded dashboard to third accordion section
     ...    Test embedded dashboard title
     ...    https://dfe-analytical-services.github.io/explore-education-statistics
 
+    user presses keys    TAB
     user waits until page does not contain    URL must be on a permitted domain
     user clicks button    Save    ${modal}
     user waits until modal is not visible    Embed a URL
@@ -698,6 +699,7 @@ Update embedded dashboard title and url
     ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
     ...    Edit embedded URL
 
+    user presses keys    TAB
     user clicks button    Save    ${modal}
     user waits until page does not contain    URL must be on a permitted domain
     user waits until modal is not visible    Edit embedded URL
