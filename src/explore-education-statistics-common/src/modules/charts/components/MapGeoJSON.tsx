@@ -167,6 +167,7 @@ export default function MapGeoJSON({
               color: '#cfdce3',
               fillColor: '#003078',
               fillOpacity: 0.1,
+              stroke: false,
               weight: 1,
             };
           }}
