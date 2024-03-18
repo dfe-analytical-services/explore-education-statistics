@@ -31,6 +31,7 @@ internal class DataSetService : IDataSetService
         CancellationToken cancellationToken = default)
     {
         return await _publicDataDbContext.DataSets
+            .AsNoTracking()
             .Include(ds => ds.LatestVersion)
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(_userService.CheckCanViewDataSet)
@@ -44,6 +45,7 @@ internal class DataSetService : IDataSetService
         CancellationToken cancellationToken = default)
     {
         var queryable = _publicDataDbContext.DataSets
+            .AsNoTracking()
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
             .WherePublicStatus();
@@ -88,6 +90,7 @@ internal class DataSetService : IDataSetService
         CancellationToken cancellationToken = default)
     {
         return await _publicDataDbContext.DataSets
+            .AsNoTracking()
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(_userService.CheckCanViewDataSet)
             .OnSuccess(dataSet => ListPaginatedVersions(
@@ -118,6 +121,7 @@ internal class DataSetService : IDataSetService
         CancellationToken cancellationToken = default)
     {
         var queryable = _publicDataDbContext.DataSetVersions
+            .AsNoTracking()
             .Where(ds => ds.DataSetId == dataSet.Id)
             .WherePublicStatus();
 
@@ -164,6 +168,7 @@ internal class DataSetService : IDataSetService
         }
 
         return await _publicDataDbContext.DataSetVersions
+            .AsNoTracking()
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(dsv => dsv.VersionMajor == version.Major)
             .Where(dsv => dsv.VersionMinor == version.Minor)
@@ -219,6 +224,7 @@ internal class DataSetService : IDataSetService
         if (dataSetVersion is null)
         {
             return await _publicDataDbContext.DataSets
+                .AsNoTracking()
                 .Include(ds => ds.LatestVersion)
                 .Where(ds => ds.Id == dataSetId)
                 .Select(ds => ds.LatestVersion!)
@@ -248,10 +254,12 @@ internal class DataSetService : IDataSetService
             .ToListAsync(cancellationToken: cancellationToken);
 
         dataSetVersion.IndicatorMetas = await _publicDataDbContext.IndicatorMetas
+            .AsNoTracking()
             .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
             .ToListAsync(cancellationToken: cancellationToken);
 
         dataSetVersion.TimePeriodMetas = await _publicDataDbContext.TimePeriodMetas
+            .AsNoTracking()
             .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
             .ToListAsync(cancellationToken: cancellationToken);
     }
