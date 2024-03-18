@@ -1,14 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 [ExcludeFromCodeCoverage]
 public class Startup
 {
+    private static readonly string[] ManagedIdentityTokenScopes = new [] { "https://ossrdbms-aad.database.windows.net/.default" };
+
     private readonly IConfiguration _configuration;
     private readonly IHostEnvironment _hostEnvironment;
 
@@ -77,20 +81,41 @@ public class Startup
         // cause the data source builder to throw a host exception.
         if (!_hostEnvironment.IsIntegrationTest())
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                _configuration.GetConnectionString("PublicDataDb"));
+            var connectionString = _configuration.GetConnectionString("PublicDataDb")!;
 
-            // Set up the data source outside the `AddDbContext` action as this
-            // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-            // creating over 20 `IServiceProvider` instances.
-            var dbDataSource = dataSourceBuilder.Build();
-
-            services.AddDbContext<PublicDataDbContext>(options =>
+            if (_hostEnvironment.IsDevelopment())
             {
-                options
-                    .UseNpgsql(dbDataSource)
-                    .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
-            });
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                    _configuration.GetConnectionString("PublicDataDb"));
+
+                // Set up the data source outside the `AddDbContext` action as this
+                // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                // creating over 20 `IServiceProvider` instances.
+                var dbDataSource = dataSourceBuilder.Build();
+
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    options
+                        .UseNpgsql(dbDataSource)
+                        .EnableSensitiveDataLogging();
+                });
+            }
+            else
+            {
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    var sqlServerTokenProvider = new DefaultAzureCredential();
+                    var accessToken = sqlServerTokenProvider.GetToken(
+                        new TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
+
+                    var connectionStringWithAccessToken =
+                        connectionString.Replace("[access_token]", accessToken);
+
+                    var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+
+                    options.UseNpgsql(dbDataSource);
+                });
+            }
         }
 
         // Caching and compression
@@ -130,11 +155,6 @@ public class Startup
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseHttpsRedirection();
-            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
         // Rewrites
