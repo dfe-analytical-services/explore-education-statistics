@@ -217,7 +217,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
     location: location
     containerAppName: apiContainerAppName
     acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: 'ees-public-api:${buildNumber}'
+    containerAppImageName: 'ees-public-api:${dockerImagesTag}'
     managedIdentityId: apiContainerAppManagedIdentity.id
     managedEnvironmentId: apiContainerAppEnvironment.id
     appSettings: [
