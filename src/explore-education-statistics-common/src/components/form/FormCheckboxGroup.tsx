@@ -98,7 +98,9 @@ export const BaseFormCheckboxGroup = ({
   });
 
   const isAllChecked = useMemo(() => {
-    return options.every(option => value.includes(option.value));
+    return options.every(
+      option => option.value && value.includes(option.value),
+    );
   }, [options, value]);
 
   const handleAllChange: MouseEventHandler<HTMLButtonElement> = useCallback(
@@ -144,11 +146,11 @@ export const BaseFormCheckboxGroup = ({
           id={
             option.id
               ? `${id}-${option.id}`
-              : `${id}-${option.value.replace(/\s/g, '-')}`
+              : `${id}-${(option.value ?? '').replace(/\s/g, '-')}`
           }
           name={name}
           key={option.value}
-          checked={value.includes(option.value)}
+          checked={!!option.value && value.includes(option.value)}
           onBlur={onBlur}
           onChange={onChange}
           inputRef={inputRef}
