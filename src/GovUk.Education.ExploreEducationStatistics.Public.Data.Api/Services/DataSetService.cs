@@ -102,7 +102,7 @@ internal class DataSetService : IDataSetService
         string? dataSetVersion = null,
         CancellationToken cancellationToken = default)
     {
-        return await QueryVersion(
+        return await FindVersion(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
@@ -211,7 +211,7 @@ internal class DataSetService : IDataSetService
         };
     }
 
-    private async Task<Either<ActionResult, DataSetVersion>> QueryVersion(
+    private async Task<Either<ActionResult, DataSetVersion>> FindVersion(
         Guid dataSetId,
         string? dataSetVersion = null,
         CancellationToken cancellationToken = default)
@@ -236,15 +236,15 @@ internal class DataSetService : IDataSetService
         dataSetVersion.FilterMetas = await _publicDataDbContext.FilterMetas
             .AsNoTracking()
             .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-            .Include(fm => fm.Options)
-            .ThenInclude(fom => fom.MetaLinks)
+            .Include(fm => fm.OptionLinks)
+            .ThenInclude(fom => fom.Option)
             .ToListAsync(cancellationToken: cancellationToken);
 
         dataSetVersion.LocationMetas = await _publicDataDbContext.LocationMetas
             .AsNoTracking()
             .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .Include(lm => lm.Options)
-            .ThenInclude(lom => lom.MetaLinks)
+            .Include(lm => lm.OptionLinks)
+            .ThenInclude(lom => lom.Option)
             .ToListAsync(cancellationToken: cancellationToken);
 
         dataSetVersion.IndicatorMetas = await _publicDataDbContext.IndicatorMetas
@@ -294,8 +294,8 @@ internal class DataSetService : IDataSetService
 
     private static FilterMetaViewModel MapFilterMeta(FilterMeta filterMeta)
     {
-        var options = filterMeta.Options
-            .Select(fom => MapFilterOptionMeta(filterMeta, fom))
+        var options = filterMeta.OptionLinks
+            .Select(MapFilterOptionMeta)
             .OrderBy(fom => fom.Label)
             .ToList();
 
@@ -308,17 +308,13 @@ internal class DataSetService : IDataSetService
         };
     }
 
-    private static FilterOptionMetaViewModel MapFilterOptionMeta(
-        FilterMeta filterMeta,
-        FilterOptionMeta filterOptionMeta)
+    private static FilterOptionMetaViewModel MapFilterOptionMeta(FilterOptionMetaLink filterOptionMetaLink)
     {
-        var publicId = filterOptionMeta.MetaLinks.Single(ml => ml.MetaId == filterMeta.Id).PublicId;
-
         return new FilterOptionMetaViewModel
         {
-            Id = publicId,
-            Label = filterOptionMeta.Label,
-            IsAggregate = filterOptionMeta.IsAggregate,
+            Id = filterOptionMetaLink.PublicId,
+            Label = filterOptionMetaLink.Option.Label,
+            IsAggregate = filterOptionMetaLink.Option.IsAggregate,
         };
     }
 
@@ -335,8 +331,8 @@ internal class DataSetService : IDataSetService
 
     private static LocationLevelMetaViewModel MapLocationMeta(LocationMeta locationMeta)
     {
-        var options = locationMeta.Options
-            .Select(lom => MapLocationOptionMeta(locationMeta, lom))
+        var options = locationMeta.OptionLinks
+            .Select(MapLocationOptionMeta)
             .OrderBy(lom => lom.Label)
             .ToList();
 
@@ -347,25 +343,21 @@ internal class DataSetService : IDataSetService
         };
     }
 
-    private static LocationOptionMetaViewModel MapLocationOptionMeta(
-        LocationMeta locationMeta,
-        LocationOptionMeta locationOptionMeta)
+    private static LocationOptionMetaViewModel MapLocationOptionMeta(LocationOptionMetaLink locationOptionMetaLink)
     {
-        var publicId = locationOptionMeta.MetaLinks.Single(ml => ml.MetaId == locationMeta.Id).PublicId;
-
-        switch (locationOptionMeta)
+        switch (locationOptionMetaLink.Option)
         {
             case LocationCodedOptionMeta locationCodedOptionMeta:
                 return new LocationCodedOptionMetaViewModel
                 {
-                    Id = publicId,
+                    Id = locationOptionMetaLink.PublicId,
                     Label = locationCodedOptionMeta.Label,
                     Code = locationCodedOptionMeta.Code,
                 };
             case LocationLocalAuthorityOptionMeta locationLocalAuthorityOptionMeta:
                 return new LocationLocalAuthorityOptionMetaViewModel
                 {
-                    Id = publicId,
+                    Id = locationOptionMetaLink.PublicId,
                     Label = locationLocalAuthorityOptionMeta.Label,
                     Code = locationLocalAuthorityOptionMeta.Code,
                     OldCode = locationLocalAuthorityOptionMeta.OldCode,
@@ -373,20 +365,20 @@ internal class DataSetService : IDataSetService
             case LocationProviderOptionMeta locationProviderOptionMeta:
                 return new LocationProviderOptionMetaViewModel
                 {
-                    Id = publicId,
+                    Id = locationOptionMetaLink.PublicId,
                     Label = locationProviderOptionMeta.Label,
                     Ukprn = locationProviderOptionMeta.Ukprn,
                 };
             case LocationRscRegionOptionMeta locationRscRegionOptionMeta:
                 return new LocationRscRegionOptionMetaViewModel
                 {
-                    Id = publicId,
+                    Id = locationOptionMetaLink.PublicId,
                     Label = locationRscRegionOptionMeta.Label,
                 };
             case LocationSchoolOptionMeta locationSchoolOptionMeta:
                 return new LocationSchoolOptionMetaViewModel
                 {
-                    Id = publicId,
+                    Id = locationOptionMetaLink.PublicId,
                     Label = locationSchoolOptionMeta.Label,
                     Urn = locationSchoolOptionMeta.Urn,
                     LaEstab = locationSchoolOptionMeta.LaEstab,

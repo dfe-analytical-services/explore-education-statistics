@@ -91,7 +91,7 @@ public class LocationCodedOptionMeta : LocationOptionMeta
 
      public new required string Code
      {
-         get => base.Code!;
+         get => base.Code ?? string.Empty;
          set => base.Code = value;
      }
 
@@ -109,7 +109,7 @@ public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
 
      public new required string Code
      {
-         get => base.Code!;
+         get => base.Code ?? string.Empty;
          set => base.Code = value;
      }
 
@@ -134,7 +134,7 @@ public class LocationProviderOptionMeta : LocationOptionMeta
 
      public new required string Ukprn
      {
-         get => base.Ukprn!;
+         get => base.Ukprn ?? string.Empty;
          set => base.Ukprn = value;
      }
 
@@ -163,13 +163,13 @@ public class LocationSchoolOptionMeta : LocationOptionMeta
 
      public new required string Urn
      {
-         get => base.Urn!;
+         get => base.Urn ?? string.Empty;
          set => base.Urn = value;
      }
 
      public new required string LaEstab
      {
-         get => base.LaEstab!;
+         get => base.LaEstab ?? string.Empty;
          set => base.LaEstab = value;
      }
 

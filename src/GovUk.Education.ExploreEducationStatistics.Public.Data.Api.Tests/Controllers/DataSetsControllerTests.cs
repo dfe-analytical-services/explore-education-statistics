@@ -725,26 +725,10 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             var filterMetas = DataFixture
                 .DefaultFilterMeta()
-                .GenerateList(3);
-
-            foreach (var filterMeta in filterMetas)
-            {
-                var filterOptionMetas = DataFixture
+                .WithOptions(() => DataFixture
                     .DefaultFilterOptionMeta()
-                    .GenerateList(3);
-
-                foreach (var filterOptionMeta in filterOptionMetas)
-                {
-                    var filterOptionMetaLink = DataFixture
-                        .DefaultFilterOptionMetaLink()
-                        .WithMeta(filterMeta)
-                        .Generate();
-
-                    filterOptionMeta.MetaLinks.Add(filterOptionMetaLink);
-                }
-
-                filterMeta.Options.AddRange(filterOptionMetas);
-            }
+                    .GenerateList(3))
+                .GenerateList(3);
 
             var allLocationOptionMetaTypesGeneratorByLevel = new Dictionary<GeographicLevel, Func<LocationOptionMeta>>
             {
@@ -755,35 +739,18 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 { GeographicLevel.EnglishDevolvedArea, () => DataFixture.DefaultLocationCodedOptionMeta() },
             };
 
-            var locationMetas = new List<LocationMeta>();
-
-            foreach (var locationOptionMetaGenerator in allLocationOptionMetaTypesGeneratorByLevel)
-            {
-                LocationMeta locationMeta = DataFixture
+            var locationMetas = allLocationOptionMetaTypesGeneratorByLevel
+                .Select(locationOptionMetaGenerator => DataFixture
                     .DefaultLocationMeta()
-                    .WithLevel(locationOptionMetaGenerator.Key);
-
-                var locationOptionMetas = new List<LocationOptionMeta>()
-                {
-                    locationOptionMetaGenerator.Value.Invoke(),
-                    locationOptionMetaGenerator.Value.Invoke(),
-                    locationOptionMetaGenerator.Value.Invoke(),
-                };
-
-                foreach (var locationOptionMeta in locationOptionMetas)
-                {
-                    var locationOptionMetaLink = DataFixture
-                        .DefaultLocationOptionMetaLink()
-                        .WithMeta(locationMeta)
-                        .Generate();
-
-                    locationOptionMeta.MetaLinks.Add(locationOptionMetaLink);
-                }
-
-                locationMeta.Options.AddRange(locationOptionMetas);
-
-                locationMetas.Add(locationMeta);
-            }
+                    .WithOptions(() => new List<LocationOptionMeta>
+                    {
+                         locationOptionMetaGenerator.Value.Invoke(),
+                         locationOptionMetaGenerator.Value.Invoke(),
+                         locationOptionMetaGenerator.Value.Invoke()
+                    })
+                    .WithLevel(locationOptionMetaGenerator.Key))
+                .Select(locationMeta => (LocationMeta)locationMeta)
+                .ToList();
 
             DataSetVersion dataSetVersion = DataFixture
                 .DefaultDataSetVersion()
@@ -839,7 +806,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             foreach (var locationMetaViewModel in content.Locations)
             {
                 var locationMeta = Assert.Single(
-                    dataSetVersion.LocationMetas, 
+                    dataSetVersion.LocationMetas,
                     fm => fm.Level == locationMetaViewModel.Level);
 
                 var allLocationMetaLinks = locationMeta.Options
@@ -865,25 +832,25 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                             Assert.Equal(codedMeta.Code, codedViewModel.Code);
                             break;
                         case LocationLocalAuthorityOptionMeta localAuthorityMeta:
-                            var localAuthorityViewModel = 
+                            var localAuthorityViewModel =
                                 Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
                             Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
                             Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
                             Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
                             break;
                         case LocationProviderOptionMeta providerMeta:
-                            var providerViewModel = 
+                            var providerViewModel =
                                 Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
                             Assert.Equal(providerMeta.Label, providerViewModel.Label);
                             Assert.Equal(providerMeta.Ukprn, providerViewModel.Ukprn);
                             break;
                         case LocationRscRegionOptionMeta rscRegionMeta:
-                            var rscRegionViewModel = 
+                            var rscRegionViewModel =
                                 Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
                             Assert.Equal(rscRegionMeta.Label, rscRegionViewModel.Label);
                             break;
                         case LocationSchoolOptionMeta schoolMeta:
-                            var schoolViewModel = 
+                            var schoolViewModel =
                                 Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
                             Assert.Equal(schoolMeta.Label, schoolViewModel.Label);
                             Assert.Equal(schoolMeta.Urn, schoolViewModel.Urn);
@@ -909,12 +876,12 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             foreach (var timePeriod in content.TimePeriods)
             {
                 var timePeriodMeta = Assert.Single(
-                    dataSetVersion.TimePeriodMetas, 
+                    dataSetVersion.TimePeriodMetas,
                     tp => tp.Code == timePeriod.Code
                     && tp.Period == timePeriod.Period);
 
                 Assert.Equal(
-                    TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code), 
+                    TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code),
                     timePeriod.Label);
             }
         }
@@ -1046,10 +1013,14 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                         ]
                     )
                 )
+                .FinishWith(dsv => dataSet.LatestVersion = dsv)
                 .GenerateList();
 
-            await TestApp.AddTestData<PublicDataDbContext>(context => 
-                context.DataSetVersions.AddRange(dataSetVersions));
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.Update(dataSet);
+            });
 
             var response = await GetDataSetMeta(dataSet.Id);
 

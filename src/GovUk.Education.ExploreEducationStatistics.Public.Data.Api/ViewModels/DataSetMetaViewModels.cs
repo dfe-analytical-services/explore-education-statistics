@@ -200,10 +200,10 @@ public record TimePeriodMetaViewModel
     /// <summary>
     /// The period that the time period relates to.
     /// </summary>
-    public string Period { get; init; } = string.Empty;
+    public required string Period { get; init; }
 
     /// <summary>
     /// The time period in human-readable format.
     /// </summary>
-    public string Label { get; init; } = string.Empty;
+    public required string Label { get; init; }
 }

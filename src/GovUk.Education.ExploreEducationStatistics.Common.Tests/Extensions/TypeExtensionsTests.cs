@@ -147,41 +147,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
         public class IsNullableTypeTests
         {
-            [Fact]
-            public void NullableValueTypes_ReturnsTrue()
+            [Theory]
+            [InlineData(typeof(int?))]
+            [InlineData(typeof(double?))]
+            [InlineData(typeof(TestEnum?))]
+            [InlineData(typeof(bool?))]
+            [InlineData(typeof(char?))]
+            public void NullableValueTypes_ReturnsTrue(Type nullableType)
             {
-                var properties = typeof(NullableValueTypesClass)
-                    .GetProperties();
+                var isNullableType = nullableType.IsNullableType();
 
-                foreach (var property in properties)
-                {
-                    var isNullableType = property.PropertyType.IsNullableType();
-
-                    Assert.True(isNullableType);
-                }
+                Assert.True(isNullableType);
             }
 
-            [Fact]
-            public void NonNullableValueTypes_ReturnsFalse()
+            [Theory]
+            [InlineData(typeof(int))]
+            [InlineData(typeof(double))]
+            [InlineData(typeof(TestEnum))]
+            [InlineData(typeof(bool))]
+            [InlineData(typeof(char))]
+            public void NonNullableValueTypes_ReturnsFalse(Type nonNullableType)
             {
-                var properties = typeof(NonNullableValueTypesClass)
-                    .GetProperties();
+                var isNullableType = nonNullableType.IsNullableType();
 
-                foreach (var property in properties)
-                {
-                    var isNullableType = property.PropertyType.IsNullableType();
-
-                    Assert.False(isNullableType);
-                }
+                Assert.False(isNullableType);
             }
 
             [Fact]
             public void ReferenceType_ReturnsFalse()
             {
-                var isNullableType = typeof(NullableReferenceTypeClass)
-                    .GetProperty(nameof(NullableReferenceTypeClass.NonNullableReferenceType))!
-                    .PropertyType
-                    .IsNullableType();
+                var isNullableType = typeof(NullableReferenceTypeClass).IsNullableType();
 
                 Assert.False(isNullableType);
             }
@@ -196,34 +191,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
                 Assert.False(isNullableType);
             }
+        }
 
-            private class NullableValueTypesClass
+        public class GetUnderlyingTypeTests
+        {
+            [Theory]
+            [InlineData(typeof(int?), typeof(int))]
+            [InlineData(typeof(double?), typeof(double))]
+            [InlineData(typeof(TestEnum?), typeof(TestEnum))]
+            [InlineData(typeof(bool?), typeof(bool))]
+            [InlineData(typeof(char?), typeof(char))]
+            public void NullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
             {
-                public int? NullableInteger { get; set; }
-                public double? NullableDouble { get; set; }
-                public TestEnum? NullableEnum { get; set; }
-                public bool? NullableBool { get; set; }
-                public char? NullableChar { get; set; }
-            };
+                var underlyingType = nullableType.GetUnderlyingType();
 
-            private class NonNullableValueTypesClass
-            {
-                public int NonNullableInteger { get; set; }
-                public double NonNullableDouble { get; set; }
-                public TestEnum NonNullableEnum { get; set; }
-                public bool NonNullableBool { get; set; }
-                public char NonNullableChar { get; set; }
-            };
-
-            private class NullableReferenceTypeClass
-            {
-                public NullableReferenceTypeClass NonNullableReferenceType { get; set; } = new();
-                public NullableReferenceTypeClass? NullableReferenceType { get; set; }
-            };
-
-            private enum TestEnum
-            {
+                Assert.Equal(expectedUnderlyingType, underlyingType);
             }
+
+            [Theory]
+            [InlineData(typeof(int), typeof(int))]
+            [InlineData(typeof(double), typeof(double))]
+            [InlineData(typeof(TestEnum), typeof(TestEnum))]
+            [InlineData(typeof(bool), typeof(bool))]
+            [InlineData(typeof(char), typeof(char))]
+            public void NonNullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
+            {
+                var underlyingType = nullableType.GetUnderlyingType();
+
+                Assert.Equal(expectedUnderlyingType, underlyingType);
+            }
+
+            [Fact]
+            public void ReferenceType_ReturnsUnderlyingType()
+            {
+                var underlyingType = typeof(NullableReferenceTypeClass).GetUnderlyingType();
+
+                Assert.Equal(typeof(NullableReferenceTypeClass), underlyingType);
+            }
+
+            [Fact]
+            public void NullableReferenceType_ReturnsUnderlyingType()
+            {
+                var underlyingType = typeof(NullableReferenceTypeClass)
+                    .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
+                    .PropertyType
+                    .GetUnderlyingType();
+
+                Assert.Equal(typeof(NullableReferenceTypeClass), underlyingType);
+            }
+        }
+
+        private class NullableReferenceTypeClass
+        {
+            public NullableReferenceTypeClass? NullableReferenceType { get; set; }
+        };
+
+        private enum TestEnum
+        {
         }
     }
 }
