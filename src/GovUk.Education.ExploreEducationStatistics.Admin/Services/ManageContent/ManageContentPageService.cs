@@ -103,20 +103,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(releaseVersion);
 
-                    // Hydrate ReleaseSeries
-                    var filteredReleaseSeries = releaseVersion.Publication.ReleaseSeries
-                        .Where(rsi => // only show items for legacy links and published releases
-                            rsi.IsLegacyLink || releaseVersion.Publication.ReleaseVersions
-                                .Any(rv =>
-                                        rsi.ReleaseId == rv.ReleaseId
-                                        && rv.Live)
-                        ).ToList();
+                    // Hydrate Publication.ReleaseSeries
                     var publishedVersions =
                         await _releaseVersionRepository
                             .ListLatestPublishedReleaseVersions(releaseVersion.PublicationId);
+                    var filteredReleaseSeries = releaseVersion.Publication.ReleaseSeries
+                        .Where(rsi => // only show items for legacy links and published releases
+                            rsi.IsLegacyLink
+                            || publishedVersions
+                                .Any(rv => rsi.ReleaseId == rv.ReleaseId)
+                        ).ToList();
                     releaseViewModel.Publication.ReleaseSeries = filteredReleaseSeries
                         .Select(rsi =>
                         {
+                            if (rsi.IsLegacyLink)
+                            {
+                                return new ReleaseSeriesItemViewModel
+                                {
+                                    Id = rsi.Id,
+                                    IsLegacyLink = rsi.IsLegacyLink,
+                                    Description = rsi.LegacyLinkDescription!,
+                                    LegacyLinkUrl = rsi.LegacyLinkUrl,
+                                };
+                            }
+
                             var latestReleaseVersion = publishedVersions
                                 .Single(rv => rv.ReleaseId == rsi.ReleaseId);
 
@@ -124,14 +134,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             {
                                 Id = rsi.Id,
                                 IsLegacyLink = rsi.IsLegacyLink,
-                                Description = rsi.LegacyLinkDescription ?? latestReleaseVersion.Title,
+                                Description = latestReleaseVersion.Title,
 
                                 ReleaseId = latestReleaseVersion.ReleaseId,
                                 PublicationSlug = latestReleaseVersion.Publication.Slug,
                                 ReleaseSlug = latestReleaseVersion.Slug,
-
-                                LegacyLinkUrl = rsi.LegacyLinkUrl,
-
                             };
                         }).ToList();
 

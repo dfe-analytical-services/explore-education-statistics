@@ -96,7 +96,9 @@ const ReleaseContent = ({
 
   const { publication } = release;
 
-  const releaseSeries = release.publication.releaseSeries; // @MarkFix filter out current release from series?
+  const releaseSeries = release.publication.releaseSeries.filter(
+    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title),
+  ); // @MarkFix better if pass releaseId down to release?
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
     const methodologies = publication.methodologies.map(methodology => ({
@@ -334,19 +336,28 @@ const ReleaseContent = ({
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...releaseSeries.map(({ id, isLegacyLink, description, legacyLinkUrl, publicationSlug, releaseSlug}) => (
-                          <li key={id} data-testid="other-release-item">
-                            {isLegacyLink ? (
-                              <a href={legacyLinkUrl}>{description}</a>
-                            ) : (
-                              <Link
-                                to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
-                              >
-                                {description}
-                              </Link>
-                            )}
-                          </li>
-                        )),
+                        ...releaseSeries.map(
+                          ({
+                            id,
+                            isLegacyLink,
+                            description,
+                            legacyLinkUrl,
+                            publicationSlug,
+                            releaseSlug,
+                          }) => (
+                            <li key={id} data-testid="other-release-item">
+                              {isLegacyLink ? (
+                                <a href={legacyLinkUrl}>{description}</a>
+                              ) : (
+                                <Link
+                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
+                                >
+                                  {description}
+                                </Link>
+                              )}
+                            </li>
+                          ),
+                        ),
                       ]}
                     </ul>
                   </ScrollableContainer>

@@ -99,6 +99,17 @@ public class PublicationService : IPublicationService
                 var releaseSeriesItemViewModels = filteredReleaseSeries
                     .Select(rsi =>
                     {
+                        if (rsi.IsLegacyLink)
+                        {
+                            return new ReleaseSeriesItemViewModel
+                            {
+                                Id = rsi.Id,
+                                IsLegacyLink = rsi.IsLegacyLink,
+                                Description = rsi.LegacyLinkDescription!,
+                                LegacyLinkUrl = rsi.LegacyLinkUrl,
+                            };
+                        }
+
                         var latestReleaseVersion = publishedVersions
                             .Single(rv => rv.ReleaseId == rsi.ReleaseId);
 
@@ -106,14 +117,11 @@ public class PublicationService : IPublicationService
                         {
                             Id = rsi.Id,
                             IsLegacyLink = rsi.IsLegacyLink,
-                            Description = rsi.LegacyLinkDescription ?? latestReleaseVersion.Title,
+                            Description = latestReleaseVersion.Title,
 
                             ReleaseId = latestReleaseVersion.ReleaseId,
                             PublicationSlug = latestReleaseVersion.Publication.Slug,
                             ReleaseSlug = latestReleaseVersion.Slug,
-
-                            LegacyLinkUrl = rsi.LegacyLinkUrl,
-
                         };
                     }).ToList();
 

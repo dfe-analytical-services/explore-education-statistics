@@ -580,7 +580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (!ComparerUtils.SequencesAreEqualIgnoringOrder(publicationReleaseIds, updatedSeriesReleaseIds))
                     {
                         throw new ArgumentException(
-                            $"Missing or duplicate release in new release series. Expected ReleaseIds: {publicationReleaseIds}");
+                            "Missing or duplicate release in new release series. Expected ReleaseIds: " +
+                            publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
                     }
 
                     // @MarkFix Check series item Ids haven't been changed? Do we care if they have?

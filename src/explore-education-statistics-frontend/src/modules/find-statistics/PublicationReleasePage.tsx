@@ -36,7 +36,9 @@ interface Props {
 }
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
-  const releaseSeries = release.publication.releaseSeries; // @MarkFix we want to filter out the current release somewhere?
+  const releaseSeries = release.publication.releaseSeries.filter(
+    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title),
+  ); // @MarkFix better if pass releaseId down to release?
 
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
@@ -330,19 +332,28 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...releaseSeries.map(({ id, isLegacyLink, description, legacyLinkUrl, publicationSlug, releaseSlug}) => (
-                          <li key={id} data-testid="other-release-item">
-                            {isLegacyLink ? (
-                              <a href={legacyLinkUrl}>{description}</a>
-                            ) : (
-                              <Link
-                                to={`/find-statistics/${publicationSlug}/${releaseSlug}`} // @MarkFix do we need to pass publicationSlug here, we have it at release.publication.slug? - same for other pages
-                              >
-                                {description}
-                              </Link>
-                            )}
-                          </li>
-                        )),
+                        ...releaseSeries.map(
+                          ({
+                            id,
+                            isLegacyLink,
+                            description,
+                            legacyLinkUrl,
+                            publicationSlug,
+                            releaseSlug,
+                          }) => (
+                            <li key={id} data-testid="other-release-item">
+                              {isLegacyLink ? (
+                                <a href={legacyLinkUrl}>{description}</a>
+                              ) : (
+                                <Link
+                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`} // @MarkFix do we need to pass publicationSlug here, we have it at release.publication.slug? - same for other pages
+                                >
+                                  {description}
+                                </Link>
+                              )}
+                            </li>
+                          ),
+                        ),
                       ]}
                     </ul>
                   </ScrollableContainer>
