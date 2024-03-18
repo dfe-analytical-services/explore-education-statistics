@@ -350,7 +350,7 @@ const ReleaseContent = ({
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
                                 <Link
-                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
+                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`} // @MarkFix needs useConfig publicAppUrl prefixed?
                                 >
                                   {description}
                                 </Link>

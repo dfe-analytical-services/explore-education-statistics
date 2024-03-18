@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -12,10 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -122,12 +122,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Url = "https://external.methodology.com",
             };
 
-            private readonly LegacyRelease _legacyRelease = new()
+            private readonly List<ReleaseSeriesItem> _legacyLinks = new()
             {
-                Id = Guid.NewGuid(),
-                Description = "Legacy release description",
-                Url = "https://legacy.release.com",
-                Order = 0,
+                new ReleaseSeriesItem
+                {
+                    LegacyLinkDescription = "Legacy release description",
+                    LegacyLinkUrl = "https://legacy.release.com",
+                },
             };
 
             [Fact]
@@ -139,12 +140,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         _dataFixture
                             .DefaultRelease(publishedVersions: 1, year: 2020),
                         _dataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021), // ignored because unpublished
                         _dataFixture
                             .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithLegacyLinks(_legacyLinks)
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
@@ -180,27 +181,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion1.Id, publicationViewModel.Releases[0].Id);
                     Assert.Equal(expectedReleaseVersion1.Slug, publicationViewModel.Releases[0].Slug);
                     Assert.Equal(expectedReleaseVersion1.Title, publicationViewModel.Releases[0].Title);
-                    //var releaseSeriesItem1 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == expectedReleaseVersion1.Id)!; // @MarkFix
-                    //Assert.False(releaseSeriesItem1.IsAmendment);
-                    //Assert.False(releaseSeriesItem1.IsDraft);
-                    //Assert.False(releaseSeriesItem1.IsLegacy);
 
                     Assert.Equal(expectedReleaseVersion2.Id, publicationViewModel.Releases[1].Id);
                     Assert.Equal(expectedReleaseVersion2.Slug, publicationViewModel.Releases[1].Slug);
                     Assert.Equal(expectedReleaseVersion2.Title, publicationViewModel.Releases[1].Title);
-                    //var releaseSeriesItem2 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == expectedReleaseVersion2.Id)!; // @MarkFix
-                    //Assert.False(releaseSeriesItem2.IsAmendment);
-                    //Assert.False(releaseSeriesItem2.IsDraft);
-                    //Assert.False(releaseSeriesItem2.IsLegacy);
 
-                    //Assert.Single(publicationViewModel.LegacyReleases); // @MarkFix
-                    //Assert.Equal(_legacyRelease.Id, publicationViewModel.LegacyReleases[0].Id);
-                    //Assert.Equal(_legacyRelease.Description, _legacyRelease.Description);
-                    //Assert.Equal(_legacyRelease.Url, publicationViewModel.LegacyReleases[0].Url);
-                    //var releaseSeriesItem3 = publicationViewModel.ReleaseSeries.Find(ro => ro.ReleaseId == _legacyRelease.Id)!; // @MarkFix
-                    //Assert.False(releaseSeriesItem3.IsAmendment);
-                    //Assert.False(releaseSeriesItem3.IsDraft);
-                    //Assert.True(releaseSeriesItem3.IsLegacy);
+                    Assert.Equal(3, publicationViewModel.ReleaseSeries.Count);
+
+                    var releaseSeriesItem1 = publicationViewModel.ReleaseSeries[0];
+                    Assert.Equal(expectedReleaseVersion1.ReleaseId, releaseSeriesItem1.ReleaseId);
+                    Assert.Equal(expectedReleaseVersion1.Title, releaseSeriesItem1.Description);
+                    Assert.Equal(expectedReleaseVersion1.Slug, releaseSeriesItem1.ReleaseSlug);
+                    Assert.Equal(publication.Slug, releaseSeriesItem1.PublicationSlug);
+                    Assert.Null(releaseSeriesItem1.LegacyLinkUrl);
+
+                    // NOTE: 2021 release does exist in the database's publication.ReleaseSeries, but is filtered out
+                    // because it's unpublished
+
+                    var releaseSeriesItem2 = publicationViewModel.ReleaseSeries[1];
+                    Assert.Equal(expectedReleaseVersion2.ReleaseId, releaseSeriesItem2.ReleaseId);
+                    Assert.Equal(expectedReleaseVersion2.Title, releaseSeriesItem2.Description);
+                    Assert.Equal(expectedReleaseVersion2.Slug, releaseSeriesItem2.ReleaseSlug);
+                    Assert.Equal(publication.Slug, releaseSeriesItem2.PublicationSlug);
+                    Assert.Null(releaseSeriesItem2.LegacyLinkUrl);
+
+                    var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
+                    Assert.Null(releaseSeriesItem3.ReleaseId);
+                    Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);
+                    Assert.Null(releaseSeriesItem3.ReleaseSlug);
+                    Assert.Null(releaseSeriesItem3.PublicationSlug);
+                    Assert.Equal(_legacyLinks[0].LegacyLinkUrl, releaseSeriesItem3.LegacyLinkUrl);
 
                     Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
                     Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
@@ -234,7 +244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
@@ -281,7 +290,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
@@ -318,7 +326,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture

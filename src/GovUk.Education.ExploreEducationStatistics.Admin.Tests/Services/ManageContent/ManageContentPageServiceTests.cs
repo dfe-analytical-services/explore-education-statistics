@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -25,6 +24,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -33,6 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public async Task GetManageContentPageViewModel()
         {
+            var releaseId = Guid.NewGuid();
+
             var publication = new Publication
             {
                 Contact = new Contact
@@ -42,20 +45,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     TeamEmail = "test@test.com",
                     TeamName = "Team Name"
                 },
-                LegacyReleases = new List<LegacyRelease>
+                ReleaseSeries = new List<ReleaseSeriesItem>
                 {
                     new()
                     {
-                        Description = "Legacy 2017/18",
-                        Order = 0,
-                        Url = "https://legacy-2017-18"
+                        Id = Guid.NewGuid(),
+                        ReleaseId = releaseId,
                     },
                     new()
                     {
-                        Description = "Legacy 2018/19",
-                        Order = 1,
-                        Url = "https://legacy-2018-19"
-                    }
+                        Id = Guid.NewGuid(),
+                        LegacyLinkDescription = "Legacy 2018/19",
+                        LegacyLinkUrl = "https://legacy-2018-19"
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        LegacyLinkDescription = "Legacy 2017/18",
+                        LegacyLinkUrl = "https://legacy-2017-18"
+                    },
                 },
                 Slug = "test-publication",
                 Title = "Publication",
@@ -74,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
                 PreReleaseAccessList = "Test access list",
                 Publication = publication,
+                Release = new Release { Id = releaseId },
                 PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
                 Published = null,
                 ReleaseName = "2020",
@@ -370,11 +379,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentPublication.Topic.Theme);
 
                 var contentPublicationReleaseSeries = contentPublication.ReleaseSeries;
-                //Assert.Equal(2, contentPublicationReleaseSeries.Count); // @MarkFix
-                //Assert.Equal("Legacy 2018/19", contentPublicationReleaseSeries[0].Description);
-                ////Assert.Equal("https://legacy-2018-19", contentPublicationReleaseSeries[0].Url);
-                //Assert.Equal("Legacy 2017/18", contentPublicationReleaseSeries[1].Description);
-                ////Assert.Equal("https://legacy-2017-18", contentPublicationReleaseSeries[1].Url);
+                // NOTE: releaseVersion is filtered from ReleaseSeries as it isn't published
+                Assert.Equal(2, contentPublicationReleaseSeries.Count);
+                Assert.True(contentPublicationReleaseSeries[0].IsLegacyLink);
+                Assert.Null(contentPublicationReleaseSeries[0].ReleaseId);
+                Assert.Null(contentPublicationReleaseSeries[0].PublicationSlug);
+                Assert.Null(contentPublicationReleaseSeries[0].ReleaseSlug);
+                Assert.Equal("Legacy 2018/19", contentPublicationReleaseSeries[0].Description);
+                Assert.Equal("https://legacy-2018-19", contentPublicationReleaseSeries[0].LegacyLinkUrl);
+                Assert.True(contentPublicationReleaseSeries[1].IsLegacyLink);
+                Assert.Null(contentPublicationReleaseSeries[1].ReleaseId);
+                Assert.Null(contentPublicationReleaseSeries[1].PublicationSlug);
+                Assert.Null(contentPublicationReleaseSeries[1].ReleaseSlug);
+                Assert.Equal("Legacy 2017/18", contentPublicationReleaseSeries[1].Description);
+                Assert.Equal("https://legacy-2017-18", contentPublicationReleaseSeries[1].LegacyLinkUrl);
 
                 var contentPublicationReleases = contentPublication.Releases;
                 Assert.Single(contentPublicationReleases);
@@ -735,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IDataBlockService? dataBlockService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IReleaseFileService? releaseFileService = null,
-            Content.Model.Repository.Interfaces.IReleaseVersionRepository? releaseVersionRepository = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserService? userService = null)
         {
             return new(
@@ -746,7 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
-            userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
     }

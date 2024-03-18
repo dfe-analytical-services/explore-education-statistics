@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     created: DateTime.UtcNow.AddDays(-2),
                     createdById: originalCreatedBy.Id)
                 .WithPublishScheduled(DateTime.Now.AddDays(1))
-                .WithNextReleaseDate(new PartialDate { Day = "1", Month = "1", Year = "2040" })
+                .WithNextReleaseDate(new PartialDate {Day = "1", Month = "1", Year = "2040"})
                 .WithPublished(DateTime.UtcNow.AddDays(-1))
                 .WithApprovalStatus(ReleaseApprovalStatus.Approved)
                 .WithPreviousVersionId(Guid.NewGuid())
@@ -96,8 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Description = "Link 2",
                         Url = "URL 2"
                     }))
-                .WithUpdates(ListOf<Update>(
-                    new()
+                .WithUpdates(ListOf<Update>(new ()
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.AddDays(-4),
@@ -368,12 +367,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                // @MarkFix
-                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease(
-                //    It.IsAny<Guid>(),
-                //    It.IsAny<Guid>()))
-                //.Returns(Task.CompletedTask);
-
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
                     statisticsDbContext);
@@ -706,7 +699,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task FiltersCommentsFromContent()
         {
-            // Arrange
             var htmlBlock1Body = @"
                 <p>
                     Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
@@ -800,12 +792,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // @MarkFix
-                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease(
-                //    It.IsAny<Guid>(),
-                //    It.IsAny<Guid>()))
-                //.Returns(Task.CompletedTask);
-
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
                     statisticsDbContext: InMemoryStatisticsDbContext());
@@ -874,11 +860,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
-                //    It.IsAny<Guid>(),
-                //    It.IsAny<Guid>()))
-                //.Returns(Task.CompletedTask);
-
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
                     statisticsDbContext: InMemoryStatisticsDbContext());
@@ -925,11 +906,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid? amendmentId;
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
-                //    It.IsAny<Guid>(),
-                //    It.IsAny<Guid>()))
-                //.Returns(Task.CompletedTask);
-
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
                     statisticsDbContext: InMemoryStatisticsDbContext());
@@ -1023,11 +999,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                //publicationReleaseSeriesService.Setup(s => s.CreateForAmendRelease( // @MarkFix
-                //    It.IsAny<Guid>(),
-                //    It.IsAny<Guid>()))
-                //.Returns(Task.CompletedTask);
-
                 var releaseAmendmentService = BuildService(
                     contentDbContext,
                     statisticsDbContext);

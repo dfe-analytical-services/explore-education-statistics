@@ -1,6 +1,11 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -16,11 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -29,8 +29,8 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -2527,7 +2527,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var releases = result.AssertRight();
 
-                //Assert.False(releases[0].IsDraft); // @MarkFix
                 Assert.Equal(new[]
                 {
                     publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 }).Id
@@ -2569,8 +2568,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 }).Id,
                     publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 1 }).Id
                 }, releases.Select(r => r.Id).ToArray());
-                //Assert.True(releases[0].IsDraft); // @MarkFix
-                //Assert.True(releases[1].IsDraft);
             }
         }
 
@@ -2692,216 +2689,706 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        //[Fact] // @MarkFix
-        //public async Task GetReleaseSeries()
-        //{
-        //    // Arrange
-        //    var publicationId = Guid.NewGuid();
-        //    var legacyRelease1Id = Guid.NewGuid();
-        //    var legacyRelease2Id = Guid.NewGuid();
-        //    var eesRelease2AmendmentId = Guid.NewGuid();
-        //    var eesRelease3DraftId = Guid.NewGuid();
-        //    var eesRelease1Id = Guid.NewGuid();
-        //    var eesRelease2Id = Guid.NewGuid();
+        [Fact]
+        public async Task GetReleaseSeries()
+        {
+            var legacyLinks = new List<ReleaseSeriesItem>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 1",
+                    LegacyLinkUrl = "https://test.com/1",
+                },
+            };
 
-        //    var publication = new Publication
-        //    {
-        //        Id = publicationId,
-        //        Slug = "Test publication",
-        //        LatestPublishedReleaseId = eesRelease2Id,
-        //        LegacyReleases = new()
-        //        {
-        //            new()
-        //            {
-        //                Id = legacyRelease1Id,
-        //                Description = "Legacy Release 1",
-        //                Url = "https://test-1.com",
-        //            },
-        //            new()
-        //            {
-        //                Id = legacyRelease2Id,
-        //                Description = "Legacy Release 2",
-        //                Url = "https://test-2.com",
-        //            }
-        //        },
-        //        Releases = new()
-        //        {
-        //            new()
-        //            {
-        //                Id = eesRelease1Id,
-        //                ReleaseName = "2022",
-        //                Slug = "2022",
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //            },
-        //            new()
-        //            {
-        //                Id = eesRelease2Id,
-        //                ReleaseName = "2023",
-        //                Slug = "2023",
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //            },
-        //            new()
-        //            {
-        //                Id = eesRelease2AmendmentId,
-        //                ReleaseName = "2023",
-        //                Slug = "2023",
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //                ApprovalStatus = ReleaseApprovalStatus.Draft
-        //            },
-        //            new()
-        //            {
-        //                Id = eesRelease3DraftId,
-        //                ReleaseName = "2024",
-        //                Slug = "2024",
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //                ApprovalStatus = ReleaseApprovalStatus.Draft,
-        //            },
-        //        },
-        //        ReleaseSeries = new()
-        //        {
-        //            new()
-        //            {
-        //                ReleaseId = eesRelease3DraftId,
-        //                IsDraft = true,
-        //                IsLegacy = false,
-        //                Order = 5
-        //            },
-        //            new()
-        //            {
-        //                ReleaseId = eesRelease2AmendmentId,
-        //                IsDraft = true,
-        //                IsLegacy = false,
-        //                IsAmendment = true,
-        //                Order = 4
-        //            },
-        //            new()
-        //            {
-        //                ReleaseId = eesRelease2Id,
-        //                IsDraft = false,
-        //                IsLegacy = false,
-        //                Order = 4
-        //            },
-        //            new()
-        //            {
-        //                ReleaseId = eesRelease1Id,
-        //                IsDraft = false,
-        //                IsLegacy = false,
-        //                Order = 3
-        //            },
-        //            new()
-        //            {
-        //                ReleaseId = legacyRelease2Id,
-        //                IsDraft = false,
-        //                IsLegacy = true,
-        //                Order = 2
-        //            },
-        //            new()
-        //            {
-        //                ReleaseId = legacyRelease1Id,
-        //                IsDraft = false,
-        //                IsLegacy = true,
-        //                Order = 1
-        //            }
-        //        }
-        //    };
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
+                .WithLegacyLinks(legacyLinks)
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
 
-        //    // @MarkFix this was previously returned from a mock of publicationService.ListLegacyReleases
-        //    // if this cannot be just deleted, it now needs actual test data to be set up
-        //    var eesReleaseVms = new List<ViewModels.ReleaseSummaryViewModel>
-        //    {
-        //        new()
-        //        {
-        //            Id = eesRelease1Id,
-        //            IsDraft = false,
-        //            Order = 3,
-        //            Title = "2022",
-        //            Slug = "2022",
-        //        },
-        //        new()
-        //        {
-        //            Id = eesRelease2AmendmentId,
-        //            IsDraft = true,
-        //            Order = 4,
-        //            Title = "2023",
-        //            Slug = "2023",
-        //            LatestRelease = true,
-        //            Amendment = true,
-        //            PreviousVersionId = eesRelease2Id,
-        //        },
-        //        new()
-        //        {
-        //            Id = eesRelease3DraftId,
-        //            IsDraft = true,
-        //            Order = 5,
-        //            Title = "2024",
-        //            Slug = "2024",
-        //        },
-        //    };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-        //    var contentDbContextId = Guid.NewGuid().ToString();
-        //    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        //    {
-        //        contentDbContext.Publications.Add(publication);
-        //        await contentDbContext.SaveChangesAsync();
-        //    }
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
 
-        //    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-        //    {
-        //        var publicationService = BuildPublicationService(contentDbContext);
+                var result = await publicationService.GetReleaseSeries(publication.Id);
+                var viewModels = result.AssertRight();
 
+                Assert.Equal(4, viewModels.Count);
 
-        //        // Act
-        //        var result = await publicationService.GetReleaseSeries(publication.Id);
+                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
+                Assert.False(viewModels[0].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
+                Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.Null(viewModels[0].LegacyLinkUrl);
 
-        //        // Assert
-        //        var viewModels = result.AssertRight();
+                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
+                Assert.False(viewModels[1].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion2.Title, viewModels[1].Description);
+                Assert.Equal(expectedReleaseVersion2.ReleaseId, viewModels[1].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion2.Slug, viewModels[1].ReleaseSlug);
+                Assert.Null(viewModels[1].LegacyLinkUrl);
 
-        //        Assert.Equal(5, viewModels.Count);
+                var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                Assert.Equal(publication.ReleaseSeries[2].Id, viewModels[2].Id);
+                Assert.False(viewModels[2].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion3.Title, viewModels[2].Description);
+                Assert.Equal(expectedReleaseVersion3.ReleaseId, viewModels[2].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion3.Slug, viewModels[2].ReleaseSlug);
+                Assert.Null(viewModels[2].LegacyLinkUrl);
 
-        //        Assert.Equal("2024", viewModels[0].Description);
-        //        Assert.Equal(eesRelease3DraftId, viewModels[0].Id);
-        //        Assert.Equal($"{publication.Slug}/2024", viewModels[0].Url);
-        //        Assert.Equal(5, viewModels[0].Order);
-        //        Assert.False(viewModels[0].IsLatest);
-        //        Assert.True(viewModels[0].IsDraft);
-        //        Assert.False(viewModels[0].IsAmendment);
+                Assert.Equal(publication.ReleaseSeries[3].Id, viewModels[3].Id);
+                Assert.True(viewModels[3].IsLegacyLink);
+                Assert.Equal(legacyLinks[0].LegacyLinkDescription, viewModels[3].Description);
+                Assert.Null(viewModels[3].ReleaseId);
+                Assert.Null(viewModels[3].PublicationSlug);
+                Assert.Null(viewModels[3].ReleaseSlug);
+                Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[3].LegacyLinkUrl);
+            }
+        }
 
-        //        Assert.Equal("2023", viewModels[1].Description);
-        //        Assert.Equal(eesRelease2AmendmentId, viewModels[1].Id);
-        //        Assert.Equal($"{publication.Slug}/2023", viewModels[1].Url);
-        //        Assert.Equal(4, viewModels[1].Order);
-        //        Assert.True(viewModels[1].IsLatest);
-        //        Assert.True(viewModels[1].IsDraft);
-        //        Assert.True(viewModels[1].IsAmendment);
+        [Fact]
+        public async Task GetReleaseSeries_NoLegacyLinks()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
 
-        //        Assert.Equal("2022", viewModels[2].Description);
-        //        Assert.Equal(eesRelease1Id, viewModels[2].Id);
-        //        Assert.Equal($"{publication.Slug}/2022", viewModels[2].Url);
-        //        Assert.Equal(3, viewModels[2].Order);
-        //        Assert.False(viewModels[2].IsLatest);
-        //        Assert.False(viewModels[2].IsDraft);
-        //        Assert.False(viewModels[2].IsAmendment);
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-        //        Assert.Equal("Legacy Release 2", viewModels[3].Description);
-        //        Assert.Equal(publication.LegacyReleases[1].Id, viewModels[3].Id);
-        //        Assert.Equal("https://test-2.com", viewModels[3].Url);
-        //        Assert.Equal(2, viewModels[3].Order);
-        //        Assert.False(viewModels[3].IsLatest);
-        //        Assert.False(viewModels[3].IsDraft);
-        //        Assert.False(viewModels[3].IsAmendment);
-        //        Assert.True(viewModels[3].IsLegacy);
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
 
-        //        Assert.Equal("Legacy Release 1", viewModels[4].Description);
-        //        Assert.Equal(publication.LegacyReleases[0].Id, viewModels[4].Id);
-        //        Assert.Equal("https://test-1.com", viewModels[4].Url);
-        //        Assert.Equal(1, viewModels[4].Order);
-        //        Assert.False(viewModels[4].IsLatest);
-        //        Assert.False(viewModels[4].IsDraft);
-        //        Assert.False(viewModels[4].IsAmendment);
-        //        Assert.True(viewModels[4].IsLegacy);
-        //    }
-        //}
+                var result = await publicationService.GetReleaseSeries(publication.Id);
+                var viewModels = result.AssertRight();
 
+                Assert.Equal(3, viewModels.Count);
+
+                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
+                Assert.False(viewModels[0].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
+                Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.Null(viewModels[0].LegacyLinkUrl);
+
+                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
+                Assert.False(viewModels[1].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion2.Title, viewModels[1].Description);
+                Assert.Equal(expectedReleaseVersion2.ReleaseId, viewModels[1].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion2.Slug, viewModels[1].ReleaseSlug);
+                Assert.Null(viewModels[1].LegacyLinkUrl);
+
+                var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                Assert.Equal(publication.ReleaseSeries[2].Id, viewModels[2].Id);
+                Assert.False(viewModels[2].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion3.Title, viewModels[2].Description);
+                Assert.Equal(expectedReleaseVersion3.ReleaseId, viewModels[2].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion3.Slug, viewModels[2].ReleaseSlug);
+                Assert.Null(viewModels[2].LegacyLinkUrl);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseSeries_NoReleases()
+        {
+            var legacyLinks = new List<ReleaseSeriesItem>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 1",
+                    LegacyLinkUrl = "https://test.com/1",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 2",
+                    LegacyLinkUrl = "https://test.com/2",
+                },
+            };
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithLegacyLinks(legacyLinks)
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
+
+                var result = await publicationService.GetReleaseSeries(publication.Id);
+                var viewModels = result.AssertRight();
+
+                Assert.Equal(2, viewModels.Count);
+
+                Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
+                Assert.True(viewModels[0].IsLegacyLink);
+                Assert.Equal(legacyLinks[0].LegacyLinkDescription, viewModels[0].Description);
+                Assert.Null(viewModels[0].ReleaseId);
+                Assert.Null(viewModels[0].PublicationSlug);
+                Assert.Null(viewModels[0].ReleaseSlug);
+                Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[0].LegacyLinkUrl);
+
+                Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
+                Assert.True(viewModels[1].IsLegacyLink);
+                Assert.Equal(legacyLinks[1].LegacyLinkDescription, viewModels[1].Description);
+                Assert.Null(viewModels[1].ReleaseId);
+                Assert.Null(viewModels[1].PublicationSlug);
+                Assert.Null(viewModels[1].ReleaseSlug);
+                Assert.Equal(legacyLinks[1].LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
+            }
+        }
+
+        [Fact]
+        public async Task GetReleaseSeries_Empty()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
+
+                var result = await publicationService.GetReleaseSeries(publication.Id);
+                var viewModels = result.AssertRight();
+
+                Assert.Empty(viewModels);
+            }
+        }
+
+        [Fact]
+        public async Task AddReleaseSeriesLegacyLink()
+        {
+            var legacyLinks = new List<ReleaseSeriesItem>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 1",
+                    LegacyLinkUrl = "https://test.com/1",
+                },
+            };
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithLegacyLinks(legacyLinks)
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
+
+                var result = await publicationService.AddReleaseSeriesLegacyLink(
+                    publication.Id,
+                    new ReleaseSeriesLegacyLinkAddRequest
+                    {
+                        Description = "New legacy link",
+                        Url = "https://test.com/new"
+                    });
+                var viewModels = result.AssertRight();
+
+                Assert.Equal(3, viewModels.Count);
+
+                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+                Assert.Equal(publication.ReleaseSeries[0].Id, viewModels[0].Id);
+                Assert.False(viewModels[0].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion1.Title, viewModels[0].Description);
+                Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.Null(viewModels[0].LegacyLinkUrl);
+
+                Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
+                Assert.True(viewModels[1].IsLegacyLink);
+                Assert.Equal(legacyLinks[0].LegacyLinkDescription, viewModels[1].Description);
+                Assert.Null(viewModels[1].ReleaseId);
+                Assert.Null(viewModels[1].PublicationSlug);
+                Assert.Null(viewModels[1].ReleaseSlug);
+                Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
+
+                Assert.True(viewModels[2].IsLegacyLink);
+                Assert.Equal("New legacy link", viewModels[2].Description);
+                Assert.Null(viewModels[2].ReleaseId);
+                Assert.Null(viewModels[2].PublicationSlug);
+                Assert.Null(viewModels[2].ReleaseSlug);
+                Assert.Equal("https://test.com/new", viewModels[2].LegacyLinkUrl);
+
+                var dbReleaseSeries = contentDbContext.Publications
+                    .Where(p => p.Id == publication.Id)
+                    .Select(p => p.ReleaseSeries)
+                    .Single();
+
+                Assert.Equal(3, dbReleaseSeries.Count);
+                Assert.Equal(viewModels[0].Id, dbReleaseSeries[0].Id);
+                Assert.Equal(viewModels[1].Id, dbReleaseSeries[1].Id);
+                Assert.Equal(viewModels[2].Id, dbReleaseSeries[2].Id);
+            }
+        }
+
+        [Fact]
+        public async Task AddReleaseSeriesLegacyLink_AddToEmptySeries()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(contentDbContext);
+
+                var result = await publicationService.AddReleaseSeriesLegacyLink(
+                    publication.Id,
+                    new ReleaseSeriesLegacyLinkAddRequest
+                    {
+                        Description = "New legacy link",
+                        Url = "https://test.com/new"
+                    });
+                var viewModels = result.AssertRight();
+
+                var newSeriesItem = Assert.Single(viewModels);
+                Assert.True(newSeriesItem.IsLegacyLink);
+                Assert.Equal("New legacy link", newSeriesItem.Description);
+                Assert.Null(newSeriesItem.ReleaseId);
+                Assert.Null(newSeriesItem.PublicationSlug);
+                Assert.Null(newSeriesItem.ReleaseSlug);
+                Assert.Equal("https://test.com/new", newSeriesItem.LegacyLinkUrl);
+
+                var dbReleaseSeries = contentDbContext.Publications
+                    .Where(p => p.Id == publication.Id)
+                    .Select(p => p.ReleaseSeries)
+                    .Single();
+
+                var dbSeriesItem = Assert.Single(dbReleaseSeries);
+                Assert.Equal(viewModels[0].Id, dbSeriesItem.Id);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries()
+        {
+            var legacyLinks = new List<ReleaseSeriesItem>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 1",
+                    LegacyLinkUrl = "https://test.com/1",
+                },
+            };
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
+                .WithLegacyLinks(legacyLinks)
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var expectedReleaseVersion2022 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
+                var expectedReleaseVersion2021 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
+                var expectedReleaseVersion2020 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
+
+                var result = await publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            LegacyLinkDescription = "Legacy link new",
+                            LegacyLinkUrl = "https://test.com/new",
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = expectedReleaseVersion2021.ReleaseId,
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = expectedReleaseVersion2020.ReleaseId,
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = expectedReleaseVersion2022.ReleaseId,
+                        },
+                    });
+                var viewModels = result.AssertRight();
+
+                Assert.Equal(4, viewModels.Count);
+
+                Assert.True(viewModels[0].IsLegacyLink);
+                Assert.Equal("Legacy link new", viewModels[0].Description);
+                Assert.Null(viewModels[0].ReleaseId);
+                Assert.Null(viewModels[0].PublicationSlug);
+                Assert.Null(viewModels[0].ReleaseSlug);
+                Assert.Equal("https://test.com/new", viewModels[0].LegacyLinkUrl);
+
+                Assert.False(viewModels[1].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion2021.Title, viewModels[1].Description);
+                Assert.Equal(expectedReleaseVersion2021.ReleaseId, viewModels[1].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion2021.Slug, viewModels[1].ReleaseSlug);
+                Assert.Null(viewModels[1].LegacyLinkUrl);
+
+                Assert.False(viewModels[2].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion2020.Title, viewModels[2].Description);
+                Assert.Equal(expectedReleaseVersion2020.ReleaseId, viewModels[2].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion2020.Slug, viewModels[2].ReleaseSlug);
+                Assert.Null(viewModels[2].LegacyLinkUrl);
+
+                Assert.False(viewModels[3].IsLegacyLink);
+                Assert.Equal(expectedReleaseVersion2022.Title, viewModels[3].Description);
+                Assert.Equal(expectedReleaseVersion2022.ReleaseId, viewModels[3].ReleaseId);
+                Assert.Equal(publication.Slug, viewModels[3].PublicationSlug);
+                Assert.Equal(expectedReleaseVersion2022.Slug, viewModels[3].ReleaseSlug);
+                Assert.Null(viewModels[3].LegacyLinkUrl);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries_SetEmpty()
+        {
+            var legacyLinks = new List<ReleaseSeriesItem>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "legacy link 1",
+                    LegacyLinkUrl = "https://test.com/1",
+                },
+            };
+
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithLegacyLinks(legacyLinks)
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var result = await publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>());
+                var viewModels = result.AssertRight();
+
+                Assert.Empty(viewModels);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries_UnsetRelease()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>()));
+                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " + publication.ReleaseVersions[0].ReleaseId, exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries_SetDuplicateRelease()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                        },
+                    }));
+                Assert.Equal("Missing or duplicate release in new release series. Expected ReleaseIds: " + publication.ReleaseVersions[0].ReleaseId, exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries_InvalidSeriesItem1()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithReleases(ListOf<Release>(
+                    _dataFixture
+                        .DefaultRelease(publishedVersions: 1, year: 2020)))
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var seriesItemId = Guid.NewGuid();
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>
+                    {
+                        new()
+                        {
+                            Id = seriesItemId,
+                            ReleaseId = publication.ReleaseVersions[0].ReleaseId,
+                            LegacyLinkDescription = "this should be null",
+                            LegacyLinkUrl = "https://should.be/null",
+                        },
+                    }));
+                Assert.Equal($"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItemId}", exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries_InvalidSeriesItem2()
+        {
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTopic(_dataFixture
+                    .DefaultTopic()
+                    .WithTheme(_dataFixture
+                        .DefaultTheme()));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(mock =>
+                        mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var publicationService = BuildPublicationService(
+                    contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var seriesItemId = Guid.NewGuid();
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() => publicationService.UpdateReleaseSeries(
+                    publication.Id,
+                    new List<ReleaseSeriesItemUpdateRequest>
+                    {
+                        new()
+                        {
+                            Id = seriesItemId,
+                            ReleaseId = null,
+                            LegacyLinkDescription = null,
+                            LegacyLinkUrl = null,
+                        },
+                    }));
+                Assert.Equal($"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItemId}", exception.Message);
+            }
+        }
 
         private static PublicationService BuildPublicationService(
             ContentDbContext context,
@@ -2919,7 +3406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
-                releaseVersionRepository ?? new Content.Model.Repository.ReleaseVersionRepository(context),
+                releaseVersionRepository ?? new ReleaseVersionRepository(context),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),

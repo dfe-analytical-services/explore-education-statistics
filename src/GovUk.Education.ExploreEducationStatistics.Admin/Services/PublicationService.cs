@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -16,11 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
@@ -440,7 +440,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // @MarkFix this needs tests
         public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _persistenceHelper
@@ -453,18 +452,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         if (seriesItem.IsLegacyLink)
                         {
-                            if (seriesItem.LegacyLinkDescription == null)
-                            {
-                                throw new InvalidDataException(
-                                    $"LegacyLinkDescription should be set. PublicationId: {publication.Id}, ReleaseSeriesItem: {seriesItem.Id}");
-                            }
-
-                            if (seriesItem.LegacyLinkUrl == null)
-                            {
-                                throw new InvalidDataException(
-                                    $"LegacyLinkUrl should be set. PublicationId: {publication.Id}, ReleaseSeriesItem: {seriesItem.Id}");
-                            }
-
                             result.Add(new ReleaseSeriesItemViewModel
                             {
                                 Id = seriesItem.Id,
@@ -472,7 +459,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Description = seriesItem.LegacyLinkDescription!,
                                 LegacyLinkUrl = seriesItem.LegacyLinkUrl,
                             });
-
                         }
                         else
                         {
@@ -486,14 +472,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     "ReleaseSeriesItem with ReleaseId set should have an associated " +
                                             $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
                                             $"ReleaseSeriesItem: {seriesItem.Id}");
-                            }
-
-                            if (latestVersion.PublicationId != publicationId)
-                            {
-                                throw new InvalidDataException(
-                                    "ReleaseSeriesItem belongs to different publication " +
-                                    $"ReleaseSeriesItem: {seriesItem.Id} Expected publication: {publicationId} " +
-                                    $"Actual publication: {latestVersion.PublicationId}");
                             }
 
                             result.Add(new ReleaseSeriesItemViewModel
@@ -512,7 +490,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        // @MarkFix this needs tests
         public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
@@ -548,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanManageReleaseSeries)
                 .OnSuccess(async publication =>
                 {
-                    // Check each updated series items fields are correctly set
+                    // Check new series items details are correct
                     foreach (var seriesItem in updatedReleaseSeriesItems)
                     {
                         if (seriesItem.ReleaseId != null && (
@@ -584,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
                     }
 
-                    // @MarkFix Check series item Ids haven't been changed? Do we care if they have?
+                    // NOTE: A malicious user could change the release series items' Ids, but we don't care
 
                     var newReleaseSeries = updatedReleaseSeriesItems
                         .Select(request => new ReleaseSeriesItem
@@ -684,6 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             bool includePermissions)
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
+
             if (includePermissions)
             {
                 viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);

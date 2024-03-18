@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.IO;
+using System.Reflection;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
@@ -24,16 +27,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Reflection;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
-using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
-using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
+using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
@@ -88,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                         publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>()
-                .AddScoped<Admin.Services.Interfaces.IPublicationService, Admin.Services.PublicationService>()
                 .AddScoped<IPublisherTableStorageService, PublisherTableStorageService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()

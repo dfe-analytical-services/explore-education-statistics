@@ -1,4 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -22,11 +27,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -78,239 +78,213 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
 
-        //[Fact] // @MarkFix
-        //public async Task CreateReleaseNoTemplate()
-        //{
-        //    // Arrange
-        //    var publication = new Publication
-        //    {
-        //        Title = "Publication"
-        //    };
+        [Fact]
+        public async Task CreateReleaseNoTemplate()
+        {
+            var publication = new Publication
+            {
+                Title = "Publication"
+            };
 
-        //    var contextId = Guid.NewGuid().ToString();
+            var contextId = Guid.NewGuid().ToString();
 
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        await context.AddAsync(publication);
-        //        await context.SaveChangesAsync();
-        //    }
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
 
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
 
-        //        publicationReleaseSeriesService.Setup(s => s.CreateForCreateRelease(
-        //            It.IsAny<Guid>(),
-        //            It.IsAny<Guid>()))
-        //        .Returns(Task.CompletedTask);
+                var result = (await releaseService.CreateRelease(
+                    new ReleaseCreateRequest
+                    {
+                        PublicationId = publication.Id,
+                        Year = 2018,
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Type = ReleaseType.OfficialStatistics
+                    }
+                )).AssertRight();
 
-        //        var releaseService = BuildReleaseService(
-        //            context,
-        //            publicationReleaseSeriesService: publicationReleaseSeriesService.Object);
+                Assert.Equal("Academic year 2018/19", result.Title);
+                Assert.Equal("2018/19", result.YearTitle);
+                Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
+                Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
 
-        //        // Act
-        //        var result = (await releaseService.CreateRelease(
-        //            new ReleaseCreateRequest
-        //            {
-        //                PublicationId = publication.Id,
-        //                Year = 2018,
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //                Type = ReleaseType.OfficialStatistics
-        //            }
-        //        )).AssertRight();
+                Assert.False(result.Amendment);
+                Assert.False(result.LatestRelease); // Most recent - but not published yet.
+                Assert.False(result.Live);
+                Assert.Null(result.NextReleaseDate);
+                Assert.Null(result.PublishScheduled);
+                Assert.Null(result.Published);
+                Assert.False(result.NotifySubscribers);
+                Assert.False(result.UpdatePublishedDate);
+            }
 
-        //        // Assert
-        //        VerifyAllMocks(publicationReleaseSeriesService);
-        //        Assert.Equal("Academic year 2018/19", result.Title);
-        //        Assert.Equal("2018/19", result.YearTitle);
-        //        Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
-        //        Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
-        //        Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actual = await context
+                    .ReleaseVersions
+                    .SingleAsync(r => r.PublicationId == publication.Id);
 
-        //        Assert.False(result.Amendment);
-        //        Assert.False(result.LatestRelease); // Most recent - but not published yet.
-        //        Assert.False(result.Live);
-        //        Assert.Null(result.NextReleaseDate);
-        //        Assert.Null(result.PublishScheduled);
-        //        Assert.Null(result.Published);
-        //        Assert.False(result.NotifySubscribers);
-        //        Assert.False(result.UpdatePublishedDate);
-        //    }
+                Assert.Equal(2018, actual.Year);
+                Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
+                Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
+                Assert.Equal(0, actual.Version);
+                Assert.NotEqual(Guid.Empty, actual.ReleaseId);
 
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        var actual = await context
-        //            .ReleaseVersions
-        //            .SingleAsync(r => r.PublicationId == publication.Id);
+                Assert.Null(actual.PreviousVersionId);
+                Assert.Null(actual.PublishScheduled);
+                Assert.Null(actual.Published);
+                Assert.Null(actual.NextReleaseDate);
+                Assert.Null(actual.NotifiedOn);
+                Assert.False(actual.NotifySubscribers);
+                Assert.False(actual.UpdatePublishedDate);
+            }
+        }
 
-        //        Assert.Equal(2018, actual.Year);
-        //        Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
-        //        Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
-        //        Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
-        //        Assert.Equal(0, actual.Version);
-        //        Assert.NotEqual(Guid.Empty, actual.ReleaseId);
+        [Fact]
+        public async Task CreateReleaseWithTemplate()
+        {
+            var templateReleaseId = Guid.NewGuid();
 
-        //        Assert.Null(actual.PreviousVersionId);
-        //        Assert.Null(actual.PublishScheduled);
-        //        Assert.Null(actual.Published);
-        //        Assert.Null(actual.NextReleaseDate);
-        //        Assert.Null(actual.NotifiedOn);
-        //        Assert.False(actual.NotifySubscribers);
-        //        Assert.False(actual.UpdatePublishedDate);
-        //    }
-        //}
+            var dataBlock1 = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Data Block 1",
+                Order = 2,
+                Comments = new List<Comment>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "Comment 1 Text"
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "Comment 2 Text"
+                    }
+                },
+                ReleaseVersionId = templateReleaseId
+            };
 
-        //[Fact] // @MarkFix
-        //public async Task CreateReleaseWithTemplate()
-        //{
-        //    // Arrange
-        //    var templateReleaseId = Guid.NewGuid();
+            var dataBlock2 = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Name = "Data Block 2",
+                ReleaseVersionId = templateReleaseId
+            };
 
-        //    var dataBlock1 = new DataBlock
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = "Data Block 1",
-        //        Order = 2,
-        //        Comments = new List<Comment>
-        //        {
-        //            new()
-        //            {
-        //                Id = Guid.NewGuid(),
-        //                Content = "Comment 1 Text"
-        //            },
-        //            new()
-        //            {
-        //                Id = Guid.NewGuid(),
-        //                Content = "Comment 2 Text"
-        //            }
-        //        },
-        //        ReleaseVersionId = templateReleaseId
-        //    };
+            var templateRelease = new ReleaseVersion
+            {
+                Id = templateReleaseId,
+                ReleaseName = "2018",
+                Content = ListOf(new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    Caption = "Template caption index 0",
+                    Heading = "Template heading index 0",
+                    Type = ContentSectionType.Generic,
+                    Order = 1,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Body = @"<div></div>",
+                            Order = 1,
+                            Comments = new List<Comment>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 1 Text"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 2 Text"
+                                }
+                            }
+                        },
+                        dataBlock1
+                    }
+                }),
+                Version = 0
+            };
 
-        //    var dataBlock2 = new DataBlock
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = "Data Block 2",
-        //        ReleaseVersionId = templateReleaseId
-        //    };
+            var contextId = Guid.NewGuid().ToString();
 
-        //    var templateRelease = new ReleaseVersion
-        //    {
-        //        Id = templateReleaseId,
-        //        ReleaseName = "2018",
-        //        Content = ListOf(new ContentSection
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Caption = "Template caption index 0",
-        //            Heading = "Template heading index 0",
-        //            Type = ContentSectionType.Generic,
-        //            Order = 1,
-        //            Content = new List<ContentBlock>
-        //            {
-        //                new HtmlBlock
-        //                {
-        //                    Id = Guid.NewGuid(),
-        //                    Body = @"<div></div>",
-        //                    Order = 1,
-        //                    Comments = new List<Comment>
-        //                    {
-        //                        new()
-        //                        {
-        //                            Id = Guid.NewGuid(),
-        //                            Content = "Comment 1 Text"
-        //                        },
-        //                        new()
-        //                        {
-        //                            Id = Guid.NewGuid(),
-        //                            Content = "Comment 2 Text"
-        //                        }
-        //                    }
-        //                },
-        //                dataBlock1
-        //            }
-        //        }),
-        //        Version = 0
-        //    };
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new Publication
+                    {
+                        Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
+                        Title = "Publication",
+                        ReleaseVersions = ListOf(templateRelease)
+                    }
+                );
+                await context.ContentBlocks.AddRangeAsync(dataBlock1, dataBlock2);
+                await context.SaveChangesAsync();
+            }
 
-        //    var contextId = Guid.NewGuid().ToString();
+            Guid? newReleaseVersionId;
 
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        await context.AddAsync(
-        //            new Publication
-        //            {
-        //                Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
-        //                Title = "Publication",
-        //                ReleaseVersions = ListOf(templateRelease)
-        //            }
-        //        );
-        //        await context.ContentBlocks.AddRangeAsync(dataBlock1, dataBlock2);
-        //        await context.SaveChangesAsync();
-        //    }
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
 
-        //    var newReleaseVersionId = Guid.Empty;
+                var result = await releaseService.CreateRelease(
+                    new ReleaseCreateRequest
+                    {
+                        PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
+                        TemplateReleaseId = templateReleaseId,
+                        Year = 2018,
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Type = ReleaseType.OfficialStatistics
+                    }
+                );
 
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        var publicationReleaseSeriesService = new Mock<IPublicationReleaseSeriesService>(Strict);
+                var newReleaseVersion = result.AssertRight();
+                newReleaseVersionId = newReleaseVersion.Id;
+            }
 
-        //        publicationReleaseSeriesService.Setup(s => s.CreateForCreateRelease(
-        //            It.IsAny<Guid>(),
-        //            It.IsAny<Guid>()))
-        //        .Returns(Task.CompletedTask);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // Do an in depth check of the saved release
+                var newReleaseVersion = context
+                    .ReleaseVersions
+                    .Include(release => release.Content)
+                    .ThenInclude(section => section.Content)
+                    .Single(rv => rv.Id == newReleaseVersionId);
 
-        //        var releaseService = BuildReleaseService(
-        //            context,
-        //            publicationReleaseSeriesService: publicationReleaseSeriesService.Object);
+                var contentSections = newReleaseVersion.GenericContent.ToList();
+                Assert.Single(contentSections);
+                Assert.Equal("Template caption index 0", contentSections[0].Caption);
+                Assert.Equal("Template heading index 0", contentSections[0].Heading);
+                Assert.Single(contentSections);
+                Assert.Equal(1, contentSections[0].Order);
 
-        //        // Act
-        //        var result = await releaseService.CreateRelease(
-        //            new ReleaseCreateRequest
-        //            {
-        //                PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
-        //                TemplateReleaseId = templateReleaseId,
-        //                Year = 2018,
-        //                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-        //                Type = ReleaseType.OfficialStatistics
-        //            }
-        //        );
+                // Content should not be copied when created from a template.
+                Assert.Empty(contentSections[0].Content);
+                Assert.Empty(contentSections[0].Content.AsReadOnly());
+                Assert.Equal(ContentSectionType.ReleaseSummary, newReleaseVersion.SummarySection.Type);
+                Assert.Equal(ContentSectionType.Headlines, newReleaseVersion.HeadlinesSection.Type);
+                Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newReleaseVersion.KeyStatisticsSecondarySection.Type);
 
-        //        // Assert
-        //        var newReleaseVersion = result.AssertRight();
-        //        newReleaseVersionId = newReleaseVersion.Id;
-        //        VerifyAllMocks(publicationReleaseSeriesService);
-        //    }
-
-        //    await using (var context = InMemoryApplicationDbContext(contextId))
-        //    {
-        //        // Do an in depth check of the saved release
-        //        var newReleaseVersion = context
-        //            .ReleaseVersions
-        //            .Include(release => release.Content)
-        //            .ThenInclude(section => section.Content)
-        //            .Single(rv => rv.Id == newreleaseVersionId);
-
-        //        var contentSections = newReleaseVersion.GenericContent.ToList();
-        //        Assert.Single(contentSections);
-        //        Assert.Equal("Template caption index 0", contentSections[0].Caption);
-        //        Assert.Equal("Template heading index 0", contentSections[0].Heading);
-        //        Assert.Single(contentSections);
-        //        Assert.Equal(1, contentSections[0].Order);
-
-        //        // Content should not be copied when created from a template.
-        //        Assert.Empty(contentSections[0].Content);
-        //        Assert.Empty(contentSections[0].Content.AsReadOnly());
-        //        Assert.Equal(ContentSectionType.ReleaseSummary, newReleaseVersion.SummarySection.Type);
-        //        Assert.Equal(ContentSectionType.Headlines, newReleaseVersion.HeadlinesSection.Type);
-        //        Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newReleaseVersion.KeyStatisticsSecondarySection.Type);
-
-        //        // Data Blocks should not be copied when created from a template.
-        //        Assert.Equal(2, context.DataBlocks.Count());
-        //        Assert.Empty(context
-        //            .DataBlocks
-        //            .Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
-        //    }
-        //}
+                // Data Blocks should not be copied when created from a template.
+                Assert.Equal(2, context.DataBlocks.Count());
+                Assert.Empty(context
+                    .DataBlocks
+                    .Where(dataBlock => dataBlock.ReleaseVersionId == newReleaseVersionId));
+            }
+        }
 
         [Fact]
         public async Task RemoveDataFiles()
@@ -779,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetRelease()
         {
-            var nextReleaseDate = new PartialDate { Day = "1", Month = "1", Year = "2040" };
+            var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
 
             var releaseVersion = new ReleaseVersion
             {
@@ -1273,11 +1247,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseVersion.Id))))
                 .Returns(Task.CompletedTask);
 
-            //publicationReleaseSeriesService.Setup(s => s.DeleteForDeleteRelease( // @MarkFix
-            //        It.IsAny<Guid>(),
-            //        It.IsAny<Guid>()))
-            //    .Returns(Task.CompletedTask);
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context,
@@ -1294,8 +1263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService.Verify(mock =>
                     mock.DeleteAll(releaseVersion.Id, false), Times.Once);
 
-                VerifyAllMocks(
-                    cacheService,
+                VerifyAllMocks(cacheService,
                     releaseDataFilesService,
                     releaseFileService
                 );

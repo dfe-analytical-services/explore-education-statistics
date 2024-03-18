@@ -199,7 +199,7 @@ const ReleaseSeriesTable = ({
                                 title="Edit legacy release"
                                 triggerButton={
                                   <ButtonText>
-                                    Edit{/* @MarkFix editing is broken */}
+                                    Edit
                                     <VisuallyHidden>
                                       {` ${seriesItem.description}`}
                                     </VisuallyHidden>

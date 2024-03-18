@@ -4,6 +4,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
+    // @MarkFix redo this migration to ensure all is well
     public partial class EES4770_AddPublicationReleaseSeriesColumn : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

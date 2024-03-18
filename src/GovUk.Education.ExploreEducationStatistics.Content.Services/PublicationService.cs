@@ -1,4 +1,8 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -11,10 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
 
@@ -69,7 +69,6 @@ public class PublicationService : IPublicationService
             .CheckEntityExists<Publication>(query => query
                 .Include(p => p.ReleaseVersions)
                 .Include(p => p.Contact)
-                .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Include(p => p.SupersededBy)
@@ -93,9 +92,6 @@ public class PublicationService : IPublicationService
                             .Any(rv => rsi.ReleaseId == rv.ReleaseId)
                     ).ToList();
 
-                var publishedVersions =
-                    await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
-
                 var releaseSeriesItemViewModels = filteredReleaseSeries
                     .Select(rsi =>
                     {
@@ -110,7 +106,7 @@ public class PublicationService : IPublicationService
                             };
                         }
 
-                        var latestReleaseVersion = publishedVersions
+                        var latestReleaseVersion = publishedReleaseVersions
                             .Single(rv => rv.ReleaseId == rsi.ReleaseId);
 
                         return new ReleaseSeriesItemViewModel
@@ -120,7 +116,7 @@ public class PublicationService : IPublicationService
                             Description = latestReleaseVersion.Title,
 
                             ReleaseId = latestReleaseVersion.ReleaseId,
-                            PublicationSlug = latestReleaseVersion.Publication.Slug,
+                            PublicationSlug = publication.Slug,
                             ReleaseSlug = latestReleaseVersion.Slug,
                         };
                     }).ToList();
@@ -260,9 +256,12 @@ public class PublicationService : IPublicationService
                 }
                 : null,
             Releases = releaseVersions
-                .Where(rv => rv.Published.HasValue)
-                .GroupBy(rv => rv.ReleaseName).Select(grouping => grouping.OrderByDescending(r => r.Version).First())
-                .Select(releaseVersion => new ReleaseVersionTitleViewModel(releaseVersion))
+                .Select(releaseVersion => new ReleaseVersionTitleViewModel
+                {
+                    Id = releaseVersion.Id,
+                    Slug = releaseVersion.Slug,
+                    Title = releaseVersion.Title,
+                })
                 .ToList(),
             ReleaseSeries = releaseSeries,
         };

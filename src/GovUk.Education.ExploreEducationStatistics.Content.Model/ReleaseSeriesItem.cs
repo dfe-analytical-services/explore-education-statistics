@@ -3,7 +3,7 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class ReleaseSeriesItem
+public record ReleaseSeriesItem
 {
     public Guid Id { get; set; }
 

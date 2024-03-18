@@ -95,7 +95,8 @@ public class ReleaseSeriesMigrationController : ControllerBase
             if (dryRun)
             {
                 _logger.LogInformation("Planned ReleaseSeries to add to Publication {publicationId}:\n{releaseSeries}\n\n",
-                    publication.Id, publication.ReleaseSeries);
+                    publication.Id,
+                    publication.ReleaseSeries.Select(rsi => rsi.ToString().JoinToString(',')));
             }
 
             updatedPublicationIds.Add(publication.Id);
@@ -107,11 +108,7 @@ public class ReleaseSeriesMigrationController : ControllerBase
 
             foreach (var publication in publications)
             {
-                if (publication.Live)
-                {
-                    _logger.LogInformation("Publication: " + publication.Slug);
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-                }
+                await _publicationCacheService.UpdatePublication(publication.Slug);
             }
         }
 

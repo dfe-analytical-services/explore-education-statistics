@@ -20,7 +20,6 @@ export interface Publication {
   slug: string;
   title: string;
   releases: {
-    // @MarkFix redundant now we have releaseSeries?
     id: string;
     slug: string;
     title: string;
