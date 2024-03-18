@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AngleSharp.Io;
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -23,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 [ExcludeFromCodeCoverage]
 public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
+    private static readonly string[] ManagedIdentityTokenScopes = new [] { "https://ossrdbms-aad.database.windows.net/.default" };
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -70,22 +74,43 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Only set up the `PublicDataDbContext` in non-integration test
         // environments. Otherwise, the connection string will be null and
         // cause the data source builder to throw a host exception.
-        if (!hostEnvironment.IsIntegrationTest())
+        if (!_hostEnvironment.IsIntegrationTest())
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                configuration.GetConnectionString("PublicDataDb"));
+            var connectionString = _configuration.GetConnectionString("PublicDataDb")!;
 
-            // Set up the data source outside the `AddDbContext` action as this
-            // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
-            // creating over 20 `IServiceProvider` instances.
-            var dbDataSource = dataSourceBuilder.Build();
-
-            services.AddDbContext<PublicDataDbContext>(options =>
+            if (_hostEnvironment.IsDevelopment())
             {
-                options
-                    .UseNpgsql(dbDataSource)
-                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
-            });
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+                    _configuration.GetConnectionString("PublicDataDb"));
+
+                // Set up the data source outside the `AddDbContext` action as this
+                // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                // creating over 20 `IServiceProvider` instances.
+                var dbDataSource = dataSourceBuilder.Build();
+
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    options
+                        .UseNpgsql(dbDataSource)
+                        .EnableSensitiveDataLogging();
+                });
+            }
+            else
+            {
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    var sqlServerTokenProvider = new DefaultAzureCredential();
+                    var accessToken = sqlServerTokenProvider.GetToken(
+                        new TokenRequestContext(scopes: ManagedIdentityTokenScopes)).Token;
+
+                    var connectionStringWithAccessToken =
+                        connectionString.Replace("[access_token]", accessToken);
+
+                    var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+
+                    options.UseNpgsql(dbDataSource);
+                });
+            }
         }
 
         // Caching and compression
@@ -130,11 +155,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {
             app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseHttpsRedirection();
-            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
         // Rewrites
