@@ -37,17 +37,11 @@ jobs:
           performMultiLevelLookup: true
 
       - task: 'DotNetCoreCLI@2'
-        displayName: 'Restore'
-        inputs:
-          command: 'restore'
-          projects: '**/GovUk.*/*csproj'
-          feedsToUse: config
-          nugetConfigPath: src/nuget.config
-
-      - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
-          projects: '**/GovUk.*/*csproj'
+          projects: |
+            **/GovUk.*/*csproj
+            !**/GovUk.Education.ExploreEducationStatistics.Admin/*csproj
           arguments: '--configuration $(BuildConfiguration)'
 
       # TODO: Uncomment this step once formatter has been run globally.
@@ -83,7 +77,9 @@ jobs:
         displayName: 'Test'
         inputs:
           command: 'test'
-          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          projects: |
+            **/GovUk.*[Tt]ests/*.csproj
+            !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
           arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
@@ -92,7 +88,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api'
           zipAfterPublish: True
 
       - task: 'DotNetCoreCLI@2'
@@ -101,14 +97,42 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api'
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Public APIs Artifacts'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Public API - API project'
         inputs:
-          artifactName: 'public-api'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Api.csproj'
+          arguments: '-r linux-musl-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/api'
+          zipAfterPublish: False
+
+      - task: Docker@2
+        displayName: 'Build Public API - API Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
+        inputs:
+          containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
+          repository: 'ees-public-api/api'
+          command: 'build'
+          Dockerfile: 'docker/public-api/api/Dockerfile'
+          buildContext: '$(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api'
+          tags: $(Build.BuildNumber)
+          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - task: Docker@2
+        displayName: 'Push Public API - API Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
+        inputs:
+          containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
+          repository: 'ees-public-api'
+          command: 'push'
+          Dockerfile: 'docker/public-api/api/Dockerfile'
+          buildContext: '$(System.ArtifactStagingDirectory)/public-api/api'
+          tags: $(Build.BuildNumber)
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Notifier Function'
@@ -116,7 +140,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
+          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/notifier'
           zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'
@@ -131,7 +155,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
+          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/publisher'
           zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'
@@ -146,7 +170,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
+          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/processor'
           zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'
@@ -177,14 +201,6 @@ jobs:
         inputs:
           version: 8.0.x
           performMultiLevelLookup: true
-
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Restore'
-        inputs:
-          command: 'restore'
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          feedsToUse: config
-          nugetConfigPath: src/nuget.config
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
@@ -223,7 +239,7 @@ jobs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Admin Artifact'
