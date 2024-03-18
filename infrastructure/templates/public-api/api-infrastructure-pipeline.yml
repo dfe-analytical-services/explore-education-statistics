@@ -1,28 +1,30 @@
-trigger:
-  batch: true
-  branches:
-    include:
-    - master
-    - dev
-  paths:
-    include:
-    - infrastructure/public-api/*
-pr: none
+trigger: none
 
-name: Deploy Public API Bicep files
+resources:
+  pipelines:
+    - pipeline: EESBuildPipeline
+      source: Explore Education Statistics
+      trigger: true
+
+# This defines the "Build.BuildNumber" variable available in the pipeline.
+name: $(Date:yyyyMMdd).$(Rev:r)
 
 parameters:
   - name: resourceGroupName
     displayName: Resource Group Name
     type: string
     default: 's101d01'
-  - name: azureSubscription
-    displayName: The current Azure subscription 
+  - name: buildNumberOverride
+    displayName: The build number of the main EES build that triggered this pipeline
     type: string
-    default: 'AzureConnection'
+    default: 'none'
+  - name: psqlDbUsersAdded
+    displayName: Have database users been added to PSQL yet for Container App and Function App?
+    default: true
 
 variables:
   - group: EES Bicep Infrastructure common
+  - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
   - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
@@ -44,6 +46,12 @@ variables:
     value: $(paramDirectory)/main-preprod.bicepparam
   - name: prodParamFile
     value: $(paramDirectory)/main-prod.bicepparam
+  - name: trimmedBuildNumberOverride
+    value: $[replace('${{ parameters.buildNumberOverride }}', 'none', '')]
+  - name: upstreamPipelineBuildNumber
+    value: $(resources.pipeline.EESBuildPipeline.runName)
+  - name: dockerImagesTag
+    value: $[ coalesce( variables.trimmedBuildNumberOverride, variables.upstreamPipelineBuildNumber ) ]
 
 pool:
   vmImage: $(vmImageName)
@@ -58,21 +66,29 @@ stages:
       displayName: 'List source files'
       inputs:
         script: |
-          echo "Structure of work folder of this pipeline:"
+
+    - task: Bash@3
+      displayName: 'Display information about this pipeline run'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo 'Using "$(dockerImagesTag)" as the tag to identify the Docker images to deploy with this pipeline run.'
+          echo
+          echo 'Structure of work folder of this pipeline:'
           tree $(Build.SourcesDirectory)
 
     - task: AzureCLI@2
       displayName: 'Install Bicep'
       inputs:
-        azureSubscription: ${{parameters.azureSubscription}}
+        azureSubscription: $(serviceConnection)
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: 'az bicep install'
 
     - task: AzureCLI@2
-      displayName: 'Validate bicep scripts' 
+      displayName: 'Validate bicep scripts'
       inputs:
-        azureSubscription: ${{parameters.azureSubscription}} 
+        azureSubscription: $(serviceConnection)
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
@@ -83,8 +99,11 @@ stages:
           --parameters $(devParamFile) \
           --parameters \
               resourceTags='$(resourceTags)' \
+              publicUrls='$(publicUrls)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
-              postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+              dockerImagesTag='$(dockerImagesTag)' \
+              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployDev
   displayName: 'Deploy to Development'
@@ -103,7 +122,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: ${{parameters.azureSubscription}}
+              azureSubscription: $(serviceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -113,9 +132,12 @@ stages:
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
                 --parameters \
-                resourceTags='$(resourceTags)' \
-                postgreSqlAdminName='$(postgreSqlAdminName)' \
-                postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(dockerImagesTag)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployTest
   displayName: 'Deploy to Testing'
@@ -133,7 +155,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: ${{parameters.azureSubscription}}
+              azureSubscription: $(serviceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -144,8 +166,11 @@ stages:
                 --parameters $(testParamFile)
                 --parameters \
                     resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(dockerImagesTag)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployPreProd
   displayName: 'Deploy to Pre-Prod'
@@ -164,7 +189,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: ${{parameters.azureSubscription}}
+              azureSubscription: $(serviceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -175,8 +200,11 @@ stages:
                 --parameters $(preProdParamFile)
                 --parameters \
                     resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(dockerImagesTag)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
 - stage: DeployProd
   displayName: 'Deploy to Production'
@@ -195,7 +223,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: ${{parameters.azureSubscription}}
+              azureSubscription: $(serviceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -206,5 +234,8 @@ stages:
                 --parameters $(prodParamFile)
                 --parameters \
                     resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)'
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(dockerImagesTag)'
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
