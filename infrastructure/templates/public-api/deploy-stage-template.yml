@@ -1,4 +1,4 @@
-# This isa reusable Deploy stage definition that is parameterised to be reusable
+# This is a reusable Deploy stage definition that is parameterised to be reusable
 # to support deployment to different environments
 
 parameters:
@@ -16,39 +16,56 @@ parameters:
 
 stages:
 - stage: Deploy${{parameters.environment}}
-  displayName: 'Deploy to ${{parameters.environment}}'
+  displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
-  dependsOn: ${{parameters.dependsOn}}
+#  dependsOn: ${{parameters.dependsOn}}
   jobs:
-#  - download: EESBuildPipeline
-#    displayName: 'Download Data Processor Function App ZIP file'
-#    artifact: data-processor
   - deployment: Deploy
-    displayName: 'Deploy ${{parameters.environment}} Infrastructure'
+    displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'
     environment: '${{parameters.environment}}'
     strategy:
       runOnce:
         deploy:
           steps:
+#          - template: 'artifact-download-url-step-template.yml'
+#            parameters:
+#              artifactName: 'public-api-data-processor'
+#              zipFileName: 'GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
+#              variableName: 'dataProcessorDownloadUrl'
+#          - download: EESBuildPipeline
+#            displayName: 'Download Data Processor Function App ZIP file'
+#            artifact: public-api-data-processor
           - download: none
           - checkout: self
-          - task: AzureCLI@2
-            displayName: 'Deploy bicep template to Azure'
+#          - task: AzureCLI@2
+#            displayName: 'Deploy bicep template to Azure'
+#            inputs:
+#              azureSubscription: $(serviceConnection)
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                set -e
+#                az deployment group create \
+#                --resource-group ${{parameters.resourceGroupName}} \
+#                --template-file $(templateFile) \
+#                --parameters $(devParamFile) \
+#                --parameters \
+#                    resourceTags='$(resourceTags)' \
+#                    publicUrls='$(publicUrls)' \
+#                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+#                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+#                    dockerImagesTag='$(dockerImagesTag)' \
+#                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
+#                    dataProcessorZipFileUrl='$(dataProcessorDownloadUrl)'
+          - task: AzureFunctionApp@2
+            displayName: 'Deploy Data Processor Function App'
             inputs:
               azureSubscription: $(serviceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
-                --template-file $(templateFile) \
-                --parameters $(devParamFile) \
-                --parameters \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
-                    dataProcessorZipFileUrl='${{parameters.dataProcessorZipFileUrl}}'
+              appType: 'functionAppLinux'
+              appName: 'dataset-processor-site2'
+              resourceGroupName: 'dfe-development-dw'
+#              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
+              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
+#              package: '/home/dwatson/development/projects/dfe/function-uploads/testupload.zip'
+              runtimeStack: 'DOTNET-ISOLATED|8.0'
+              deploymentMethod: 'runFromPackage'

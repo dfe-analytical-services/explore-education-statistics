@@ -1,0 +1,23 @@
+## This is a step template that obtains a download URL for a published Pipeline Artifact and stores the URL in the
+## variable name provided.
+
+parameters:
+  - name: artifactName
+    type: string
+  - name: zipFileName
+    type: string
+  - name: variableName
+    type: string
+
+steps:
+- bash: |
+    devOpsUrlEncodedOrganisation=`printf %s "$(System.TeamProject)" | jq -sRr @uri`
+    curl -H "Authorization: Bearer $(System.AccessToken)" $(System.TeamFoundationCollectionUri)$devOpsUrlEncodedOrganisation/_apis/build/builds/$(resources.pipeline.EESBuildPipeline.runID)/artifacts?artifactName=${{parameters.artifactName}} > artifact-info.json
+    artifactDownloadUrl=`jq -r '.resource.downloadUrl' < artifact-info.json`
+    artifactDownloadUrlWithFileFormat=`sed 's/format=zip/format=file/' <<<$artifactDownloadUrl`
+    fileDownloadUrl="$artifactDownloadUrlWithFileFormat&subPath=%2F${{parameters.zipFileName}}"
+    echo "$(System.AccessToken)"
+    authenticatedFileDownloadUrl="`sed 's/https:\/\//https:\/\/$(serviceConnection):$(System.AccessToken)@/' <<<$fileDownloadUrl`"
+    echo "Found download URL $authenticatedFileDownloadUrl"
+    echo "##vso[task.setvariable variable=${{parameters.variableName}}]$authenticatedFileDownloadUrl"
+  displayName: 'Get artifact download URL for ${{parameters.artifactName}}/${{parameters.zipFileName}}'
