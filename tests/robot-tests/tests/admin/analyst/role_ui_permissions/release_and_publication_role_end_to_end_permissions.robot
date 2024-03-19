@@ -225,8 +225,8 @@ Check release approver can create a release note
     user clicks link    Content
     user adds a release note    Test release note one
     ${date}    get current datetime    %-d %B %Y
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Check release approver can publish a release
     user clicks link    Sign off

@@ -51,7 +51,7 @@ user adds a release note
     ...    ${display_date_month}=${EMPTY}
     ...    ${display_date_year}=${EMPTY}
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    ${body}
+    user enters text into element    id:create-release-note-form-reason    ${body}
     user clicks button    Save note
     user waits until page contains button    Add note
 

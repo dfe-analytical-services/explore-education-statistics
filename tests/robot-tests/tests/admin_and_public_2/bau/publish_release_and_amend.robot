@@ -713,11 +713,11 @@ Update embedded dashboard title and url
 
 Add release note to first amendment
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note one
+    user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
     ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Check public prerelease access list for amendment is same as original release
     user clicks link    Pre-release access
@@ -977,7 +977,7 @@ Return to Admin and create second amendment
 Add release note to second amendment
     user clicks link    Content
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note two
+    user enters text into element    id:create-release-note-form-reason    Test release note two
     user clicks button    Save note
 
 Remove the data block from the second amendment

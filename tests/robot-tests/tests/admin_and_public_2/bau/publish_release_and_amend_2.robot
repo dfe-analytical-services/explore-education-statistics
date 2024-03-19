@@ -290,11 +290,11 @@ Navigate to 'Content' page for release amendment
 
 Add release note to release amendment
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note one
+    user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
     ${date}    get current datetime    %-d %B %Y
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note one
 
 Go to "Sign off" page
     user clicks link    Sign off
@@ -426,8 +426,8 @@ Add release note for new release amendment
     user clicks link    Content
     user adds a release note    Test release note two
     ${date}    get current datetime    %-d %B %Y
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note two
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note two
 
 Go to "Sign off" to approve amended release for immediate publication
     user clicks link    Sign off
