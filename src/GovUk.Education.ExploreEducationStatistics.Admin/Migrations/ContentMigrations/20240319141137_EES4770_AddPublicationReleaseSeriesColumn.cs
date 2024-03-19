@@ -4,7 +4,6 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    // @MarkFix redo this migration to ensure all is well
     public partial class EES4770_AddPublicationReleaseSeriesColumn : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "Publications",
                 type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "[]"); // to ensure pages still load until we use the migration endpoint
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
