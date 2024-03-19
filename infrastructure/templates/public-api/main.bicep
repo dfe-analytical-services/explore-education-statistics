@@ -263,12 +263,12 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
   }
 }
 
-resource dataProcessorFunctionAppZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = if (dataProcessorZipFileUrl != null) {
-  name: '${resourcePrefix}-${dataProcessorFunctionAppName}/ZipDeploy'
-  properties: {
-    packageUri: dataProcessorZipFileUrl
-  }
-  dependsOn: [
-    dataProcessorFunctionAppModule
-  ]
-}
+//resource dataProcessorFunctionAppZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = if (psqlDbUsersAdded && dataProcessorZipFileUrl != null) {
+//  name: '${resourcePrefix}-fa-${dataProcessorFunctionAppName}/ZipDeploy'
+//  properties: {
+//      packageUri: dataProcessorZipFileUrl
+//  }
+//  dependsOn: [
+//    dataProcessorFunctionAppModule
+//  ]
+//}

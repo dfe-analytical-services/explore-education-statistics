@@ -4,9 +4,6 @@ param resourcePrefix string
 @description('Specifies the location for all resources.')
 param location string
 
-@description('Specifies the Runtime Language of the function')
-param functionAppRuntime string = 'dotnet'
-
 @description('Specifies the name of the function.')
 param functionAppName string
 
@@ -40,7 +37,7 @@ module functionAppModule '../components/functionApp.bicep' = {
     settings: {
       dbConnectionString: dbConnectionString
     }
-    functionAppRuntime: functionAppRuntime
+    functionAppRuntime: 'dotnet-isolated'
     sku: {
       name: 'EP1'
       tier: 'ElasticPremium'
