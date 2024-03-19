@@ -110,7 +110,7 @@
     "dataFactoryConcurrency": {
       "value": 10
     },
-    "immediatePublicationOfScheduledReleasesEnabled": {
+    "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
     }
   }

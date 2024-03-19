@@ -33,13 +33,15 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400)]
     public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
-        [FromQuery] PublicationListRequest request)
+        [FromQuery] PublicationListRequest request,
+        CancellationToken cancellationToken)
     {
         return await _publicationService
             .ListPublications(
                 page: request.Page,
                 pageSize: request.PageSize,
-                search: request.Search)
+                search: request.Search,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -54,10 +56,14 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(404)]
     // add other responses
-    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication([SwaggerParameter("The ID of the publication.")] Guid publicationId)
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId,
+        CancellationToken cancellationToken)
     {
         return await _publicationService
-            .GetPublication(publicationId)
+            .GetPublication(
+                publicationId: publicationId,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -71,15 +77,17 @@ public class PublicationsController : ControllerBase
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListDataSets(
+    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListPublicationDataSets(
         [FromQuery] DataSetListRequest request,
-        [SwaggerParameter("The ID of the publication.")] Guid publicationId)
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetService
             .ListDataSets(
                 page: request.Page,
                 pageSize: request.PageSize,
-                publicationId)
+                publicationId: publicationId,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

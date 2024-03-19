@@ -24,11 +24,17 @@ internal class PublicationService : IPublicationService
     public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize,
-        string? search = null)
+        string? search = null,
+        CancellationToken cancellationToken = default)
     {
         return await GetPublishedDataSetPublicationIds()
             .OnSuccess(async publicationIds =>
-                await _contentApiClient.ListPublications(page, pageSize, search, publicationIds))
+                await _contentApiClient.ListPublications(
+                    page: page, 
+                    pageSize: pageSize, 
+                    search:search, 
+                    publicationIds: publicationIds,
+                    cancellationToken: cancellationToken))
             .OnSuccess(paginatedPublications =>
             {
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
@@ -44,10 +50,12 @@ internal class PublicationService : IPublicationService
             });
     }
 
-    public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    public async Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        return await CheckPublicationIsPublished(publicationId)
-            .OnSuccess(async _ => await _contentApiClient.GetPublication(publicationId))
+        return await CheckPublicationIsPublished(publicationId, cancellationToken)
+            .OnSuccess(async _ => await _contentApiClient.GetPublication(publicationId, cancellationToken))
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
                 Id  = publication.Id,
@@ -58,11 +66,14 @@ internal class PublicationService : IPublicationService
             });
     }
 
-    private Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds()
+    private async Task<Either<ActionResult, HashSet<Guid>>> GetPublishedDataSetPublicationIds(
+        CancellationToken cancellationToken = default)
     {
-        return _publicDataDbContext.DataSets
-            .Where(ds => ds.Status == DataSetStatus.Published)
-            .Select(ds => ds.PublicationId)
+        return (await _publicDataDbContext.DataSets
+                .Where(ds => ds.Status == DataSetStatus.Published)
+                .Select(ds => ds.PublicationId)
+                .ToListAsync(cancellationToken: cancellationToken)
+            )
             .ToHashSet();
     }
 
@@ -78,11 +89,13 @@ internal class PublicationService : IPublicationService
         };
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckPublicationIsPublished(Guid publicationId)
+    private async Task<Either<ActionResult, Unit>> CheckPublicationIsPublished(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
         var publicationIsPublished = await _publicDataDbContext.DataSets
             .Where(ds => ds.PublicationId == publicationId)
-            .AnyAsync(ds => ds.Status == DataSetStatus.Published);
+            .AnyAsync(ds => ds.Status == DataSetStatus.Published, cancellationToken: cancellationToken);
 
         if (publicationIsPublished)
         {
