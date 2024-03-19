@@ -4,8 +4,8 @@ param subscription string
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
-var vNetName = '${subscription}-vnet-ees'
-var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-data-processor'
+var vNetName = '${subscription}-vnet-eesdw'
+var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-dataset-processor'
 var postgreSqlSubnetName = '${resourcePrefix}-snet-psql'
 var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-api'
 

@@ -65,7 +65,7 @@ param publicUrls {
 }?
 
 var resourcePrefix = '${subscription}-ees-publicapi'
-var storageAccountName = '${subscription}saeescore'
+var storageAccountName = '${subscription}saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 
@@ -76,7 +76,7 @@ var tagValues = union(resourceTags ?? {}, {
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: 'eesacr'
+  name: 'eesacrdw'
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
