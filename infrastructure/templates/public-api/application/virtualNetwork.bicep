@@ -13,7 +13,7 @@ param dataProcessorFunctionAppName string
 @description('Specifies the name suffix of the PostgreSQL Flexible Server')
 param postgreSqlServerName string
 
-var vNetName = '${subscription}-vnet-eesdw'
+var vNetName = 's101d01-vnet-eesdw'
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
 var postgreSqlSubnetName = '${resourcePrefix}-snet-${postgreSqlServerName}'
 var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-${apiContainerAppName}'

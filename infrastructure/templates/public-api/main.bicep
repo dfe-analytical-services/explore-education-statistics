@@ -68,7 +68,7 @@ param publicUrls {
 param dataProcessorZipFileUrl string?
 
 var resourcePrefix = '${subscription}-ees-publicapi'
-var storageAccountName = '${subscription}saeescoredw'
+var storageAccountName = 's101d01saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var dataProcessorFunctionAppName = 'dataset-processor'
@@ -161,6 +161,9 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     subnetId: vNetModule.outputs.postgreSqlSubnetRef
     databaseNames: ['public_data']
   }
+  dependsOn: [
+    postgreSqlPrivateDnsZone
+  ]
 }
 
 resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -262,8 +265,10 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
 
 resource dataProcessorFunctionAppZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = if (dataProcessorZipFileUrl != null) {
   name: '${resourcePrefix}-${dataProcessorFunctionAppName}/ZipDeploy'
-  location: location
   properties: {
     packageUri: dataProcessorZipFileUrl
   }
+  dependsOn: [
+    dataProcessorFunctionAppModule
+  ]
 }
