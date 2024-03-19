@@ -2,20 +2,27 @@
 # to support deployment to different environments
 
 parameters:
-  - name:
+  - name: environment
     default: 'Development'
   - name: dependsOn
     default: 'Build'
-#  - name: resourceGroupName
-#    default: 'dfe-dev-dw'
-#  - name: psqlDbUsersAdded
-#    default: true
+  - name: resourceGroupName
+    default: 'dfe-devdw2'
+  - name: psqlDbUsersAdded
+    type: boolean
+    default: true
+  - name: dataProcessorZipFileUrl
+    default: ''
 
 stages:
 - stage: Deploy${{parameters.environment}}
   displayName: 'Deploy to ${{parameters.environment}}'
+  condition: succeeded()
   dependsOn: ${{parameters.dependsOn}}
   jobs:
+#  - download: EESBuildPipeline
+#    displayName: 'Download Data Processor Function App ZIP file'
+#    artifact: data-processor
   - deployment: Deploy
     displayName: 'Deploy ${{parameters.environment}} Infrastructure'
     environment: '${{parameters.environment}}'
@@ -44,4 +51,4 @@ stages:
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(dockerImagesTag)' \
                     psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
-                    dataProcessorZipFileUrl='${}'
+                    dataProcessorZipFileUrl='${{parameters.dataProcessorZipFileUrl}}'

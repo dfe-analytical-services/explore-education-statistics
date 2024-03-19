@@ -13,7 +13,7 @@ parameters:
   - name: resourceGroupName
     displayName: Resource Group Name
     type: string
-    default: 'dfe-dev-dw'
+    default: 'dfe-devdw2'
   - name: buildNumberOverride
     displayName: The build number of the main EES build that triggered this pipeline
     type: string

@@ -1,7 +1,7 @@
 using '../main.bicep'
 
 // Environment Params
-param subscription = 's101d01'
+param subscription = 'dfe-devdw2'
 param environmentName = 'Development'
 
 // PostgreSQL Database Params
