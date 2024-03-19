@@ -29,12 +29,16 @@ public class DataSetsController : ControllerBase
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
+    [SwaggerResponse(403)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetService
-            .GetDataSet(dataSetId)
+            .GetDataSet(
+               dataSetId: dataSetId,
+               cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -47,13 +51,18 @@ public class DataSetsController : ControllerBase
     [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
+    [SwaggerResponse(403)]
     [SwaggerResponse(404)]
-    public async Task<ActionResult<DataSetVersionViewModel>> GetVersion(
+    public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
-        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion)
+        [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
+        CancellationToken cancellationToken)
     {
         return await _dataSetService
-            .GetVersion(dataSetId, dataSetVersion)
+            .GetVersion(
+                dataSetId: dataSetId, 
+                dataSetVersion: dataSetVersion,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -67,15 +76,42 @@ public class DataSetsController : ControllerBase
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListVersions(
+    [SwaggerResponse(403)]
+    public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
         [FromQuery] DataSetVersionListRequest request,
-        [SwaggerParameter("The ID of the data set.")] Guid dataSetId)
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        CancellationToken cancellationToken)
     {
         return await _dataSetService
             .ListVersions(
                 dataSetId: dataSetId,
                 page: request.Page,
-                pageSize: request.PageSize)
+                pageSize: request.PageSize,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    /// <summary>
+    /// Get a data set’s metadata
+    /// </summary>
+    /// <remarks>
+    /// Get the metadata about a data set. Use this to create data set queries.
+    /// </remarks>
+    [HttpGet("{dataSetId:guid}/meta")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
+    [SwaggerResponse(403)]
+    [SwaggerResponse(404)]
+    public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] [FromQuery] string? dataSetVersion,
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        CancellationToken cancellationToken)
+    {
+        return await _dataSetService
+            .GetMeta(
+                dataSetId: dataSetId, 
+                dataSetVersion: dataSetVersion, 
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

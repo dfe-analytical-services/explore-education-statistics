@@ -30,7 +30,7 @@ public record DataSetViewModel
     ///
     /// - `Published` - the data set has been published and will receive updates
     /// - `Deprecated` - the data set is being discontinued and will no receive updates
-    /// - `Unpublished` - the data set has been unpublished and can no longer be used
+    /// - `Withdrawn` - the data set has been withdrawn and can no longer be used
     /// </summary>
     public required DataSetStatus Status { get; init; }
 
@@ -73,7 +73,7 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>
@@ -110,7 +110,6 @@ public class DataSetVersionViewModel
     /// 
     /// Minor versions should not cause issues in the functionality of existing code.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 
     /// <summary>
@@ -118,7 +117,7 @@ public class DataSetVersionViewModel
     ///
     /// - `Published` - the version is published and can be used
     /// - `Deprecated` - the version is being deprecated and will not be usable in the future
-    /// - `Unpublished` - the version has been unpublished and can no longer be used
+    /// - `Withdrawn` - the version has been withdrawn and can no longer be used
     /// </summary>
     public required DataSetVersionStatus Status { get; init; }
 
@@ -128,9 +127,9 @@ public class DataSetVersionViewModel
     public required DateTimeOffset Published { get; init; }
 
     /// <summary>
-    /// When the version was unpublished.
+    /// When the version was withdrawn.
     /// </summary>
-    public DateTimeOffset? Unpublished { get; init; }
+    public DateTimeOffset? Withdrawn { get; init; }
 
     /// <summary>
     /// Any notes about this version and its changes.
@@ -150,7 +149,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The geographic levels available in the data set.
     /// </summary>
-    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumLabelJsonConverter<GeographicLevel>>))]
+    [JsonConverter(typeof(ListJsonConverter<GeographicLevel, EnumToEnumValueJsonConverter<GeographicLevel>>))]
     public required IReadOnlyList<GeographicLevel> GeographicLevels { get; init; }
 
     /// <summary>

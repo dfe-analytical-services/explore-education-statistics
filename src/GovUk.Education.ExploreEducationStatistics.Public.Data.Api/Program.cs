@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Configuration.AddJsonFile(
-    path:"appsettings.Local.json",
+    path: "appsettings.Local.json",
     optional: true,
     reloadOnChange: false);
 
@@ -27,11 +27,7 @@ builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).Ful
 builder.Logging.AddAzureWebAppDiagnostics();
 
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.DescribeAllParametersInCamelCase();
-    options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
-});
+builder.Services.AddSwaggerGen();
 
 var startup = new Startup(builder.Configuration, builder.Environment);
 
@@ -43,7 +39,7 @@ startup.Configure(app, app.Environment);
 
 app.UseSwagger(options =>
 {
-     options.RouteTemplate = "/docs/{documentName}/openapi.json";
+    options.RouteTemplate = "/docs/{documentName}/openapi.json";
 });
 app.UseSwaggerUI(options =>
 {
