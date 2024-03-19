@@ -48,3 +48,5 @@ module functionAppModule '../components/functionApp.bicep' = {
     }
   }
 }
+
+output functionAppName string = functionAppModule.outputs.functionAppName
