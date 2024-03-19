@@ -98,6 +98,9 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   params: {
     subscription: subscription
     resourcePrefix: resourcePrefix
+    apiContainerAppName: apiContainerAppName
+    dataProcessorFunctionAppName: dataProcessorFunctionAppName
+    postgreSqlServerName: 'psql-flexibleserver'
   }
 }
 

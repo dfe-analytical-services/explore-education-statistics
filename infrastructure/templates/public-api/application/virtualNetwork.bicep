@@ -4,10 +4,19 @@ param subscription string
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
+@description('Specifies the name suffix of the API Container App')
+param apiContainerAppName string
+
+@description('Specifies the name suffix of the Data Processor Function App')
+param dataProcessorFunctionAppName string
+
+@description('Specifies the name suffix of the PostgreSQL Flexible Server')
+param postgreSqlServerName string
+
 var vNetName = '${subscription}-vnet-eesdw'
-var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-dataset-processor'
-var postgreSqlSubnetName = '${resourcePrefix}-snet-psql'
-var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-api'
+var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
+var postgreSqlSubnetName = '${resourcePrefix}-snet-${postgreSqlServerName}'
+var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-${apiContainerAppName}'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetPrefix = '10.0.6.0/24'
@@ -25,7 +34,7 @@ var dataProcessorSubnet = {
     addressPrefix: dataProcessorSubnetPrefix
     delegations: [
       {
-        name: '${resourcePrefix}-snet-delegation-fa-data-processor'
+        name: '${resourcePrefix}-snet-delegation-fa-${dataProcessorFunctionAppName}'
         properties: {
           serviceName: 'Microsoft.Web/serverFarms'
         }
@@ -40,7 +49,7 @@ var postgreSqlSubnet = {
     addressPrefix: postgreSqlSubnetPrefix
     delegations: [
     {
-      name: '${resourcePrefix}-snet-delegation-psql'
+      name: '${resourcePrefix}-snet-delegation-${postgreSqlServerName}'
       properties: {
         serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
       }
@@ -54,7 +63,7 @@ var apiContainerAppSubnet = {
     addressPrefix: apiContainerAppSubnetPrefix
     delegations: [
       {
-        name: '${resourcePrefix}-snet-delegation-cae-api'
+        name: '${resourcePrefix}-snet-delegation-cae-${apiContainerAppName}'
         properties: {
           serviceName: 'Microsoft.App/environments'
         }

@@ -54,7 +54,8 @@ variables:
     value: $[ coalesce( variables.trimmedBuildNumberOverride, variables.upstreamPipelineBuildNumber ) ]
 
 pool:
-  vmImage: $(vmImageName)
+  #  vmImage: $(vmImageName)
+  name: dfe-development-dw agent pool
 
 stages:
 - stage: Build
