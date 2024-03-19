@@ -155,6 +155,7 @@ jobs:
         inputs:
           command: 'publish'
           publishWebProjects: false
+          includeRootFolder: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/data-processor'
           zipAfterPublish: True
@@ -162,7 +163,7 @@ jobs:
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Public API Data Processor Artifacts'
         inputs:
-          artifactName: 'data-processor'
+          artifactName: 'public-api-data-processor'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api/data-processor'
 
 #      - task: 'DotNetCoreCLI@2'

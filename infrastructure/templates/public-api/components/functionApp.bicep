@@ -17,6 +17,7 @@ param appServicePlanOS string = 'Linux'
 @description('Function App runtime')
 @allowed([
   'dotnet'
+  'dotnet-isolated'
   'node'
   'python'
   'java'
@@ -58,7 +59,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: functionName
+  name: '${functionAppName}-site2'
   location: location
   kind: kind
   identity: {
@@ -67,9 +68,12 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   properties: {
     httpsOnly: true
     serverFarmId: appServicePlan.id
-    virtualNetworkSubnetId: subnetId
+    //virtualNetworkSubnetId: subnetId
     clientAffinityEnabled: true
     reserved: true
+    siteConfig: {
+      linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+    }
   }
   tags: tagValues
 }
@@ -81,7 +85,8 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     AzureWebJobsStorage: storageAccountConnectionString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: storageAccountConnectionString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
-    WEBSITE_CONTENTOVERVNET: 1
+    // WEBSITE_CONTENTOVERVNET: 1
+    // WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
     FUNCTIONS_EXTENSION_VERSION: '~4'
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime

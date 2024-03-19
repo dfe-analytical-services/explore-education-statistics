@@ -14,7 +14,7 @@ public class HelloWorldFunction
         _logger = logger;
     }
 
-    [Function("HelloWorld")]
+    [Function("DataProcessor")]
     public IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequest req,
         FunctionContext executionContext)
