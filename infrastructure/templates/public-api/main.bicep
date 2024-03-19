@@ -64,10 +64,14 @@ param publicUrls {
   contentApi: string
 }?
 
+@description('URL of Data Processor artifact ZIP to deploy.')
+param dataProcessorZipFileUrl string?
+
 var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = '${subscription}saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
+var dataProcessorFunctionAppName = 'dataset-processor'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -244,11 +248,19 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
   params: {
     resourcePrefix: resourcePrefix
     location: location
-    functionAppName: 'dataset-processor'
+    functionAppName: dataProcessorFunctionAppName
     storageAccountConnectionString: storageAccountConnectionString
     dbConnectionString: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+  }
+}
+
+resource dataProcessorFunctionAppZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = if (dataProcessorZipFileUrl != null) {
+  name: '${resourcePrefix}-${dataProcessorFunctionAppName}/ZipDeploy'
+  location: location
+  properties: {
+    packageUri: dataProcessorZipFileUrl
   }
 }

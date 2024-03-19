@@ -12,7 +12,7 @@ param functionAppName string
   'Windows'
   'Linux'
 ])
-param appServicePlanOS string = 'Windows'
+param appServicePlanOS string = 'Linux'
 
 @description('Function App runtime')
 @allowed([
