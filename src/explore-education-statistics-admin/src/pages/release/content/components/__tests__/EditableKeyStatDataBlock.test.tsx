@@ -1,6 +1,4 @@
 import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
-import { KeyStatDataBlockFormValues } from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
-import _keyStatisticService from '@admin/services/keyStatisticService';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
@@ -11,10 +9,6 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 jest.mock('@admin/services/keyStatisticService');
-const keyStatisticService = _keyStatisticService as jest.Mocked<
-  typeof _keyStatisticService
->;
-
 jest.mock('@common/services/tableBuilderService');
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService

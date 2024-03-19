@@ -3,35 +3,27 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import releaseContentRelatedInformationService from '@admin/services/releaseContentRelatedInformationService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
-import {
-  Form,
-  FormFieldset,
-  FormFieldTextInput,
-} from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import useToggle from '@common/hooks/useToggle';
+import ButtonGroup from '@common/components/ButtonGroup';
 import { BasicLink } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { useState } from 'react';
+
+type FormValues = Omit<BasicLink, 'id'>;
 
 interface Props {
   release: EditableRelease;
 }
 
-const RelatedPagesSection = ({ release }: Props) => {
+export default function RelatedPagesSection({ release }: Props) {
   const [links, setLinks] = useState<BasicLink[]>(release.relatedInformation);
-  const [formOpen, setFormOpen] = useState<boolean>(false);
+  const [formOpen, toggleFormOpen] = useToggle(false);
 
   const { editingMode } = useEditingContext();
-
-  const addLink = async (link: Omit<BasicLink, 'id'>) => {
-    const newLinks = await releaseContentRelatedInformationService.create(
-      release.id,
-      link,
-    );
-
-    setLinks(newLinks);
-  };
 
   const removeLink = (linkId: string) => {
     releaseContentRelatedInformationService
@@ -39,54 +31,13 @@ const RelatedPagesSection = ({ release }: Props) => {
       .then(setLinks);
   };
 
-  const renderLinkForm = () => {
-    return !formOpen ? (
-      <Button onClick={() => setFormOpen(true)}>Add related page link</Button>
-    ) : (
-      <Formik<Omit<BasicLink, 'id'>>
-        initialValues={{ description: '', url: '' }}
-        validationSchema={Yup.object({
-          description: Yup.string().required('Enter a link title'),
-          url: Yup.string()
-            .url('Enter a valid link url')
-            .required('Enter a link url'),
-        })}
-        onSubmit={async link => {
-          await addLink(link);
-          setFormOpen(false);
-        }}
-      >
-        {form => {
-          return (
-            <Form {...form} id="relatedPageForm">
-              <FormFieldset
-                id="relatedLink"
-                legend="Add related page link"
-                legendSize="m"
-              >
-                <FormFieldTextInput label="Title" name="description" />
-                <FormFieldTextInput label="Link url" name="url" />
-              </FormFieldset>
-              <Button
-                type="submit"
-                className="govuk-button govuk-!-margin-right-1"
-              >
-                Create link
-              </Button>
-              <ButtonText
-                className="govuk-button govuk-button--secondary"
-                onClick={() => {
-                  form.resetForm();
-                  setFormOpen(false);
-                }}
-              >
-                Cancel
-              </ButtonText>
-            </Form>
-          );
-        }}
-      </Formik>
+  const handleSubmit = async (values: FormValues) => {
+    const newLinks = await releaseContentRelatedInformationService.create(
+      release.id,
+      values,
     );
+    setLinks(newLinks);
+    toggleFormOpen.off();
   };
 
   return (
@@ -109,9 +60,55 @@ const RelatedPagesSection = ({ release }: Props) => {
           </nav>
         </>
       )}
-      {editingMode === 'edit' && renderLinkForm()}
+      {editingMode === 'edit' && (
+        <>
+          {formOpen ? (
+            <FormProvider
+              initialValues={{ description: '', url: '' }}
+              validationSchema={Yup.object({
+                description: Yup.string().required('Enter a link title'),
+                url: Yup.string()
+                  .url('Enter a valid link URL')
+                  .required('Enter a link URL'),
+              })}
+            >
+              <RHFForm id="relatedPageForm" onSubmit={handleSubmit}>
+                <FormFieldset
+                  id="relatedLink"
+                  legend="Add related page link"
+                  legendSize="m"
+                >
+                  <RHFFormFieldTextInput<FormValues>
+                    label="Title"
+                    name="description"
+                  />
+                  <RHFFormFieldTextInput<FormValues>
+                    label="Link URL"
+                    name="url"
+                  />
+                </FormFieldset>
+                <ButtonGroup>
+                  <Button
+                    type="submit"
+                    className="govuk-button govuk-!-margin-right-1"
+                  >
+                    Create link
+                  </Button>
+                  <Button
+                    className="govuk-button govuk-button--secondary"
+                    variant="secondary"
+                    onClick={toggleFormOpen.off}
+                  >
+                    Cancel
+                  </Button>
+                </ButtonGroup>
+              </RHFForm>
+            </FormProvider>
+          ) : (
+            <Button onClick={toggleFormOpen.on}>Add related page link</Button>
+          )}
+        </>
+      )}
     </>
   );
-};
-
-export default RelatedPagesSection;
+}
