@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -103,6 +104,7 @@ internal class DataSetService : IDataSetService
     public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
         Guid dataSetId,
         string? dataSetVersion = null,
+        IReadOnlySet<MetadataType>? types = null,
         CancellationToken cancellationToken = default)
     {
         return await FindVersion(
@@ -110,7 +112,7 @@ internal class DataSetService : IDataSetService
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dataSetVersion => LoadMeta(dataSetVersion, cancellationToken))
+            .OnSuccessDo(dataSetVersion => LoadMeta(dataSetVersion, types, cancellationToken))
             .OnSuccess(MapVersionMeta);
     }
 
@@ -237,31 +239,48 @@ internal class DataSetService : IDataSetService
             cancellationToken: cancellationToken);
     }
 
-    private async Task LoadMeta(DataSetVersion dataSetVersion, CancellationToken cancellationToken = default)
+    private async Task LoadMeta(
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<MetadataType>? types = null, 
+        CancellationToken cancellationToken = default)
     {
-        dataSetVersion.FilterMetas = await _publicDataDbContext.FilterMetas
-            .AsNoTracking()
-            .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-            .Include(fm => fm.OptionLinks)
-            .ThenInclude(fom => fom.Option)
-            .ToListAsync(cancellationToken: cancellationToken);
+        types = types.IsNullOrEmpty() ? EnumUtil.GetEnums<MetadataType>().ToHashSet() : types!;
 
-        dataSetVersion.LocationMetas = await _publicDataDbContext.LocationMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .Include(lm => lm.OptionLinks)
-            .ThenInclude(lom => lom.Option)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(MetadataType.Filters))
+        {
+            dataSetVersion.FilterMetas = await _publicDataDbContext.FilterMetas
+                .AsNoTracking()
+                .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
+                .Include(fm => fm.OptionLinks)
+                .ThenInclude(fom => fom.Option)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
 
-        dataSetVersion.IndicatorMetas = await _publicDataDbContext.IndicatorMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(MetadataType.Locations))
+        {
+            dataSetVersion.LocationMetas = await _publicDataDbContext.LocationMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .Include(lm => lm.OptionLinks)
+                .ThenInclude(lom => lom.Option)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
 
-        dataSetVersion.TimePeriodMetas = await _publicDataDbContext.TimePeriodMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(MetadataType.Indicators))
+        {
+            dataSetVersion.IndicatorMetas = await _publicDataDbContext.IndicatorMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
+
+        if (types.Contains(MetadataType.TimePeriods))
+        {
+            dataSetVersion.TimePeriodMetas = await _publicDataDbContext.TimePeriodMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
     }
 
     private DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)

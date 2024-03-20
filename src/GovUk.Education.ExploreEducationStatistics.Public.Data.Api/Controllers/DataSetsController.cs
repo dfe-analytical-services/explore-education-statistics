@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -98,14 +99,16 @@ public class DataSetsController(
     [SwaggerResponse(403)]
     [SwaggerResponse(404)]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
-        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] [FromQuery] string? dataSetVersion,
+        [FromQuery] DataSetMetaRequest request,
+        [FromQuery, SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] string? dataSetVersion,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         CancellationToken cancellationToken)
     {
         return await dataSetService
             .GetMeta(
                 dataSetId: dataSetId, 
-                dataSetVersion: dataSetVersion, 
+                dataSetVersion: dataSetVersion,
+                types: request.ParsedTypes(),
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }

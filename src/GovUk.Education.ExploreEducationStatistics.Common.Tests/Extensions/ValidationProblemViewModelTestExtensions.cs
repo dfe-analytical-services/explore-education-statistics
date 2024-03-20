@@ -193,6 +193,14 @@ public static class ValidationProblemViewModelTestExtensions
             expectedKey: FluentValidationKeys.EnumValidator
         );
 
+    public static ErrorViewModel AssertHasAllowedValueError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath)
+        => validationProblem.AssertHasFluentValidationError(
+            expectedPath: expectedPath,
+            expectedKey: ValidationMessages.AllowedValue.Code
+        );
+
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
