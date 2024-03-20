@@ -2841,22 +2841,21 @@
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('notificationsPlanName'))]",
         "httpsOnly": true,
-        "http20Enabled": true,
-        "minTlsVersion": "[parameters('minTlsVersion')]",
-        "ftpsState": "FtpsOnly",
-        "webSocketsEnabled": false,
-        "requestTracingEnabled": true,
-        "remoteDebuggingEnabled": false,
-        "httpLoggingEnabled": true,
-        "detailedErrorLoggingEnabled": true,
-        "cors": {
-          "allowedOrigins": [
-            "[concat('https://', parameters('domain'))]",
-            "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-            "https://localhost:3000",
-            "http://localhost:3000",
-            "http://127.0.0.1"
-          ]
+        "siteConfig": {
+          "http20Enabled": true,
+          "minTlsVersion": "[parameters('minTlsVersion')]",
+          "ftpsState": "FtpsOnly",
+          "netFrameworkVersion": "v8.0",
+          "webSocketsEnabled": false,
+          "requestTracingEnabled": true,
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "cors": {
+            "allowedOrigins": [
+              "[concat('https://', parameters('domain'))]"
+            ]
+          }
         }
       }
     },
