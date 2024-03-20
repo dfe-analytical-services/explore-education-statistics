@@ -5,90 +5,89 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
+
+/// <summary>
+/// A stream implementation that wraps and writes to multiple target streams.
+/// <para>
+/// It should be noted that this stream is only intended for writing,
+/// and is not intended to be seekable or readable.
+/// </para>
+/// </summary>
+public class MultiWriteStream : Stream
 {
-    /// <summary>
-    /// A stream implementation that wraps and writes to multiple target streams.
-    /// <para>
-    /// It should be noted that this stream is only intended for writing,
-    /// and is not intended to be seekable or readable.
-    /// </para>
-    /// </summary>
-    public class MultiWriteStream : Stream
+    private readonly List<Stream> _streams;
+
+    public MultiWriteStream(params Stream[] streams)
     {
-        private readonly List<Stream> _streams;
+        _streams = streams.ToList();
+    }
 
-        public MultiWriteStream(params Stream[] streams)
-        {
-            _streams = streams.ToList();
-        }
-
-        public override ValueTask DisposeAsync()
-        {
-            try
-            {
-                foreach (var stream in _streams)
-                {
-                    stream.Dispose();
-                }
-
-                return default;
-            }
-            catch (Exception exc)
-            {
-                return new ValueTask(Task.FromException(exc));
-            }
-        }
-
-        public override void Flush()
+    public override ValueTask DisposeAsync()
+    {
+        try
         {
             foreach (var stream in _streams)
             {
-                stream.Flush();
+                stream.Dispose();
             }
-        }
 
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotSupportedException();
+            return default;
         }
-
-        public override void SetLength(long value)
+        catch (Exception exc)
         {
-            foreach (var stream in _streams)
+            return new ValueTask(Task.FromException(exc));
+        }
+    }
+
+    public override void Flush()
+    {
+        foreach (var stream in _streams)
+        {
+            stream.Flush();
+        }
+    }
+
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        throw new NotSupportedException();
+    }
+
+    public override void SetLength(long value)
+    {
+        foreach (var stream in _streams)
+        {
+            stream.SetLength(value);
+        }
+    }
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        throw new NotSupportedException();
+    }
+
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        foreach (var stream in _streams)
+        {
+            if (stream.CanWrite)
             {
-                stream.SetLength(value);
+                stream.Write(buffer, offset, count);
             }
         }
+    }
 
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            throw new NotSupportedException();
-        }
+    public override bool CanRead => false;
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            foreach (var stream in _streams)
-            {
-                if (stream.CanWrite)
-                {
-                    stream.Write(buffer, offset, count);
-                }
-            }
-        }
+    public override bool CanSeek => false;
 
-        public override bool CanRead => false;
+    public override bool CanWrite => _streams.Any(x => x.CanWrite);
 
-        public override bool CanSeek => false;
+    public override long Length => -1;
 
-        public override bool CanWrite => _streams.Any(x => x.CanWrite);
-
-        public override long Length => -1;
-
-        public override long Position
-        {
-            get => -1;
-            set => throw new NotSupportedException();
-        }
+    public override long Position
+    {
+        get => -1;
+        set => throw new NotSupportedException();
     }
 }

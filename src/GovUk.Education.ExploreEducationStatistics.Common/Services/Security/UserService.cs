@@ -7,58 +7,57 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+
+public class UserService : IUserService
 {
-    public class UserService : IUserService
+    private readonly IAuthorizationService _authorizationService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserService(IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _authorizationService = authorizationService;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public UserService(IAuthorizationService authorizationService, IHttpContextAccessor httpContextAccessor)
+    public Task<bool> MatchesPolicy(Enum policy)
+    {
+        return _authorizationService.MatchesPolicy(GetUser(), policy);
+    }
+
+    public Task<bool> MatchesPolicy(object resource, Enum policy)
+    {
+        return _authorizationService.MatchesPolicy(GetUser(), resource, policy);
+    }
+
+    public Guid GetUserId()
+    {
+        var user = GetUser();
+
+        if (user == null)
         {
-            _authorizationService = authorizationService;
-            _httpContextAccessor = httpContextAccessor;
+            throw new AuthenticationException("No user was found to get Id from");
         }
 
-        public Task<bool> MatchesPolicy(Enum policy)
+        return user.GetUserId();
+    }
+
+    public UserProfileFromClaims GetProfileFromClaims()
+    {
+        var user = GetUser();
+
+        if (user == null)
         {
-            return _authorizationService.MatchesPolicy(GetUser(), policy);
+            throw new AuthenticationException("No user was found to get Claims from");
         }
 
-        public Task<bool> MatchesPolicy(object resource, Enum policy)
-        {
-            return _authorizationService.MatchesPolicy(GetUser(), resource, policy);
-        }
+        var email = user.GetEmail();
+        var (firstName, lastName) = user.GetNameParts();
+        return new UserProfileFromClaims(Email: email, FirstName: firstName, LastName: lastName);
+    }
 
-        public Guid GetUserId()
-        {
-            var user = GetUser();
-
-            if (user == null)
-            {
-                throw new AuthenticationException("No user was found to get Id from");
-            }
-
-            return user.GetUserId();
-        }
-
-        public UserProfileFromClaims GetProfileFromClaims()
-        {
-            var user = GetUser();
-
-            if (user == null)
-            {
-                throw new AuthenticationException("No user was found to get Claims from");
-            }
-
-            var email = user.GetEmail();
-            var (firstName, lastName) = user.GetNameParts();
-            return new UserProfileFromClaims(Email: email, FirstName: firstName, LastName: lastName);
-        }
-
-        private ClaimsPrincipal? GetUser()
-        {
-            return _httpContextAccessor.HttpContext?.User;
-        }
+    private ClaimsPrincipal? GetUser()
+    {
+        return _httpContextAccessor.HttpContext?.User;
     }
 }

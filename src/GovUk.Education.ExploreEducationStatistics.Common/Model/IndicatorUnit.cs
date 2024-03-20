@@ -1,22 +1,21 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public enum IndicatorUnit
 {
-    public enum IndicatorUnit
-    {
-        [EnumLabelValue("", "")]
-        Number,
+    [EnumLabelValue("", "")]
+    Number,
 
-        [EnumLabelValue("%", "%")]
-        Percent,
+    [EnumLabelValue("%", "%")]
+    Percent,
 
-        [EnumLabelValue("£", "£")]
-        Pound,
+    [EnumLabelValue("£", "£")]
+    Pound,
 
-        [EnumLabelValue("£m", "£m")]
-        MillionPounds,
+    [EnumLabelValue("£m", "£m")]
+    MillionPounds,
 
-        [EnumLabelValue("pp", "pp")]
-        PercentagePoint,
-    }
+    [EnumLabelValue("pp", "pp")]
+    PercentagePoint,
 }
