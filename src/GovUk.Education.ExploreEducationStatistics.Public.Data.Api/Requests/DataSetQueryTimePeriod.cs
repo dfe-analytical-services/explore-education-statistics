@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 /// - 2020/2021 academic year's summer term
 ///
 /// If you wish to be more explicit, you may use a range for the `period` e.g. `2020/2021`.
+/// However, a range cannot be used with time period types which only span a single year,
+/// for example, `2020/21` cannot be used with `CY`, `M` or `W` codes.
 ///
 /// Some examples:
 ///
