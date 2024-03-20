@@ -48,7 +48,6 @@ Validate that two legacy releases exist in the page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
-    sleep    10
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -78,3 +77,24 @@ Check legacy release appears on public frontend
     ${other_release_1}=    user gets list item element    css:ul    2    ${other_releases}
     ${other_release_1_link}=    get child element    ${other_release_1}    link:${DESCRIPTION}
     user checks element attribute value should be    ${other_release_1_link}    href    http://test.com/
+
+Navigate to publication to update legacy releases
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+
+Update legacy release
+    user clicks element    xpath://tr[2]//*[text()="Edit"]
+    ${modal}=    user waits until modal is visible    Edit legacy release
+    user clicks button    OK    ${modal}
+
+    user waits until page contains element    id:releaseSeriesLegacyLinkForm-description
+    user enters text into element    id:releaseSeriesLegacyLinkForm-description    ${UPDATED_DESCRIPTION}
+    user enters text into element    id:releaseSeriesLegacyLinkForm-url    http://test2.com
+    user clicks button    Save legacy release
+
+Validate the updated legacy release
+    user waits until h2 is visible    Legacy releases
+    user checks element count is x    css:tbody tr    3
+    user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    2    2    http://test2.com
