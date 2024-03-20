@@ -17,7 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTable
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.TableStorageTestUtils;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils.NotifierTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Functions;
 
 public class ReleaseNotifierTests
 {
