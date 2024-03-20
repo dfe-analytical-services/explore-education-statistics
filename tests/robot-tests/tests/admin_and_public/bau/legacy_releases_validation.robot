@@ -98,3 +98,16 @@ Validate the updated legacy release
     user checks element count is x    css:tbody tr    3
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
+
+Reorder the legacy releases
+    user clicks button    Reorder releases
+    user waits until modal is visible    Reorder releases
+    user clicks button    OK
+    user waits until modal is not visible    Reorder legacy releases
+    user waits until page contains button    Confirm order
+    user sets focus to element    css:tbody tr:first-child
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button    Confirm order
