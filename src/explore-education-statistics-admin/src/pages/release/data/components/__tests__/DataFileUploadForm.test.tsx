@@ -8,13 +8,13 @@ describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {
     render(<DataFileUploadForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Upload data file'));
+    await userEvent.click(screen.getByLabelText('Upload data file'));
     fireEvent.change(screen.getByLabelText('Upload data file'), {
       target: {
         value: null,
       },
     });
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -32,8 +32,8 @@ describe('DataFileUploadForm', () => {
       type: 'text/csv',
     });
 
-    userEvent.upload(screen.getByLabelText('Upload data file'), file);
-    userEvent.tab();
+    await userEvent.upload(screen.getByLabelText('Upload data file'), file);
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -47,11 +47,11 @@ describe('DataFileUploadForm', () => {
   test('shows validation message when no meta data file selected', async () => {
     render(<DataFileUploadForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Upload metadata file'));
+    await userEvent.click(screen.getByLabelText('Upload metadata file'));
     fireEvent.change(screen.getByLabelText('Upload metadata file'), {
       target: { value: null },
     });
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -69,8 +69,8 @@ describe('DataFileUploadForm', () => {
       type: 'text/csv',
     });
 
-    userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
-    userEvent.tab();
+    await userEvent.upload(screen.getByLabelText('Upload metadata file'), file);
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -84,12 +84,12 @@ describe('DataFileUploadForm', () => {
   test('shows validation message when no ZIP file selected', async () => {
     render(<DataFileUploadForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('ZIP file'));
-    userEvent.click(screen.getByLabelText('Upload ZIP file'));
+    await userEvent.click(screen.getByLabelText('ZIP file'));
+    await userEvent.click(screen.getByLabelText('Upload ZIP file'));
     fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
       target: { value: null },
     });
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -107,9 +107,9 @@ describe('DataFileUploadForm', () => {
       type: 'application/zip',
     });
 
-    userEvent.click(screen.getByLabelText('ZIP file'));
-    userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('ZIP file'));
+    await userEvent.upload(screen.getByLabelText('Upload ZIP file'), file);
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -125,7 +125,7 @@ describe('DataFileUploadForm', () => {
 
     render(<DataFileUploadForm onSubmit={handleSubmit} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Upload data files',
       }),
@@ -157,8 +157,8 @@ describe('DataFileUploadForm', () => {
 
     render(<DataFileUploadForm onSubmit={handleSubmit} />);
 
-    userEvent.click(screen.getByLabelText('ZIP file'));
-    userEvent.click(
+    await userEvent.click(screen.getByLabelText('ZIP file'));
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Upload data files',
       }),

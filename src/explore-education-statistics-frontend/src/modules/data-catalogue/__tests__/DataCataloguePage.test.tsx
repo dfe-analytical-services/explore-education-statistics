@@ -137,7 +137,7 @@ describe('DataCataloguePage', () => {
       }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('radio', { name: 'Theme title 1' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Theme title 1' }));
 
     // Check there is only one radio for the publication
     await waitFor(() => {
@@ -176,9 +176,11 @@ describe('DataCataloguePage', () => {
 
     expect(step1.getByText('Choose a publication')).toBeInTheDocument();
 
-    userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    userEvent.click(step1.getByRole('radio', { name: 'Publication title 1' }));
-    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await userEvent.click(
+      step1.getByRole('radio', { name: 'Publication title 1' }),
+    );
+    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
@@ -211,8 +213,8 @@ describe('DataCataloguePage', () => {
     expect(releaseRadios[1]).toEqual(step2.getByLabelText('Release title 2'));
     expect(releaseRadios[2]).toEqual(step2.getByLabelText('Release title 1'));
 
-    userEvent.click(releaseRadios[0]);
-    userEvent.click(step2.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(releaseRadios[0]);
+    await userEvent.click(step2.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-2')).not.toHaveAttribute(
@@ -244,10 +246,10 @@ describe('DataCataloguePage', () => {
       step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
     );
 
-    userEvent.click(fileCheckboxes[1]);
-    userEvent.click(fileCheckboxes[2]);
+    await userEvent.click(fileCheckboxes[1]);
+    await userEvent.click(fileCheckboxes[2]);
 
-    userEvent.click(
+    await userEvent.click(
       step3.getByRole('button', { name: 'Download selected files' }),
     );
 
@@ -274,9 +276,11 @@ describe('DataCataloguePage', () => {
     // Step 1
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
-    userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    userEvent.click(step1.getByRole('radio', { name: 'Publication title 1' }));
-    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await userEvent.click(
+      step1.getByRole('radio', { name: 'Publication title 1' }),
+    );
+    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
@@ -320,9 +324,11 @@ describe('DataCataloguePage', () => {
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
 
-    userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
-    userEvent.click(step1.getByRole('radio', { name: 'Publication title 1' }));
-    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+    await userEvent.click(step1.getByRole('radio', { name: 'Theme title 1' }));
+    await userEvent.click(
+      step1.getByRole('radio', { name: 'Publication title 1' }),
+    );
+    await userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
       expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
@@ -984,7 +990,7 @@ describe('DataCataloguePage', () => {
           results: testDataSetSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
+        dataSetService.listDataSets.mockResolvedValue({
           results: [testDataSetSummaries[1], testDataSetSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
@@ -996,8 +1002,11 @@ describe('DataCataloguePage', () => {
           expect(screen.getByText('30 data sets')).toBeInTheDocument();
         });
 
-        userEvent.type(screen.getByLabelText('Search data sets'), 'find me');
-        userEvent.click(screen.getByRole('button', { name: 'Search' }));
+        await userEvent.type(
+          screen.getByLabelText('Search data sets'),
+          'find me',
+        );
+        await userEvent.click(screen.getByRole('button', { name: 'Search' }));
 
         await waitFor(() => {
           expect(screen.getByText('2 data sets')).toBeInTheDocument();
@@ -1414,7 +1423,7 @@ describe('DataCataloguePage', () => {
           results: [testDataSetSummaries[1], testDataSetSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
+        dataSetService.listDataSets.mockResolvedValue({
           results: testDataSetSummaries,
           paging: testPaging,
         });
@@ -1469,6 +1478,13 @@ describe('DataCataloguePage', () => {
           query: {},
         });
 
+        await waitFor(() =>
+          expect(
+            screen.queryByText(
+              'Publication title 2 - Release title 1 downloads',
+            ),
+          ).not.toBeInTheDocument(),
+        );
         expect(
           screen.queryByRole('button', {
             name: 'Remove filter: Theme Theme title 2',
@@ -1500,7 +1516,7 @@ describe('DataCataloguePage', () => {
           results: [testDataSetSummaries[1], testDataSetSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
+        dataSetService.listDataSets.mockResolvedValue({
           results: testDataSetSummaries,
           paging: testPaging,
         });
@@ -1527,7 +1543,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove filter: Publication Publication title 2',
           }),
@@ -1566,7 +1582,7 @@ describe('DataCataloguePage', () => {
           results: [testDataSetSummaries[1], testDataSetSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
+        dataSetService.listDataSets.mockResolvedValue({
           results: testDataSetSummaries,
           paging: testPaging,
         });
@@ -1584,15 +1600,13 @@ describe('DataCataloguePage', () => {
           expect(releasesSelect).toHaveValue('release-1');
         });
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove filter: Release Release title 1',
           }),
         );
 
-        await waitFor(() => {
-          expect(screen.getByText('30 data sets')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('30 data sets')).toBeInTheDocument();
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
@@ -1689,7 +1703,7 @@ describe('DataCataloguePage', () => {
           }),
         ).toBeInTheDocument();
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Clear filters',
           }),
@@ -1771,8 +1785,13 @@ describe('DataCataloguePage', () => {
           expect(screen.getByText('30 data sets')).toBeInTheDocument();
         });
 
-        userEvent.type(screen.getByLabelText('Search data sets'), 'Find me');
-        userEvent.click(screen.getByRole('button', { name: 'Search' }));
+        await userEvent.type(
+          screen.getByLabelText('Search data sets'),
+          'Find me',
+        );
+        await await userEvent.click(
+          screen.getByRole('button', { name: 'Search' }),
+        );
 
         await waitFor(() => {
           expect(screen.getByText('2 data sets')).toBeInTheDocument();
@@ -1809,7 +1828,7 @@ describe('DataCataloguePage', () => {
           query: { orderBy: 'relevance' },
         });
 
-        userEvent.click(
+        await userEvent.click(
           screen.getByRole('button', {
             name: 'Remove filter: Search Find me',
           }),
@@ -1836,11 +1855,13 @@ describe('DataCataloguePage', () => {
 
       render(<DataCataloguePage newDesign />);
 
-      await waitFor(() => {
-        expect(screen.getByText('30 data sets')).toBeInTheDocument();
-      });
+      expect(await screen.findByText('30 data sets')).toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Filter results' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Filter results' }),
+      );
+
+      expect(await screen.findByText('Back to results')).toBeInTheDocument();
 
       const modal = within(screen.getByRole('dialog'));
 

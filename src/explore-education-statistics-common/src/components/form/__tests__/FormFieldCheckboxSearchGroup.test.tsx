@@ -213,7 +213,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
 
     expect(checkbox.checked).toBe(false);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(checkbox.checked).toBe(true);
@@ -247,14 +247,14 @@ describe('FormFieldCheckboxSearchGroup', () => {
 
     expect(checkbox.checked).toBe(true);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(checkbox.checked).toBe(false);
     });
   });
 
-  test('clicking `Select all 3 options` button checks all values', () => {
+  test('clicking `Select all 3 options` button checks all values', async () => {
     render(
       <Formik
         initialValues={{
@@ -278,7 +278,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
       </Formik>,
     );
 
-    userEvent.click(screen.getByText('Select all 3 options'));
+    await userEvent.click(screen.getByText('Select all 3 options'));
 
     expect(
       (screen.getByLabelText('Checkbox 1') as HTMLInputElement).checked,
@@ -291,7 +291,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
     ).toBe(true);
   });
 
-  test('clicking `Unselect all 3 options` button un-checks all values', () => {
+  test('clicking `Unselect all 3 options` button un-checks all values', async () => {
     render(
       <Formik
         initialValues={{
@@ -323,7 +323,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
 
-    userEvent.click(screen.getByText('Unselect all 3 options'));
+    await userEvent.click(screen.getByText('Unselect all 3 options'));
 
     expect(checkbox1.checked).toBe(false);
     expect(checkbox2.checked).toBe(false);
@@ -362,9 +362,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(queryByText('Select all 3 options')).toBeInTheDocument();
     expect(queryByText('Unselect all 3 options')).not.toBeInTheDocument();
 
-    userEvent.click(checkbox1);
-    userEvent.click(checkbox2);
-    userEvent.click(checkbox3);
+    await userEvent.click(checkbox1);
+    await userEvent.click(checkbox2);
+    await userEvent.click(checkbox3);
 
     await waitFor(() => {
       expect(checkbox1.checked).toBe(true);
@@ -406,7 +406,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
     expect(screen.queryByText('Unselect all 3 options')).toBeInTheDocument();
     expect(screen.queryByText('Select all 3 options')).not.toBeInTheDocument();
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     await waitFor(() => {
       expect(checkbox.checked).toBe(false);
@@ -487,7 +487,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       await waitFor(() => {
         expect(checkbox.checked).toBe(false);
@@ -534,7 +534,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       await waitFor(() => {
         expect(checkbox.checked).toBe(false);
@@ -546,8 +546,6 @@ describe('FormFieldCheckboxSearchGroup', () => {
   });
 
   test('providing a search term does not remove checkboxes that have already been checked', async () => {
-    jest.useFakeTimers();
-
     render(
       <Formik
         initialValues={{
@@ -579,7 +577,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
 
     await userEvent.type(searchInput, '2');
 
-    jest.runAllTimers();
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     expect(screen.getAllByLabelText(/Checkbox/)).toHaveLength(2);
     expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');

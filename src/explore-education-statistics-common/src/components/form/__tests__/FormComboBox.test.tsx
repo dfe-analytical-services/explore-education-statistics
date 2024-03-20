@@ -266,11 +266,11 @@ describe('FormComboBox', () => {
 
       await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      userEvent.click(screen.getByText('Target'));
+      await userEvent.click(screen.getByText('Target'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
 
-      userEvent.click(screen.getByLabelText('Choose option'));
+      await userEvent.click(screen.getByLabelText('Choose option'));
 
       expect(screen.getByRole('listbox')).toBeInTheDocument();
       expect(screen.getAllByRole('option')).toHaveLength(3);
@@ -786,7 +786,7 @@ describe('FormComboBox', () => {
 
       expect(onSelect).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByText('Option 2'));
+      await userEvent.click(screen.getByText('Option 2'));
 
       expect(onSelect).toHaveBeenCalledWith(1);
     });
@@ -804,7 +804,7 @@ describe('FormComboBox', () => {
 
       await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      userEvent.click(screen.getByText('Option 2'));
+      await userEvent.click(screen.getByText('Option 2'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
     });
@@ -828,7 +828,7 @@ describe('FormComboBox', () => {
 
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      userEvent.click(screen.getByText('Target'));
+      await userEvent.click(screen.getByText('Target'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
     });

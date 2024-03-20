@@ -1,3 +1,4 @@
+using Bogus;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
@@ -17,12 +18,12 @@ public static class DataSetVersionGeneratorExtensions
         int maxLocationOptions = 10)
         => fixture
             .DefaultDataSetVersion()
-            .WithFilterMetas(() => fixture.DefaultFilterMeta()
-                .WithOptions(() => fixture.DefaultFilterOptionMeta().GenerateRandom(maxFilterOptions))
+            .WithFilterMetas(faker => fixture
+                .DefaultFilterMeta(options: faker.Random.Int(1, maxFilterOptions))
                 .Generate(filters))
             .WithIndicatorMetas(() => fixture.DefaultIndicatorMeta().Generate(indicators))
-            .WithLocationMetas(() => fixture.DefaultLocationMeta()
-                .WithOptions(() => fixture.DefaultLocationCodedOptionMeta().GenerateRandom(maxLocationOptions))
+            .WithLocationMetas(faker => fixture
+                .DefaultLocationMeta(options: faker.Random.Int(1, maxLocationOptions))
                 .Generate(locations))
             .WithTimePeriodMetas(() => fixture.DefaultTimePeriodMeta().Generate(timePeriods))
             .WithMetaSummary();
@@ -103,9 +104,19 @@ public static class DataSetVersionGeneratorExtensions
         Func<IEnumerable<LocationMeta>> metas)
         => generator.ForInstance(s => s.SetLocationMetas(metas));
 
+    public static Generator<DataSetVersion> WithLocationMetas(
+        this Generator<DataSetVersion> generator,
+        Func<Faker, IEnumerable<LocationMeta>> metas)
+        => generator.ForInstance(s => s.SetLocationMetas(metas));
+
     public static Generator<DataSetVersion> WithFilterMetas(
         this Generator<DataSetVersion> generator,
         Func<IEnumerable<FilterMeta>> metas)
+        => generator.ForInstance(s => s.SetFilterMetas(metas));
+
+    public static Generator<DataSetVersion> WithFilterMetas(
+        this Generator<DataSetVersion> generator,
+        Func<Faker, IEnumerable<FilterMeta>> metas)
         => generator.ForInstance(s => s.SetFilterMetas(metas));
 
     public static Generator<DataSetVersion> WithIndicatorMetas(
@@ -255,10 +266,15 @@ public static class DataSetVersionGeneratorExtensions
     public static InstanceSetters<DataSetVersion> SetLocationMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
         Func<IEnumerable<LocationMeta>> metas)
+        => instanceSetter.SetLocationMetas(_ => metas());
+
+    public static InstanceSetters<DataSetVersion> SetLocationMetas(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<Faker, IEnumerable<LocationMeta>> metas)
         => instanceSetter.Set(
-            (_, dsv) =>
+            (faker, dsv) =>
             {
-                dsv.LocationMetas = metas().ToList();
+                dsv.LocationMetas = metas(faker).ToList();
 
                 foreach (var meta in dsv.LocationMetas)
                 {
@@ -272,10 +288,15 @@ public static class DataSetVersionGeneratorExtensions
     public static InstanceSetters<DataSetVersion> SetFilterMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
         Func<IEnumerable<FilterMeta>> metas)
+        => instanceSetter.SetFilterMetas(_ => metas());
+
+    public static InstanceSetters<DataSetVersion> SetFilterMetas(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<Faker, IEnumerable<FilterMeta>> metas)
         => instanceSetter.Set(
-            (_, dsv) =>
+            (faker, dsv) =>
             {
-                dsv.FilterMetas = metas().ToList();
+                dsv.FilterMetas = metas(faker).ToList();
 
                 foreach (var meta in dsv.FilterMetas)
                 {

@@ -5,8 +5,9 @@ import useRegister from '@common/components/form/rhf/hooks/useRegister';
 import handleAllRHFCheckboxChange from '@common/components/form/rhf/util/handleAllRHFCheckboxChange';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import get from 'lodash/get';
-import React, { memo, useCallback } from 'react';
+import React, { ChangeEvent, memo, useCallback } from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
+import { OtherCheckboxChangeProps } from '../FormCheckbox';
 
 export interface RHFFormFieldCheckboxSearchSubGroupsProps<
   TFormValues extends FieldValues,
@@ -26,7 +27,7 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
   ...props
 }: RHFFormFieldCheckboxSearchSubGroupsProps<TFormValues>) {
   const {
-    formState: { errors, submitCount },
+    formState: { errors },
     register,
     setValue,
     trigger,
@@ -46,7 +47,10 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
   const fieldOnChange = field.onChange;
 
   const handleChange = useCallback(
-    async (event, option) => {
+    async (
+      event: ChangeEvent<HTMLInputElement>,
+      option: OtherCheckboxChangeProps,
+    ) => {
       if (propsOnChange) {
         propsOnChange(event, option);
       }
@@ -79,7 +83,6 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
           options: options.flatMap(group => group.options),
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}
@@ -99,7 +102,6 @@ function RHFFormFieldCheckboxSearchSubGroups<TFormValues extends FieldValues>({
           options: groupOptions,
           selectedValues,
           setValue,
-          submitCount,
           trigger,
         });
       }}

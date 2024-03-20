@@ -5,9 +5,9 @@ import {
   RenderResult,
 } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React, { FC, ReactElement } from 'react';
+import React, { FC, ReactElement, ReactNode } from 'react';
 
-const DefaultWrapper: FC = ({ children }) => {
+const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
   const queryClient = new QueryClient({
     logger: {
       // eslint-disable-next-line no-console

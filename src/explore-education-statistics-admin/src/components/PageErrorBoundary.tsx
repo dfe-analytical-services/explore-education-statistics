@@ -4,11 +4,15 @@ import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
 import { isAxiosError } from 'axios';
-import React, { Component } from 'react';
+import React, { Component, ReactNode } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 interface State {
   errorCode?: number;
+}
+
+interface Props extends RouteComponentProps {
+  children: ReactNode;
 }
 
 /**
@@ -16,7 +20,7 @@ interface State {
  * specific types, or a fallback "Service problems" page
  * dependant on the type of error encountered.
  */
-class PageErrorBoundary extends Component<RouteComponentProps, State> {
+class PageErrorBoundary extends Component<Props, State> {
   public state: State = {};
 
   private unregisterCallback?: () => void;

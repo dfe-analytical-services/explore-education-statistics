@@ -11,7 +11,7 @@ import {
   Draggable,
   DraggableStateSnapshot,
   Droppable,
-} from 'react-beautiful-dnd';
+} from '@hello-pangea/dnd';
 import { useFormContext } from 'react-hook-form';
 
 const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button

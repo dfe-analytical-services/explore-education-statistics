@@ -15,7 +15,7 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router';
 import orderBy from 'lodash/orderBy';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
 interface Props {
   canUpdateRelease: boolean;

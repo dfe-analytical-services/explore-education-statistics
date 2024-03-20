@@ -259,7 +259,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     );
   });
 
-  test('checking option checks it', () => {
+  test('checking option checks it', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -295,12 +295,12 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     expect(checkbox.checked).toBe(false);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(true);
   });
 
-  test('un-checking option un-checks it', () => {
+  test('un-checking option un-checks it', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -337,12 +337,12 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     expect(checkbox.checked).toBe(true);
 
-    userEvent.click(checkbox);
+    await userEvent.click(checkbox);
 
     expect(checkbox.checked).toBe(false);
   });
 
-  test('clicking `Select all options` button checks all values for all groups', () => {
+  test('clicking `Select all options` button checks all values for all groups', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -379,7 +379,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Select all 3 options',
       }),
@@ -396,7 +396,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking `Unselect all options` button un-checks all options for all groups', () => {
+  test('clicking `Unselect all options` button un-checks all options for all groups', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -433,7 +433,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Unselect all 3 options',
       }),
@@ -444,7 +444,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(false);
   });
 
-  test('checking all checkboxes for all groups renders `Unselect all options` button', () => {
+  test('checking all checkboxes for all groups renders `Unselect all options` button', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -479,9 +479,9 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(screen.getByLabelText('Checkbox 1'));
-    userEvent.click(screen.getByLabelText('Checkbox 2'));
-    userEvent.click(screen.getByLabelText('Checkbox 3'));
+    await userEvent.click(screen.getByLabelText('Checkbox 1'));
+    await userEvent.click(screen.getByLabelText('Checkbox 2'));
+    await userEvent.click(screen.getByLabelText('Checkbox 3'));
 
     expect(
       screen.getByRole('button', {
@@ -490,7 +490,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking `Select all subgroup options` button for a group checks all values for that group', () => {
+  test('clicking `Select all subgroup options` button for a group checks all values for that group', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -530,7 +530,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(false);
 
-    userEvent.click(
+    await userEvent.click(
       group2.getByRole('button', {
         name: /Select all 2 subgroup options/i,
       }),
@@ -541,7 +541,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(true);
   });
 
-  test('clicking `Unselect all` button for a group un-checks all values for that group', () => {
+  test('clicking `Unselect all` button for a group un-checks all values for that group', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -581,7 +581,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
 
-    userEvent.click(
+    await userEvent.click(
       group2.getByRole('button', { name: /Unselect all 2 subgroup options/i }),
     );
 
@@ -590,7 +590,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(false);
   });
 
-  test('checking all options for a group renders corresponding `Unselect all subgroup options` button', () => {
+  test('checking all options for a group renders corresponding `Unselect all subgroup options` button', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -634,8 +634,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       group2.queryByRole('button', { name: 'Unselect all 2 subgroup options' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(checkbox2);
-    userEvent.click(checkbox3);
+    await userEvent.click(checkbox2);
+    await userEvent.click(checkbox3);
 
     expect(checkbox2.checked).toBe(true);
     expect(checkbox3.checked).toBe(true);
@@ -648,7 +648,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     ).toBeInTheDocument();
   });
 
-  test('un-checking any options renders the corresponding `Unselect all options` button', () => {
+  test('un-checking any options renders the corresponding `Unselect all options` button', async () => {
     render(
       <FormProvider
         initialValues={{
@@ -692,7 +692,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       group2.getByRole('button', { name: /Unselect all 2 subgroup options/i }),
     ).toBeInTheDocument();
 
-    userEvent.click(checkbox2);
+    await userEvent.click(checkbox2);
 
     expect(checkbox2.checked).toBe(false);
     expect(checkbox3.checked).toBe(true);
@@ -787,10 +787,10 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       expect(checkbox.checked).toBe(true);
       expect(screen.queryByText('Select at least one option')).toBeNull();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
       expect(checkbox.checked).toBe(false);
 
-      userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
         expect(
@@ -799,7 +799,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       });
     });
 
-    test('does not display validation message when `showError` is false', () => {
+    test('does not display validation message when `showError` is false', async () => {
       render(
         <FormProvider
           initialValues={{
@@ -842,7 +842,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(checkbox.checked).toBe(false);
       expect(
@@ -852,8 +852,6 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
   });
 
   test('providing a search term does not remove checkboxes that have already been checked', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormProvider
         initialValues={{
@@ -893,7 +891,9 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     await userEvent.type(searchInput, '2');
 
-    jest.runAllTimers();
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     expect(screen.getAllByLabelText(/Checkbox/)).toHaveLength(2);
     expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');

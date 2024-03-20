@@ -9,7 +9,10 @@ public interface IPublicationService
     Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize, 
-        string? search = null);
+        string? search = null,
+        CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(Guid publicationId);
+    Task<Either<ActionResult, PublicationSummaryViewModel>> GetPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default);
 }

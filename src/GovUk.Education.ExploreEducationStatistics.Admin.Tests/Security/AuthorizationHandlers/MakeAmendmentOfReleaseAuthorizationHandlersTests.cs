@@ -33,8 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
@@ -56,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
@@ -80,8 +80,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
@@ -103,8 +103,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
@@ -126,8 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
@@ -153,8 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
@@ -177,8 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
@@ -202,8 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
@@ -226,8 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
@@ -250,8 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);
@@ -278,8 +278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 0, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 0, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 0 });
@@ -301,8 +301,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: not null, Version: 0 });
@@ -324,8 +324,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 1, draftVersion: true)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 1, draftVersion: true)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv is { Published: null, Version: 1 });
@@ -347,8 +347,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 0);
@@ -370,8 +370,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Publication publication = _dataFixture
                     .DefaultPublication()
-                    .WithReleaseParents(_dataFixture
-                        .DefaultReleaseParent(publishedVersions: 2)
+                    .WithReleases(_dataFixture
+                        .DefaultRelease(publishedVersions: 2)
                         .Generate(1));
 
                 var releaseVersion = publication.ReleaseVersions.Single(rv => rv.Version == 1);

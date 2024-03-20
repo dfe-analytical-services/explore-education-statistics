@@ -45,10 +45,10 @@ public static class ReleaseVersionGeneratorExtensions
         return generator;
     }
 
-    public static Generator<ReleaseVersion> WithReleaseParent(
+    public static Generator<ReleaseVersion> WithRelease(
         this Generator<ReleaseVersion> generator,
-        ReleaseParent releaseParent)
-        => generator.ForInstance(s => s.SetReleaseParent(releaseParent));
+        Release release)
+        => generator.ForInstance(s => s.SetRelease(release));
 
     public static Generator<ReleaseVersion> WithApprovalStatus(
         this Generator<ReleaseVersion> generator,
@@ -216,16 +216,16 @@ public static class ReleaseVersionGeneratorExtensions
             releaseVersion.PublicationId = publication.Id;
         });
 
-    public static InstanceSetters<ReleaseVersion> SetReleaseParent(
+    public static InstanceSetters<ReleaseVersion> SetRelease(
         this InstanceSetters<ReleaseVersion> setters,
-        ReleaseParent releaseParent)
-        => setters.Set(releaseVersion => releaseVersion.ReleaseParent, releaseParent)
-            .SetReleaseParentId(releaseParent.Id);
+        Release release)
+        => setters.Set(releaseVersion => releaseVersion.Release, release)
+            .SetReleaseId(release.Id);
 
-    public static InstanceSetters<ReleaseVersion> SetReleaseParentId(
+    public static InstanceSetters<ReleaseVersion> SetReleaseId(
         this InstanceSetters<ReleaseVersion> setters,
-        Guid releaseParentId)
-        => setters.Set(releaseVersion => releaseVersion.ReleaseParentId, releaseParentId);
+        Guid releaseId)
+        => setters.Set(releaseVersion => releaseVersion.ReleaseId, releaseId);
 
     public static InstanceSetters<ReleaseVersion> SetApprovalStatus(
         this InstanceSetters<ReleaseVersion> setters,

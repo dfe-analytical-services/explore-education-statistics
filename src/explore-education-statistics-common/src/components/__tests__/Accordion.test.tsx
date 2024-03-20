@@ -1,4 +1,4 @@
-import { render, waitFor, screen } from '@testing-library/react';
+import { render, waitFor, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Accordion from '../Accordion';
@@ -48,7 +48,7 @@ describe('Accordion', () => {
     ).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('clicking heading makes the section content expanded', () => {
+  test('clicking heading makes the section content expanded', async () => {
     render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading">Test content</AccordionSection>
@@ -59,7 +59,7 @@ describe('Accordion', () => {
 
     expect(heading).toHaveAttribute('aria-expanded', 'false');
 
-    userEvent.click(heading);
+    await userEvent.click(heading);
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
   });
@@ -103,7 +103,6 @@ describe('Accordion', () => {
   });
 
   test('scrolls to and opens section if location hash matches section heading ID', async () => {
-    jest.useFakeTimers();
     window.location.hash = '#test-sections-1-heading';
 
     render(
@@ -117,15 +116,17 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const heading = screen.getByRole('button', { name: /Test heading 1/ });
+    const accordionSections = screen.getAllByTestId('accordionSection');
+    expect(
+      await within(accordionSections[0]).findByText('Hide'),
+    ).toBeInTheDocument();
 
-    jest.runOnlyPendingTimers();
-
-    expect(heading).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      screen.getByRole('button', { name: /Test heading 1/ }),
+    ).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('scrolls to and opens section if location hash matches section content ID', async () => {
-    jest.useFakeTimers();
     window.location.hash = '#test-sections-1-content';
 
     const { container } = render(
@@ -143,18 +144,21 @@ describe('Accordion', () => {
       '#test-sections-1-content',
     ) as HTMLElement;
 
-    jest.advanceTimersByTime(300);
+    const accordionSections = screen.getAllByTestId('accordionSection');
+    expect(
+      await within(accordionSections[0]).findByText('Hide'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: /Test heading 1/ }),
+    ).toHaveAttribute('aria-expanded', 'true');
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Test heading 1/ }),
-      ).toHaveAttribute('aria-expanded', 'true');
       expect(content.scrollIntoView).toHaveBeenCalled();
     });
   });
 
   test('scrolls to and opens section if location hash matches an element in the section content', async () => {
-    jest.useFakeTimers();
     window.location.hash = '#test-heading';
 
     const { container } = render(
@@ -168,21 +172,22 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    jest.advanceTimersByTime(300);
+    const accordionSections = screen.getAllByTestId('accordionSection');
+    expect(
+      await within(accordionSections[1]).findByText('Hide'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: /Test heading 2/ }),
+    ).toHaveAttribute('aria-expanded', 'true');
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Test heading 2/ }),
-      ).toHaveAttribute('aria-expanded', 'true');
-
       const content = container.querySelector('#test-heading') as HTMLElement;
-
       expect(content.scrollIntoView).toHaveBeenCalled();
     });
   });
 
-  test('accordion sections that were opened when the location hash matches an element in the section content can be closed', () => {
-    jest.useFakeTimers();
+  test('accordion sections that were opened when the location hash matches an element in the section content can be closed', async () => {
     window.location.hash = '#test-sections-1-content';
 
     render(
@@ -196,13 +201,20 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    jest.runOnlyPendingTimers();
+    const accordionSections = screen.getAllByTestId('accordionSection');
 
+    expect(
+      await within(accordionSections[0]).findByText('Hide'),
+    ).toBeInTheDocument();
     const heading = screen.getByRole('button', { name: /Test heading 1/ });
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
 
-    userEvent.click(heading);
+    await userEvent.click(heading);
+
+    expect(
+      await within(accordionSections[0]).findByText('Show'),
+    ).toBeInTheDocument();
 
     expect(heading).toHaveAttribute('aria-expanded', 'false');
   });
@@ -227,7 +239,7 @@ describe('Accordion', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('clicking on `Show all sections` reveals all sections', () => {
+  test('clicking on `Show all sections` reveals all sections', async () => {
     render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1">
@@ -248,14 +260,14 @@ describe('Accordion', () => {
     expect(sections[0]).toHaveAttribute('aria-expanded', 'false');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
 
-    userEvent.click(button);
+    await userEvent.click(button);
 
     expect(button).toHaveAttribute('aria-expanded', 'true');
     expect(sections[0]).toHaveAttribute('aria-expanded', 'true');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('clicking on `Show all sections` causes `onToggleAll` handler to be called with new state', () => {
+  test('clicking on `Show all sections` causes `onToggleAll` handler to be called with new state', async () => {
     const toggleAll = jest.fn();
 
     render(
@@ -266,12 +278,14 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Show all sections' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Show all sections' }),
+    );
 
     expect(toggleAll).toHaveBeenCalledWith(true);
   });
 
-  test('clicking on `Hide all sections` closes all sections', () => {
+  test('clicking on `Hide all sections` closes all sections', async () => {
     render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1" open>
@@ -292,14 +306,14 @@ describe('Accordion', () => {
     expect(sections[0]).toHaveAttribute('aria-expanded', 'true');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
 
-    userEvent.click(closeAllButton);
+    await userEvent.click(closeAllButton);
 
     expect(closeAllButton).toHaveAttribute('aria-expanded', 'false');
     expect(sections[0]).toHaveAttribute('aria-expanded', 'false');
     expect(sections[1]).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('clicking on `Hide all sections` causes `onToggleAll` handler to be called with new state', () => {
+  test('clicking on `Hide all sections` causes `onToggleAll` handler to be called with new state', async () => {
     const toggleAll = jest.fn();
 
     render(
@@ -312,7 +326,9 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Hide all sections' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Hide all sections' }),
+    );
 
     expect(toggleAll).toHaveBeenCalledWith(false);
   });

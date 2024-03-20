@@ -86,29 +86,23 @@ describe('KeyStatDataBlock', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
-        1,
-      );
-
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Number of applications received',
-      );
-
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'Down from 620,330 in 2017',
-      );
+    await screen.findByRole('button', {
+      name: 'What is the number of applications received?',
     });
 
-    expect(
-      screen.getByRole('button', {
-        name: 'What is the number of applications received?',
-      }),
-    ).toBeInTheDocument();
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
+
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+      'Number of applications received',
+    );
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'Down from 620,330 in 2017',
+    );
 
     expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
       'Total number of applications received for places at primary and secondary schools.',
@@ -130,29 +124,25 @@ describe('KeyStatDataBlock', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
-        1,
-      );
-
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Number of applications received',
-      );
-
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'Down from 620,330 in 2017',
-      );
-    });
-
     expect(
-      screen.getByRole('button', {
+      await screen.findByRole('button', {
         name: 'Help for Number of applications received',
       }),
     ).toBeInTheDocument();
+
+    expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(1);
+
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+      'Number of applications received',
+    );
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'Down from 620,330 in 2017',
+    );
 
     expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
       'Total number of applications received for places at primary and secondary schools.',

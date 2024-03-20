@@ -99,7 +99,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
 
     expect(handleAddGroup).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
       expect(handleAddGroup).toHaveBeenCalledWith({ min: 0, max: 10 });
@@ -108,7 +108,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
     await userEvent.type(screen.getByLabelText('Min'), '11');
     await userEvent.type(screen.getByLabelText('Max'), '20');
 
-    userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
       expect(handleAddGroup).toHaveBeenCalledTimes(2);
@@ -135,7 +135,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
 
     expect(handleRemoveGroup).not.toHaveBeenCalled();
 
-    userEvent.click(row2.getByRole('button', { name: 'Remove group' }));
+    await userEvent.click(row2.getByRole('button', { name: 'Remove group' }));
 
     await waitFor(() => {
       expect(handleRemoveGroup).toHaveBeenCalledWith({ min: 51, max: 100 });
@@ -144,7 +144,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
     const row1 = within(table.getAllByRole('row')[1]);
     expect(row1.getByText('0')).toBeInTheDocument();
     expect(row1.getByText('50')).toBeInTheDocument();
-    userEvent.click(row1.getByRole('button', { name: 'Remove group' }));
+    await userEvent.click(row1.getByRole('button', { name: 'Remove group' }));
 
     await waitFor(() => {
       expect(handleRemoveGroup).toHaveBeenCalledTimes(2);
@@ -162,7 +162,7 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
       expect(screen.getByText('Enter a minimum value')).toBeInTheDocument();
@@ -180,9 +180,9 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '10');
-    userEvent.type(screen.getByLabelText('Max'), '9');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Min'), '10');
+    await userEvent.type(screen.getByLabelText('Max'), '9');
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(screen.getByText('Must be greater than min')).toBeInTheDocument();
@@ -199,9 +199,9 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '10');
-    userEvent.type(screen.getByLabelText('Max'), '200');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Min'), '10');
+    await userEvent.type(screen.getByLabelText('Max'), '200');
+    await userEvent.tab();
 
     const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
       'cell',
@@ -230,9 +230,9 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '-10');
-    userEvent.type(screen.getByLabelText('Max'), '75');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Min'), '-10');
+    await userEvent.type(screen.getByLabelText('Max'), '75');
+    await userEvent.tab();
 
     const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
       'cell',
@@ -262,9 +262,9 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '10');
-    userEvent.type(screen.getByLabelText('Max'), '75');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Min'), '10');
+    await userEvent.type(screen.getByLabelText('Max'), '75');
+    await userEvent.tab();
 
     const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
       'cell',
@@ -293,9 +293,9 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '-10');
-    userEvent.type(screen.getByLabelText('Max'), '150');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Min'), '-10');
+    await userEvent.type(screen.getByLabelText('Max'), '150');
+    await userEvent.tab();
 
     const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
       'cell',
@@ -324,15 +324,15 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Min'), '-3');
+    await userEvent.type(screen.getByLabelText('Min'), '-3');
 
     const minCell = within(screen.getAllByRole('row')[2]).getAllByRole(
       'cell',
     )[0];
 
-    userEvent.type(screen.getByLabelText('Max'), '3');
+    await userEvent.type(screen.getByLabelText('Max'), '3');
 
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(

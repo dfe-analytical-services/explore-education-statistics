@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -17,6 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 /// </summary>
 internal class JsonConverterSchemaFilter : ISchemaFilter
 {
+    private readonly HashSet<Type> _typesToIgnore =
+    [
+         typeof(GeographicLevel),
+         typeof(TimeIdentifier),
+    ];
+
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
         if (context.Type is { IsClass: false })
@@ -51,20 +59,27 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 continue;
             }
 
-            if (property.PropertyType.IsEnum)
+            if (property.PropertyType.GetUnderlyingType().IsEnum)
             {
                 ApplyEnumConverter(property, propertySchema, converterType, context.SchemaRepository);
             }
         }
     }
 
-    private static void ApplyEnumConverter(
+    private void ApplyEnumConverter(
         PropertyInfo property,
         OpenApiSchema propertySchema,
         Type converterType,
         SchemaRepository schemaRepository)
     {
-        Type? enumType = null;
+        var enumType = property.PropertyType.GetUnderlyingType();
+
+        if (_typesToIgnore.Contains(enumType))
+        {
+            return;
+        }
+
+        var hasEnumConverter = false;
 
         var converterBaseType = converterType.IsGenericType
             ? converterType.GetGenericTypeDefinition()
@@ -73,7 +88,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         if (converterBaseType == typeof(JsonStringEnumConverter) ||
             converterBaseType == typeof(JsonStringEnumConverter<>))
         {
-            enumType = property.PropertyType;
+            hasEnumConverter = true;
 
             propertySchema.Type = "string";
             propertySchema.Enum = Enum.GetNames(enumType)
@@ -82,7 +97,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         }
         else if (converterBaseType == typeof(EnumToEnumLabelJsonConverter<>))
         {
-            enumType = property.PropertyType;
+            hasEnumConverter = true;
 
             propertySchema.Type = "string";
             propertySchema.Enum = Enum.GetValues(enumType)
@@ -92,7 +107,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
         }
         else if (converterBaseType == typeof(EnumToEnumValueJsonConverter<>))
         {
-            enumType = property.PropertyType;
+            hasEnumConverter = true;
 
             propertySchema.Type = "string";
             propertySchema.Enum = Enum.GetValues(enumType)
@@ -101,7 +116,7 @@ internal class JsonConverterSchemaFilter : ISchemaFilter
                 .ToList<IOpenApiAny>();
         }
 
-        if (enumType is not null && schemaRepository.TryLookupByType(enumType, out var enumSchema))
+        if (hasEnumConverter && schemaRepository.TryLookupByType(enumType, out var enumSchema))
         {
             // Clear any references to the enum schema as this would get merged together
             // with the property in the final document and produce incorrect enum values.

@@ -586,7 +586,9 @@ describe('ChartDataGroupingsConfiguration', () => {
     );
 
     const rows = screen.getAllByRole('row');
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -649,7 +651,9 @@ describe('ChartDataGroupingsConfiguration', () => {
     );
 
     const rows = screen.getAllByRole('row');
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -720,7 +724,9 @@ describe('ChartDataGroupingsConfiguration', () => {
     );
 
     const rows = screen.getAllByRole('row');
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -790,14 +796,19 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
-    userEvent.click(modal.getByLabelText('Quantiles'));
-    userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
-    userEvent.type(modal.getAllByLabelText('Number of data groups')[1], '3');
+    await userEvent.click(modal.getByLabelText('Quantiles'));
+    await userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
+    await userEvent.type(
+      modal.getAllByLabelText('Number of data groups')[1],
+      '3',
+    );
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     const expectedValues: MapDataSetConfig[] = [
       {
@@ -871,13 +882,15 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
-    userEvent.click(modal.getByLabelText('New custom groups'));
-    userEvent.type(modal.getByLabelText('Min'), '0');
-    userEvent.type(modal.getByLabelText('Max'), '10');
-    userEvent.click(modal.getByRole('button', { name: 'Add group' }));
+    await userEvent.click(modal.getByLabelText('New custom groups'));
+    await userEvent.type(modal.getByLabelText('Min'), '0');
+    await userEvent.type(modal.getByLabelText('Max'), '10');
+    await userEvent.click(modal.getByRole('button', { name: 'Add group' }));
 
     await waitFor(() => {
       expect(screen.getByText('Remove group')).toBeInTheDocument();
@@ -895,7 +908,7 @@ describe('ChartDataGroupingsConfiguration', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     const expectedValues: MapDataSetConfig[] = [
       {
@@ -998,7 +1011,9 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -1027,7 +1042,7 @@ describe('ChartDataGroupingsConfiguration', () => {
       }),
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       within(customGroupsRows[2]).getByRole('button', { name: 'Remove group' }),
     );
 
@@ -1035,11 +1050,11 @@ describe('ChartDataGroupingsConfiguration', () => {
     expect(modal.queryByText('51')).not.toBeInTheDocument();
     expect(modal.queryByText('66')).not.toBeInTheDocument();
 
-    userEvent.type(modal.getByLabelText('Min'), '51');
-    userEvent.type(modal.getByLabelText('Max'), '100');
-    userEvent.click(modal.getByRole('button', { name: 'Add group' }));
+    await userEvent.type(modal.getByLabelText('Min'), '51');
+    await userEvent.type(modal.getByLabelText('Max'), '100');
+    await userEvent.click(modal.getByRole('button', { name: 'Add group' }));
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     const expectedValues: MapDataSetConfig[] = [
       {
@@ -1146,13 +1161,15 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[2]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[2]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByLabelText('Copy custom groups'));
+    await userEvent.click(modal.getByLabelText('Copy custom groups'));
 
-    userEvent.selectOptions(
+    await userEvent.selectOptions(
       modal.getByLabelText('Copy custom groups from another data set'),
       generateDataSetKey({
         filters: ['ethnicity-major-chinese', 'state-funded-primary'],
@@ -1161,7 +1178,7 @@ describe('ChartDataGroupingsConfiguration', () => {
       }),
     );
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     const expectedValues: MapDataSetConfig[] = [
       {
@@ -1239,13 +1256,15 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.clear(modal.getAllByLabelText('Number of data groups')[0]);
+    await userEvent.clear(modal.getAllByLabelText('Number of data groups')[0]);
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     await waitFor(() => {
       expect(modal.getByText('There is a problem')).toBeInTheDocument();
@@ -1294,15 +1313,17 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByLabelText('Quantiles'));
+    await userEvent.click(modal.getByLabelText('Quantiles'));
 
-    userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
+    await userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     await waitFor(() => {
       expect(modal.getByText('There is a problem')).toBeInTheDocument();
@@ -1351,15 +1372,17 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByLabelText('New custom groups'));
+    await userEvent.click(modal.getByLabelText('New custom groups'));
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(modal.getByText('There is a problem')).toBeInTheDocument();
@@ -1438,13 +1461,15 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[2]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[2]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
 
-    userEvent.click(modal.getByLabelText('Copy custom groups'));
+    await userEvent.click(modal.getByLabelText('Copy custom groups'));
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     await waitFor(() => {
       expect(modal.getByText('There is a problem')).toBeInTheDocument();
@@ -1457,7 +1482,7 @@ describe('ChartDataGroupingsConfiguration', () => {
     ).toHaveAttribute('href', '#chartDataGroupingForm-copyCustomGroups');
   });
 
-  test('submitting fails if another form is invalid', async () => {
+  test('shows a validation error if another form is invalid', async () => {
     const handleSubmit = jest.fn();
 
     render(
@@ -1494,16 +1519,12 @@ describe('ChartDataGroupingsConfiguration', () => {
       },
     );
 
-    expect(handleSubmit).not.toHaveBeenCalled();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
-      expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
+    expect(await screen.findByText('Cannot save chart')).toBeInTheDocument();
+    expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
   });
 
   test('successfully submits with updated values', async () => {
@@ -1543,14 +1564,19 @@ describe('ChartDataGroupingsConfiguration', () => {
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
-    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit' }));
+    await userEvent.click(
+      within(rows[1]).getByRole('button', { name: 'Edit' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
-    userEvent.click(modal.getByLabelText('Quantiles'));
-    userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
-    userEvent.type(modal.getAllByLabelText('Number of data groups')[1], '3');
+    await userEvent.click(modal.getByLabelText('Quantiles'));
+    await userEvent.clear(modal.getAllByLabelText('Number of data groups')[1]);
+    await userEvent.type(
+      modal.getAllByLabelText('Number of data groups')[1],
+      '3',
+    );
 
-    userEvent.click(modal.getByRole('button', { name: 'Done' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
     await waitFor(() => {
       expect(within(rows[1]).getByText('3 quantiles')).toBeInTheDocument();
@@ -1560,7 +1586,9 @@ describe('ChartDataGroupingsConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     const expectedValues: MapDataSetConfig[] = [
       {

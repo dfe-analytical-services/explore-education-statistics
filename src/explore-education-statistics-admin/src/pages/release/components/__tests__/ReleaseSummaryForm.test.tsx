@@ -197,7 +197,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    userEvent.click(buttonCreate);
+    await userEvent.click(buttonCreate);
 
     await waitFor(() => {
       expect(
@@ -244,8 +244,8 @@ describe('ReleaseSummaryForm', () => {
     });
 
     await userEvent.type(inputYear, '2');
-    userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
-    userEvent.click(buttonCreate);
+    await userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
+    await userEvent.click(buttonCreate);
 
     await waitFor(() => {
       expect(
@@ -296,8 +296,8 @@ describe('ReleaseSummaryForm', () => {
     });
 
     await userEvent.type(inputYear, '202021');
-    userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
-    userEvent.click(buttonCreate);
+    await userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
+    await userEvent.click(buttonCreate);
 
     await waitFor(() => {
       expect(
@@ -353,7 +353,7 @@ describe('ReleaseSummaryForm', () => {
     });
 
     await userEvent.type(inputYear, '1966');
-    userEvent.click(buttonCreate);
+    await userEvent.click(buttonCreate);
 
     await waitFor(() => {
       expect(
@@ -437,7 +437,7 @@ describe('ReleaseSummaryForm', () => {
     const selectYearType = screen.getByLabelText('Type', {
       selector: 'select',
     });
-    userEvent.selectOptions(selectYearType, 'AY');
+    await userEvent.selectOptions(selectYearType, 'AY');
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
@@ -446,13 +446,13 @@ describe('ReleaseSummaryForm', () => {
     const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
       releaseTypes.NationalStatistics,
     );
-    userEvent.click(radioOptionReleaseTypeNationalStats);
+    await userEvent.click(radioOptionReleaseTypeNationalStats);
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
     expect(onSubmit).not.toHaveBeenCalled();
-    userEvent.click(buttonCreate);
+    await userEvent.click(buttonCreate);
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledTimes(1);

@@ -112,6 +112,7 @@ Add Methodology Annexes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology annex section 1    1    Adding Methodology annex
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user scrolls down    100
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user checks accordion section text block contains image with alt text    Methodology annex section 1    1

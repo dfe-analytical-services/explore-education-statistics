@@ -29,6 +29,8 @@ const config = {
     '^@common-test/(.*)$':
       '<rootDir>/../explore-education-statistics-common/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
+    'react-markdown':
+      '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
   },
   moduleFileExtensions: [
     'web.js',

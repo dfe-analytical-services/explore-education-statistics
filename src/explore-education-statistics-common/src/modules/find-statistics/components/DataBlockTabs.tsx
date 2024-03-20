@@ -64,6 +64,7 @@ const DataBlockTabs = ({
         {!!dataBlock.charts?.length && (
           <TabsSection
             id={`${id}-charts`}
+            lazy
             tabLabel={
               <>
                 Chart
@@ -74,7 +75,7 @@ const DataBlockTabs = ({
             }
             title="Chart"
           >
-            {error && errorMessage}
+            {!!error && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
@@ -133,7 +134,7 @@ const DataBlockTabs = ({
             }
             title="Table"
           >
-            {error && errorMessage}
+            {!!error && errorMessage}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>

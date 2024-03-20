@@ -293,7 +293,7 @@ describe('PublicationDraftReleases', () => {
     const rows = screen.getAllByRole('row');
     const row3Cells = within(rows[3]).getAllByRole('cell');
 
-    userEvent.click(
+    await userEvent.click(
       within(row3Cells[4]).getByRole('button', {
         name: 'Cancel amendment for Release 3',
       }),
@@ -313,7 +313,7 @@ describe('PublicationDraftReleases', () => {
     expect(modal.getByText('Methodology 1')).toBeInTheDocument();
     expect(modal.getByText('Methodology 2')).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       modal.getByRole('button', {
         name: 'Confirm',
       }),

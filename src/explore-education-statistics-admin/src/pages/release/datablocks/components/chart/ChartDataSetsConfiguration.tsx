@@ -27,7 +27,7 @@ import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useEffect, useMemo } from 'react';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import classNames from 'classnames';
 
 const formId = 'chartDataSetsConfigurationForm';

@@ -25,6 +25,9 @@ interface Props {
 
 const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [hasCheckedHash, setHasCheckedHash] = useState<boolean>(
+    !window.location.hash,
+  );
   const ref = useRef<HTMLDivElement>(null);
 
   const { onMedia } = useDesktopMedia();
@@ -45,7 +48,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       {
         'aria-labelledby': `${sectionId}-tab`,
         hasSiblings: filteredChildren.length > 1,
-        hidden: selectedTabIndex !== index,
+        hidden: !hasCheckedHash || selectedTabIndex !== index,
         id: sectionId,
         key: sectionId,
       },
@@ -107,6 +110,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
           // the location hash again by using `selectTab`
           setSelectedTabIndex(matchingTabIndex);
         }
+        setHasCheckedHash(true);
       }
     };
 

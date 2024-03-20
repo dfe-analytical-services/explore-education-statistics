@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -242,8 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -288,8 +288,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -368,8 +368,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -451,8 +451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -641,8 +641,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -686,8 +686,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -731,8 +731,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -813,8 +813,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var filters = _fixture.DefaultFilter()
@@ -1050,8 +1050,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1098,8 +1098,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1183,8 +1183,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1369,8 +1369,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1505,8 +1505,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1553,8 +1553,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();
@@ -1601,8 +1601,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             Publication publication = _fixture
                 .DefaultPublication()
-                .WithReleaseParents(_fixture
-                    .DefaultReleaseParent(publishedVersions: 1)
+                .WithReleases(_fixture
+                    .DefaultRelease(publishedVersions: 1)
                     .Generate(1));
 
             var releaseVersion = publication.ReleaseVersions.Single();

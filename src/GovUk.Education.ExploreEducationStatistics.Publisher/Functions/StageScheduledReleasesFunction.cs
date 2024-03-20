@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// Azure function which triggers publishing files and staging content for all Releases that are scheduled to
+        /// Azure function which triggers publishing files and staging content for all release versions that are scheduled to
         /// be published later during the day. This operates on a schedule which by default occurs at midnight every
         /// night.
         /// </summary>
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// Azure function which triggers publishing files and staging content for all Releases that are scheduled to
+        /// Azure function which triggers publishing files and staging content for all release versions that are scheduled to
         /// be published later during the day. This is triggered manually by an HTTP post request, and is disabled in
         /// production environments.
         /// </summary>
@@ -66,9 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// </param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
-        [FunctionName("StageScheduledReleasesImmediately")]
+        [FunctionName("StageScheduledReleaseVersionsImmediately")]
         // ReSharper disable once UnusedMember.Global
-        public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleasesImmediately(
+        public async Task<ActionResult<ManualTriggerResponse>> StageScheduledReleaseVersionsImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequest request,
             ExecutionContext executionContext,

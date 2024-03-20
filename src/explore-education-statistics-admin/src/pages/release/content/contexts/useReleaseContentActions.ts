@@ -16,6 +16,7 @@ import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 import keyStatisticService, {
   KeyStatisticDataBlockUpdateRequest,
+  KeyStatisticTextSaveRequest,
   KeyStatisticTextUpdateRequest,
 } from '@admin/services/keyStatisticService';
 import { KeyStatistic } from '@common/services/publicationService';
@@ -437,7 +438,13 @@ export default function useReleaseContentActions() {
   );
 
   const addKeyStatisticDataBlock = useCallback(
-    async ({ releaseId, dataBlockId }) => {
+    async ({
+      releaseId,
+      dataBlockId,
+    }: {
+      releaseId: string;
+      dataBlockId: string;
+    }) => {
       const keyStatisticDataBlock =
         await keyStatisticService.createKeyStatisticDataBlock(releaseId, {
           dataBlockId,
@@ -451,7 +458,13 @@ export default function useReleaseContentActions() {
   );
 
   const addKeyStatisticText = useCallback(
-    async ({ releaseId, keyStatisticText }) => {
+    async ({
+      releaseId,
+      keyStatisticText,
+    }: {
+      releaseId: string;
+      keyStatisticText: KeyStatisticTextSaveRequest;
+    }) => {
       const createdKeyStatText =
         await keyStatisticService.createKeyStatisticText(
           releaseId,

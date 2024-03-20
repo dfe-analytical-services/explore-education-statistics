@@ -46,7 +46,7 @@ const ContentBlockRenderer = ({
 
   switch (type) {
     case 'MarkDownBlock':
-      return <ReactMarkdown className="dfe-content" source={body} />;
+      return <ReactMarkdown className="dfe-content">{body}</ReactMarkdown>;
     case 'HtmlBlock':
       return (
         <ContentHtml

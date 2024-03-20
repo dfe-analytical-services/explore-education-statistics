@@ -1,10 +1,11 @@
-import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
 import { matcherHint, printReceived } from 'jest-matcher-utils';
 
 const toBeAriaDisabled: jest.CustomMatcher = function toHaveScrolledIntoView(
   element: HTMLElement,
 ) {
-  checkHtmlElement(element, toBeAriaDisabled, this);
+  if (!(element instanceof window.HTMLElement)) {
+    throw new Error('Not a HTMLElement');
+  }
 
   return {
     pass: element.getAttribute('aria-disabled') === 'true',

@@ -621,7 +621,7 @@ describe('PublicationTeamAccessPage', () => {
       `/publication/publication-1/team/release-1`,
     );
 
-    userEvent.selectOptions(
+    await userEvent.selectOptions(
       screen.getByLabelText('Select release'),
       'release-2',
     );

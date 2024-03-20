@@ -34,7 +34,7 @@ describe('TableHeadersForm', () => {
     ).not.toBeInTheDocument();
 
     // Click button to show the form
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
     expect(
@@ -48,7 +48,7 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
 
     // Click button to hide the form
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update and view reordered table' }),
     );
     await waitFor(() => {
@@ -67,7 +67,7 @@ describe('TableHeadersForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the column table headers correctly', () => {
+  test('renders the column table headers correctly', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
@@ -75,7 +75,7 @@ describe('TableHeadersForm', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
@@ -157,14 +157,14 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders the row table headers correctly', () => {
+  test('renders the row table headers correctly', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
@@ -199,14 +199,14 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('handles moving a group to the other axis', () => {
+  test('handles moving a group to the other axis', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
@@ -217,9 +217,11 @@ describe('TableHeadersForm', () => {
       columnAxis.getByRole('heading', { name: 'Locations' }),
     ).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Move Locations' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move Locations' }),
+    );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move Locations to rows' }),
     );
 
@@ -243,11 +245,11 @@ describe('TableHeadersForm', () => {
         onSubmit={handleSubmit}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update and view reordered table' }),
     );
     await waitFor(() => {
@@ -263,17 +265,19 @@ describe('TableHeadersForm', () => {
         onSubmit={handleSubmit}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Move Locations' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Move Locations' }),
+    );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move Locations to rows' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update and view reordered table' }),
     );
 
@@ -289,14 +293,14 @@ describe('TableHeadersForm', () => {
     });
   });
 
-  test('toggling a group between readonly and reorderable mode', () => {
+  test('toggling a group between readonly and reorderable mode', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
@@ -315,7 +319,7 @@ describe('TableHeadersForm', () => {
       screen.queryByRole('button', { name: 'Done' }),
     ).not.toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Reorder items in Locations' }),
     );
 
@@ -343,7 +347,7 @@ describe('TableHeadersForm', () => {
     expect(items[3]).toHaveTextContent('Location 4');
     expect(items[4]).toHaveTextContent('Location 5');
 
-    userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Done' }));
 
     // readonly
     expect(screen.getByTestId('draggable-group-locations')).toHaveAttribute(
@@ -362,18 +366,18 @@ describe('TableHeadersForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('when one group is reorderable the others cannot be moved or reordered', () => {
+  test('when one group is reorderable the others cannot be moved or reordered', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Reorder items in Locations' }),
     );
 
@@ -430,7 +434,7 @@ describe('TableHeadersForm', () => {
         onSubmit={noop}
       />,
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
@@ -444,7 +448,7 @@ describe('TableHeadersForm', () => {
       within(columnGroup1Items[1]).getByText('Location 2'),
     ).toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       columnGroup1.getByRole('button', {
         name: 'Show 3 more items in Locations',
       }),
@@ -479,7 +483,7 @@ describe('TableHeadersForm', () => {
       expect(screen.getByText('Show fewer')).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       columnGroup1.getByRole('button', {
         name: 'Show fewer items for Locations',
       }),

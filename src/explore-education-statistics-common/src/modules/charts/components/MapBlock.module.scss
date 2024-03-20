@@ -3,20 +3,8 @@
 .map {
   background-color: govuk-colour('light-grey');
 
-  path {
-    fill-opacity: 1;
-    stroke: #081b26;
-    stroke-width: 1px;
-  }
-
-  .uk {
-    fill: govuk-colour('dark-blue');
-    fill-opacity: 0.1;
-    stroke: #cfdce3;
-  }
-
-  .selected {
-    stroke-width: 3px;
+  path:focus {
+    outline: none;
   }
 }
 

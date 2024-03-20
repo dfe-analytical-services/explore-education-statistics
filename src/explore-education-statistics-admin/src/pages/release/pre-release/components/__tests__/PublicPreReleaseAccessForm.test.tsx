@@ -36,7 +36,7 @@ describe('PublicPreReleaseAccessForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking Create button renders form with default text', () => {
+  test('clicking Create button renders form with default text', async () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
@@ -49,7 +49,7 @@ describe('PublicPreReleaseAccessForm', () => {
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Create public pre-release access list',
       }),
@@ -106,7 +106,7 @@ describe('PublicPreReleaseAccessForm', () => {
       </TestConfigContextProvider>,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Create public pre-release access list',
       }),
@@ -114,7 +114,9 @@ describe('PublicPreReleaseAccessForm', () => {
 
     expect(screen.getByLabelText('Public access list')).toBeInTheDocument();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save access list' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save access list' }),
+    );
 
     await waitFor(() => {
       expect(
@@ -136,13 +138,13 @@ describe('PublicPreReleaseAccessForm', () => {
       </TestConfigContextProvider>,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Create public pre-release access list',
       }),
     );
 
-    userEvent.clear(screen.getByLabelText('Public access list'));
+    await userEvent.clear(screen.getByLabelText('Public access list'));
     await userEvent.type(
       screen.getByLabelText('Public access list'),
       'Test updated access list',
@@ -150,7 +152,9 @@ describe('PublicPreReleaseAccessForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save access list' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save access list' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);

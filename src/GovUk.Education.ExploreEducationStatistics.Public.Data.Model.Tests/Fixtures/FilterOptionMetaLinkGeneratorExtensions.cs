@@ -5,8 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fix
 public static class FilterOptionMetaLinkGeneratorExtensions
 {
     public static Generator<FilterOptionMetaLink> DefaultFilterOptionMetaLink(this DataFixture fixture)
-        => fixture.Generator<FilterOptionMetaLink>();
-    
+        => fixture.Generator<FilterOptionMetaLink>().WithDefaults();
+
+    public static Generator<FilterOptionMetaLink> WithDefaults(
+        this Generator<FilterOptionMetaLink> generator)
+        => generator.ForInstance(s => s.SetDefaults());
+
     public static Generator<FilterOptionMetaLink> WithMeta(
         this Generator<FilterOptionMetaLink> generator,
         FilterMeta meta)
@@ -22,6 +26,11 @@ public static class FilterOptionMetaLinkGeneratorExtensions
         FilterOptionMeta option)
         => generator.ForInstance(s => s.SetOption(option));
 
+    public static Generator<FilterOptionMetaLink> WithOption(
+        this Generator<FilterOptionMetaLink> generator,
+        Func<FilterOptionMeta> option)
+        => generator.ForInstance(s => s.SetOption(option));
+
     public static Generator<FilterOptionMetaLink> WithOptionId(
         this Generator<FilterOptionMetaLink> generator,
         int optionId)
@@ -29,8 +38,13 @@ public static class FilterOptionMetaLinkGeneratorExtensions
 
     public static Generator<FilterOptionMetaLink> WithPublicId(
         this Generator<FilterOptionMetaLink> generator,
-        int publicId)
+        string publicId)
         => generator.ForInstance(s => s.SetPublicId(publicId));
+
+    public static InstanceSetters<FilterOptionMetaLink> SetDefaults(
+        this InstanceSetters<FilterOptionMetaLink> setters)
+        => setters
+            .SetDefault(l => l.PublicId);
 
     public static InstanceSetters<FilterOptionMetaLink> SetMeta(
         this InstanceSetters<FilterOptionMetaLink> setters,
@@ -47,9 +61,17 @@ public static class FilterOptionMetaLinkGeneratorExtensions
     public static InstanceSetters<FilterOptionMetaLink> SetOption(
         this InstanceSetters<FilterOptionMetaLink> setters,
         FilterOptionMeta option)
+        => setters.SetOption(() => option);
+
+    public static InstanceSetters<FilterOptionMetaLink> SetOption(
+        this InstanceSetters<FilterOptionMetaLink> setters,
+        Func<FilterOptionMeta> option)
         => setters
-            .Set(l => l.Option, option)
-            .Set(l => l.OptionId, option.Id);
+            .Set((_, l) =>
+            {
+                l.Option = option();
+                l.OptionId = l.Option.Id;
+            });
 
     public static InstanceSetters<FilterOptionMetaLink> SetOptionId(
         this InstanceSetters<FilterOptionMetaLink> setters,
@@ -58,6 +80,6 @@ public static class FilterOptionMetaLinkGeneratorExtensions
 
     public static InstanceSetters<FilterOptionMetaLink> SetPublicId(
         this InstanceSetters<FilterOptionMetaLink> setters,
-        int publicId)
+        string publicId)
         => setters.Set(l => l.PublicId, publicId);
 }

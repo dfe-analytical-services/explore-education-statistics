@@ -207,7 +207,7 @@ describe('EditableKeyStat', () => {
         expect(screen.getByText(/Edit/)).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: Indicator',
         }),
@@ -224,7 +224,7 @@ describe('EditableKeyStat', () => {
         keyStatisticService.updateKeyStatisticDataBlock,
       ).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(
@@ -263,7 +263,7 @@ describe('EditableKeyStat', () => {
       expect(keyStatisticService.deleteKeyStatistic).not.toHaveBeenCalled();
       expect(dataBlockService.getUnattachedDataBlocks).not.toHaveBeenCalled();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Remove key statistic: Indicator',
         }),

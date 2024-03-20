@@ -137,12 +137,12 @@ describe('DownloadTable', () => {
       </>,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Table in ODS format (spreadsheet, with title and footnotes)',
       }),
     );
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Download table',
       }),
@@ -184,7 +184,7 @@ describe('DownloadTable', () => {
       />,
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('radio', {
         name: 'Table in CSV format (flat file, with location codes)',
       }),
@@ -192,7 +192,7 @@ describe('DownloadTable', () => {
 
     expect(onCsvDownload).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Download table',
       }),

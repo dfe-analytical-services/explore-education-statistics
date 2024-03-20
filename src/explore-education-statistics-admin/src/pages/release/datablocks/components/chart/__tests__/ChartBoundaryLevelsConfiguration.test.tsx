@@ -110,7 +110,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     expect(screen.getByLabelText('Boundary level')).toHaveValue('2');
   });
 
-  test('calls `onChange` handler when form values change', () => {
+  test('calls `onChange` handler when form values change', async () => {
     const handleChange = jest.fn();
 
     render(
@@ -124,7 +124,9 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
+    await userEvent.selectOptions(screen.getByLabelText('Boundary level'), [
+      '2',
+    ]);
 
     expect(handleChange).toHaveBeenCalledWith<[ChartOptions]>({
       ...testDefaultChartOptions,
@@ -142,7 +144,9 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -168,11 +172,15 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
+    await userEvent.selectOptions(screen.getByLabelText('Boundary level'), [
+      '2',
+    ]);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
@@ -199,7 +207,9 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save chart options' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({

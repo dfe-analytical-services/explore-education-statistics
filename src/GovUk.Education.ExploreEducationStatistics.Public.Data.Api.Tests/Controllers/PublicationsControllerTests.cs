@@ -84,7 +84,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     pageSize,
                     null,
                     It.Is<IEnumerable<Guid>>(ids =>
-                        ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order()))))
+                        ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order())),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: expectedPublications,
                     totalResults: numberOfPublishedDataSets,
@@ -138,7 +139,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     1,
                     1,
                     null,
-                    new List<Guid>() { publicationId }))
+                    new List<Guid>() { publicationId },
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: [publication],
                     totalResults: 1,
@@ -177,7 +179,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     1,
                     1,
                     null,
-                    Enumerable.Empty<Guid>()))
+                    Enumerable.Empty<Guid>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: [],
                     totalResults: 0,
@@ -298,7 +301,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publication.Id))
+                .Setup(c => c.GetPublication(publication.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(publication);
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -328,7 +331,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publicationId))
+                .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new NotFoundResult());
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -378,7 +381,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publicationId))
+                .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException("something went wrong"));
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -404,9 +407,9 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListDataSetsTests : PublicationsControllerTests
+    public class ListPublicationDataSetsTests : PublicationsControllerTests
     {
-        public ListDataSetsTests(TestApplicationFactory testApp) : base(testApp)
+        public ListPublicationDataSetsTests(TestApplicationFactory testApp) : base(testApp)
         {
         }
 
@@ -462,7 +465,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: page,
@@ -511,7 +514,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: 1,
@@ -599,7 +602,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId1,
                 page: 1,
@@ -647,7 +650,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: 1,
@@ -667,7 +670,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: 1,
@@ -701,7 +704,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: page,
@@ -723,7 +726,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: page,
@@ -744,7 +747,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: 1,
@@ -775,7 +778,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             response.AssertNotFound();
         }
 
-        private static async Task<HttpResponseMessage> ListDataSets(
+        private static async Task<HttpResponseMessage> ListPublicationDataSets(
             HttpClient client,
             Guid publicationId,
             int? page = null,

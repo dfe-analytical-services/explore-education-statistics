@@ -14,7 +14,6 @@ interface Props<TFormValues extends FieldValues> {
   options: CheckboxOption[];
   selectedValues: string[];
   setValue: UseFormSetValue<TFormValues>;
-  submitCount: number;
   trigger: UseFormTrigger<TFormValues>;
 }
 
@@ -26,7 +25,6 @@ export default function handleAllRHFCheckboxChange<
   options,
   selectedValues,
   setValue,
-  submitCount,
   trigger,
 }: Props<TFormValues>): void {
   const allOptionValues = options.map(option => option.value);
@@ -35,8 +33,5 @@ export default function handleAllRHFCheckboxChange<
 
   setValue(name, nextValues as PathValue<TFormValues, Path<TFormValues>>);
 
-  // trigger revalidation if the form has been submitted.
-  if (submitCount > 0) {
-    trigger(name);
-  }
+  trigger(name);
 }

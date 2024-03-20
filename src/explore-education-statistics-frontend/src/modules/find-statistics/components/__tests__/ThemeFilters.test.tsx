@@ -44,7 +44,7 @@ describe('ThemeFilters', () => {
     expect(screen.getByLabelText('Theme 3')).toBeChecked();
   });
 
-  test('calls onChange when a theme is selected', () => {
+  test('calls onChange when a theme is selected', async () => {
     const handleChange = jest.fn();
     render(
       <ThemeFilters themes={testThemeSummaries} onChange={handleChange} />,
@@ -52,7 +52,7 @@ describe('ThemeFilters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByLabelText('Theme 1'));
+    await userEvent.click(screen.getByLabelText('Theme 1'));
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'themeId',
@@ -60,10 +60,12 @@ describe('ThemeFilters', () => {
     });
   });
 
-  test('shows the guidance modal', () => {
+  test('shows the guidance modal', async () => {
     render(<ThemeFilters themes={testThemeSummaries} onChange={noop} />);
 
-    userEvent.click(screen.getByRole('button', { name: 'What are themes?' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'What are themes?' }),
+    );
 
     const modal = within(screen.getByRole('dialog'));
     expect(

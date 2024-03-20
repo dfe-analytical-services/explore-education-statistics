@@ -1,5 +1,5 @@
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('ScreenReaderMessage', () => {
@@ -7,7 +7,7 @@ describe('ScreenReaderMessage', () => {
     jest.useFakeTimers();
   });
 
-  test('sets the message after a timeout', () => {
+  test('sets the message after a timeout', async () => {
     const { rerender } = render(<ScreenReaderMessage message="" />);
 
     rerender(<ScreenReaderMessage message="I am a message" />);
@@ -16,10 +16,12 @@ describe('ScreenReaderMessage', () => {
 
     jest.advanceTimersByTime(200);
 
-    expect(screen.getByText('I am a message')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('I am a message')).toBeInTheDocument();
+    });
   });
 
-  test('clears and then replaces the message', () => {
+  test('clears and then replaces the message', async () => {
     const { rerender } = render(<ScreenReaderMessage message="" />);
 
     rerender(<ScreenReaderMessage message="I am a message" />);
@@ -28,7 +30,9 @@ describe('ScreenReaderMessage', () => {
 
     jest.advanceTimersByTime(200);
 
-    expect(screen.getByText('I am a message')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('I am a message')).toBeInTheDocument();
+    });
 
     rerender(<ScreenReaderMessage message="I am another message" />);
 
@@ -38,6 +42,8 @@ describe('ScreenReaderMessage', () => {
 
     jest.advanceTimersByTime(200);
 
-    expect(screen.getByText('I am another message')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('I am another message')).toBeInTheDocument();
+    });
   });
 });

@@ -4,22 +4,19 @@ import {
   useEditingContext,
 } from '@admin/contexts/EditingContext';
 import { OmitStrict } from '@common/types';
-import React, { FC } from 'react';
-import { act, renderHook } from '@testing-library/react-hooks';
+import React, { ReactNode } from 'react';
+import { act, renderHook } from '@testing-library/react';
 
 describe('EditingContext', () => {
-  type Props = OmitStrict<EditingContextProviderProps, 'children'>;
-
-  const wrapper: FC<Props> = ({ ...props }) => (
-    <EditingContextProvider {...props}>{props.children}</EditingContextProvider>
-  );
+  interface Props extends OmitStrict<EditingContextProviderProps, 'children'> {
+    children?: ReactNode;
+  }
 
   test('setEditingMode', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
-      },
+      }),
     });
     expect(result.current.editingMode).toBe('edit');
 
@@ -31,7 +28,11 @@ describe('EditingContext', () => {
   });
 
   test('addUnsavedBlock', () => {
-    const { result } = renderHook(() => useEditingContext(), { wrapper });
+    const { result } = renderHook(() => useEditingContext(), {
+      wrapper: createWrapper({
+        editingMode: 'edit',
+      }),
+    });
     expect(result.current.unsavedBlocks).toEqual([]);
 
     act(() => {
@@ -43,11 +44,10 @@ describe('EditingContext', () => {
 
   test('removeUnsavedBlock', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unsavedBlocks: ['block-1', 'block-2', 'block-3'],
-      },
+      }),
     });
 
     expect(result.current.unsavedBlocks).toEqual([
@@ -64,7 +64,11 @@ describe('EditingContext', () => {
   });
 
   test('updateUnresolvedComments - stores unresolved comment by block', () => {
-    const { result } = renderHook(() => useEditingContext(), { wrapper });
+    const { result } = renderHook(() => useEditingContext(), {
+      wrapper: createWrapper({
+        editingMode: 'edit',
+      }),
+    });
 
     expect(result.current.unresolvedComments).toEqual({});
 
@@ -79,11 +83,10 @@ describe('EditingContext', () => {
 
   test('updateUnresolvedComments - stores another unresolved comment on the same block', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1'] },
-      },
+      }),
     });
 
     act(() => {
@@ -97,11 +100,10 @@ describe('EditingContext', () => {
 
   test('updateUnresolvedComments - stores another unresolved comment on a different block', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1', 'comment-2'] },
-      },
+      }),
     });
 
     act(() => {
@@ -116,11 +118,10 @@ describe('EditingContext', () => {
 
   test('updateUnresolvedComments -  removes unresolved comment', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1', 'comment-2'] },
-      },
+      }),
     });
 
     act(() => {
@@ -133,7 +134,11 @@ describe('EditingContext', () => {
   });
 
   test('updateUnsavedCommentDeletions - stores unresolved comment by block', () => {
-    const { result } = renderHook(() => useEditingContext(), { wrapper });
+    const { result } = renderHook(() => useEditingContext(), {
+      wrapper: createWrapper({
+        editingMode: 'edit',
+      }),
+    });
 
     expect(result.current.unsavedCommentDeletions).toEqual({});
 
@@ -151,11 +156,10 @@ describe('EditingContext', () => {
 
   test('updateUnsavedCommentDeletions - stores another unresolved comment on the same block', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1'] },
-      },
+      }),
     });
 
     act(() => {
@@ -172,11 +176,10 @@ describe('EditingContext', () => {
 
   test('updateUnsavedCommentDeletions - stores another unresolved comment on a different block', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1', 'comment-2'] },
-      },
+      }),
     });
 
     act(() => {
@@ -194,11 +197,10 @@ describe('EditingContext', () => {
 
   test('updateUnsavedCommentDeletions -  removes unresolved comment', () => {
     const { result } = renderHook(() => useEditingContext(), {
-      wrapper,
-      initialProps: {
+      wrapper: createWrapper({
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1', 'comment-2'] },
-      },
+      }),
     });
 
     act(() => {
@@ -212,4 +214,12 @@ describe('EditingContext', () => {
       'block-1': ['comment-2'],
     });
   });
+
+  function createWrapper(props: Props) {
+    return function CreatedWrapper({ children }: { children: ReactNode }) {
+      return (
+        <EditingContextProvider {...props}>{children}</EditingContextProvider>
+      );
+    };
+  }
 });

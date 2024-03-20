@@ -59,9 +59,9 @@ describe('PublicationLegacyReleaseEditPage', () => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Description'), ' edited');
-    userEvent.type(screen.getByLabelText('URL'), '/edit');
-    userEvent.click(
+    await userEvent.type(screen.getByLabelText('Description'), ' edited');
+    await userEvent.type(screen.getByLabelText('URL'), '/edit');
+    await userEvent.click(
       screen.getByRole('button', {
         name: 'Save legacy release',
       }),

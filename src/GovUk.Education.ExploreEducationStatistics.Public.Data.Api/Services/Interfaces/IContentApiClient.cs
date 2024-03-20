@@ -11,7 +11,10 @@ public interface IContentApiClient
         int page,
         int pageSize, 
         string? search = null, 
-        IEnumerable<Guid>? publicationIds = null);
+        IEnumerable<Guid>? publicationIds = null,
+        CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId);
+    Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default);
 }

@@ -27,7 +27,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('First name is required')).toHaveAttribute(
@@ -62,7 +62,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.queryByText('First name is required')).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Line 1 of address is required')).toHaveAttribute(
@@ -128,7 +128,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -159,7 +159,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
@@ -188,7 +188,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -221,7 +221,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -257,7 +257,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -293,7 +293,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Custom submit error message')).toHaveAttribute(
@@ -326,7 +326,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -337,7 +337,7 @@ describe('Form', () => {
     // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -378,7 +378,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
@@ -386,7 +386,7 @@ describe('Form', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByText('Reset form'));
+    await userEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
@@ -419,7 +419,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
@@ -449,7 +449,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
@@ -458,7 +458,7 @@ describe('Form', () => {
     // Stop the onSubmit from throwing error
     onSubmit.mockImplementation();
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -499,13 +499,13 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByText('Reset form'));
+    await userEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -545,13 +545,16 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Invalid first name')).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText('Firstname'), 'Another firstname');
+    await userEvent.type(
+      screen.getByLabelText('Firstname'),
+      'Another firstname',
+    );
 
     await waitFor(() => {
       expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
@@ -587,7 +590,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('The form is submitted')).toBeInTheDocument();
@@ -627,7 +630,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -660,7 +663,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -670,13 +673,13 @@ describe('Form', () => {
 
     const input = screen.getByLabelText('First name');
 
-    userEvent.type(input, 'a first name');
+    await userEvent.type(input, 'a first name');
 
     await waitFor(() => {
       expect(screen.queryByText('There is a problem')).not.toBeInTheDocument();
     });
 
-    userEvent.clear(input);
+    await userEvent.clear(input);
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -709,7 +712,7 @@ describe('Form', () => {
       </FormProvider>,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
@@ -720,12 +723,11 @@ describe('Form', () => {
     screen.getByLabelText('First name').focus();
     expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
-
-    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 });

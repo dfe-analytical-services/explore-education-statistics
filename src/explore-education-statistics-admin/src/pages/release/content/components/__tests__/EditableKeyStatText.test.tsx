@@ -160,7 +160,7 @@ describe('EditableKeyStatText', () => {
 
       expect(screen.getByText(/Edit/)).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: Text title',
         }),
@@ -210,7 +210,7 @@ describe('EditableKeyStatText', () => {
 
       expect(screen.getByText(/Edit/)).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: Text title',
         }),
@@ -220,28 +220,28 @@ describe('EditableKeyStatText', () => {
         expect(screen.getByLabelText('Title')).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Title'));
+      await userEvent.clear(screen.getByLabelText('Title'));
       await userEvent.type(screen.getByLabelText('Title'), 'New title');
 
-      userEvent.clear(screen.getByLabelText('Statistic'));
+      await userEvent.clear(screen.getByLabelText('Statistic'));
       await userEvent.type(screen.getByLabelText('Statistic'), 'New stat');
 
-      userEvent.clear(screen.getByLabelText('Trend'));
+      await userEvent.clear(screen.getByLabelText('Trend'));
       await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
 
-      userEvent.clear(screen.getByLabelText('Guidance title'));
+      await userEvent.clear(screen.getByLabelText('Guidance title'));
       await userEvent.type(
         screen.getByLabelText('Guidance title'),
         'New guidance title',
       );
 
-      userEvent.clear(screen.getByLabelText('Guidance text'));
+      await userEvent.clear(screen.getByLabelText('Guidance text'));
       await userEvent.type(
         screen.getByLabelText('Guidance text'),
         'New guidance text',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
@@ -265,7 +265,7 @@ describe('EditableKeyStatText', () => {
         />,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: Text title',
         }),
@@ -275,13 +275,13 @@ describe('EditableKeyStatText', () => {
         expect(screen.getByLabelText('Title')).toBeInTheDocument();
       });
 
-      userEvent.clear(screen.getByLabelText('Guidance title'));
+      await userEvent.clear(screen.getByLabelText('Guidance title'));
       await userEvent.type(
         screen.getByLabelText('Guidance title'),
         '   New guidance title  ',
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
@@ -301,7 +301,7 @@ describe('EditableKeyStatText', () => {
 
       expect(screen.getByText(/Edit/)).toBeInTheDocument();
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: Text title',
         }),
@@ -311,7 +311,7 @@ describe('EditableKeyStatText', () => {
         expect(screen.getByText('Cancel')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
         expect(screen.queryByText('Cancel')).not.toBeInTheDocument();

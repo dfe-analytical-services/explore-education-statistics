@@ -4,7 +4,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import PageSearchForm from '../PageSearchForm';
@@ -17,7 +17,8 @@ describe('PageSearchForm', () => {
   });
 
   test('does not render results if input is less than default 3 characters', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -50,19 +51,18 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'To');
+    await user.type(screen.getByLabelText(labelText), 'To');
 
     jest.runOnlyPendingTimers();
 
-    expect(container.querySelector('#pageSearchForm-resultsLabel')).toBeNull();
-
-    const options = container.querySelectorAll('[role="option"]');
-
-    expect(options).toHaveLength(0);
+    await waitFor(() =>
+      expect(screen.queryAllByRole('option')).toHaveLength(0),
+    );
   });
 
   test('does not render results if input is less the custom `minInput` prop', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} minInput={5} />
 
@@ -95,19 +95,16 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(container.querySelector('#pageSearchForm-resultsLabel')).toBeNull();
-
-    const options = container.querySelectorAll('[role="option"]');
-
-    expect(options).toHaveLength(0);
+    expect(screen.queryAllByRole('option')).toHaveLength(0);
   });
 
   test('renders correct results when input is an acronym', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -140,15 +137,15 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'TEST');
+    await user.type(screen.getByLabelText(labelText), 'TEST');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 2 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 2 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('TESTING 2');
@@ -156,7 +153,8 @@ describe('PageSearchForm', () => {
   });
 
   test('renders correct results when input is an acronym and is below `minInput`', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} minInput={5} />
 
@@ -189,15 +187,15 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'TE');
+    await user.type(screen.getByLabelText(labelText), 'TE');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 2 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 2 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('TESTING 2');
@@ -205,7 +203,8 @@ describe('PageSearchForm', () => {
   });
 
   test('renders results found in default elements', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -238,15 +237,15 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 5 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 5 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(5);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -255,11 +254,12 @@ describe('PageSearchForm', () => {
     expect(options[3]).toHaveTextContent('Test 4');
     expect(options[4]).toHaveTextContent('Test 5');
 
-    expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
+    expect(screen.getByRole('listbox')).toMatchSnapshot();
   });
 
   test('renders results found in custom selectors', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm
           inputLabel={labelText}
@@ -296,25 +296,26 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 2 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 2 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
     expect(options[1]).toHaveTextContent('Test 2');
 
-    expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
+    expect(screen.getByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations uses nearest heading', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -334,15 +335,15 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 2 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 2 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -350,11 +351,12 @@ describe('PageSearchForm', () => {
     expect(options[1]).toHaveTextContent('Test 2');
     expect(options[1]).toHaveTextContent('Section 2');
 
-    expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
+    expect(screen.getByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations include heading hierarchy', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -371,25 +373,26 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 1 result');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(1);
     expect(options[0]).toHaveTextContent('Test 1');
     expect(options[0]).toHaveTextContent('Section 1 > Section 2 > Section 3');
 
-    expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
+    expect(screen.getByRole('listbox')).toMatchSnapshot();
   });
 
   test('result locations include accordion sections', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <PageSearchForm inputLabel={labelText} />
 
@@ -412,15 +415,15 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    expect(
-      container.querySelector('#pageSearchForm-resultsLabel'),
-    ).toHaveTextContent('Found 2 results');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 2 results',
+    );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.getAllByRole('option');
 
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Test 1');
@@ -432,61 +435,73 @@ describe('PageSearchForm', () => {
       'Section 1 > Section 2 > Accordion section 2',
     );
 
-    expect(container.querySelector('[role="listbox"]')).toMatchSnapshot();
+    expect(screen.getByRole('listbox')).toMatchSnapshot();
   });
 
   test('clicking result scrolls and focuses the element', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <h2>Section 1</h2>
-        <p id="target">Test</p>
+        <p data-testid="target">Test</p>
 
         <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    userEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
+    );
+
+    await user.click(screen.getAllByRole('option')[0]);
 
     await flushTasks();
 
-    const target = container.querySelector('#target');
-
-    expect(target).toHaveFocus();
-    expect(target).toHaveScrolledIntoView();
+    await waitFor(() => {
+      const target = screen.getByTestId('target');
+      expect(target).toHaveFocus();
+      expect(target).toHaveScrolledIntoView();
+    });
   });
 
   test('pressing Enter on result scrolls and focuses the element', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <h2>Section 1</h2>
-        <p id="target">Test</p>
+        <p data-testid="target">Test</p>
 
         <PageSearchForm inputLabel={labelText} />
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    const listBox = container.querySelector('[role="listbox"]') as HTMLElement;
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
+    );
 
-    fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-    fireEvent.keyDown(listBox, { key: 'Enter' });
+    await user.keyboard('[ArrowDown]');
+    await user.keyboard('[Enter]');
 
     await flushTasks();
 
-    const target = container.querySelector('#target');
-    expect(target).toHaveFocus();
-    expect(target).toHaveScrolledIntoView();
+    await waitFor(() => {
+      const target = screen.getByTestId('target');
+      expect(target).toHaveFocus();
+      expect(target).toHaveScrolledIntoView();
+    });
   });
 
   test('opens parent accordion of selected result', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <Accordion id="test-accordion">
           <AccordionSection heading="Section 1">
@@ -502,28 +517,31 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    const accordionSection = container.querySelector(
-      '#test-accordion-1-heading',
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
     );
 
-    expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
+    const accordionSection = screen.getByTestId('accordionSection');
 
-    fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    expect(within(accordionSection).getByText('Show')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('option'));
 
     jest.runOnlyPendingTimers();
 
-    expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
+    expect(within(accordionSection).getByText('Hide')).toBeInTheDocument();
   });
 
   test('opens parent details of selected result', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <Details summary="Details 1">
-          <p id="target">Test</p>
+          <p data-testid="target">Test</p>
         </Details>
 
         <PageSearchForm inputLabel={labelText} />
@@ -534,23 +552,34 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    const summary = container.querySelector('summary');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
+    );
 
-    expect(summary).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      screen.getByRole('button', {
+        name: 'Details 1',
+      }),
+    ).toHaveAttribute('aria-expanded', 'false');
 
-    fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    await user.click(screen.getByRole('option'));
 
     await flushTasks();
 
-    expect(summary).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      screen.getByRole('button', {
+        name: 'Details 1',
+      }),
+    ).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('opens parent tab section of selected result', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <Tabs id="test-tabs">
           <TabsSection title="Tab 1">
@@ -569,11 +598,15 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    const tabs = container.querySelectorAll('[role="tab"]');
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
+    );
+
+    const tabs = screen.getAllByRole('tab');
 
     expect(tabs[0]).toHaveTextContent('Tab 1');
     expect(tabs[1]).toHaveTextContent('Tab 2');
@@ -581,7 +614,7 @@ describe('PageSearchForm', () => {
     expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
-    fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    await user.click(screen.getByRole('option'));
 
     await flushTasks();
 
@@ -590,7 +623,8 @@ describe('PageSearchForm', () => {
   });
 
   test('opens nested sections of selected result', async () => {
-    const { container } = render(
+    const user = userEvent.setup({ delay: null });
+    render(
       <div>
         <Accordion id="test-accordion">
           <AccordionSection heading="Section 1">
@@ -615,27 +649,32 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await user.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
-    const accordionSection = container.querySelector(
-      '#test-accordion-1-heading',
+    expect(await screen.findByTestId('results-label')).toHaveTextContent(
+      'Found 1 result',
     );
-    const tabs = container.querySelectorAll('[role="tab"]');
-    const summary = container.querySelector('summary');
 
-    expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
+    const accordionSection = screen.getByTestId('accordionSection');
+    const tabs = screen.getAllByRole('tab');
 
-    fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    expect(within(accordionSection).getByText('Show')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('option'));
 
     await flushTasks();
 
-    expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
+    expect(within(accordionSection).getByText('Hide')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
-      expect(summary).toHaveAttribute('aria-expanded', 'true');
+      expect(
+        screen.getByRole('button', {
+          name: 'Details 1',
+        }),
+      ).toHaveAttribute('aria-expanded', 'true');
     });
   });
 });

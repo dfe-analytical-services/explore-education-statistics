@@ -44,9 +44,9 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Set an alternative title'));
-    userEvent.clear(screen.getByLabelText('Enter methodology title'));
-    userEvent.tab();
+    await userEvent.click(screen.getByLabelText('Set an alternative title'));
+    await userEvent.clear(screen.getByLabelText('Enter methodology title'));
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -73,14 +73,16 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Set an alternative title'));
-    userEvent.clear(screen.getByLabelText('Enter methodology title'));
+    await userEvent.click(screen.getByLabelText('Set an alternative title'));
+    await userEvent.clear(screen.getByLabelText('Enter methodology title'));
     await userEvent.type(
       screen.getByLabelText('Enter methodology title'),
       'an alternative title',
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Update methodology' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith('an alternative title');
@@ -103,7 +105,9 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Update methodology' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith('the publication title');
@@ -126,9 +130,11 @@ describe('MethodologySummaryForm', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Use publication title'));
+    await userEvent.click(screen.getByLabelText('Use publication title'));
 
-    userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Update methodology' }),
+    );
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith('the publication title');

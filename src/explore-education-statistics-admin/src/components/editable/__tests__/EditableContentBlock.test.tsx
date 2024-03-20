@@ -218,7 +218,7 @@ Test paragraph
     ).toBeInTheDocument();
   });
 
-  test('clicking `Edit block` button calls `onEditing` handler', () => {
+  test('clicking `Edit block` button calls `onEditing` handler', async () => {
     const handleEditing = jest.fn();
 
     render(
@@ -236,7 +236,7 @@ Test paragraph
     expect(screen.queryByLabelText('Block content')).not.toBeInTheDocument();
     expect(handleEditing).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
 
     expect(handleEditing).toHaveBeenCalledTimes(1);
   });
@@ -258,7 +258,7 @@ Test paragraph
     );
     expect(handleSave).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSave).toHaveBeenCalledTimes(1);
@@ -281,7 +281,7 @@ Test paragraph
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
     await waitFor(() => {
       expect(
@@ -291,7 +291,7 @@ Test paragraph
 
     expect(handleDelete).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(handleDelete).toHaveBeenCalledTimes(1);
@@ -327,7 +327,7 @@ Test paragraph
       ).toBeInTheDocument();
     });
 
-    test('clicking the `View comments` button calls the `onEditing` handler', () => {
+    test('clicking the `View comments` button calls the `onEditing` handler', async () => {
       const handleEditing = jest.fn();
 
       render(
@@ -352,7 +352,7 @@ Test paragraph
         </CommentsContextProvider>,
       );
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'View comments (3 unresolved)' }),
       );
 

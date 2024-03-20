@@ -79,7 +79,7 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
@@ -108,13 +108,13 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
     expect(screen.getByLabelText('Team name')).toHaveValue('Team Smith');
 
-    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.getByTestId('Team name')).toHaveTextContent('Team Smith');
 
@@ -143,16 +143,18 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    userEvent.clear(screen.getByLabelText('Team name'));
-    userEvent.clear(screen.getByLabelText('Team email'));
-    userEvent.clear(screen.getByLabelText('Contact name'));
-    userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+    await userEvent.clear(screen.getByLabelText('Team name'));
+    await userEvent.clear(screen.getByLabelText('Team email'));
+    await userEvent.clear(screen.getByLabelText('Contact name'));
+    await userEvent.clear(
+      screen.getByLabelText('Contact telephone (optional)'),
+    );
 
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -190,18 +192,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+      await userEvent.clear(
+        screen.getByLabelText('Contact telephone (optional)'),
+      );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -234,18 +238,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+      await userEvent.clear(
+        screen.getByLabelText('Contact telephone (optional)'),
+      );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -273,18 +279,20 @@ describe('PublicationContactPage', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.click(
+      await userEvent.click(
         screen.getByRole('button', { name: 'Edit contact details' }),
       );
 
-      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+      await userEvent.clear(
+        screen.getByLabelText('Contact telephone (optional)'),
+      );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Contact telephone (optional)'),
         telNo,
       );
 
-      userEvent.tab();
+      await userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -307,15 +315,18 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    userEvent.clear(screen.getByLabelText('Team email'));
+    await userEvent.clear(screen.getByLabelText('Team email'));
 
-    userEvent.type(screen.getByLabelText('Team email'), 'not a valid email');
+    await userEvent.type(
+      screen.getByLabelText('Team email'),
+      'not a valid email',
+    );
 
-    userEvent.tab();
+    await userEvent.tab();
 
     await waitFor(() => {
       expect(
@@ -337,13 +348,13 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -355,7 +366,7 @@ describe('PublicationContactPage', () => {
     expect(modal.getByRole('heading')).toHaveTextContent(
       'Confirm contact changes',
     );
-    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
   });
 
   test('clicking confirm calls the publication service', async () => {
@@ -368,7 +379,7 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
@@ -376,7 +387,7 @@ describe('PublicationContactPage', () => {
       target: { value: 'new team name' },
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -384,7 +395,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(publicationService.updateContact).toHaveBeenCalledWith(
@@ -412,11 +423,11 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -424,7 +435,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(publicationService.updateContact).toHaveBeenCalledWith(
@@ -454,11 +465,11 @@ describe('PublicationContactPage', () => {
       ).toBeInTheDocument();
     });
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
@@ -466,7 +477,7 @@ describe('PublicationContactPage', () => {
       expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
       expect(

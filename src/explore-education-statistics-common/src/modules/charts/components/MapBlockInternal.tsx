@@ -1,14 +1,14 @@
-import { FormGroup, FormSelect } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import useCallbackRef from '@common/hooks/useCallbackRef';
-import useIntersectionObserver from '@common/hooks/useIntersectionObserver';
 import styles from '@common/modules/charts/components/MapBlock.module.scss';
 import createMapDataSetCategories, {
   MapDataSetCategory,
 } from '@common/modules/charts/components/utils/createMapDataSetCategories';
-import generateLegendDataGroups, {
-  LegendDataGroup,
-} from '@common/modules/charts/components/utils/generateLegendDataGroups';
+import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
+import MapGeoJSON from '@common/modules/charts/components/MapGeoJSON';
+import MapControls from '@common/modules/charts/components/MapControls';
+import MapLegend from '@common/modules/charts/components/MapLegend';
+import MapSelectedItem from '@common/modules/charts/components/MapSelectedItem';
+import generateFeaturesAndDataGroups from '@common/modules/charts/components/utils/generateFeaturesAndDataGroups';
 import {
   AxisConfiguration,
   ChartProps,
@@ -20,26 +20,15 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import getDataSetCategoryConfigs, {
   DataSetCategoryConfig,
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import generateHslColour from '@common/utils/colour/generateHslColour';
-import locationLevelsMap from '@common/utils/locationLevelsMap';
-import formatPretty from '@common/utils/number/formatPretty';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
-import { Layer, Path, PathOptions, Polyline } from 'leaflet';
+import { Layer, Path, Polyline } from 'leaflet';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
-import uniq from 'lodash/uniq';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { GeoJSON, Map } from 'react-leaflet';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MapContainer } from 'react-leaflet';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -83,11 +72,6 @@ export default function MapBlockInternal({
   height,
   axes,
 }: MapBlockProps) {
-  const mapRef = useRef<Map>(null);
-  const container = useRef<HTMLDivElement>(null);
-  const geometryRef = useRef<GeoJSON>(null);
-  const ukRef = useRef<GeoJSON>(null);
-
   const axisMajor = useMemo<AxisConfiguration>(
     () => ({
       ...axes.major,
@@ -135,68 +119,12 @@ export default function MapBlockInternal({
     );
   }, [dataSetCategoryConfigs]);
 
-  const shouldGroupLocationOptions = useMemo(() => {
-    return dataSetCategories.some(
-      element =>
-        element.filter.level === 'localAuthority' ||
-        element.filter.level === 'localAuthorityDistrict',
-    );
-  }, [dataSetCategories]);
-
-  // If there are no LAs or LADs don't group the locations.
-  const locationOptions = useMemo(() => {
-    if (shouldGroupLocationOptions) {
-      return undefined;
-    }
-    return orderBy(
-      dataSetCategories.map(dataSetCategory => ({
-        label: dataSetCategory.filter.label,
-        value: dataSetCategory.filter.id,
-      })),
-      ['label'],
-    );
-  }, [dataSetCategories, shouldGroupLocationOptions]);
-
-  // If there are LAs or LADs, group them by region and group any others by level
-  const groupedLocationOptions = useMemo(() => {
-    if (!shouldGroupLocationOptions) {
-      return undefined;
-    }
-    return dataSetCategories.reduce<Dictionary<SelectOption[]>>(
-      (acc, { filter }) => {
-        const groupLabel =
-          filter.level === 'localAuthority' ||
-          filter.level === 'localAuthorityDistrict'
-            ? (filter.group as string)
-            : locationLevelsMap[filter.level].label;
-
-        (acc[groupLabel] ??= []).push({
-          label: filter.label,
-          value: filter.id,
-        });
-        return acc;
-      },
-      {},
-    );
-  }, [dataSetCategories, shouldGroupLocationOptions]);
-
-  const locationType = useMemo(() => {
-    const levels = uniq(
-      dataSetCategories.map(category => category.filter.level),
-    );
-    return !levels.every(level => level === levels[0]) ||
-      !locationLevelsMap[levels[0]]
-      ? { label: 'location', prefix: 'a' }
-      : locationLevelsMap[levels[0]];
-  }, [dataSetCategories]);
-
   const [selectedDataSetKey, setSelectedDataSetKey] = useState<string>(
     (dataSetOptions[0]?.value as string) ?? '',
   );
   const [selectedFeature, setSelectedFeature] = useState<MapFeature>();
 
   const [features, setFeatures] = useState<MapFeatureCollection>();
-  const [ukGeometry, setUkGeometry] = useState<FeatureCollection>();
 
   const [legendDataGroups, setLegendDataGroups] = useState<LegendDataGroup[]>(
     [],
@@ -206,34 +134,6 @@ export default function MapBlockInternal({
 
   const selectedDataSet =
     selectedFeature?.properties?.dataSets[selectedDataSetKey];
-
-  // initialise
-  useEffect(() => {
-    import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
-      setUkGeometry(imported.default as FeatureCollection);
-    });
-  }, []);
-
-  const [intersectionEntry] = useIntersectionObserver(container, {
-    threshold: 0.00001,
-  });
-
-  useEffect(() => {
-    const { current } = mapRef;
-    if (current && intersectionEntry) {
-      requestAnimationFrame(() => {
-        current.leafletElement.invalidateSize();
-      });
-    }
-  }, [intersectionEntry]);
-
-  // For a refresh of the Leaflet map element
-  // if width or height are changed
-  useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.leafletElement.invalidateSize();
-    }
-  }, [width, height]);
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
@@ -256,118 +156,6 @@ export default function MapBlockInternal({
     selectedDataSetKey,
   ]);
 
-  // Reset the GeoJson layer if the geometry is changed,
-  // updating the component doesn't do it once it's rendered
-  useEffect(() => {
-    if (geometryRef.current) {
-      geometryRef.current.leafletElement.clearLayers();
-
-      if (features) {
-        geometryRef.current.leafletElement.addData(features);
-      }
-    }
-  }, [features]);
-
-  const updateSelectedFeature = useCallback(
-    (feature: MapFeature) => {
-      if (selectedFeature) {
-        const element = selectedFeature?.properties.layer?.getElement();
-
-        if (element) {
-          element.classList.remove(styles.selected);
-          element.removeAttribute('data-testid');
-        }
-      }
-
-      setSelectedFeature(feature);
-
-      const { layer } = feature.properties;
-
-      if (!layer) {
-        return;
-      }
-
-      layer.bringToFront();
-
-      const element = layer.getElement();
-
-      if (element) {
-        element.classList.add(styles.selected);
-        element.setAttribute('data-testid', 'mapBlock-selectedFeature');
-      }
-
-      if (mapRef.current) {
-        // Centers the feature on the map
-        mapRef.current.leafletElement.fitBounds(layer.getBounds());
-      }
-    },
-    [selectedFeature],
-  );
-
-  const resetSelectedFeature = useCallback(() => {
-    if (selectedFeature) {
-      const element = selectedFeature?.properties.layer?.getElement();
-
-      if (element) {
-        element.classList.remove(styles.selected);
-        element.removeAttribute('data-testid');
-      }
-      if (mapRef.current) {
-        mapRef.current.leafletElement.setZoom(5);
-      }
-
-      setSelectedFeature(undefined);
-    }
-  }, [selectedFeature]);
-
-  // We have to assign our `onEachFeature` callback to a ref
-  // as `onEachFeature` forms an internal closure which
-  // prevents us from updating the callback's dependencies.
-  // This would otherwise lead to stale state and most likely
-  // result in the callback throwing null pointer errors.
-  const onEachFeature = useCallbackRef(
-    (feature: MapFeature, featureLayer: Layer) => {
-      if (feature.properties) {
-        // eslint-disable-next-line no-param-reassign
-        feature.properties.layer =
-          featureLayer as MapFeatureProperties['layer'];
-      }
-
-      featureLayer.bindTooltip(
-        () => {
-          if (feature.properties.dataSets[selectedDataSetKey]) {
-            const dataSetValue = formatPretty(
-              feature.properties.dataSets[selectedDataSetKey].value,
-              selectedDataSetConfig.dataSet.indicator.unit,
-              selectedDataSetConfig.dataSet.indicator.decimalPlaces,
-            );
-            const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
-
-            const mapWidth = mapRef.current?.container?.clientWidth;
-
-            // Not ideal, we would want to use `max-width` instead.
-            // Unfortunately it doesn't seem to work with the tooltip
-            // for some reason (maybe due to the pane styling).
-            const tooltipStyle = mapWidth
-              ? `width: ${mapWidth / 2 - 20}px`
-              : '';
-
-            return (
-              `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
-              `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
-              `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
-              `</div>`
-            );
-          }
-
-          return '';
-        },
-        { sticky: true },
-      );
-    },
-    [dataSetCategoryConfigs, selectedDataSetKey],
-  );
-
   if (
     data === undefined ||
     axisMajor === undefined ||
@@ -378,230 +166,62 @@ export default function MapBlockInternal({
 
   return (
     <>
-      <form className="govuk-!-margin-bottom-2">
-        <div className="govuk-grid-row">
-          <FormGroup className="govuk-grid-column-two-thirds">
-            <FormSelect
-              name="selectedDataSet"
-              id={`${id}-selectedDataSet`}
-              className="govuk-!-width-full"
-              label="1. Select data to view"
-              value={selectedDataSetKey}
-              onChange={e => setSelectedDataSetKey(e.currentTarget.value)}
-              options={dataSetOptions}
-              order={FormSelect.unordered}
-            />
-          </FormGroup>
+      <MapControls
+        dataSetCategories={dataSetCategories}
+        dataSetOptions={dataSetOptions}
+        id={id}
+        selectedDataSetKey={selectedDataSetKey}
+        selectedLocation={selectedFeature?.id?.toString()}
+        onChangeDataSet={setSelectedDataSetKey}
+        onChangeLocation={value => {
+          const feature = features?.features.find(feat => feat.id === value);
+          return feature
+            ? setSelectedFeature(feature)
+            : setSelectedFeature(undefined);
+        }}
+      />
 
-          <FormGroup className="govuk-grid-column-one-third">
-            <FormSelect
-              name="selectedLocation"
-              id={`${id}-selectedLocation`}
-              label={`2. Select ${locationType.prefix} ${locationType.label}`}
-              value={selectedFeature?.id?.toString()}
-              options={locationOptions}
-              optGroups={groupedLocationOptions}
-              order={FormSelect.unordered}
-              placeholder="None selected"
-              onChange={e => {
-                const feature = features?.features.find(
-                  feat => feat.id === e.currentTarget.value,
-                );
-                if (feature) {
-                  return updateSelectedFeature(feature);
-                }
-                return resetSelectedFeature();
-              }}
-            />
-          </FormGroup>
-        </div>
-      </form>
-
-      <div className="govuk-grid-row govuk-!-margin-bottom-4" ref={container}>
+      <div className="govuk-grid-row govuk-!-margin-bottom-4">
         <div className="govuk-grid-column-two-thirds">
-          {ukGeometry && (
-            <Map
-              ref={mapRef}
-              style={{
-                width: (width && `${width}px`) || '100%',
-                height: `${height || 600}px`,
-              }}
-              className={classNames(styles.map, 'dfe-print-break-avoid')}
-              center={position}
-              minZoom={5}
-              zoom={5}
-              whenReady={() => {
-                mapRef.current?.leafletElement.setMaxBounds(
-                  mapRef.current.leafletElement.getBounds(),
-                );
-              }}
-            >
-              <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
-
-              {features && (
-                <GeoJSON
-                  ref={geometryRef}
-                  data={features}
-                  onEachFeature={(...params) => {
-                    if (onEachFeature.current) {
-                      onEachFeature.current(...params);
-                    }
-                  }}
-                  style={(feature?: MapFeature): PathOptions => {
-                    if (!feature) {
-                      return {};
-                    }
-
-                    return {
-                      fillColor: feature.properties.colour,
-                    };
-                  }}
-                  onclick={e => {
-                    const { feature } = e.sourceTarget;
-
-                    if (feature.properties && feature.id) {
-                      updateSelectedFeature(feature);
-                    }
-                  }}
-                />
-              )}
-            </Map>
-          )}
+          <MapContainer
+            style={{
+              width: (width && `${width}px`) || '100%',
+              height: `${height || 600}px`,
+            }}
+            className={classNames(styles.map, 'dfe-print-break-avoid')}
+            center={position}
+            minZoom={5}
+            zoom={5}
+          >
+            <MapGeoJSON
+              dataSetCategoryConfigs={dataSetCategoryConfigs}
+              features={features}
+              width={width}
+              height={height}
+              selectedDataSetKey={selectedDataSetKey}
+              selectedFeature={selectedFeature}
+              onSelectFeature={setSelectedFeature}
+            />
+          </MapContainer>
         </div>
         {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">
-            <h3 className="govuk-heading-s dfe-word-break--break-word">
-              Key to {selectedDataSetConfig?.config?.label}
-            </h3>
-            <ul className="govuk-list" data-testid="mapBlock-legend">
-              {legendDataGroups.map(({ min, max, colour }) => (
-                <li
-                  key={`${min}-${max}-${colour}`}
-                  className={styles.legend}
-                  data-testid="mapBlock-legend-item"
-                >
-                  <span
-                    className={styles.legendIcon}
-                    data-testid="mapBlock-legend-colour"
-                    style={{
-                      backgroundColor: colour,
-                    }}
-                  />
-                  {`${min} to ${max}`}
-                </li>
-              ))}
-            </ul>
-
-            <div
-              aria-live="polite"
-              className="govuk-!-margin-top-5"
-              data-testid="mapBlock-indicator"
-            >
-              {selectedFeature && (
-                <>
-                  <h3 className="govuk-heading-s">
-                    {selectedFeature?.properties.name}
-                  </h3>
-
-                  {selectedDataSet && (
-                    <KeyStatTile
-                      testId="mapBlock-indicatorTile"
-                      title={selectedDataSetConfig.config.label}
-                      value={formatPretty(
-                        selectedDataSet.value,
-                        selectedDataSetConfig.dataSet.indicator.unit,
-                        selectedDataSetConfig.dataSet.indicator.decimalPlaces,
-                      )}
-                    />
-                  )}
-                </>
-              )}
-            </div>
+            <MapLegend
+              heading={selectedDataSetConfig?.config?.label}
+              legendDataGroups={legendDataGroups}
+            />
+            <MapSelectedItem
+              decimalPlaces={
+                selectedDataSetConfig.dataSet.indicator.decimalPlaces
+              }
+              heading={selectedFeature?.properties.name}
+              title={selectedDataSetConfig.config.label}
+              unit={selectedDataSetConfig.dataSet.indicator.unit}
+              value={selectedDataSet?.value}
+            />
           </div>
         )}
       </div>
     </>
   );
-}
-
-function generateFeaturesAndDataGroups({
-  dataSetCategories,
-  selectedDataSetConfig,
-}: {
-  dataSetCategories: MapDataSetCategory[];
-  selectedDataSetConfig: DataSetCategoryConfig;
-}): {
-  features: MapFeatureCollection;
-  dataGroups: LegendDataGroup[];
-} {
-  const selectedDataSetKey = selectedDataSetConfig.dataKey;
-  const { unit, decimalPlaces } = selectedDataSetConfig.dataSet.indicator;
-
-  const colour =
-    selectedDataSetConfig.config.colour ??
-    generateHslColour(selectedDataSetConfig.dataKey);
-
-  // Extract only the numeric values out of relevant data sets
-  const values = dataSetCategories.reduce<number[]>((acc, category) => {
-    const value = category.dataSets[selectedDataSetKey]?.value;
-
-    if (Number.isFinite(value)) {
-      acc.push(value);
-    }
-
-    return acc;
-  }, []);
-
-  const dataGroups = generateLegendDataGroups({
-    colour,
-    dataGrouping: selectedDataSetConfig.dataGrouping,
-    decimalPlaces,
-    values,
-    unit,
-  });
-
-  // Default to white for areas not covered by custom data sets
-  // to make it clearer which aren't covered by the groups.
-  const defaultColour =
-    selectedDataSetConfig.dataGrouping?.type === 'Custom'
-      ? 'rgba(255, 255, 255, 1)'
-      : 'rgba(0,0,0,0)';
-
-  const features: MapFeatureCollection = {
-    type: 'FeatureCollection',
-    features: dataSetCategories.reduce<MapFeature[]>(
-      (acc, { dataSets, filter, geoJson }) => {
-        const value = dataSets?.[selectedDataSetKey]?.value;
-
-        const matchingDataGroup = Number.isFinite(value)
-          ? dataGroups.find(dataClass => {
-              const roundedValue = Number(
-                value.toFixed(dataClass.decimalPlaces),
-              );
-              return (
-                dataClass.minRaw <= roundedValue &&
-                roundedValue <= dataClass.maxRaw
-              );
-            })
-          : undefined;
-
-        acc.push({
-          ...geoJson,
-          id: filter.id,
-          properties: {
-            ...geoJson.properties,
-            dataSets,
-            // Default to transparent if no match
-            colour: matchingDataGroup?.colour ?? defaultColour,
-            data: value,
-          },
-        });
-
-        return acc;
-      },
-      [],
-    ),
-  };
-
-  return { features, dataGroups };
 }

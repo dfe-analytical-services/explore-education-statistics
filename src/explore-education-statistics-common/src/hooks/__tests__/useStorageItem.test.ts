@@ -1,6 +1,6 @@
 import useStorageItem from '@common/hooks/useStorageItem';
 import _storageService from '@common/services/storageService';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 
 jest.mock('@common/services/storageService');
 
@@ -36,34 +36,30 @@ describe('useStorageItem', () => {
   });
 
   test('can set new `value`', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useStorageItem('testKey', 'initial'),
-    );
+    const { result } = renderHook(() => useStorageItem('testKey', 'initial'));
 
     const [, setValue] = result.current;
 
     setValue('test');
 
-    await waitForNextUpdate();
+    await waitFor(() => {
+      const [value] = result.current;
 
-    const [value] = result.current;
-
-    expect(value).toBe('test');
+      expect(value).toBe('test');
+    });
   });
 
   test('can clear `value`', async () => {
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useStorageItem('testKey', 'initial'),
-    );
+    const { result } = renderHook(() => useStorageItem('testKey', 'initial'));
 
     const [, , clearValue] = result.current;
 
     clearValue();
 
-    await waitForNextUpdate();
+    await waitFor(() => {
+      const [value] = result.current;
 
-    const [value] = result.current;
-
-    expect(value).toBeUndefined();
+      expect(value).toBeUndefined();
+    });
   });
 });

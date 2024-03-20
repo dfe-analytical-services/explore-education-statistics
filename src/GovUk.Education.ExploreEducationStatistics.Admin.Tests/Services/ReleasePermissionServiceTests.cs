@@ -533,15 +533,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationContributors()
         {
-            ReleaseParent releaseParent1 = _dataFixture
-                .DefaultReleaseParent(publishedVersions: 1);
+            Release release1 = _dataFixture
+                .DefaultRelease(publishedVersions: 1);
 
-            ReleaseParent releaseParent2 = _dataFixture
-                .DefaultReleaseParent(publishedVersions: 1, draftVersion: true);
+            Release release2 = _dataFixture
+                .DefaultRelease(publishedVersions: 1, draftVersion: true);
 
             Publication publication = _dataFixture
                 .DefaultPublication()
-                .WithReleaseParents(ListOf(releaseParent1, releaseParent2));
+                .WithReleases(ListOf(release1, release2));
 
             var user1 = new User
             {
@@ -552,7 +552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1ReleaseRole1 = new UserReleaseRole
             {
                 User = user1,
-                ReleaseVersion = releaseParent1.Versions[0],
+                ReleaseVersion = release1.Versions[0],
                 Role = Contributor,
             };
 
@@ -565,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user2ReleaseRole1 = new UserReleaseRole
             {
                 User = user2,
-                ReleaseVersion = releaseParent2.Versions[1],
+                ReleaseVersion = release2.Versions[1],
                 Role = Contributor,
             };
 
@@ -579,13 +579,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
             {
                 User = user3,
-                ReleaseVersion = releaseParent1.Versions[0],
+                ReleaseVersion = release1.Versions[0],
                 Role = PrereleaseViewer,
             };
             var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
             {
                 User = user3,
-                ReleaseVersion = releaseParent2.Versions[0],
+                ReleaseVersion = release2.Versions[0],
                 Role = Contributor,
                 Deleted = DateTime.UtcNow,
             };

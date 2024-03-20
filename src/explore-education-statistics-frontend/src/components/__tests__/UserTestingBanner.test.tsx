@@ -59,7 +59,7 @@ describe('UserTestingBanner', () => {
     ).toBeInTheDocument();
   });
 
-  test('clicking the close button sets the cookie', () => {
+  test('clicking the close button sets the cookie', async () => {
     const handleUserTestingBannerSeen = jest.fn();
     jest.spyOn(useCookies, 'useCookies').mockImplementation(() => ({
       getCookie: () => {
@@ -74,7 +74,7 @@ describe('UserTestingBanner', () => {
 
     expect(handleUserTestingBannerSeen).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Close' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(handleUserTestingBannerSeen).toHaveBeenCalledWith(
       useCookies.userTestingBannerVersion,

@@ -45,7 +45,7 @@ describe('PublicationInviteNewUsersForm', () => {
     });
 
     const emailInput = screen.getByLabelText('Enter an email address');
-    userEvent.type(emailInput, 'test@test.com');
+    await userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
       /Academic year /,
@@ -61,7 +61,7 @@ describe('PublicationInviteNewUsersForm', () => {
     expect(checkboxes[2].checked).toBe(true);
     expect(checkboxes[2]).toHaveAttribute('value', 'release-3');
 
-    userEvent.click(checkboxes[1]);
+    await userEvent.click(checkboxes[1]);
 
     await waitFor(() => {
       expect(checkboxes[1].checked).toBe(false);
@@ -69,7 +69,7 @@ describe('PublicationInviteNewUsersForm', () => {
 
     expect(userService.inviteContributor).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
 
     await waitFor(() => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(1);
@@ -98,7 +98,7 @@ describe('PublicationInviteNewUsersForm', () => {
 
     expect(userService.inviteContributor).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
 
     await waitFor(() => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(0);
@@ -126,16 +126,16 @@ describe('PublicationInviteNewUsersForm', () => {
     });
 
     const emailInput = screen.getByLabelText('Enter an email address');
-    userEvent.type(emailInput, 'test@test.com');
+    await userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
       /Academic year /,
     ) as HTMLInputElement[];
     expect(checkboxes).toHaveLength(3);
 
-    userEvent.click(checkboxes[0]);
-    userEvent.click(checkboxes[1]);
-    userEvent.click(checkboxes[2]);
+    await userEvent.click(checkboxes[0]);
+    await userEvent.click(checkboxes[1]);
+    await userEvent.click(checkboxes[2]);
 
     await waitFor(() => {
       expect(checkboxes[0].checked).toBe(false);
@@ -145,7 +145,7 @@ describe('PublicationInviteNewUsersForm', () => {
 
     expect(userService.inviteContributor).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Invite user' }));
 
     await waitFor(() => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(0);

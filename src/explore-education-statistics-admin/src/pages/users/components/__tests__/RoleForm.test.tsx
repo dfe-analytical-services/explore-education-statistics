@@ -61,7 +61,7 @@ describe('RoleForm', () => {
       target: { value: testRoles[1].id },
     });
 
-    userEvent.click(screen.getByRole('button', { name: 'Update role' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Update role' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith(

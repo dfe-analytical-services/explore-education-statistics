@@ -315,7 +315,7 @@ describe('PreReleaseTableToolPage', () => {
 
     expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
 
-    userEvent.click(step1.getByLabelText('View all featured tables'));
+    await userEvent.click(step1.getByLabelText('View all featured tables'));
 
     expect(step1.getByRole('link', { name: 'Test highlight' })).toHaveAttribute(
       'href',

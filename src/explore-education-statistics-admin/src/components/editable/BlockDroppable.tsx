@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 
 interface Props {
   droppable: boolean;

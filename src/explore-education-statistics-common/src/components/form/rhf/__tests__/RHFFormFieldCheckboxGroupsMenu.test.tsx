@@ -144,7 +144,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
       screen.getByRole('button', { name: 'Choose options' }),
     ).not.toHaveAttribute('aria-expanded', 'true');
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Option 1')).toBeVisible();
@@ -189,7 +189,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
 
     const summary = screen.getByRole('button', { name: 'Choose options' });
 
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(screen.getByText('Option 1')).toBeVisible();
@@ -198,7 +198,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
 
-    userEvent.click(summary);
+    await userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();

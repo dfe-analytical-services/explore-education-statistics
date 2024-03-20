@@ -1,5 +1,5 @@
 import useButton from '@common/hooks/useButton';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
 
 describe('useButton', () => {
   test('returns button props', () => {

@@ -33,17 +33,17 @@ public static class ReleaseVersionPredicates
             .Where(releaseVersion => publicationId == null || releaseVersion.PublicationId == publicationId)
             .Where(releaseVersion => releaseSlug == null || releaseVersion.Slug == releaseSlug)
             .Where(releaseVersion => !publishedOnly || releaseVersion.Published.HasValue)
-            .GroupBy(releaseVersion => releaseVersion.ReleaseParentId)
+            .GroupBy(releaseVersion => releaseVersion.ReleaseId)
             .Select(groupedVersions =>
                 new
                 {
-                    ReleaseParentId = groupedVersions.Key,
+                    ReleaseId = groupedVersions.Key,
                     Version = groupedVersions.Max(releaseVersion => releaseVersion.Version)
                 });
 
         return releaseVersions
             .Join(maxVersionsQueryable,
-                releaseVersion => new { releaseVersion.ReleaseParentId, releaseVersion.Version },
+                releaseVersion => new { releaseVersion.ReleaseId, releaseVersion.Version },
                 maxVersion => maxVersion,
                 (releaseVersion, _) => releaseVersion);
     }

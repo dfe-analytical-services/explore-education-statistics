@@ -14,10 +14,10 @@ describe('CopyLinkButton', () => {
     ).toBeInTheDocument();
   });
 
-  test('shows the modal when the button is clicked', () => {
+  test('shows the modal when the button is clicked', async () => {
     render(<CopyLinkButton url={testUrl} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Copy link to the clipboard' }),
     );
 
@@ -32,12 +32,12 @@ describe('CopyLinkButton', () => {
   test('copies the url to the clipboard and shows a message when the button is clicked', async () => {
     render(<CopyLinkButton url={testUrl} />);
 
-    userEvent.click(
+    await userEvent.click(
       screen.getByRole('button', { name: 'Copy link to the clipboard' }),
     );
 
     const modal = within(screen.getByRole('dialog'));
-    userEvent.click(modal.getByRole('button', { name: 'Copy' }));
+    await userEvent.click(modal.getByRole('button', { name: 'Copy' }));
 
     await waitFor(() => {
       expect(

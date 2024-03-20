@@ -233,17 +233,17 @@ describe('FormTextArea', () => {
     ).toBeInTheDocument();
   });
 
-  test('trims on blur by default', () => {
+  test('trims on blur by default', async () => {
     render(
       <FormTextArea id="test-input" label="Test input" name="testInput" />,
     );
 
-    userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
-    userEvent.tab();
+    await userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
+    await userEvent.tab();
     expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
   });
 
-  test('does not trim on blur when `trimValue` is false', () => {
+  test('does not trim on blur when `trimValue` is false', async () => {
     render(
       <FormTextArea
         id="test-input"
@@ -253,8 +253,11 @@ describe('FormTextArea', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Test input'), '   do not trim me  ');
-    userEvent.tab();
+    await userEvent.type(
+      screen.getByLabelText('Test input'),
+      '   do not trim me  ',
+    );
+    await userEvent.tab();
     expect(screen.getByLabelText('Test input')).toHaveValue(
       '   do not trim me  ',
     );

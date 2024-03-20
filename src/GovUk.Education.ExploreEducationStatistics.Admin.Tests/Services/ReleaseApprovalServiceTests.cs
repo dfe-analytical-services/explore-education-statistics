@@ -1953,11 +1953,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task Success()
             {
-                var (releaseParent, otherReleaseParent) = _fixture
-                    .DefaultReleaseParent()
-                    .ForIndex(0, rp => rp.SetVersions(_fixture
+                var (release, otherRelease) = _fixture
+                    .DefaultRelease()
+                    .ForIndex(0, r => r.SetVersions(_fixture
                         .DefaultReleaseVersion()
-                        .ForIndex(0, r => r
+                        .ForIndex(0, rv => rv
                             .SetVersion(0)
                             .SetReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
@@ -1967,7 +1967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 .ForIndex(1, rs => rs
                                     .SetCreated(DateTime.UtcNow.AddDays(-3)))
                                 .Generate(2)))
-                        .ForIndex(1, r => r
+                        .ForIndex(1, rv => rv
                             .SetVersion(1)
                             .SetReleaseStatuses(_fixture
                                 .DefaultReleaseStatus()
@@ -1978,7 +1978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     .SetCreated(DateTime.UtcNow.AddDays(-1)))
                                 .Generate(2)))
                         .Generate(2)))
-                    .ForIndex(1, rp => rp.SetVersions(_fixture
+                    .ForIndex(1, r => r.SetVersions(_fixture
                         .DefaultReleaseVersion()
                         .WithReleaseStatuses(_fixture
                             .DefaultReleaseStatus()
@@ -1991,16 +1991,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var contextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
-                    contentDbContext.ReleaseParents.AddRange(releaseParent, otherReleaseParent);
+                    contentDbContext.Releases.AddRange(release, otherRelease);
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(release.Versions[0].Id);
 
-                    var expectedReleaseStatuses = releaseParent.Versions.SelectMany(rv => rv.ReleaseStatuses)
+                    var expectedReleaseStatuses = release.Versions.SelectMany(rv => rv.ReleaseStatuses)
                         .OrderByDescending(rs => rs.Created)
                         .ToList();
 
@@ -2026,8 +2026,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task ReleaseStatusHasNullCreatedValue_ResultHasNullCreatedValue()
             {
-                ReleaseParent releaseParent = _fixture
-                    .DefaultReleaseParent()
+                Release release = _fixture
+                    .DefaultRelease()
                     .WithVersions(
                         _fixture
                             .DefaultReleaseVersion()
@@ -2041,14 +2041,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var contextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId, updateTimestamps: false))
                 {
-                    contentDbContext.ReleaseParents.Add(releaseParent);
+                    contentDbContext.Releases.Add(release);
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(release.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
 
@@ -2060,8 +2060,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task ReleaseStatusHasNullCreatedByValue_ResultHasNullCreatedByEmailValue()
             {
-                ReleaseParent releaseParent = _fixture
-                    .DefaultReleaseParent()
+                Release release = _fixture
+                    .DefaultRelease()
                     .WithVersions(
                         _fixture
                             .DefaultReleaseVersion()
@@ -2074,14 +2074,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var contextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
-                    contentDbContext.ReleaseParents.Add(releaseParent);
+                    contentDbContext.Releases.Add(release);
                     await contentDbContext.SaveChangesAsync();
                 }
 
                 await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(contentDbContext);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(release.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
 
@@ -2093,8 +2093,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             [Fact]
             public async Task NoReleaseStatuses_ReturnsEmpty()
             {
-                ReleaseParent releaseParent = _fixture
-                    .DefaultReleaseParent()
+                Release release = _fixture
+                    .DefaultRelease()
                     .WithVersions(_fixture
                         .DefaultReleaseVersion()
                         .Generate(1));
@@ -2102,14 +2102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var contextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
-                    context.ReleaseParents.Add(releaseParent);
+                    context.Releases.Add(release);
                     await context.SaveChangesAsync();
                 }
 
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     var releaseService = BuildService(context);
-                    var result = await releaseService.ListReleaseStatuses(releaseParent.Versions[0].Id);
+                    var result = await releaseService.ListReleaseStatuses(release.Versions[0].Id);
 
                     var viewModels = result.AssertRight();
                     Assert.Empty(viewModels);

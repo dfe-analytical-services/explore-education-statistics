@@ -24,7 +24,8 @@ internal class ContentApiClient : IContentApiClient
         int page,
         int pageSize,
         string? search = null,
-        IEnumerable<Guid>? publicationIds = null)
+        IEnumerable<Guid>? publicationIds = null,
+        CancellationToken cancellationToken = default)
     {
         var request = new PublicationsListPostRequest(
             Search: search,
@@ -32,7 +33,7 @@ internal class ContentApiClient : IContentApiClient
             PageSize: pageSize,
             PublicationIds: publicationIds);
 
-        var response = await _httpClient.PostAsJsonAsync("api/publications", request);
+        var response = await _httpClient.PostAsJsonAsync("api/publications", request, cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -59,9 +60,11 @@ internal class ContentApiClient : IContentApiClient
             ?? throw new Exception("Could not deserialize publications from content API.");
     }
 
-    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(Guid publicationId)
+    public async Task<Either<ActionResult, PublishedPublicationSummaryViewModel>> GetPublication(
+        Guid publicationId,
+        CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetAsync($"api/publications/{publicationId}/summary");
+        var response = await _httpClient.GetAsync($"api/publications/{publicationId}/summary", cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
