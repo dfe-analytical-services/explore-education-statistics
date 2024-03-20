@@ -67,14 +67,14 @@ const ErrorSummary = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    import('govuk-frontend/govuk/components/error-summary/error-summary').then(
-      ({ default: GovUkErrorSummary }) => {
-        if (ref.current) {
-          const { handleClick } = new GovUkErrorSummary(ref.current);
-          ref.current.addEventListener('click', handleClick);
-        }
-      },
-    );
+    import(
+      'govuk-frontend/dist/govuk/components/error-summary/error-summary'
+    ).then(({ default: GovUkErrorSummary }) => {
+      if (ref.current) {
+        const { handleClick } = new GovUkErrorSummary(ref.current);
+        ref.current.addEventListener('click', handleClick);
+      }
+    });
   }, [ref]);
 
   useEffect(() => {

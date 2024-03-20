@@ -87,7 +87,7 @@ export const BaseFormCheckboxGroup = ({
 
   useMounted(() => {
     if (ref.current) {
-      import('govuk-frontend/govuk/components/checkboxes/checkboxes').then(
+      import('govuk-frontend/dist/govuk/components/checkboxes/checkboxes').then(
         ({ default: GovUkCheckboxes }) => {
           if (ref.current) {
             new GovUkCheckboxes(ref.current).init();
