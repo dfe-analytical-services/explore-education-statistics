@@ -25,9 +25,7 @@ interface Props {
 
 const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [hasCheckedHash, setHasCheckedHash] = useState<boolean>(
-    !window.location.hash,
-  );
+  const [hasCheckedHash, setHasCheckedHash] = useState<boolean>();
   const ref = useRef<HTMLDivElement>(null);
 
   const { onMedia } = useDesktopMedia();
@@ -97,6 +95,12 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
     },
     [sections],
   );
+
+  useEffect(() => {
+    if (window) {
+      setHasCheckedHash(!window.location.hash);
+    }
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
