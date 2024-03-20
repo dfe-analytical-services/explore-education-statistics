@@ -53,16 +53,11 @@ const DownloadStep = ({
       >
         Choose files to download{' '}
         {release && release.latestRelease && !hideLatestDataTag ? (
-          <Tag
-            strong
-            className="govuk-!-margin-left-4"
-            data-testid="latest-data-tag"
-          >
+          <Tag className="govuk-!-margin-left-4" data-testid="latest-data-tag">
             This is the latest data
           </Tag>
         ) : (
           <Tag
-            strong
             colour="orange"
             className="govuk-!-margin-left-4"
             data-testid="not-latest-data-tag"

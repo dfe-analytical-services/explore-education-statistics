@@ -5,6 +5,7 @@ import appendQuery from '@common/utils/url/appendQuery';
 import { PublicationSortOption } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
+import VisuallyHidden from './VisuallyHidden';
 
 const paginationLinkClassName = 'govuk-pagination__link';
 
@@ -71,7 +72,9 @@ const Pagination = ({
             children: (
               <>
                 <ArrowLeft className="govuk-pagination__icon govuk-pagination__icon--prev" />
-                <span className="govuk-pagination__link-title">Previous</span>
+                <span className="govuk-pagination__link-title">
+                  Previous<VisuallyHidden> page</VisuallyHidden>
+                </span>
               </>
             ),
             onClick: () => onClick?.(currentPage - 1),
@@ -129,7 +132,9 @@ const Pagination = ({
             }),
             children: (
               <>
-                <span className="govuk-pagination__link-title">Next</span>
+                <span className="govuk-pagination__link-title">
+                  Next<VisuallyHidden> page</VisuallyHidden>
+                </span>
                 <ArrowRight className="govuk-pagination__icon govuk-pagination__icon--next" />
               </>
             ),

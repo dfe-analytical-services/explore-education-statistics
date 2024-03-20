@@ -138,7 +138,6 @@ const ImporterStatus = ({
               ? 'blue'
               : getImportStatusColour(currentStatus.status)
           }
-          strong
         >
           {dataFile.replacedBy
             ? 'Data replacement in progress'

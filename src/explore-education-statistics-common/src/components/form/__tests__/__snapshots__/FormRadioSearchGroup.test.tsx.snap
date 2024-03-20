@@ -20,7 +20,7 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
            value
     >
     <div aria-live="assertive">
-      <div class="govuk-radios">
+      <div class="govuk-radios radio">
         <div class="govuk-radios__item"
              data-testid="Radio item for Test radio 1"
         >

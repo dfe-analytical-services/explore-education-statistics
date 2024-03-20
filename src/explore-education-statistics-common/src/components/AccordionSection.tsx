@@ -123,11 +123,7 @@ const AccordionSection = ({
           )}
       </div>
 
-      <div
-        aria-labelledby={headingId}
-        className={classNames(classes.sectionContent)}
-        id={contentId}
-      >
+      <div className={classNames(classes.sectionContent)} id={contentId}>
         {typeof children === 'function'
           ? children({ open, contentId, headingId })
           : children}

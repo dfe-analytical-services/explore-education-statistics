@@ -104,7 +104,7 @@ describe('PublicationAdoptMethodologyPage', () => {
     );
 
     expect(
-      screen.getByLabelText('Search for a published methodology'),
+      await screen.findByLabelText('Search for a published methodology'),
     ).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');

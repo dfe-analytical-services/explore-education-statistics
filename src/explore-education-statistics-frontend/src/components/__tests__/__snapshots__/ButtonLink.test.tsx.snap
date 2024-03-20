@@ -3,7 +3,6 @@
 exports[`ButtonLink renders correctly with required props 1`] = `
 <a href="/"
    class="govuk-button"
-   aria-disabled="false"
 >
   Test button
 </a>

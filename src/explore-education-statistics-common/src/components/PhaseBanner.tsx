@@ -9,9 +9,7 @@ export default function PhaseBanner({ url }: Props) {
   return (
     <div className="govuk-phase-banner" role="region" aria-label="phase-banner">
       <p className="govuk-phase-banner__content">
-        <Tag className="govuk-phase-banner__content__tag" strong>
-          Beta
-        </Tag>
+        <Tag className="govuk-phase-banner__content__tag">Beta</Tag>
 
         <span className="govuk-phase-banner__text">
           This is a new service – your{' '}
