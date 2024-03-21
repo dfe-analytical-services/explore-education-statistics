@@ -40,6 +40,11 @@ var dataProcessorSubnet = {
         }
       }
     ]
+    serviceEndpoints: [
+      {
+         service: 'Microsoft.Storage'
+      }
+    ]
   }
 }
 
