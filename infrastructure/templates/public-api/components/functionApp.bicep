@@ -54,19 +54,19 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
-module storageAccountDeploy 'storageAccount.bicep' = {
-  resourcePrefix: resourcePrefix
-  location: location
-  storageAccountName: functionAppName
-  skuStorageResource: 'Standard_LRS'
-  tagValues: tagValues
-}
+var storageAccountName = 'sa${replace(functionAppName, '-', '')}'
 
-var storageAccountName = storageAccountDeploy.outputs.storageAccountName
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
-  scope: resourceGroup(resourceGroup().name)
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'Storage'
+  properties: {
+    supportsHttpsTrafficOnly: true
+    defaultToOAuthAuthentication: true
+  }
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
