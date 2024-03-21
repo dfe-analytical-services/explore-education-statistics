@@ -59,7 +59,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: '${functionAppName}-site3'
+  name: '${functionAppName}-site'
   location: location
   kind: kind
   identity: {
