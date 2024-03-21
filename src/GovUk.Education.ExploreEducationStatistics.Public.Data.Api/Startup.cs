@@ -98,9 +98,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Options
 
         services.AddOptions<ContentApiOptions>()
-            .Bind(_configuration.GetRequiredSection(ContentApiOptions.Section));
+            .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
         services.AddOptions<ParquetFilesOptions>()
-            .Bind(_configuration.GetRequiredSection(ParquetFilesOptions.Section));
+            .Bind(configuration.GetRequiredSection(ParquetFilesOptions.Section));
 
         // Services
 
