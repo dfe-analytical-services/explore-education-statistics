@@ -192,7 +192,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion1.ReleaseId, releaseSeriesItem1.ReleaseId);
                     Assert.Equal(expectedReleaseVersion1.Title, releaseSeriesItem1.Description);
                     Assert.Equal(expectedReleaseVersion1.Slug, releaseSeriesItem1.ReleaseSlug);
-                    Assert.Equal(publication.Slug, releaseSeriesItem1.PublicationSlug);
                     Assert.Null(releaseSeriesItem1.LegacyLinkUrl);
 
                     // NOTE: 2021 release does exist in the database's publication.ReleaseSeries, but is filtered out
@@ -202,14 +201,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion2.ReleaseId, releaseSeriesItem2.ReleaseId);
                     Assert.Equal(expectedReleaseVersion2.Title, releaseSeriesItem2.Description);
                     Assert.Equal(expectedReleaseVersion2.Slug, releaseSeriesItem2.ReleaseSlug);
-                    Assert.Equal(publication.Slug, releaseSeriesItem2.PublicationSlug);
                     Assert.Null(releaseSeriesItem2.LegacyLinkUrl);
 
                     var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
                     Assert.Null(releaseSeriesItem3.ReleaseId);
                     Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);
                     Assert.Null(releaseSeriesItem3.ReleaseSlug);
-                    Assert.Null(releaseSeriesItem3.PublicationSlug);
                     Assert.Equal(_legacyLinks[0].LegacyLinkUrl, releaseSeriesItem3.LegacyLinkUrl);
 
                     Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);

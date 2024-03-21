@@ -21,7 +21,6 @@ export const testPublication: Publication = {
       id: 'release-2',
       isLegacyLink: false,
       description: 'Academic year 2018/19',
-      publicationSlug: 'pupil-absence-in-schools-in-england',
       releaseSlug: '2018-19',
     },
     {
@@ -34,7 +33,6 @@ export const testPublication: Publication = {
       id: 'release-1',
       isLegacyLink: false,
       description: 'Academic year 2017/18',
-      publicationSlug: 'pupil-absence-in-schools-in-england',
       releaseSlug: '2017-18',
     },
     {

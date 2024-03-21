@@ -7,7 +7,7 @@ import {
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationEditReleaseSeriesLegacyLinkRouteParams,
 } from '@admin/routes/publicationRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {ReleaseSeriesTableEntry} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -23,11 +23,12 @@ import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { ReleaseSeriesItem } from '@common/services/publicationService';
+import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
+import Tag from '@common/components/Tag';
 
 interface Props {
   canManageReleaseSeries: boolean;
-  releaseSeries: ReleaseSeriesItem[];
+  releaseSeries: ReleaseSeriesTableEntry[];
   publicationId: string;
 }
 const ReleaseSeriesTable = ({
@@ -146,16 +147,8 @@ const ReleaseSeriesTable = ({
                         <span className="govuk-!-display-block">
                           {seriesItem.description}
                         </span>
-                        {/* @MarkFix{seriesItem.isLatest && ( */}
-                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1"> */}
-                        {/*    Latest */}
-                        {/*  </span> */}
-                        {/* )} */}
-                        {/* @MarkFix{seriesItem.isDraft && ( */}
-                        {/*  <span className="govuk-tag govuk-!-display-inline-block govuk-!-margin-right-1 govuk-!-margin-bottom-1 dfe-white-space--nowrap"> */}
-                        {/*    Draft{seriesItem.isAmendment && ' Amendment'} */}
-                        {/*  </span> */}
-                        {/* )} */}
+                        {seriesItem.isLatest && <Tag>Latest</Tag>}
+                        {!seriesItem.isPublished && <Tag>Unpublished</Tag>}
                       </td>
                       <td
                         className={classNames({
@@ -174,10 +167,7 @@ const ReleaseSeriesTable = ({
                           </a>
                         )}
 
-                        {!seriesItem.isLegacyLink && (
-                          // seriesItem.isDraft && // @MarkFix
-                          // seriesItem.isAmendment) ||
-                          // (!seriesItem.isDraft && !seriesItem.isAmendment)) && (
+                        {!seriesItem.isLegacyLink && seriesItem.isPublished && (
                           <Link
                             to={`${config.publicAppUrl}/find-statistics/${seriesItem.publicationSlug}/${seriesItem.releaseSlug}`}
                             className="govuk-link--no-visited-state"
@@ -240,19 +230,9 @@ const ReleaseSeriesTable = ({
                                     );
                                   await publicationService.updateReleaseSeries(
                                     publicationId,
-                                    nextReleaseSeries.map(item => ({
-                                      // @MarkFix abstract this mapping out?
-                                      id: item.id,
-                                      releaseId: !item.isLegacyLink
-                                        ? item.releaseId
-                                        : undefined,
-                                      legacyLinkDescription: item.isLegacyLink
-                                        ? item.description
-                                        : undefined,
-                                      legacyLinkUrl: item.isLegacyLink
-                                        ? item.legacyLinkUrl
-                                        : undefined,
-                                    })),
+                                    mapToReleaseSeriesItemUpdateRequest(
+                                      nextReleaseSeries,
+                                    ),
                                   );
                                   setReleaseSeries(nextReleaseSeries);
                                 }}
@@ -287,18 +267,7 @@ const ReleaseSeriesTable = ({
             onClick={async () => {
               await publicationService.updateReleaseSeries(
                 publicationId,
-                releaseSeries.map(seriesItem => ({
-                  id: seriesItem.id,
-                  releaseId: !seriesItem.isLegacyLink
-                    ? seriesItem.releaseId
-                    : undefined,
-                  legacyLinkDescription: seriesItem.isLegacyLink
-                    ? seriesItem.description
-                    : undefined,
-                  legacyLinkUrl: seriesItem.isLegacyLink
-                    ? seriesItem.legacyLinkUrl
-                    : undefined,
-                })),
+                mapToReleaseSeriesItemUpdateRequest(releaseSeries),
               );
 
               toggleReordering.off();

@@ -98,7 +98,7 @@ const ReleaseContent = ({
 
   const releaseSeries = release.publication.releaseSeries.filter(
     rsi => !(rsi.isLegacyLink === false && rsi.description === release.title),
-  ); // @MarkFix better if pass releaseId down to release?
+  );
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
     const methodologies = publication.methodologies.map(methodology => ({
@@ -342,7 +342,6 @@ const ReleaseContent = ({
                             isLegacyLink,
                             description,
                             legacyLinkUrl,
-                            publicationSlug,
                             releaseSlug,
                           }) => (
                             <li key={id} data-testid="other-release-item">
@@ -350,7 +349,7 @@ const ReleaseContent = ({
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
                                 <Link
-                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`} // @MarkFix needs useConfig publicAppUrl prefixed?
+                                  to={`/find-statistics/${publication.slug}/${releaseSlug}`} // @MarkFix needs useConfig publicAppUrl prefixed?
                                 >
                                   {description}
                                 </Link>

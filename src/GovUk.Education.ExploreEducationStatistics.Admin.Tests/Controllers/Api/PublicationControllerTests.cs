@@ -109,7 +109,7 @@ public class PublicationControllerTests
     {
         // Arrange
         var templateReleaseResult =
-            new Either<ActionResult, List<ReleaseSeriesItemViewModel>>(new List<ReleaseSeriesItemViewModel>());
+            new Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>(new List<ReleaseSeriesTableEntryViewModel>());
 
         var publicationId = Guid.NewGuid();
         var publicationService = new Mock<IPublicationService>(Strict);

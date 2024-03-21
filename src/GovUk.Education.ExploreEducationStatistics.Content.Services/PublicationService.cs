@@ -116,7 +116,6 @@ public class PublicationService : IPublicationService
                             Description = latestReleaseVersion.Title,
 
                             ReleaseId = latestReleaseVersion.ReleaseId,
-                            PublicationSlug = publication.Slug,
                             ReleaseSlug = latestReleaseVersion.Slug,
                         };
                     }).ToList();

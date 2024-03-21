@@ -3,13 +3,12 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService, {
-  PublicationWithPermissions,
+  PublicationWithPermissions, ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import {ReleaseSeriesItem} from "@common/services/publicationService";
 
 jest.mock('@admin/services/publicationService');
 
@@ -18,7 +17,8 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationReleaseSeriesPage', () => {
-  const testReleaseSeries: ReleaseSeriesItem[] = [
+  const testReleaseSeries: ReleaseSeriesTableEntry[] = [
+    // @MarkFix add IsLatest and IsPublished
     {
       id: 'legacy-release-3',
       isLegacyLink: true,

@@ -53,14 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             bool? live = null,
             bool includePermissions = false);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(
+        Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(
             Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
+        Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest newLegacyLink);
 
-        Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
+        Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
            Guid publicationId,
            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems);
     }

@@ -5,8 +5,7 @@ import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
-import { ReleaseSeriesItem } from '@common/services/publicationService';
-import _publicationService from '@admin/services/publicationService';
+import _publicationService, {ReleaseSeriesTableEntry} from '@admin/services/publicationService';
 
 jest.mock('@admin/services/publicationService');
  const publicationService = _publicationService as jest.Mocked<
@@ -14,7 +13,7 @@ jest.mock('@admin/services/publicationService');
 >;
 
 describe('ReleaseSeriesTable', () => {
-  const testReleaseSeries: ReleaseSeriesItem[] = [
+  const testReleaseSeries: ReleaseSeriesTableEntry[] = [
     // @MarkFix create isLegacyLink: false in here and test that
     {
       id: 'ees-release-3',

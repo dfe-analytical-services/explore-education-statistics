@@ -44,7 +44,6 @@ export interface ReleaseSeriesItem {
   description: string;
 
   releaseId?: string;
-  publicationSlug?: string;
   releaseSlug?: string;
 
   legacyLinkUrl?: string;

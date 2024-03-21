@@ -6,7 +6,7 @@ import {
   publicationEditReleaseSeriesLegacyLinkRoute,
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
-  PublicationWithPermissions,
+  PublicationWithPermissions, ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,7 +14,6 @@ import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
-import { ReleaseSeriesItem } from '@common/services/publicationService';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -22,7 +21,8 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
-  const releaseSeries: ReleaseSeriesItem[] = [
+  const releaseSeries: ReleaseSeriesTableEntry[] = [
+    // @MarkFix add IsLatest / IsPublished
     {
       id: 'legacy-release-1',
       isLegacyLink: true,

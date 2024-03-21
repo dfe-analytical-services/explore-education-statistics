@@ -2740,6 +2740,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.True(viewModels[0].IsLatest);
+                Assert.True(viewModels[0].IsPublished);
                 Assert.Null(viewModels[0].LegacyLinkUrl);
 
                 var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
@@ -2749,6 +2751,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion2.ReleaseId, viewModels[1].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion2.Slug, viewModels[1].ReleaseSlug);
+                Assert.False(viewModels[1].IsLatest);
+                Assert.False(viewModels[1].IsPublished);
                 Assert.Null(viewModels[1].LegacyLinkUrl);
 
                 var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
@@ -2758,6 +2762,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion3.ReleaseId, viewModels[2].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion3.Slug, viewModels[2].ReleaseSlug);
+                Assert.False(viewModels[2].IsLatest);
+                Assert.True(viewModels[2].IsPublished);
                 Assert.Null(viewModels[2].LegacyLinkUrl);
 
                 Assert.Equal(publication.ReleaseSeries[3].Id, viewModels[3].Id);
@@ -2766,6 +2772,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[3].ReleaseId);
                 Assert.Null(viewModels[3].PublicationSlug);
                 Assert.Null(viewModels[3].ReleaseSlug);
+                Assert.Null(viewModels[3].IsLatest);
+                Assert.Null(viewModels[3].IsPublished);
                 Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[3].LegacyLinkUrl);
             }
         }
@@ -2810,6 +2818,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.True(viewModels[0].IsLatest);
+                Assert.True(viewModels[0].IsPublished);
                 Assert.Null(viewModels[0].LegacyLinkUrl);
 
                 var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2021, Version: 0 });
@@ -2819,6 +2829,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion2.ReleaseId, viewModels[1].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion2.Slug, viewModels[1].ReleaseSlug);
+                Assert.False(viewModels[1].IsLatest);
+                Assert.False(viewModels[1].IsPublished);
                 Assert.Null(viewModels[1].LegacyLinkUrl);
 
                 var expectedReleaseVersion3 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
@@ -2828,6 +2840,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion3.ReleaseId, viewModels[2].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion3.Slug, viewModels[2].ReleaseSlug);
+                Assert.False(viewModels[2].IsLatest);
+                Assert.True(viewModels[2].IsPublished);
                 Assert.Null(viewModels[2].LegacyLinkUrl);
             }
         }
@@ -2881,6 +2895,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[0].ReleaseId);
                 Assert.Null(viewModels[0].PublicationSlug);
                 Assert.Null(viewModels[0].ReleaseSlug);
+                Assert.Null(viewModels[0].IsLatest);
+                Assert.Null(viewModels[0].IsPublished);
                 Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[0].LegacyLinkUrl);
 
                 Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
@@ -2889,6 +2905,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[1].ReleaseId);
                 Assert.Null(viewModels[1].PublicationSlug);
                 Assert.Null(viewModels[1].ReleaseSlug);
+                Assert.Null(viewModels[1].IsLatest);
+                Assert.Null(viewModels[1].IsPublished);
                 Assert.Equal(legacyLinks[1].LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
             }
         }
@@ -2974,6 +2992,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion1.ReleaseId, viewModels[0].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[0].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion1.Slug, viewModels[0].ReleaseSlug);
+                Assert.True(viewModels[0].IsLatest);
+                Assert.True(viewModels[0].IsPublished);
                 Assert.Null(viewModels[0].LegacyLinkUrl);
 
                 Assert.Equal(publication.ReleaseSeries[1].Id, viewModels[1].Id);
@@ -2982,6 +3002,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[1].ReleaseId);
                 Assert.Null(viewModels[1].PublicationSlug);
                 Assert.Null(viewModels[1].ReleaseSlug);
+                Assert.Null(viewModels[1].IsLatest);
+                Assert.Null(viewModels[1].IsPublished);
                 Assert.Equal(legacyLinks[0].LegacyLinkUrl, viewModels[1].LegacyLinkUrl);
 
                 Assert.True(viewModels[2].IsLegacyLink);
@@ -2989,6 +3011,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[2].ReleaseId);
                 Assert.Null(viewModels[2].PublicationSlug);
                 Assert.Null(viewModels[2].ReleaseSlug);
+                Assert.Null(viewModels[2].IsLatest);
+                Assert.Null(viewModels[2].IsPublished);
                 Assert.Equal("https://test.com/new", viewModels[2].LegacyLinkUrl);
 
                 var dbReleaseSeries = contentDbContext.Publications
@@ -3039,6 +3063,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(newSeriesItem.ReleaseId);
                 Assert.Null(newSeriesItem.PublicationSlug);
                 Assert.Null(newSeriesItem.ReleaseSlug);
+                Assert.Null(newSeriesItem.IsLatest);
+                Assert.Null(newSeriesItem.IsPublished);
                 Assert.Equal("https://test.com/new", newSeriesItem.LegacyLinkUrl);
 
                 var dbReleaseSeries = contentDbContext.Publications
@@ -3136,6 +3162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(viewModels[0].ReleaseId);
                 Assert.Null(viewModels[0].PublicationSlug);
                 Assert.Null(viewModels[0].ReleaseSlug);
+                Assert.Null(viewModels[0].IsLatest);
+                Assert.Null(viewModels[0].IsPublished);
                 Assert.Equal("https://test.com/new", viewModels[0].LegacyLinkUrl);
 
                 Assert.False(viewModels[1].IsLegacyLink);
@@ -3143,6 +3171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion2021.ReleaseId, viewModels[1].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[1].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion2021.Slug, viewModels[1].ReleaseSlug);
+                Assert.False(viewModels[1].IsLatest);
+                Assert.False(viewModels[1].IsPublished);
                 Assert.Null(viewModels[1].LegacyLinkUrl);
 
                 Assert.False(viewModels[2].IsLegacyLink);
@@ -3150,6 +3180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion2020.ReleaseId, viewModels[2].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[2].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion2020.Slug, viewModels[2].ReleaseSlug);
+                Assert.False(viewModels[2].IsLatest);
+                Assert.True(viewModels[2].IsPublished);
                 Assert.Null(viewModels[2].LegacyLinkUrl);
 
                 Assert.False(viewModels[3].IsLegacyLink);
@@ -3157,6 +3189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(expectedReleaseVersion2022.ReleaseId, viewModels[3].ReleaseId);
                 Assert.Equal(publication.Slug, viewModels[3].PublicationSlug);
                 Assert.Equal(expectedReleaseVersion2022.Slug, viewModels[3].ReleaseSlug);
+                Assert.True(viewModels[3].IsLatest);
+                Assert.True(viewModels[3].IsPublished);
                 Assert.Null(viewModels[3].LegacyLinkUrl);
             }
         }

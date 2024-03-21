@@ -9,15 +9,16 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
-import publicationService, {ReleaseSeriesItemUpdateRequest} from '@admin/services/publicationService';
-import {ReleaseSeriesItem} from "@common/services/publicationService";
+import publicationService, {
+  ReleaseSeriesItemUpdateRequest, ReleaseSeriesTableEntry,
+} from '@admin/services/publicationService';
 
-const mapToReleaseSeriesItemUpdateRequest = (releaseSeries: ReleaseSeriesItem[]): ReleaseSeriesItemUpdateRequest[] => {
+export const mapToReleaseSeriesItemUpdateRequest = (
+  releaseSeries: ReleaseSeriesTableEntry[],
+): ReleaseSeriesItemUpdateRequest[] => {
   return releaseSeries.map(seriesItem => ({
     id: seriesItem.id,
-    releaseId: !seriesItem.isLegacyLink
-      ? seriesItem.releaseId
-      : undefined,
+    releaseId: !seriesItem.isLegacyLink ? seriesItem.releaseId : undefined,
     legacyLinkDescription: seriesItem.isLegacyLink
       ? seriesItem.description
       : undefined,
@@ -25,7 +26,8 @@ const mapToReleaseSeriesItemUpdateRequest = (releaseSeries: ReleaseSeriesItem[])
       ? seriesItem.legacyLinkUrl
       : undefined,
   }));
-}
+};
+
 const PublicationEditReleaseSeriesLegacyLinkPage = ({
   match,
 }: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) => {
@@ -33,26 +35,24 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 
-  const { value: releaseSeries, isLoading } = useAsyncHandledRetry(() =>
+  const { value: releaseSeries = [], isLoading } = useAsyncHandledRetry(() =>
     publicationService.getReleaseSeries(publicationId),
   );
 
   const itemIndex = releaseSeries?.findIndex(
     rsi => rsi.id === releaseSeriesItemId,
   );
-  if (
-    isLoading ||
-    releaseSeries === undefined ||
-    itemIndex === undefined ||
-    itemIndex === -1
-  ) {
-    // @MarkFix
+
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
+  if (itemIndex === -1) {
+    return <p>Release series item not found.</p>;
+  }
+
   if (releaseSeries[itemIndex].releaseId !== undefined) {
-    // @MarkFix
-    return <p>Cannot edit this release series item!</p>;
+    return <p>Release series item isn't a legacy link.</p>;
   }
 
   const publicationEditPath = generatePath(publicationReleaseSeriesRoute.path, {

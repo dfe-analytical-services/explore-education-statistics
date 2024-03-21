@@ -4,7 +4,6 @@ import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
   PublicationSummary,
-  ReleaseSeriesItem,
 } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
@@ -97,6 +96,20 @@ export interface ListReleasesParams {
   page?: number;
   pageSize?: number;
   includePermissions?: boolean;
+}
+
+export interface ReleaseSeriesTableEntry {
+  id: string;
+  isLegacyLink: boolean;
+  description: string;
+
+  releaseId?: string;
+  publicationSlug?: string;
+  releaseSlug?: string;
+  isLatest?: boolean;
+  isPublished?: boolean;
+
+  legacyLinkUrl?: string;
 }
 
 const publicationService = {
@@ -213,14 +226,14 @@ const publicationService = {
     );
   },
 
-  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesItem[]> {
+  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesTableEntry[]> {
     return client.get(`/publications/${publicationId}/release-series`);
   },
 
   addReleaseSeriesLegacyLink(
     publicationId: string,
     newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
-  ): Promise<ReleaseSeriesItem[]> {
+  ): Promise<ReleaseSeriesTableEntry[]> {
     return client.post(
       `publications/${publicationId}/release-series`,
       newLegacyLink,
@@ -230,7 +243,7 @@ const publicationService = {
   updateReleaseSeries(
     publicationId: string,
     updatedReleaseSeries: ReleaseSeriesItemUpdateRequest[],
-  ): Promise<ReleaseSeriesItem[]> {
+  ): Promise<ReleaseSeriesTableEntry[]> {
     return client.put(
       `/publications/${publicationId}/release-series`,
       updatedReleaseSeries,

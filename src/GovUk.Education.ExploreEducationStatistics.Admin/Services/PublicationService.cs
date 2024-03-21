@@ -440,19 +440,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
                 .OnSuccess(async publication =>
                 {
-                    var result = new List<ReleaseSeriesItemViewModel>();
+                    var result = new List<ReleaseSeriesTableEntryViewModel>();
                     foreach (var seriesItem in publication.ReleaseSeries)
                     {
                         if (seriesItem.IsLegacyLink)
                         {
-                            result.Add(new ReleaseSeriesItemViewModel
+                            result.Add(new ReleaseSeriesTableEntryViewModel
                             {
                                 Id = seriesItem.Id,
                                 IsLegacyLink = true,
@@ -464,17 +464,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var latestVersion = await _releaseVersionRepository
                                 .GetLatestReleaseVersionForParent(
-                                    seriesItem.ReleaseId!.Value);
+                                    seriesItem.ReleaseId!.Value, publishedOnly: true);
 
                             if (latestVersion == null)
                             {
-                                throw new InvalidDataException(
-                                    "ReleaseSeriesItem with ReleaseId set should have an associated " +
-                                            $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
-                                            $"ReleaseSeriesItem: {seriesItem.Id}");
+                                // if no published version, look for an unpublished version
+                                latestVersion = await _releaseVersionRepository
+                                    .GetLatestReleaseVersionForParent(
+                                        seriesItem.ReleaseId!.Value);
+
+                                if (latestVersion == null)
+                                {
+                                    throw new InvalidDataException(
+                                        "ReleaseSeriesItem with ReleaseId set should have an associated " +
+                                        $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
+                                        $"ReleaseSeriesItem: {seriesItem.Id}");
+                                }
                             }
 
-                            result.Add(new ReleaseSeriesItemViewModel
+                            result.Add(new ReleaseSeriesTableEntryViewModel
                                 {
                                     Id = seriesItem.Id,
                                     IsLegacyLink = false,
@@ -482,6 +490,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     ReleaseId = latestVersion.ReleaseId,
                                     PublicationSlug = publication.Slug,
                                     ReleaseSlug = latestVersion.Slug,
+                                    IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
+                                    IsPublished = latestVersion.Live,
                                 });
                         }
                     }
@@ -490,7 +500,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
         {
@@ -515,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
         {
