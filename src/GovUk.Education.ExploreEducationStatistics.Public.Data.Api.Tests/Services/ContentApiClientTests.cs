@@ -19,9 +19,9 @@ public abstract class ContentApiClientTests
     public ContentApiClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
-        var _client = _mockHttp.ToHttpClient();
-        _client.BaseAddress = new Uri("http://localhost/");
-        _contentApiClient = new ContentApiClient(Mock.Of<ILogger<ContentApiClient>>(), _client);
+        var client = _mockHttp.ToHttpClient();
+        client.BaseAddress = new Uri("http://localhost/");
+        _contentApiClient = new ContentApiClient(Mock.Of<ILogger<ContentApiClient>>(), client);
     }
 
     public class ListPublicationsTests : ContentApiClientTests

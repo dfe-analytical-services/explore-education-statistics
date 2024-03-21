@@ -17,8 +17,8 @@ public record DataSetMetaRequest
     /// Can be any combination of the following:
     /// - `Filters` - include all meta relating to *filters*
     /// - `Indicators` - include all meta relating to *indicators*
-    /// - `Locations` - include all meta associated with the *locations*
-    /// - `TimePeriods` - include all meta associated with the *time periods*
+    /// - `Locations` - include all meta relating to *locations*
+    /// - `TimePeriods` - include all meta relating to *time periods*
     /// </summary>
     [FromQuery]
     [QuerySeparator]
