@@ -9,8 +9,23 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {ReleaseSeriesItemUpdateRequest} from '@admin/services/publicationService';
+import {ReleaseSeriesItem} from "@common/services/publicationService";
 
+const mapToReleaseSeriesItemUpdateRequest = (releaseSeries: ReleaseSeriesItem[]): ReleaseSeriesItemUpdateRequest[] => {
+  return releaseSeries.map(seriesItem => ({
+    id: seriesItem.id,
+    releaseId: !seriesItem.isLegacyLink
+      ? seriesItem.releaseId
+      : undefined,
+    legacyLinkDescription: seriesItem.isLegacyLink
+      ? seriesItem.description
+      : undefined,
+    legacyLinkUrl: seriesItem.isLegacyLink
+      ? seriesItem.legacyLinkUrl
+      : undefined,
+  }));
+}
 const PublicationEditReleaseSeriesLegacyLinkPage = ({
   match,
 }: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) => {
@@ -63,19 +78,7 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
             releaseSeries[itemIndex].legacyLinkUrl = values.url;
             await publicationService.updateReleaseSeries(
               publicationId,
-              releaseSeries.map(seriesItem => ({
-                // @MarkFix abstract out mapping (as similar happens in ReleaseSeriesTable)
-                id: seriesItem.id,
-                releaseId: !seriesItem.isLegacyLink
-                  ? seriesItem.releaseId
-                  : undefined,
-                legacyLinkDescription: seriesItem.isLegacyLink
-                  ? seriesItem.description
-                  : undefined,
-                legacyLinkUrl: seriesItem.isLegacyLink
-                  ? seriesItem.legacyLinkUrl
-                  : undefined,
-              })),
+              mapToReleaseSeriesItemUpdateRequest(releaseSeries),
             );
 
             history.push(publicationEditPath);

@@ -6,11 +6,12 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
 import { ReleaseSeriesItem } from '@common/services/publicationService';
+import _publicationService from '@admin/services/publicationService';
 
-// jest.mock('@admin/services/legacyReleaseService'); // @MarkFix remove
-// const legacyReleaseService = _legacyReleaseService as jest.Mocked<
-//  typeof _legacyReleaseService
-// >;
+jest.mock('@admin/services/publicationService');
+ const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
 
 describe('ReleaseSeriesTable', () => {
   const testReleaseSeries: ReleaseSeriesItem[] = [
