@@ -9,6 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
@@ -101,23 +104,28 @@ public class Startup
             options.EnableForHttps = true;
         });
 
+        // Options
+
+        services.AddOptions<ContentApiOptions>()
+            .Bind(_configuration.GetRequiredSection(ContentApiOptions.Section));
+        services.AddOptions<ParquetFilesOptions>()
+            .Bind(_configuration.GetRequiredSection(ParquetFilesOptions.Section));
+
         // Services
 
         services.AddFluentValidation();
         services.AddFluentValidationRulesToSwagger();
 
-        services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>
+        services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
         {
-            var contentApiOptions = _configuration
-                .GetRequiredSection(ContentApiOptions.Section)
-                .Get<ContentApiOptions>()!;
-
-            httpClient.BaseAddress = new Uri(contentApiOptions.Url);
+            var options = provider.GetRequiredService<ContentApiOptions>();
+            httpClient.BaseAddress = new Uri(options.Url);
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
         services.AddSecurity();
 
+        services.AddSingleton<IParquetPathResolver, ParquetPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();
     }

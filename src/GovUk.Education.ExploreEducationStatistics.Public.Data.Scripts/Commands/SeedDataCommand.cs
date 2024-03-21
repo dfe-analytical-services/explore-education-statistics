@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
@@ -167,9 +168,6 @@ public class SeedDataCommand : ICommand
 
     private class Seeder
     {
-        private const string FiltersDuckDbTable = "filters";
-        private const string TimePeriodsDuckDbTable = "time_periods";
-
         private readonly DataSetSeed _seed;
         private readonly PublicDataDbContext _dbContext;
         private readonly DuckDBConnection _duckDb;
@@ -724,33 +722,32 @@ public class SeedDataCommand : ICommand
             // in DuckDB itself (i.e. changing all the filters and locations to normalised IDs).
             // Trying to transform the data via using Appender API in C# is slower
             // and seems to regularly cause DuckDB crashes for larger data sets.
-            await CreateDuckDbMetaTables(version);
+            await CreateParquetMetaTables(version);
 
             await _duckDb.ExecuteAsync("CREATE SEQUENCE data_seq START 1");
 
             string[] columns =
             [
-                "id UINTEGER PRIMARY KEY",
-                "time_period_id INTEGER",
-                "geographic_level VARCHAR",
-                ..version.LocationMetas.Select(location => $"{GetDuckDbLocationTableName(location)}_id INTEGER"),
-                ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\" INTEGER"),
-                ..version.IndicatorMetas.Select(indicator => $"\"{indicator.PublicId}\" VARCHAR"),
+                $"{DataTable.Cols.Id} UINTEGER PRIMARY KEY",
+                $"{DataTable.Cols.TimePeriodId} INTEGER",
+                $"{DataTable.Cols.GeographicLevel} VARCHAR",
+                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER"),
+                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER"),
+                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR"),
             ];
 
-            await _duckDb.ExecuteAsync($"CREATE TABLE data({columns.JoinToString(",\n")})");
+            await _duckDb.ExecuteAsync($"CREATE TABLE {DataTable.TableName}({columns.JoinToString(",\n")})");
 
             string[] insertColumns =
             [
                 "nextval('data_seq') AS id",
-                "time_periods.id AS time_period_id",
-                "data_source.geographic_level",
-                ..version.LocationMetas.Select(
-                    location =>
-                        $"{GetDuckDbLocationTableName(location)}.id AS {GetDuckDbLocationTableName(location)}_id"
-                ),
-                ..version.FilterMetas.Select(filter => $"\"{filter.PublicId}\".id AS \"{filter.PublicId}\""),
-                ..version.IndicatorMetas.Select(indicator => $"\"{indicator.PublicId}\""),
+                $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
+                DataSourceTable.Ref.GeographicLevel,
+                ..version.LocationMetas.Select(location =>
+                    $"{LocationsTable.Ref(location).Id} AS {DataTable.Cols.LocationId(location)}"),
+                ..version.FilterMetas.Select(filter => 
+                    $"{FiltersTable.Ref(filter).Id} AS {DataTable.Cols.Filter(filter)}"),
+                ..version.IndicatorMetas.Select(DataTable.Cols.Indicator),
             ];
 
             string[] insertJoins =
@@ -758,45 +755,46 @@ public class SeedDataCommand : ICommand
                 ..version.LocationMetas.Select(
                     location =>
                     {
-                        var locationTable = GetDuckDbLocationTableName(location.Level);
-                        var codeColumns = GetDuckDbLocationCodeColumns(location.Level);
+                        var codeColumns = GetParquetLocationCodeColumns(location.Level);
 
                         string[] conditions =
                         [
-                            ..codeColumns.Select(col => $"{locationTable}.{col.Name} = data_source.{col.CsvName}"),
-                            $"{locationTable}.name = data_source.{location.Level.CsvNameColumn()}"
+                            ..codeColumns.Select(col =>
+                                $"{LocationsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
+                            $"{LocationsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
                         ];
 
                         return $"""
-                                LEFT JOIN {locationTable}
+                                LEFT JOIN {LocationsTable.TableName} AS {LocationsTable.Alias(location)}
                                 ON {conditions.JoinToString(" AND ")}
                                 """;
                     }
                 ),
                 ..version.FilterMetas.Select(
                     filter => $"""
-                               LEFT JOIN {FiltersDuckDbTable} AS "{filter.PublicId}"
-                               ON "{filter.PublicId}".column_name = '{filter.PublicId}'
-                               AND "{filter.PublicId}".label = data_source."{filter.PublicId}"
+                               LEFT JOIN {FiltersTable.TableName} AS {FiltersTable.Alias(filter)}
+                               ON {FiltersTable.Ref(filter).ColumnName} = '{filter.PublicId}'
+                               AND {FiltersTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.PublicId)}
                                """
                 ),
-                """
-                JOIN time_periods ON time_periods.period = data_source.time_period 
-                AND time_periods.identifier = data_source.time_identifier
+                $"""
+                JOIN {TimePeriodsTable.TableName} 
+                ON {TimePeriodsTable.Ref().Period} = {DataSourceTable.Ref.TimePeriod} 
+                AND {TimePeriodsTable.Ref().Identifier} = {DataSourceTable.Ref.TimeIdentifier}
                 """
             ];
 
             await _duckDb.ExecuteAsync(
                 new CommandDefinition(
                     $"""
-                     INSERT INTO data
+                     INSERT INTO {DataTable.TableName}
                      SELECT
                         {insertColumns.JoinToString(",\n")}
-                     FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS data_source
+                     FROM read_csv_auto('{_dataFilePath}', ALL_VARCHAR = true) AS {DataSourceTable.TableName}
                      {insertJoins.JoinToString('\n')}
                      ORDER BY
-                         data_source.geographic_level ASC,
-                         data_source.time_period DESC
+                         {DataSourceTable.Ref.GeographicLevel} ASC,
+                         {DataSourceTable.Ref.TimePeriod} DESC
                      """,
                     cancellationToken: _cancellationToken
                 )
@@ -855,39 +853,38 @@ public class SeedDataCommand : ICommand
             await File.WriteAllLinesAsync(loadSqlFilePath, newLines, _cancellationToken);
         }
 
-        private async Task CreateDuckDbMetaTables(DataSetVersion version)
+        private async Task CreateParquetMetaTables(DataSetVersion version)
         {
-            await CreateDuckDbLocationMetaTables(version);
-            await CreateDuckDbFilterMetaTable(version);
-            await CreateDuckDbTimePeriodMetaTable(version);
+            await CreateParquetLocationMetaTables(version);
+            await CreateParquetFilterMetaTable(version);
+            await CreateParquetTimePeriodMetaTable(version);
         }
 
-        private async Task CreateDuckDbLocationMetaTables(DataSetVersion version)
+        private async Task CreateParquetLocationMetaTables(DataSetVersion version)
         {
+            await _duckDb.ExecuteAsync(
+                $"""
+                 CREATE TABLE {LocationsTable.TableName}(
+                     {LocationsTable.Cols.Id} INTEGER PRIMARY KEY,
+                     {LocationsTable.Cols.Label} VARCHAR,
+                     {LocationsTable.Cols.Level} VARCHAR,
+                     {LocationsTable.Cols.PublicId} VARCHAR,
+                     {LocationsTable.Cols.Code} VARCHAR,
+                     {LocationsTable.Cols.OldCode} VARCHAR,
+                     {LocationsTable.Cols.Urn} VARCHAR,
+                     {LocationsTable.Cols.LaEstab} VARCHAR,
+                     {LocationsTable.Cols.Ukprn} VARCHAR
+                 )
+                 """
+            );
+
+            var id = 1;
+
             foreach (var location in version.LocationMetas)
             {
-                var locationTable = GetDuckDbLocationTableName(location.Level);
-
-                string[] locationCols =
-                [
-                    "id INTEGER PRIMARY KEY",
-                    "name VARCHAR",
-                    "public_id VARCHAR",
-                    ..GetDuckDbLocationCodeColumns(location.Level).Select(col => $"{col.Name} VARCHAR")
-                ];
-
-                await _duckDb.ExecuteAsync(
-                    $"""
-                     CREATE TABLE {locationTable}(
-                        {locationCols.JoinToString(",\n")}
-                     )
-                     """
-                );
-
-                using var appender = _duckDb.CreateAppender(table: locationTable);
+                using var appender = _duckDb.CreateAppender(table: LocationsTable.TableName);
 
                 var insertRow = appender.CreateRow();
-                var id = 1;
 
                 foreach (var link in location.OptionLinks.OrderBy(l => l.Option.Label))
                 {
@@ -895,6 +892,7 @@ public class SeedDataCommand : ICommand
 
                     insertRow.AppendValue(id++);
                     insertRow.AppendValue(option.Label);
+                    insertRow.AppendValue(location.Level.GetEnumValue());
                     insertRow.AppendValue(link.PublicId);
 
                     switch (option)
@@ -902,16 +900,30 @@ public class SeedDataCommand : ICommand
                         case LocationLocalAuthorityOptionMeta laOption:
                             insertRow.AppendValue(laOption.Code);
                             insertRow.AppendValue(laOption.OldCode);
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
                             break;
                         case LocationCodedOptionMeta codedOption:
                             insertRow.AppendValue(codedOption.Code);
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
                             break;
                         case LocationProviderOptionMeta providerOption:
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
                             insertRow.AppendValue(providerOption.Ukprn);
                             break;
                         case LocationSchoolOptionMeta schoolOption:
+                            insertRow.AppendNullValue();
+                            insertRow.AppendNullValue();
                             insertRow.AppendValue(schoolOption.Urn);
                             insertRow.AppendValue(schoolOption.LaEstab);
+                            insertRow.AppendNullValue();
                             break;
                     }
 
@@ -920,15 +932,15 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private async Task CreateDuckDbFilterMetaTable(DataSetVersion version)
+        private async Task CreateParquetFilterMetaTable(DataSetVersion version)
         {
             await _duckDb.ExecuteAsync(
                 $"""
-                 CREATE TABLE {FiltersDuckDbTable}(
-                     id INTEGER PRIMARY KEY,
-                     label VARCHAR,
-                     public_id VARCHAR,
-                     column_name VARCHAR
+                 CREATE TABLE {FiltersTable.TableName}(
+                     {FiltersTable.Cols.Id} INTEGER PRIMARY KEY,
+                     {FiltersTable.Cols.Label} VARCHAR,
+                     {FiltersTable.Cols.PublicId} VARCHAR,
+                     {FiltersTable.Cols.ColumnName} VARCHAR
                  )
                  """
             );
@@ -937,7 +949,7 @@ public class SeedDataCommand : ICommand
 
             foreach (var filter in version.FilterMetas)
             {
-                using var appender = _duckDb.CreateAppender(table: FiltersDuckDbTable);
+                using var appender = _duckDb.CreateAppender(table: FiltersTable.TableName);
 
                 foreach (var link in filter.OptionLinks.OrderBy(l => l.Option.Label))
                 {
@@ -953,19 +965,19 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private async Task CreateDuckDbTimePeriodMetaTable(DataSetVersion version)
+        private async Task CreateParquetTimePeriodMetaTable(DataSetVersion version)
         {
             await _duckDb.ExecuteAsync(
                 $"""
-                 CREATE TABLE {TimePeriodsDuckDbTable}(
-                     id INTEGER PRIMARY KEY,
-                     period VARCHAR,
-                     identifier VARCHAR
+                 CREATE TABLE {TimePeriodsTable.TableName}(
+                     {TimePeriodsTable.Cols.Id} INTEGER PRIMARY KEY,
+                     {TimePeriodsTable.Cols.Period} VARCHAR,
+                     {TimePeriodsTable.Cols.Identifier} VARCHAR
                  )
                  """
             );
 
-            using var appender = _duckDb.CreateAppender(table: TimePeriodsDuckDbTable);
+            using var appender = _duckDb.CreateAppender(table: TimePeriodsTable.TableName);
 
             var timePeriods = version.TimePeriodMetas
                 .OrderBy(tp => tp.Period)
@@ -984,38 +996,48 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private LocationColumn[] GetDuckDbLocationCodeColumns(GeographicLevel geographicLevel)
+        private LocationColumn[] GetParquetLocationCodeColumns(GeographicLevel geographicLevel)
         {
             return geographicLevel switch
             {
                 GeographicLevel.LocalAuthority =>
                 [
-                    new LocationColumn(Name: "code", CsvName: LocalAuthorityCsvColumns.NewCode),
-                    new LocationColumn(Name: "old_code", CsvName: LocalAuthorityCsvColumns.OldCode)
+                    new LocationColumn(Name: LocationsTable.Cols.Code, CsvName: LocalAuthorityCsvColumns.NewCode),
+                    new LocationColumn(Name: LocationsTable.Cols.OldCode, CsvName: LocalAuthorityCsvColumns.OldCode)
                 ],
                 GeographicLevel.Provider =>
                 [
-                    new LocationColumn(Name: "ukprn", CsvName: ProviderCsvColumns.Ukprn)
+                    new LocationColumn(Name: LocationsTable.Cols.Ukprn, CsvName: ProviderCsvColumns.Ukprn)
                 ],
                 GeographicLevel.RscRegion => [],
                 GeographicLevel.School =>
                 [
-                    new LocationColumn(Name: "urn", CsvName: SchoolCsvColumns.Urn),
-                    new LocationColumn(Name: "laestab", CsvName: SchoolCsvColumns.LaEstab)
+                    new LocationColumn(Name: LocationsTable.Cols.Urn, CsvName: SchoolCsvColumns.Urn),
+                    new LocationColumn(Name: LocationsTable.Cols.LaEstab, CsvName: SchoolCsvColumns.LaEstab)
                 ],
                 _ =>
                 [
-                    new LocationColumn(Name: "code", CsvName: geographicLevel.CsvCodeColumns().First())
+                    new LocationColumn(Name: LocationsTable.Cols.Code, CsvName: geographicLevel.CsvCodeColumns().First())
                 ],
             };
         }
 
-        private string GetDuckDbLocationTableName(LocationMeta locationMeta)
-            => GetDuckDbLocationTableName(locationMeta.Level);
-
-        private string GetDuckDbLocationTableName(GeographicLevel geographicLevel)
-            => $"locations_{geographicLevel.GetEnumValue().ToLower()}";
-
         private record LocationColumn(string Name, string CsvName);
+    }
+
+    private static class DataSourceTable
+    {
+        public const string TableName = "data_source";
+
+        public static readonly TableRef Ref = new(TableName);
+
+        public class TableRef(string table)
+        {
+            public readonly string TimePeriod = $"{table}.time_period";
+            public readonly string TimeIdentifier = $"{table}.time_identifier";
+            public readonly string GeographicLevel = $"{table}.geographic_level";
+
+            public string Col(string column) => $"{table}.\"{column}\"";
+        }
     }
 }

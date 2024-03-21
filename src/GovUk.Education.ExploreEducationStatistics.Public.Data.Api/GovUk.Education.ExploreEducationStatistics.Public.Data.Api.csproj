@@ -24,7 +24,7 @@
         <PackageReference Include="Asp.Versioning.Mvc" Version="8.0.0" />
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
         <PackageReference Include="AspectInjector" Version="2.8.2" />
-        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.9.2" />
+        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.1" />
         <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.0.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
@@ -44,6 +44,7 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Services\GovUk.Education.ExploreEducationStatistics.Public.Data.Services.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils\GovUk.Education.ExploreEducationStatistics.Public.Data.Utils.csproj" />
     </ItemGroup>
 
