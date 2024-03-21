@@ -12,9 +12,10 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${PUBLICATION_NAME}=        UI tests - legacy releases %{RUN_IDENTIFIER}
-${DESCRIPTION}=             legacy release description
-${UPDATED_DESCRIPTION}=     updated legacy release description
+${PUBLICATION_NAME}=                    UI-tests-legacy-releases %{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
+${DESCRIPTION}=                         legacy release description
+${UPDATED_DESCRIPTION}=                 updated legacy release description
 
 
 *** Test Cases ***
@@ -111,3 +112,36 @@ Reorder the legacy releases
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
     user clicks button    Confirm order
+    Sleep    10
+
+Validate reordered legacy releases
+    user waits until page contains button    Reorder releases
+    user checks element count is x    css:tbody tr    3
+
+    user checks table cell contains    1    1    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    1    2    http://test2.com
+
+    user checks table cell contains    2    1    ${DESCRIPTION}
+    user checks table cell contains    2    2    http://test.com
+
+    user checks table cell contains    3    1    Academic year 2020/21
+    user checks table cell contains    3    2    ${PUBLIC_RELEASE_LINK}
+
+Create a second draft release via api
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    2022
+
+Add headline text block to content page(2nd release)
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve 2nd release
+    user clicks link    Sign off
+    user approves original release for immediate publication
+
+Navigate to publication to verify the legacy releases
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+    Sleep    100
