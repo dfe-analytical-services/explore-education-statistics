@@ -66,6 +66,15 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
     defaultToOAuthAuthentication: true
+    publicNetworkAccess: 'Disabled'
+    networkAcls: {
+      virtualNetworkRules: [
+        {
+          action: 'Allow'
+          id: subnetId
+        }
+      ]
+    }
   }
 }
 
@@ -98,8 +107,8 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     AzureWebJobsStorage: dedicatedStorageAccountString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
-    //WEBSITE_CONTENTOVERVNET: 1
-    // WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
+    WEBSITE_CONTENTOVERVNET: 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
     FUNCTIONS_EXTENSION_VERSION: '~4'
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
