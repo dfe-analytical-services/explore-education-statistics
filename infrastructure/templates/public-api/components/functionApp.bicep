@@ -68,7 +68,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   properties: {
     httpsOnly: true
     serverFarmId: appServicePlan.id
-    //virtualNetworkSubnetId: subnetId
+    virtualNetworkSubnetId: subnetId
     clientAffinityEnabled: true
     reserved: true
     siteConfig: {
@@ -85,7 +85,7 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
     AzureWebJobsStorage: storageAccountConnectionString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: storageAccountConnectionString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
-    // WEBSITE_CONTENTOVERVNET: 1
+    WEBSITE_CONTENTOVERVNET: 1
     // WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
     FUNCTIONS_EXTENSION_VERSION: '~4'
     APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
