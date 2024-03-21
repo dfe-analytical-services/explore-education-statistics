@@ -39,7 +39,8 @@ public static class PathUtils
     /// <returns>A path compatible with the target OS</returns>
     public static string OsPath(string path, OSPlatform? osPlatform = null)
     {
-        if (osPlatform == OSPlatform.Windows || RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (osPlatform == OSPlatform.Windows
+            || (osPlatform == null && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)))
         {
             return path.Replace('/', '\\');
         }
