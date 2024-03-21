@@ -1,4 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,5 +31,6 @@ public interface IDataSetService
     Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
         Guid dataSetId,
         string? dataSetVersion = null,
+        IReadOnlySet<DataSetMetaType>? types = null,
         CancellationToken cancellationToken = default);
 }

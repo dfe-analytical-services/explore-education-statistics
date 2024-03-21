@@ -10,17 +10,9 @@ using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.P
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-internal class PublicationService : IPublicationService
+internal class PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
+    : IPublicationService
 {
-    private readonly PublicDataDbContext _publicDataDbContext;
-    private readonly IContentApiClient _contentApiClient;
-
-    public PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
-    {
-        _publicDataDbContext = publicDataDbContext;
-        _contentApiClient = contentApiClient;
-    }
-
     public async Task<Either<ActionResult, PublicationPaginatedListViewModel>> ListPublications(
         int page,
         int pageSize,
@@ -29,7 +21,7 @@ internal class PublicationService : IPublicationService
     {
         return await GetPublishedDataSetPublicationIds()
             .OnSuccess(async publicationIds =>
-                await _contentApiClient.ListPublications(
+                await contentApiClient.ListPublications(
                     page: page, 
                     pageSize: pageSize, 
                     search:search, 
@@ -55,7 +47,7 @@ internal class PublicationService : IPublicationService
         CancellationToken cancellationToken = default)
     {
         return await CheckPublicationIsPublished(publicationId, cancellationToken)
-            .OnSuccess(async _ => await _contentApiClient.GetPublication(publicationId, cancellationToken))
+            .OnSuccess(async _ => await contentApiClient.GetPublication(publicationId, cancellationToken))
             .OnSuccess(publication => new PublicationSummaryViewModel
             {
                 Id  = publication.Id,
@@ -69,7 +61,7 @@ internal class PublicationService : IPublicationService
     private async Task<Either<ActionResult, HashSet<Guid>>> GetPublishedDataSetPublicationIds(
         CancellationToken cancellationToken = default)
     {
-        return (await _publicDataDbContext.DataSets
+        return (await publicDataDbContext.DataSets
                 .Where(ds => ds.Status == DataSetStatus.Published)
                 .Select(ds => ds.PublicationId)
                 .ToListAsync(cancellationToken: cancellationToken)
@@ -93,7 +85,7 @@ internal class PublicationService : IPublicationService
         Guid publicationId,
         CancellationToken cancellationToken = default)
     {
-        var publicationIsPublished = await _publicDataDbContext.DataSets
+        var publicationIsPublished = await publicDataDbContext.DataSets
             .Where(ds => ds.PublicationId == publicationId)
             .AnyAsync(ds => ds.Status == DataSetStatus.Published, cancellationToken: cancellationToken);
 

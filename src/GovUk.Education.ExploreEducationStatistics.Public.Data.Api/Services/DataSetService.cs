@@ -10,31 +10,24 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-internal class DataSetService : IDataSetService
+internal class DataSetService(
+    PublicDataDbContext publicDataDbContext,
+    IUserService userService)
+    : IDataSetService
 {
-    private readonly PublicDataDbContext _publicDataDbContext;
-    private readonly IUserService _userService;
-
-    public DataSetService(
-        PublicDataDbContext publicDataDbContext,
-        IUserService userService)
-    {
-        _publicDataDbContext = publicDataDbContext;
-        _userService = userService;
-    }
-
     public async Task<Either<ActionResult, DataSetViewModel>> GetDataSet(
         Guid dataSetId,
         CancellationToken cancellationToken = default)
     {
-        return await _publicDataDbContext.DataSets
+        return await publicDataDbContext.DataSets
             .AsNoTracking()
             .Include(ds => ds.LatestVersion)
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
-            .OnSuccessDo(_userService.CheckCanViewDataSet)
+            .OnSuccessDo(userService.CheckCanViewDataSet)
             .OnSuccess(MapDataSet);
     }
 
@@ -44,7 +37,7 @@ internal class DataSetService : IDataSetService
         Guid publicationId,
         CancellationToken cancellationToken = default)
     {
-        var queryable = _publicDataDbContext.DataSets
+        var queryable = publicDataDbContext.DataSets
             .AsNoTracking()
             .Include(ds => ds.LatestVersion)
             .Where(ds => ds.PublicationId == publicationId)
@@ -79,7 +72,7 @@ internal class DataSetService : IDataSetService
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
-            .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(userService.CheckCanViewDataSetVersion)
             .OnSuccess(MapDataSetVersion);
     }
 
@@ -89,10 +82,10 @@ internal class DataSetService : IDataSetService
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        return await _publicDataDbContext.DataSets
+        return await publicDataDbContext.DataSets
             .AsNoTracking()
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
-            .OnSuccessDo(_userService.CheckCanViewDataSet)
+            .OnSuccessDo(userService.CheckCanViewDataSet)
             .OnSuccess(dataSet => ListPaginatedVersions(
                 dataSet: dataSet,
                 page: page,
@@ -103,14 +96,15 @@ internal class DataSetService : IDataSetService
     public async Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
         Guid dataSetId,
         string? dataSetVersion = null,
+        IReadOnlySet<DataSetMetaType>? types = null,
         CancellationToken cancellationToken = default)
     {
         return await FindVersion(
                 dataSetId: dataSetId,
                 dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
-            .OnSuccessDo(_userService.CheckCanViewDataSetVersion)
-            .OnSuccessDo(dataSetVersion => LoadMeta(dataSetVersion, cancellationToken))
+            .OnSuccessDo(userService.CheckCanViewDataSetVersion)
+            .OnSuccessDo(dataSetVersion => LoadMeta(dataSetVersion, types, cancellationToken))
             .OnSuccess(MapVersionMeta);
     }
 
@@ -120,7 +114,7 @@ internal class DataSetService : IDataSetService
         int pageSize,
         CancellationToken cancellationToken = default)
     {
-        var queryable = _publicDataDbContext.DataSetVersions
+        var queryable = publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .Where(ds => ds.DataSetId == dataSet.Id)
             .WherePublicStatus();
@@ -167,7 +161,7 @@ internal class DataSetService : IDataSetService
             return new NotFoundResult();
         }
 
-        return await _publicDataDbContext.DataSetVersions
+        return await publicDataDbContext.DataSetVersions
             .AsNoTracking()
             .Where(dsv => dsv.DataSetId == dataSetId)
             .Where(dsv => dsv.VersionMajor == version.Major)
@@ -223,7 +217,7 @@ internal class DataSetService : IDataSetService
     {
         if (dataSetVersion is null)
         {
-            return await _publicDataDbContext.DataSets
+            return await publicDataDbContext.DataSets
                 .AsNoTracking()
                 .Include(ds => ds.LatestVersion)
                 .Where(ds => ds.Id == dataSetId)
@@ -237,31 +231,48 @@ internal class DataSetService : IDataSetService
             cancellationToken: cancellationToken);
     }
 
-    private async Task LoadMeta(DataSetVersion dataSetVersion, CancellationToken cancellationToken = default)
+    private async Task LoadMeta(
+        DataSetVersion dataSetVersion,
+        IReadOnlySet<DataSetMetaType>? types = null, 
+        CancellationToken cancellationToken = default)
     {
-        dataSetVersion.FilterMetas = await _publicDataDbContext.FilterMetas
-            .AsNoTracking()
-            .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
-            .Include(fm => fm.OptionLinks)
-            .ThenInclude(fom => fom.Option)
-            .ToListAsync(cancellationToken: cancellationToken);
+        types = types.IsNullOrEmpty() ? EnumUtil.GetEnums<DataSetMetaType>().ToHashSet() : types!;
 
-        dataSetVersion.LocationMetas = await _publicDataDbContext.LocationMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .Include(lm => lm.OptionLinks)
-            .ThenInclude(lom => lom.Option)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(DataSetMetaType.Filters))
+        {
+            dataSetVersion.FilterMetas = await publicDataDbContext.FilterMetas
+                .AsNoTracking()
+                .Where(fm => fm.DataSetVersionId == dataSetVersion.Id)
+                .Include(fm => fm.OptionLinks)
+                .ThenInclude(fom => fom.Option)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
 
-        dataSetVersion.IndicatorMetas = await _publicDataDbContext.IndicatorMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(DataSetMetaType.Locations))
+        {
+            dataSetVersion.LocationMetas = await publicDataDbContext.LocationMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .Include(lm => lm.OptionLinks)
+                .ThenInclude(lom => lom.Option)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
 
-        dataSetVersion.TimePeriodMetas = await _publicDataDbContext.TimePeriodMetas
-            .AsNoTracking()
-            .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
-            .ToListAsync(cancellationToken: cancellationToken);
+        if (types.Contains(DataSetMetaType.Indicators))
+        {
+            dataSetVersion.IndicatorMetas = await publicDataDbContext.IndicatorMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
+
+        if (types.Contains(DataSetMetaType.TimePeriods))
+        {
+            dataSetVersion.TimePeriodMetas = await publicDataDbContext.TimePeriodMetas
+                .AsNoTracking()
+                .Where(lm => lm.DataSetVersionId == dataSetVersion.Id)
+                .ToListAsync(cancellationToken: cancellationToken);
+        }
     }
 
     private DataSetMetaViewModel MapVersionMeta(DataSetVersion dataSetVersion)
