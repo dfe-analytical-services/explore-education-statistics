@@ -18,7 +18,7 @@ stages:
 - stage: Deploy${{parameters.environment}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
-#  dependsOn: ${{parameters.dependsOn}}
+  dependsOn: ${{parameters.dependsOn}}
   jobs:
   - deployment: Deploy
     displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'
@@ -62,7 +62,7 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               appType: 'functionAppLinux'
-              appName: 'dataset-processor3-site'
+              appName: 'dataset-processor4-site'
               resourceGroupName: 'dfe-development-dw'
 #              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
 #              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'

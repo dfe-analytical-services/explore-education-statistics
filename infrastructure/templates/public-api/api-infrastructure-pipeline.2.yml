@@ -69,59 +69,60 @@ pool:
   name: dfe-development-dw agent pool
 
 stages:
-#- stage: Build
-#  jobs:
-#  - job: CheckInfrastructure
-#    steps:
-#    - checkout: self
-#    - task: CmdLine@2
-#      displayName: 'List source files'
-#      inputs:
-#        script: |
-#
-#    - task: Bash@3
-#      displayName: 'Display information about this pipeline run'
-#      inputs:
-#        targetType: 'inline'
-#        script: |
-#          echo 'Using "$(dockerImagesTag)" as the tag to identify the Docker images to deploy with this pipeline run.'
-#          echo
-#          echo 'Structure of work folder of this pipeline:'
-#          tree $(Build.SourcesDirectory)
-#
-#    - task: AzureCLI@2
-#      displayName: 'Install Bicep'
-#      inputs:
-#        azureSubscription: $(serviceConnection)
-#        scriptType: bash
-#        scriptLocation: inlineScript
-#        inlineScript: 'az bicep install'
+- stage: Build
+  jobs:
+  - job: CheckInfrastructure
+    steps:
+    - checkout: self
+    - task: CmdLine@2
+      displayName: 'List source files'
+      inputs:
+        script: |
 
-#    - task: AzureCLI@2
-#      displayName: 'Validate bicep scripts'
-#      inputs:
-#        azureSubscription: $(serviceConnection)
-#        scriptType: bash
-#        scriptLocation: inlineScript
-#        inlineScript: |
-#          set -e
-#          az deployment group validate \
-#          --resource-group ${{parameters.resourceGroupName}} \
-#          --template-file $(templateFile) \
-#          --parameters $(devParamFile) \
-#          --parameters \
-#              resourceTags='$(resourceTags)' \
-#              publicUrls='$(publicUrls)' \
-#              postgreSqlAdminName='$(postgreSqlAdminName)' \
-#              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-#              dockerImagesTag='$(dockerImagesTag)' \
-#              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
-#              dataProcessorZipFileUrl='$(dataProcessorZipFileUrl)'
+    - task: Bash@3
+      displayName: 'Display information about this pipeline run'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo 'Using "$(dockerImagesTag)" as the tag to identify the Docker images to deploy with this pipeline run.'
+          echo
+          echo 'Structure of work folder of this pipeline:'
+          tree $(Build.SourcesDirectory)
+
+    - task: AzureCLI@2
+      displayName: 'Install Bicep'
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: 'az bicep install'
+
+    - task: AzureCLI@2
+      displayName: 'Validate bicep scripts'
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -e
+          az deployment group validate \
+          --resource-group ${{parameters.resourceGroupName}} \
+          --template-file $(templateFile) \
+          --parameters $(devParamFile) \
+          --parameters \
+              resourceTags='$(resourceTags)' \
+              publicUrls='$(publicUrls)' \
+              postgreSqlAdminName='$(postgreSqlAdminName)' \
+              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+              dockerImagesTag='$(dockerImagesTag)' \
+              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+              dataProcessorZipFileUrl='$(dataProcessorZipFileUrl)'
 
 - ${{ if variables.isDev }}:
   - template: deploy-stage-template.yml
     parameters:
       environment: 'Development'
+      dependsOn: Build
       resourceGroupName: ${{parameters.resourceGroupName}}
       psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
       dataProcessorZipFileUrl: $(dataProcessorZipFileUrl)
