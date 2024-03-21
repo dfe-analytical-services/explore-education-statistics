@@ -37,26 +37,26 @@ stages:
 #            artifact: public-api-data-processor
           - download: none
           - checkout: self
-#          - task: AzureCLI@2
-#            displayName: 'Deploy bicep template to Azure'
-#            inputs:
-#              azureSubscription: $(serviceConnection)
-#              scriptType: bash
-#              scriptLocation: inlineScript
-#              inlineScript: |
-#                set -e
-#                az deployment group create \
-#                --resource-group ${{parameters.resourceGroupName}} \
-#                --template-file $(templateFile) \
-#                --parameters $(devParamFile) \
-#                --parameters \
-#                    resourceTags='$(resourceTags)' \
-#                    publicUrls='$(publicUrls)' \
-#                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-#                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-#                    dockerImagesTag='$(dockerImagesTag)' \
-#                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
-#                    dataProcessorZipFileUrl='$(dataProcessorDownloadUrl)'
+          - task: AzureCLI@2
+            displayName: 'Deploy bicep template to Azure'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+                az deployment group create \
+                --resource-group ${{parameters.resourceGroupName}} \
+                --template-file $(templateFile) \
+                --parameters $(devParamFile) \
+                --parameters \
+                    resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(dockerImagesTag)' \
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
+                    dataProcessorZipFileUrl='$(dataProcessorDownloadUrl)'
           - task: AzureFunctionApp@2
             displayName: 'Deploy Data Processor Function App'
             inputs:
