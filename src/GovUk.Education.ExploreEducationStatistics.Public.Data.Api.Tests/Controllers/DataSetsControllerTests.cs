@@ -1,7 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -9,27 +10,16 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using System.Text.Json;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerTests : IntegrationTestFixture
+public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/v1/data-sets";
 
-    public DataSetsControllerTests(TestApplicationFactory testApp) : base(testApp)
+    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-    }
-
-    public class GetDataSetTests : DataSetsControllerTests
-    {
-        public GetDataSetTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(DataSetStatus.Published)]
         [InlineData(DataSetStatus.Deprecated)]
@@ -121,12 +111,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListDataSetVersionsTests : DataSetsControllerTests
+    public class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public ListDataSetVersionsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(1, 2, 1)]
         [InlineData(1, 2, 2)]
@@ -543,12 +529,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetDataSetVersionTests : DataSetsControllerTests
+    public class GetDataSetVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public GetDataSetVersionTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
@@ -713,18 +695,10 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetDataSetMetaTests : DataSetsControllerTests
+    public class GetDataSetMetaTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public GetDataSetMetaTests(TestApplicationFactory testApp) : base(testApp)
+        public class NoQueryParametersTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
         {
-        }
-
-        public class NoQueryParametersTests : GetDataSetMetaTests
-        {
-            public NoQueryParametersTests(TestApplicationFactory testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task ReturnsCorrectViewModel()
             {
@@ -981,12 +955,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             }
         }
 
-        public class DataSetVersionQueryParameterTests : GetDataSetMetaTests
+        public class DataSetVersionQueryParameterTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
         {
-            public DataSetVersionQueryParameterTests(TestApplicationFactory testApp) : base(testApp)
-            {
-            }
-
             [Fact]
             public async Task VersionSpecified_ReturnsCorrectVersion()
             {
@@ -1175,14 +1145,10 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             }
         }
 
-        public class TypesQueryParameterTests : GetDataSetMetaTests
+        public class TypesQueryParameterTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
         {
-            public TypesQueryParameterTests(TestApplicationFactory testApp) : base(testApp)
-            {
-            }
-
             [Fact]
-            public async Task TypesNotSpecified_ReturnsAllMetadata()
+            public async Task TypesNotSpecified_ReturnsAllMeta()
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
@@ -1219,11 +1185,11 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             }
 
             [Theory]
-            [InlineData(MetadataType.Filters)]
-            [InlineData(MetadataType.Locations)]
-            [InlineData(MetadataType.Indicators)]
-            [InlineData(MetadataType.TimePeriods)]
-            public async Task OneTypeSpecified_OnlyReturnsMetadataForSpecifiedType(MetadataType metadataType)
+            [InlineData(DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods)]
+            public async Task OneTypeSpecified_ReturnsOnlySpecifiedMetaType(DataSetMetaType metaType)
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
@@ -1249,33 +1215,33 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
                 var response = await GetDataSetMeta(
                     dataSet.Id,
-                    types: [metadataType.ToString()]);
+                    types: [metaType.ToString()]);
 
                 var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
                 Assert.NotNull(content);
 
-                switch (metadataType)
+                switch (metaType)
                 {
-                    case MetadataType.Filters:
+                    case DataSetMetaType.Filters:
                         Assert.NotEmpty(content.Filters);
                         Assert.Empty(content.Locations);
                         Assert.Empty(content.Indicators);
                         Assert.Empty(content.TimePeriods);
                         break;
-                    case MetadataType.Locations:
+                    case DataSetMetaType.Locations:
                         Assert.Empty(content.Filters);
                         Assert.NotEmpty(content.Locations);
                         Assert.Empty(content.Indicators);
                         Assert.Empty(content.TimePeriods);
                         break;
-                    case MetadataType.Indicators:
+                    case DataSetMetaType.Indicators:
                         Assert.Empty(content.Filters);
                         Assert.Empty(content.Locations);
                         Assert.NotEmpty(content.Indicators);
                         Assert.Empty(content.TimePeriods);
                         break;
-                    case MetadataType.TimePeriods:
+                    case DataSetMetaType.TimePeriods:
                         Assert.Empty(content.Filters);
                         Assert.Empty(content.Locations);
                         Assert.Empty(content.Indicators);
@@ -1285,10 +1251,10 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             }
 
             [Theory]
-            [InlineData(MetadataType.Filters, MetadataType.Locations)]
-            [InlineData(MetadataType.Filters, MetadataType.Locations, MetadataType.Indicators)]
-            [InlineData(MetadataType.Filters, MetadataType.Locations, MetadataType.Indicators, MetadataType.TimePeriods)]
-            public async Task MultipleTypesSpecified_OnlyReturnsMetadataForSpecifiedTypes(params MetadataType[] metadataTypes)
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
+            public async Task MultipleTypesSpecified_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
@@ -1314,49 +1280,49 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
                 var response = await GetDataSetMeta(
                     dataSet.Id,
-                    types: metadataTypes.Select(t => t.ToString()).ToList());
+                    types: metaTypes.Select(t => t.ToString()).ToList());
 
                 var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
                 Assert.NotNull(content);
 
-                var allMetaDataTypes = EnumUtil.GetEnums<MetadataType>().ToHashSet();
-                var specifiedMetaDataTypes = metadataTypes.ToHashSet();
-                var unspecifiedMetaDataTypes = allMetaDataTypes.Except(specifiedMetaDataTypes);
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
 
-                foreach (var type in specifiedMetaDataTypes)
+                foreach (var type in specifiedMetaTypes)
                 {
                     switch (type)
                     {
-                        case MetadataType.Filters:
+                        case DataSetMetaType.Filters:
                             Assert.NotEmpty(content.Filters);
                             break;
-                        case MetadataType.Locations:
+                        case DataSetMetaType.Locations:
                             Assert.NotEmpty(content.Locations);
                             break;
-                        case MetadataType.Indicators:
+                        case DataSetMetaType.Indicators:
                             Assert.NotEmpty(content.Indicators);
                             break;
-                        case MetadataType.TimePeriods:
+                        case DataSetMetaType.TimePeriods:
                             Assert.NotEmpty(content.TimePeriods);
                             break;
                     }
                 }
 
-                foreach (var type in unspecifiedMetaDataTypes)
+                foreach (var type in unspecifiedMetaTypes)
                 {
                     switch (type)
                     {
-                        case MetadataType.Filters:
+                        case DataSetMetaType.Filters:
                             Assert.Empty(content.Filters);
                             break;
-                        case MetadataType.Locations:
+                        case DataSetMetaType.Locations:
                             Assert.Empty(content.Locations);
                             break;
-                        case MetadataType.Indicators:
+                        case DataSetMetaType.Indicators:
                             Assert.Empty(content.Indicators);
                             break;
-                        case MetadataType.TimePeriods:
+                        case DataSetMetaType.TimePeriods:
                             Assert.Empty(content.TimePeriods);
                             break;
                     }
@@ -1365,15 +1331,15 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
 
             [Theory]
-            [InlineData(MetadataType.Filters, MetadataType.Filters)]
-            [InlineData(MetadataType.Locations, MetadataType.Locations)]
-            [InlineData(MetadataType.Indicators, MetadataType.Indicators)]
-            [InlineData(MetadataType.TimePeriods, MetadataType.TimePeriods)]
-            [InlineData(MetadataType.Filters, MetadataType.Filters, MetadataType.Locations)]
-            [InlineData(MetadataType.Locations, MetadataType.Locations, MetadataType.Filters)]
-            [InlineData(MetadataType.Indicators, MetadataType.Indicators, MetadataType.Filters)]
-            [InlineData(MetadataType.TimePeriods, MetadataType.TimePeriods, MetadataType.Filters)]
-            public async Task DuplicateTypesSpecified_SuccessfullyReturnsMetadataForSpecifiedTypes(params MetadataType[] metadataTypes)
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods, DataSetMetaType.TimePeriods)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Locations, DataSetMetaType.Locations, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Indicators, DataSetMetaType.Indicators, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.TimePeriods, DataSetMetaType.TimePeriods, DataSetMetaType.Filters)]
+            public async Task DuplicateTypesSpecified_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
             {
                 DataSet dataSet = DataFixture
                     .DefaultDataSet()
@@ -1399,49 +1365,138 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
                 var response = await GetDataSetMeta(
                     dataSet.Id,
-                    types: metadataTypes.Select(t => t.ToString()).ToList());
+                    types: metaTypes.Select(t => t.ToString()).ToList());
 
                 var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
 
                 Assert.NotNull(content);
 
-                var allMetaDataTypes = EnumUtil.GetEnums<MetadataType>().ToHashSet();
-                var specifiedMetaDataTypes = metadataTypes.ToHashSet();
-                var unspecifiedMetaDataTypes = allMetaDataTypes.Except(specifiedMetaDataTypes);
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
 
-                foreach (var type in specifiedMetaDataTypes)
+                foreach (var type in specifiedMetaTypes)
                 {
                     switch (type)
                     {
-                        case MetadataType.Filters:
+                        case DataSetMetaType.Filters:
                             Assert.NotEmpty(content.Filters);
                             break;
-                        case MetadataType.Locations:
+                        case DataSetMetaType.Locations:
                             Assert.NotEmpty(content.Locations);
                             break;
-                        case MetadataType.Indicators:
+                        case DataSetMetaType.Indicators:
                             Assert.NotEmpty(content.Indicators);
                             break;
-                        case MetadataType.TimePeriods:
+                        case DataSetMetaType.TimePeriods:
                             Assert.NotEmpty(content.TimePeriods);
                             break;
                     }
                 }
 
-                foreach (var type in unspecifiedMetaDataTypes)
+                foreach (var type in unspecifiedMetaTypes)
                 {
                     switch (type)
                     {
-                        case MetadataType.Filters:
+                        case DataSetMetaType.Filters:
                             Assert.Empty(content.Filters);
                             break;
-                        case MetadataType.Locations:
+                        case DataSetMetaType.Locations:
                             Assert.Empty(content.Locations);
                             break;
-                        case MetadataType.Indicators:
+                        case DataSetMetaType.Indicators:
                             Assert.Empty(content.Indicators);
                             break;
-                        case MetadataType.TimePeriods:
+                        case DataSetMetaType.TimePeriods:
+                            Assert.Empty(content.TimePeriods);
+                            break;
+                    }
+                }
+            }
+
+            [Theory]
+            [InlineData(DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
+            public async Task ArrayQueryParameterSyntax_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var query = metaTypes
+                    .Select((mt, index) => new { mt, index })
+                    .ToDictionary(a => $"types[{a.index}]", a => a.mt.ToString());
+
+                var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSet.Id}/meta", query!);
+
+                var client = TestApp.CreateClient();
+
+                var response = await client.GetAsync(uri);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
+
+                foreach (var type in specifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.NotEmpty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.NotEmpty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.NotEmpty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.NotEmpty(content.TimePeriods);
+                            break;
+                    }
+                }
+
+                foreach (var type in unspecifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.Empty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.Empty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.Empty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
                             Assert.Empty(content.TimePeriods);
                             break;
                     }
@@ -1455,18 +1510,12 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
                 var validationProblem = response.AssertValidationProblem();
 
-                validationProblem.AssertHasAllowedValueError("types[0]");
+                Assert.Single(validationProblem.Errors);
 
-                var error = Assert.Single(validationProblem.Errors);
-
-                var errorDetail = GetErrorDetail(error);
-
-                Assert.NotNull(errorDetail);
-                Assert.Equal(2, errorDetail.Count);
-                Assert.Null(errorDetail["value"].GetString());
-                Assert.Equal(
-                    EnumUtil.GetEnums<MetadataType>(),
-                    errorDetail["allowed"].EnumerateArray().Select(e => EnumUtil.GetFromEnumValue<MetadataType>(e.GetString()!)));
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: null,
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
             }
 
             [Theory]
@@ -1477,83 +1526,53 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             [InlineData("invalid", "invalid")]
             [InlineData(null, "")]
             [InlineData(null, " ")]
-            public async Task InvalidMetadataType_AllowedValueError(string? invalidType, string metadataType)
+            public async Task InvalidMetaType_AllowedValueError(string? invalidType, string metaType)
             {
-                var response = await GetDataSetMeta(Guid.NewGuid(), types: [metadataType]);
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: [metaType]);
 
                 var validationProblem = response.AssertValidationProblem();
 
-                validationProblem.AssertHasAllowedValueError("types[0]");
+                Assert.Single(validationProblem.Errors);
 
-                var error = Assert.Single(validationProblem.Errors);
-
-                var errorDetail = GetErrorDetail(error);
-
-                Assert.NotNull(errorDetail);
-                Assert.Equal(2, errorDetail.Count);
-                Assert.Equal(invalidType, errorDetail["value"].GetString());
-                Assert.Equal(
-                    EnumUtil.GetEnums<MetadataType>(),
-                    errorDetail["allowed"].EnumerateArray().Select(e => EnumUtil.GetFromEnumValue<MetadataType>(e.GetString()!)));
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: invalidType,
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
             }
 
             [Fact]
-            public async Task MultipleInvalidMetadataTypes_AllowedValueError()
+            public async Task MultipleInvalidMetaTypes_AllowedValueError()
             {
                 var response = await GetDataSetMeta(Guid.NewGuid(), types: ["invalid1", "invalid2"]);
 
                 var validationProblem = response.AssertValidationProblem();
 
-                validationProblem.AssertHasAllowedValueError("types[0]");
-                validationProblem.AssertHasAllowedValueError("types[1]");
-
                 Assert.Equal(2, validationProblem.Errors.Count);
 
-                var errorDetail1 = GetErrorDetail(validationProblem.Errors[0]);
-                var errorDetail2 = GetErrorDetail(validationProblem.Errors[1]);
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: "invalid1",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
 
-                Assert.NotNull(errorDetail1);
-                Assert.NotNull(errorDetail2);
-                Assert.Equal(2, errorDetail1.Count);
-                Assert.Equal(2, errorDetail2.Count);
-                Assert.Equal("invalid1", errorDetail1["value"].GetString());
-                Assert.Equal("invalid2", errorDetail2["value"].GetString());
-                Assert.Equal(
-                    EnumUtil.GetEnums<MetadataType>(),
-                    errorDetail1["allowed"].EnumerateArray().Select(e => EnumUtil.GetFromEnumValue<MetadataType>(e.GetString()!)));
-                Assert.Equal(
-                    EnumUtil.GetEnums<MetadataType>(),
-                    errorDetail2["allowed"].EnumerateArray().Select(e => EnumUtil.GetFromEnumValue<MetadataType>(e.GetString()!)));
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[1]",
+                    value: "invalid2",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
             }
 
             [Fact]
-            public async Task MixedValidAndInvalidMetadataTypes_AllowedValueError()
+            public async Task MixedValidAndInvalidMetaTypes_AllowedValueError()
             {
-                var response = await GetDataSetMeta(Guid.NewGuid(), types: [MetadataType.Filters.ToString(), "invalid"]);
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: [DataSetMetaType.Filters.ToString(), "invalid"]);
 
                 var validationProblem = response.AssertValidationProblem();
 
-                validationProblem.AssertHasAllowedValueError("types[1]");
+                Assert.Single(validationProblem.Errors);
 
-                var error = Assert.Single(validationProblem.Errors);
-
-                var errorDetail = GetErrorDetail(error);
-
-                Assert.NotNull(errorDetail);
-                Assert.Equal(2, errorDetail.Count);
-                Assert.Equal("invalid", errorDetail["value"].GetString());
-                Assert.Equal(
-                    EnumUtil.GetEnums<MetadataType>(),
-                    errorDetail["allowed"].EnumerateArray().Select(e => EnumUtil.GetFromEnumValue<MetadataType>(e.GetString()!)));
-            }
-
-            private static Dictionary<string, JsonElement> GetErrorDetail(ErrorViewModel error)
-            {
-                var errorDetailJson = Assert.IsType<JsonElement>(error.Detail);
-                var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
-
-                Assert.NotNull(errorDetail);
-                return errorDetail;
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[1]",
+                    value: "invalid",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
             }
         }
 

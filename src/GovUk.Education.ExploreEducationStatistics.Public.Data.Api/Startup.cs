@@ -20,17 +20,8 @@ using Npgsql;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup
+public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
 {
-    private readonly IConfiguration _configuration;
-    private readonly IHostEnvironment _hostEnvironment;
-
-    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
-    {
-        _configuration = configuration;
-        _hostEnvironment = hostEnvironment;
-    }
-
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -78,10 +69,10 @@ public class Startup
         // Only set up the `PublicDataDbContext` in non-integration test
         // environments. Otherwise, the connection string will be null and
         // cause the data source builder to throw a host exception.
-        if (!_hostEnvironment.IsIntegrationTest())
+        if (!hostEnvironment.IsIntegrationTest())
         {
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                _configuration.GetConnectionString("PublicDataDb"));
+                configuration.GetConnectionString("PublicDataDb"));
 
             // Set up the data source outside the `AddDbContext` action as this
             // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
@@ -92,7 +83,7 @@ public class Startup
             {
                 options
                     .UseNpgsql(dbDataSource)
-                    .EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
             });
         }
 

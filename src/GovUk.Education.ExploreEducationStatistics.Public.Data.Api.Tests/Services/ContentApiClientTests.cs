@@ -14,13 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Servi
 public abstract class ContentApiClientTests
 {
     private readonly MockHttpMessageHandler _mockHttp;
-    private readonly HttpClient _client;
     private readonly ContentApiClient _contentApiClient;
 
     public ContentApiClientTests()
     {
         _mockHttp = new MockHttpMessageHandler();
-        _client = _mockHttp.ToHttpClient();
+        var _client = _mockHttp.ToHttpClient();
         _client.BaseAddress = new Uri("http://localhost/");
         _contentApiClient = new ContentApiClient(Mock.Of<ILogger<ContentApiClient>>(), _client);
     }

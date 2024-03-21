@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
-public enum MetadataType
+public enum DataSetMetaType
 {
     Filters,
     Indicators,

@@ -4,25 +4,29 @@ using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Swagger;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 public record DataSetMetaRequest
 {
     /// <summary>
-    /// The types of metadata to return.
+    /// The types of meta to get for the requested data set version.
     /// 
     /// Can be any combination of the following:
-    /// - `Filters` - include all metadata associated with the *filters* of the requested data set version
-    /// - `Indicators` - include all metadata associated with the *indicators* of the requested data set version
-    /// - `Locations` - include all metadata associated with the *locations* of the requested data set version
-    /// - `TimePeriods` - include all metadata associated with the *time periods* of the requested data set version
+    /// - `Filters` - include all meta relating to *filters*
+    /// - `Indicators` - include all meta relating to *indicators*
+    /// - `Locations` - include all meta associated with the *locations*
+    /// - `TimePeriods` - include all meta associated with the *time periods*
     /// </summary>
-    [FromQuery, QuerySeparator]
+    [FromQuery]
+    [QuerySeparator]
+    [SwaggerEnum(type: typeof(DataSetMetaType), serializer: SwaggerEnumSerializer.String)]
     public IReadOnlyList<string>? Types { get; init; }
 
-    public IReadOnlySet<MetadataType>? ParsedTypes()
-        => Types?.Select(EnumUtil.GetFromEnumValue<MetadataType>).ToHashSet();
+    public IReadOnlySet<DataSetMetaType>? ParsedTypes()
+        => Types?.Select(EnumUtil.GetFromEnumValue<DataSetMetaType>).ToHashSet();
 
     public class Validator : AbstractValidator<DataSetMetaRequest>
     {
@@ -33,7 +37,7 @@ public record DataSetMetaRequest
                 RuleFor(request => request.Types)
                     .NotEmpty();
                 RuleForEach(request => request.Types)
-                    .AllowedValue(EnumUtil.GetEnumValues<MetadataType>());
+                    .AllowedValue(EnumUtil.GetEnumValues<DataSetMetaType>());
             });
         }
     }

@@ -17,20 +17,12 @@ using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.P
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class PublicationsControllerTests : IntegrationTestFixture
+public abstract class PublicationsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/v1/publications";
 
-    public PublicationsControllerTests(TestApplicationFactory testApp) : base(testApp)
+    public class ListPublicationsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-    }
-
-    public class ListPublicationsTests : PublicationsControllerTests
-    {
-        public ListPublicationsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task PublishedDataSets_Returns200_FiltersPublicationsWithoutPublishedDataSets()
         {
@@ -281,12 +273,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetPublicationTests : PublicationsControllerTests
+    public class GetPublicationTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-        public GetPublicationTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task PublicationExists_Returns200()
         {
@@ -407,12 +395,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListPublicationDataSetsTests : PublicationsControllerTests
+    public class ListPublicationDataSetsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-        public ListPublicationDataSetsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(1, 2, 1)]
         [InlineData(1, 2, 2)]

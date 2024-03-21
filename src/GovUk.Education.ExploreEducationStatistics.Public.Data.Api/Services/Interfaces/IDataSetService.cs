@@ -31,6 +31,6 @@ public interface IDataSetService
     Task<Either<ActionResult, DataSetMetaViewModel>> GetMeta(
         Guid dataSetId,
         string? dataSetVersion = null,
-        IReadOnlySet<MetadataType>? types = null,
+        IReadOnlySet<DataSetMetaType>? types = null,
         CancellationToken cancellationToken = default);
 }

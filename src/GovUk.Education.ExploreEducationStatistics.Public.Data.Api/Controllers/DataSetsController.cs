@@ -12,9 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [ApiVersion(1.0)]
 [ApiController]
 [Route("api/v{version:apiVersion}/data-sets")]
-public class DataSetsController(
-    IDataSetService dataSetService)
-    : ControllerBase
+public class DataSetsController(IDataSetService dataSetService) : ControllerBase
 {
     /// <summary>
     /// Get a data set’s summary

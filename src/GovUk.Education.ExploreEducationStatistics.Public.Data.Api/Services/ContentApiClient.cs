@@ -9,17 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-internal class ContentApiClient : IContentApiClient
+internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient httpClient) : IContentApiClient
 {
-    private readonly ILogger<ContentApiClient> _logger;
-    private readonly HttpClient _httpClient;
-
-    public ContentApiClient(ILogger<ContentApiClient> logger, HttpClient httpClient)
-    {
-        _logger = logger;
-        _httpClient = httpClient;
-    }
-
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         int page,
         int pageSize,
@@ -33,7 +24,7 @@ internal class ContentApiClient : IContentApiClient
             PageSize: pageSize,
             PublicationIds: publicationIds);
 
-        var response = await _httpClient.PostAsJsonAsync("api/publications", request, cancellationToken: cancellationToken);
+        var response = await httpClient.PostAsJsonAsync("api/publications", request, cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -43,7 +34,7 @@ internal class ContentApiClient : IContentApiClient
                     return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
                 default:
                     var message = await response.Content.ReadAsStringAsync();
-                    _logger.LogError(StringExtensions.TrimIndent(
+                    logger.LogError(StringExtensions.TrimIndent(
                         $"""
                          Failed to retrieve publications with status code: {response.StatusCode}. Message:
                          {message}
@@ -64,7 +55,7 @@ internal class ContentApiClient : IContentApiClient
         Guid publicationId,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.GetAsync($"api/publications/{publicationId}/summary", cancellationToken: cancellationToken);
+        var response = await httpClient.GetAsync($"api/publications/{publicationId}/summary", cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -76,7 +67,7 @@ internal class ContentApiClient : IContentApiClient
                     return new NotFoundResult();
                 default:
                     var message = await response.Content.ReadAsStringAsync();
-                    _logger.LogError(StringExtensions.TrimIndent(
+                    logger.LogError(StringExtensions.TrimIndent(
                         $"""
                          Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
                          {message}
