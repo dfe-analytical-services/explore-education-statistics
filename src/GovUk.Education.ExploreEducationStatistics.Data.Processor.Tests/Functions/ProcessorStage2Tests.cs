@@ -10,16 +10,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
-using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -230,6 +232,7 @@ public class ProcessorStage2Tests
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
 
         var importerService = new ImporterService(
+            Options.Create(new AppSettingOptions()),
             guidGenerator,
             new ImporterLocationService(
                 guidGenerator,
@@ -255,19 +258,19 @@ public class ProcessorStage2Tests
 
         var importMessage = new ImportMessage(import.Id);
 
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
-
-        importStagesMessageQueue
-            .Setup(s => s.Add(importMessage));
-
         var function = BuildFunction(processorService, dataImportService);
 
-        await function.ProcessUploads(
+        var outputMessages = await function.ProcessUploads(
             importMessage,
-            new ExecutionContext(),
-            importStagesMessageQueue.Object);
+            new TestFunctionContext());
 
-        VerifyAllMocks(privateBlobStorageService, importStagesMessageQueue);
+        VerifyAllMocks(privateBlobStorageService);
+
+        // Verify that the message will be queued to trigger the next stage.
+        Assert.Equal(new[]
+        {
+            importMessage
+        }, outputMessages);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {

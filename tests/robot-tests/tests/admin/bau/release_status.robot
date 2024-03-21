@@ -18,11 +18,11 @@ ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adopt
 *** Test Cases ***
 Create new publication and release via API
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    2100
 
 Go to release sign off page and verify initial release checklist
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial year 3000-01
+    ...    Financial year 2100-01
 
 Validate checklist errors and warnings
     user edits release status
@@ -133,13 +133,13 @@ Submit release for Higher Review
     user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Submitted for Higher Review
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3001
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2100
     user clicks button    Update status
 
 Verify release status is Higher Review
     user checks summary list contains    Current status    Awaiting higher review
     user checks summary list contains    Scheduled release    Not scheduled
-    user checks summary list contains    Next release expected    December 3001
+    user checks summary list contains    Next release expected    December 2100
 
 Verify release checklist has not been updated by status
     user edits release status
@@ -175,10 +175,10 @@ Approve release
     user clicks radio    On a specific date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    1
     user enters text into element    id:releaseStatusForm-publishScheduled-month    12
-    user enters text into element    id:releaseStatusForm-publishScheduled-year    3000
+    user enters text into element    id:releaseStatusForm-publishScheduled-year    2100
 
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    3
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3002
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2101
 
     user clicks button    Update status
     user waits until h2 is visible    Confirm publish date
@@ -186,21 +186,21 @@ Approve release
 
 Verify release status is Approved
     user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release    1 December 3000
-    user checks summary list contains    Next release expected    March 3002
+    user checks summary list contains    Scheduled release    1 December 2100
+    user checks summary list contains    Next release expected    March 2101
     user waits for release process status to be    Scheduled    %{WAIT_LONG}
 
 Move release status back to Draft
     user puts release into draft
     ...    release_note=Moved back to draft
     ...    next_release_date_month=1
-    ...    next_release_date_year=3001
-    ...    expected_next_release_date=January 3001
+    ...    next_release_date_year=2102
+    ...    expected_next_release_date=January 2102
 
 Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
     user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial year 3000-01
+    ...    Financial year 2100-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -210,7 +210,7 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
 Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial year 3000-01
+    ...    Financial year 2100-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -243,7 +243,7 @@ Adopt a methodology with a draft amendment
 
 Check that having a draft methodology amendment adopted by this Release's Publication will show a checklist warning
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial year 3000-01
+    ...    Financial year 2100-01
     user edits release status
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
@@ -252,7 +252,7 @@ Check that having a draft methodology amendment adopted by this Release's Public
 Approve the adopted methodology amendment and verify the warning disappears
     user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial year 3000-01
+    ...    Financial year 2100-01
     user edits release status
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.

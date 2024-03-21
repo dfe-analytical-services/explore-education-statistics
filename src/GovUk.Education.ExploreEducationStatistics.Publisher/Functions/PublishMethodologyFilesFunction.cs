@@ -1,38 +1,28 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
+
+public class PublishMethodologyFilesFunction(
+    ILogger<PublishMethodologyFilesFunction> logger,
+    IPublishingService publishingService)
 {
-    // ReSharper disable once UnusedType.Global
-    public class PublishMethodologyFilesFunction
+    [Function("PublishMethodologyFiles")]
+    public async Task PublishMethodologyFiles(
+        [QueueTrigger(PublishMethodologyFilesQueue)]
+        PublishMethodologyFilesMessage message,
+        FunctionContext context)
     {
-        private readonly IPublishingService _publishingService;
+        logger.LogInformation("{FunctionName} triggered: {Message}",
+            context.FunctionDefinition.Name,
+            message);
 
-        public PublishMethodologyFilesFunction(IPublishingService publishingService)
-        {
-            _publishingService = publishingService;
-        }
+        await publishingService.PublishMethodologyFiles(message.MethodologyId);
 
-        [FunctionName("PublishMethodologyFiles")]
-        // ReSharper disable once UnusedMember.Global
-        public async Task PublishMethodologyFiles(
-            [QueueTrigger(PublishMethodologyFilesQueue)]
-            PublishMethodologyFilesMessage message,
-            ExecutionContext executionContext,
-            ILogger logger)
-        {
-            logger.LogInformation("{0} triggered: {1}",
-                executionContext.FunctionName,
-                message);
-
-            await _publishingService.PublishMethodologyFiles(message.MethodologyId);
-
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
-        }
+        logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
     }
 }
