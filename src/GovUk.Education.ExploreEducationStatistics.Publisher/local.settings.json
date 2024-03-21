@@ -2,21 +2,17 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "WEBSITE_TIME_ZONE": "GMT Standard Time",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "PublishReleasesCronSchedule": "0 0-58/2 * * * *",
-    "PublishReleaseContentCronSchedule": "0 1-59/2 * * * *",
-    "CoreStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;",
-    "NotificationStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://data-storage:10001/devstoreaccount1;",
-    "PublisherStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;QueueEndpoint=http://data-storage:10001/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;",
-    "PublicStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;"
+    "AppSettings:PublishReleasesCronSchedule": "0 0-58/2 * * * *",
+    "AppSettings:PublishReleaseContentCronSchedule": "0 1-59/2 * * * *"
   },
   "ConnectionStrings": {
     "ContentDb": "Server=db;Database=content;User=publisher;Password=Your_Password123;TrustServerCertificate=True;",
-    "StatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;TrustServerCertificate=True;",
-    "PublicStatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;"
+    "StatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;TrustServerCertificate=True;"
   },
   "Host": {
+    "LocalHttpPort": 7072,
     "CORS": "*"
   }
 }

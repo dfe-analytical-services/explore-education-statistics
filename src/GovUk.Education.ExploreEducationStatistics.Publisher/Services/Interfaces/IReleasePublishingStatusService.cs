@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task<ReleasePublishingStatus> GetAsync(Guid releaseVersionId,
             Guid releaseStatusId);
 
-        Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseVersionId);
+        Task<ReleasePublishingStatus?> GetLatestAsync(Guid releaseVersionId);
 
         Task UpdateStateAsync(Guid releaseVersionId,
             Guid releaseStatusId,
