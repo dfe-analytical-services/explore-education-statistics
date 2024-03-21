@@ -44,7 +44,8 @@ var host = new HostBuilder()
     {
         builder
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false);
+            .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables();
     })
     .ConfigureServices((hostContext, services) =>
     {
