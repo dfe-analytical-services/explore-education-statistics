@@ -29,13 +29,13 @@ module functionAppModule '../components/functionApp.bicep' = {
   params: {
     resourcePrefix: resourcePrefix
     functionAppName: functionAppName
-    storageAccountConnectionString: storageAccountConnectionString
     location: location
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsKey
     subnetId: subnetId
     settings: {
       dbConnectionString: dbConnectionString
+      coreStorage: storageAccountConnectionString
     }
     functionAppRuntime: 'dotnet-isolated'
     sku: {

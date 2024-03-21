@@ -24,10 +24,6 @@ param appServicePlanOS string = 'Linux'
 ])
 param functionAppRuntime string = 'dotnet'
 
-@description('Storage Account connection string')
-@secure()
-param storageAccountConnectionString string
-
 @description('Specifies the additional setting to add to the functionapp.')
 param settings object
 
@@ -58,6 +54,21 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
+module storageAccountDeploy 'storageAccount.bicep' = {
+  resourcePrefix: resourcePrefix
+  location: location
+  storageAccountName: functionAppName
+  skuStorageResource: 'Standard_LRS'
+  tagValues: tagValues
+}
+
+var storageAccountName = storageAccountDeploy.outputs.storageAccountName
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+  name: storageAccountName
+  scope: resourceGroup(resourceGroup().name)
+}
+
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: '${functionAppName}-site'
   location: location
@@ -78,12 +89,14 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: tagValues
 }
 
+var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+
 resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   parent: functionApp
   name: 'appsettings'
   properties: union(settings, {
-    AzureWebJobsStorage: storageAccountConnectionString
-    WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: storageAccountConnectionString
+    AzureWebJobsStorage: dedicatedStorageAccountString
+    WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
     WEBSITE_CONTENTSHARE: toLower(functionAppName)
     //WEBSITE_CONTENTOVERVNET: 1
     // WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
