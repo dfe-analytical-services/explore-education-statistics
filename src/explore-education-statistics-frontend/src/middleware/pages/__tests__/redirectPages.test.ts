@@ -76,6 +76,7 @@ describe('redirectPages', () => {
       expect.objectContaining({
         href: 'https://my-env/find-statistics',
       }),
+      301,
     );
     expect(nextSpy).not.toHaveBeenCalled();
 
@@ -92,6 +93,7 @@ describe('redirectPages', () => {
       expect.objectContaining({
         href: 'https://my-env/find-statistics/release-name?testParam=Something',
       }),
+      301,
     );
     expect(nextSpy).not.toHaveBeenCalled();
   });
@@ -109,6 +111,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/methodology/updated-slug-1',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -155,6 +158,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/methodology/updated-slug-1/child-page',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -173,6 +177,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/methodology/updated-slug-1?search=something',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -201,6 +206,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/methodology/updated-slug-1',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -219,6 +225,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/find-statistics/updated-slug-3',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -269,6 +276,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/find-statistics/updated-slug-3/child-page',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -288,6 +296,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/find-statistics/updated-slug-3?search=something',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
@@ -316,6 +325,7 @@ describe('redirectPages', () => {
         expect.objectContaining({
           href: 'https://my-env/find-statistics/updated-slug-3',
         }),
+        301,
       );
       expect(nextSpy).not.toHaveBeenCalled();
     });
