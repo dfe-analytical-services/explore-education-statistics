@@ -81,9 +81,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
 }
 
 
-
-resource share 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/share'
+resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${storageAccountName}/default/${fileShareName}'
   dependsOn: [
     storageAccount
   ]
@@ -121,7 +120,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   }
   tags: tagValues
   dependsOn: [
-    share
+    fileShare
   ]
 }
 
@@ -131,9 +130,10 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   parent: functionApp
   name: 'appsettings'
   properties: union(settings, {
+    AZURE_CLIENT_ID: functionApp.identity.principalId
     AzureWebJobsStorage: dedicatedStorageAccountString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
-    WEBSITE_CONTENTSHARE: 'share'
+    WEBSITE_CONTENTSHARE: fileShareName
     WEBSITE_CONTENTOVERVNET: 1
     WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
     FUNCTIONS_EXTENSION_VERSION: '~4'
