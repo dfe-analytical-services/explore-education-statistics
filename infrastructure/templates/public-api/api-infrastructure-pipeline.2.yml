@@ -49,11 +49,11 @@ pool:
 
 stages:
 - stage: Build
-  variables:
-    - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-    - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   jobs:
   - job: CheckInfrastructure
+    variables:
+      - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
+      - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
     steps:
     - checkout: self
     - task: CmdLine@2
@@ -75,7 +75,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Install Bicep'
       inputs:
-        azureSubscription: $(serviceConnection)
+        azureSubscription: '${{variables.serviceConnection}}'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: 'az bicep install'
@@ -83,7 +83,7 @@ stages:
     - task: AzureCLI@2
       displayName: 'Validate bicep scripts'
       inputs:
-        azureSubscription: $(serviceConnection)
+        azureSubscription: '${{variables.serviceConnection}}'
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
@@ -102,9 +102,6 @@ stages:
 
 - ${{ if variables.isDev }}:
   - template: deploy-stage-template.yml
-    variables:
-      - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-      - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
     parameters:
       environment: 'Development'
       dependsOn: Build

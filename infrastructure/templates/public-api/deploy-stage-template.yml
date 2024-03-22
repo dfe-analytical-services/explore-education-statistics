@@ -14,6 +14,9 @@ parameters:
 
 stages:
 - stage: Deploy${{parameters.environment}}
+  variables:
+    - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
+    - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
   dependsOn: ${{parameters.dependsOn}}
@@ -33,7 +36,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: $(serviceConnection)
+              azureSubscription: '${{variables.serviceConnection}}'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -55,7 +58,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App'
             inputs:
-              azureSubscription: $(serviceConnection)
+              azureSubscription: '${{variables.serviceConnection}}'
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
