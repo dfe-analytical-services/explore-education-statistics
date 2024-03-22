@@ -120,6 +120,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     }
   }
   tags: tagValues
+  dependsOn: [
+    share
+  ]
 }
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
