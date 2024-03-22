@@ -11,8 +11,6 @@ parameters:
   - name: psqlDbUsersAdded
     type: boolean
     default: true
-  - name: dataProcessorZipFileUrl
-    default: ''
 
 stages:
 - stage: Deploy${{parameters.environment}}
@@ -27,11 +25,6 @@ stages:
       runOnce:
         deploy:
           steps:
-#          - template: 'artifact-download-url-step-template.yml'
-#            parameters:
-#              artifactName: 'public-api-data-processor'
-#              zipFileName: 'GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
-#              variableName: 'dataProcessorDownloadUrl'
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'
             artifact: 'public-api-data-processor-$(upstreamPipelineBuildNumber)'
@@ -55,20 +48,7 @@ stages:
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
-                    dataProcessorZipFileUrl='$(dataProcessorDownloadUrl)'
-#          - task: AzureFunctionApp@2
-#            displayName: 'Deploy Data Processor Function App'
-#            inputs:
-#              azureSubscription: $(serviceConnection)
-#              appType: 'functionAppLinux'
-#              appName: 'dataset-processor13-site'
-#              resourceGroupName: 'dfe-development-dw'
-##              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
-##              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
-#              package: '/home/dwatson/development/projects/dfe/function-uploads/testupload.zip'
-#              runtimeStack: 'DOTNET-ISOLATED|8.0'
-#              deploymentMethod: 'runFromPackage'
+                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
 
           # Swapping out from AzureFunctionApp@2 due to intermittent deployment issues as faced in
           # https://github.com/microsoft/azure-pipelines-tasks/issues/18766
@@ -82,4 +62,4 @@ stages:
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
                   --name 'dataset-processor13-site' \
-                  --resource-group 'dfe-development-dw' # --slot 'staging'
+                  --resource-group '${{parameters.resourceGroupName}}' # --slot 'staging'

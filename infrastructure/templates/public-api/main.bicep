@@ -64,14 +64,11 @@ param publicUrls {
   contentApi: string
 }?
 
-@description('URL of Data Processor artifact ZIP to deploy.')
-param dataProcessorZipFileUrl string?
-
 var resourcePrefix = '${subscription}-ees-publicapi'
-var storageAccountName = 's101d01saeescoredw'
+var coreStorageAccountName = 's101d01saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
-var dataProcessorFunctionAppName = 'dataset-processor13'
+var dataProcessorFunctionAppName = 'data'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -85,7 +82,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' e
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
-  name: storageAccountName
+  name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
 var storageAccountKey = storageAccount.listKeys().keys[0].value
@@ -121,7 +118,7 @@ module fileShareModule 'components/fileShares.bicep' = {
     resourcePrefix: resourcePrefix
     fileShareName: 'data'
     fileShareQuota: fileShareQuota
-    storageAccountName: storageAccountName
+    storageAccountName: coreStorageAccountName
   }
 }
 
@@ -180,7 +177,7 @@ resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignm
   }
 }
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource apiContainerAppLogAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: '${resourcePrefix}-log-${apiContainerAppName}'
   location: location
   properties: {
@@ -202,8 +199,8 @@ resource apiContainerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-0
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
+        customerId: apiContainerAppLogAnalytics.properties.customerId
+        sharedKey: apiContainerAppLogAnalytics.listKeys().primarySharedKey
       }
     }
     workloadProfiles: [
@@ -267,13 +264,3 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     }
   }
 }
-
-//resource dataProcessorFunctionAppZipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = if (psqlDbUsersAdded && dataProcessorZipFileUrl != null) {
-//  name: '${resourcePrefix}-fa-${dataProcessorFunctionAppName}/ZipDeploy'
-//  properties: {
-//      packageUri: dataProcessorZipFileUrl
-//  }
-//  dependsOn: [
-//    dataProcessorFunctionAppModule
-//  ]
-//}
