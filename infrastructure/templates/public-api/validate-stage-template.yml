@@ -1,0 +1,62 @@
+# This is a reusable Deploy stage definition that is parameterised to be reusable
+# to support deployment to different environments
+
+parameters:
+  - name: stageName
+    type: string
+  - name: environment
+    default: 'Development'
+
+stages:
+  - stage: ${{parameters.stageName}}
+    jobs:
+      - job: CheckInfrastructure
+        variables:
+          - group: EES Bicep Infrastructure public - ${{parameters.environment}}
+          - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
+        steps:
+          - checkout: self
+          - task: CmdLine@2
+            displayName: 'List source files'
+            inputs:
+              script: |
+
+          - task: Bash@3
+            displayName: 'Display information about this pipeline run'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the Docker images to deploy with this pipeline run.'
+                echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the published build artifacts to deploy with this pipeline run.'
+                echo
+                echo 'Structure of work folder of this pipeline:'
+                tree $(Build.SourcesDirectory)
+
+          - task: AzureCLI@2
+            displayName: 'Install Bicep'
+            inputs:
+              azureSubscription: '${{variables.serviceConnection}}'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: 'az bicep install'
+
+          - task: AzureCLI@2
+            displayName: 'Validate bicep scripts'
+            inputs:
+              azureSubscription: '${{variables.serviceConnection}}'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+                az deployment group validate \
+                --resource-group $(resourceGroupName) \
+                --template-file $(templateFile) \
+                --parameters $(devParamFile) \
+                --parameters \
+                    environment='${{parameters.environment}}' \
+                    resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(upstreamPipelineBuildNumber)' \
+                    psqlDbUsersAdded=true
