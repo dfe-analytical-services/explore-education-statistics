@@ -2,21 +2,21 @@
 # to support deployment to different environments
 
 parameters:
+  - name: stageName
+    type: string
   - name: environment
     default: 'Development'
   - name: dependsOn
     default: 'Build'
-  - name: resourceGroupName
-    default: 'dfe-devdw2'
   - name: psqlDbUsersAdded
     type: boolean
     default: true
 
 stages:
-- stage: Deploy${{parameters.environment}}
+- stage: ${{parameters.stageName}}
   variables:
-    - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-    - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
+    - group: EES Bicep Infrastructure public - ${{parameters.environment}}
+    - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
   dependsOn: ${{parameters.dependsOn}}
@@ -42,7 +42,7 @@ stages:
               inlineScript: |
                 set -e
                 az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
+                --resource-group $(resourceGroupName) \
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
                 --parameters \
@@ -65,4 +65,4 @@ stages:
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
                   --name 'dataset-processor13-site' \
-                  --resource-group '${{parameters.resourceGroupName}}' # --slot 'staging'
+                  --resource-group '$(resourceGroupName)' # --slot 'staging'
