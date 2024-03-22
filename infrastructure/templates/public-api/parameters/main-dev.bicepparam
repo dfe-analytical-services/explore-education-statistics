@@ -1,8 +1,6 @@
 using '../main.bicep'
 
 // Environment Params
-param subscription = 'dfe-devdw2'
-param resourceGroupName = 'dfe-development-dw'
 param environmentName = 'Development'
 
 // PostgreSQL Database Params

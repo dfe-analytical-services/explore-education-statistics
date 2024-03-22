@@ -1,7 +1,6 @@
 using '../main.bicep'
 
 // Environment Params
-param subscription = 's101p01'
 param environmentName = 'Production'
 
 // PostgreSQL Database Params

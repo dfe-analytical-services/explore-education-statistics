@@ -6,11 +6,14 @@ parameters:
     type: string
   - name: environment
     default: 'Development'
+  - name: serviceConnection
+    type: string
 
 stages:
   - stage: ${{parameters.stageName}}
+    displayName: 'Validate ${{parameters.environment}} Infrastructure'
     jobs:
-      - job: CheckInfrastructure
+      - job: Validate_Infrastructure
         variables:
           - group: EES Bicep Infrastructure public - ${{parameters.environment}}
           - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
@@ -28,6 +31,10 @@ stages:
               script: |
                 echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the Docker images to deploy with this pipeline run.'
                 echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the published build artifacts to deploy with this pipeline run.'
+                echo 'Using Service Connection ${{parameters.serviceConnection}}.'
+                echo 'Using VNet $(vNetName).'
+                echo 'Using ACR $(acrName).'
+                echo 'Using Core Storage Account $(coreStorageAccountName).'
                 echo
                 echo 'Structure of work folder of this pipeline:'
                 tree $(Build.SourcesDirectory)
@@ -35,7 +42,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Install Bicep'
             inputs:
-              azureSubscription: '${{variables.serviceConnection}}'
+              azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: 'az bicep install'
@@ -43,7 +50,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'Validate bicep scripts'
             inputs:
-              azureSubscription: '${{variables.serviceConnection}}'
+              azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -53,7 +60,10 @@ stages:
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
                 --parameters \
-                    environment='${{parameters.environment}}' \
+                    subscription='$(subscription)' \
+                    vNetName='$(vNetName)' \
+                    acrName='$(acrName)' \
+                    coreStorageAccountName='$(coreStorageAccountName)' \
                     resourceTags='$(resourceTags)' \
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \

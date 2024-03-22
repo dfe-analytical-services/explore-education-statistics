@@ -5,12 +5,11 @@ parameters:
   - name: stageName
     type: string
   - name: environment
-    default: 'Development'
+    type: string
+  - name: serviceConnection
+    type: string
   - name: dependsOn
-    default: 'Build'
-  - name: psqlDbUsersAdded
-    type: boolean
-    default: true
+    type: string
 
 stages:
 - stage: ${{parameters.stageName}}
@@ -31,12 +30,11 @@ stages:
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'
             artifact: 'public-api-data-processor-$(upstreamPipelineBuildNumber)'
-#          - download: none
           - checkout: self
           - task: AzureCLI@2
             displayName: 'Deploy bicep template to Azure'
             inputs:
-              azureSubscription: '${{variables.serviceConnection}}'
+              azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -46,23 +44,27 @@ stages:
                 --template-file $(templateFile) \
                 --parameters $(devParamFile) \
                 --parameters \
+                    subscription='$(subscription)' \
+                    vNetName='$(vNetName)' \
+                    acrName='$(acrName)' \
+                    coreStorageAccountName='$(coreStorageAccountName)' \
                     resourceTags='$(resourceTags)' \
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+                    psqlDbUsersAdded='$(parameters.psqlDbUsersAdded)'
 
           # Swapping out from AzureFunctionApp@2 due to intermittent deployment issues as faced in
           # https://github.com/microsoft/azure-pipelines-tasks/issues/18766
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App'
             inputs:
-              azureSubscription: '${{variables.serviceConnection}}'
+              azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                  --name 'dataset-processor13-site' \
+                  --name '$(subscription)-ees-publicapi-fa-processor' \
                   --resource-group '$(resourceGroupName)' # --slot 'staging'
