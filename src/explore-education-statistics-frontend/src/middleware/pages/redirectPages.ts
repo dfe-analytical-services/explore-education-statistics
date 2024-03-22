@@ -26,7 +26,7 @@ export default async function redirectPages(request: NextRequest) {
   // Check for redirects for release and methodology pages
   if (
     Object.values(redirectPaths).find(path =>
-      decodedPathname.startsWith(path),
+      decodedPathname.toLowerCase().startsWith(path),
     ) &&
     decodedPathname.split('/').length > 2
   ) {
@@ -75,7 +75,7 @@ export default async function redirectPages(request: NextRequest) {
   if (decodedPathname !== decodedPathname.toLowerCase()) {
     const url = nextUrl.clone();
     url.pathname = decodedPathname.toLowerCase();
-    return NextResponse.redirect(url, 307);
+    return NextResponse.redirect(url, 301);
   }
 
   return NextResponse.next();
