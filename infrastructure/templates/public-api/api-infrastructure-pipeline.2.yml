@@ -49,7 +49,6 @@ stages:
     parameters:
       stageName: 'Validate against Development'
       environment: 'Development'
-      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
 
   - template: deploy-stage-template.yml
     parameters:
