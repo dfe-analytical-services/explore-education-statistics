@@ -17,13 +17,13 @@ param storageAccountName string
 var shareName = '${resourcePrefix}-fs-${fileShareName}'
 
 // Reference an existing Storage Account.
-resource apiStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
 }
 
 resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
   name: 'default'
-  parent: apiStorageAccount
+  parent: storageAccount
 }
 
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {

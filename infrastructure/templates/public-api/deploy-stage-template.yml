@@ -62,7 +62,7 @@ stages:
             inputs:
               azureSubscription: $(serviceConnection)
               appType: 'functionAppLinux'
-              appName: 'dataset-processor5-site'
+              appName: 'dataset-processor6-site'
               resourceGroupName: 'dfe-development-dw'
 #              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
 #              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
