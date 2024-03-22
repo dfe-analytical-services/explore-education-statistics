@@ -1,5 +1,5 @@
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string
+param subscription string?
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -64,11 +64,19 @@ param publicUrls {
   contentApi: string
 }?
 
+@description('The full name of the existing VNet.')
+param vNetName string?
+
+@description('The full name of the existing ACR.')
+param acrName string?
+
+@description('The full name of the existing Core Storage account.')
+param coreStorageAccountName string?
+
 var resourcePrefix = '${subscription}-ees-publicapi'
-var coreStorageAccountName = 's101d01saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
-var dataProcessorFunctionAppName = 'data'
+var dataProcessorFunctionAppName = 'processor'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -77,7 +85,7 @@ var tagValues = union(resourceTags ?? {}, {
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: 'eesacrdw'
+  name: acrName
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
@@ -93,7 +101,7 @@ var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${
 module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
-    subscription: subscription
+    vNetName: vNetName
     resourcePrefix: resourcePrefix
     apiContainerAppName: apiContainerAppName
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
@@ -246,6 +254,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
 module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
+    subscription: subscription
     resourcePrefix: resourcePrefix
     functionAppName: dataProcessorFunctionAppName
     location: location
@@ -253,7 +262,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     settings: {
-      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppName)
+      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', '${resourcePrefix}-fa-${dataProcessorFunctionAppName}')
       ConnectionStrings__CoreStorage: coreStorageConnectionString
     }
     functionAppRuntime: 'dotnet-isolated'

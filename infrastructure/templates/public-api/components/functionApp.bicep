@@ -1,3 +1,6 @@
+@description('Specifies the subscription name - used for creating a shorter name for Storage Accounts')
+param subscription string
+
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
@@ -54,7 +57,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
-var storageAccountName = replace('${resourcePrefix}sa${functionAppName}', '-', '')
+var storageAccountName = replace('${subscription}eessa${functionAppName}', '-', '')
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
