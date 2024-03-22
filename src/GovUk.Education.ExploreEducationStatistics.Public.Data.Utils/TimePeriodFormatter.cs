@@ -6,8 +6,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 
 public static partial class TimePeriodFormatter
 {
-    [GeneratedRegex(@"^[0-9]{4}(\/[0-9]{4})?$")]
-    private static partial Regex PeriodRegex();
+    [GeneratedRegex(@"^[0-9]{4}(\/[0-9]{4})?$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    private static partial Regex PeriodRegexGenerated();
+
+    private static readonly Regex PeriodRegex = PeriodRegexGenerated();
 
     /// <summary>
     /// Format a time period to its human-readable label.
@@ -17,7 +19,7 @@ public static partial class TimePeriodFormatter
     /// <returns>The time period's human-readable label</returns>
     public static string FormatLabel(string period, TimeIdentifier identifier)
     {
-        var match = PeriodRegex().Match(period);
+        var match = PeriodRegex.Match(period);
 
         if (!match.Success)
         {
@@ -41,8 +43,10 @@ public static partial class TimePeriodFormatter
         return TimePeriodLabelFormatter.Format(firstYear, identifier);
     }
 
-    [GeneratedRegex(@"^[0-9]{4}([0-9]{2})?$")]
-    private static partial Regex CsvPeriodRegex();
+    [GeneratedRegex(@"^[0-9]{4}([0-9]{2})?$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    private static partial Regex CsvPeriodRegexGenerated();
+
+    private static readonly Regex CsvPeriodRegex = CsvPeriodRegexGenerated();
 
     /// <summary>
     /// Format a time period from a CSV (e.g. 202021) to a standard format (e.g. 2020/2021).
@@ -51,7 +55,7 @@ public static partial class TimePeriodFormatter
     /// <returns>The time period in standard format</returns>
     public static string FormatFromCsv(string period)
     {
-        var match = CsvPeriodRegex().Match(period);
+        var match = CsvPeriodRegex.Match(period);
 
         if (!match.Success)
         {
@@ -87,7 +91,7 @@ public static partial class TimePeriodFormatter
     /// <returns>The time period in CSV format</returns>
     public static string FormatToCsv(string period)
     {
-        var match = PeriodRegex().Match(period);
+        var match = PeriodRegex.Match(period);
 
         if (!match.Success)
         {

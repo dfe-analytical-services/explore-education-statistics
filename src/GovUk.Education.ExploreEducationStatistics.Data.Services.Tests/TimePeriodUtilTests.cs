@@ -561,8 +561,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, AutumnTerm),
-                    (2019, AutumnSpringTerm),
                     (2019, SpringTerm),
+                    (2019, AutumnSpringTerm),
                     (2019, SummerTerm)
                 },
                 TimePeriodUtil.Range(new TimePeriodQuery(2019, AutumnTerm, 2019, SummerTerm)).ToList());
@@ -570,15 +570,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             CollectionAssert.AreEquivalent(
                 new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
-                    (2018, SpringTerm),
+                    (2018, AutumnSpringTerm),
                     (2018, SummerTerm),
                     (2019, AutumnTerm),
-                    (2019, AutumnSpringTerm),
                     (2019, SpringTerm),
+                    (2019, AutumnSpringTerm),
                     (2019, SummerTerm),
                     (2020, AutumnTerm)
                 },
-                TimePeriodUtil.Range(new TimePeriodQuery(2018, SpringTerm, 2020, AutumnTerm)).ToList());
+                TimePeriodUtil.Range(new TimePeriodQuery(2018, AutumnSpringTerm, 2020, AutumnTerm)).ToList());
         }
 
         [Fact]

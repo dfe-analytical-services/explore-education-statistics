@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>10.0</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
-
 
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
@@ -14,13 +12,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.21" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-        <PackageReference Include="Moq" Version="4.20.69" />
-        <PackageReference Include="xunit" Version="2.5.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+        <PackageReference Include="Moq" Version="4.20.70" />
+        <PackageReference Include="xunit" Version="2.7.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -30,5 +26,5 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
     </ItemGroup>
-    
+
 </Project>

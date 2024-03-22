@@ -2,39 +2,31 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions;
+
+public class PoisonQueueHandler(
+    IDataImportService dataImportService,
+    ILogger<PoisonQueueHandler> logger)
 {
-    public class PoisonQueueHandler
+    [Function("ProcessUploadsPoisonHandler")]
+    public async Task ProcessUploadsPoisonQueueHandler(
+        [QueueTrigger(ImportsPendingPoisonQueue)]
+        ImportMessage message,
+        FunctionContext context)
     {
-        private readonly IDataImportService _dataImportService;
-        private readonly ILogger<PoisonQueueHandler> _logger;
-
-        public PoisonQueueHandler(
-            IDataImportService dataImportService, 
-            ILogger<PoisonQueueHandler> logger)
+        try
         {
-            _dataImportService = dataImportService;
-            _logger = logger;
+            await dataImportService.FailImport(message.Id,
+                "File failed to import for unknown reason in upload processing stage.");
         }
-
-        [FunctionName("ProcessUploadsPoisonHandler")]
-        public async Task ProcessUploadsPoisonQueueHandler(
-            [QueueTrigger(ImportsPendingPoisonQueue)]
-            ImportMessage message)
+        catch (Exception e)
         {
-            try
-            {
-                await _dataImportService.FailImport(message.Id,
-                    "File failed to import for unknown reason in upload processing stage.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Exception caught whilst processing ProcessUploadsPoisonQueueHandler function: {ex.StackTrace}");
-            }
+            logger.LogError(e, "Exception occured while executing {FunctionName}",
+                context.FunctionDefinition.Name);
         }
     }
 }

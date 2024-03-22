@@ -2,15 +2,14 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true;DevelopmentStorageProxyUri=http://data-storage",
-    "CoreStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;QueueEndpoint=http://data-storage:10001/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "RowsPerBatch": 3000
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
   },
   "ConnectionStrings": {
-    "StatisticsDb": "Server=db;Database=statistics;User=importer;Password=Your_Password123;",
-    "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;"
+    "StatisticsDb": "Server=db;Database=statistics;User=importer;Password=Your_Password123;TrustServerCertificate=True;",
+    "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;TrustServerCertificate=True;"
   },
   "Host": {
+    "LocalHttpPort": 7071,
     "CORS": "*"
   }
 }

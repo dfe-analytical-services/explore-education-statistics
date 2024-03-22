@@ -8,6 +8,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
@@ -58,7 +59,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Single(errorDetail);
+            Assert.Equal("", errorDetail["value"].GetString());
         }
 
         [Fact]
@@ -109,15 +114,23 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var error0Detail = GetErrorDetail(errors[0]);
+
+            Assert.Single(error0Detail);
+            Assert.Equal("", error0Detail["value"].GetString());
 
             Assert.Equal("testAddresses[0].line1", errors[1].Path);
             Assert.Equal("MinimumLength", errors[1].Code);
             Assert.Equal("Must be at least 10 characters (was 0).", errors[1].Message);
 
-            // Assert.Equal(3, errors[1].Detail!.Count);
-            // var minLength = Assert.IsType<JsonElement>(errors[1].Detail!["MinLength"]);
-            // Assert.Equal(10, minLength.GetInt32());
+            var error1Detail = GetErrorDetail(errors[1]);
+
+            Assert.Equal(4, error1Detail.Count);
+            Assert.Equal("", error1Detail["value"].GetString());
+            Assert.Equal(10, error1Detail["minLength"].GetInt32());
+            Assert.Equal(-1, error1Detail["maxLength"].GetInt32());
+            Assert.Equal(0, error1Detail["totalLength"].GetInt32());
         }
 
         [Fact]
@@ -158,7 +171,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Single(errorDetail);
+            Assert.Null(errorDetail["value"].GetString());
         }
 
         [Fact]
@@ -197,7 +214,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Single(errorDetail);
+            Assert.Null(errorDetail["value"].GetString());
         }
 
         [Fact]
@@ -228,7 +249,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Single(errorDetail);
+            Assert.Equal("", errorDetail["value"].GetString());
         }
     }
 
@@ -266,7 +291,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("name", errors[0].Path);
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
-            Assert.Null(errors[0].Detail);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Single(errorDetail);
+            Assert.Equal("", errorDetail["value"].GetString());
         }
 
         [Fact]
@@ -287,10 +316,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
 
-            var errorDetailJson = Assert.IsType<JsonElement>(errors[0].Detail);
-            var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
+            var errorDetail = GetErrorDetail(errors[0]);
 
-            Assert.Equal(1234, errorDetail!["state"].GetInt32());
+            Assert.Equal(2, errorDetail.Count);
+            Assert.Equal("", errorDetail["value"].GetString());
+            Assert.Equal(1234, errorDetail["state"].GetInt32());
         }
 
         [Fact]
@@ -311,11 +341,11 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal(NotEmptyCode, errors[0].Code);
             Assert.Equal(NotEmptyMessage, errors[0].Message);
 
-            var errorDetailJson = Assert.IsType<JsonElement>(errors[0].Detail);
-            var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
+            var errorDetail = GetErrorDetail(errors[0]);
 
-            Assert.Single(errorDetail!);
-            Assert.Equal("Some allowed value", errorDetail!["allowed"].GetString());
+            Assert.Equal(2, errorDetail.Count);
+            Assert.Equal("", errorDetail["value"].GetString());
+            Assert.Equal("Some allowed value", errorDetail["allowed"].GetString());
         }
 
         [Fact]
@@ -336,15 +366,52 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
             Assert.Equal("MinimumLength", errors[0].Code);
             Assert.Equal("Must be at least 2 characters (was 0).", errors[0].Message);
 
-            var errorDetailJson = Assert.IsType<JsonElement>(errors[0].Detail);
-            var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
+            var errorDetail = GetErrorDetail(errors[0]);
 
-            Assert.Equal(4, errorDetail!.Count);
+            Assert.Equal(5, errorDetail.Count);
+            Assert.Equal("", errorDetail["value"].GetString());
             Assert.Equal(2, errorDetail["minLength"].GetInt32());
             Assert.Equal(-1, errorDetail["maxLength"].GetInt32());
             Assert.Equal(0, errorDetail["totalLength"].GetInt32());
             Assert.Equal("Some reason", errorDetail["reason"].GetString());
         }
+
+        [Fact]
+        public async Task InvalidWithPlaceholderValuesAndOverridingState()
+        {
+            var body = new TestRecord { Name = "Test", Vehicle = "" };
+
+            var client = BuildApp().CreateClient();
+            var response = await client.PostAsJsonAsync(nameof(TestController.TestRecordBody), body);
+
+            var details = response.AssertValidationProblem();
+
+            var errors = details.Errors;
+
+            Assert.Single(errors);
+
+            Assert.Equal("vehicle", errors[0].Path);
+            Assert.Equal("MinimumLength", errors[0].Code);
+            Assert.Equal("Must be at least 2 characters (was 0).", errors[0].Message);
+
+            var errorDetail = GetErrorDetail(errors[0]);
+
+            Assert.Equal(4, errorDetail.Count);
+            Assert.Equal("", errorDetail["value"].GetString());
+            // Custom state overrides `minLength` and `maxLength`
+            Assert.Equal(20, errorDetail["minLength"].GetInt32());
+            Assert.Equal(100, errorDetail["maxLength"].GetInt32());
+            Assert.Equal(0, errorDetail["totalLength"].GetInt32());
+        }
+    }
+
+    private Dictionary<string, JsonElement> GetErrorDetail(ErrorViewModel error)
+    {
+        var errorDetailJson = Assert.IsType<JsonElement>(error.Detail);
+        var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
+
+        Assert.NotNull(errorDetail);
+        return errorDetail;
     }
 
     [ApiController]
@@ -425,6 +492,8 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
 
         public string? Person { get; init; }
 
+        public string? Vehicle { get; init; }
+
         public class Validator : AbstractValidator<TestRecord>
         {
             public Validator()
@@ -453,6 +522,17 @@ public class FluentValidationActionFilterTests : IntegrationTest<TestStartup>
                     () => RuleFor(c => c.Person)
                         .NotEmpty()
                         .WithState(_ => 1234)
+                );
+
+                When(
+                    c => c.Vehicle is not null,
+                    () => RuleFor(c => c.Vehicle)
+                        .MinimumLength(2)
+                        .WithState(_ => new
+                        {
+                            MinLength = 20,
+                            MaxLength = 100
+                        })
                 );
             }
         }

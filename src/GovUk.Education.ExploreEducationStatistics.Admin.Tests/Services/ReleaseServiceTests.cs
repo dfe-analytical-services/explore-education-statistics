@@ -257,10 +257,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                // Do an in depth check of the saved release
+                // Do an in depth check of the saved release version
                 var newReleaseVersion = context
                     .ReleaseVersions
-                    .Include(release => release.Content)
+                    .Include(releaseVersion => releaseVersion.Content)
                     .ThenInclude(section => section.Content)
                     .Single(rv => rv.Id == newReleaseVersionId);
 
@@ -640,7 +640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication(),
                 ReleaseName = "2030",
                 PublishScheduled = DateTime.UtcNow,
-                NextReleaseDate = new PartialDate { Day = "15", Month = "6", Year = "2039" },
+                NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
                 PreReleaseAccessList = "Old access list",
                 Version = 0
             };

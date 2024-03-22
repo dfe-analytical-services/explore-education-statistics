@@ -7,7 +7,9 @@ import {
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationEditReleaseSeriesLegacyLinkRouteParams,
 } from '@admin/routes/publicationRoutes';
-import publicationService, {ReleaseSeriesTableEntry} from '@admin/services/publicationService';
+import publicationService, {
+  ReleaseSeriesTableEntry,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -147,8 +149,11 @@ const ReleaseSeriesTable = ({
                         <span className="govuk-!-display-block">
                           {seriesItem.description}
                         </span>
-                        {seriesItem.isLatest && <Tag>Latest</Tag>}
-                        {!seriesItem.isPublished && <Tag>Unpublished</Tag>}
+                        {!seriesItem.isLegacyLink && seriesItem.isLatest && (
+                          <Tag>Latest</Tag>
+                        )}
+                        {!seriesItem.isLegacyLink &&
+                          !seriesItem.isPublished && <Tag>Unpublished</Tag>}
                       </td>
                       <td
                         className={classNames({

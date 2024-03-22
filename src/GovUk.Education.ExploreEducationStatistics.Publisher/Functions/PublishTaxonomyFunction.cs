@@ -1,38 +1,25 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
+
+public class PublishTaxonomyFunction(
+    ILogger<PublishTaxonomyFunction> logger,
+    IContentService contentService)
 {
-    // ReSharper disable once UnusedType.Global
-    public class PublishTaxonomyFunction
+    [Function("PublishTaxonomy")]
+    public async Task PublishTaxonomy(
+        [QueueTrigger(PublishTaxonomyQueue)] PublishTaxonomyMessage message,
+        FunctionContext context)
     {
-        private readonly IContentService _contentService;
+        logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
-        public PublishTaxonomyFunction(IContentService contentService)
-        {
-            _contentService = contentService;
-        }
+        await contentService.UpdateCachedTaxonomyBlobs();
 
-        [FunctionName("PublishTaxonomy")]
-        // ReSharper disable once UnusedMember.Global
-        public async Task PublishTaxonomy(
-            [QueueTrigger(PublishTaxonomyQueue)]
-            PublishTaxonomyMessage message,
-            ExecutionContext executionContext,
-            ILogger logger)
-        {
-            logger.LogInformation("{0} triggered: {1}",
-                executionContext.FunctionName,
-                message.ToString());
-
-            await _contentService.UpdateCachedTaxonomyBlobs();
-
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
-        }
+        logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
     }
 }

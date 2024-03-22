@@ -11,6 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum TimeIdentifier
     {
+        [TimeIdentifierMeta("Autumn term", "T1", Term, Academic)]
+        AutumnTerm,
+
+        [TimeIdentifierMeta("Spring term", "T2", Term, Academic)]
+        SpringTerm,
+
+        [TimeIdentifierMeta("Autumn and spring term", "T1T2", Term, Academic)]
+        AutumnSpringTerm,
+
+        [TimeIdentifierMeta("Summer term", "T3", Term, Academic)]
+        SummerTerm,
+
         [TimeIdentifierMeta("Academic year", "AY", Category.AcademicYear, Academic, NoLabel)]
         AcademicYear,
 
@@ -81,18 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [TimeIdentifierMeta("Reporting year", "RY", Category.ReportingYear, Default, NoLabel)]
         ReportingYear,
-
-        [TimeIdentifierMeta("Autumn term", "T1", Term, Academic)]
-        AutumnTerm,
-
-        [TimeIdentifierMeta("Autumn and spring term", "T1T2", Term, Academic)]
-        AutumnSpringTerm,
-
-        [TimeIdentifierMeta("Spring term", "T2", Term, Academic)]
-        SpringTerm,
-
-        [TimeIdentifierMeta("Summer term", "T3", Term, Academic)]
-        SummerTerm,
 
         [TimeIdentifierMeta("Week 1", "W1", Week)]
         Week1,

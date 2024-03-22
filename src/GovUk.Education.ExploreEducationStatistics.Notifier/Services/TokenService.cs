@@ -3,15 +3,20 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
 {
-    public class TokenService : ITokenService
+    public class TokenService(IOptions<AppSettingOptions> appSettingOptions) : ITokenService
     {
-        public string GenerateToken(string secretKey, string email, DateTime expiryDateTime)
+        private readonly AppSettingOptions _appSettingOptions = appSettingOptions.Value;
+
+        public string GenerateToken(string email, DateTime expiryDateTime)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettingOptions.TokenSecretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var secToken = new JwtSecurityToken(
@@ -28,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
             return handler.WriteToken(secToken);
         }
 
-        public string? GetEmailFromToken(string authToken, string secretKey)
+        public string? GetEmailFromToken(string authToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var validationParameters = GetValidationParameters(secretKey);
+            var validationParameters = GetValidationParameters(_appSettingOptions.TokenSecretKey);
             string? email = null;
 
             try
