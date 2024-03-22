@@ -18,6 +18,8 @@ variables:
   - group: EES Bicep Infrastructure common
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4807-build-and-deploy-function-app')]
+  - name: isDev
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -38,6 +40,8 @@ variables:
     value: $(paramDirectory)/main-prod.bicepparam
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.EESBuildPipeline.runName)
+  - name: psqlDbUsersAdded
+    value: ${{parameters.psqlDbUsersAdded}}
 
 pool:
   #  vmImage: $(vmImageName)
@@ -47,15 +51,30 @@ stages:
 - ${{ if variables.isDev }}:
   - template: validate-stage-template.yml
     parameters:
-      stageName: 'Validate against Development'
+      stageName: 'Validate_Against_Development'
       environment: 'Development'
+      serviceConnection: $(serviceConnectionDevelopment)
 
   - template: deploy-stage-template.yml
     parameters:
-      stageName: 'Deploy to Development'
+      stageName: 'Deploy_to_Development'
       environment: 'Development'
-      dependsOn: 'Validate against Development'
-      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
+      serviceConnection: $(serviceConnectionDevelopment)
+      dependsOn: 'Validate_Against_Development'
+
+- ${{ if variables.isTest }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
+
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
+      dependsOn: 'Validate_Against_Test'
 
 #  - template: deploy-stage-template.yml
 #    parameters:
