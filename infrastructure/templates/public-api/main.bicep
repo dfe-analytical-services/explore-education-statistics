@@ -125,128 +125,128 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
-// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
-// with "postgres.database.azure.com".
-resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'private.postgres.database.azure.com'
-  location: 'global'
-  resource vNetLink 'virtualNetworkLinks' = {
-    name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
-    location: 'global'
-    properties: {
-      registrationEnabled: false
-      virtualNetwork: {
-        id: vNetModule.outputs.vNetRef
-      }
-    }
-  }
-}
+// // In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
+// // with "postgres.database.azure.com".
+// resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+//   name: 'private.postgres.database.azure.com'
+//   location: 'global'
+//   resource vNetLink 'virtualNetworkLinks' = {
+//     name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
+//     location: 'global'
+//     properties: {
+//       registrationEnabled: false
+//       virtualNetwork: {
+//         id: vNetModule.outputs.vNetRef
+//       }
+//     }
+//   }
+// }
 
 // Deploy PostgreSQL Database.
-module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
-  name: 'postgreSQLDatabaseDeploy'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    createMode: psqlDbUsersAdded ? 'Update' : 'Default'
-    adminName: postgreSqlAdminName!
-    adminPassword: postgreSqlAdminPassword!
-    dbSkuName: postgreSqlSkuName
-    dbStorageSizeGB: postgreSqlStorageSizeGB
-    dbAutoGrowStatus: postgreSqlAutoGrowStatus
-    postgreSqlVersion: '16'
-    tagValues: tagValues
-    privateDnsZoneId: postgreSqlPrivateDnsZone.id
-    firewallRules: postgreSqlFirewallRules
-    subnetId: vNetModule.outputs.postgreSqlSubnetRef
-    databaseNames: ['public_data']
-  }
-  dependsOn: [
-    postgreSqlPrivateDnsZone
-  ]
-}
-
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
-  name: apiContainerAppManagedIdentityName
-  location: location
-}
-
-var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
-
-@description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, apiContainerAppManagedIdentity.id, acrPullRole)
-  properties: {
-    roleDefinitionId: acrPullRole
-    principalId: apiContainerAppManagedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: '${resourcePrefix}-log-${apiContainerAppName}'
-  location: location
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
-  }
-  tags: tagValues
-}
-
-resource apiContainerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: '${resourcePrefix}-cae-${apiContainerAppName}'
-  location: location
-  properties: {
-    vnetConfiguration: {
-      infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
-    }
-    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
-      }
-    }
-    workloadProfiles: [
-      {
-        name: 'Consumption'
-        workloadProfileType: 'Consumption'
-      }
-    ]
-  }
-  tags: tagValues
-}
-
-// Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
-  name: 'apiContainerAppDeploy'
-  params: {
-    resourcePrefix: resourcePrefix
-    location: location
-    containerAppName: apiContainerAppName
-    acrLoginServer: containerRegistry.properties.loginServer
-    containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
-    managedIdentityId: apiContainerAppManagedIdentity.id
-    managedEnvironmentId: apiContainerAppEnvironment.id
-    appSettings: [
-      {
-        name: 'ConnectionStrings__PublicDataDb'
-        value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
-      }
-      {
-        name: 'AZURE_CLIENT_ID'
-        value: apiContainerAppManagedIdentity.properties.clientId
-      }
-      {
-        name: 'ContentApi__Url'
-        value: publicUrls!.contentApi
-      }
-    ]
-    tagValues: tagValues
-  }
-}
+// module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
+//   name: 'postgreSQLDatabaseDeploy'
+//   params: {
+//     resourcePrefix: resourcePrefix
+//     location: location
+//     createMode: psqlDbUsersAdded ? 'Update' : 'Default'
+//     adminName: postgreSqlAdminName!
+//     adminPassword: postgreSqlAdminPassword!
+//     dbSkuName: postgreSqlSkuName
+//     dbStorageSizeGB: postgreSqlStorageSizeGB
+//     dbAutoGrowStatus: postgreSqlAutoGrowStatus
+//     postgreSqlVersion: '16'
+//     tagValues: tagValues
+//     privateDnsZoneId: postgreSqlPrivateDnsZone.id
+//     firewallRules: postgreSqlFirewallRules
+//     subnetId: vNetModule.outputs.postgreSqlSubnetRef
+//     databaseNames: ['public_data']
+//   }
+//   dependsOn: [
+//     postgreSqlPrivateDnsZone
+//   ]
+// }
+//
+// resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+//   name: apiContainerAppManagedIdentityName
+//   location: location
+// }
+//
+// var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
+//
+// @description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
+// resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(resourceGroup().id, apiContainerAppManagedIdentity.id, acrPullRole)
+//   properties: {
+//     roleDefinitionId: acrPullRole
+//     principalId: apiContainerAppManagedIdentity.properties.principalId
+//     principalType: 'ServicePrincipal'
+//   }
+// }
+//
+// resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+//   name: '${resourcePrefix}-log-${apiContainerAppName}'
+//   location: location
+//   properties: {
+//     sku: {
+//       name: 'PerGB2018'
+//     }
+//   }
+//   tags: tagValues
+// }
+//
+// resource apiContainerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+//   name: '${resourcePrefix}-cae-${apiContainerAppName}'
+//   location: location
+//   properties: {
+//     vnetConfiguration: {
+//       infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
+//     }
+//     daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
+//     appLogsConfiguration: {
+//       destination: 'log-analytics'
+//       logAnalyticsConfiguration: {
+//         customerId: logAnalytics.properties.customerId
+//         sharedKey: logAnalytics.listKeys().primarySharedKey
+//       }
+//     }
+//     workloadProfiles: [
+//       {
+//         name: 'Consumption'
+//         workloadProfileType: 'Consumption'
+//       }
+//     ]
+//   }
+//   tags: tagValues
+// }
+//
+// // Deploy main Public API Container App.
+// module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
+//   name: 'apiContainerAppDeploy'
+//   params: {
+//     resourcePrefix: resourcePrefix
+//     location: location
+//     containerAppName: apiContainerAppName
+//     acrLoginServer: containerRegistry.properties.loginServer
+//     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
+//     managedIdentityId: apiContainerAppManagedIdentity.id
+//     managedEnvironmentId: apiContainerAppEnvironment.id
+//     appSettings: [
+//       {
+//         name: 'ConnectionStrings__PublicDataDb'
+//         value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
+//       }
+//       {
+//         name: 'AZURE_CLIENT_ID'
+//         value: apiContainerAppManagedIdentity.properties.clientId
+//       }
+//       {
+//         name: 'ContentApi__Url'
+//         value: publicUrls!.contentApi
+//       }
+//     ]
+//     tagValues: tagValues
+//   }
+// }
 
 // Deploy data-processing Function.
 module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = if (psqlDbUsersAdded) {
@@ -256,7 +256,7 @@ module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bice
     location: location
     functionAppName: dataProcessorFunctionAppName
     storageAccountConnectionString: storageAccountConnectionString
-    dbConnectionString: postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
+    dbConnectionString: '' //postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
