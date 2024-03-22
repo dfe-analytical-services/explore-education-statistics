@@ -71,7 +71,7 @@ var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = 's101d01saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
-var dataProcessorFunctionAppName = 'dataset-processor5'
+var dataProcessorFunctionAppName = 'dataset-processor6'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName

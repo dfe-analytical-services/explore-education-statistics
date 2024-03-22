@@ -43,6 +43,7 @@ var kind = 'functionapp'
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
 var functionName = '${resourcePrefix}-fa-${functionAppName}'
+var fileShareName = toLower(functionAppName)
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -66,8 +67,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   properties: {
     supportsHttpsTrafficOnly: true
     defaultToOAuthAuthentication: true
-    publicNetworkAccess: 'Disabled'
     networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
       virtualNetworkRules: [
         {
           action: 'Allow'
@@ -77,6 +79,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     }
   }
 }
+
+// module fileShareModule 'fileShares.bicep' = {
+//   name: 'fileShareDeploy'
+//   params: {
+//     resourcePrefix: resourcePrefix
+//     fileShareName: fileShareName
+//     fileShareQuota: 1
+//     storageAccountName: storageAccountName
+//   }
+//   dependsOn: [
+//     storageAccount
+//   ]
+// }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: '${functionAppName}-site'
@@ -106,7 +121,7 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   properties: union(settings, {
     AzureWebJobsStorage: dedicatedStorageAccountString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
-    WEBSITE_CONTENTSHARE: toLower(functionAppName)
+    WEBSITE_CONTENTSHARE: fileShareName
     WEBSITE_CONTENTOVERVNET: 1
     WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
     FUNCTIONS_EXTENSION_VERSION: '~4'

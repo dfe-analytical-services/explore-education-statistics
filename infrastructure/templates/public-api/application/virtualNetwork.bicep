@@ -19,7 +19,7 @@ var postgreSqlSubnetName = '${resourcePrefix}-snet-${postgreSqlServerName}'
 var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-${apiContainerAppName}'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
-var dataProcessorSubnetPrefix = '10.0.11.0/24'
+var dataProcessorSubnetPrefix = '10.0.12.0/24'
 var postgreSqlSubnetPrefix = '10.0.7.0/24'
 var apiContainerAppSubnetPrefix = '10.0.8.0/24'
 
