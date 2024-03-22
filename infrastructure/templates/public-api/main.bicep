@@ -77,6 +77,7 @@ var resourcePrefix = '${subscription}-ees-publicapi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var dataProcessorFunctionAppName = 'processor'
+var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -245,6 +246,10 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         name: 'ContentApi__Url'
         value: publicUrls!.contentApi
       }
+      {
+        name: 'DataProcessorFunctionAppIdentityName'
+        value: dataProcessorFunctionAppFullName
+      }
     ]
     tagValues: tagValues
   }
@@ -262,7 +267,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     settings: {
-      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', '${resourcePrefix}-fa-${dataProcessorFunctionAppName}')
+      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
       ConnectionStrings__CoreStorage: coreStorageConnectionString
     }
     functionAppRuntime: 'dotnet-isolated'
