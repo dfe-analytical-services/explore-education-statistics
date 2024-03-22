@@ -11,6 +11,7 @@ public partial class EES4807_AddPermissionsToDataProcessorUser : Migration
     /// <inheritdoc />
     protected override void Up(MigrationBuilder migrationBuilder)
     {
+        Console.WriteLine(">>>>>>>>>>>>>>>>>>>> Adding grants to FA user");
         var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
         migrationBuilder.Sql($"GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
     }
