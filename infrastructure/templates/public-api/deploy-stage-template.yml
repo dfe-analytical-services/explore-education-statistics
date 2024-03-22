@@ -53,7 +53,7 @@ stages:
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded='$(parameters.psqlDbUsersAdded)'
+                    psqlDbUsersAdded='$(psqlDbUsersAdded)'
 
           # Swapping out from AzureFunctionApp@2 due to intermittent deployment issues as faced in
           # https://github.com/microsoft/azure-pipelines-tasks/issues/18766
