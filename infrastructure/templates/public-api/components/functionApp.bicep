@@ -39,7 +39,6 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
-var kind = 'functionapp'
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
 var functionName = '${resourcePrefix}-fa-${functionAppName}'
@@ -48,14 +47,14 @@ var fileShareName = toLower(functionAppName)
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
   location: location
-  kind: kind
+  kind: 'functionapp'
   sku: sku
   properties: {
     reserved: reserved
   }
 }
 
-var storageAccountName = 'sa${replace(functionAppName, '-', '')}'
+var storageAccountName = replace('${resourcePrefix}sa${functionAppName}', '-', '')
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storageAccountName
@@ -88,23 +87,10 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-0
   ]
 }
 
-// module fileShareModule 'fileShares.bicep' = {
-//   name: 'fileShareDeploy'
-//   params: {
-//     resourcePrefix: resourcePrefix
-//     fileShareName: fileShareName
-//     fileShareQuota: 1
-//     storageAccountName: storageAccountName
-//   }
-//   dependsOn: [
-//     storageAccount
-//   ]
-// }
-
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: '${functionAppName}-site'
+  name: functionName
   location: location
-  kind: kind
+  kind: 'functionapp'
   identity: {
     type: 'SystemAssigned'
   }
@@ -130,7 +116,6 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   parent: functionApp
   name: 'appsettings'
   properties: union(settings, {
-    AZURE_CLIENT_ID: functionApp.identity.principalId
     AzureWebJobsStorage: dedicatedStorageAccountString
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
     WEBSITE_CONTENTSHARE: fileShareName

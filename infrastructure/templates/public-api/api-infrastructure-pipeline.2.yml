@@ -14,25 +14,14 @@ parameters:
     displayName: Resource Group Name
     type: string
     default: 'dfe-development-dw'
-  - name: buildNumberOverride
-    displayName: The build number of the main EES build that triggered this pipeline
-    type: string
-    default: 'none'
   - name: psqlDbUsersAdded
     displayName: Have database users been added to PSQL yet for Container App and Function App?
     default: true
-  - name: dataProcessorZipUrlOverride
-    displayName: Manually provide a URL to download a ZIP file containing the Data Processor code.
-    default: 'none'
 
 variables:
   - group: EES Bicep Infrastructure common
-  - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-  - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4807-build-and-deploy-function-app')]
-  - name: isDevBranch
-    value: $[eq(variables['Build.SourceBranchName'], 'EES-4807-build-and-deploy-function-app')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -51,18 +40,8 @@ variables:
     value: $(paramDirectory)/main-preprod.bicepparam
   - name: prodParamFile
     value: $(paramDirectory)/main-prod.bicepparam
-  - name: trimmedBuildNumberOverride
-    value: $[replace('${{ parameters.buildNumberOverride }}', 'none', '')]
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.EESBuildPipeline.runName)
-  - name: dockerImagesTag
-    value: $[ coalesce( variables.trimmedBuildNumberOverride, variables.upstreamPipelineBuildNumber ) ]
-  - name: trimmedDataProcessorZipUrlOverride
-    value: $[replace('${{ parameters.dataProcessorZipUrlOverride }}', 'none', '')]
-  - name: upstreamDataProcessorArtifactUrl
-    value: ''
-  - name: dataProcessorZipFileUrl
-    value: $[ coalesce( variables.trimmedDataProcessorZipUrlOverride, variables.upstreamDataProcessorArtifactUrl ) ]
 
 pool:
   #  vmImage: $(vmImageName)
@@ -70,6 +49,9 @@ pool:
 
 stages:
 - stage: Build
+  variables:
+    - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
+    - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   jobs:
   - job: CheckInfrastructure
     steps:
@@ -84,7 +66,8 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          echo 'Using "$(dockerImagesTag)" as the tag to identify the Docker images to deploy with this pipeline run.'
+          echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the Docker images to deploy with this pipeline run.'
+          echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the published build artifactes to deploy with this pipeline run.'
           echo
           echo 'Structure of work folder of this pipeline:'
           tree $(Build.SourcesDirectory)
@@ -114,18 +97,19 @@ stages:
               publicUrls='$(publicUrls)' \
               postgreSqlAdminName='$(postgreSqlAdminName)' \
               postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              dockerImagesTag='$(dockerImagesTag)' \
+              dockerImagesTag='$(upstreamPipelineBuildNumber)' \
               psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
-              dataProcessorZipFileUrl='$(dataProcessorZipFileUrl)'
 
 - ${{ if variables.isDev }}:
   - template: deploy-stage-template.yml
+    variables:
+      - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
+      - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
     parameters:
       environment: 'Development'
       dependsOn: Build
       resourceGroupName: ${{parameters.resourceGroupName}}
       psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-      dataProcessorZipFileUrl: $(dataProcessorZipFileUrl)
 
 #  - template: deploy-stage-template.yml
 #    parameters:
@@ -133,7 +117,6 @@ stages:
 #      dependsOn: DeployDevelopment
 #      resourceGroupName: ${{parameters.resourceGroupName}}
 #      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-#      dataProcessorZipFileUrl: $(dataProcessorZipFileUrl)
 #
 #- ${{ if eq(variables.isMaster, 'true') }}:
 #  - template: deploy-stage-template.yml
@@ -142,7 +125,6 @@ stages:
 #      dependsOn: DeployDevelopment
 #      resourceGroupName: ${{parameters.resourceGroupName}}
 #      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-#      dataProcessorZipFileUrl: $(dataProcessorZipFileUrl)
 #
 #  - template: deploy-stage-template.yml
 #    parameters:
@@ -150,4 +132,3 @@ stages:
 #      dependsOn: DeployPreProduction
 #      resourceGroupName: ${{parameters.resourceGroupName}}
 #      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-#      dataProcessorZipFileUrl: $(dataProcessorZipFileUrl)
