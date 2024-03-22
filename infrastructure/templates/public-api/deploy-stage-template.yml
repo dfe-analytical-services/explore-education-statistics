@@ -62,7 +62,7 @@ stages:
 #            inputs:
 #              azureSubscription: $(serviceConnection)
 #              appType: 'functionAppLinux'
-#              appName: 'dataset-processor10-site'
+#              appName: 'dataset-processor12-site'
 #              resourceGroupName: 'dfe-development-dw'
 ##              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
 ##              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
@@ -80,4 +80,4 @@ stages:
               inlineScript: |
                 az functionapp deployment source config-zip \
                   --src "/home/dwatson/development/projects/dfe/function-uploads/testupload.zip" \
-                  --name "dataset-processor10-site" --resource-group "dfe-development-dw" # --slot "staging"
+                  --name "dataset-processor12-site" --resource-group "dfe-development-dw" # --slot "staging"
