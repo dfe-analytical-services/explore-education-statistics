@@ -10,10 +10,6 @@ resources:
 name: $(Date:yyyyMMdd).$(Rev:r)
 
 parameters:
-  - name: resourceGroupName
-    displayName: Resource Group Name
-    type: string
-    default: 'dfe-development-dw'
   - name: psqlDbUsersAdded
     displayName: Have database users been added to PSQL yet for Container App and Function App?
     default: true
@@ -48,64 +44,18 @@ pool:
   name: dfe-development-dw agent pool
 
 stages:
-- stage: Build
-  jobs:
-  - job: CheckInfrastructure
-    variables:
-      - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-      - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
-    steps:
-    - checkout: self
-    - task: CmdLine@2
-      displayName: 'List source files'
-      inputs:
-        script: |
-
-    - task: Bash@3
-      displayName: 'Display information about this pipeline run'
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the Docker images to deploy with this pipeline run.'
-          echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the published build artifactes to deploy with this pipeline run.'
-          echo
-          echo 'Structure of work folder of this pipeline:'
-          tree $(Build.SourcesDirectory)
-
-    - task: AzureCLI@2
-      displayName: 'Install Bicep'
-      inputs:
-        azureSubscription: '${{variables.serviceConnection}}'
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: 'az bicep install'
-
-    - task: AzureCLI@2
-      displayName: 'Validate bicep scripts'
-      inputs:
-        azureSubscription: '${{variables.serviceConnection}}'
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          set -e
-          az deployment group validate \
-          --resource-group ${{parameters.resourceGroupName}} \
-          --template-file $(templateFile) \
-          --parameters $(devParamFile) \
-          --parameters \
-              resourceTags='$(resourceTags)' \
-              publicUrls='$(publicUrls)' \
-              postgreSqlAdminName='$(postgreSqlAdminName)' \
-              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
-
 - ${{ if variables.isDev }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate against Development'
+      environment: 'Development'
+      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
+
   - template: deploy-stage-template.yml
     parameters:
+      stageName: 'Deploy to Development'
       environment: 'Development'
-      dependsOn: Build
-      resourceGroupName: ${{parameters.resourceGroupName}}
+      dependsOn: 'Validate against Development'
       psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
 
 #  - template: deploy-stage-template.yml
