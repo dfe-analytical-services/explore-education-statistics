@@ -2,9 +2,7 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import {
-  PublicationSummary,
-} from '@common/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
 import { isAxiosError } from 'axios';
@@ -104,7 +102,6 @@ export interface ReleaseSeriesTableEntry {
   description: string;
 
   releaseId?: string;
-  publicationSlug?: string;
   releaseSlug?: string;
   isLatest?: boolean;
   isPublished?: boolean;

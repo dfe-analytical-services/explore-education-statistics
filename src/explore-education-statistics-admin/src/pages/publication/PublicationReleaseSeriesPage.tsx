@@ -28,6 +28,7 @@ const PublicationReleaseSeriesPage = () => {
         canManageReleaseSeries={publication.permissions.canManageReleaseSeries}
         releaseSeries={releaseSeries}
         publicationId={publicationId}
+        publicationSlug={publication.slug}
       />
     </>
   );

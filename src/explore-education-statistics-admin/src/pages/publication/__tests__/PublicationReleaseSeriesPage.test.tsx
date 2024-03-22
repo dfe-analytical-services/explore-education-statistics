@@ -3,7 +3,8 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService, {
-  PublicationWithPermissions, ReleaseSeriesTableEntry,
+  PublicationWithPermissions,
+  ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -18,32 +19,37 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationReleaseSeriesPage', () => {
   const testReleaseSeries: ReleaseSeriesTableEntry[] = [
-    // @MarkFix add IsLatest and IsPublished
     {
       id: 'legacy-release-3',
       isLegacyLink: true,
-      description: 'Legacy release 3',
+      description: 'Legacy link 3',
       legacyLinkUrl: 'http://gov.uk/3',
     },
     {
       id: 'legacy-release-2',
       isLegacyLink: true,
-      description: 'Legacy release 2',
+      description: 'Legacy link 2',
       legacyLinkUrl: 'http://gov.uk/2',
     },
     {
       id: 'legacy-release-1',
       isLegacyLink: true,
-      description: 'Legacy release 1',
+      description: 'Legacy link 1',
       legacyLinkUrl: 'http://gov.uk/1',
+    },
+    {
+      id: 'release-1',
+      isLegacyLink: false,
+      description: 'Academic year 2000/01',
+      releaseId: 'release-id',
+      releaseSlug: '2000-01',
+      isLatest: true,
+      isPublished: true,
     },
   ];
 
   test('renders the legacy releases page', async () => {
-    return; // @MarkFix
-    publicationService.getReleaseSeries.mockResolvedValue(
-      testReleaseSeries,
-    );
+    publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
 
     renderPage(testPublication);
     await waitFor(() => {
@@ -51,7 +57,7 @@ describe('PublicationReleaseSeriesPage', () => {
     });
 
     const rows = screen.getAllByRole('row');
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(5);
 
     const row1Cells = within(rows[0]).getAllByRole('columnheader');
     expect(row1Cells[0]).toHaveTextContent('Description');
@@ -59,16 +65,22 @@ describe('PublicationReleaseSeriesPage', () => {
     expect(row1Cells[2]).toHaveTextContent('Actions');
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
-    expect(row2Cells[0]).toHaveTextContent('Legacy release 3');
+    expect(row2Cells[0]).toHaveTextContent('Legacy link 3');
     expect(row2Cells[1]).toHaveTextContent('http://gov.uk/3');
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
-    expect(row3Cells[0]).toHaveTextContent('Legacy release 2');
+    expect(row3Cells[0]).toHaveTextContent('Legacy link 2');
     expect(row3Cells[1]).toHaveTextContent('http://gov.uk/2');
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
-    expect(row4Cells[0]).toHaveTextContent('Legacy release 1');
+    expect(row4Cells[0]).toHaveTextContent('Legacy link 1');
     expect(row4Cells[1]).toHaveTextContent('http://gov.uk/1');
+
+    const row5Cells = within(rows[4]).getAllByRole('cell');
+    expect(row5Cells[0]).toHaveTextContent('Academic year 2000/01');
+    expect(row5Cells[1]).toHaveTextContent(
+      'http://localhost/find-statistics/publication-1-slug/2000-01',
+    );
 
     expect(
       screen.getByRole('button', { name: 'Create legacy release' }),

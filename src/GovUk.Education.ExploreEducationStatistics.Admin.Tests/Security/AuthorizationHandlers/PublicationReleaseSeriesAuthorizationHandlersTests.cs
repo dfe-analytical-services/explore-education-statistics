@@ -29,7 +29,7 @@ public class PublicationReleaseSeriesAuthorizationHandlersTests
             await AssertHandlerSucceedsWithCorrectClaims<Publication, ManagePublicationReleaseSeriesRequirement>(
                 CreateHandler,
                 new Publication(),
-                CreateAnyRelease
+                UpdateAllPublications
             );
         }
 

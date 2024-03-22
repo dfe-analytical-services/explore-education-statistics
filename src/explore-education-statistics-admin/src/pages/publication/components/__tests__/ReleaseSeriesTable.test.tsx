@@ -5,70 +5,82 @@ import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
-import _publicationService, {ReleaseSeriesTableEntry} from '@admin/services/publicationService';
+import _publicationService, {
+  ReleaseSeriesTableEntry,
+} from '@admin/services/publicationService';
+import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 
 jest.mock('@admin/services/publicationService');
- const publicationService = _publicationService as jest.Mocked<
+const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
 describe('ReleaseSeriesTable', () => {
   const testReleaseSeries: ReleaseSeriesTableEntry[] = [
-    // @MarkFix create isLegacyLink: false in here and test that
     {
       id: 'ees-release-3',
-      isLegacyLink: true, // @MarkFix should be false?
+      isLegacyLink: false,
       description: 'EES release 3',
 
-      legacyLinkUrl: 'http://explore-education-statistics/3',
+      releaseId: 'release-id',
+      releaseSlug: '3',
+      isLatest: false,
+      isPublished: false,
     },
     {
       id: 'ees-release-2',
-      isLegacyLink: true, // @MarkFix should be false?
+      isLegacyLink: false,
       description: 'EES release 2',
 
-      legacyLinkUrl: 'http://explore-education-statistics/2',
+      releaseId: 'release-id',
+      releaseSlug: '2',
+      isLatest: true,
+      isPublished: true,
     },
     {
       id: 'ees-release-1',
-      isLegacyLink: true, // @MarkFix should be false?
+      isLegacyLink: false,
       description: 'EES release 1',
 
-      legacyLinkUrl: 'http://explore-education-statistics/1',
+      releaseId: 'release-id',
+      releaseSlug: '1',
+      isLatest: false,
+      isPublished: true,
     },
     {
       id: 'legacy-release-3',
       isLegacyLink: true,
-      description: 'Legacy release 3',
+      description: 'Legacy link 3',
 
       legacyLinkUrl: 'http://gov.uk/3',
     },
     {
       id: 'legacy-release-2',
       isLegacyLink: true,
-      description: 'Legacy release 2',
+      description: 'Legacy link 2',
 
       legacyLinkUrl: 'http://gov.uk/2',
     },
     {
       id: 'legacy-release-1',
       isLegacyLink: true,
-      description: 'Legacy release 1',
+      description: 'Legacy link 1',
 
       legacyLinkUrl: 'http://gov.uk/1',
     },
   ];
 
   const testPublicationId = 'publication-1';
+  const testPublicationSlug = 'publication-1-slug';
 
   test('renders the legacy releases table correctly', () => {
-    return; // @MarkFix
     render(
       <TestConfigContextProvider>
         <ReleaseSeriesTable
           canManageReleaseSeries
           releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
+          publicationSlug={testPublicationSlug}
         />
       </TestConfigContextProvider>,
     );
@@ -76,7 +88,7 @@ describe('ReleaseSeriesTable', () => {
     const table = screen.getByRole('table');
     const rows = within(table).getAllByRole('row');
 
-    expect(rows).toHaveLength(8);
+    expect(rows).toHaveLength(7);
 
     const row1Cells = within(rows[0]).getAllByRole('columnheader');
     expect(row1Cells[0]).toHaveTextContent('Description');
@@ -84,46 +96,66 @@ describe('ReleaseSeriesTable', () => {
     expect(row1Cells[2]).toHaveTextContent('Actions');
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
-    expect(row2Cells[0]).toHaveTextContent(
-      'EES release 3 amendment', // @MarkFix Draft Amendment',
-    );
-    expect(row2Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/3a',
-    );
+    expect(row2Cells[0]).toHaveTextContent('EES release 3Unpublished');
+    expect(row2Cells[1]).toHaveTextContent('');
     expect(within(row2Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
-    expect(row3Cells[0]).toHaveTextContent('EES release 3Latest');
+    expect(row3Cells[0]).toHaveTextContent('EES release 2Latest');
     expect(row3Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/3',
+      'http://localhost/find-statistics/publication-1-slug/2',
     );
     expect(within(row2Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
-    expect(row4Cells[0]).toHaveTextContent('EES release 2Draft');
-    expect(row4Cells[1]).toHaveTextContent('');
+    expect(row4Cells[0]).toHaveTextContent('EES release 1');
+    expect(row4Cells[1]).toHaveTextContent(
+      'http://localhost/find-statistics/publication-1-slug/1',
+    );
     expect(within(row4Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row5Cells = within(rows[4]).getAllByRole('cell');
-    expect(row5Cells[0]).toHaveTextContent('EES release 1');
-    expect(row5Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/1',
-    );
-    expect(within(row5Cells[2]).queryByRole('button')).not.toBeInTheDocument();
+    expect(row5Cells[0]).toHaveTextContent('Legacy link 3');
+    expect(row5Cells[1]).toHaveTextContent('http://gov.uk/3');
+    expect(
+      within(row5Cells[2]).getByRole('button', {
+        name: 'Edit Legacy link 3',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(row5Cells[2]).getByRole('button', {
+        name: 'Delete Legacy link 3',
+      }),
+    ).toBeInTheDocument();
 
     const row6Cells = within(rows[5]).getAllByRole('cell');
-    expect(row6Cells[0]).toHaveTextContent('Legacy release 3');
-    expect(row6Cells[1]).toHaveTextContent('http://gov.uk/3');
+    expect(row6Cells[0]).toHaveTextContent('Legacy link 2');
+    expect(row6Cells[1]).toHaveTextContent('http://gov.uk/2');
     expect(
       within(row6Cells[2]).getByRole('button', {
-        name: 'Edit Legacy release 3',
+        name: 'Edit Legacy link 2',
       }),
     ).toBeInTheDocument();
     expect(
       within(row6Cells[2]).getByRole('button', {
-        name: 'Delete Legacy release 3',
+        name: 'Delete Legacy link 2',
       }),
     ).toBeInTheDocument();
+
+    const row7Cells = within(rows[6]).getAllByRole('cell');
+    expect(row7Cells[0]).toHaveTextContent('Legacy link 1');
+    expect(row7Cells[1]).toHaveTextContent('http://gov.uk/1');
+    expect(
+      within(row7Cells[2]).getByRole('button', {
+        name: 'Edit Legacy link 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(row7Cells[2]).getByRole('button', {
+        name: 'Delete Legacy link 1',
+      }),
+    ).toBeInTheDocument();
+
     expect(
       screen.getByRole('button', { name: 'Create legacy release' }),
     ).toBeInTheDocument();
@@ -139,6 +171,7 @@ describe('ReleaseSeriesTable', () => {
           canManageReleaseSeries
           releaseSeries={[]}
           publicationId={testPublicationId}
+          publicationSlug={testPublicationSlug}
         />
       </TestConfigContextProvider>,
     );
@@ -168,12 +201,13 @@ describe('ReleaseSeriesTable', () => {
               canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
+              publicationSlug={testPublicationSlug}
             />
           </TestConfigContextProvider>
         </Router>,
       );
       await userEvent.click(
-        screen.getByRole('button', { name: 'Edit Legacy release 3' }),
+        screen.getByRole('button', { name: 'Edit Legacy link 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
@@ -192,7 +226,6 @@ describe('ReleaseSeriesTable', () => {
     });
 
     test('goes to the edit page when OK is clicked', async () => {
-      return; // @MarkFix
       const history = createMemoryHistory();
       render(
         <Router history={history}>
@@ -201,12 +234,13 @@ describe('ReleaseSeriesTable', () => {
               canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
+              publicationSlug={testPublicationSlug}
             />
           </TestConfigContextProvider>
         </Router>,
       );
       await userEvent.click(
-        screen.getByRole('button', { name: 'Edit Legacy release 3' }),
+        screen.getByRole('button', { name: 'Edit Legacy link 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
@@ -216,20 +250,20 @@ describe('ReleaseSeriesTable', () => {
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublicationId}/legacy/${testReleaseSeries[4].id}/edit`,
+          `/publication/${testPublicationId}/legacy/${testReleaseSeries[3].id}/edit`,
         );
       });
     });
   });
 
   test('does not show edit and delete actions when user does not have permission to manage legacy releases', () => {
-    return; // @MarkFix
     render(
       <TestConfigContextProvider>
         <ReleaseSeriesTable
           canManageReleaseSeries={false}
           releaseSeries={testReleaseSeries}
           publicationId={testPublicationId}
+          publicationSlug={testPublicationSlug}
         />
         ,
       </TestConfigContextProvider>,
@@ -238,7 +272,7 @@ describe('ReleaseSeriesTable', () => {
     const table = screen.getByRole('table');
     const rows = within(table).getAllByRole('row');
 
-    expect(rows).toHaveLength(8);
+    expect(rows).toHaveLength(7);
 
     const row1Cells = within(rows[0]).getAllByRole('columnheader');
     expect(row1Cells).toHaveLength(2);
@@ -247,46 +281,37 @@ describe('ReleaseSeriesTable', () => {
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells).toHaveLength(2);
-    expect(row2Cells[0]).toHaveTextContent(
-      'EES release 3 amendmentDraft Amendment',
-    );
-    expect(row2Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/3a',
-    );
+    expect(row2Cells[0]).toHaveTextContent('EES release 3Unpublished');
+    expect(row2Cells[1]).toHaveTextContent('');
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
     expect(row3Cells).toHaveLength(2);
-    expect(row3Cells[0]).toHaveTextContent('EES release 3');
+    expect(row3Cells[0]).toHaveTextContent('EES release 2Latest');
     expect(row3Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/3',
+      'http://localhost/find-statistics/publication-1-slug/2',
     );
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
     expect(row4Cells).toHaveLength(2);
-    expect(row4Cells[0]).toHaveTextContent('EES release 2');
-    expect(row4Cells[1]).toHaveTextContent('');
+    expect(row4Cells[0]).toHaveTextContent('EES release 1');
+    expect(row4Cells[1]).toHaveTextContent(
+      'http://localhost/find-statistics/publication-1-slug/1',
+    );
 
     const row5Cells = within(rows[4]).getAllByRole('cell');
     expect(row5Cells).toHaveLength(2);
-    expect(row5Cells[0]).toHaveTextContent('EES release 1');
-    expect(row5Cells[1]).toHaveTextContent(
-      'http://explore-education-statistics/1',
-    );
+    expect(row5Cells[0]).toHaveTextContent('Legacy link 3');
+    expect(row5Cells[1]).toHaveTextContent('http://gov.uk/3');
 
     const row6Cells = within(rows[5]).getAllByRole('cell');
     expect(row6Cells).toHaveLength(2);
-    expect(row6Cells[0]).toHaveTextContent('Legacy release 3');
-    expect(row6Cells[1]).toHaveTextContent('http://gov.uk/3');
+    expect(row6Cells[0]).toHaveTextContent('Legacy link 2');
+    expect(row6Cells[1]).toHaveTextContent('http://gov.uk/2');
 
     const row7Cells = within(rows[6]).getAllByRole('cell');
     expect(row7Cells).toHaveLength(2);
-    expect(row7Cells[0]).toHaveTextContent('Legacy release 2');
-    expect(row7Cells[1]).toHaveTextContent('http://gov.uk/2');
-
-    const row8Cells = within(rows[7]).getAllByRole('cell');
-    expect(row8Cells).toHaveLength(2);
-    expect(row8Cells[0]).toHaveTextContent('Legacy release 1');
-    expect(row8Cells[1]).toHaveTextContent('http://gov.uk/1');
+    expect(row7Cells[0]).toHaveTextContent('Legacy link 1');
+    expect(row7Cells[1]).toHaveTextContent('http://gov.uk/1');
   });
 
   describe('deleting', () => {
@@ -297,11 +322,12 @@ describe('ReleaseSeriesTable', () => {
             canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
           />
         </TestConfigContextProvider>,
       );
       await userEvent.click(
-        screen.getByRole('button', { name: 'Delete Legacy release 3' }),
+        screen.getByRole('button', { name: 'Delete Legacy link 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
@@ -321,41 +347,44 @@ describe('ReleaseSeriesTable', () => {
       ).toBeInTheDocument();
     });
 
-    // @MarkFix
-    // test('sends the delete request and updates the releases table when confirm is clicked', async () => {
-    //  render(
-    //    <TestConfigContextProvider>
-    //      <ReleaseSeriesTable
-    //        canManageReleaseSeries
-    //        releaseSeries={testReleaseSeries}
-    //        publicationId={testPublicationId}
-    //      />
-    //    </TestConfigContextProvider>,
-    //  );
-    //  await userEvent.click(
-    //    screen.getByRole('button', { name: 'Delete Legacy release 3' }),
-    //  );
-    //  await waitFor(() => {
-    //    expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
-    //  });
-    //  const modal = within(screen.getByRole('dialog'));
-    //  await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+    test('sends the delete request and updates the releases table when confirm is clicked', async () => {
+      render(
+        <TestConfigContextProvider>
+          <ReleaseSeriesTable
+            canManageReleaseSeries
+            releaseSeries={testReleaseSeries}
+            publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
+          />
+        </TestConfigContextProvider>,
+      );
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Delete Legacy link 3' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
+      });
+      const modal = within(screen.getByRole('dialog'));
+      await userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
-    //  expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
-    //    testReleaseSeries[4].id,
-    //  );
+      expect(publicationService.updateReleaseSeries).toHaveBeenCalledWith(
+        testPublicationId,
+        mapToReleaseSeriesItemUpdateRequest(
+          testReleaseSeries.filter(rsi => rsi.id !== testReleaseSeries[3].id),
+        ),
+      );
 
-    //  await waitFor(() => {
-    //    expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
-    //  });
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
+      });
 
-    //  const table = within(screen.getByRole('table'));
-    //  await waitFor(() => {
-    //    expect(table.queryByText('Legacy release 3')).not.toBeInTheDocument();
-    //  });
-    //  const rows = table.getAllByRole('row');
-    //  expect(rows).toHaveLength(7);
-    // });
+      const table = within(screen.getByRole('table'));
+      await waitFor(() => {
+        expect(table.queryByText('Legacy link 3')).not.toBeInTheDocument();
+      });
+      const rows = table.getAllByRole('row');
+      expect(rows).toHaveLength(6);
+    });
   });
 
   describe('creating', () => {
@@ -368,6 +397,7 @@ describe('ReleaseSeriesTable', () => {
               canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
+              publicationSlug={testPublicationSlug}
             />
           </TestConfigContextProvider>
         </Router>,
@@ -400,6 +430,7 @@ describe('ReleaseSeriesTable', () => {
               canManageReleaseSeries
               releaseSeries={testReleaseSeries}
               publicationId={testPublicationId}
+              publicationSlug={testPublicationSlug}
             />
           </TestConfigContextProvider>
         </Router>,
@@ -426,6 +457,7 @@ describe('ReleaseSeriesTable', () => {
             canManageReleaseSeries={false}
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
           />
         </TestConfigContextProvider>,
       );
@@ -444,10 +476,13 @@ describe('ReleaseSeriesTable', () => {
             canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
           />
         </TestConfigContextProvider>,
       );
-      await userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Reorder releases' }),
+      );
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
       });
@@ -471,10 +506,13 @@ describe('ReleaseSeriesTable', () => {
             canManageReleaseSeries
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
           />
         </TestConfigContextProvider>,
       );
-      await userEvent.click(screen.getByRole('button', { name: 'Reorder releases' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Reorder releases' }),
+      );
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
       });
@@ -510,6 +548,7 @@ describe('ReleaseSeriesTable', () => {
             canManageReleaseSeries={false}
             releaseSeries={testReleaseSeries}
             publicationId={testPublicationId}
+            publicationSlug={testPublicationSlug}
           />
         </TestConfigContextProvider>,
       );

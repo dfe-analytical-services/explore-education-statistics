@@ -345,7 +345,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
                                 <Link
-                                  to={`/find-statistics/${release.publication.slug}/${releaseSlug}`} // @MarkFix do we need to pass publicationSlug here, we have it at release.publication.slug? - same for other pages
+                                  to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
                                 >
                                   {description}
                                 </Link>

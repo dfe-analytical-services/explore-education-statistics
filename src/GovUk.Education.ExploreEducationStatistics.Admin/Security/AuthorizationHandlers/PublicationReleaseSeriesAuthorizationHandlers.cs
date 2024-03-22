@@ -26,7 +26,7 @@ public class ManagePublicationReleaseSeriesAuthorizationHandler
         ManagePublicationReleaseSeriesRequirement requirement,
         Publication publication)
     {
-        if (SecurityUtils.HasClaim(context.User, CreateAnyRelease)) // @MarkFix CreateAnyRelease is right?
+        if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
         {
             context.Succeed(requirement);
             return;

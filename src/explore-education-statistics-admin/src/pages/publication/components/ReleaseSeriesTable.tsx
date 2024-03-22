@@ -32,11 +32,13 @@ interface Props {
   canManageReleaseSeries: boolean;
   releaseSeries: ReleaseSeriesTableEntry[];
   publicationId: string;
+  publicationSlug: string;
 }
 const ReleaseSeriesTable = ({
   canManageReleaseSeries,
   releaseSeries: initialReleaseSeries,
   publicationId,
+  publicationSlug,
 }: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
@@ -174,13 +176,13 @@ const ReleaseSeriesTable = ({
 
                         {!seriesItem.isLegacyLink && seriesItem.isPublished && (
                           <Link
-                            to={`${config.publicAppUrl}/find-statistics/${seriesItem.publicationSlug}/${seriesItem.releaseSlug}`}
+                            to={`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
                             className="govuk-link--no-visited-state"
                             target="_blank"
                             rel="noopener noreferrer"
                             tabIndex={isReordering ? -1 : undefined}
                           >
-                            {`${config.publicAppUrl}/find-statistics/${seriesItem.publicationSlug}/${seriesItem.releaseSlug}`}
+                            {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
                           </Link>
                         )}
                       </td>
