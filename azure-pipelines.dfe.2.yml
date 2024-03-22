@@ -163,7 +163,7 @@ jobs:
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Public API Data Processor Artifacts'
         inputs:
-          artifactName: 'public-api-data-processor'
+          artifactName: 'public-api-data-processor-$(Build.BuildNumber)'
           targetPath: '$(Build.ArtifactStagingDirectory)/public-api/data-processor'
 
 #      - task: 'DotNetCoreCLI@2'

@@ -24,6 +24,7 @@
         <PackageReference Include="Asp.Versioning.Mvc" Version="8.0.0" />
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
         <PackageReference Include="AspectInjector" Version="2.8.2" />
+        <PackageReference Include="Azure.Identity" Version="1.10.4" />
         <PackageReference Include="DuckDB.NET.Data.Full" Version="0.9.2" />
         <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.0.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
@@ -37,7 +38,6 @@
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
-        <PackageReference Include="Azure.Identity" Version="1.10.4" />
     </ItemGroup>
 
     <ItemGroup>
