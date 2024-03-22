@@ -29,6 +29,7 @@ describe('PublicationCreateReleaseSeriesLegacyLinkPage', () => {
       '/publication/publication-1/legacy',
     );
   });
+  // @MarkFix another test to actually create a new series item
 });
 
 function renderPage(publication: PublicationWithPermissions) {

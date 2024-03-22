@@ -126,6 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 new ReleaseSeriesItem
                 {
+                    Id = Guid.NewGuid(),
                     LegacyLinkDescription = "Legacy release description",
                     LegacyLinkUrl = "https://legacy.release.com",
                 },
@@ -140,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         _dataFixture
                             .DefaultRelease(publishedVersions: 1, year: 2020),
                         _dataFixture
-                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021), // ignored because unpublished
+                            .DefaultRelease(publishedVersions: 0, draftVersion: true, year: 2021),
                         _dataFixture
                             .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                     .WithContact(_contact)
@@ -189,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(3, publicationViewModel.ReleaseSeries.Count);
 
                     var releaseSeriesItem1 = publicationViewModel.ReleaseSeries[0];
+                    Assert.False(releaseSeriesItem1.IsLegacyLink);
                     Assert.Equal(expectedReleaseVersion1.ReleaseId, releaseSeriesItem1.ReleaseId);
                     Assert.Equal(expectedReleaseVersion1.Title, releaseSeriesItem1.Description);
                     Assert.Equal(expectedReleaseVersion1.Slug, releaseSeriesItem1.ReleaseSlug);
@@ -198,12 +200,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // because it's unpublished
 
                     var releaseSeriesItem2 = publicationViewModel.ReleaseSeries[1];
+                    Assert.False(releaseSeriesItem1.IsLegacyLink);
                     Assert.Equal(expectedReleaseVersion2.ReleaseId, releaseSeriesItem2.ReleaseId);
                     Assert.Equal(expectedReleaseVersion2.Title, releaseSeriesItem2.Description);
                     Assert.Equal(expectedReleaseVersion2.Slug, releaseSeriesItem2.ReleaseSlug);
                     Assert.Null(releaseSeriesItem2.LegacyLinkUrl);
 
                     var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
+                    Assert.Equal(_legacyLinks[0].Id, releaseSeriesItem3.Id);
+                    Assert.True(releaseSeriesItem1.IsLegacyLink);
                     Assert.Null(releaseSeriesItem3.ReleaseId);
                     Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);
                     Assert.Null(releaseSeriesItem3.ReleaseSlug);

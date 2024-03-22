@@ -77,7 +77,7 @@ describe('PublicationReleaseSeriesPage', () => {
     expect(row4Cells[1]).toHaveTextContent('http://gov.uk/1');
 
     const row5Cells = within(rows[4]).getAllByRole('cell');
-    expect(row5Cells[0]).toHaveTextContent('Academic year 2000/01');
+    expect(row5Cells[0]).toHaveTextContent('Academic year 2000/01Latest');
     expect(row5Cells[1]).toHaveTextContent(
       'http://localhost/find-statistics/publication-1-slug/2000-01',
     );

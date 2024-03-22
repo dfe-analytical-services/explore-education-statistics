@@ -11,7 +11,6 @@ public record ReleaseSeriesTableEntryViewModel
 
     // used by EES release series item
     public Guid? ReleaseId { get; set; }
-    public string? PublicationSlug { get; set; }
     public string? ReleaseSlug { get; set; }
     public bool? IsLatest { get; set; }
     public bool? IsPublished { get; set; }

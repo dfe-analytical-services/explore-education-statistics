@@ -264,9 +264,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await ReleaseUpdateRequestValidator.Validate(request)
                 .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccessDo(async release =>
+                .OnSuccessDo(async releaseVersion =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
-                        publicationId: release.PublicationId,
+                        publicationId: releaseVersion.PublicationId,
                         releaseVersionId: releaseVersionId))
                 .OnSuccess(async releaseVersion =>
                 {

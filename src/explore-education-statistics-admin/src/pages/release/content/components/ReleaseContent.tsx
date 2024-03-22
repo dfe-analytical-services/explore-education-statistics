@@ -99,7 +99,7 @@ const ReleaseContent = ({
   const { publication } = release;
 
   const releaseSeries = release.publication.releaseSeries.filter(
-    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title),
+    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title), // @MarkFix simplify
   );
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {

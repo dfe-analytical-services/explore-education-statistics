@@ -37,7 +37,7 @@ public interface IReleaseVersionRepository
     /// Retrieves the latest release version for a particular release.
     /// </summary>
     /// <param name="releaseId">The unique identifier of the release.</param>
-    /// <param name="publishedOnly">Return only published release versions if true.</param>
+    /// <param name="publishedOnly">Return only published release version if true.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
     /// <returns>The latest version that is associated with a particular release</returns>
     Task<ReleaseVersion?> GetLatestReleaseVersionForParent(

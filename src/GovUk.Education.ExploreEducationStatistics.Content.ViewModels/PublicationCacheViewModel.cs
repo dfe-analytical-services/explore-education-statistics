@@ -14,11 +14,11 @@ public record PublicationCacheViewModel
 
     public bool IsSuperseded { get; init; }
 
-    public PublicationSupersededByViewModel? SupersededBy { get; set; } = new();
+    public PublicationSupersededByViewModel? SupersededBy { get; init; } = new();
 
     public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; } = new();
+    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = new();
 
     public TopicViewModel Topic { get; init; } = null!;
 

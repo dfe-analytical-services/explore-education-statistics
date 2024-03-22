@@ -1,6 +1,6 @@
 #nullable enable
+
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -102,31 +101,6 @@ public class PublicationControllerTests
         // Method under test
         var result = await controller.GetRoles(publicationId);
         Assert.Equal(rolesForPublication, result.Value);
-    }
-
-    [Fact]
-    public async Task GetReleaseSeries_ReturnsOk()
-    {
-        // Arrange
-        var templateReleaseResult =
-            new Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>(new List<ReleaseSeriesTableEntryViewModel>());
-
-        var publicationId = Guid.NewGuid();
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService
-            .Setup(s => s.GetReleaseSeries(
-                It.Is<Guid>(id => id == publicationId)))
-            .ReturnsAsync(templateReleaseResult);
-
-        var controller = BuildController(publicationService.Object);
-
-        // Act
-        var result = await controller.GetReleaseSeries(publicationId);
-
-        // Assert
-        MockUtils.VerifyAllMocks(publicationService);
-        result.AssertOkResult();
     }
 
     private PublicationController BuildController(

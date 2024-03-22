@@ -10,7 +10,8 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 import publicationService, {
-  ReleaseSeriesItemUpdateRequest, ReleaseSeriesTableEntry,
+  ReleaseSeriesItemUpdateRequest,
+  ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
 
 export const mapToReleaseSeriesItemUpdateRequest = (
@@ -39,13 +40,13 @@ const PublicationEditReleaseSeriesLegacyLinkPage = ({
     publicationService.getReleaseSeries(publicationId),
   );
 
-  const itemIndex = releaseSeries?.findIndex(
-    rsi => rsi.id === releaseSeriesItemId,
-  );
-
   if (isLoading) {
     return <LoadingSpinner />;
   }
+
+  const itemIndex = releaseSeries?.findIndex(
+    rsi => rsi.id === releaseSeriesItemId,
+  );
 
   if (itemIndex === -1) {
     return <p>Release series item not found.</p>;

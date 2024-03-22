@@ -464,7 +464,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var latestVersion = await _releaseVersionRepository
                                 .GetLatestReleaseVersionForParent(
-                                    seriesItem.ReleaseId!.Value, publishedOnly: true);
+                                    seriesItem.ReleaseId!.Value,
+                                    publishedOnly: true);
 
                             if (latestVersion == null)
                             {
@@ -488,7 +489,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     IsLegacyLink = false,
                                     Description = latestVersion.Title,
                                     ReleaseId = latestVersion.ReleaseId,
-                                    PublicationSlug = publication.Slug,
                                     ReleaseSlug = latestVersion.Slug,
                                     IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
                                     IsPublished = latestVersion.Live,

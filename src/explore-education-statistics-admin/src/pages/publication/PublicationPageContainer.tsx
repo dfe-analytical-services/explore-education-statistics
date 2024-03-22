@@ -14,7 +14,7 @@ import {
   publicationTeamAccessRoute,
   publicationReleasesRoute,
   publicationReleaseSeriesRoute,
-  publicationCreateReleaseLegacyLinkRoute,
+  publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
@@ -41,7 +41,7 @@ const routes = [
   ...navRoutes,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
-  publicationCreateReleaseLegacyLinkRoute,
+  publicationCreateReleaseSeriesLegacyLinkRoute,
   publicationEditReleaseSeriesLegacyLinkRoute,
   publicationManageReleaseContributorsPageRoute,
   publicationInviteUsersPageRoute,

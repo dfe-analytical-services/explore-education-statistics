@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -12,5 +13,6 @@ public record ReleaseSeriesItem
     public string? LegacyLinkUrl { get; set; }
     public string? LegacyLinkDescription { get; set; }
 
+    [JsonIgnore]
     public bool IsLegacyLink => ReleaseId == null;
 }

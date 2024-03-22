@@ -2,7 +2,7 @@ import DraggableItem from '@admin/components/DraggableItem';
 import DroppableArea from '@admin/components/DroppableArea';
 import Link from '@admin/components/Link';
 import {
-  publicationCreateReleaseLegacyLinkRoute,
+  publicationCreateReleaseSeriesLegacyLinkRoute,
   PublicationRouteParams,
   publicationEditReleaseSeriesLegacyLinkRoute,
   PublicationEditReleaseSeriesLegacyLinkRouteParams,
@@ -65,7 +65,7 @@ const ReleaseSeriesTable = ({
             onConfirm={() => {
               history.push(
                 generatePath<PublicationRouteParams>(
-                  publicationCreateReleaseLegacyLinkRoute.path,
+                  publicationCreateReleaseSeriesLegacyLinkRoute.path,
                   {
                     publicationId,
                   },
@@ -185,6 +185,9 @@ const ReleaseSeriesTable = ({
                             {`${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
                           </Link>
                         )}
+                        {!seriesItem.isLegacyLink &&
+                          !seriesItem.isPublished &&
+                          `${config.publicAppUrl}/find-statistics/${publicationSlug}/${seriesItem.releaseSlug}`}
                       </td>
 
                       {canManageReleaseSeries && !isReordering && (
