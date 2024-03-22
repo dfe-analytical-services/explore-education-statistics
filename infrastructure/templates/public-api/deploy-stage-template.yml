@@ -57,15 +57,27 @@ stages:
                     dockerImagesTag='$(dockerImagesTag)' \
                     psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}} \
                     dataProcessorZipFileUrl='$(dataProcessorDownloadUrl)'
-          - task: AzureFunctionApp@2
-            displayName: 'Deploy Data Processor Function App'
+#          - task: AzureFunctionApp@2
+#            displayName: 'Deploy Data Processor Function App'
+#            inputs:
+#              azureSubscription: $(serviceConnection)
+#              appType: 'functionAppLinux'
+#              appName: 'dataset-processor10-site'
+#              resourceGroupName: 'dfe-development-dw'
+##              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
+##              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
+#              package: '/home/dwatson/development/projects/dfe/function-uploads/testupload.zip'
+#              runtimeStack: 'DOTNET-ISOLATED|8.0'
+#              deploymentMethod: 'runFromPackage'
+
+          # Swapping out from AzureFunctionApp@2 due to intermittent deployment issues as faced in
+          # https://github.com/microsoft/azure-pipelines-tasks/issues/18766
+          - task: AzureCLI@2
             inputs:
               azureSubscription: $(serviceConnection)
-              appType: 'functionAppLinux'
-              appName: 'dataset-processor9-site'
-              resourceGroupName: 'dfe-development-dw'
-#              package: '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip'
-#              package: '/home/dwatson/development/projects/dfe/function-uploads/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor-DataProcessor.zip'
-              package: '/home/dwatson/development/projects/dfe/function-uploads/testupload.zip'
-              runtimeStack: 'DOTNET-ISOLATED|8.0'
-              deploymentMethod: 'runFromPackage'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az functionapp deployment source config-zip \
+                  --src "/home/dwatson/development/projects/dfe/function-uploads/testupload.zip" \
+                  --name "dataset-processor10-site" --resource-group "dfe-development-dw" # --slot "staging"
