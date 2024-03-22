@@ -71,7 +71,7 @@ var resourcePrefix = '${subscription}-ees-publicapi'
 var storageAccountName = 's101d01saeescoredw'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
-var dataProcessorFunctionAppName = 'dataset-processor12'
+var dataProcessorFunctionAppName = 'dataset-processor13'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -90,7 +90,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
 }
 var storageAccountKey = storageAccount.listKeys().keys[0].value
 var endpointSuffix = environment().suffixes.storage
-var storageAccountConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${storageAccountKey}'
+var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${endpointSuffix};AccountKey=${storageAccountKey}'
 
 // Reference the existing VNet as currently managed by the EES ARM template, and register new subnets for Bicep-controlled resources.
 module vNetModule 'application/virtualNetwork.bicep' = {
@@ -125,47 +125,44 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
-// // In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
-// // with "postgres.database.azure.com".
-// resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-//   name: 'private.postgres.database.azure.com'
-//   location: 'global'
-//   resource vNetLink 'virtualNetworkLinks' = {
-//     name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
-//     location: 'global'
-//     properties: {
-//       registrationEnabled: false
-//       virtualNetwork: {
-//         id: vNetModule.outputs.vNetRef
-//       }
-//     }
-//   }
-// }
+// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
+// with "postgres.database.azure.com".
+resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: 'private.postgres.database.azure.com'
+  location: 'global'
+  resource vNetLink 'virtualNetworkLinks' = {
+    name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
+    location: 'global'
+    properties: {
+      registrationEnabled: false
+      virtualNetwork: {
+        id: vNetModule.outputs.vNetRef
+      }
+    }
+  }
+}
 
 // Deploy PostgreSQL Database.
-// module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
-//   name: 'postgreSQLDatabaseDeploy'
-//   params: {
-//     resourcePrefix: resourcePrefix
-//     location: location
-//     createMode: psqlDbUsersAdded ? 'Update' : 'Default'
-//     adminName: postgreSqlAdminName!
-//     adminPassword: postgreSqlAdminPassword!
-//     dbSkuName: postgreSqlSkuName
-//     dbStorageSizeGB: postgreSqlStorageSizeGB
-//     dbAutoGrowStatus: postgreSqlAutoGrowStatus
-//     postgreSqlVersion: '16'
-//     tagValues: tagValues
-//     privateDnsZoneId: postgreSqlPrivateDnsZone.id
-//     firewallRules: postgreSqlFirewallRules
-//     subnetId: vNetModule.outputs.postgreSqlSubnetRef
-//     databaseNames: ['public_data']
-//   }
-//   dependsOn: [
-//     postgreSqlPrivateDnsZone
-//   ]
-// }
-//
+module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
+  name: 'postgreSQLDatabaseDeploy'
+  params: {
+    resourcePrefix: resourcePrefix
+    location: location
+    createMode: psqlDbUsersAdded ? 'Update' : 'Default'
+    adminName: postgreSqlAdminName!
+    adminPassword: postgreSqlAdminPassword!
+    dbSkuName: postgreSqlSkuName
+    dbStorageSizeGB: postgreSqlStorageSizeGB
+    dbAutoGrowStatus: postgreSqlAutoGrowStatus
+    postgreSqlVersion: '16'
+    tagValues: tagValues
+    privateDnsZoneId: postgreSqlPrivateDnsZone.id
+    firewallRules: postgreSqlFirewallRules
+    subnetId: vNetModule.outputs.postgreSqlSubnetRef
+    databaseNames: ['public_data']
+  }
+}
+
 // resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
 //   name: apiContainerAppManagedIdentityName
 //   location: location
@@ -248,18 +245,26 @@ module fileShareModule 'components/fileShares.bicep' = {
 //   }
 // }
 
-// Deploy data-processing Function.
-module dataProcessorFunctionAppModule 'application/dataProcessorFunctionApp.bicep' = if (psqlDbUsersAdded) {
+// Deploy Data Processor Function.
+module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
-    location: location
     functionAppName: dataProcessorFunctionAppName
-    storageAccountConnectionString: storageAccountConnectionString
-    dbConnectionString: '' //postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate
+    location: location
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
+    settings: {
+      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppName)
+      ConnectionStrings__CoreStorage: coreStorageConnectionString
+    }
+    functionAppRuntime: 'dotnet-isolated'
+    sku: {
+      name: 'EP1'
+      tier: 'ElasticPremium'
+      family: 'EP'
+    }
   }
 }
 
