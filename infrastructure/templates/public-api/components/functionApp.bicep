@@ -131,6 +131,19 @@ resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   })
 }
 
+resource functionAppStagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
+  name: '${functionApp.name}/staging'
+  location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    serverFarmId: appServicePlan.id
+    enabled: true
+    httpsOnly: true
+  }
+}
+
 output functionAppName string = functionApp.name
 output principalId string = functionApp.identity.principalId
 output tenantId string = functionApp.identity.tenantId

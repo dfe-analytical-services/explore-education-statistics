@@ -41,7 +41,7 @@ variables:
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.EESBuildPipeline.runName)
   - name: psqlDbUsersAdded
-    value: ${{parameters.psqlDbUsersAdded}}
+    value: $(psqlDbUsersAdded)
 
 pool:
   #  vmImage: $(vmImageName)
