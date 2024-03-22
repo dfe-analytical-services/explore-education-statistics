@@ -111,6 +111,7 @@ public class Startup
                     var connectionStringWithAccessToken =
                         connectionString.Replace("[access_token]", accessToken);
 
+                    Console.WriteLine(">>>>>>>>>" + accessToken);
                     var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
 
                     options.UseNpgsql(dbDataSource);
