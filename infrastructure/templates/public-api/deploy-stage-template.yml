@@ -20,7 +20,7 @@ stages:
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
   ${{ if not(eq(parameters.dependsOn, '')) }}:
-    # dependsOn: ${{parameters.dependsOn}}
+    dependsOn: ${{parameters.dependsOn}}
   jobs:
   - deployment: Deploy
     displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'

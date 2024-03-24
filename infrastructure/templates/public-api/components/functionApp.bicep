@@ -46,6 +46,8 @@ var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
 var functionName = 'test-fa-${functionAppName}'
 var fileShareName = toLower(functionAppName)
+var fileShareNameStaging = '${fileShareName}-staging'
+var fileShareNameProduction = '${fileShareName}-production'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -82,19 +84,24 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
-//resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-//  name: '${storageAccountName}/default/${fileShareName}'
-//  dependsOn: [
-//    storageAccount
-//  ]
-//}
+// When deploying to a Function App utilising a secured VNet to store its deployment files,
+// unique file shares must be pre-generated and unique to each slot prior to deploying the
+// Function App itself if we wish to use slot swapping.
+//
+// See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
+resource fileShareStaging 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${storageAccountName}/default/${fileShareNameStaging}'
+  dependsOn: [
+    storageAccount
+  ]
+}
 
-//resource stagingFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-//  name: '${storageAccountName}/default/${fileShareName}-staging'
-//  dependsOn: [
-//    storageAccount
-//  ]
-//}
+resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${storageAccountName}/default/${fileShareNameProduction}'
+  dependsOn: [
+    storageAccount
+  ]
+}
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionName
@@ -106,17 +113,17 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   properties: {
     httpsOnly: true
     serverFarmId: appServicePlan.id
+
+    // This property integrates the Function App into a VNet given the supplied subnet id.
     virtualNetworkSubnetId: subnetId
+
     clientAffinityEnabled: true
-    reserved: true
+    reserved: appServicePlanOS == 'Linux'
     siteConfig: {
-      linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+      linuxFxVersion: appServicePlan == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     }
   }
   tags: tagValues
-  //dependsOn: [
-  //  fileShare
-  //]
 }
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
@@ -131,28 +138,63 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     appName: functionName
     location: location
     slotSpecificSettingKeys: [
-      'APP_CONFIGURATION_LABEL'
-      // 'WEBSITE_CONTENTSHARE'
+      // This value is sticky to its individual slot and will not swap when slot swapping occurs.
+      // This "SLOT_NAME" configuration value is merely to help enable debugging and checking which.
+      // site is being viewed.
+      'SLOT_NAME'
     ]
     baseSettings: union(settings, {
+
+      // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
       AzureWebJobsStorage: dedicatedStorageAccountString
-      // WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+
+      // This property tells the Function App that the deployment code resides in this Storage account.
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+
+      // These 2 properties indicate that the traffic which pulls down the deployment code for the Function App
+      // from Storage should go over the VNet and find their code in file shares within their linked Storage Account.
       WEBSITE_CONTENTOVERVNET: 1
-      WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
-      FUNCTIONS_EXTENSION_VERSION: '~4'
-      APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
-      FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
+      vnetContentShareEnabled: true
+
+      // This setting is necessary in order to allow slot swapping to work without complaining that
+      // "Storage volume is currently in R/O mode".
+      // See https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings#website_override_sticky_diagnostics_settings.
+      WEBSITE_OVERRIDE_STICKY_DIAGNOSTICS_SETTINGS: 0
+
+      // This value puts the Function App filesystem into readonly mode and runs code from a ZIP deployment.
       WEBSITE_RUN_FROM_PACKAGE: '1'
+
+      // This is set by the Azure ZIP deploy commands, so it si included here to prevent any unnecessary checking for changes in this
+      // property when a code deploy is pushed out.
+      SCM_DO_BUILD_DURING_DEPLOYMENT: false
+
+      FUNCTIONS_EXTENSION_VERSION: '~4'
+      FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
+      APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
     })
     stagingOnlySettings: {
-      APP_CONFIGURATION_LABEL: 'staging'
-      // WEBSITE_CONTENTSHARE: '${fileShareName}-staging'
+      SLOT_NAME: 'staging'
+      // When deploying to a Function App utilising a secured VNet to store its deployment files,
+      // unique file shares must be pre-generated and unique to each slot prior to deploying the
+      // Function App itself if we wish to use slot swapping.
+      //
+      // In conjunction with WEBSITE_CONTENTAZUREFILECONNECTIONSTRING, this property tells the
+      // Function App that the deployment code resides in this Storage account and within *this*
+      // file share.
+      //
+      // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
+      WEBSITE_CONTENTSHARE: fileShareNameStaging
     }
     prodOnlySettings: {
-      APP_CONFIGURATION_LABEL: 'production'
-      // WEBSITE_CONTENTSHARE: fileShareName
+      SLOT_NAME: 'production'
+      // As above, this value is distinct from its staging slot equivalent.
+      WEBSITE_CONTENTSHARE: fileShareNameProduction
     }
   }
+  dependsOn: [
+    fileShareStaging
+    fileShareProduction
+  ]
 }
 
 output functionAppName string = functionApp.name
