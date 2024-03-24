@@ -44,7 +44,7 @@ param sku object
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
-var functionName = '${resourcePrefix}-fa-${functionAppName}'
+var functionName = 'test-fa-${functionAppName}'
 var fileShareName = toLower(functionAppName)
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
@@ -82,7 +82,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
-
 resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
   name: '${storageAccountName}/default/${fileShareName}'
   dependsOn: [
@@ -115,32 +114,33 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
 
-resource functionAppSettings 'Microsoft.Web/sites/config@2023-01-01' = {
-  parent: functionApp
-  name: 'appsettings'
-  properties: union(settings, {
-    AzureWebJobsStorage: dedicatedStorageAccountString
-    WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
-    WEBSITE_CONTENTSHARE: fileShareName
-    WEBSITE_CONTENTOVERVNET: 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
-    FUNCTIONS_EXTENSION_VERSION: '~4'
-    APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
-    FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
-    WEBSITE_RUN_FROM_PACKAGE: '1'
-  })
-}
-
-resource functionAppStagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
-  name: '${functionApp.name}/staging'
-  location: location
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    enabled: true
-    httpsOnly: true
+// Create staging and production deploy slots, and set base app settings on both.
+// These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
+// application-specific appsettings so as to be able to control the rollout of new, updated and deleted
+// appsettings to the correct swap slots.
+module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
+  name: '${functionName}AppServiceSlotConfigDeploy'
+  params: {
+    appName: functionName
+    location: location
+    slotSpecificSettingKeys: ['APP_CONFIGURATION_LABEL']
+    baseSettings: union(settings, {
+      AzureWebJobsStorage: dedicatedStorageAccountString
+      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+      WEBSITE_CONTENTSHARE: fileShareName
+      WEBSITE_CONTENTOVERVNET: 1
+      WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
+      FUNCTIONS_EXTENSION_VERSION: '~4'
+      APPINSIGHTS_INSTRUMENTATIONKEY: applicationInsightsKey
+      FUNCTIONS_WORKER_RUNTIME: functionAppRuntime
+      WEBSITE_RUN_FROM_PACKAGE: '1'
+    })
+    stagingOnlySettings: {
+      APP_CONFIGURATION_LABEL: 'staging'
+    }
+    prodOnlySettings: {
+      APP_CONFIGURATION_LABEL: 'production'
+    }
   }
 }
 
