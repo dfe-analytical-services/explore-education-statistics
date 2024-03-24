@@ -34,6 +34,7 @@ resource appProductionSettings 'Microsoft.Web/sites/config@2021-03-01' = {
 
 @description('Set app settings on staging slot')
 resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2021-03-01' = {
-  name: '${stagingSlot.name}/appsettings'
+  name: 'appsettings'
+  parent: stagingSlot
   properties: union(baseSettings, stagingOnlySettings)
 }
