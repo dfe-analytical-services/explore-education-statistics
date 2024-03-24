@@ -82,19 +82,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
-resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareName}'
-  dependsOn: [
-    storageAccount
-  ]
-}
+//resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+//  name: '${storageAccountName}/default/${fileShareName}'
+//  dependsOn: [
+//    storageAccount
+//  ]
+//}
 
-resource stagingFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareName}-staging'
-  dependsOn: [
-    storageAccount
-  ]
-}
+//resource stagingFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+//  name: '${storageAccountName}/default/${fileShareName}-staging'
+//  dependsOn: [
+//    storageAccount
+//  ]
+//}
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionName
@@ -114,9 +114,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     }
   }
   tags: tagValues
-  dependsOn: [
-    fileShare
-  ]
+  //dependsOn: [
+  //  fileShare
+  //]
 }
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
@@ -126,17 +126,17 @@ var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=
 // application-specific appsettings so as to be able to control the rollout of new, updated and deleted
 // appsettings to the correct swap slots.
 module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
-  name: '${functionName}AppServiceSlotConfigDeploy'
+  name: '${functionApp.name}AppServiceSlotConfigDeploy'
   params: {
     appName: functionName
     location: location
     slotSpecificSettingKeys: [
       'APP_CONFIGURATION_LABEL'
-      'WEBSITE_CONTENTSHARE'
+      // 'WEBSITE_CONTENTSHARE'
     ]
     baseSettings: union(settings, {
       AzureWebJobsStorage: dedicatedStorageAccountString
-      WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
+      // WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
       WEBSITE_CONTENTOVERVNET: 1
       WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
       FUNCTIONS_EXTENSION_VERSION: '~4'
@@ -146,11 +146,11 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       APP_CONFIGURATION_LABEL: 'staging'
-      WEBSITE_CONTENTSHARE: '${fileShareName}-staging'
+      // WEBSITE_CONTENTSHARE: '${fileShareName}-staging'
     }
     prodOnlySettings: {
       APP_CONFIGURATION_LABEL: 'production'
-      WEBSITE_CONTENTSHARE: fileShareName
+      // WEBSITE_CONTENTSHARE: fileShareName
     }
   }
 }

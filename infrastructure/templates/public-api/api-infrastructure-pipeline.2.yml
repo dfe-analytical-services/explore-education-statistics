@@ -49,18 +49,18 @@ pool:
 
 stages:
 - ${{ if variables.isDev }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Development'
-      environment: 'Development'
-      serviceConnection: $(serviceConnectionDevelopment)
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_Development'
+#      environment: 'Development'
+#      serviceConnection: $(serviceConnectionDevelopment)
 
   - template: deploy-stage-template.yml
     parameters:
       stageName: 'Deploy_to_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
-      dependsOn: 'Validate_Against_Development'
+#      dependsOn: 'Validate_Against_Development'
 
 - ${{ if variables.isTest }}:
   - template: validate-stage-template.yml
