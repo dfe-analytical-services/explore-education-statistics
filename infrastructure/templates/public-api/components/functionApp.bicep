@@ -131,7 +131,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     appName: functionName
     location: location
     slotSpecificSettingKeys: [
-      'APP_CONFIGURATION_LABEL',
+      'APP_CONFIGURATION_LABEL'
       'WEBSITE_CONTENTSHARE'
     ]
     baseSettings: union(settings, {
@@ -146,7 +146,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       APP_CONFIGURATION_LABEL: 'staging'
-      WEBSITE_CONTENTSHARE: stagingFileShareName
+      WEBSITE_CONTENTSHARE: '${fileShareName}-staging'
     }
     prodOnlySettings: {
       APP_CONFIGURATION_LABEL: 'production'
