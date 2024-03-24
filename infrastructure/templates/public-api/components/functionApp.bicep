@@ -96,12 +96,12 @@ resource fileShareStaging 'Microsoft.Storage/storageAccounts/fileServices/shares
   ]
 }
 
-resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+/*resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
   name: '${storageAccountName}/default/${fileShareNameProduction}'
   dependsOn: [
     storageAccount
   ]
-}
+}*/
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionName
@@ -188,12 +188,12 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     prodOnlySettings: {
       SLOT_NAME: 'production'
       // As above, this value is distinct from its staging slot equivalent.
-      WEBSITE_CONTENTSHARE: fileShareNameProduction
+      WEBSITE_CONTENTSHARE: fileShareNameStaging
     }
   }
   dependsOn: [
     fileShareStaging
-    fileShareProduction
+    // fileShareProduction
   ]
 }
 
