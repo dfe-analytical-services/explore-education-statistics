@@ -96,7 +96,7 @@ stages:
               inlineScript: |
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                  --name '$(subscription)-ees-publicapi-fa-processor' \
+                  --name 'test-fa-processor' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging'
 
@@ -108,7 +108,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az functionapp deployment slot swap \
-                  --name '$(subscription)-ees-publicapi-fa-processor' \
+                  --name 'test-fa-processor' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --target-slot 'production'
