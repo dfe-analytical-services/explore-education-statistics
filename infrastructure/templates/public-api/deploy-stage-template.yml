@@ -10,6 +10,7 @@ parameters:
     type: string
   - name: dependsOn
     type: string
+    default: ''
 
 stages:
 - stage: ${{parameters.stageName}}
@@ -18,7 +19,8 @@ stages:
     - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
-  dependsOn: ${{parameters.dependsOn}}
+  ${{ if not(eq(parameters.dependsOn, '')) }}:
+    # dependsOn: ${{parameters.dependsOn}}
   jobs:
   - deployment: Deploy
     displayName: 'Deploy ${{parameters.environment}} Infrastructure Bicep template and applications'
