@@ -52,13 +52,43 @@ stages:
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)' \
+                    dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     psqlDbUsersAdded='$(psqlDbUsersAdded)'
 
-          # Swapping out from AzureFunctionApp@2 due to intermittent deployment issues as faced in
-          # https://github.com/microsoft/azure-pipelines-tasks/issues/18766
+#          - task: AzureCLI@2
+#            displayName: Set Pipeline Variables
+#            inputs:
+#              azureSubscription: $(azureServiceConnection)
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                deploymentOutputs=$(az deployment group show \
+#                --resource-group $(azureResourceGroup) \
+#                --name $(deploymentName) \
+#                --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
+#                echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
+#                  outputname=$(echo "$c" | jq -r '.[0]')
+#                  outputvalue=$(echo "$c" | jq -r '.[1]')
+#                  echo "##vso[task.setvariable variable=$outputname;]$outputvalue"
+#                done
+#
+#          - task: AzureCLI@2
+#            displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+#            inputs:
+#              azureSubscription: ${{parameters.serviceConnection}}
+#              scriptType: bash
+#              scriptLocation: inlineScript
+#              inlineScript: |
+#                az functionapp config appsettings set \
+#                  --name '$(subscription)-ees-publicapi-fa-processor' \
+#                  --resource-group '$(resourceGroupName)' \
+#                  --slot 'staging' \
+#                  --settings \
+#                    ConnectionStrings__PublicDataDb=$(dataProcessorPsqlConnectionString) \
+#                    ConnectionStrings__CoreStorage=$(dataProcessorCoreStorageConnectionString)
+
           - task: AzureCLI@2
-            displayName: 'Deploy Data Processor Function App'
+            displayName: 'Deploy Data Processor Function App - deploy to staging slot'
             inputs:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
@@ -67,4 +97,18 @@ stages:
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
                   --name '$(subscription)-ees-publicapi-fa-processor' \
-                  --resource-group '$(resourceGroupName)' # --slot 'staging'
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging'
+
+          - task: AzureCLI@2
+            displayName: 'Deploy Data Processor Function App - swap slots'
+            inputs:
+              azureSubscription: ${{parameters.serviceConnection}}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az functionapp deployment slot swap \
+                  --name '$(subscription)-ees-publicapi-fa-processor' \
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging' \
+                  --target-slot 'production'

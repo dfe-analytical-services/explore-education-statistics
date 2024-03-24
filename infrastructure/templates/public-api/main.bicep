@@ -86,12 +86,12 @@ var tagValues = union(resourceTags ?? {}, {
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: acrName
+  name: acrName!
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
-  name: coreStorageAccountName
+  name: coreStorageAccountName!
   scope: resourceGroup(resourceGroup().name)
 }
 var storageAccountKey = storageAccount.listKeys().keys[0].value
@@ -102,7 +102,7 @@ var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${
 module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
-    vNetName: vNetName
+    vNetName: vNetName!
     resourcePrefix: resourcePrefix
     apiContainerAppName: apiContainerAppName
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
@@ -127,7 +127,7 @@ module fileShareModule 'components/fileShares.bicep' = {
     resourcePrefix: resourcePrefix
     fileShareName: 'data'
     fileShareQuota: fileShareQuota
-    storageAccountName: coreStorageAccountName
+    storageAccountName: coreStorageAccountName!
   }
 }
 
@@ -259,7 +259,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
 module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    subscription: subscription
+    subscription: subscription!
     resourcePrefix: resourcePrefix
     functionAppName: dataProcessorFunctionAppName
     location: location
