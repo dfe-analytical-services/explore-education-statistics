@@ -89,6 +89,13 @@ resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-0
   ]
 }
 
+resource stagingFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${storageAccountName}/default/${fileShareName}-staging'
+  dependsOn: [
+    storageAccount
+  ]
+}
+
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionName
   location: location
@@ -123,11 +130,13 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   params: {
     appName: functionName
     location: location
-    slotSpecificSettingKeys: ['APP_CONFIGURATION_LABEL']
+    slotSpecificSettingKeys: [
+      'APP_CONFIGURATION_LABEL',
+      'WEBSITE_CONTENTSHARE'
+    ]
     baseSettings: union(settings, {
       AzureWebJobsStorage: dedicatedStorageAccountString
       WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: dedicatedStorageAccountString
-      WEBSITE_CONTENTSHARE: fileShareName
       WEBSITE_CONTENTOVERVNET: 1
       WEBSITES_ENABLE_APP_SERVICE_STORAGE: 'true'
       FUNCTIONS_EXTENSION_VERSION: '~4'
@@ -137,9 +146,11 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     })
     stagingOnlySettings: {
       APP_CONFIGURATION_LABEL: 'staging'
+      WEBSITE_CONTENTSHARE: stagingFileShareName
     }
     prodOnlySettings: {
       APP_CONFIGURATION_LABEL: 'production'
+      WEBSITE_CONTENTSHARE: fileShareName
     }
   }
 }
