@@ -286,6 +286,24 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   }
 }
 
+// Allow Key Vault references passed as secure appsettings to be resolved by the resource itself.
+resource dataProcessorFunctionAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
+  name: '${keyVaultName}/add'
+  properties: {
+      accessPolicies: [
+      {
+          tenantId: dataProcessorFunctionAppModule.output.tenantId
+          objectId: dataProcessorFunctionAppModule.output.principalId
+          permissions: {
+            secrets: [
+              'list'
+              'get'
+            ]
+          }
+      }]
+  }
+}
+
 var dataProcessorPsqlConnectionStringSecretKey = 'dataProcessorPsqlConnectionString'
 
 module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' = {
