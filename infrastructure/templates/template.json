@@ -1080,8 +1080,8 @@
     "ees-notifier-templateid-release-amendment-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-amendment-published-superseded-subscribers')]",
     "ees-notifier-templateid-release-published": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published')]",
     "ees-notifier-templateid-release-published-superseded-subscribers": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-release-published-superseded-subscribers')]",
-    "ees-notifier-template-id-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-confirmation')]",
-    "ees-notifier-template-id-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-verification')]",
+    "ees-notifier-templateid-subscription-confirmation": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-confirmation')]",
+    "ees-notifier-templateid-subscription-verification": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-templateid-subscription-verification')]",
 
     "ees-openidconnect-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientid')]",
     "ees-openidconnect-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-openidconnect-clientsecret')]",
@@ -2850,8 +2850,8 @@
         "GovUkNotify:EmailTemplates:ReleaseAmendmentPublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-amendment-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify:EmailTemplates:ReleasePublishedId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published'), '2018-02-14').secretUriWithVersion, ')')]",
         "GovUkNotify:EmailTemplates:ReleasePublishedSupersededSubscribersId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-release-published-superseded-subscribers'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-template-id-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
-        "GovUkNotify:EmailTemplates:SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-template-id-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
+        "GovUkNotify:EmailTemplates:SubscriptionConfirmationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-confirmation'), '2018-02-14').secretUriWithVersion, ')')]",
+        "GovUkNotify:EmailTemplates:SubscriptionVerificationId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notifier-templateid-subscription-verification'), '2018-02-14').secretUriWithVersion, ')')]"
       }
     },
     {
