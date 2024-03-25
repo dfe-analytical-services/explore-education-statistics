@@ -6,28 +6,17 @@ resources:
       source: Explore Education Statistics
       trigger: true
 
-# This defines the "Build.BuildNumber" variable available in the pipeline.
-name: $(Date:yyyyMMdd).$(Rev:r)
-
 parameters:
-  - name: resourceGroupName
-    displayName: Resource Group Name
-    type: string
-    default: 'dfe-devdw2'
-  - name: buildNumberOverride
-    displayName: The build number of the main EES build that triggered this pipeline
-    type: string
-    default: 'none'
   - name: psqlDbUsersAdded
     displayName: Have database users been added to PSQL yet for Container App and Function App?
     default: true
 
 variables:
   - group: EES Bicep Infrastructure common
-  - group: EES Bicep Infrastructure public - ${{parameters.resourceGroupName}}
-  - group: EES Bicep Infrastructure secrets - ${{parameters.resourceGroupName}}
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+  - name: isDev
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -46,196 +35,66 @@ variables:
     value: $(paramDirectory)/main-preprod.bicepparam
   - name: prodParamFile
     value: $(paramDirectory)/main-prod.bicepparam
-  - name: trimmedBuildNumberOverride
-    value: $[replace('${{ parameters.buildNumberOverride }}', 'none', '')]
   - name: upstreamPipelineBuildNumber
     value: $(resources.pipeline.EESBuildPipeline.runName)
-  - name: dockerImagesTag
-    value: $[ coalesce( variables.trimmedBuildNumberOverride, variables.upstreamPipelineBuildNumber ) ]
+  - name: psqlDbUsersAdded
+    value: ${{parameters.psqlDbUsersAdded}}
 
 pool:
   vmImage: $(vmImageName)
 
 stages:
-- stage: Build
-  jobs:
-  - job: CheckInfrastructure
-    steps:
-    - checkout: self
-    - task: CmdLine@2
-      displayName: 'List source files'
-      inputs:
-        script: |
+- ${{ if variables.isDev }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Development'
+      environment: 'Development'
+      serviceConnection: $(serviceConnectionDevelopment)
 
-    - task: Bash@3
-      displayName: 'Display information about this pipeline run'
-      inputs:
-        targetType: 'inline'
-        script: |
-          echo 'Using "$(dockerImagesTag)" as the tag to identify the Docker images to deploy with this pipeline run.'
-          echo
-          echo 'Structure of work folder of this pipeline:'
-          tree $(Build.SourcesDirectory)
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Development'
+      dependsOn: 'Validate_Against_Development'
+      environment: 'Development'
+      serviceConnection: $(serviceConnectionDevelopment)
 
-    - task: AzureCLI@2
-      displayName: 'Install Bicep'
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: 'az bicep install'
+- ${{ if variables.isTest }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
 
-    - task: AzureCLI@2
-      displayName: 'Validate bicep scripts'
-      inputs:
-        azureSubscription: $(serviceConnection)
-        scriptType: bash
-        scriptLocation: inlineScript
-        inlineScript: |
-          set -e
-          az deployment group validate \
-          --resource-group ${{parameters.resourceGroupName}} \
-          --template-file $(templateFile) \
-          --parameters $(devParamFile) \
-          --parameters \
-              resourceTags='$(resourceTags)' \
-              publicUrls='$(publicUrls)' \
-              postgreSqlAdminName='$(postgreSqlAdminName)' \
-              postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-              dockerImagesTag='$(dockerImagesTag)' \
-              psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Test'
+      dependsOn: 'Validate_Against_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
 
-- stage: DeployDev
-  displayName: 'Deploy to Development'
-  condition: and(succeeded(), eq(variables.isDev, 'true'))
-  dependsOn: Build
-  jobs:
-  - deployment: Deploy
-    displayName: 'Deploy Dev Infrastructure'
-    environment: 'Development'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: none
-          - checkout: self
-          - task: AzureCLI@2
-            displayName: 'Deploy bicep template to Azure'
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
-                --template-file $(templateFile) \
-                --parameters $(devParamFile) \
-                --parameters \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+- ${{ if variables.isMaster }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_PreProduction'
+      environment: 'PreProduction'
+      serviceConnection: $(serviceConnectionPreProduction)
 
-- stage: DeployTest
-  displayName: 'Deploy to Testing'
-  dependsOn: DeployDev
-  jobs:
-  - deployment: Deploy
-    displayName: 'Deploy Testing Infrastructure'
-    environment: 'Test'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: none
-          - checkout: self
-          - task: AzureCLI@2
-            displayName: 'Deploy bicep template to Azure'
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
-                --template-file $(templateFile) \
-                --parameters $(testParamFile)
-                --parameters \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_PreProduction'
+      dependsOn: 'Validate_Against_PreProduction'
+      environment: 'PreProduction'
+      serviceConnection: $(serviceConnectionPreProduction)
 
-- stage: DeployPreProd
-  displayName: 'Deploy to Pre-Prod'
-  condition: and(succeeded(), eq(variables.isMaster, 'true'))
-  dependsOn: DeployDev
-  jobs:
-  - deployment: Deploy
-    displayName: 'Deploy Pre Prod Infrastructure'
-    environment: 'Pre-production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: none
-          - checkout: self
-          - task: AzureCLI@2
-            displayName: 'Deploy bicep template to Azure'
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
-                --template-file $(templateFile) \
-                --parameters $(preProdParamFile)
-                --parameters \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)' \
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Production'
+      environment: 'Production'
+      serviceConnection: $(serviceConnectionProduction)
 
-- stage: DeployProd
-  displayName: 'Deploy to Production'
-  condition: and(succeeded(), eq(variables.isMaster, 'true'))
-  dependsOn: DeployPreProd
-  jobs:
-  - deployment: Deploy
-    displayName: 'Deploy Production Infrastructure'
-    environment: 'Production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: none
-          - checkout: self
-          - task: AzureCLI@2
-            displayName: 'Deploy bicep template to Azure'
-            inputs:
-              azureSubscription: $(serviceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -e
-                az deployment group create \
-                --resource-group ${{parameters.resourceGroupName}} \
-                --template-file $(templateFile) \
-                --parameters $(prodParamFile)
-                --parameters \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(dockerImagesTag)'
-                    psqlDbUsersAdded=${{parameters.psqlDbUsersAdded}}
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Production'
+      dependsOn: 'Validate_Against_Production'
+      environment: 'Production'
+      serviceConnection: $(serviceConnectionProduction)
