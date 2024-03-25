@@ -29,11 +29,8 @@ stages:
       runOnce:
         deploy:
           steps:
-#          - template: get-functionapp-fileshare-config-step-template.yml
-#            parameters:
-#              stepName: 'Get_Data_Processor_Fileshares'
-#              functionAppName: 'test-fa-processor'
-#              variableNamePrefix: 'dataProcessor'
+          - bash: echo "##vso[task.setvariable variable=dataProcessorFunctionAppName;]$(subscription)-ees-papi-fa-processor"
+            displayName: 'Set additional pipeline variables'
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'
             artifact: 'public-api-data-processor-$(upstreamPipelineBuildNumber)'
@@ -46,7 +43,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
-                dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='test-fa-processor']" | jq '. != []'`
+                dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='$(dataProcessorFunctionAppName)']" | jq '. != []'`
                 
                 az deployment group create \
                   --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
@@ -93,7 +90,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az functionapp config appsettings set \
-                  --name 'test-fa-processor' \
+                  --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --settings \
@@ -109,7 +106,7 @@ stages:
               inlineScript: |
                 az functionapp deployment source config-zip \
                   --src '$(Pipeline.Workspace)/EESBuildPipeline/public-api-data-processor-$(upstreamPipelineBuildNumber)/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.zip' \
-                  --name 'test-fa-processor' \
+                  --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging'
 
@@ -121,7 +118,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az functionapp deployment slot swap \
-                  --name 'test-fa-processor' \
+                  --name '$(dataProcessorFunctionAppName)' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --target-slot 'production'
