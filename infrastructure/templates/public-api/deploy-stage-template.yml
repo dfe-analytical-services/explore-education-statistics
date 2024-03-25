@@ -46,54 +46,45 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
-                dataProcessorExists=`az functionapp list --resource-group dfe-development-dw --subscription "Department for Education"  --query "[?name=='test-fa-processor']" | jq '. != []'`
-#                dataProcessorProductionFileshare=''
-#                dataProcessorStagingFileshare=''
-#
-#                if [ "$dataProcessorExists" = "true" ]; then
-#                  dataProcessorProductionFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
-#                  dataProcessorStagingFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" --slot "staging" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
-#                fi
+                dataProcessorExists=`az functionapp list --resource-group $(resourceGroupName) --query "[?name=='test-fa-processor']" | jq '. != []'`
                 
                 az deployment group create \
-                --resource-group $(resourceGroupName) \
-                --template-file $(templateFile) \
-                --parameters $(devParamFile) \
-                --parameters \
-                    subscription='$(subscription)' \
-                    vNetName='$(vNetName)' \
-                    acrName='$(acrName)' \
-                    coreStorageAccountName='$(coreStorageAccountName)' \
-                    keyVaultName='$(keyVaultName)' \
-                    resourceTags='$(resourceTags)' \
-                    publicUrls='$(publicUrls)' \
-                    postgreSqlAdminName='$(postgreSqlAdminName)' \
-                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
-                    dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                    psqlDbUsersAdded='$(psqlDbUsersAdded)' \
-                    dataProcessorFunctionAppExists=$dataProcessorExists
-#                    existingDataProcessorProductionFileshare="$dataProcessorProductionFileshare" \
-#                    existingDataProcessorStagingFileshare="$dataProcessorStagingFileshare"
+                  --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
+                  --resource-group $(resourceGroupName) \
+                  --template-file $(templateFile) \
+                  --parameters $(devParamFile) \
+                  --parameters \
+                      subscription='$(subscription)' \
+                      vNetName='$(vNetName)' \
+                      acrName='$(acrName)' \
+                      coreStorageAccountName='$(coreStorageAccountName)' \
+                      keyVaultName='$(keyVaultName)' \
+                      resourceTags='$(resourceTags)' \
+                      publicUrls='$(publicUrls)' \
+                      postgreSqlAdminName='$(postgreSqlAdminName)' \
+                      postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                      dockerImagesTag='$(upstreamPipelineBuildNumber)' \
+                      psqlDbUsersAdded='$(psqlDbUsersAdded)' \
+                      dataProcessorFunctionAppExists=$dataProcessorExists
 
           - task: AzureCLI@2
             displayName: Convert Bicep outputs to Azure Pipeline variables
             inputs:
-              azureSubscription: $(azureServiceConnection)
+              azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 deploymentOutputs=$(az deployment group show \
-                --resource-group $(azureResourceGroup) \
-                --name $(deploymentName) \
+                --resource-group $(resourceGroupName) \
+                --name 'DeployPublicApiInfrastructure$(upstreamPipelineBuildNumber)' \
                 --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
                 
                 echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
                   outputname=$(echo "$c" | jq -r '.[0]')
                   outputvalue=$(echo "$c" | jq -r '.[1]')
                   echo "##vso[task.setvariable variable=$outputname;]$outputvalue"
-                
                 done
-#
+
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - update staging slot app settings'
             inputs:
@@ -102,7 +93,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az functionapp config appsettings set \
-                  --name '$(subscription)-ees-publicapi-fa-processor' \
+                  --name 'test-fa-processor' \
                   --resource-group '$(resourceGroupName)' \
                   --slot 'staging' \
                   --settings \

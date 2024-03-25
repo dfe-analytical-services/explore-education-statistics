@@ -28,7 +28,7 @@ param appServicePlanOS string = 'Linux'
 param functionAppRuntime string = 'dotnet'
 
 @description('Specifies the additional setting to add to the functionapp.')
-param settings object
+param settings object = {}
 
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
@@ -42,17 +42,13 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
-// param existingFileShareNameStaging string
-// param existingFileShareNameProduction string
-param functionAppExists boolean
+param functionAppExists bool
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
-var functionName = 'test-fa-${functionAppName}'
-var fileShareName = toLower(functionAppName)
-var fileShareNameProduction = '${fileShareName}-1'// !empty(existingFileShareNameProduction) ? existingFileShareNameProduction : '${fileShareName}-1'
-var fileShareNameStaging = '${fileShareName}-2'// !empty(existingFileShareNameStaging) ? existingFileShareNameStaging : '${fileShareName}-2'
-
+var fullFunctionAppName = 'test-fa-${functionAppName}'
+var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
+var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -95,21 +91,21 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
 //
 // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
 resource fileShareStaging 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareNameStaging}'
+  name: '${storageAccountName}/default/${fileShareName2}'
   dependsOn: [
     storageAccount
   ]
 }
 
 resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareNameProduction}'
+  name: '${storageAccountName}/default/${fileShareName1}'
   dependsOn: [
     storageAccount
   ]
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: functionName
+  name: fullFunctionAppName
   location: location
   kind: 'functionapp'
   identity: {
@@ -133,6 +129,9 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 
 var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
 
+var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
+var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
+
 // Create staging and production deploy slots, and set base app settings on both.
 // These will be infrastructure-specific appsettings, and the YAML pipeline will handle the deployment of
 // application-specific appsettings so as to be able to control the rollout of new, updated and deleted
@@ -140,12 +139,13 @@ var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=
 module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   name: '${functionApp.name}AppServiceSlotConfigDeploy'
   params: {
-    appName: functionName
+    appName: functionApp.name
     location: location
-    appServiceExists: functionAppExists
+    existingStagingAppSettings: existingStagingAppSettings
+    existingProductionAppSettings: existingProductionAppSettings
     slotSpecificSettingKeys: [
       // This value is sticky to its individual slot and will not swap when slot swapping occurs.
-      // This "SLOT_NAME" configuration value is merely to help enable debugging and checking which.
+      // This "SLOT_NAME" configuration value is merely to help enable debugging and checking which
       // site is being viewed.
       'SLOT_NAME'
     ]
@@ -189,12 +189,12 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // file share.
       //
       // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-      WEBSITE_CONTENTSHARE: fileShareNameStaging
+      WEBSITE_CONTENTSHARE: fileShareName2
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
       // As above, this value is distinct from its staging slot equivalent.
-      WEBSITE_CONTENTSHARE: fileShareNameProduction
+      WEBSITE_CONTENTSHARE: fileShareName1
     }
   }
   dependsOn: [

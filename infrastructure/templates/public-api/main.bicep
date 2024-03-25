@@ -1,5 +1,5 @@
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
-param subscription string?
+param subscription string = ''
 
 @description('Environment : Specifies the location in which the Azure resources should be deployed.')
 param location string = resourceGroup().location
@@ -9,7 +9,7 @@ param fileShareQuota int = 1
 
 @description('Database : administrator login name.')
 @minLength(0)
-param postgreSqlAdminName string?
+param postgreSqlAdminName string = ''
 
 @description('Database : administrator password.')
 @minLength(8)
@@ -54,7 +54,7 @@ param resourceTags {
 param dateProvisioned string = utcNow('u')
 
 @description('The tags of the Docker images to deploy.')
-param dockerImagesTag string?
+param dockerImagesTag string = ''
 
 @description('Have database users been added to PSQL yet for Container App and Function App?')
 param psqlDbUsersAdded bool = true
@@ -65,21 +65,21 @@ param publicUrls {
 }?
 
 @description('The full name of the existing VNet.')
-param vNetName string?
+param vNetName string = ''
 
 @description('The full name of the existing ACR.')
-param acrName string?
+param acrName string = ''
 
 @description('The full name of the existing Core Storage account.')
-param coreStorageAccountName string?
+param coreStorageAccountName string = ''
 
 @description('The full name of the existing Key Vault.')
-param keyVaultName string?
+param keyVaultName string = ''
 
 // param existingDataProcessorProductionFileshare string?
 // param existingDataProcessorStagingFileshare string?
 
-param dataProcessorFunctionAppExists boolean?
+param dataProcessorFunctionAppExists bool = false
 
 var resourcePrefix = '${subscription}-ees-publicapi'
 var apiContainerAppName = 'api'
@@ -94,12 +94,12 @@ var tagValues = union(resourceTags ?? {}, {
 
 // Reference the existing Azure Container Registry resource as currently managed by the EES ARM template.
 resource containerRegistry 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
-  name: acrName!
+  name: acrName
 }
 
 // Reference the existing core Storage Account as currently managed by the EES ARM template.
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
-  name: coreStorageAccountName!
+  name: coreStorageAccountName
   scope: resourceGroup(resourceGroup().name)
 }
 var storageAccountKey = storageAccount.listKeys().keys[0].value
@@ -110,7 +110,7 @@ var coreStorageConnectionString = 'DefaultEndpointsProtocol=https;AccountName=${
 module vNetModule 'application/virtualNetwork.bicep' = {
   name: 'networkDeploy'
   params: {
-    vNetName: vNetName!
+    vNetName: vNetName
     resourcePrefix: resourcePrefix
     apiContainerAppName: apiContainerAppName
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
@@ -135,7 +135,7 @@ module fileShareModule 'components/fileShares.bicep' = {
     resourcePrefix: resourcePrefix
     fileShareName: 'data'
     fileShareQuota: fileShareQuota
-    storageAccountName: coreStorageAccountName!
+    storageAccountName: coreStorageAccountName
   }
 }
 
@@ -163,7 +163,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     resourcePrefix: resourcePrefix
     location: location
     createMode: psqlDbUsersAdded ? 'Update' : 'Default'
-    adminName: postgreSqlAdminName!
+    adminName: postgreSqlAdminName
     adminPassword: postgreSqlAdminPassword!
     dbSkuName: postgreSqlSkuName
     dbStorageSizeGB: postgreSqlStorageSizeGB
@@ -267,7 +267,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
 module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
   name: 'dataProcessorFunctionAppDeploy'
   params: {
-    subscription: subscription!
+    subscription: subscription
     resourcePrefix: resourcePrefix
     functionAppName: dataProcessorFunctionAppName
     location: location
@@ -288,7 +288,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
 
 var dataProcessorPsqlConnectionStringSecretKey = 'dataProcessorPsqlConnectionString'
 
-module storeDataProcessorPsqlConnectionString '../components/keyVaultSecret.bicep' = {
+module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' = {
   name: 'storeDataProcessorPsqlConnectionString'
   params: {
     keyVaultName: keyVaultName
@@ -314,7 +314,7 @@ module storeApiContainerAppPsqlConnectionString '../components/keyVaultSecret.bi
 
 var coreStorageConnectionStringSecretKey = 'coreStorageConnectionString'
 
-module storeCoreStorageConnectionString '../components/keyVaultSecret.bicep' = {
+module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
   name: 'storeCoreStorageConnectionString'
   params: {
     keyVaultName: keyVaultName
