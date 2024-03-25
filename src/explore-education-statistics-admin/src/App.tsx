@@ -48,7 +48,7 @@ function ApplicationInsightsTracking() {
       });
     }
 
-    document.body.classList.add('js-enabled');
+    document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   }, [appInsights, history]);
 
   return null;

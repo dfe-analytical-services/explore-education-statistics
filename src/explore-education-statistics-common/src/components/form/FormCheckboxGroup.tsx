@@ -85,18 +85,6 @@ export const BaseFormCheckboxGroup = ({
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  useMounted(() => {
-    if (ref.current) {
-      import('govuk-frontend/govuk/components/checkboxes/checkboxes').then(
-        ({ default: GovUkCheckboxes }) => {
-          if (ref.current) {
-            new GovUkCheckboxes(ref.current).init();
-          }
-        },
-      );
-    }
-  });
-
   const isAllChecked = useMemo(() => {
     return options.every(option => value.includes(option.value));
   }, [options, value]);

@@ -1,3 +1,4 @@
+import styles from '@common/components/Tag.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
@@ -8,6 +9,7 @@ export interface TagProps {
     | 'green'
     | 'turquoise'
     | 'blue'
+    | 'light-blue'
     | 'purple'
     | 'pink'
     | 'red'
@@ -15,29 +17,17 @@ export interface TagProps {
     | 'yellow';
   className?: string;
   id?: string;
-  strong?: boolean;
 }
 
-const Tag = ({
-  children,
-  className,
-  colour,
-  id = undefined,
-  strong = false,
-}: TagProps) => {
-  const classes = classNames('govuk-tag', className, {
-    [`govuk-tag--${colour}`]: !!colour,
-  });
-
-  return strong ? (
-    <strong className={classes} id={id}>
+export default function Tag({ children, className, colour, id }: TagProps) {
+  return (
+    <strong
+      className={classNames('govuk-tag', styles.tag, className, {
+        [`govuk-tag--${colour}`]: !!colour,
+      })}
+      id={id}
+    >
       {children}
     </strong>
-  ) : (
-    <span className={classes} id={id}>
-      {children}
-    </span>
   );
-};
-
-export default Tag;
+}

@@ -601,7 +601,7 @@ user puts release into draft
         user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_date_year}
     END
     user clicks button    Update status
-    user checks summary list contains    Current status    In Draft
+    user checks summary list contains    Current status    In draft
     user checks summary list contains    Scheduled release    ${expected_scheduled_release_date}
     user checks summary list contains    Next release expected    ${expected_next_release_date}
 
@@ -663,8 +663,8 @@ user waits for scheduled release to be published immediately
     user reloads page
     user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
     user opens details dropdown    View stages
-    user waits until page contains    content - Scheduled    %{WAIT_MEDIUM}
-    user waits until page contains    files - Complete    %{WAIT_MEDIUM}
+    user waits until page contains    Content - scheduled    %{WAIT_MEDIUM}
+    user waits until page contains    Files - complete    %{WAIT_MEDIUM}
     trigger immediate publishing of scheduled release    ${release_id}
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
@@ -706,7 +706,7 @@ user changes methodology status to Draft
     user clicks element    id:methodologyStatusForm-status-Draft
     user clicks button    Update status
     user waits until h2 is visible    Sign off
-    user checks page contains tag    In Draft
+    user checks page contains tag    In draft
 
 user changes methodology status to Higher level review
     user clicks link    Sign off

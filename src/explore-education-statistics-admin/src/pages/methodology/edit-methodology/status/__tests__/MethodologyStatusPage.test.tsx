@@ -92,7 +92,7 @@ describe('MethodologyStatusPage', () => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('Status')).toHaveTextContent('In Draft');
+    expect(screen.getByTestId('Status-value')).toHaveTextContent('In draft');
     expect(screen.queryByTestId('When to publish')).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('Publish with release'),

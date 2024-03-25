@@ -3,6 +3,7 @@ import naturalOrderBy, {
   OrderDirection,
   OrderKeys,
 } from '@common/utils/array/naturalOrderBy';
+import styles from '@common/components/form/FormRadioGroup.module.scss';
 import classNames from 'classnames';
 import omit from 'lodash/omit';
 import React, { FocusEventHandler, Ref, memo } from 'react';
@@ -52,9 +53,9 @@ export const BaseFormRadioGroup = <Value extends string = string>({
 }: BaseFormRadioGroupProps<Value>) => {
   return (
     <div
-      className={classNames('govuk-radios', {
+      className={classNames('govuk-radios', styles.radio, {
         'govuk-radios--inline': inline,
-        'govuk-radios--small': small,
+        [`govuk-radios--small ${styles.small}`]: small,
       })}
     >
       {naturalOrderBy(options, order, orderDirection).map(option => (

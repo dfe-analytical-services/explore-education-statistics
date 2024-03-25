@@ -336,14 +336,14 @@ user closes accordion section with accordion header
 user gets accordion section content element
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
-    ${content_id}=    get element attribute    ${header_button}    id
-    ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
+    ${content_id}=    get element attribute    ${header_button}    aria-controls
+    ${content}=    get child element    ${parent}    css:[id="${content_id}"]
     [Return]    ${content}
 
 user gets accordion section content element from heading element
     [Arguments]    ${heading_element}    ${parent}=css:[data-testid="accordion"]
-    ${content_id}=    get element attribute    ${heading_element}    id
-    ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
+    ${content_id}=    get element attribute    ${heading_element}    aria-controls
+    ${content}=    get child element    ${parent}    css:[id="${content_id}"]
     [Return]    ${content}
 
 user scrolls to accordion section
