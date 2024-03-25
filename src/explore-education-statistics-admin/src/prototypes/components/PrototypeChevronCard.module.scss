@@ -1,0 +1,43 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.card {
+  //border-top: 1px solid $govuk-border-colour;
+  margin: 0 15px 0 0;
+  padding: 5px 0 20px;
+}
+
+.cardListView {
+  padding-bottom: 0;
+}
+
+.wrapper {
+  padding: 10px 30px 10px 0;
+  position: relative;
+}
+
+.cardLink {
+  display: block;
+
+  &::before {
+    border-right: 3px solid #1d70b8;
+    border-top: 3px solid #1d70b8;
+    content: '';
+    display: block;
+    height: 7px;
+    position: absolute;
+    right: 25px;
+    top: 20px;
+    transform: translateY(0) rotate(45deg) scale(1);
+    width: 7px;
+  }
+
+  &::after {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
