@@ -29,6 +29,11 @@ stages:
       runOnce:
         deploy:
           steps:
+#          - template: get-functionapp-fileshare-config-step-template.yml
+#            parameters:
+#              stepName: 'Get_Data_Processor_Fileshares'
+#              functionAppName: 'test-fa-processor'
+#              variableNamePrefix: 'dataProcessor'
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'
             artifact: 'public-api-data-processor-$(upstreamPipelineBuildNumber)'
@@ -42,13 +47,13 @@ stages:
               inlineScript: |
                 set -e
                 dataProcessorExists=`az functionapp list --resource-group dfe-development-dw --subscription "Department for Education"  --query "[?name=='test-fa-processor']" | jq '. != []'`
-                dataProcessorProductionFileshare=''
-                dataProcessorStagingFileshare=''
-                
-                if [ "$dataProcessorExists" = "true" ]; then
-                  dataProcessorProductionFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
-                  dataProcessorStagingFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" --slot "staging" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
-                fi
+#                dataProcessorProductionFileshare=''
+#                dataProcessorStagingFileshare=''
+#
+#                if [ "$dataProcessorExists" = "true" ]; then
+#                  dataProcessorProductionFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
+#                  dataProcessorStagingFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" --slot "staging" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
+#                fi
                 
                 az deployment group create \
                 --resource-group $(resourceGroupName) \
@@ -59,47 +64,51 @@ stages:
                     vNetName='$(vNetName)' \
                     acrName='$(acrName)' \
                     coreStorageAccountName='$(coreStorageAccountName)' \
+                    keyVaultName='$(keyVaultName)' \
                     resourceTags='$(resourceTags)' \
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     psqlDbUsersAdded='$(psqlDbUsersAdded)' \
-                    existingDataProcessorProductionFileshare="$dataProcessorProductionFileshare" \
-                    existingDataProcessorStagingFileshare="$dataProcessorStagingFileshare"
+                    dataProcessorFunctionAppExists=$dataProcessorExists
+#                    existingDataProcessorProductionFileshare="$dataProcessorProductionFileshare" \
+#                    existingDataProcessorStagingFileshare="$dataProcessorStagingFileshare"
 
-#          - task: AzureCLI@2
-#            displayName: Set Pipeline Variables
-#            inputs:
-#              azureSubscription: $(azureServiceConnection)
-#              scriptType: bash
-#              scriptLocation: inlineScript
-#              inlineScript: |
-#                deploymentOutputs=$(az deployment group show \
-#                --resource-group $(azureResourceGroup) \
-#                --name $(deploymentName) \
-#                --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
-#                echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
-#                  outputname=$(echo "$c" | jq -r '.[0]')
-#                  outputvalue=$(echo "$c" | jq -r '.[1]')
-#                  echo "##vso[task.setvariable variable=$outputname;]$outputvalue"
-#                done
+          - task: AzureCLI@2
+            displayName: Convert Bicep outputs to Azure Pipeline variables
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                deploymentOutputs=$(az deployment group show \
+                --resource-group $(azureResourceGroup) \
+                --name $(deploymentName) \
+                --query properties.outputs | jq -c 'to_entries[] | [.key, .value.value]')
+                
+                echo "$deploymentOutputs" | while IFS=$'\n' read -r c; do
+                  outputname=$(echo "$c" | jq -r '.[0]')
+                  outputvalue=$(echo "$c" | jq -r '.[1]')
+                  echo "##vso[task.setvariable variable=$outputname;]$outputvalue"
+                
+                done
 #
-#          - task: AzureCLI@2
-#            displayName: 'Deploy Data Processor Function App - update staging slot app settings'
-#            inputs:
-#              azureSubscription: ${{parameters.serviceConnection}}
-#              scriptType: bash
-#              scriptLocation: inlineScript
-#              inlineScript: |
-#                az functionapp config appsettings set \
-#                  --name '$(subscription)-ees-publicapi-fa-processor' \
-#                  --resource-group '$(resourceGroupName)' \
-#                  --slot 'staging' \
-#                  --settings \
-#                    ConnectionStrings__PublicDataDb=$(dataProcessorPsqlConnectionString) \
-#                    ConnectionStrings__CoreStorage=$(dataProcessorCoreStorageConnectionString)
-
+          - task: AzureCLI@2
+            displayName: 'Deploy Data Processor Function App - update staging slot app settings'
+            inputs:
+              azureSubscription: ${{parameters.serviceConnection}}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az functionapp config appsettings set \
+                  --name '$(subscription)-ees-publicapi-fa-processor' \
+                  --resource-group '$(resourceGroupName)' \
+                  --slot 'staging' \
+                  --settings \
+                    "ConnectionStrings__PublicDataDb=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(dataProcessorPsqlConnectionStringSecretKey))" \
+                    "ConnectionStrings__CoreStorage=@Microsoft.KeyVault(VaultName=$(keyVaultName); SecretName=$(coreStorageConnectionStringSecretKey))"
+          
           - task: AzureCLI@2
             displayName: 'Deploy Data Processor Function App - deploy to staging slot'
             inputs:
