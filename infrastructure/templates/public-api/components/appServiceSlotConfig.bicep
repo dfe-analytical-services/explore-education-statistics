@@ -7,6 +7,9 @@ param stagingOnlySettings object
 param existingStagingAppSettings object
 param existingProductionAppSettings object
 
+@description('A set of tags with which to tag the resource in Azure')
+param tagValues object
+
 // Create a staging slot.
 resource stagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
   name: '${appName}/staging'
@@ -18,6 +21,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
     enabled: true
     httpsOnly: true
   }
+  tags: tagValues
 }
 
 @description('Set specific app settings to be slot specific values')

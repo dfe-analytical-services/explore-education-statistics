@@ -6,9 +6,6 @@ resources:
       source: Explore Education Statistics
       trigger: true
 
-# This defines the "Build.BuildNumber" variable available in the pipeline.
-name: $(Date:yyyyMMdd).$(Rev:r)
-
 parameters:
   - name: psqlDbUsersAdded
     displayName: Have database users been added to PSQL yet for Container App and Function App?

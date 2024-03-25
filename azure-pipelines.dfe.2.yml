@@ -126,29 +126,19 @@ jobs:
           zipAfterPublish: False
 
       - task: Docker@2
-        displayName: 'Build Public API - API Docker image'
+        displayName: 'Build and Push Public API - API Docker image'
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: '$(AcrServiceConnection)'
           repository: 'ees-public-api/api'
-          command: 'build'
+          command: 'buildAndPush'
           Dockerfile: 'docker/public-api/api/Dockerfile'
           buildContext: '$(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+          addPipelineData: true
         env:
           DOCKER_BUILDKIT: 1
-
-      - task: Docker@2
-        displayName: 'Push Public API - API Docker image'
-        condition: eq(variables.IsBranchDeployable, true)
-        inputs:
-          containerRegistry: '$(AcrServiceConnection)'
-          repository: 'ees-public-api/api'
-          command: 'push'
-          Dockerfile: 'docker/public-api/api/Dockerfile'
-          buildContext: '$(System.ArtifactStagingDirectory)/public-api/api'
-          tags: $(Build.BuildNumber)
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Public API Data Processor Function'
@@ -347,29 +337,19 @@ jobs:
 #          script: 'pnpm --filter=explore-education-statistics-frontend run build'
 #
 #      - task: Docker@2
-#        displayName: 'Build public frontend Docker image'
+#        displayName: 'Build and Push Public Frontend Docker image'
 #        condition: eq(variables.IsBranchDeployable, true)
 #        inputs:
 #          containerRegistry: '$(AcrServiceConnection)'
 #          repository: 'ees-public-frontend'
-#          command: 'build'
+#          command: 'buildAndPush'
 #          Dockerfile: 'docker/public-frontend/Dockerfile'
 #          buildContext: '$(System.DefaultWorkingDirectory)'
 #          tags: $(Build.BuildNumber)
 #          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+#          addPipelineData: true
 #        env:
 #          DOCKER_BUILDKIT: 1
-#
-#      - task: Docker@2
-#        displayName: 'Push public frontend Docker image'
-#        condition: eq(variables.IsBranchDeployable, true)
-#        inputs:
-#          containerRegistry: '$(AcrServiceConnection)'
-#          repository: 'ees-public-frontend'
-#          command: 'push'
-#          Dockerfile: 'docker/public-frontend/Dockerfile'
-#          buildContext: '$(System.DefaultWorkingDirectory)'
-#          tags: $(Build.BuildNumber)
 #
 #  - job: 'MiscellaneousArtifacts'
 #    pool:
