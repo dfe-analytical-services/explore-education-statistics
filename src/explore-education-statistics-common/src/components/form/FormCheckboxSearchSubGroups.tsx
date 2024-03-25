@@ -82,7 +82,7 @@ const FormCheckboxSearchSubGroups = ({
     onBlur: onFieldsetBlur,
   };
 
-  const { isMounted, onMounted } = useMounted();
+  const { isMounted } = useMounted();
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -135,54 +135,9 @@ const FormCheckboxSearchSubGroups = ({
       [isAllChecked, onAllChange, filteredOptions],
     );
 
-  return (
-    <FormFieldset {...fieldsetProps} useFormId={false}>
-      {isMounted && (
-        <>
-          {totalOptions > 1 && options.length > 1 && (
-            <ButtonText
-              id={`${id}-all`}
-              className="govuk-!-margin-bottom-4"
-              underline={false}
-              onClick={handleAllGroupsChange}
-            >
-              {getDefaultSelectAllText(isAllChecked, totalFilteredOptions)}
-              {groupLabel && (
-                <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
-              )}
-            </ButtonText>
-          )}
-
-          {totalOptions > 1 && (
-            <FormTextSearchInput
-              id={`${id}-search`}
-              name={`${name}-search`}
-              label={
-                searchLabel || (
-                  <>
-                    Search options
-                    {groupLabel && (
-                      <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
-                    )}
-                  </>
-                )
-              }
-              width={20}
-              onChange={event => setSearchTerm(event.target.value)}
-              onKeyPress={event => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                }
-              }}
-            />
-          )}
-        </>
-      )}
-
-      <div
-        aria-live={onMounted('assertive')}
-        className={styles.optionsContainer}
-      >
+  const renderCheckboxes = () => {
+    return (
+      <>
         {options.length > 1 ? (
           <>
             {filteredOptions.map((optionGroup, index) => (
@@ -233,6 +188,56 @@ const FormCheckboxSearchSubGroups = ({
             }}
           />
         )}
+      </>
+    );
+  };
+
+  if (!isMounted) {
+    return renderCheckboxes();
+  }
+
+  return (
+    <FormFieldset {...fieldsetProps} useFormId={false}>
+      {totalOptions > 1 && options.length > 1 && (
+        <ButtonText
+          id={`${id}-all`}
+          className="govuk-!-margin-bottom-4"
+          underline={false}
+          onClick={handleAllGroupsChange}
+        >
+          {getDefaultSelectAllText(isAllChecked, totalFilteredOptions)}
+          {groupLabel && (
+            <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+          )}
+        </ButtonText>
+      )}
+
+      {totalOptions > 1 && (
+        <FormTextSearchInput
+          id={`${id}-search`}
+          name={`${name}-search`}
+          label={
+            searchLabel || (
+              <>
+                Search options
+                {groupLabel && (
+                  <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+                )}
+              </>
+            )
+          }
+          width={20}
+          onChange={event => setSearchTerm(event.target.value)}
+          onKeyPress={event => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+            }
+          }}
+        />
+      )}
+
+      <div aria-live="assertive" className={styles.optionsContainer}>
+        {renderCheckboxes()}
       </div>
     </FormFieldset>
   );
