@@ -4,10 +4,8 @@ param slotSpecificSettingKeys string[]
 param baseSettings object
 param prodOnlySettings object
 param stagingOnlySettings object
-param appServiceExists boolean
-
-var existingStagingAppSettings = appServiceExists ? list(resourceId('Microsoft.Web/sites/slots/config', appName, 'staging', 'appsettings'), '@2021-03-01').properties) : {}
-var existingProductionAppSettings = appServiceExists ? list(resourceId('Microsoft.Web/sites/config', appName, 'appsettings'), '2021-03-01').properties) : {}
+param existingStagingAppSettings object
+param existingProductionAppSettings object
 
 // Create a staging slot.
 resource stagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
