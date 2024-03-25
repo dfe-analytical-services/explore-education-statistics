@@ -36,13 +36,13 @@ resource functionSlotConfig 'Microsoft.Web/sites/config@2021-03-01' = {
 resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2021-03-01' = {
   name: 'appsettings'
   parent: stagingSlot
-  properties: union(existingStagingAppSettings, baseSettings, stagingOnlySettings)
+  properties: union(baseSettings, stagingOnlySettings, existingStagingAppSettings)
 }
 
 @description('Set app settings on production slot')
 resource appProductionSettings 'Microsoft.Web/sites/config@2021-03-01' = {
   name: '${appName}/appsettings'
-  properties: union(existingProductionAppSettings, baseSettings, prodOnlySettings)
+  properties: union(baseSettings, prodOnlySettings, existingProductionAppSettings)
 }
 
 output stagingSlotPrincipalId string = stagingSlot.identity.principalId
