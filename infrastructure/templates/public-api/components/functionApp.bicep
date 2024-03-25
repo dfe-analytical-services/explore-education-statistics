@@ -42,12 +42,15 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
+param existingFileShareNameStaging string
+param existingFileShareNameProduction string
+
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
 var functionName = 'test-fa-${functionAppName}'
 var fileShareName = toLower(functionAppName)
-var fileShareNameStaging = '${fileShareName}-staging'
-var fileShareNameProduction = '${fileShareName}-production'
+var fileShareNameProduction = !empty(existingFileShareNameProduction) ? existingFileShareNameProduction : '${fileShareName}-1'
+var fileShareNameStaging = !empty(existingFileShareNameStaging) ? existingFileShareNameStaging : '${fileShareName}-2'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -96,12 +99,12 @@ resource fileShareStaging 'Microsoft.Storage/storageAccounts/fileServices/shares
   ]
 }
 
-/*resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
   name: '${storageAccountName}/default/${fileShareNameProduction}'
   dependsOn: [
     storageAccount
   ]
-}*/
+}
 
 resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   name: functionName
@@ -120,7 +123,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     clientAffinityEnabled: true
     reserved: appServicePlanOS == 'Linux'
     siteConfig: {
-      linuxFxVersion: appServicePlan == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
+      linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     }
   }
   tags: tagValues
@@ -188,12 +191,12 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
     prodOnlySettings: {
       SLOT_NAME: 'production'
       // As above, this value is distinct from its staging slot equivalent.
-      WEBSITE_CONTENTSHARE: fileShareNameStaging
+      WEBSITE_CONTENTSHARE: fileShareNameProduction
     }
   }
   dependsOn: [
     fileShareStaging
-    // fileShareProduction
+    fileShareProduction
   ]
 }
 
