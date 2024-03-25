@@ -73,6 +73,9 @@ param acrName string?
 @description('The full name of the existing Core Storage account.')
 param coreStorageAccountName string?
 
+param existingDataProcessorProductionFileshare string?
+param existingDataProcessorStagingFileshare string?
+
 var resourcePrefix = '${subscription}-ees-publicapi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
@@ -270,6 +273,8 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
       ConnectionStrings__CoreStorage: coreStorageConnectionString
     }
+    existingFileShareNameStaging: existingDataProcessorStagingFileshare ?? ''
+    existingFileShareNameProduction: existingDataProcessorProductionFileshare ?? ''
     functionAppRuntime: 'dotnet-isolated'
     sku: {
       name: 'EP1'
