@@ -983,9 +983,9 @@ user creates legacy release
     ${modal}=    user waits until modal is visible    Create legacy release
     user clicks button    OK    ${modal}
 
-    user waits until page contains element    id:releaseLegacyLinkForm-description
-    user enters text into element    id:releaseLegacyLinkForm-description    ${description}
-    user enters text into element    id:releaseLegacyLinkForm-url    ${url}
+    user waits until page contains element    id:releaseSeriesLegacyLinkForm-description
+    user enters text into element    id:releaseSeriesLegacyLinkForm-description    ${description}
+    user enters text into element    id:releaseSeriesLegacyLinkForm-url    ${url}
     user clicks button    Save legacy release
     user waits until page finishes loading
     user waits until page contains button    Create legacy release
