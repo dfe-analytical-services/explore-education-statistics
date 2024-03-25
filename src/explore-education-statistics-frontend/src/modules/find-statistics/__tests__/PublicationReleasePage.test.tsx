@@ -187,7 +187,7 @@ describe('PublicationReleasePage', () => {
     expect(quickLinks[3]).toHaveAttribute('href', '#help-and-support');
   });
 
-  test(`renders other releases including legacy releases`, async () => {
+  test(`renders other releases including legacy links`, async () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     const usefulInfo = within(screen.getByRole('complementary'));

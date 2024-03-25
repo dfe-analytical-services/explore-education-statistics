@@ -63,7 +63,6 @@ describe('ReleaseContent', () => {
     expect(
       screen.getByRole('heading', { name: 'Related pages' }),
     ).toBeInTheDocument();
-
     expect(
       screen.getByRole('button', { name: 'View releases (1)' }),
     ).toBeInTheDocument();

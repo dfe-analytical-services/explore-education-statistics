@@ -208,7 +208,7 @@ public static class PublicationGeneratorExtensions
                     {
                         publication.ReleaseSeries.Add(new()
                         {
-                            Id = Guid.NewGuid(),
+                            Id = legacyLink.Id,
                             LegacyLinkDescription = legacyLink.LegacyLinkDescription,
                             LegacyLinkUrl = legacyLink.LegacyLinkUrl,
                         });

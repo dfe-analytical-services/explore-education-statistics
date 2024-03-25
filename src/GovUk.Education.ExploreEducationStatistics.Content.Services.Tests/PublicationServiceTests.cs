@@ -152,10 +152,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .WithTheme(_dataFixture
                             .DefaultTheme()));
 
-                // Expect the latest published release versions in reverse chronological order
-                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
-                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
-
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
@@ -165,6 +161,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
+                    var expectedReleaseVersion1 = publication.ReleaseVersions
+                        .Single(rv => rv is { Year: 2022, Version: 1 });
+                    var expectedReleaseVersion2 = publication.ReleaseVersions
+                        .Single(rv => rv is { Year: 2020, Version: 0 });
+
                     var service = SetupPublicationService(contentDbContext);
 
                     var result = await service.Get(publication.Slug);
@@ -200,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     // because it's unpublished
 
                     var releaseSeriesItem2 = publicationViewModel.ReleaseSeries[1];
-                    Assert.False(releaseSeriesItem1.IsLegacyLink);
+                    Assert.False(releaseSeriesItem2.IsLegacyLink);
                     Assert.Equal(expectedReleaseVersion2.ReleaseId, releaseSeriesItem2.ReleaseId);
                     Assert.Equal(expectedReleaseVersion2.Title, releaseSeriesItem2.Description);
                     Assert.Equal(expectedReleaseVersion2.Slug, releaseSeriesItem2.ReleaseSlug);
@@ -208,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                     var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
                     Assert.Equal(_legacyLinks[0].Id, releaseSeriesItem3.Id);
-                    Assert.True(releaseSeriesItem1.IsLegacyLink);
+                    Assert.True(releaseSeriesItem3.IsLegacyLink);
                     Assert.Null(releaseSeriesItem3.ReleaseId);
                     Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);
                     Assert.Null(releaseSeriesItem3.ReleaseSlug);

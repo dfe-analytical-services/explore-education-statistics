@@ -37,7 +37,7 @@ interface Props {
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   const releaseSeries = release.publication.releaseSeries.filter(
-    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title), // @MarkFix simplify
+    rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
 
   // Re-order updates in descending order in-case the cached

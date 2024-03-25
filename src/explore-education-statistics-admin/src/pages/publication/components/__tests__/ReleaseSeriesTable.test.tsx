@@ -73,7 +73,7 @@ describe('ReleaseSeriesTable', () => {
   const testPublicationId = 'publication-1';
   const testPublicationSlug = 'publication-1-slug';
 
-  test('renders the legacy releases table correctly', () => {
+  test('renders the release series table correctly', () => {
     render(
       <TestConfigContextProvider>
         <ReleaseSeriesTable
@@ -97,7 +97,9 @@ describe('ReleaseSeriesTable', () => {
 
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('EES release 3Unpublished');
-    expect(row2Cells[1]).toHaveTextContent('');
+    expect(row2Cells[1]).toHaveTextContent(
+      'http://localhost/find-statistics/publication-1-slug/3',
+    );
     expect(within(row2Cells[2]).queryByRole('button')).not.toBeInTheDocument();
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
@@ -282,7 +284,9 @@ describe('ReleaseSeriesTable', () => {
     const row2Cells = within(rows[1]).getAllByRole('cell');
     expect(row2Cells).toHaveLength(2);
     expect(row2Cells[0]).toHaveTextContent('EES release 3Unpublished');
-    expect(row2Cells[1]).toHaveTextContent('');
+    expect(row2Cells[1]).toHaveTextContent(
+      'http://localhost/find-statistics/publication-1-slug/3',
+    );
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
     expect(row3Cells).toHaveLength(2);

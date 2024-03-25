@@ -520,6 +520,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
                     return await GetReleaseSeries(publication.Id)
                         .OnSuccess(releaseSeries => releaseSeries);
                 });
