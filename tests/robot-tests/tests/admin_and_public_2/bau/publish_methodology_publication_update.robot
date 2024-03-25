@@ -16,7 +16,7 @@ ${PUBLICATION_NAME}=                            UI tests-publish publication upd
 ${PUBLIC_METHODOLOGY_URL_ENDING}=               /methodology/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_UPDATED}=                    ${PUBLICATION_NAME} updated
 ${PUBLIC_PUBLICATION_URL_ENDING}=               /find-statistics/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
-${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}=      https://dev.explore-education-statistics.service.gov.uk${PUBLIC_PUBLICATION_URL_ENDING}
+${EXPECTED_PUBLIC_PUBLICATION_URL_ENDING}=      %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}
 ${RELEASE_NAME}=                                Academic year Q1
 ${ACADEMIC_YEAR}=                               /2046-47
 
