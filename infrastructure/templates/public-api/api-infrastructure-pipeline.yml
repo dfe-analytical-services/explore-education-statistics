@@ -15,7 +15,7 @@ variables:
   - group: EES Bicep Infrastructure common
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
-  - name: isDev
+  - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]

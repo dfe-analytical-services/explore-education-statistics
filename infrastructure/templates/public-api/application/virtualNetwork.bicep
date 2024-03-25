@@ -4,9 +4,6 @@ param vNetName string
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
-@description('Specifies the name suffix of the API Container App')
-param apiContainerAppName string
-
 @description('Specifies the name suffix of the Data Processor Function App')
 param dataProcessorFunctionAppName string
 
@@ -15,12 +12,12 @@ param postgreSqlServerName string
 
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
 var postgreSqlSubnetName = '${resourcePrefix}-snet-${postgreSqlServerName}'
-var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-${apiContainerAppName}'
+var containerAppEnvironmentSubnetName = '${resourcePrefix}-snet-cae'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetPrefix = '10.0.6.0/24'
 var postgreSqlSubnetPrefix = '10.0.7.0/24'
-var apiContainerAppSubnetPrefix = '10.0.8.0/24'
+var containerAppEnvironmentSubnetPrefix = '10.0.8.0/24'
 
 // Reference the existing VNet.
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
@@ -61,13 +58,13 @@ var postgreSqlSubnet = {
   }
 }
 
-var apiContainerAppSubnet = {
-  name: apiContainerAppSubnetName
+var containerAppEnvironmentSubnet = {
+  name: containerAppEnvironmentSubnetName
   properties: {
-    addressPrefix: apiContainerAppSubnetPrefix
+    addressPrefix: containerAppEnvironmentSubnetPrefix
     delegations: [
       {
-        name: '${resourcePrefix}-snet-delegation-cae-${apiContainerAppName}'
+        name: '${resourcePrefix}-snet-delegation-cae'
         properties: {
           serviceName: 'Microsoft.App/environments'
         }
@@ -79,7 +76,7 @@ var apiContainerAppSubnet = {
 var subnets = [
   dataProcessorSubnet
   postgreSqlSubnet
-  apiContainerAppSubnet
+  containerAppEnvironmentSubnet
 ]
 
 // Create the subnets sequentially rather than in parallel to avoid "AnotherOperationInProgress" errors when multiple
@@ -101,4 +98,4 @@ output dataProcessorSubnetRef string = resourceId('Microsoft.Network/VirtualNetw
 output postgreSqlSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, postgreSqlSubnetName)
 
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
-output apiContainerAppSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, apiContainerAppSubnetName)
+output containerAppEnvironmentSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, containerAppEnvironmentSubnetName)
