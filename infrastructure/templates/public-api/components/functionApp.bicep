@@ -42,15 +42,17 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
-param existingFileShareNameStaging string
-param existingFileShareNameProduction string
+// param existingFileShareNameStaging string
+// param existingFileShareNameProduction string
+param functionAppExists boolean
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
 var functionName = 'test-fa-${functionAppName}'
 var fileShareName = toLower(functionAppName)
-var fileShareNameProduction = !empty(existingFileShareNameProduction) ? existingFileShareNameProduction : '${fileShareName}-1'
-var fileShareNameStaging = !empty(existingFileShareNameStaging) ? existingFileShareNameStaging : '${fileShareName}-2'
+var fileShareNameProduction = '${fileShareName}-1'// !empty(existingFileShareNameProduction) ? existingFileShareNameProduction : '${fileShareName}-1'
+var fileShareNameStaging = '${fileShareName}-2'// !empty(existingFileShareNameStaging) ? existingFileShareNameStaging : '${fileShareName}-2'
+
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -140,6 +142,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   params: {
     appName: functionName
     location: location
+    appServiceExists: functionAppExists
     slotSpecificSettingKeys: [
       // This value is sticky to its individual slot and will not swap when slot swapping occurs.
       // This "SLOT_NAME" configuration value is merely to help enable debugging and checking which.

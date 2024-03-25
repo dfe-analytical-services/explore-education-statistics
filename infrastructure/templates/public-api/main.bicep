@@ -73,8 +73,13 @@ param acrName string?
 @description('The full name of the existing Core Storage account.')
 param coreStorageAccountName string?
 
-param existingDataProcessorProductionFileshare string?
-param existingDataProcessorStagingFileshare string?
+@description('The full name of the existing Key Vault.')
+param keyVaultName string?
+
+// param existingDataProcessorProductionFileshare string?
+// param existingDataProcessorStagingFileshare string?
+
+param dataProcessorFunctionAppExists boolean?
 
 var resourcePrefix = '${subscription}-ees-publicapi'
 var apiContainerAppName = 'api'
@@ -269,12 +274,9 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     tagValues: tagValues
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
-    settings: {
-      ConnectionStrings__PublicDataDb: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
-      ConnectionStrings__CoreStorage: coreStorageConnectionString
-    }
-    existingFileShareNameStaging: existingDataProcessorStagingFileshare ?? ''
-    existingFileShareNameProduction: existingDataProcessorProductionFileshare ?? ''
+    functionAppExists: dataProcessorFunctionAppExists
+    // existingFileShareNameStaging: existingDataProcessorStagingFileshare ?? ''
+    // existingFileShareNameProduction: existingDataProcessorProductionFileshare ?? ''
     functionAppRuntime: 'dotnet-isolated'
     sku: {
       name: 'EP1'
@@ -283,3 +285,46 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     }
   }
 }
+
+var dataProcessorPsqlConnectionStringSecretKey = 'dataProcessorPsqlConnectionString'
+
+module storeDataProcessorPsqlConnectionString '../components/keyVaultSecret.bicep' = {
+  name: 'storeDataProcessorPsqlConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: dataProcessorPsqlConnectionStringSecretKey
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', dataProcessorFunctionAppFullName)
+    contentType: 'text/plain'
+  }
+}
+
+/*var apiContainerAppPsqlConnectionStringSecretKey = 'apiContainerAppPsqlConnectionString'
+
+module storeApiContainerAppPsqlConnectionString '../components/keyVaultSecret.bicep' = {
+  name: 'storeApiContainerAppPsqlConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: apiContainerAppPsqlConnectionStringSecretKey
+    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
+    contentType: 'text/plain'
+  }
+}*/
+
+var coreStorageConnectionStringSecretKey = 'coreStorageConnectionString'
+
+module storeCoreStorageConnectionString '../components/keyVaultSecret.bicep' = {
+  name: 'storeCoreStorageConnectionString'
+  params: {
+    keyVaultName: keyVaultName
+    isEnabled: true
+    secretName: coreStorageConnectionStringSecretKey
+    secretValue: coreStorageConnectionString
+    contentType: 'text/plain'
+  }
+}
+
+output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
+// output apiContainerAppPsqlConnectionStringSecretKey string = apiContainerAppPsqlConnectionStringSecretKey
+output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey
