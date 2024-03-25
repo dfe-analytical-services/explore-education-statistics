@@ -76,9 +76,7 @@ param coreStorageAccountName string = ''
 @description('The full name of the existing Key Vault.')
 param keyVaultName string = ''
 
-// param existingDataProcessorProductionFileshare string?
-// param existingDataProcessorStagingFileshare string?
-
+@description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
 var resourcePrefix = '${subscription}-ees-papi'
@@ -112,7 +110,6 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   params: {
     vNetName: vNetName
     resourcePrefix: resourcePrefix
-    apiContainerAppName: apiContainerAppName
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
     postgreSqlServerName: 'psql-flexibleserver'
   }
@@ -146,7 +143,7 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
   location: location
   properties: {
     vnetConfiguration: {
-      infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
+      infrastructureSubnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     }
     daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
     appLogsConfiguration: {
@@ -196,7 +193,7 @@ resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01'
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
   params: {
-    resourcePrefix: resourcePrefix
+    resourcePrefix: '${subscription}-ees'
     location: location
     createMode: psqlDbUsersAdded ? 'Update' : 'Default'
     adminName: postgreSqlAdminName
@@ -247,6 +244,11 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         value: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
       }
       {
+        // This settings allows the Container App to identify which user-assigned identity it should use in order to
+        // perform Managed Identity-based authentication and authorization with other Azure services / resources.
+        //
+        // It is used in conjunction with the Azure.Identity .NET library to retrieve access tokens for the user-assigned
+        // identity.
         name: 'AZURE_CLIENT_ID'
         value: apiContainerAppManagedIdentity.properties.clientId
       }
@@ -255,6 +257,9 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         value: publicUrls!.contentApi
       }
       {
+        // This property informs the Container App of the name of the Data Processor's system-assigned identity.
+        // It uses this to grant permissions to the Data Processor user in order for it to be able to access
+        // tables in the "public_data" datbase successfully.
         name: 'DataProcessorFunctionAppIdentityName'
         value: dataProcessorFunctionAppFullName
       }
@@ -276,8 +281,6 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     functionAppExists: dataProcessorFunctionAppExists
     keyVaultName: keyVaultName
-    // existingFileShareNameStaging: existingDataProcessorStagingFileshare ?? ''
-    // existingFileShareNameProduction: existingDataProcessorProductionFileshare ?? ''
     functionAppRuntime: 'dotnet-isolated'
     sku: {
       name: 'EP1'
@@ -300,19 +303,6 @@ module storeDataProcessorPsqlConnectionString 'components/keyVaultSecret.bicep' 
   }
 }
 
-/*var apiContainerAppPsqlConnectionStringSecretKey = 'apiContainerAppPsqlConnectionString'
-
-module storeApiContainerAppPsqlConnectionString '../components/keyVaultSecret.bicep' = {
-  name: 'storeApiContainerAppPsqlConnectionString'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretName: apiContainerAppPsqlConnectionStringSecretKey
-    secretValue: replace(replace(postgreSqlServerModule.outputs.managedIdentityConnectionStringTemplate, '[database_name]', 'public_data'), '[managed_identity_name]', apiContainerAppManagedIdentityName)
-    contentType: 'text/plain'
-  }
-}*/
-
 var coreStorageConnectionStringSecretKey = 'coreStorageConnectionString'
 
 module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
@@ -327,5 +317,4 @@ module storeCoreStorageConnectionString 'components/keyVaultSecret.bicep' = {
 }
 
 output dataProcessorPsqlConnectionStringSecretKey string = dataProcessorPsqlConnectionStringSecretKey
-// output apiContainerAppPsqlConnectionStringSecretKey string = apiContainerAppPsqlConnectionStringSecretKey
 output coreStorageConnectionStringSecretKey string = coreStorageConnectionStringSecretKey

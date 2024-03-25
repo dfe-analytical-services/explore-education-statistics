@@ -42,15 +42,15 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
+@description('Specifies the Key Vault name that this Function App will be permitted to get and list secrets from')
 param keyVaultName string
 
+@description('Specifies whether or not the Function App already exists. This is used to determine whether or not to look for existing appsettings')
 param functionAppExists bool
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
-var reserved = appServicePlanOS == 'Linux' ? true : false
+var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
-var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
-var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -99,6 +99,9 @@ var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=
 // Function App itself if we wish to use slot swapping.
 //
 // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
+var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
+var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
+
 resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
   name: '${dedicatedStorageAccountName}/default/${fileShareName1}'
   dependsOn: [
@@ -128,7 +131,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     virtualNetworkSubnetId: subnetId
 
     clientAffinityEnabled: true
-    reserved: appServicePlanOS == 'Linux'
+    reserved: reserved
     siteConfig: {
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     }
@@ -140,7 +143,6 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
 // deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
 // appsettings back to their original values by allowing existing ones to take precedence.
 var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
-
 var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
 
 // Create staging and production deploy slots, and set base app settings on both.
@@ -160,7 +162,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // site is being viewed.
       'SLOT_NAME'
     ]
-    baseSettings: union(settings, {
+    commonSettings: union(settings, {
 
       // This tells the Function App where to store its "azure-webjobs-hosts" and "azure-webjobs-secrets" files.
       AzureWebJobsStorage: dedicatedStorageAccountString
