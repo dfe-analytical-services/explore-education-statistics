@@ -40,3 +40,5 @@ resource appProductionSettings 'Microsoft.Web/sites/config@2021-03-01' = {
   name: '${appName}/appsettings'
   properties: union(existingProductionAppSettings, baseSettings, prodOnlySettings)
 }
+
+output stagingSlotPrincipalId string = stagingSlot.identity.principalId
