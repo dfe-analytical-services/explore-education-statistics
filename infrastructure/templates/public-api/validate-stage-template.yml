@@ -5,7 +5,7 @@ parameters:
   - name: stageName
     type: string
   - name: environment
-    default: 'Development'
+    type: string
   - name: serviceConnection
     type: string
 
@@ -64,9 +64,11 @@ stages:
                     vNetName='$(vNetName)' \
                     acrName='$(acrName)' \
                     coreStorageAccountName='$(coreStorageAccountName)' \
+                    keyVaultName='$(keyVaultName)' \
                     resourceTags='$(resourceTags)' \
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                    psqlDbUsersAdded=true
+                    psqlDbUsersAdded=true \
+                    dataProcessorFunctionAppExists=true

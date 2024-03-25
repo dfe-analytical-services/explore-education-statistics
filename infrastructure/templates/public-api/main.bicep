@@ -275,6 +275,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
     subnetId: vNetModule.outputs.dataProcessorSubnetRef
     functionAppExists: dataProcessorFunctionAppExists
+    keyVaultName: keyVaultName
     // existingFileShareNameStaging: existingDataProcessorStagingFileshare ?? ''
     // existingFileShareNameProduction: existingDataProcessorProductionFileshare ?? ''
     functionAppRuntime: 'dotnet-isolated'
@@ -283,24 +284,6 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       tier: 'ElasticPremium'
       family: 'EP'
     }
-  }
-}
-
-// Allow Key Vault references passed as secure appsettings to be resolved by the resource itself.
-resource dataProcessorFunctionAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
-  name: '${keyVaultName}/add'
-  properties: {
-      accessPolicies: [
-      {
-          tenantId: dataProcessorFunctionAppModule.output.tenantId
-          objectId: dataProcessorFunctionAppModule.output.principalId
-          permissions: {
-            secrets: [
-              'list'
-              'get'
-            ]
-          }
-      }]
   }
 }
 

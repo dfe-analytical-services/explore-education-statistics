@@ -42,6 +42,8 @@ param subnetId string
 @description('Specifies the SKU for the Function App hosting plan')
 param sku object
 
+param keyVaultName string
+
 param functionAppExists bool
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
@@ -60,10 +62,15 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
-var storageAccountName = replace('${subscription}eessa${functionAppName}', '-', '')
+var dedicatedStorageAccountName = replace('${subscription}eessa${functionAppName}', '-', '')
 
-resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
-  name: storageAccountName
+// Create a dedicated Storage Account for this Function App for it to store its deployment code and jobs in.
+// Grant the Function App access by whitelisting its subnet for inbound traffic.
+//
+// For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
+// https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
+resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+  name: dedicatedStorageAccountName
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -85,22 +92,24 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
 }
 
+var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${dedicatedStorageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${dedicatedStorageAccount.listKeys().keys[0].value}'
+
 // When deploying to a Function App utilising a secured VNet to store its deployment files,
 // unique file shares must be pre-generated and unique to each slot prior to deploying the
 // Function App itself if we wish to use slot swapping.
 //
 // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
-resource fileShareStaging 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareName2}'
+resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${dedicatedStorageAccountName}/default/${fileShareName1}'
   dependsOn: [
-    storageAccount
+    dedicatedStorageAccount
   ]
 }
 
-resource fileShareProduction 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
-  name: '${storageAccountName}/default/${fileShareName1}'
+resource fileShare2 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+  name: '${dedicatedStorageAccountName}/default/${fileShareName2}'
   dependsOn: [
-    storageAccount
+    dedicatedStorageAccount
   ]
 }
 
@@ -127,9 +136,11 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
   tags: tagValues
 }
 
-var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
-
+// We determine any pre-existing appsettings for both the production and the staging slots during this infrastructure
+// deploy and supply them as the most important appsettings. This prevents infrastructure deploys from overriding any
+// appsettings back to their original values by allowing existing ones to take precedence.
 var existingStagingAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/slots/config', functionApp.name, 'staging', 'appsettings'), '2021-03-01').properties : {}
+
 var existingProductionAppSettings = functionAppExists ? list(resourceId('Microsoft.Web/sites/config', functionApp.name, 'appsettings'), '2021-03-01').properties : {}
 
 // Create staging and production deploy slots, and set base app settings on both.
@@ -170,8 +181,8 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // This value puts the Function App filesystem into readonly mode and runs code from a ZIP deployment.
       WEBSITE_RUN_FROM_PACKAGE: '1'
 
-      // This is set by the Azure ZIP deploy commands, so it si included here to prevent any unnecessary checking for changes in this
-      // property when a code deploy is pushed out.
+      // This is set by the Azure ZIP deploy commands in the YAML pipeline, so it is included here to prevent any
+      // unnecessary changes when a code deploy is pushed out.
       SCM_DO_BUILD_DURING_DEPLOYMENT: false
 
       FUNCTIONS_EXTENSION_VERSION: '~4'
@@ -189,18 +200,55 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // file share.
       //
       // See the second paragraph of https://learn.microsoft.com/en-us/azure/azure-functions/functions-infrastructure-as-code?tabs=json%2Clinux%2Cdevops&pivots=premium-plan#secured-deployments.
+      //
+      // When slots are swapped, this fileshare configuration value will swap with the slots and thereby make the new
+      // code deployment location available to the other slot.
       WEBSITE_CONTENTSHARE: fileShareName2
     }
     prodOnlySettings: {
       SLOT_NAME: 'production'
-      // As above, this value is distinct from its staging slot equivalent.
+      // As above, this value is distinct from the initial staging slot equivalent and will swap to the other slot upon
+      // a slot swap operation.
       WEBSITE_CONTENTSHARE: fileShareName1
     }
   }
   dependsOn: [
-    fileShareStaging
-    fileShareProduction
+    fileShare1
+    fileShare2
   ]
+}
+
+resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
+  name: keyVaultName
+}
+
+// Allow Key Vault references passed as secure appsettings to be resolved by the Data Processor Function App itself.
+resource dataProcessorFunctionAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
+  name: 'add'
+  parent: keyVault
+  properties: {
+    accessPolicies: [
+    {
+      tenantId: functionApp.identity.tenantId
+      objectId: functionApp.identity.principalId
+      permissions: {
+        secrets: [
+          'list'
+          'get'
+        ]
+      }
+    }
+    {
+      tenantId: functionApp.identity.tenantId
+      objectId: functionAppSlotSettings.outputs.stagingSlotPrincipalId
+      permissions: {
+        secrets: [
+          'list'
+          'get'
+        ]
+      }
+    }]
+  }
 }
 
 output functionAppName string = functionApp.name
