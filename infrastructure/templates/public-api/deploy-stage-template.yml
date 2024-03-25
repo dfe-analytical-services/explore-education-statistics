@@ -41,6 +41,15 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 set -e
+                dataProcessorExists=`az functionapp list --resource-group dfe-development-dw --subscription "Department for Education"  --query "[?name=='test-fa-processor']" | jq '. != []'`
+                dataProcessorProductionFileshare=''
+                dataProcessorStagingFileshare=''
+                
+                if [ "$dataProcessorExists" = "true" ]; then
+                  dataProcessorProductionFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
+                  dataProcessorStagingFileshare=`az functionapp config appsettings list --name test-fa-processor --resource-group dfe-development-dw --subscription "Department for Education" --slot "staging" | jq '.[] | select ( .name == "WEBSITE_CONTENTSHARE" )' | jq -r '.value'`
+                fi
+                
                 az deployment group create \
                 --resource-group $(resourceGroupName) \
                 --template-file $(templateFile) \
@@ -55,7 +64,9 @@ stages:
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                    psqlDbUsersAdded='$(psqlDbUsersAdded)'
+                    psqlDbUsersAdded='$(psqlDbUsersAdded)' \
+                    existingDataProcessorProductionFileshare="$dataProcessorProductionFileshare" \
+                    existingDataProcessorStagingFileshare="$dataProcessorStagingFileshare"
 
 #          - task: AzureCLI@2
 #            displayName: Set Pipeline Variables
