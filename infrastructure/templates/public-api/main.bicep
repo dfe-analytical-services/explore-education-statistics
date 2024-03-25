@@ -81,11 +81,11 @@ param keyVaultName string = ''
 
 param dataProcessorFunctionAppExists bool = false
 
-var resourcePrefix = '${subscription}-ees-publicapi'
+var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var dataProcessorFunctionAppName = 'processor'
-var dataProcessorFunctionAppFullName = 'test-fa-${dataProcessorFunctionAppName}'
+var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -126,6 +126,42 @@ module applicationInsightsModule 'components/appInsights.bicep' = {
     location: location
     appInsightsName: ''
   }
+}
+
+// Create a generic, shared Log Analytics Workspace for any relevant resources to use.
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+  name: '${subscription}-ees-log'
+  location: location
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+  }
+  tags: tagValues
+}
+
+// Create a generic Container App Environment for any Container Apps to use.
+resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+  name: '${subscription}-ees-cae'
+  location: location
+  properties: {
+    vnetConfiguration: {
+      infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
+    }
+    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logAnalyticsWorkspace.properties.customerId
+        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
+      }
+    }
+    workloadProfiles: [{
+      name: 'Consumption'
+      workloadProfileType: 'Consumption'
+    }]
+  }
+  tags: tagValues
 }
 
 // Deploy File Share.
@@ -194,42 +230,6 @@ resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignm
   }
 }
 
-resource apiContainerAppLogAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: '${resourcePrefix}-log-${apiContainerAppName}'
-  location: location
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
-  }
-  tags: tagValues
-}
-
-resource apiContainerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: '${resourcePrefix}-cae-${apiContainerAppName}'
-  location: location
-  properties: {
-    vnetConfiguration: {
-      infrastructureSubnetId: vNetModule.outputs.apiContainerAppSubnetRef
-    }
-    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: apiContainerAppLogAnalytics.properties.customerId
-        sharedKey: apiContainerAppLogAnalytics.listKeys().primarySharedKey
-      }
-    }
-    workloadProfiles: [
-      {
-        name: 'Consumption'
-        workloadProfileType: 'Consumption'
-      }
-    ]
-  }
-  tags: tagValues
-}
-
 // Deploy main Public API Container App.
 module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
   name: 'apiContainerAppDeploy'
@@ -240,7 +240,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     managedIdentityName: apiContainerAppManagedIdentity.name
-    managedEnvironmentId: apiContainerAppEnvironment.id
+    managedEnvironmentId: containerAppEnvironment.id
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'

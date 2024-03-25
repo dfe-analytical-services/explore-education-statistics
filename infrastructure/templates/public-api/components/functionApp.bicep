@@ -48,7 +48,7 @@ param functionAppExists bool
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux' ? true : false
-var fullFunctionAppName = 'test-fa-${functionAppName}'
+var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
 var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
 var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
 
