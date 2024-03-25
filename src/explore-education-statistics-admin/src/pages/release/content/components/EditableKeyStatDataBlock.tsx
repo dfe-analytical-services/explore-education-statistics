@@ -17,7 +17,7 @@ export interface EditableKeyStatDataBlockProps {
   keyStat: KeyStatisticDataBlock;
   releaseId: string;
   testId?: string;
-  onRemove?: () => void;
+  onRemove: () => void;
   onSubmit: (values: KeyStatDataBlockFormValues) => void;
 }
 

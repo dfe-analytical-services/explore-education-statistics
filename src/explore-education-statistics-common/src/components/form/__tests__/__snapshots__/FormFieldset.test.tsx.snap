@@ -11,6 +11,7 @@ exports[`FormFieldset renders correctly with error 1`] = `
     </legend>
     <span class="govuk-error-message"
           id="test-fieldset-error"
+          data-testid="test-fieldset-error"
     >
       <span class="govuk-visually-hidden">
         Error:

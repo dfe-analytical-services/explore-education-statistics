@@ -30,6 +30,7 @@ exports[`FormSelect renders with error message 1`] = `
 </label>
 <span class="govuk-error-message"
       id="test-select-error"
+      data-testid="test-select-error"
 >
   <span class="govuk-visually-hidden">
     Error:

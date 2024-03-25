@@ -223,6 +223,7 @@ const ReleaseDataFileReplacePage = ({
                 <h2>Upload replacement data</h2>
 
                 <DataFileUploadForm
+                  isDataReplacement
                   onSubmit={values => handleSubmit(dataFile, values)}
                 />
               </section>

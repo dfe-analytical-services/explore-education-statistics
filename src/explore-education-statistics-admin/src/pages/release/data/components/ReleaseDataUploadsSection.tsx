@@ -17,35 +17,17 @@ import releaseDataFileService, {
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import logger from '@common/services/logger';
-import { mapFieldErrors } from '@common/validation/serverValidations';
-import Yup from '@common/validation/yup';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
 import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
 import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
-
-interface FormValues extends DataFileUploadFormValues {
-  subjectTitle: string;
-}
-
-const errorMappings = [
-  mapFieldErrors<FormValues>({
-    target: 'subjectTitle',
-    messages: {
-      SubjectTitleMustBeUnique: 'Subject title must be unique',
-      SubjectTitleCannotContainSpecialCharacters:
-        'Subject title cannot contain special characters',
-    },
-  }),
-];
 
 interface Props {
   publicationId: string;
@@ -58,8 +40,6 @@ interface DeleteDataFile {
   plan: DeleteDataFilePlan;
   file: DataFile;
 }
-
-const formId = 'dataFileUploadForm';
 
 const ReleaseDataUploadsSection = ({
   publicationId,
@@ -127,8 +107,11 @@ const ReleaseDataUploadsSection = ({
   };
 
   const handleSubmit = useCallback(
-    async (values: FormValues) => {
+    async (values: DataFileUploadFormValues) => {
       let file: DataFile;
+      if (!values.subjectTitle) {
+        return;
+      }
 
       if (values.uploadType === 'csv') {
         file = await releaseDataFileService.uploadDataFiles(releaseId, {
@@ -179,46 +162,7 @@ const ReleaseDataUploadsSection = ({
         </ul>
       </InsetText>
       {canUpdateRelease ? (
-        <DataFileUploadForm
-          id={formId}
-          initialValues={{
-            subjectTitle: '',
-            uploadType: 'csv',
-            dataFile: null,
-            metadataFile: null,
-            zipFile: null,
-          }}
-          errorMappings={errorMappings}
-          onSubmit={handleSubmit}
-          validationSchema={baseSchema => {
-            return baseSchema.shape({
-              subjectTitle: Yup.string()
-                .required('Enter a subject title')
-                .test({
-                  name: 'unique',
-                  message: 'Enter a unique subject title',
-                  test(value: string) {
-                    if (!value) {
-                      return true;
-                    }
-
-                    return (
-                      dataFiles.find(
-                        f => f.title.toUpperCase() === value.toUpperCase(),
-                      ) === undefined
-                    );
-                  },
-                }),
-            });
-          }}
-          beforeFields={
-            <FormFieldTextInput<FormValues>
-              name="subjectTitle"
-              label="Subject title"
-              className="govuk-!-width-two-thirds"
-            />
-          }
-        />
+        <DataFileUploadForm dataFiles={dataFiles} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.
