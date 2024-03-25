@@ -3,5 +3,5 @@ WORKDIR /App
 
 EXPOSE 8080
 
-COPY [".", "."]
+COPY . .
 ENTRYPOINT ["dotnet", "GovUk.Education.ExploreEducationStatistics.Public.Data.Api.dll"]
