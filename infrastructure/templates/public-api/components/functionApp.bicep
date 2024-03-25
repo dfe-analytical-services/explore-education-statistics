@@ -211,6 +211,7 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
       // a slot swap operation.
       WEBSITE_CONTENTSHARE: fileShareName1
     }
+    tagValues: tagValues
   }
   dependsOn: [
     fileShare1
