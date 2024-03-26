@@ -3,25 +3,27 @@ import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import formatPretty from '@common/utils/number/formatPretty';
 import keyBy from 'lodash/keyBy';
-import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
 import {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
 import { TooltipProps } from 'recharts/types/component/Tooltip';
+import orderBy from 'lodash/orderBy';
 import styles from './CustomTooltip.module.scss';
 
 interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
   dataSetCategories: DataSetCategory[];
   dataSetCategoryConfigs: DataSetCategoryConfig[];
+  order?: 'default' | 'reverse' | 'value';
 }
 
 const CustomTooltip = ({
-  payload,
+  payload = [],
   label,
   dataSetCategories,
   dataSetCategoryConfigs,
+  order = 'default',
 }: CustomTooltipProps) => {
   const tooltipLabel = useMemo(() => {
     if (typeof label !== 'string') {
@@ -36,47 +38,52 @@ const CustomTooltip = ({
     [dataSetCategoryConfigs],
   );
 
+  const getPayloadOrder = () => {
+    if (order === 'value') {
+      return orderBy(payload, item => Number(item.value), ['desc']);
+    }
+    return order === 'reverse' ? [...payload]?.reverse() : payload;
+  };
+
   return (
     <div className={styles.tooltip} data-testid="chartTooltip">
       <p className="govuk-!-font-weight-bold" data-testid="chartTooltip-label">
         {tooltipLabel}
       </p>
 
-      {payload && (
+      {!!payload.length && (
         <ul className={styles.itemList} data-testid="chartTooltip-items">
-          {orderBy(payload, item => Number(item.value), ['desc']).map(
-            (item, index) => {
-              const dataKey =
-                typeof item.dataKey === 'string' ? item.dataKey : '';
+          {getPayloadOrder()?.map((item, index) => {
+            const dataKey =
+              typeof item.dataKey === 'string' ? item.dataKey : '';
 
-              return (
-                // eslint-disable-next-line react/no-array-index-key
-                <li key={index}>
-                  <div className="govuk-!-margin-right-2">
-                    <span
-                      className={styles.itemColour}
-                      style={{ backgroundColor: item.color }}
-                    />
-                  </div>
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={index}>
+                <div className="govuk-!-margin-right-2">
+                  <span
+                    className={styles.itemColour}
+                    style={{ backgroundColor: item.color }}
+                  />
+                </div>
 
-                  <div data-testid="chartTooltip-item-text">
-                    {`${item.name}: `}
+                <div data-testid="chartTooltip-item-text">
+                  {`${item.name}: `}
 
-                    {typeof item.value !== 'undefined' && (
-                      <strong>
-                        {formatPretty(
-                          item.value.toString(),
-                          typeof item.unit === 'string' ? item.unit : '',
-                          configsByDataKey[dataKey]?.dataSet.indicator
-                            .decimalPlaces,
-                        )}
-                      </strong>
-                    )}
-                  </div>
-                </li>
-              );
-            },
-          )}
+                  {typeof item.value !== 'undefined' && (
+                    <strong>
+                      {formatPretty(
+                        item.value.toString(),
+                        typeof item.unit === 'string' ? item.unit : '',
+                        configsByDataKey[dataKey]?.dataSet.indicator
+                          .decimalPlaces,
+                      )}
+                    </strong>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
