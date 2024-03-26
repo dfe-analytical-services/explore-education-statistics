@@ -11,7 +11,7 @@ export interface EditableKeyStatTextProps {
   isReordering?: boolean;
   keyStat: KeyStatisticText;
   testId?: string;
-  onRemove?: () => void;
+  onRemove: () => void;
   onSubmit: (values: KeyStatTextFormValues) => void;
 }
 

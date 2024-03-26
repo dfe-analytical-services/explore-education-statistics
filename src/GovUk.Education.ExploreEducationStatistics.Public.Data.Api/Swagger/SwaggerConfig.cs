@@ -11,6 +11,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
     {
         options.OperationFilter<DefaultValuesOperationFilter>();
         options.SchemaFilter<JsonConverterSchemaFilter>();
+        options.SchemaFilter<SwaggerEnumSchemaFilter>();
         options.SchemaFilter<DataSetStatusSchemaFilter>();
         options.SchemaFilter<DataSetVersionStatusSchemaFilter>();
         options.SchemaFilter<GeographicLevelSchemaFilter>();
@@ -19,6 +20,9 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
         var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
         var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
 
+        options.DescribeAllParametersInCamelCase();
+        options.UseOneOfForPolymorphism();
+        options.UseAllOfForInheritance();
         options.UseAllOfToExtendReferenceSchemas();
         options.SupportNonNullableReferenceTypes();
         options.IncludeXmlComments(filePath);

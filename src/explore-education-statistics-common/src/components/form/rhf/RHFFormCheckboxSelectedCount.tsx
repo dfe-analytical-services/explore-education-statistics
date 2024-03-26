@@ -15,7 +15,7 @@ const RHFFormCheckboxSelectedCount = ({ name }: Props) => {
   }
 
   return count > 0 ? (
-    <Tag className="govuk-!-margin-left-2 govuk-!-font-size-14">
+    <Tag className="govuk-!-margin-left-2 govuk-!-font-size-16">
       <span className="govuk-visually-hidden"> - </span>
       {count} selected
     </Tag>

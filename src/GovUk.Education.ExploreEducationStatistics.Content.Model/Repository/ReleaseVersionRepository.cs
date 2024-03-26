@@ -174,15 +174,19 @@ public class ReleaseVersionRepository : IReleaseVersionRepository
 
     public async Task<ReleaseVersion?> GetLatestReleaseVersionForParent(
         Guid releaseId,
+        bool publishedOnly = false,
         CancellationToken cancellationToken = default)
     {
-        var maxVersion = await GetMaxVersionNumber(releaseId, cancellationToken: cancellationToken);
+        var maxVersion = await GetMaxVersionNumber(
+            releaseId,
+            publishedOnly: publishedOnly,
+            cancellationToken: cancellationToken);
 
         return await _contentDbContext.ReleaseVersions
             .Where(rv =>
                 rv.ReleaseId == releaseId
                 && rv.Version == maxVersion)
-            .FirstAsync(cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     private async Task<int?> GetMaxVersionNumber(

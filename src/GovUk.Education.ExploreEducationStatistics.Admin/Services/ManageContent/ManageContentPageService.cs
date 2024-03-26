@@ -137,7 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                                 Description = latestReleaseVersion.Title,
 
                                 ReleaseId = latestReleaseVersion.ReleaseId,
-                                PublicationSlug = latestReleaseVersion.Publication.Slug,
                                 ReleaseSlug = latestReleaseVersion.Slug,
                             };
                         }).ToList();

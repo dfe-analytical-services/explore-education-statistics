@@ -206,9 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     continue;
                 }
 
-                var entry = archive
-                    .CreateEntry(releaseFile.File.ZipFileEntryName())
-                    .SetUnixPermissions("664");
+                var entry = archive.CreateEntry(releaseFile.File.ZipFileEntryName());
 
                 await using var entryStream = entry.Open();
 
@@ -225,9 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             // Add data guidance file if there are any data files in this zip.
             if (releaseFilesWithZipEntries.Any(rf => rf.File.Type == FileType.Data))
             {
-                var entry = archive
-                    .CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt")
-                    .SetUnixPermissions("664");
+                var entry = archive.CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt");
 
                 await using var entryStream = entry.Open();
 

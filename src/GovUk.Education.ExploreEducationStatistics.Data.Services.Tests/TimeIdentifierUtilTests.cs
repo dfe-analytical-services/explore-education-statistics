@@ -152,8 +152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             Assert.Equal(new[]
             {
                 AutumnTerm,
-                AutumnSpringTerm,
                 SpringTerm,
+                AutumnSpringTerm,
                 SummerTerm
             }, TimeIdentifierUtil.GetTerms());
         }

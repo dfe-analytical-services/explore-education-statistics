@@ -73,12 +73,12 @@ export default function ReleaseAncillaryFilePage({
           {file ? (
             <AncillaryFileForm
               files={allFiles.filter(f => f.id !== file.id)}
-              fileFieldLabel="Upload new file"
               initialValues={{
                 title: file.title,
                 summary: file.summary,
                 file: null,
               }}
+              isEditing
               onCancel={navigateBack}
               onSubmit={handleSubmit}
             />

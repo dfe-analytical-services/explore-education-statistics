@@ -2,15 +2,15 @@ import Link from '@admin/components/Link';
 import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import { publicationReleaseSeriesRoute } from '@admin/routes/publicationRoutes';
+import publicationService from '@admin/services/publicationService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
-import publicationService from "@admin/services/publicationService";
 
-const PublicationCreateReleaseSeriesLegacyLinkPage = () => {
+export default function PublicationCreateReleaseSeriesLegacyLinkPage() {
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 
-  const publicationEditPath = generatePath(
+  const publicationReleaseSeriesPath = generatePath(
     publicationReleaseSeriesRoute.path,
     {
       publicationId,
@@ -22,7 +22,7 @@ const PublicationCreateReleaseSeriesLegacyLinkPage = () => {
       <h2>Create legacy release</h2>
       <ReleaseSeriesLegacyLinkForm
         cancelButton={
-          <Link unvisited to={publicationEditPath}>
+          <Link unvisited to={publicationReleaseSeriesPath}>
             Cancel
           </Link>
         }
@@ -32,11 +32,9 @@ const PublicationCreateReleaseSeriesLegacyLinkPage = () => {
             url: values.url,
           });
 
-          history.push(publicationEditPath);
+          history.push(publicationReleaseSeriesPath);
         }}
       />
     </>
   );
-};
-
-export default PublicationCreateReleaseSeriesLegacyLinkPage;
+}

@@ -104,7 +104,7 @@ describe('PublicationAdoptMethodologyPage', () => {
     );
 
     expect(
-      screen.getByLabelText('Search for a published methodology'),
+      await screen.findByLabelText('Search for a published methodology'),
     ).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');
@@ -155,6 +155,7 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 
   test('handles successful form submission', async () => {
+    const user = userEvent.setup();
     const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
@@ -177,9 +178,9 @@ describe('PublicationAdoptMethodologyPage', () => {
       ).toBeInTheDocument(),
     );
 
-    await userEvent.click(screen.getByLabelText('Methodology 2'));
+    await user.click(screen.getByLabelText('Methodology 2'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(publicationService.adoptMethodology).toHaveBeenCalledWith(
@@ -194,6 +195,7 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 
   test('handles clicking the cancel button', async () => {
+    const user = userEvent.setup();
     const history = createMemoryHistory();
     publicationService.getAdoptableMethodologies.mockResolvedValue(
       testMethodologies,
@@ -216,7 +218,7 @@ describe('PublicationAdoptMethodologyPage', () => {
       ).toBeInTheDocument(),
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(publicationService.adoptMethodology).not.toHaveBeenCalled();
 

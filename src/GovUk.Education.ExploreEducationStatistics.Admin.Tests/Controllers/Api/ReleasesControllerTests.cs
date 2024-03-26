@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task UpdateReleaseVersion_Returns_Ok()
+        public async Task UpdateRelease_Returns_Ok()
         {
             var releaseService = new Mock<IReleaseService>(Strict);
 

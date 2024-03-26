@@ -5,11 +5,15 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import _publicationService, {
   PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { testReleaseSeries } from '@admin/pages/publication/__data__/testReleaseSeries';
+import { mapToReleaseSeriesItemUpdateRequest } from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
+import render from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Router } from 'react-router-dom';
 import noop from 'lodash/noop';
-import {ReleaseSeriesItem} from "@common/services/publicationService";
+import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
 
 jest.mock('@admin/services/publicationService');
 
@@ -18,57 +22,23 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationReleaseSeriesPage', () => {
-  const testReleaseSeries: ReleaseSeriesItem[] = [
-    {
-      id: 'legacy-release-3',
-      isLegacyLink: true,
-      description: 'Legacy release 3',
-      legacyLinkUrl: 'http://gov.uk/3',
-    },
-    {
-      id: 'legacy-release-2',
-      isLegacyLink: true,
-      description: 'Legacy release 2',
-      legacyLinkUrl: 'http://gov.uk/2',
-    },
-    {
-      id: 'legacy-release-1',
-      isLegacyLink: true,
-      description: 'Legacy release 1',
-      legacyLinkUrl: 'http://gov.uk/1',
-    },
-  ];
-
-  test('renders the legacy releases page', async () => {
-    return; // @MarkFix
-    publicationService.getReleaseSeries.mockResolvedValue(
-      testReleaseSeries,
-    );
+  test('renders the release series page', async () => {
+    publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
 
     renderPage(testPublication);
-    await waitFor(() => {
-      expect(screen.getByText('Legacy releases')).toBeInTheDocument();
-    });
+    expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
 
-    const rows = screen.getAllByRole('row');
-    expect(rows).toHaveLength(4);
+    const table = screen.getByRole('table');
+    expect(within(table).getAllByRole('row')).toHaveLength(5);
 
-    const row1Cells = within(rows[0]).getAllByRole('columnheader');
-    expect(row1Cells[0]).toHaveTextContent('Description');
-    expect(row1Cells[1]).toHaveTextContent('URL');
-    expect(row1Cells[2]).toHaveTextContent('Actions');
+    const rows = within(table).getAllByRole('row');
+    expect(rows).toHaveLength(5);
 
-    const row2Cells = within(rows[1]).getAllByRole('cell');
-    expect(row2Cells[0]).toHaveTextContent('Legacy release 3');
-    expect(row2Cells[1]).toHaveTextContent('http://gov.uk/3');
-
-    const row3Cells = within(rows[2]).getAllByRole('cell');
-    expect(row3Cells[0]).toHaveTextContent('Legacy release 2');
-    expect(row3Cells[1]).toHaveTextContent('http://gov.uk/2');
-
-    const row4Cells = within(rows[3]).getAllByRole('cell');
-    expect(row4Cells[0]).toHaveTextContent('Legacy release 1');
-    expect(row4Cells[1]).toHaveTextContent('http://gov.uk/1');
+    const tableHeaders = within(rows[0]).getAllByRole('columnheader');
+    expect(tableHeaders[0]).toHaveTextContent('Description');
+    expect(tableHeaders[1]).toHaveTextContent('URL');
+    expect(tableHeaders[2]).toHaveTextContent('Status');
+    expect(tableHeaders[3]).toHaveTextContent('Actions');
 
     expect(
       screen.getByRole('button', { name: 'Create legacy release' }),
@@ -76,6 +46,246 @@ describe('PublicationReleaseSeriesPage', () => {
     expect(
       screen.getByRole('button', { name: 'Reorder releases' }),
     ).toBeInTheDocument();
+  });
+
+  test('shows a message when there are no releases', async () => {
+    publicationService.getReleaseSeries.mockResolvedValue([]);
+    renderPage(testPublication);
+
+    expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+    expect(
+      screen.getByText('No releases for this publication.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Create legacy release' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Reorder releases' }),
+    ).not.toBeInTheDocument();
+  });
+
+  describe('reordering', () => {
+    test('shows a warning modal when the reorder releases button is clicked', async () => {
+      const user = userEvent.setup();
+      publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
+      renderPage(testPublication);
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Reorder releases' }),
+      );
+
+      expect(await screen.findByText('Warning')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(
+        modal.getByRole('heading', { name: 'Reorder releases' }),
+      ).toBeInTheDocument();
+      expect(
+        modal.getByText(
+          'All changes made to releases appear immediately on the public website.',
+        ),
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'OK' })).toBeInTheDocument();
+    });
+
+    test('shows the reordering UI when OK is clicked', async () => {
+      const user = userEvent.setup();
+      publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
+      renderPage(testPublication);
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Reorder releases' }),
+      );
+
+      expect(await screen.findByText('Warning')).toBeInTheDocument();
+
+      const modal = within(screen.getByRole('dialog'));
+      await user.click(modal.getByRole('button', { name: 'OK' }));
+
+      expect(await screen.findByText('Sort')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm order' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel reordering' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Edit release' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete release' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Create legacy release' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show button to reorder when user does not have permission to manage legacy releases', async () => {
+      publicationService.getReleaseSeries.mockResolvedValue(testReleaseSeries);
+      renderPage({
+        ...testPublication,
+        permissions: {
+          ...testPublication.permissions,
+          canManageReleaseSeries: false,
+        },
+      });
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Reorder releases' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('deleting', () => {
+    test('sends the delete request and updates the releases table when confirm is clicked', async () => {
+      const user = userEvent.setup();
+      publicationService.getReleaseSeries.mockResolvedValueOnce(
+        testReleaseSeries,
+      );
+      publicationService.getReleaseSeries.mockResolvedValueOnce([
+        testReleaseSeries[0],
+        testReleaseSeries[1],
+        testReleaseSeries[2],
+      ]);
+      renderPage(testPublication);
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Delete Legacy link 1' }),
+      );
+      expect(
+        await screen.findByText('Delete legacy release'),
+      ).toBeInTheDocument();
+
+      expect(publicationService.updateReleaseSeries).not.toHaveBeenCalled();
+
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: 'Confirm',
+        }),
+      );
+
+      expect(publicationService.updateReleaseSeries).toHaveBeenCalledTimes(1);
+      expect(publicationService.updateReleaseSeries).toHaveBeenCalledWith(
+        testPublication.id,
+        mapToReleaseSeriesItemUpdateRequest(
+          testReleaseSeries.filter(rsi => rsi.id !== testReleaseSeries[3].id),
+        ),
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
+      });
+
+      const table = within(screen.getByRole('table'));
+      await waitFor(() => {
+        expect(table.queryByText('Legacy link 1')).not.toBeInTheDocument();
+      });
+      const rows = table.getAllByRole('row');
+      expect(rows).toHaveLength(4);
+    });
+  });
+
+  describe('creating', () => {
+    test('shows a warning modal when the create legacy release button is clicked', async () => {
+      const user = userEvent.setup();
+      publicationService.getReleaseSeries.mockResolvedValueOnce(
+        testReleaseSeries,
+      );
+      renderPage(testPublication);
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Create legacy release' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning')).toBeInTheDocument();
+      });
+      const modal = within(screen.getByRole('dialog'));
+      expect(
+        modal.getByRole('heading', { name: 'Create legacy release' }),
+      ).toBeInTheDocument();
+      expect(
+        modal.getByText(
+          'All changes made to legacy releases appear immediately on the public website.',
+        ),
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'OK' })).toBeInTheDocument();
+    });
+
+    test('goes to the create page when OK is clicked', async () => {
+      const history = createMemoryHistory();
+      const user = userEvent.setup();
+      publicationService.getReleaseSeries.mockResolvedValueOnce(
+        testReleaseSeries,
+      );
+      render(
+        <Router history={history}>
+          <TestConfigContextProvider>
+            <PublicationContextProvider
+              publication={testPublication}
+              onPublicationChange={noop}
+              onReload={noop}
+            >
+              <PublicationReleaseSeriesPage />
+            </PublicationContextProvider>
+          </TestConfigContextProvider>
+        </Router>,
+      );
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Create legacy release' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning')).toBeInTheDocument();
+      });
+      await user.click(
+        within(screen.getByRole('dialog')).getByRole('button', { name: 'OK' }),
+      );
+      await waitFor(() => {
+        expect(history.location.pathname).toBe(
+          `/publication/${testPublication.id}/legacy/create`,
+        );
+      });
+    });
+
+    test('does not show button to create when user does not have permission to manage legacy releases', async () => {
+      publicationService.getReleaseSeries.mockResolvedValueOnce(
+        testReleaseSeries,
+      );
+      renderPage({
+        ...testPublication,
+        permissions: {
+          ...testPublication.permissions,
+          canManageReleaseSeries: false,
+        },
+      });
+
+      expect(await screen.findByText('Legacy releases')).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Create legacy release' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
 

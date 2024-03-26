@@ -18,6 +18,8 @@ import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
+  commentTagAttributes,
+  commentTags,
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
   TagFilter,
@@ -95,13 +97,6 @@ const EditableContentBlock = ({
   );
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
-    const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
-      'comment-start': ['name'],
-      'comment-end': ['name'],
-      'resolvedcomment-start': ['name'],
-      'resolvedcomment-end': ['name'],
-    };
-
     const commentTagFilter: TagFilter = frame =>
       comments.every(comment => comment.id !== frame.attribs.name);
 
@@ -109,7 +104,7 @@ const EditableContentBlock = ({
       ...defaultSanitizeOptions,
       allowedTags: [
         ...(defaultSanitizeOptions.allowedTags ?? []),
-        ...Object.keys(commentTagAttributes),
+        ...commentTags,
       ],
       allowedAttributes: {
         ...(defaultSanitizeOptions.allowedAttributes ?? {}),

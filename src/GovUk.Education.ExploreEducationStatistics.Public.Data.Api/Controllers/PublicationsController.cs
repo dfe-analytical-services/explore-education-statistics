@@ -11,17 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [ApiVersion(1.0)]
 [ApiController]
 [Route("api/v{version:apiVersion}/publications")]
-public class PublicationsController : ControllerBase
+public class PublicationsController(IPublicationService publicationService, IDataSetService dataSetService)
+    : ControllerBase
 {
-    private readonly IPublicationService _publicationService;
-    private readonly IDataSetService _dataSetService;
-
-    public PublicationsController(IPublicationService publicationService, IDataSetService dataSetService)
-    {
-        _publicationService = publicationService;
-        _dataSetService = dataSetService;
-    }
-
     /// <summary>
     /// List publications
     /// </summary>
@@ -33,13 +25,15 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(200, "The paginated list of publications", type: typeof(PublicationPaginatedListViewModel))]
     [SwaggerResponse(400)]
     public async Task<ActionResult<PublicationPaginatedListViewModel>> ListPublications(
-        [FromQuery] PublicationListRequest request)
+        [FromQuery] PublicationListRequest request,
+        CancellationToken cancellationToken)
     {
-        return await _publicationService
+        return await publicationService
             .ListPublications(
                 page: request.Page,
                 pageSize: request.PageSize,
-                search: request.Search)
+                search: request.Search,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -54,10 +48,14 @@ public class PublicationsController : ControllerBase
     [SwaggerResponse(200, "The requested publication summary", type: typeof(PublicationSummaryViewModel))]
     [SwaggerResponse(404)]
     // add other responses
-    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication([SwaggerParameter("The ID of the publication.")] Guid publicationId)
+    public async Task<ActionResult<PublicationSummaryViewModel>> GetPublication(
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId,
+        CancellationToken cancellationToken)
     {
-        return await _publicationService
-            .GetPublication(publicationId)
+        return await publicationService
+            .GetPublication(
+                publicationId: publicationId,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 
@@ -71,15 +69,17 @@ public class PublicationsController : ControllerBase
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data sets", type: typeof(DataSetPaginatedListViewModel))]
     [SwaggerResponse(400)]
-    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListDataSets(
+    public async Task<ActionResult<DataSetPaginatedListViewModel>> ListPublicationDataSets(
         [FromQuery] DataSetListRequest request,
-        [SwaggerParameter("The ID of the publication.")] Guid publicationId)
+        [SwaggerParameter("The ID of the publication.")] Guid publicationId,
+        CancellationToken cancellationToken)
     {
-        return await _dataSetService
+        return await dataSetService
             .ListDataSets(
                 page: request.Page,
                 pageSize: request.PageSize,
-                publicationId)
+                publicationId: publicationId,
+                cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
 }

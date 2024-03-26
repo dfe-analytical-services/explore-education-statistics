@@ -206,6 +206,8 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                name="test-checkboxes"
                type="checkbox"
                value="1"
+               aria-controls="test-checkboxes-checkbox-1-conditional"
+               aria-expanded="false"
         >
         <label class="govuk-label govuk-checkboxes__label"
                for="test-checkboxes-checkbox-1"
@@ -213,7 +215,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
           Test checkbox 1
         </label>
       </div>
-      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden"
+           id="test-checkboxes-checkbox-1-conditional"
+      >
         <p>
           Conditional 1
         </p>
@@ -227,6 +231,8 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                type="checkbox"
                value="2"
                checked
+               aria-controls="test-checkboxes-checkbox-2-conditional"
+               aria-expanded="true"
         >
         <label class="govuk-label govuk-checkboxes__label"
                for="test-checkboxes-checkbox-2"
@@ -234,7 +240,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
           Test checkbox 2
         </label>
       </div>
-      <div class="govuk-checkboxes__conditional">
+      <div class="govuk-checkboxes__conditional"
+           id="test-checkboxes-checkbox-2-conditional"
+      >
         <p>
           Conditional 2
         </p>
@@ -247,6 +255,8 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
                name="test-checkboxes"
                type="checkbox"
                value="3"
+               aria-controls="test-checkboxes-checkbox-3-conditional"
+               aria-expanded="false"
         >
         <label class="govuk-label govuk-checkboxes__label"
                for="test-checkboxes-checkbox-3"
@@ -254,7 +264,9 @@ exports[`FormCheckboxGroup renders option with conditional contents 1`] = `
           Test checkbox 3
         </label>
       </div>
-      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+      <div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden"
+           id="test-checkboxes-checkbox-3-conditional"
+      >
         <p>
           Conditional 3
         </p>

@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
@@ -63,23 +64,18 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
+using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
-using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
-using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
-using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
@@ -308,7 +304,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<PreReleaseOptions>(Configuration);
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
-            services.Configure<ReleaseApprovalOptions>(Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
+            services.Configure<ReleaseApprovalOptions>(
+                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
@@ -509,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
-                        new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" });
+                        new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
                     c.CustomSchemaIds((type) => type.FullName);
                     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {

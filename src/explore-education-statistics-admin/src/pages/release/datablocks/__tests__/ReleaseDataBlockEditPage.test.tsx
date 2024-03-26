@@ -38,6 +38,16 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
+// Mock useMedia as tests for tabs can be flaky due to the
+// role being added only on desktop.
+jest.mock('@common/hooks/useMedia', () => ({
+  useDesktopMedia: () => {
+    return {
+      onMedia: (value: string) => value,
+    };
+  },
+}));
+
 describe('ReleaseDataBlockEditPage', () => {
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',

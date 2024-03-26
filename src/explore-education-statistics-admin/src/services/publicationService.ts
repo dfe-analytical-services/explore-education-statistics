@@ -85,9 +85,7 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
 
 export interface ReleaseSeriesItemUpdateRequest {
   id: string;
-
   releaseId?: string;
-
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;
 }
@@ -97,6 +95,11 @@ export interface ListReleasesParams {
   page?: number;
   pageSize?: number;
   includePermissions?: boolean;
+}
+
+export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
+  isLatest?: boolean;
+  isPublished?: boolean;
 }
 
 const publicationService = {
@@ -213,14 +216,14 @@ const publicationService = {
     );
   },
 
-  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesItem[]> {
+  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesTableEntry[]> {
     return client.get(`/publications/${publicationId}/release-series`);
   },
 
   addReleaseSeriesLegacyLink(
     publicationId: string,
     newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
-  ): Promise<ReleaseSeriesItem[]> {
+  ): Promise<ReleaseSeriesTableEntry[]> {
     return client.post(
       `publications/${publicationId}/release-series`,
       newLegacyLink,
@@ -230,7 +233,7 @@ const publicationService = {
   updateReleaseSeries(
     publicationId: string,
     updatedReleaseSeries: ReleaseSeriesItemUpdateRequest[],
-  ): Promise<ReleaseSeriesItem[]> {
+  ): Promise<ReleaseSeriesTableEntry[]> {
     return client.put(
       `/publications/${publicationId}/release-series`,
       updatedReleaseSeries,

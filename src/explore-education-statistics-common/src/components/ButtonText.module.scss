@@ -1,5 +1,5 @@
-@import '~govuk-frontend/govuk/base';
-@import '~govuk-frontend/govuk/core/links';
+@import '~govuk-frontend/dist/govuk/base';
+@import '~govuk-frontend/dist/govuk/core/links';
 
 .button {
   @include govuk-link-common;

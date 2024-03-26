@@ -57,10 +57,10 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => generator.ForInstance(p => p.SetExternalMethodology(externalMethodology));
 
-    public static Generator<Publication> WithLegacyReleases( // @MarkFix
+    public static Generator<Publication> WithLegacyLinks(
         this Generator<Publication> generator,
-        IEnumerable<LegacyRelease> legacyReleases)
-        => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
+        IEnumerable<ReleaseSeriesItem> releaseSeries)
+        => generator.ForInstance(p => p.SetLegacyLinks(releaseSeries));
 
     public static Generator<Publication> WithSupersededBy(
         this Generator<Publication> generator,
@@ -109,25 +109,24 @@ public static class PublicationGeneratorExtensions
                 p => p.ReleaseVersions,
                 (_, publication, context) =>
                 {
-                    var list = releases.Invoke(context).ToList();
+                    var releaseList = releases.Invoke(context).ToList();
 
-                    var releaseVersions = list.SelectMany(r => r.Versions)
+                    releaseList.ForEach(release =>
+                    {
+                        publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = release.Id,
+                        });
+                    });
+
+                    var releaseVersions = releaseList.SelectMany(r => r.Versions)
                         .ToList();
 
                     releaseVersions.ForEach(releaseVersion =>
                     {
                         releaseVersion.Publication = publication;
                         releaseVersion.PublicationId = publication.Id;
-
-                        // @MarkFix
-                        //publication.ReleaseSeries.Add(new()
-                        //{
-                        //    ReleaseId = release.Id,
-                        //    IsAmendment = release.Amendment,
-                        //    IsDraft = !release.Published.HasValue,
-                        //    IsLegacy = false,
-                        //    Order = publication.ReleaseSeries.Count + 1,
-                        //});
                     });
 
                     return releaseVersions;
@@ -198,30 +197,24 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => setters.Set(p => p.ExternalMethodology, externalMethodology);
 
-    private static InstanceSetters<Publication> SetLegacyReleases( // @MarkFix remove
+    private static InstanceSetters<Publication> SetLegacyLinks(
         this InstanceSetters<Publication> setters,
-        IEnumerable<LegacyRelease> legacyReleases)
+        IEnumerable<ReleaseSeriesItem> legacyLinks)
         => setters.Set(
-                p => p.LegacyReleases,
+                p => p.ReleaseSeries,
                 (_, publication, context) =>
                 {
-                    legacyReleases.ForEach(legacyRelease =>
+                    legacyLinks.ForEach(legacyLink =>
                     {
-                        legacyRelease.Publication = publication;
-                        legacyRelease.PublicationId = publication.Id;
-
-                        // @MarkFix
-                        //publication.ReleaseSeries.Add(new()
-                        //{
-                        //    ReleaseId = legacyRelease.Id,
-                        //    IsAmendment = false,
-                        //    IsDraft = false,
-                        //    IsLegacy = true,
-                        //    Order = publication.ReleaseSeries.Count + 1,
-                        //});
+                        publication.ReleaseSeries.Add(new()
+                        {
+                            Id = legacyLink.Id,
+                            LegacyLinkDescription = legacyLink.LegacyLinkDescription,
+                            LegacyLinkUrl = legacyLink.LegacyLinkUrl,
+                        });
                     });
 
-                    return legacyReleases;
+                    return publication.ReleaseSeries;
                 }
             );
 

@@ -64,6 +64,7 @@ const DataBlockTabs = ({
         {!!dataBlock.charts?.length && (
           <TabsSection
             id={`${id}-charts`}
+            lazy
             tabLabel={
               <>
                 Chart

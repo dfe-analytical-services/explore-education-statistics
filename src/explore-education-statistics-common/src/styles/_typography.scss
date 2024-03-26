@@ -1,8 +1,8 @@
-@import '~govuk-frontend/govuk/core/lists';
-@import '~govuk-frontend/govuk/core/section-break';
-@import '~govuk-frontend/govuk/core/typography';
-@import '~govuk-frontend/govuk/core/links';
-@import '~govuk-frontend/govuk/helpers/typography';
+@import '~govuk-frontend/dist/govuk/core/lists';
+@import '~govuk-frontend/dist/govuk/core/section-break';
+@import '~govuk-frontend/dist/govuk/core/typography';
+@import '~govuk-frontend/dist/govuk/core/links';
+@import '~govuk-frontend/dist/govuk/helpers/typography';
 
 body {
   @extend %govuk-body-m;

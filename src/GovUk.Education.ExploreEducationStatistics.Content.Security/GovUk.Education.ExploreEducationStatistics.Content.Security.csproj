@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>10.0</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
-
 
     <ItemGroup>
         <CompilerVisibleProperty Include="RootNamespace" />
@@ -13,8 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.21" />
+        <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.3" />
     </ItemGroup>
 
     <ItemGroup>

@@ -8,7 +8,7 @@ exports[`FormRadioGroup renders correctly with legend 1`] = `
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Choose a radio
     </legend>
-    <div class="govuk-radios">
+    <div class="govuk-radios radio">
       <div class="govuk-radios__item"
            data-testid="Radio item for Test radio 1"
       >
@@ -44,7 +44,7 @@ exports[`FormRadioGroup renders correctly with small size variants 1`] = `
         Choose a radio
       </legend>
       <div
-        class="govuk-radios govuk-radios--small"
+        class="govuk-radios radio govuk-radios--small small"
       >
         <div
           class="govuk-radios__item"
@@ -78,7 +78,7 @@ exports[`FormRadioGroup renders list of radios in correct order 1`] = `
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Test radios
     </legend>
-    <div class="govuk-radios">
+    <div class="govuk-radios radio">
       <div class="govuk-radios__item"
            data-testid="Radio item for Test radio 1"
       >
@@ -137,7 +137,7 @@ exports[`FormRadioGroup renders option with conditional contents 1`] = `
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
       Test radios
     </legend>
-    <div class="govuk-radios">
+    <div class="govuk-radios radio">
       <div class="govuk-radios__item"
            data-testid="Radio item for Test radio 1"
       >

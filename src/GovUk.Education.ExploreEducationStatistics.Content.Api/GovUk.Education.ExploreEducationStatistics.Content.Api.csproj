@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>10.0</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
         <AssemblyName>GovUk.Education.ExploreEducationStatistics.Content.Api</AssemblyName>
         <RootNamespace>GovUk.Education.ExploreEducationStatistics.Content.Api</RootNamespace>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -12,16 +11,14 @@
         <CompilerVisibleProperty Include="RootNamespace" />
         <CompilerVisibleProperty Include="ProjectDir" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
-        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
-        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.21" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.3" />
+        <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.3" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>

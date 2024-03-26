@@ -1,4 +1,8 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -23,17 +27,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -266,9 +264,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await ReleaseUpdateRequestValidator.Validate(request)
                 .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
-                .OnSuccessDo(async release =>
+                .OnSuccessDo(async releaseVersion =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
-                        publicationId: release.PublicationId,
+                        publicationId: releaseVersion.PublicationId,
                         releaseVersionId: releaseVersionId))
                 .OnSuccess(async releaseVersion =>
                 {

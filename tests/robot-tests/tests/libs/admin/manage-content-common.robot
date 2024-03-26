@@ -51,7 +51,7 @@ user adds a release note
     ...    ${display_date_month}=${EMPTY}
     ...    ${display_date_year}=${EMPTY}
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    ${body}
+    user enters text into element    id:create-release-note-form-reason    ${body}
     user clicks button    Save note
     user waits until page contains button    Add note
 
@@ -425,6 +425,9 @@ user adds image to accordion section text block
     choose file
     ...    xpath://button[span[.="Upload image from computer"]]/input[@type="file"]
     ...    ${FILES_DIR}${filename}
+
+    user scrolls down    200
+
     user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save

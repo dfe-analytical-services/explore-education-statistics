@@ -52,14 +52,14 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        ReleaseSeries = new() // @MarkFix
+        ReleaseSeries = new()
         {
             new()
             {
                 Id = Guid.NewGuid(),
-                ReleaseId = null,
-                LegacyLinkUrl = "http://test.com/",
+                IsLegacyLink = true,
                 Description = "legacy link description",
+                LegacyLinkUrl = "http://test.com/",
             }
         },
         Topic = new TopicViewModel(new ThemeViewModel(

@@ -62,7 +62,7 @@ Adopt a published Methodology
     user checks element should contain    ${selected_methodology_details}    ${OWNING_PUBLICATION_NAME}
     # List of adoptable methodologies shows latest published version, not latest version -
     # that's why this is approved and not the draft amendment
-    user checks element should contain    ${selected_methodology_details}    APPROVED
+    user checks element should contain    ${selected_methodology_details}    Approved
     ${methodology_published_date}=    get current datetime    %-d %B %Y
     user checks element should contain    ${selected_methodology_details}    ${methodology_published_date}
     user clicks button    Save

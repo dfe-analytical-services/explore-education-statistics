@@ -44,8 +44,7 @@ const PrototypeManagePublication = () => {
 
       <h3 className="govuk-heading-l">Legacy releases</h3>
       <p>
-        Legacy releases will be displayed in descending order on the
-        publication.
+        Legacy releases will be shown in the order below on the publication.
       </p>
 
       <div style={{ width: '100%', overflow: 'auto' }}>

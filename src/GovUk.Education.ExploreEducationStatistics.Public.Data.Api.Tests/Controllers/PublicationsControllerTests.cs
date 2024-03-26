@@ -17,20 +17,12 @@ using PublicationSummaryViewModel = GovUk.Education.ExploreEducationStatistics.P
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class PublicationsControllerTests : IntegrationTestFixture
+public abstract class PublicationsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/v1/publications";
 
-    public PublicationsControllerTests(TestApplicationFactory testApp) : base(testApp)
+    public class ListPublicationsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-    }
-
-    public class ListPublicationsTests : PublicationsControllerTests
-    {
-        public ListPublicationsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task PublishedDataSets_Returns200_FiltersPublicationsWithoutPublishedDataSets()
         {
@@ -84,7 +76,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     pageSize,
                     null,
                     It.Is<IEnumerable<Guid>>(ids =>
-                        ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order()))))
+                        ids.Order().SequenceEqual(publishedDataSetPublicationIds.Order())),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: expectedPublications,
                     totalResults: numberOfPublishedDataSets,
@@ -138,7 +131,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     1,
                     1,
                     null,
-                    new List<Guid>() { publicationId }))
+                    new List<Guid>() { publicationId },
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: [publication],
                     totalResults: 1,
@@ -177,7 +171,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
                     1,
                     1,
                     null,
-                    Enumerable.Empty<Guid>()))
+                    Enumerable.Empty<Guid>(),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(
                     results: [],
                     totalResults: 0,
@@ -278,12 +273,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetPublicationTests : PublicationsControllerTests
+    public class GetPublicationTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-        public GetPublicationTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task PublicationExists_Returns200()
         {
@@ -298,7 +289,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publication.Id))
+                .Setup(c => c.GetPublication(publication.Id, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(publication);
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -328,7 +319,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publicationId))
+                .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new NotFoundResult());
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -378,7 +369,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var contentApiClient = new Mock<IContentApiClient>();
             contentApiClient
-                .Setup(c => c.GetPublication(publicationId))
+                .Setup(c => c.GetPublication(publicationId, It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new HttpRequestException("something went wrong"));
 
             var client = BuildApp(contentApiClient.Object).CreateClient();
@@ -404,12 +395,8 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListDataSetsTests : PublicationsControllerTests
+    public class ListPublicationDataSetsTests(TestApplicationFactory testApp) : PublicationsControllerTests(testApp)
     {
-        public ListDataSetsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(1, 2, 1)]
         [InlineData(1, 2, 2)]
@@ -462,7 +449,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: page,
@@ -511,7 +498,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: 1,
@@ -599,7 +586,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId1,
                 page: 1,
@@ -647,7 +634,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: 1,
@@ -667,7 +654,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: 1,
@@ -701,7 +688,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
 
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: publicationId,
                 page: page,
@@ -723,7 +710,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: page,
@@ -744,7 +731,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
         {
             var client = BuildApp().CreateClient();
 
-            var response = await ListDataSets(
+            var response = await ListPublicationDataSets(
                 client: client,
                 publicationId: Guid.NewGuid(),
                 page: 1,
@@ -775,7 +762,7 @@ public abstract class PublicationsControllerTests : IntegrationTestFixture
             response.AssertNotFound();
         }
 
-        private static async Task<HttpResponseMessage> ListDataSets(
+        private static async Task<HttpResponseMessage> ListPublicationDataSets(
             HttpClient client,
             Guid publicationId,
             int? page = null,

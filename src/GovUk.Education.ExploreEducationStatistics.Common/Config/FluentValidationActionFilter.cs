@@ -134,8 +134,13 @@ public class FluentValidationActionFilter : IAsyncActionFilter
     {
         var detail = failure.FormattedMessagePlaceholderValues
             .Where(kv => !IgnoredMessagePlaceholders.Contains(kv.Key))
-            .ToDictionary(kv => kv.Key.CamelCase(), kv => kv.Value)
+            .ToDictionary(kv => kv.Key.ToLowerFirst(), kv => kv.Value)
             as Dictionary<string, object?>;
+
+        if (!detail.ContainsKey("value"))
+        {
+            detail["value"] = failure.AttemptedValue;
+        }
 
         if (failure.CustomState is null)
         {
@@ -146,13 +151,16 @@ public class FluentValidationActionFilter : IAsyncActionFilter
 
         if (type is { IsClass: true, IsPrimitive: false, IsEnum: false, IsValueType: false })
         {
-            detail.AddRange(
-                failure.CustomState
-                    .ToDictionary()
-                    .ToDictionary(
-                        kv => kv.Key.CamelCase(),
-                        kv => kv.Value)
-            );
+            var customKeyValues = failure.CustomState
+                .ToDictionary()
+                .ToDictionary(
+                    kv => kv.Key.CamelCase(),
+                    kv => kv.Value);
+
+            foreach (var keyValue in customKeyValues)
+            {
+                detail[keyValue.Key] = keyValue.Value;
+            }
         }
         else
         {

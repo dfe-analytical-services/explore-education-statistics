@@ -7,14 +7,15 @@ import {
 } from '@admin/routes/publicationRoutes';
 import _publicationService, {
   PublicationWithPermissions,
+  ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
-import { ReleaseSeriesItem } from '@common/services/publicationService';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -22,11 +23,11 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
-  const releaseSeries: ReleaseSeriesItem[] = [
+  const releaseSeries: ReleaseSeriesTableEntry[] = [
     {
       id: 'legacy-release-1',
       isLegacyLink: true,
-      description: 'Legacy release 1',
+      description: 'Legacy link 1',
 
       legacyLinkUrl: 'https://gov.uk/1',
     },
@@ -36,13 +37,14 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
       description: 'Academic Year 2000/01',
 
       releaseId: 'release-parent-1',
-      publicationSlug: 'publication-slug',
       releaseSlug: 'release-slug',
+      isLatest: true,
+      isPublished: true,
     },
     {
       id: 'legacy-release-2',
       isLegacyLink: true,
-      description: 'Legacy release 2',
+      description: 'Legacy link 2',
 
       legacyLinkUrl: 'https://gov.uk/2',
     },
@@ -58,9 +60,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
     });
-    expect(screen.getByLabelText('Description')).toHaveValue(
-      'Legacy release 1',
-    );
+    expect(screen.getByLabelText('Description')).toHaveValue('Legacy link 1');
     expect(screen.getByLabelText('URL')).toHaveValue('https://gov.uk/1');
     expect(
       screen.getByRole('button', { name: 'Save legacy release' }),
@@ -92,7 +92,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
           {
             id: 'legacy-release-1',
 
-            legacyLinkDescription: 'Legacy release 1 edited',
+            legacyLinkDescription: 'Legacy link 1 edited',
             legacyLinkUrl: 'https://gov.uk/1/edit',
           },
           {
@@ -103,7 +103,7 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
           {
             id: 'legacy-release-2',
 
-            legacyLinkDescription: 'Legacy release 2',
+            legacyLinkDescription: 'Legacy link 2',
             legacyLinkUrl: 'https://gov.uk/2',
           },
         ],
@@ -111,8 +111,6 @@ describe('PublicationEditReleaseSeriesLegacyLinkPage', () => {
     });
   });
 });
-
-// @MarkFix more tests
 
 function renderPage(
   publication: PublicationWithPermissions,

@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {

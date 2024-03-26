@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,87 +8,64 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once UnusedType.Global
-    public class PublishScheduledReleasesFunction
+    public class PublishScheduledReleasesFunction(
+        ILogger<PublishScheduledReleasesFunction> logger,
+        IReleasePublishingStatusService releasePublishingStatusService,
+        IPublishingService publishingService,
+        IPublishingCompletionService publishingCompletionService)
     {
-        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-        private readonly IPublishingService _publishingService;
-        private readonly IPublishingCompletionService _publishingCompletionService;
-
-        public PublishScheduledReleasesFunction(
-            IReleasePublishingStatusService releasePublishingStatusService,
-            IPublishingService publishingService,
-            IPublishingCompletionService publishingCompletionService)
-        {
-            _releasePublishingStatusService = releasePublishingStatusService;
-            _publishingService = publishingService;
-            _publishingCompletionService = publishingCompletionService;
-        }
-
         /// <summary>
-        /// Azure function which publishes the content for a Release at a scheduled time by moving it from a staging
+        /// Azure function which publishes the content for a release version at a scheduled time by moving it from a staging
         /// directory.
         /// </summary>
         /// <remarks>
-        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
         /// </remarks>
         /// <param name="timer"></param>
-        /// <param name="executionContext"></param>
-        /// <param name="logger"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        [FunctionName("PublishStagedReleaseContent")]
-        // ReSharper disable once UnusedMember.Global
-        public async Task PublishScheduledReleases([TimerTrigger("%PublishReleaseContentCronSchedule%")] TimerInfo timer,
-            ExecutionContext executionContext,
-            ILogger logger)
+        [Function("PublishStagedReleaseContent")]
+        public async Task PublishScheduledReleases(
+            [TimerTrigger("%AppSettings:PublishReleaseContentCronSchedule%")] TimerInfo timer,
+            FunctionContext context)
         {
-            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
-                executionContext.FunctionName,
-                DateTime.UtcNow);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var publishedReleaseVersionIds =
                 await PublishScheduledReleases((await QueryScheduledReleasesForToday()).ToArray());
 
             logger.LogInformation(
-                "{FunctionName} completed.  Published release versions [{ReleaseVersionIds}].  " +
-                "Will be scheduled again to run at {NextDateTime}",
-                executionContext.FunctionName,
-                publishedReleaseVersionIds.JoinToString(','),
-                timer.FormatNextOccurrences(1));
+                "{FunctionName} completed. Published release versions [{ReleaseVersionIds}].",
+                context.FunctionDefinition.Name,
+                publishedReleaseVersionIds.JoinToString(','));
         }
 
         /// <summary>
-        /// Azure function which publishes the content for a Release immediately by moving it from a staging
+        /// Azure function which publishes the content for a release version immediately by moving it from a staging
         /// directory. This function is manually triggered by an HTTP POST, and is disabled by default in production
         /// environments. 
         /// </summary>
         /// <remarks>
-        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that release version.
         /// </remarks>
         /// <param name="request">
         /// An optional JSON request body with a "ReleaseVersionIds" array can be included in the POST request to limit
         /// the scope of the Function to only operate upon the provided release version id's.
         /// </param>
-        /// <param name="executionContext"></param>
-        /// <param name="logger"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        [FunctionName("PublishStagedReleaseContentImmediately")]
-        // ReSharper disable once UnusedMember.Global
-        public async Task<ActionResult<ManualTriggerResponse>> PublishScheduledReleasesImmediately(
+        [Function("PublishStagedReleaseVersionContentImmediately")]
+        public async Task<ActionResult<ManualTriggerResponse>> PublishStagedReleaseVersionContentImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequest request,
-            ExecutionContext executionContext,
-            ILogger logger)
+            FunctionContext context)
         {
-            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
-                executionContext.FunctionName,
-                DateTime.UtcNow);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionDefinition.Name);
 
             var releaseVersionIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseVersionIds;
 
@@ -101,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var publishedReleaseVersionIds = await PublishScheduledReleases(scheduled.ToArray());
 
             logger.LogInformation("{FunctionName} completed. Published release versions [{ReleaseVersionIds}]",
-                executionContext.FunctionName,
+                context.FunctionDefinition.Name,
                 publishedReleaseVersionIds.JoinToString(','));
 
             return new ManualTriggerResponse(publishedReleaseVersionIds);
@@ -114,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 return Array.Empty<Guid>();
             }
 
-            await _publishingService.PublishStagedReleaseContent();
+            await publishingService.PublishStagedReleaseContent();
 
             await scheduled
                 .ToAsyncEnumerable()
@@ -122,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
 
             // Finalise publishing of these releases
-            await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+            await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
                 scheduled.Select(status => (status.ReleaseVersionId, ReleaseStatusId: status.Id)));
 
             return scheduled
@@ -132,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleasesForToday()
         {
-            return await _releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
@@ -140,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleasesForTodayOrFuture()
         {
-            return await _releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
+            return await releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
@@ -151,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await _releasePublishingStatusService.UpdateContentStageAsync(
+            await releasePublishingStatusService.UpdateContentStageAsync(
                 releaseVersionId: status.ReleaseVersionId,
                 releaseStatusId: status.Id,
                 stage,

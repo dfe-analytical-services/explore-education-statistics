@@ -1,4 +1,8 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -6,23 +10,16 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerTests : IntegrationTestFixture
+public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/v1/data-sets";
 
-    public DataSetsControllerTests(TestApplicationFactory testApp) : base(testApp)
+    public class GetDataSetTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-    }
-
-    public class GetDataSetTests : DataSetsControllerTests
-    {
-        public GetDataSetTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(DataSetStatus.Published)]
         [InlineData(DataSetStatus.Deprecated)]
@@ -41,8 +38,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                     locations: 1,
                     timePeriods: 3)
                 .WithStatusPublished()
-                .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .WithDataSet(dataSet);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -115,12 +111,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class ListVersionsTests : DataSetsControllerTests
+    public class ListDataSetVersionsTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public ListVersionsTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(1, 2, 1)]
         [InlineData(1, 2, 2)]
@@ -153,7 +145,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 context.DataSetVersions.AddRange(dataSetVersions);
             });
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize);
@@ -202,7 +194,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
                 context.DataSetVersions.AddRange(dataSetVersions);
             });
 
-            var page1Response = await ListVersions(
+            var page1Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 3);
@@ -214,7 +206,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             Assert.Equal("3.0", page1Content.Results[1].Number);
             Assert.Equal("2.1", page1Content.Results[2].Number);
 
-            var page2Response = await ListVersions(
+            var page2Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 2,
                 pageSize: 3);
@@ -255,7 +247,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -278,7 +270,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(
                 dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                result.Unpublished?.ToUnixTimeSeconds()
+                result.Withdrawn?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, result.Notes);
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
@@ -334,7 +326,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             await TestApp.AddTestData<PublicDataDbContext>(context =>
                 context.DataSetVersions.AddRange(dataSet1Version, dataSet2Version));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet1.Id,
                 page: 1,
                 pageSize: 1);
@@ -350,6 +342,9 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
 
         [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
         [InlineData(DataSetVersionStatus.Draft)]
         public async Task DataSetVersionUnavailable_Returns200_EmptyList(DataSetVersionStatus dataSetVersionStatus)
         {
@@ -370,7 +365,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -393,7 +388,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: 1,
                 pageSize: 1);
@@ -432,7 +427,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.AddRange(dataSetVersions));
 
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
                 page: page,
                 pageSize: pageSize);
@@ -451,7 +446,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(-1)]
         public async Task PageTooSmall_Returns400(int page)
         {
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: Guid.NewGuid(),
                 page: page,
                 pageSize: 1);
@@ -469,7 +464,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         [InlineData(21)]
         public async Task PageSizeOutOfBounds_Returns400(int pageSize)
         {
-            var response = await ListVersions(
+            var response = await ListDataSetVersions(
                 dataSetId: Guid.NewGuid(),
                 page: 1,
                 pageSize: pageSize);
@@ -492,7 +487,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await ListVersions(dataSetId: dataSet.Id);
+            var response = await ListDataSetVersions(dataSetId: dataSet.Id);
 
             response.AssertForbidden();
         }
@@ -515,7 +510,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> ListVersions(
+        private async Task<HttpResponseMessage> ListDataSetVersions(
             Guid dataSetId,
             int? page = null,
             int? pageSize = null)
@@ -534,12 +529,8 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
         }
     }
 
-    public class GetVersionTests : DataSetsControllerTests
+    public class GetDataSetVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
-        public GetVersionTests(TestApplicationFactory testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Withdrawn)]
@@ -564,7 +555,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version);
 
             var content = response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
 
@@ -578,7 +569,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
             );
             Assert.Equal(
                 dataSetVersion.Withdrawn?.ToUnixTimeSeconds(),
-                content.Unpublished?.ToUnixTimeSeconds()
+                content.Withdrawn?.ToUnixTimeSeconds()
             );
             Assert.Equal(dataSetVersion.Notes, content.Notes);
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
@@ -621,7 +612,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet.Id, dataSetVersion.Version);
 
             response.AssertForbidden();
         }
@@ -650,7 +641,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(dataSet2.Id, dataSetVersion.Version);
+            var response = await GetDataSetVersion(dataSet2.Id, dataSetVersion.Version);
 
             response.AssertNotFound();
         }
@@ -664,7 +655,7 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
 
-            var response = await GetVersion(dataSet.Id, "1.0");
+            var response = await GetDataSetVersion(dataSet.Id, "1.0");
 
             response.AssertNotFound();
         }
@@ -689,16 +680,920 @@ public abstract class DataSetsControllerTests : IntegrationTestFixture
 
             await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
 
-            var response = await GetVersion(Guid.NewGuid(), dataSetVersion.Version);
+            var response = await GetDataSetVersion(Guid.NewGuid(), dataSetVersion.Version);
 
             response.AssertNotFound();
         }
 
-        private async Task<HttpResponseMessage> GetVersion(Guid dataSetId, string dataSetVersion)
+        private async Task<HttpResponseMessage> GetDataSetVersion(Guid dataSetId, string dataSetVersion)
         {
             var client = TestApp.CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+    }
+
+    public class GetDataSetMetaTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    {
+        public class NoQueryParametersTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
+        {
+            [Fact]
+            public async Task ReturnsCorrectViewModel()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var filterMetas = DataFixture
+                    .DefaultFilterMeta()
+                    .WithOptions(() => DataFixture
+                        .DefaultFilterOptionMeta()
+                        .GenerateList(3))
+                    .GenerateList(3);
+
+                var allLocationOptionMetaTypesGeneratorByLevel = new Dictionary<GeographicLevel, Func<LocationOptionMeta>>
+                {
+                    { GeographicLevel.School, () => DataFixture.DefaultLocationSchoolOptionMeta() },
+                    { GeographicLevel.LocalAuthority, () => DataFixture.DefaultLocationLocalAuthorityOptionMeta() },
+                    { GeographicLevel.RscRegion, () => DataFixture.DefaultLocationRscRegionOptionMeta() },
+                    { GeographicLevel.Provider, () => DataFixture.DefaultLocationProviderOptionMeta() },
+                    { GeographicLevel.EnglishDevolvedArea, () => DataFixture.DefaultLocationCodedOptionMeta() },
+                };
+
+                var locationMetas = allLocationOptionMetaTypesGeneratorByLevel
+                    .Select(locationOptionMetaGenerator => DataFixture
+                        .DefaultLocationMeta()
+                        .WithOptions(() => new List<LocationOptionMeta>
+                        {
+                            locationOptionMetaGenerator.Value.Invoke(),
+                            locationOptionMetaGenerator.Value.Invoke(),
+                            locationOptionMetaGenerator.Value.Invoke()
+                        })
+                        .WithLevel(locationOptionMetaGenerator.Key))
+                    .Select(locationMeta => (LocationMeta)locationMeta)
+                    .ToList();
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion()
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .WithFilterMetas(() => filterMetas)
+                    .WithLocationMetas(() => locationMetas)
+                    .WithIndicatorMetas(() =>
+                        DataFixture
+                        .DefaultIndicatorMeta()
+                        .GenerateList(3)
+                    )
+                    .WithTimePeriodMetas(() =>
+                        DataFixture
+                        .DefaultTimePeriodMeta()
+                        .GenerateList(3)
+                    )
+                    .WithMetaSummary()
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(dataSet.Id);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                foreach (var filterMetaViewModel in content.Filters)
+                {
+                    var filterMeta = Assert.Single(dataSetVersion.FilterMetas, fm => fm.PublicId == filterMetaViewModel.Id);
+                    Assert.Equal(filterMeta.Hint, filterMetaViewModel.Hint);
+                    Assert.Equal(filterMeta.Label, filterMetaViewModel.Label);
+
+                    var allFilterMetaLinks = filterMeta.Options
+                        .SelectMany(o => o.MetaLinks)
+                        .ToList();
+
+                    foreach (var filterOptionMetaViewModel in filterMetaViewModel.Options)
+                    {
+                        var filterOptionMetaLink = Assert.Single(
+                            allFilterMetaLinks,
+                            link => link.PublicId == filterOptionMetaViewModel.Id);
+
+                        var filterOptionMeta = Assert.Single(
+                            filterMeta.Options,
+                            o => o.Id == filterOptionMetaLink.OptionId);
+
+                        Assert.Equal(filterOptionMeta.Label, filterOptionMetaViewModel.Label);
+                        Assert.Equal(filterOptionMeta.IsAggregate, filterOptionMetaViewModel.IsAggregate);
+                    }
+                }
+
+                foreach (var locationMetaViewModel in content.Locations)
+                {
+                    var locationMeta = Assert.Single(
+                        dataSetVersion.LocationMetas,
+                        fm => fm.Level == locationMetaViewModel.Level);
+
+                    var allLocationMetaLinks = locationMeta.Options
+                        .SelectMany(o => o.MetaLinks)
+                        .ToList();
+
+                    foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
+                    {
+                        var locationOptionMetaLink = Assert.Single(
+                            allLocationMetaLinks,
+                            link => link.PublicId == locationOptionMetaViewModel.Id);
+
+                        var locationOptionMeta = Assert.Single(
+                            locationMeta.Options,
+                            o => o.Id == locationOptionMetaLink.OptionId);
+
+                        switch (locationOptionMeta)
+                        {
+                            case LocationCodedOptionMeta codedMeta:
+                                var codedViewModel =
+                                    Assert.IsType<LocationCodedOptionMetaViewModel>(locationOptionMetaViewModel);
+                                Assert.Equal(codedMeta.Label, codedViewModel.Label);
+                                Assert.Equal(codedMeta.Code, codedViewModel.Code);
+                                break;
+                            case LocationLocalAuthorityOptionMeta localAuthorityMeta:
+                                var localAuthorityViewModel =
+                                    Assert.IsType<LocationLocalAuthorityOptionMetaViewModel>(locationOptionMetaViewModel);
+                                Assert.Equal(localAuthorityMeta.Label, localAuthorityViewModel.Label);
+                                Assert.Equal(localAuthorityMeta.Code, localAuthorityViewModel.Code);
+                                Assert.Equal(localAuthorityMeta.OldCode, localAuthorityViewModel.OldCode);
+                                break;
+                            case LocationProviderOptionMeta providerMeta:
+                                var providerViewModel =
+                                    Assert.IsType<LocationProviderOptionMetaViewModel>(locationOptionMetaViewModel);
+                                Assert.Equal(providerMeta.Label, providerViewModel.Label);
+                                Assert.Equal(providerMeta.Ukprn, providerViewModel.Ukprn);
+                                break;
+                            case LocationRscRegionOptionMeta rscRegionMeta:
+                                var rscRegionViewModel =
+                                    Assert.IsType<LocationRscRegionOptionMetaViewModel>(locationOptionMetaViewModel);
+                                Assert.Equal(rscRegionMeta.Label, rscRegionViewModel.Label);
+                                break;
+                            case LocationSchoolOptionMeta schoolMeta:
+                                var schoolViewModel =
+                                    Assert.IsType<LocationSchoolOptionMetaViewModel>(locationOptionMetaViewModel);
+                                Assert.Equal(schoolMeta.Label, schoolViewModel.Label);
+                                Assert.Equal(schoolMeta.Urn, schoolViewModel.Urn);
+                                Assert.Equal(schoolMeta.LaEstab, schoolViewModel.LaEstab);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+                }
+
+                Assert.Equal(dataSetVersion.LocationMetas.Select(lm => lm.Level), content.GeographicLevels);
+
+                foreach (var indicator in content.Indicators)
+                {
+                    var indicatorMeta = Assert.Single(dataSetVersion.IndicatorMetas, im => im.PublicId == indicator.Id);
+
+                    Assert.Equal(indicatorMeta.Label, indicator.Label);
+                    Assert.Equal(indicatorMeta.Unit, indicator.Unit);
+                    Assert.Equal(indicatorMeta.DecimalPlaces, indicator.DecimalPlaces);
+                }
+
+                foreach (var timePeriod in content.TimePeriods)
+                {
+                    var timePeriodMeta = Assert.Single(
+                        dataSetVersion.TimePeriodMetas,
+                        tp => tp.Code == timePeriod.Code
+                        && tp.Period == timePeriod.Period);
+
+                    Assert.Equal(
+                        TimePeriodFormatter.FormatLabel(timePeriodMeta.Period, timePeriodMeta.Code),
+                        timePeriod.Label);
+                }
+            }                   
+
+            [Theory]
+            [InlineData(DataSetVersionStatus.Published)]
+            [InlineData(DataSetVersionStatus.Withdrawn)]
+            [InlineData(DataSetVersionStatus.Deprecated)]
+            public async Task VersionAvailable_Returns200(DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
+                    .WithStatus(dataSetVersionStatus)
+                    .WithPublished(DateTimeOffset.UtcNow)
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(dataSet.Id);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+            }
+
+            [Theory]
+            [InlineData(DataSetVersionStatus.Processing)]
+            [InlineData(DataSetVersionStatus.Failed)]
+            [InlineData(DataSetVersionStatus.Mapping)]
+            [InlineData(DataSetVersionStatus.Draft)]
+            public async Task VersionNotAvailable_Returns403(DataSetVersionStatus dataSetVersionStatus)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
+                    .WithStatus(dataSetVersionStatus)
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(dataSet.Id);
+
+                response.AssertForbidden();
+            }           
+
+            [Fact]
+            public async Task DataSetDoesNotExist_Returns404()
+            {
+                var response = await GetDataSetMeta(Guid.NewGuid());
+
+                response.AssertNotFound();
+            }
+        }
+
+        public class DataSetVersionQueryParameterTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
+        {
+            [Fact]
+            public async Task VersionSpecified_ReturnsCorrectVersion()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .ForIndex(0, dsv => dsv
+                        .SetVersionNumber(1, 0)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 1")
+                            ]
+                        )
+                    )
+                    .ForIndex(1, dsv => dsv
+                        .SetVersionNumber(1, 1)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 2")
+                            ]
+                        )
+                    )
+                    .ForIndex(2, dsv => dsv
+                        .SetVersionNumber(2, 0)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 3")
+                            ]
+                        )
+                    )
+                    .ForIndex(3, dsv => dsv
+                        .SetVersionNumber(2, 1)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 4")
+                            ]
+                        )
+                    )
+                    .GenerateList();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                    context.DataSetVersions.AddRange(dataSetVersions));
+
+                var response = await GetDataSetMeta(dataSet.Id, "2.0");
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+                Assert.Equal("filter 3", content.Filters.Single().Label);
+            }
+
+            [Fact]
+            public async Task VersionUnspecified_ReturnsLatestVersion()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var dataSetVersions = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .ForIndex(0, dsv => dsv
+                        .SetVersionNumber(1, 0)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 1")
+                            ]
+                        )
+                    )
+                    .ForIndex(1, dsv => dsv
+                        .SetVersionNumber(1, 1)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 2")
+                            ]
+                        )
+                    )
+                    .ForIndex(2, dsv => dsv
+                        .SetVersionNumber(2, 0)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 3")
+                            ]
+                        )
+                    )
+                    .ForIndex(3, dsv => dsv
+                        .SetVersionNumber(2, 1)
+                        .SetFilterMetas(() =>
+                            [
+                                DataFixture
+                            .DefaultFilterMeta()
+                            .WithLabel("filter 4")
+                            ]
+                        )
+                    )
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv)
+                    .GenerateList();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.AddRange(dataSetVersions);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(dataSet.Id);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+                Assert.Equal("filter 4", content.Filters.Single().Label);
+            }
+
+            [Fact]
+            public async Task VersionExistsForOtherDataSet_Returns404()
+            {
+                DataSet dataSet1 = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                DataSet dataSet2 = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSet1, dataSet2));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 3)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet1.Id);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSetVersions.Add(dataSetVersion));
+
+                var response = await GetDataSetMeta(dataSet2.Id, dataSetVersion.Version);
+
+                response.AssertNotFound();
+            }
+
+            [Fact]
+            public async Task VersionDoesNotExist_Returns404()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                var response = await GetDataSetMeta(dataSet.Id, "1.0");
+
+                response.AssertNotFound();
+            }
+        }
+
+        public class TypesQueryParameterTests(TestApplicationFactory testApp) : GetDataSetMetaTests(testApp)
+        {
+            [Fact]
+            public async Task TypesNotSpecified_ReturnsAllMeta()
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(dataSet.Id);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                Assert.NotEmpty(content.Filters);
+                Assert.NotEmpty(content.Locations);
+                Assert.NotEmpty(content.Indicators);
+                Assert.NotEmpty(content.TimePeriods);
+            }
+
+            [Theory]
+            [InlineData(DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods)]
+            public async Task OneTypeSpecified_ReturnsOnlySpecifiedMetaType(DataSetMetaType metaType)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(
+                    dataSet.Id,
+                    types: [metaType.ToString()]);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                switch (metaType)
+                {
+                    case DataSetMetaType.Filters:
+                        Assert.NotEmpty(content.Filters);
+                        Assert.Empty(content.Locations);
+                        Assert.Empty(content.Indicators);
+                        Assert.Empty(content.TimePeriods);
+                        break;
+                    case DataSetMetaType.Locations:
+                        Assert.Empty(content.Filters);
+                        Assert.NotEmpty(content.Locations);
+                        Assert.Empty(content.Indicators);
+                        Assert.Empty(content.TimePeriods);
+                        break;
+                    case DataSetMetaType.Indicators:
+                        Assert.Empty(content.Filters);
+                        Assert.Empty(content.Locations);
+                        Assert.NotEmpty(content.Indicators);
+                        Assert.Empty(content.TimePeriods);
+                        break;
+                    case DataSetMetaType.TimePeriods:
+                        Assert.Empty(content.Filters);
+                        Assert.Empty(content.Locations);
+                        Assert.Empty(content.Indicators);
+                        Assert.NotEmpty(content.TimePeriods);
+                        break;
+                }
+            }
+
+            [Theory]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
+            public async Task MultipleTypesSpecified_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(
+                    dataSet.Id,
+                    types: metaTypes.Select(t => t.ToString()).ToList());
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
+
+                foreach (var type in specifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.NotEmpty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.NotEmpty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.NotEmpty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.NotEmpty(content.TimePeriods);
+                            break;
+                    }
+                }
+
+                foreach (var type in unspecifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.Empty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.Empty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.Empty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.Empty(content.TimePeriods);
+                            break;
+                    }
+                }
+            }
+
+
+            [Theory]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods, DataSetMetaType.TimePeriods)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Locations, DataSetMetaType.Locations, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Indicators, DataSetMetaType.Indicators, DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.TimePeriods, DataSetMetaType.TimePeriods, DataSetMetaType.Filters)]
+            public async Task DuplicateTypesSpecified_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var response = await GetDataSetMeta(
+                    dataSet.Id,
+                    types: metaTypes.Select(t => t.ToString()).ToList());
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
+
+                foreach (var type in specifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.NotEmpty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.NotEmpty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.NotEmpty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.NotEmpty(content.TimePeriods);
+                            break;
+                    }
+                }
+
+                foreach (var type in unspecifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.Empty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.Empty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.Empty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.Empty(content.TimePeriods);
+                            break;
+                    }
+                }
+            }
+
+            [Theory]
+            [InlineData(DataSetMetaType.Filters)]
+            [InlineData(DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.TimePeriods)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators)]
+            [InlineData(DataSetMetaType.Filters, DataSetMetaType.Locations, DataSetMetaType.Indicators, DataSetMetaType.TimePeriods)]
+            public async Task ArrayQueryParameterSyntax_ReturnsOnlySpecifiedMetaTypes(params DataSetMetaType[] metaTypes)
+            {
+                DataSet dataSet = DataFixture
+                    .DefaultDataSet()
+                    .WithStatusPublished();
+
+                await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+                DataSetVersion dataSetVersion = DataFixture
+                    .DefaultDataSetVersion(
+                        filters: 1,
+                        indicators: 1,
+                        locations: 1,
+                        timePeriods: 2)
+                    .WithStatusPublished()
+                    .WithDataSetId(dataSet.Id)
+                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+
+                await TestApp.AddTestData<PublicDataDbContext>(context =>
+                {
+                    context.DataSetVersions.Add(dataSetVersion);
+                    context.DataSets.Update(dataSet);
+                });
+
+                var query = metaTypes
+                    .Select((mt, index) => new { mt, index })
+                    .ToDictionary(a => $"types[{a.index}]", a => a.mt.ToString());
+
+                var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSet.Id}/meta", query!);
+
+                var client = TestApp.CreateClient();
+
+                var response = await client.GetAsync(uri);
+
+                var content = response.AssertOk<DataSetMetaViewModel>(useSystemJson: true);
+
+                Assert.NotNull(content);
+
+                var allMetaTypes = EnumUtil.GetEnums<DataSetMetaType>().ToHashSet();
+                var specifiedMetaTypes = metaTypes.ToHashSet();
+                var unspecifiedMetaTypes = allMetaTypes.Except(specifiedMetaTypes);
+
+                foreach (var type in specifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.NotEmpty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.NotEmpty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.NotEmpty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.NotEmpty(content.TimePeriods);
+                            break;
+                    }
+                }
+
+                foreach (var type in unspecifiedMetaTypes)
+                {
+                    switch (type)
+                    {
+                        case DataSetMetaType.Filters:
+                            Assert.Empty(content.Filters);
+                            break;
+                        case DataSetMetaType.Locations:
+                            Assert.Empty(content.Locations);
+                            break;
+                        case DataSetMetaType.Indicators:
+                            Assert.Empty(content.Indicators);
+                            break;
+                        case DataSetMetaType.TimePeriods:
+                            Assert.Empty(content.TimePeriods);
+                            break;
+                    }
+                }
+            }
+
+            [Fact]
+            public async Task EmptyList_AllowedValueError()
+            {
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: []);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: null,
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
+            }
+
+            [Theory]
+            [InlineData("filters", "filters")]
+            [InlineData("locations", "locations")]
+            [InlineData("indicators", "indicators")]
+            [InlineData("timePeriods", "timePeriods")]
+            [InlineData("invalid", "invalid")]
+            [InlineData(null, "")]
+            [InlineData(null, " ")]
+            public async Task InvalidMetaType_AllowedValueError(string? invalidType, string metaType)
+            {
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: [metaType]);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: invalidType,
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
+            }
+
+            [Fact]
+            public async Task MultipleInvalidMetaTypes_AllowedValueError()
+            {
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: ["invalid1", "invalid2"]);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Equal(2, validationProblem.Errors.Count);
+
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[0]",
+                    value: "invalid1",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
+
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[1]",
+                    value: "invalid2",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
+            }
+
+            [Fact]
+            public async Task MixedValidAndInvalidMetaTypes_AllowedValueError()
+            {
+                var response = await GetDataSetMeta(Guid.NewGuid(), types: [DataSetMetaType.Filters.ToString(), "invalid"]);
+
+                var validationProblem = response.AssertValidationProblem();
+
+                Assert.Single(validationProblem.Errors);
+
+                validationProblem.AssertHasAllowedValueError(
+                    expectedPath: "types[1]",
+                    value: "invalid",
+                    allowed: EnumUtil.GetEnumValues<DataSetMetaType>());
+            }
+        }
+
+        private async Task<HttpResponseMessage> GetDataSetMeta(
+            Guid dataSetId,
+            string? dataSetVersion = null,
+            IReadOnlyList<string>? types = null)
+        {
+            var query = new Dictionary<string, string?>
+            {
+                { "dataSetVersion", dataSetVersion?.ToString() },
+            };
+
+            if (types is not null)
+            {
+                query.Add("types", types.JoinToString(","));
+            }
+
+            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/meta", query);
+
+            var client = TestApp.CreateClient();
 
             return await client.GetAsync(uri);
         }

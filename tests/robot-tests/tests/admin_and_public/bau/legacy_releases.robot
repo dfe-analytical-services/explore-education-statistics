@@ -13,6 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=        UI tests - legacy releases %{RUN_IDENTIFIER}
+${PUBLICATION_SLUG}=        ui-tests-legacy-releases-%{RUN_IDENTIFIER}
 ${DESCRIPTION}=             legacy release description
 ${UPDATED_DESCRIPTION}=     updated legacy release description
 
@@ -30,10 +31,14 @@ Create legacy release
 
 Validate created legacy release
     user waits until h2 is visible    Legacy releases
-    user checks element count is x    css:tbody tr    1
-    user checks table cell contains    1    1    1
-    user checks table cell contains    1    2    ${DESCRIPTION}
-    user checks table cell contains    1    3    http://test.com
+    user checks element count is x    css:tbody tr    2
+
+    user checks table cell contains    1    1    Academic year 2020/21
+    user checks table cell contains    1    1    Unpublished
+    user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
+
+    user checks table cell contains    2    1    ${DESCRIPTION}
+    user checks table cell contains    2    2    http://test.com
 
 Navigate to admin dashboard to create new release
     user navigates to admin dashboard    Bau1
@@ -73,21 +78,30 @@ Navigate to publication to update legacy releases
     user waits until h2 is visible    Legacy releases
 
 Update legacy release
-    user clicks element    xpath://tr[1]//*[text()="Edit"]
+    user clicks element    xpath://tr[2]//*[text()="Edit"]
     ${modal}=    user waits until modal is visible    Edit legacy release
     user clicks button    OK    ${modal}
 
-    user waits until page contains element    id:releaseLegacyLinkForm-description
-    user enters text into element    id:releaseLegacyLinkForm-description    ${UPDATED_DESCRIPTION}
-    user enters text into element    id:releaseLegacyLinkForm-url    http://test2.com
+    user waits until page contains element    id:releaseSeriesLegacyLinkForm-description
+    user enters text into element    id:releaseSeriesLegacyLinkForm-description    ${UPDATED_DESCRIPTION}
+    user enters text into element    id:releaseSeriesLegacyLinkForm-url    http://test2.com
     user clicks button    Save legacy release
 
 Validate updated legacy release
     user waits until h2 is visible    Legacy releases
-    user checks element count is x    css:tbody tr    1
-    user checks table cell contains    1    1    1
-    user checks table cell contains    1    2    ${UPDATED_DESCRIPTION}
-    user checks table cell contains    1    3    http://test2.com
+    user checks element count is x    css:tbody tr    2
+
+    user checks table cell contains    1    1    Academic year 2020/21
+    user checks table cell contains    1    1    Latest
+    user checks table cell does not contain    1    1    Unpublished
+    user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    user checks table cell does not contain    1    3    Edit
+    user checks table cell does not contain    1    3    Delete
+
+    user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    2    2    http://test2.com
+    user checks table cell contains    2    3    Edit
+    user checks table cell contains    2    3    Delete
 
 Validate public frontend shows changes made to legacy release after saving publication
     user waits for caches to expire
@@ -112,13 +126,12 @@ Navigate to publication to update legacy releases again
     user waits until h2 is visible    Legacy releases
 
 Delete legacy release
-    ${ROW}=    user gets table row    1
-    user clicks element    xpath://*[text()="Delete"]    ${ROW}
+    user clicks element    xpath://tr[2]//*[text()="Delete"]
 
     ${modal}=    user waits until modal is visible    Delete legacy release
     user clicks button    Confirm    ${modal}
 
-    user waits until page does not contain element    css:table
+    user waits until page does not contain element    xpath://tr[2]
 
 Create multiple legacy releases
     user creates legacy release    Test collection 1    http://test-1.com
@@ -126,25 +139,26 @@ Create multiple legacy releases
     user creates legacy release    Test collection 3    http://test-3.com
 
 Validate legacy release order
-    user checks element count is x    css:tbody tr    3
+    user checks element count is x    css:tbody tr    4
 
-    user checks table cell contains    1    1    3
-    user checks table cell contains    1    2    Test collection 3
-    user checks table cell contains    1    3    http://test-3.com
+    user checks table cell contains    1    1    Academic year 2020/21
+    user checks table cell contains    1    1    Latest
+    user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
 
-    user checks table cell contains    2    1    2
-    user checks table cell contains    2    2    Test collection 2
-    user checks table cell contains    2    3    http://test-2.com
+    user checks table cell contains    2    1    Test collection 1
+    user checks table cell contains    2    2    http://test-1.com
 
-    user checks table cell contains    3    1    1
-    user checks table cell contains    3    2    Test collection 1
-    user checks table cell contains    3    3    http://test-1.com
+    user checks table cell contains    3    1    Test collection 2
+    user checks table cell contains    3    2    http://test-2.com
 
-Reorder legacy releases
-    user clicks button    Reorder legacy releases
-    user waits until modal is visible    Reorder legacy releases
+    user checks table cell contains    4    1    Test collection 3
+    user checks table cell contains    4    2    http://test-3.com
+
+Reorder releases
+    user clicks button    Reorder releases
+    user waits until modal is visible    Reorder releases
     user clicks button    OK
-    user waits until modal is not visible    Reorder legacy releases
+    user waits until modal is not visible    Reorder releases
     user waits until page contains button    Confirm order
     user sets focus to element    css:tbody tr:first-child
     user presses keys    ${SPACE}
@@ -154,35 +168,18 @@ Reorder legacy releases
     user clicks button    Confirm order
 
 Validate reordered legacy releases
-    user waits until page contains button    Reorder legacy releases
-    user checks element count is x    css:tbody tr    3
+    user waits until page contains button    Reorder releases
+    user checks element count is x    css:tbody tr    4
 
-    user checks table cell contains    1    1    3
-    user checks table cell contains    1    2    Test collection 2
-    user checks table cell contains    1    3    http://test-2.com
+    user checks table cell contains    1    1    Test collection 1
+    user checks table cell contains    1    2    http://test-1.com
 
-    user checks table cell contains    2    1    2
-    user checks table cell contains    2    2    Test collection 1
-    user checks table cell contains    2    3    http://test-1.com
+    user checks table cell contains    2    1    Test collection 2
+    user checks table cell contains    2    2    http://test-2.com
 
-    user checks table cell contains    3    1    1
-    user checks table cell contains    3    2    Test collection 3
-    user checks table cell contains    3    3    http://test-3.com
+    user checks table cell contains    3    1    Academic year 2020/21
+    user checks table cell contains    3    1    Latest
+    user checks table cell contains    3    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
 
-
-*** Keywords ***
-user creates legacy release
-    [Arguments]    ${description}    ${url}
-    user clicks button    Create legacy release
-
-    ${modal}=    user waits until modal is visible    Create legacy release
-    user clicks button    OK    ${modal}
-
-    user waits until page contains element    id:releaseLegacyLinkForm-description
-    user enters text into element    id:releaseLegacyLinkForm-description    ${description}
-    user enters text into element    id:releaseLegacyLinkForm-url    ${url}
-    user clicks button    Save legacy release
-    user waits until h2 is visible    Legacy releases
-
-    user waits until page contains    ${description}
-    user checks page contains    ${url}
+    user checks table cell contains    4    1    Test collection 3
+    user checks table cell contains    4    2    http://test-3.com

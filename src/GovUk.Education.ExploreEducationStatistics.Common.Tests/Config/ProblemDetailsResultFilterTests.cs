@@ -28,7 +28,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, problemDetails.Status);
         Assert.Equal("Bad Request", problemDetails.Title);
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", problemDetails.Type);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", problemDetails.Type);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(500, problemDetails.Status);
         Assert.Equal("An error occurred while processing your request.", problemDetails.Title);
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.6.1", problemDetails.Type);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.6.1", problemDetails.Type);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -78,7 +78,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -98,7 +98,7 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
         Assert.Equal(400, validationProblem.Status);
         Assert.Equal("One or more validation errors occurred.", validationProblem.Title);
-        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", validationProblem.Type);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.1", validationProblem.Type);
 
         var errors = validationProblem.Errors;
 
@@ -150,7 +150,8 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
 
     private class TestClass
     {
-        [Required] public string? Name { get; init; }
+        [Required]
+        public string? Name { get; init; }
     }
 
     private WebApplicationFactory<TestStartup> BuildApp()

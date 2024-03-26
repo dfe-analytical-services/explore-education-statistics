@@ -112,6 +112,28 @@ describe('EditableContentForm', () => {
       });
     });
 
+    test('preserves comment tags when calling the `onSubmit` handler', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <EditableContentForm
+          content={`<p><comment-start name="comment-id-1"></comment-start>fewgwg<comment-end name="comment-id-1"></comment-end></p>`}
+          id="block-id"
+          label="Form label"
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(
+          `<p><comment-start name="comment-id-1"></comment-start>fewgwg<comment-end name="comment-id-1"></comment-end></p>`,
+        );
+      });
+    });
+
     test('formats links before calling `onSubmit` handler', async () => {
       const handleSubmit = jest.fn();
 

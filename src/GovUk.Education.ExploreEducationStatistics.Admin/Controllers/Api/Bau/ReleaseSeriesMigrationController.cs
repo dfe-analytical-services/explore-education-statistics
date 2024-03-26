@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -38,7 +37,6 @@ public class ReleaseSeriesMigrationController : ControllerBase
     {
         public bool IsDryRun;
         public int NumPublicationsUpdated;
-        public string UpdatedPublicationIds = string.Empty;
     }
 
     [HttpPatch("bau/migrate-release-series")]
@@ -52,7 +50,7 @@ public class ReleaseSeriesMigrationController : ControllerBase
             .Include(p => p.LegacyReleases.OrderByDescending(lr => lr.Order))
             .ToListAsync(cancellationToken);
 
-        var updatedPublicationIds = new List<Guid>();
+        var numPublicationsUpdated = 0;
 
         foreach (var publication in publications)
         {
@@ -95,10 +93,11 @@ public class ReleaseSeriesMigrationController : ControllerBase
             if (dryRun)
             {
                 _logger.LogInformation("Planned ReleaseSeries to add to Publication {publicationId}:\n{releaseSeries}\n\n",
-                    publication.Id, publication.ReleaseSeries);
+                    publication.Id,
+                    publication.ReleaseSeries.Select(rsi => rsi.ToString()));
             }
 
-            updatedPublicationIds.Add(publication.Id);
+            numPublicationsUpdated++;
         }
 
         if (!dryRun)
@@ -107,19 +106,14 @@ public class ReleaseSeriesMigrationController : ControllerBase
 
             foreach (var publication in publications)
             {
-                if (publication.Live)
-                {
-                    _logger.LogInformation("Publication: " + publication.Slug);
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-                }
+                await _publicationCacheService.UpdatePublication(publication.Slug);
             }
         }
 
         return new ReleaseSeriesMigrationResult
         {
             IsDryRun = dryRun,
-            NumPublicationsUpdated = updatedPublicationIds.Count,
-            UpdatedPublicationIds = updatedPublicationIds.Select(id => id.ToString()).JoinToString(','),
+            NumPublicationsUpdated = numPublicationsUpdated,
         };
     }
 }

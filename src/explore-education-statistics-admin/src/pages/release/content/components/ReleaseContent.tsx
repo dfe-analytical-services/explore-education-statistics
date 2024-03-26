@@ -32,6 +32,7 @@ import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataA
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface MethodologyLink {
   key: string;
@@ -44,6 +45,7 @@ const ReleaseContent = ({
 }: {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
+  const { publicAppUrl } = useConfig();
   const location = useLocation();
   const {
     editingMode,
@@ -97,8 +99,8 @@ const ReleaseContent = ({
   const { publication } = release;
 
   const releaseSeries = release.publication.releaseSeries.filter(
-    rsi => !(rsi.isLegacyLink === false && rsi.description === release.title),
-  ); // @MarkFix better if pass releaseId down to release?
+    rsi => rsi.isLegacyLink || rsi.description !== release.title,
+  );
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
     const methodologies = publication.methodologies.map(methodology => ({
@@ -331,7 +333,7 @@ const ReleaseContent = ({
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View releases (${releaseSeries.length})`} // @MarkFix right length?
+                  summary={`View releases (${releaseSeries.length})`}
                 >
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
@@ -342,7 +344,6 @@ const ReleaseContent = ({
                             isLegacyLink,
                             description,
                             legacyLinkUrl,
-                            publicationSlug,
                             releaseSlug,
                           }) => (
                             <li key={id} data-testid="other-release-item">
@@ -350,7 +351,7 @@ const ReleaseContent = ({
                                 <a href={legacyLinkUrl}>{description}</a>
                               ) : (
                                 <Link
-                                  to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
+                                  to={`${publicAppUrl}/find-statistics/${publication.slug}/${releaseSlug}`}
                                 >
                                   {description}
                                 </Link>

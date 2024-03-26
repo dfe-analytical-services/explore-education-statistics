@@ -98,7 +98,7 @@ export default function DataSetSummary({
       )}
       {showLatestDataTag && (
         <p className="govuk-!-margin-top-4">
-          <Tag strong colour={latestData ? undefined : 'orange'}>
+          <Tag colour={latestData ? undefined : 'orange'}>
             {latestData
               ? 'This is the latest data'
               : 'This is not the latest data'}

@@ -1,13 +1,17 @@
-#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
+using Microsoft.Extensions.Options;
 using Notify.Client;
 
-namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+
+public class NotificationClientProvider(IOptions<GovUkNotifyOptions> govUkNotifyOptions)
+    : INotificationClientProvider
 {
-    public class NotificationClientProvider : INotificationClientProvider
+    private readonly GovUkNotifyOptions _govUkNotifyOptions = govUkNotifyOptions.Value;
+
+    public NotificationClient Get()
     {
-        public NotificationClient Get(string notifyApiKey)
-        {
-            return new NotificationClient(notifyApiKey);
-        }
+        return new NotificationClient(_govUkNotifyOptions.ApiKey);
     }
 }

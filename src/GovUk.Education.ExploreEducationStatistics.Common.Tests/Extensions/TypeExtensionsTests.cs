@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -142,6 +143,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Single(path);
                 Assert.Equal(typeof(ActionResult), path[0]);
             }
+        }
+
+        public class IsNullableTypeTests
+        {
+            [Theory]
+            [InlineData(typeof(int?))]
+            [InlineData(typeof(double?))]
+            [InlineData(typeof(TestEnum?))]
+            [InlineData(typeof(bool?))]
+            [InlineData(typeof(char?))]
+            public void NullableValueTypes_ReturnsTrue(Type nullableType)
+            {
+                var isNullableType = nullableType.IsNullableType();
+
+                Assert.True(isNullableType);
+            }
+
+            [Theory]
+            [InlineData(typeof(int))]
+            [InlineData(typeof(double))]
+            [InlineData(typeof(TestEnum))]
+            [InlineData(typeof(bool))]
+            [InlineData(typeof(char))]
+            public void NonNullableValueTypes_ReturnsFalse(Type nonNullableType)
+            {
+                var isNullableType = nonNullableType.IsNullableType();
+
+                Assert.False(isNullableType);
+            }
+
+            [Fact]
+            public void ReferenceType_ReturnsFalse()
+            {
+                var isNullableType = typeof(NullableReferenceTypeClass).IsNullableType();
+
+                Assert.False(isNullableType);
+            }
+
+            [Fact]
+            public void NullableReferenceType_ReturnsFalse()
+            {
+                var isNullableType = typeof(NullableReferenceTypeClass)
+                    .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
+                    .PropertyType
+                    .IsNullableType();
+
+                Assert.False(isNullableType);
+            }
+        }
+
+        public class GetUnderlyingTypeTests
+        {
+            [Theory]
+            [InlineData(typeof(int?), typeof(int))]
+            [InlineData(typeof(double?), typeof(double))]
+            [InlineData(typeof(TestEnum?), typeof(TestEnum))]
+            [InlineData(typeof(bool?), typeof(bool))]
+            [InlineData(typeof(char?), typeof(char))]
+            public void NullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
+            {
+                var underlyingType = nullableType.GetUnderlyingType();
+
+                Assert.Equal(expectedUnderlyingType, underlyingType);
+            }
+
+            [Theory]
+            [InlineData(typeof(int), typeof(int))]
+            [InlineData(typeof(double), typeof(double))]
+            [InlineData(typeof(TestEnum), typeof(TestEnum))]
+            [InlineData(typeof(bool), typeof(bool))]
+            [InlineData(typeof(char), typeof(char))]
+            public void NonNullableValueTypes_ReturnsUnderlyingType(Type nullableType, Type expectedUnderlyingType)
+            {
+                var underlyingType = nullableType.GetUnderlyingType();
+
+                Assert.Equal(expectedUnderlyingType, underlyingType);
+            }
+
+            [Fact]
+            public void ReferenceType_ReturnsUnderlyingType()
+            {
+                var underlyingType = typeof(NullableReferenceTypeClass).GetUnderlyingType();
+
+                Assert.Equal(typeof(NullableReferenceTypeClass), underlyingType);
+            }
+
+            [Fact]
+            public void NullableReferenceType_ReturnsUnderlyingType()
+            {
+                var underlyingType = typeof(NullableReferenceTypeClass)
+                    .GetProperty(nameof(NullableReferenceTypeClass.NullableReferenceType))!
+                    .PropertyType
+                    .GetUnderlyingType();
+
+                Assert.Equal(typeof(NullableReferenceTypeClass), underlyingType);
+            }
+        }
+
+        private class NullableReferenceTypeClass
+        {
+            public NullableReferenceTypeClass? NullableReferenceType { get; set; }
+        };
+
+        private enum TestEnum
+        {
         }
     }
 }

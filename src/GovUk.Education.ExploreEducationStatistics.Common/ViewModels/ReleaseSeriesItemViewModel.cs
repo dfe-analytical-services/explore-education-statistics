@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -12,9 +11,8 @@ public record ReleaseSeriesItemViewModel
 
     // used by EES release series item
     public Guid? ReleaseId { get; set; }
-    public string? PublicationSlug { get; set; }
     public string? ReleaseSlug { get; set; }
 
     // used by legacy link series item
-    public string? LegacyLinkUrl { get; set; } = string.Empty;
+    public string? LegacyLinkUrl { get; set; }
 }

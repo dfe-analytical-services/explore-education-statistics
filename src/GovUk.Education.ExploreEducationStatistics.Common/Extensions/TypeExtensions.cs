@@ -85,5 +85,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 return e.Types.WhereNotNull();
             }
         }
+
+        public static bool IsNullableType(this Type type)
+            => Nullable.GetUnderlyingType(type) is not null;
+
+        public static Type GetUnderlyingType(this Type type)
+            => type.IsNullableType()
+            ? Nullable.GetUnderlyingType(type)!
+            : type;
     }
 }

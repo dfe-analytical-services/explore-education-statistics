@@ -198,7 +198,7 @@ describe('FindStatisticsPage', () => {
       'href',
       '/find-statistics?page=3',
     );
-    expect(pagination.getByRole('link', { name: 'Next' })).toHaveAttribute(
+    expect(pagination.getByRole('link', { name: 'Next page' })).toHaveAttribute(
       'href',
       '/find-statistics?page=2',
     );

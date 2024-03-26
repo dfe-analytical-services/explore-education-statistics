@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -132,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> GetReleaseSeries(Guid publicationId)
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _publicationService
                 .GetReleaseSeries(publicationId)
@@ -140,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> AddReleaseSeriesLegacyLink(
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest request)
         {
@@ -150,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesItemViewModel>>> UpdateReleaseSeries(
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {

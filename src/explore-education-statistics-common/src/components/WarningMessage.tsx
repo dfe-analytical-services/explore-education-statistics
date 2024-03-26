@@ -31,7 +31,7 @@ const WarningMessage = ({
         {icon}
       </span>
       <strong className={classNames('govuk-warning-text__text', styles.text)}>
-        <span className="govuk-warning-text__assistive">Warning</span>
+        <span className="govuk-visually-hidden">Warning</span>
         {children}
       </strong>
     </div>

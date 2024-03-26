@@ -97,11 +97,12 @@ export const publicationReleaseSeriesRoute: PublicationRouteProps = {
   component: PublicationReleaseSeriesPage,
 };
 
-export const publicationCreateReleaseLegacyLinkRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/legacy/create',
-  title: 'Create legacy release',
-  component: PublicationCreateReleaseSeriesLegacyLinkPage,
-};
+export const publicationCreateReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
+  {
+    path: '/publication/:publicationId/legacy/create',
+    title: 'Create legacy release',
+    component: PublicationCreateReleaseSeriesLegacyLinkPage,
+  };
 
 export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
   {

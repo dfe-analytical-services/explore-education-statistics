@@ -21,6 +21,16 @@ const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
 >;
 
+// Mock useMedia as tests for tabs can be flaky due to the
+// role being added only on desktop.
+jest.mock('@common/hooks/useMedia', () => ({
+  useDesktopMedia: () => {
+    return {
+      onMedia: (value: string) => value,
+    };
+  },
+}));
+
 describe('ReleasePreReleaseAccessPage', () => {
   test('renders the pre-release users tab', async () => {
     releaseService.getRelease.mockResolvedValue(testRelease);
@@ -34,6 +44,8 @@ describe('ReleasePreReleaseAccessPage', () => {
         screen.getByText('Manage pre-release user access'),
       ).toBeInTheDocument();
     });
+
+    expect(await screen.findByText('Pre-release users')).toBeInTheDocument();
 
     expect(
       screen.getByRole('tab', { name: 'Pre-release users' }),
