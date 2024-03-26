@@ -84,6 +84,7 @@ var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
+var psqlServerName = 'psql-flexibleserver'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -110,8 +111,9 @@ module vNetModule 'application/virtualNetwork.bicep' = {
   params: {
     vNetName: vNetName
     resourcePrefix: resourcePrefix
+    subscription: subscription
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
-    postgreSqlServerName: 'psql-flexibleserver'
+    postgreSqlServerName: psqlServerName
   }
 }
 
@@ -178,7 +180,7 @@ resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01'
   name: 'private.postgres.database.azure.com'
   location: 'global'
   resource vNetLink 'virtualNetworkLinks' = {
-    name: '${resourcePrefix}-psql-flexibleserver-vnet-link'
+    name: '${subscription}-ees-${psqlServerName}-vnet-link'
     location: 'global'
     properties: {
       registrationEnabled: false

@@ -1,6 +1,9 @@
 @description('The full name of the existing VNet')
 param vNetName string
 
+@description('Specifies the Subscription name')
+param subscription string
+
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
@@ -11,8 +14,8 @@ param dataProcessorFunctionAppName string
 param postgreSqlServerName string
 
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
-var postgreSqlSubnetName = '${resourcePrefix}-snet-${postgreSqlServerName}'
-var containerAppEnvironmentSubnetName = '${resourcePrefix}-snet-cae'
+var postgreSqlSubnetName = '${subscription}-snet-${postgreSqlServerName}'
+var containerAppEnvironmentSubnetName = '${subscription}-snet-cae'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetPrefix = '10.0.6.0/24'
