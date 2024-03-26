@@ -150,7 +150,7 @@ var existingProductionAppSettings = functionAppExists ? list(resourceId('Microso
 // application-specific appsettings so as to be able to control the rollout of new, updated and deleted
 // appsettings to the correct swap slots.
 module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
-  name: '${functionApp.name}AppServiceSlotConfigDeploy'
+  name: '${functionAppName}AppServiceSlotConfigDeploy'
   params: {
     appName: functionApp.name
     location: location
