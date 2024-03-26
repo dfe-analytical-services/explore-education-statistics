@@ -197,7 +197,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   params: {
     resourcePrefix: '${subscription}-ees'
     location: location
-    createMode: psqlDbUsersAdded ? 'Update' : 'Default'
+    createMode: 'Default'
     adminName: postgreSqlAdminName
     adminPassword: postgreSqlAdminPassword!
     dbSkuName: postgreSqlSkuName
