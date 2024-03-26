@@ -16,4 +16,8 @@ public static class CollectionExtensions
             source.Add(item);
         }
     }
+
+    public static int LastIndex<T>(this ICollection<T> source) => source.Count - 1;
+
+    public static bool IsLastIndex<T>(this ICollection<T> source, int index) => index == source.LastIndex();
 }

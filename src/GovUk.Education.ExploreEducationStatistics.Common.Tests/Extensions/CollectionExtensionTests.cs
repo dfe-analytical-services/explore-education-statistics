@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
 public static class CollectionExtensionTests
 {
-    public class AddRange
+    public class AddRangeTests
     {
         [Fact]
         public void Set()
@@ -82,6 +82,48 @@ public static class CollectionExtensionTests
             Assert.Equal("a", list[0]);
             Assert.Equal("a", list[1]);
             Assert.Equal("b", list[2]);
+        }
+    }
+
+    public class LastIndexTests
+    {
+        [Theory]
+        [InlineData(0, "a")]
+        [InlineData(1, "a", "b")]
+        [InlineData(2, "a", "b", "c")]
+        [InlineData(3, "a", "b", "c", "d")]
+        public void CorrectLastIndex(int expectedLastIndex, params string[] values)
+        {
+            var list = new List<string>(values);
+
+            Assert.Equal(expectedLastIndex, list.LastIndex());
+        }
+    }
+
+    public class IsLastIndexTests
+    {
+        [Theory]
+        [InlineData(0, "a")]
+        [InlineData(1, "a", "b")]
+        [InlineData(2, "a", "b", "c")]
+        [InlineData(3, "a", "b", "c", "d")]
+        public void TrueForCorrectLastIndex(int correctIndex, params string[] values)
+        {
+            var list = new List<string>(values);
+
+            Assert.True(list.IsLastIndex(correctIndex));
+        }
+
+        [Theory]
+        [InlineData(1, "a")]
+        [InlineData(2, "a", "b")]
+        [InlineData(3, "a", "b", "c")]
+        [InlineData(4, "a", "b", "c", "d")]
+        public void FalseForIncorrectLastIndex(int incorrectIndex, params string[] values)
+        {
+            var list = new List<string>(values);
+
+            Assert.False(list.IsLastIndex(incorrectIndex));
         }
     }
 }
