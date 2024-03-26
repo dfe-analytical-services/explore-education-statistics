@@ -12,6 +12,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
+${RELEASE_NAME}=                        Academic year Q1 2022/23
 ${PUBLICATION_NAME}=                    UI-tests-legacy-releases %{RUN_IDENTIFIER}
 ${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
 ${DESCRIPTION}=                         legacy release description
@@ -63,9 +64,9 @@ Approve release
     user clicks link    Sign off
     user approves original release for immediate publication
     user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    ${PUBLIC_RELEASE_LINK}=    get value    xpath://*[@data-testid="public-release-url"]
     check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
-    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+    set suite variable    ${PUBLIC_RELEASE_LINK}
 
 Check legacy release appears on public frontend
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
@@ -112,7 +113,7 @@ Reorder the legacy releases
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
     user clicks button    Confirm order
-    Sleep    10
+    Sleep    2
 
 Validate reordered legacy releases
     user waits until page contains button    Reorder releases
@@ -144,4 +145,67 @@ Navigate to publication to verify the legacy releases
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
-    Sleep    100
+
+Return to Admin and create first amendment
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+Change the Release type and Academic year
+    user waits until page contains link    Edit release summary
+    user clicks link    Edit release summary
+    user waits until page finishes loading
+    user waits until h2 is visible    Edit release summary
+    user checks page contains radio    Official statistics in development
+    user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2024
+    user clicks radio    Official statistics in development
+    user clicks button    Update release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    Academic year Q1
+    ...    2024/25
+    ...    Official statistics in development
+
+Navigate to 'Content' page for amendment
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block
+
+Add release note to first amendment
+    user clicks button    Add note
+    user enters text into element    id:createReleaseNoteForm-reason    Test release note one
+    user clicks button    Save note
+    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
+
+Navigate to "Sign off" page
+    user clicks link    Sign off
+    user waits until h3 is visible    Release status history
+
+Approve release amendment
+    user approves amended release for immediate publication
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_AMENDED_RELEASE_LINK}=    get value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_AMENDED_RELEASE_LINK}
+    set suite variable    ${PUBLIC_AMENDED_RELEASE_LINK}
+
+Navigate to publication page and verify the amended release
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+    sleep    100
+
+Validate amended legacy releases
+    user waits until page contains button    Reorder releases
+    user checks element count is x    css:tbody tr    3
+
+    user checks table cell contains    1    1    Academic year Q1 2024/25
+    user checks table cell contains    1    2    ${PUBLIC_AMENDED_RELEASE_LINK}
+
+    user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    2    2    http://test2.com
+
+    user checks table cell contains    3    1    ${DESCRIPTION}
+    user checks table cell contains    3    2    http://test.com
+
+    user checks table cell contains    4    1    Academic year 2020/21
+    user checks table cell contains    4    2    ${PUBLIC_RELEASE_LINK}
