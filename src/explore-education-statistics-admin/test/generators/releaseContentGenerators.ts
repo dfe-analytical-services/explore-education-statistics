@@ -99,7 +99,7 @@ const defaultPublication: Publication = {
       isLegacyLink: true,
       description: 'legacy link 1',
       legacyLinkUrl: 'https://test.com/1',
-    }
+    },
   ],
   slug: 'publication-slug',
   title: 'Publication title',
