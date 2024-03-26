@@ -34,8 +34,7 @@ exports[`AccordionSection renders correctly with required props 1`] = `
       </button>
     </h2>
   </div>
-  <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content"
+  <div class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
@@ -91,8 +90,7 @@ exports[`AccordionSection renders with caption 1`] = `
       </button>
     </h2>
   </div>
-  <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content"
+  <div class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
@@ -143,8 +141,7 @@ exports[`AccordionSection renders with different heading size 1`] = `
       </button>
     </h3>
   </div>
-  <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content"
+  <div class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>

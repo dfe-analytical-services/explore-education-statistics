@@ -17,7 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ProcessorQueues;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services

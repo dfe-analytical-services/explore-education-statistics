@@ -77,7 +77,7 @@ describe('AncillaryFileForm', () => {
     render(<AncillaryFileForm onSubmit={noop} />);
 
     await userEvent.upload(screen.getByLabelText('Upload file'), testFile);
-    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -91,7 +91,7 @@ describe('AncillaryFileForm', () => {
   test('shows validation messages if submitted form is invalid', async () => {
     render(<AncillaryFileForm onSubmit={noop} />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(
@@ -122,7 +122,7 @@ describe('AncillaryFileForm', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(screen.getByRole('button', { name: 'Save file' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Add file' }));
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith<

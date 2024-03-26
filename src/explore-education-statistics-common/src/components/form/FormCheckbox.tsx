@@ -1,3 +1,4 @@
+import useMounted from '@common/hooks/useMounted';
 import classNames from 'classnames';
 import React, {
   ChangeEvent,
@@ -49,6 +50,8 @@ const FormCheckbox = ({
   disabled = false,
   inputRef,
 }: FormCheckboxProps) => {
+  const { onMounted } = useMounted(undefined, false);
+
   return (
     <>
       <div
@@ -57,6 +60,10 @@ const FormCheckbox = ({
       >
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
+          aria-controls={onMounted(
+            conditional ? `${id}-conditional` : undefined,
+          )}
+          aria-expanded={onMounted(conditional ? checked : undefined)}
           className="govuk-checkboxes__input"
           checked={checked}
           defaultChecked={defaultChecked}
@@ -98,6 +105,7 @@ const FormCheckbox = ({
           className={classNames('govuk-checkboxes__conditional', {
             'govuk-checkboxes__conditional--hidden': !checked,
           })}
+          id={`${id}-conditional`}
         >
           {conditional}
         </div>

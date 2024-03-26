@@ -9,6 +9,7 @@ exports[`FormCheckbox does not render conditional content when not checked 1`] =
          name="test"
          type="checkbox"
          value="true"
+         aria-controls="test-checkbox-conditional"
   >
   <label class="govuk-label govuk-checkboxes__label"
          for="test-checkbox"
@@ -16,7 +17,9 @@ exports[`FormCheckbox does not render conditional content when not checked 1`] =
     Test checkbox
   </label>
 </div>
-<div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden">
+<div class="govuk-checkboxes__conditional govuk-checkboxes__conditional--hidden"
+     id="test-checkbox-conditional"
+>
   <p>
     The conditional content
   </p>
@@ -33,6 +36,8 @@ exports[`FormCheckbox renders conditional content when checked 1`] = `
          type="checkbox"
          value="true"
          checked
+         aria-controls="test-checkbox-conditional"
+         aria-expanded="true"
   >
   <label class="govuk-label govuk-checkboxes__label"
          for="test-checkbox"
@@ -40,7 +45,9 @@ exports[`FormCheckbox renders conditional content when checked 1`] = `
     Test checkbox
   </label>
 </div>
-<div class="govuk-checkboxes__conditional">
+<div class="govuk-checkboxes__conditional"
+     id="test-checkbox-conditional"
+>
   <p>
     The conditional content
   </p>

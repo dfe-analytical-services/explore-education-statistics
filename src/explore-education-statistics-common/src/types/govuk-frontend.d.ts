@@ -16,15 +16,15 @@ declare module 'govuk-frontend' {
   export function initAll(): void;
 }
 
-declare module 'govuk-frontend/govuk/components/accordion/accordion' {
+declare module 'govuk-frontend/dist/govuk/components/accordion/accordion' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/govuk/components/checkboxes/checkboxes' {
+declare module 'govuk-frontend/dist/govuk/components/checkboxes/checkboxes' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/govuk/components/details/details' {
+declare module 'govuk-frontend/dist/govuk/components/details/details' {
   export class Details extends GovUkModule {
     public setAttributes(): void;
   }
@@ -32,7 +32,7 @@ declare module 'govuk-frontend/govuk/components/details/details' {
   export default Details;
 }
 
-declare module 'govuk-frontend/govuk/components/error-summary/error-summary' {
+declare module 'govuk-frontend/dist/govuk/components/error-summary/error-summary' {
   export class ErrorSummary extends GovUkModule {
     public handleClick(event: MouseEvent): void;
   }
@@ -40,11 +40,11 @@ declare module 'govuk-frontend/govuk/components/error-summary/error-summary' {
   export default ErrorSummary;
 }
 
-declare module 'govuk-frontend/govuk/components/radios/radios' {
+declare module 'govuk-frontend/dist/govuk/components/radios/radios' {
   export default GovUkModule;
 }
 
-declare module 'govuk-frontend/govuk/components/tabs/tabs' {
+declare module 'govuk-frontend/dist/govuk/components/tabs/tabs' {
   export default GovUkModule;
 }
 

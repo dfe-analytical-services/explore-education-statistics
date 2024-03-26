@@ -1,0 +1,6 @@
+// Overriding the max-width as it causes the
+// 'This is the latest data' tags to wrap.
+// https://github.com/alphagov/govuk-frontend/issues/4626
+.tag {
+  max-width: none;
+}

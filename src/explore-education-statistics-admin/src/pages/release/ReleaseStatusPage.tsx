@@ -169,7 +169,7 @@ const ReleaseStatusPage = () => {
                     </td>
                     <td>{status.approvalStatus}</td>
                     <td>{status.internalReleaseNote}</td>
-                    <td>{`${status.releaseVersion + 1}`}</td>{' '}
+                    <td>{`${status.releaseVersion + 1}`}</td>
                     {/* +1 because version starts from 0 in DB */}
                     <td>
                       {status.createdByEmail ? (

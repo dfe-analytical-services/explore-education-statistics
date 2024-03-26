@@ -8,14 +8,12 @@ import {
 import { LinkProps } from './Link';
 
 type Props = {
-  disabled?: boolean;
   variant?: 'secondary' | 'warning';
 } & LinkProps;
 
 const ButtonLink = ({
   children,
   className,
-  disabled = false,
   prefetch,
   to,
   variant,
@@ -31,13 +29,11 @@ const ButtonLink = ({
       className={classNames(
         'govuk-button',
         {
-          'govuk-button--disabled': disabled,
           'govuk-button--secondary': variant === 'secondary',
           'govuk-button--warning': variant === 'warning',
         },
         className,
       )}
-      aria-disabled={disabled}
     >
       {children}
     </a>

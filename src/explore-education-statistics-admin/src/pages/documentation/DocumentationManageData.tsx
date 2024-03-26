@@ -70,7 +70,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                   !
                 </span>
                 <strong className="govuk-warning-text__text">
-                  <span className="govuk-warning-text__assistive">Warning</span>
+                  <span className="govuk-visually-hidden">Warning</span>
                   If your data doesn’t meet these standards, you won’t be able
                   to upload it to your release.
                 </strong>
@@ -620,7 +620,7 @@ const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
                   !
                 </span>
                 <strong className="govuk-warning-text__text">
-                  <span className="govuk-warning-text__assistive">Warning</span>
+                  <span className="ggovuk-visually-hidden">Warning</span>
                   You can’t create data blocks, tables and charts for your
                   release until your data has been uploaded and processed.
                 </strong>

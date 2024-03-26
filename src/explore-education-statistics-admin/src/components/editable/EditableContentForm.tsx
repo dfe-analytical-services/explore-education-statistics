@@ -1,15 +1,21 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import {
+  Element,
+  Node,
+  ToolbarGroup,
+  ToolbarOption,
+} from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
@@ -22,9 +28,13 @@ import sanitizeHtml, {
   commentTags,
   defaultSanitizeOptions,
 } from '@common/utils/sanitizeHtml';
-import { Formik, FormikHelpers } from 'formik';
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+
+export interface InvalidUrl {
+  text: string;
+  url: string;
+}
 
 interface FormValues {
   content: string;
@@ -73,6 +83,10 @@ const EditableContentForm = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
+  const [altTextError, setAltTextError] = useState<string>();
+  const [elements, setElements] = useState<Element[] | undefined>();
+  const [invalidLinkErrors, setInvalidLinkErrors] = useState<InvalidUrl[]>([]);
+  const [submitError, setSubmitError] = useState<string>();
 
   useIdleTimer({
     element: containerRef.current ?? document,
@@ -119,13 +133,13 @@ const EditableContentForm = ({
     );
 
   const handleSubmit = useCallback(
-    async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
+    async (values: FormValues) => {
       try {
         await clearPendingDeletions?.();
         await onSubmit(sanitizeHtml(values.content, sanitizeOptions));
       } catch (err) {
         logger.error(err);
-        helpers.setFieldError('content', 'Could not save content');
+        setSubmitError('Could not save content');
       }
     },
     [clearPendingDeletions, sanitizeOptions, onSubmit],
@@ -142,30 +156,70 @@ const EditableContentForm = ({
       onAdd={toggleCommentAddForm.on}
     >
       <div className={styles.form}>
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{
             content,
           }}
           validationSchema={Yup.object({
-            content: Yup.string().required('Enter content'),
+            content: Yup.string()
+              .required('Enter content')
+              .test('validate alt text', (value, { createError, path }) => {
+                const errorMessage = elements?.length
+                  ? validateAltText(elements)
+                  : '';
+                if (errorMessage) {
+                  setAltTextError(errorMessage);
+                  return createError({
+                    path,
+                    message: errorMessage,
+                  });
+                }
+                return true;
+              })
+              .test('validate links', (_, { createError, path }) => {
+                const invalidLinks = elements?.length
+                  ? getInvalidLinks(elements)
+                  : [];
+                if (invalidLinks.length) {
+                  setInvalidLinkErrors(invalidLinks);
+                  return createError({
+                    path,
+                    message: `${
+                      invalidLinks.length === 1
+                        ? '1 link has an invalid URL.'
+                        : `${invalidLinks.length} links have invalid URLs.`
+                    }`,
+                  });
+                }
+                return true;
+              }),
           })}
-          onSubmit={handleSubmit}
         >
-          {form => {
-            const isSaving = form.isSubmitting || isAutoSaving;
-
+          {({ formState }) => {
+            const isSaving = formState.isSubmitting || isAutoSaving;
             return (
-              <Form id={`${id}-form`} visuallyHiddenErrorSummary>
-                <FormFieldEditor<FormValues>
+              <RHFForm
+                id={`${id}-form`}
+                visuallyHiddenErrorSummary
+                onSubmit={handleSubmit}
+              >
+                <RHFFormFieldEditor<FormValues>
                   allowComments={allowComments}
-                  error={autoSaveError ? 'Could not save content' : undefined}
+                  altTextError={altTextError}
+                  error={
+                    autoSaveError || submitError
+                      ? 'Could not save content'
+                      : undefined
+                  }
                   focusOnInit
                   hideLabel={hideLabel}
+                  invalidLinkErrors={invalidLinkErrors}
                   label={label}
                   name="content"
                   toolbarConfig={toolbarConfig}
                   onAutoSave={handleAutoSave}
                   onBlur={onBlur}
+                  onChange={setElements}
                   onCancelComment={toggleCommentAddForm.off}
                   onClickAddComment={toggleCommentAddForm.on}
                   onImageUpload={onImageUpload}
@@ -190,12 +244,62 @@ const EditableContentForm = ({
                     text="Saving"
                   />
                 </ButtonGroup>
-              </Form>
+              </RHFForm>
             );
           }}
-        </Formik>
+        </FormProvider>
       </div>
     </CommentsWrapper>
   );
 };
 export default EditableContentForm;
+
+function validateAltText(els: Element[]): string {
+  const hasInvalidImage = els.some(
+    element =>
+      isInvalidImage(element) ||
+      Array.from(element.getChildren()).some(child => isInvalidImage(child)),
+  );
+
+  return hasInvalidImage ? 'All images must have alternative text.' : '';
+}
+
+function isInvalidImage(element: Element | Node) {
+  return (
+    (element.name === 'imageBlock' || element.name === 'imageInline') &&
+    !element.getAttribute('alt')
+  );
+}
+
+function getInvalidLinks(elements: Element[]) {
+  return elements
+    .flatMap(element =>
+      Array.from(element.getChildren()).flatMap(child => child),
+    )
+    .reduce<InvalidUrl[]>((acc, el) => {
+      if (!el.getAttribute('linkHref')) {
+        return acc;
+      }
+      const jsonEl = el.toJSON();
+      const attributes = jsonEl.attributes as Record<string, unknown>;
+      const url = attributes.linkHref as string;
+
+      try {
+        // exclude anchor links, localhost and emails as they fail Yup url validation.
+        if (
+          url &&
+          !url.startsWith('#') &&
+          !url.startsWith('http://localhost') &&
+          !url.startsWith('mailto:')
+        ) {
+          Yup.string().url().validateSync(url.trim());
+        }
+      } catch {
+        acc.push({
+          text: jsonEl.data as string,
+          url,
+        });
+      }
+      return acc;
+    }, []);
+}

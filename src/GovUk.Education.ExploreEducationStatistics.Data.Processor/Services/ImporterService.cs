@@ -11,17 +11,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
+        private readonly AppSettingOptions _appSettingOptions;
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
         private readonly IImporterMetaService _importerMetaService;
@@ -33,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private const int Stage2RowCheck = 1000;
 
         public ImporterService(
+            IOptions<AppSettingOptions> appSettingOptions,
             IGuidGenerator guidGenerator,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
@@ -41,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IDatabaseHelper databaseHelper, 
             IObservationBatchImporter? observationBatchImporter = null)
         {
+            _appSettingOptions = appSettingOptions.Value;
             _guidGenerator = guidGenerator;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
@@ -189,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Subject subject,
             StatisticsDbContext context)
         {
-            var importObservationsBatchSize = GetRowsPerBatch();
+            var importObservationsBatchSize = _appSettingOptions.RowsPerBatch;
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / importObservationsBatchSize);
@@ -291,12 +296,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     return true;
                 },
                 startingBatchIndex);
-        }
-
-        private static int GetRowsPerBatch()
-        {
-            return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
-                               ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
         }
 
         /// <summary>

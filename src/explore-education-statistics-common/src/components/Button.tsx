@@ -17,7 +17,6 @@ function Button(props: ButtonOptions, ref: Ref<HTMLButtonElement>) {
         'govuk-button',
         {
           [styles.disabled]: isDisabled,
-          'govuk-button--disabled': isDisabled,
           'govuk-button--secondary': variant === 'secondary',
           'govuk-button--warning': variant === 'warning',
         },

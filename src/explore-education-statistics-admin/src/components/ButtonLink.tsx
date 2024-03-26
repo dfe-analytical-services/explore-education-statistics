@@ -10,18 +10,10 @@ import {
 type Props = {
   children: ReactNode;
   className?: string;
-  disabled?: boolean;
   variant?: 'secondary' | 'warning';
 } & LinkProps;
 
-const ButtonLink = ({
-  children,
-  className,
-  disabled = false,
-  to,
-  variant,
-  ...props
-}: Props) => {
+const ButtonLink = ({ children, className, to, variant, ...props }: Props) => {
   return (
     <RouterLink
       {...props}
@@ -29,13 +21,11 @@ const ButtonLink = ({
       className={classNames(
         'govuk-button',
         {
-          'govuk-button--disabled': disabled,
           'govuk-button--secondary': variant === 'secondary',
           'govuk-button--warning': variant === 'warning',
         },
         className,
       )}
-      aria-disabled={disabled}
     >
       {children}
     </RouterLink>

@@ -57,7 +57,7 @@ POST http://localhost:7072/api/PublishStagedReleaseVersionContentImmediately
 Content-Type: 'application/json'
 
 {
-  releaseVersionIds: ["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]
+  "releaseVersionIds": ["6f6d5510-9f16-40ce-bc39-0dd88aa5e6ea", "c540405b-dc86-42fe-9420-3c3f007a48ef"]
 }
 ```
 

@@ -88,18 +88,18 @@ export default function RHFFormFieldDateInput<TFormValues extends FieldValues>({
         const date = parse(`${year}-${month}-${day}Z`, 'yyyy-M-dX', new Date());
 
         const newDateValue = isValid(date) ? date : undefined;
-
         setValue(
           name,
           newDateValue as PathValue<TFormValues, Path<TFormValues>>,
           { shouldTouch: true },
         );
       } else {
-        setValue(
-          name,
-          { day, month, year } as PathValue<TFormValues, Path<TFormValues>>,
-          { shouldTouch: true },
-        );
+        const nextValue =
+          !day && !month && !year ? undefined : { day, month, year };
+
+        setValue(name, nextValue as PathValue<TFormValues, Path<TFormValues>>, {
+          shouldTouch: true,
+        });
       }
 
       setValues({

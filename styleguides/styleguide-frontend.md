@@ -348,18 +348,11 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.3.2"></a>
 
-#### 5.3.2 Avoiding slow calls in waitFor blocks
+#### 5.3.2 Waiting for UI changes
 
-- Don't use `getByRole` when using `waitFor` as it causes performance degradation.
-- Use faster selector like `getByText` or `getByLabel` in `waitFor` and keep assertions minimal inside.
-- Follow up after `waitFor` with any `getByRoles`.
-
-<a id="s5.3.3"></a>
-
-#### 5.3.3 Use findBy instead of waitFor
-
-- findBy selectors typically didn't use to work properly, but now does in newer RTL versions
-- Try to use findBy instead of waitFor!
+- UI changes on load or following user interaction usually have to be waited for.
+- Use `findBy*` where applicable, e.g. `expect(await screen.findByText('find me')).toBeInTheDocument()`.
+- When using `waitFor` don't use `getByRole` as it causes performance degradation. Use a faster selector like `getByText` or `getByLabel` in `waitFor` and keep assertions minimal inside. Follow up after `waitFor` with any `getByRoles`.
 
 <a id="s5.4"></a>
 
@@ -367,9 +360,24 @@ Work is ongoing to convert existing forms to RHF. New RHF form components that m
 
 <a id="s5.4.1"></a>
 
-#### 5.4.1 Awaiting userEvent methods
+#### 5.4.1 userEvents
 
-- When we update testing-library to latest, we will have to await all userEvent usages (as this is the new API)
+- Use `await` with all `userEvents`.
+- Invoke `userEvent.setup()` before the component is rendered (this is a recent change to Testing Library so most tests still use `userEvent` directly), e.g.
+  ```
+  const user = userEvent.setup();
+  render(<MyComponent />);
+  await user.click(screen.getByRole('button', {name: 'click me'}));
+  ```
+
+<a id="s5.4.2"></a>
+
+#### 5.4.2 Using jest.useFakeTimers with userEvents
+
+- Using `jest.useFakeTimers()` with `userEvents` can cause tests to timeout.
+- To fix this invoke `userEvent` with one of the following as appropriate:
+  - `const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });`
+  - `const user = userEvent.setup({ delay: null });`
 
 <a id="s5.5"></a>
 

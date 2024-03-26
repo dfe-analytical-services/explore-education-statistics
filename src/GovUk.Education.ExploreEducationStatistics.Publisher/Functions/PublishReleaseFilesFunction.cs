@@ -4,47 +4,33 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusFilesStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
-    // ReSharper disable once UnusedType.Global
-    public class PublishReleaseFilesFunction
+    public class PublishReleaseFilesFunction(
+        ILogger<PublishReleaseFilesFunction> logger,
+        IPublishingService publishingService,
+        IReleasePublishingStatusService releasePublishingStatusService,
+        IPublishingCompletionService publishingCompletionService)
     {
-        private readonly IPublishingService _publishingService;
-        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-        private readonly IPublishingCompletionService _publishingCompletionService;
-
-        public PublishReleaseFilesFunction(
-            IPublishingService publishingService,
-            IReleasePublishingStatusService releasePublishingStatusService,
-            IPublishingCompletionService publishingCompletionService)
-        {
-            _publishingService = publishingService;
-            _releasePublishingStatusService = releasePublishingStatusService;
-            _publishingCompletionService = publishingCompletionService;
-        }
-
         /// <summary>
         /// Azure function which publishes the files for a Release by copying them between storage accounts.
         /// </summary>
         /// <param name="message"></param>
-        /// <param name="executionContext"></param>
-        /// <param name="logger"></param>
+        /// <param name="context"></param>
         /// <returns></returns>
-        [FunctionName("PublishReleaseFiles")]
-        // ReSharper disable once UnusedMember.Global
+        [Function("PublishReleaseFiles")]
         public async Task PublishReleaseFiles(
             [QueueTrigger(PublishReleaseFilesQueue)]
             PublishReleaseFilesMessage message,
-            ExecutionContext executionContext,
-            ILogger logger)
+            FunctionContext context)
         {
             logger.LogInformation("{FunctionName} triggered: {Message}",
-                executionContext.FunctionName,
+                context.FunctionDefinition.Name,
                 message);
 
             await UpdateFilesStage(message.Releases, Started);
@@ -56,14 +42,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     try
                     {
-                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseVersionId);
-                        await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseVersionId);
+                        await publishingService.PublishMethodologyFilesIfApplicableForRelease(
+                            releaseStatus.ReleaseVersionId);
+                        await publishingService.PublishReleaseFiles(releaseStatus.ReleaseVersionId);
                         return true;
                     }
                     catch (Exception e)
                     {
                         logger.LogError(e, "Exception occured while executing {FunctionName}",
-                            executionContext.FunctionName);
+                            context.FunctionDefinition.Name);
 
                         return false;
                     }
@@ -79,31 +66,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
+                await publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Exception occured while completing publishing in {FunctionName}",
-                    executionContext.FunctionName);
+                    context.FunctionDefinition.Name);
 
                 await UpdatePublishingStage(
                     successfulReleases,
                     ReleasePublishingStatusPublishingStage.Failed,
-                    new ReleasePublishingStatusLogMessage($"Failed during completion of the Publishing process: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage(
+                        $"Failed during completion of the Publishing process: {e.Message}"));
             }
 
-            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
         }
 
         private async Task UpdateFilesStage(
             IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
             ReleasePublishingStatusFilesStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await releaseStatuses
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(status =>
-                    _releasePublishingStatusService.UpdateFilesStageAsync(
+                    releasePublishingStatusService.UpdateFilesStageAsync(
                         releaseVersionId: status.releaseVersionId,
                         releaseStatusId: status.releaseStatusId,
                         stage,
@@ -113,12 +101,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task UpdatePublishingStage(
             IEnumerable<(Guid releaseVersionId, Guid releaseStatusId)> releaseStatuses,
             ReleasePublishingStatusPublishingStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await releaseStatuses
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(status =>
-                    _releasePublishingStatusService.UpdatePublishingStageAsync(
+                    releasePublishingStatusService.UpdatePublishingStageAsync(
                         releaseVersionId: status.releaseVersionId,
                         releaseStatusId: status.releaseStatusId,
                         stage,

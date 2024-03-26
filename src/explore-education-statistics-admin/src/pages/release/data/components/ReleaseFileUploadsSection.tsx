@@ -13,7 +13,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import logger from '@common/services/logger';
-import Yup from '@common/validation/yup';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useMemo, useState } from 'react';
 
@@ -67,8 +66,6 @@ export default function ReleaseFileUploadsSection({
     [files, listFilesQuery.queryKey, queryClient, releaseId],
   );
 
-  const MAX_FILE_SIZE = 2147483647; // 2GB
-
   return (
     <>
       <h2>Add file to release</h2>
@@ -110,18 +107,7 @@ export default function ReleaseFileUploadsSection({
       </InsetText>
 
       {canUpdateRelease ? (
-        <AncillaryFileForm
-          files={files}
-          submitText="Add file"
-          resetAfterSubmit
-          validationSchema={Yup.object<Partial<AncillaryFileFormValues>>({
-            file: Yup.file()
-              .required('Choose a file')
-              .minSize(0, 'Choose a file that is not empty')
-              .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB'),
-          })}
-          onSubmit={handleSubmit}
-        />
+        <AncillaryFileForm files={files} onSubmit={handleSubmit} />
       ) : (
         <WarningMessage>
           This release has been approved, and can no longer be updated.

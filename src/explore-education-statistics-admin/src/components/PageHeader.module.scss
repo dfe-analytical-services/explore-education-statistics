@@ -1,4 +1,4 @@
-@import '~govuk-frontend/govuk/base';
+@import '~govuk-frontend/dist/govuk/base';
 
 // Setting page header colours based on environment
 $envs: (
@@ -39,12 +39,12 @@ $envs: (
       border-color: $colour;
     }
 
-    :global(.govuk-header__logotype) {
+    :global(.govuk-header__link--homepage) {
       align-items: center;
       display: inline-flex;
     }
 
-    :global(.govuk-header__logotype::after) {
+    :global(.govuk-header__link--homepage::after) {
       background-color: $colour;
       color: $text-colour;
       content: $title;
@@ -53,10 +53,6 @@ $envs: (
       margin-left: 1rem;
       padding: 0.25rem 0.4rem;
       text-transform: uppercase;
-    }
-
-    :global(.govuk-header__logotype-text) {
-      margin-left: 0.5rem;
     }
   }
 }

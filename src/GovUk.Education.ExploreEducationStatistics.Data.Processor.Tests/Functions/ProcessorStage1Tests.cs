@@ -7,17 +7,19 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Functions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
-using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -39,7 +41,7 @@ public class ProcessorStage1Tests
     {
         await AssertStage1ItemsValidatedCorrectly(new SmallCsvStage1Scenario());
     }
-    
+
     private async Task AssertStage1ItemsValidatedCorrectly(IProcessorStage1TestScenario scenario)
     {
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
@@ -89,13 +91,13 @@ public class ProcessorStage1Tests
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
         privateBlobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
+
         privateBlobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -103,21 +105,22 @@ public class ProcessorStage1Tests
             statisticsDbContextId: _statisticsDbContextId);
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-        
+
         var guidGenerator = new SequentialGuidGenerator();
 
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
-        
+
         var importerService = new ImporterService(
+            Options.Create(new AppSettingOptions()),
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -144,30 +147,30 @@ public class ProcessorStage1Tests
             importerService: importerService,
             fileImportService: fileImportService,
             validatorService: validatorService);
-        
+
         var importMessage = new ImportMessage(import.Id);
 
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
-
-        importStagesMessageQueue
-            .Setup(s => s.Add(importMessage));
-
         var function = BuildFunction(processorService, dataImportService);
-        
-        await function.ProcessUploads(
-            importMessage, 
-            new ExecutionContext(),
-            importStagesMessageQueue.Object);
-        
-        VerifyAllMocks(privateBlobStorageService, importStagesMessageQueue);
+
+        var outputMessages = await function.ProcessUploads(
+            importMessage,
+            new TestFunctionContext());
+
+        VerifyAllMocks(privateBlobStorageService);
+
+        // Verify that the message will be queued to trigger the next stage.
+        Assert.Equal(new[]
+        {
+            importMessage
+        }, outputMessages);
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
             var dataImports = await contentDbContext
                 .DataImports
                 .ToListAsync();
-            
-            // Verify that the import status has moved onto Stage 3.
+
+            // Verify that the import status has moved onto Stage 2.
             dataImports.ForEach(dataImport =>
             {
                 Assert.Equal(DataImportStatus.STAGE_2, dataImport.Status);

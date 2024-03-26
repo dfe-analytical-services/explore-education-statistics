@@ -21,13 +21,14 @@ const redirectPaths = {
 
 export default async function redirectPages(request: NextRequest) {
   const { nextUrl } = request;
+  const decodedPathname = decodeURIComponent(request.nextUrl.pathname);
 
   // Check for redirects for release and methodology pages
   if (
     Object.values(redirectPaths).find(path =>
-      nextUrl.pathname.toLowerCase().startsWith(path),
+      decodedPathname.toLowerCase().startsWith(path),
     ) &&
-    nextUrl.pathname.split('/').length > 2
+    decodedPathname.split('/').length > 2
   ) {
     const shouldRefetch =
       !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
@@ -42,9 +43,9 @@ export default async function redirectPages(request: NextRequest) {
     const redirectPath = Object.keys(redirectPaths).reduce((acc, key) => {
       const redirectType = key as RedirectType;
       if (
-        nextUrl.pathname.toLowerCase().startsWith(redirectPaths[redirectType])
+        decodedPathname.toLowerCase().startsWith(redirectPaths[redirectType])
       ) {
-        const pathSegments = nextUrl.pathname.split('/');
+        const pathSegments = decodedPathname.split('/');
 
         const rewriteRule = cachedRedirects?.redirects[redirectType]?.find(
           ({ fromSlug }) => pathSegments[2].toLowerCase() === fromSlug,
@@ -66,15 +67,15 @@ export default async function redirectPages(request: NextRequest) {
     if (redirectPath) {
       const redirectUrl = nextUrl.clone();
       redirectUrl.pathname = redirectPath;
-      return NextResponse.redirect(redirectUrl);
+      return NextResponse.redirect(redirectUrl, 301);
     }
   }
 
   // Redirect any URLs with uppercase characters to lowercase.
-  if (nextUrl.pathname !== nextUrl.pathname.toLowerCase()) {
+  if (decodedPathname !== decodedPathname.toLowerCase()) {
     const url = nextUrl.clone();
-    url.pathname = url.pathname.toLowerCase();
-    return NextResponse.redirect(url);
+    url.pathname = decodedPathname.toLowerCase();
+    return NextResponse.redirect(url, 301);
   }
 
   return NextResponse.next();

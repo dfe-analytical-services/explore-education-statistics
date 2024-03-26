@@ -78,13 +78,13 @@ const TableToolFinalStep = ({
         <>
           <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
             {selectedPublication.selectedRelease.latestData && (
-              <Tag strong>This is the latest data</Tag>
+              <Tag>This is the latest data</Tag>
             )}
 
             {!selectedPublication.selectedRelease.latestData && (
               <div>
                 <div className="govuk-!-margin-bottom-3">
-                  <Tag strong colour="orange">
+                  <Tag colour="orange">
                     This data is not from the latest release
                   </Tag>
                 </div>

@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -131,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await ExecuteQueryAsync(query);
         }
 
-        public async Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseVersionId)
+        public async Task<ReleasePublishingStatus?> GetLatestAsync(Guid releaseVersionId)
         {
             var query = new TableQuery<ReleasePublishingStatus>()
                 .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),

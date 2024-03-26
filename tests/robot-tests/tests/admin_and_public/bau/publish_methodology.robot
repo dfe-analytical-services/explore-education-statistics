@@ -467,7 +467,7 @@ Verify that the methodology that was scheduled with the cancelled release amendm
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
 
-    user checks summary list contains    Status    In Draft
+    user checks summary list contains    Status    In draft
     user checks summary list contains    Owning publication    ${PUBLICATION_NAME}
 
     user clicks button    Edit status
