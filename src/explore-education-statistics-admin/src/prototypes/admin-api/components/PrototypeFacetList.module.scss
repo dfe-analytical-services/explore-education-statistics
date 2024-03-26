@@ -1,0 +1,23 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.container {
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: govuk-spacing(2);
+
+  scrollbar-gutter: stable;
+}
+
+.heading {
+  display: none;
+
+  @include govuk-media-query($from: tablet) {
+    display: block;
+    margin-bottom: govuk-spacing(2);
+    width: 45%;
+
+    + .heading {
+      margin-left: 10%;
+    }
+  }
+}

@@ -151,7 +151,6 @@ const PrototypeTableToolWizard = ({
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
         id: publication.id,
-        isSuperseded: false,
         slug: publication.slug,
         title: publication.title,
         selectedRelease: {
@@ -164,6 +163,7 @@ const PrototypeTableToolWizard = ({
         latestRelease: {
           title: latestRelease.title,
         },
+        isSuperseded: false,
       };
     });
   };

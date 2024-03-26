@@ -1,0 +1,6 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.inner {
+  max-height: calc(90vh - 200px);
+  overflow-y: auto;
+}

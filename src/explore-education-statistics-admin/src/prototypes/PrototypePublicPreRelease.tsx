@@ -22,9 +22,9 @@ const PrototypePreReleasePage = () => {
 
       <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
         <p>
-          Besides Department for Education (DfE) professional and production
-          staff, the following post holders were given pre-release access up to
-          24 hours before release.
+          Beside Department for Education (DfE) professional and production
+          staff the following post holders are given pre-release access up to 24
+          hours before release.
         </p>
         <ul>
           <li>Secretary of State, DfE</li>
