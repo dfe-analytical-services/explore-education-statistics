@@ -26,8 +26,8 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
            type="text"
            value
     >
-    <div class="optionsContainer"
-         aria-live="assertive"
+    <div aria-live="assertive"
+         class="optionsContainer"
     >
       <div class="govuk-form-group">
         <fieldset class="govuk-fieldset"
@@ -155,8 +155,8 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
            type="text"
            value
     >
-    <div class="optionsContainer"
-         aria-live="assertive"
+    <div aria-live="assertive"
+         class="optionsContainer"
     >
       <div class="govuk-checkboxes">
         <button aria-disabled="false"
