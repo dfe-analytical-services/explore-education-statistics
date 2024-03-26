@@ -2,25 +2,24 @@ import {
   pluginsConfigSimple,
   toolbarConfigSimple,
 } from '@admin/config/ckEditorConfig';
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form } from '@common/components/form';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
 import minDelay from '@common/utils/minDelay';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import toPath from 'lodash/toPath';
 import React from 'react';
 
@@ -62,22 +61,16 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
   const [isEditing, toggleEditing] = useToggle(canUpdateRelease);
 
-  const handleSubmit = useFormSubmit<DataGuidanceFormValues>(
-    async (values, helpers) => {
-      await minDelay(async () => {
-        const updatedGuidance =
-          await releaseDataGuidanceService.updateDataGuidance(
-            releaseId,
-            values,
-          );
+  const handleSubmit = async (values: DataGuidanceFormValues) => {
+    await minDelay(async () => {
+      const updatedGuidance =
+        await releaseDataGuidanceService.updateDataGuidance(releaseId, values);
 
-        setDataGuidance({ value: updatedGuidance });
+      setDataGuidance({ value: updatedGuidance });
 
-        helpers.resetForm();
-        toggleEditing.off();
-      }, 600);
-    },
-  );
+      toggleEditing.off();
+    }, 600);
+  };
 
   return (
     <>
@@ -111,8 +104,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
         {dataGuidance && (
           <>
             {dataGuidance.dataSets.length > 0 ? (
-              <Formik<DataGuidanceFormValues>
-                enableReinitialize
+              <FormProvider
                 initialValues={{
                   content: dataGuidance.content || initialReleaseDataGuidance,
                   dataSets: dataGuidance.dataSets.map(dataSet => ({
@@ -138,16 +130,18 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                     }),
                   ),
                 })}
-                onSubmit={handleSubmit}
               >
-                {form => {
+                {({ formState, getValues, reset }) => {
                   const hasSubmitValidationError =
-                    form.submitCount > 0 && !form.isValid ? true : undefined;
+                    formState.submitCount > 0 && !formState.isValid
+                      ? true
+                      : undefined;
 
+                  const values = getValues() as DataGuidanceFormValues;
                   return (
-                    <Form id={formId}>
+                    <RHFForm id={formId} onSubmit={handleSubmit}>
                       {isEditing ? (
-                        <FormFieldEditor<DataGuidanceFormValues>
+                        <RHFFormFieldEditor<DataGuidanceFormValues>
                           name="content"
                           label="Main guidance content"
                         />
@@ -159,7 +153,10 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                             </InsetText>
                           ) : (
                             <ContentHtml
-                              html={form.values.content}
+                              // html={form.values.content}
+                              // html={getValues('content')}
+                              // html={dataGuidance.content}
+                              html={values.content}
                               testId="mainGuidanceContent"
                             />
                           )}
@@ -184,18 +181,16 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                   dataSet={dataSet}
                                   renderContent={() =>
                                     isEditing ? (
-                                      <FormFieldEditor<DataGuidanceFormValues>
+                                      <RHFFormFieldEditor<DataGuidanceFormValues>
                                         includePlugins={pluginsConfigSimple}
                                         toolbarConfig={toolbarConfigSimple}
-                                        name={`dataSets[${index}].content`}
+                                        name={`dataSets.${index}.content`}
                                         label="File guidance content"
                                         testId="fileGuidanceContent"
                                       />
                                     ) : (
                                       <ContentHtml
-                                        html={
-                                          form.values.dataSets[index].content
-                                        }
+                                        html={values.dataSets[index].content}
                                         testId="fileGuidanceContent"
                                       />
                                     )
@@ -210,7 +205,10 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                       {canUpdateRelease && (
                         <ButtonGroup>
                           {isEditing && (
-                            <Button type="submit" disabled={form.isSubmitting}>
+                            <Button
+                              type="submit"
+                              disabled={formState.isSubmitting}
+                            >
                               Save guidance
                             </Button>
                           )}
@@ -223,16 +221,16 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                           </Button>
 
                           {isEditing && (
-                            <ButtonText onClick={() => form.resetForm()}>
+                            <ButtonText onClick={() => reset()}>
                               Cancel
                             </ButtonText>
                           )}
                         </ButtonGroup>
                       )}
-                    </Form>
+                    </RHFForm>
                   );
                 }}
-              </Formik>
+              </FormProvider>
             ) : (
               <>
                 {canUpdateRelease ? (
