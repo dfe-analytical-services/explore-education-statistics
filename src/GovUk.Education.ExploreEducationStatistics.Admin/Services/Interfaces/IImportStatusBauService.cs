@@ -4,10 +4,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IImportStatusBauService
 {
-    public interface IImportStatusBauService
-    {
-        Task<Either<ActionResult, List<ImportStatusBauViewModel>>> GetAllIncompleteImports();
-    }
+    Task<Either<ActionResult, List<ImportStatusBauViewModel>>> GetAllIncompleteImports();
 }

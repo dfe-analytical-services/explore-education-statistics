@@ -10,32 +10,31 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class GlossaryService : IGlossaryService
 {
-    public class GlossaryService : IGlossaryService
+    private readonly ContentDbContext _contentDbContext;
+
+    public GlossaryService(ContentDbContext contentDbContext)
     {
-        private readonly ContentDbContext _contentDbContext;
+        _contentDbContext = contentDbContext;
+    }
 
-        public GlossaryService(ContentDbContext contentDbContext)
-        {
-            _contentDbContext = contentDbContext;
-        }
+    public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
+    {
+        var glossaryEntries = await _contentDbContext.GlossaryEntries
+            .ToListAsync();
+        return GlossaryUtils.BuildGlossary(glossaryEntries);
+    }
 
-        public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
-        {
-            var glossaryEntries = await _contentDbContext.GlossaryEntries
-                .ToListAsync();
-            return GlossaryUtils.BuildGlossary(glossaryEntries);
-        }
-
-        public async Task<Either<ActionResult, GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
-        {
-            return await _contentDbContext.GlossaryEntries
-                .SingleOrNotFoundAsync(e => e.Slug == slug)
-                .OnSuccess(e => new GlossaryEntryViewModel(
-                    Title: e.Title,
-                    Slug: e.Slug,
-                    Body: e.Body));
-        }
+    public async Task<Either<ActionResult, GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
+    {
+        return await _contentDbContext.GlossaryEntries
+            .SingleOrNotFoundAsync(e => e.Slug == slug)
+            .OnSuccess(e => new GlossaryEntryViewModel(
+                Title: e.Title,
+                Slug: e.Slug,
+                Body: e.Body));
     }
 }

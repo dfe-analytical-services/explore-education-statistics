@@ -15,265 +15,264 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Methodolog
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
+
+public class MethodologyServiceTests
 {
-    public class MethodologyServiceTests
+    [Fact]
+    public async Task GetFiles()
     {
-        [Fact]
-        public async Task GetFiles()
+        var methodologyVersion = new MethodologyVersion();
+
+        var imageFile1 = new MethodologyFile
         {
-            var methodologyVersion = new MethodologyVersion();
-
-            var imageFile1 = new MethodologyFile
+            MethodologyVersion = methodologyVersion,
+            File = new File
             {
-                MethodologyVersion = methodologyVersion,
-                File = new File
-                {
-                    Filename = "image1.png",
-                    Type = Image
-                }
-            };
-
-            var imageFile2 = new MethodologyFile
-            {
-                MethodologyVersion = methodologyVersion,
-                File = new File
-                {
-                    Filename = "image2.png",
-                    Type = Image
-                }
-            };
-
-            var otherFile = new MethodologyFile
-            {
-                MethodologyVersion = methodologyVersion,
-                File = new File
-                {
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2, otherFile);
-                await contentDbContext.SaveChangesAsync();
+                Filename = "image1.png",
+                Type = Image
             }
+        };
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        var imageFile2 = new MethodologyFile
+        {
+            MethodologyVersion = methodologyVersion,
+            File = new File
             {
-                var service = SetupMethodologyService(contentDbContext);
-
-                var result = await service.GetFiles(methodologyVersion.Id, Image);
-
-                Assert.Equal(2, result.Count);
-                Assert.Equal(imageFile1.File.Id, result[0].Id);
-                Assert.Equal(imageFile2.File.Id, result[1].Id);
+                Filename = "image2.png",
+                Type = Image
             }
-        }
+        };
 
-        [Fact]
-        public async Task GetLatestVersionByRelease()
+        var otherFile = new MethodologyFile
         {
-            var releaseVersion = new ReleaseVersion
+            MethodologyVersion = methodologyVersion,
+            File = new File
             {
-                Publication = new Publication
-                {
-                    Title = "Publication",
-                    Slug = "publication-slug"
-                },
-                ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ1
-            };
-
-            var methodologies = AsList(
-                new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    PreviousVersionId = null,
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    Version = 0
-                },
-                new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    PreviousVersionId = null,
-                    PublishingStrategy = Immediately,
-                    Status = Approved,
-                    Version = 0
-                });
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(releaseVersion);
-                await contentDbContext.SaveChangesAsync();
+                Filename = "ancillary.pdf",
+                Type = Ancillary
             }
+        };
 
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                .ReturnsAsync(methodologies);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(contentDbContext,
-                    methodologyVersionRepository.Object);
-
-                var result = await service.GetLatestVersionByRelease(releaseVersion);
-
-                Assert.Equal(methodologies, result);
-            }
-
-            MockUtils.VerifyAllMocks(methodologyVersionRepository);
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+            await contentDbContext.MethodologyFiles.AddRangeAsync(imageFile1, imageFile2, otherFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task IsBeingPublishedAlongsideRelease_NotApproved()
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Draft,
-            };
+            var service = SetupMethodologyService(contentDbContext);
 
-            await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
-            var methodologyService = SetupMethodologyService(contentDbContext);
-            var result = await methodologyService.IsBeingPublishedAlongsideRelease(
-                methodologyVersion,
-                new ReleaseVersion());
-            Assert.False(result);
+            var result = await service.GetFiles(methodologyVersion.Id, Image);
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal(imageFile1.File.Id, result[0].Id);
+            Assert.Equal(imageFile2.File.Id, result[1].Id);
         }
+    }
 
-        [Fact]
-        public async Task IsBeingPublishedAlongsideRelease_Immediately()
+    [Fact]
+    public async Task GetLatestVersionByRelease()
+    {
+        var releaseVersion = new ReleaseVersion
         {
-            var methodologyVersion = new MethodologyVersion
+            Publication = new Publication
             {
-                Status = Approved,
-                PublishingStrategy = Immediately,
-            };
+                Title = "Publication",
+                Slug = "publication-slug"
+            },
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1
+        };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                PublicationId = Guid.NewGuid(),
-            };
-
-            await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
-            var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
-
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
-                .ReturnsAsync(false);
-
-            var methodologyService = SetupMethodologyService(contentDbContext,
-                publicationRepository: publicationRepository.Object);
-            var result = await methodologyService.IsBeingPublishedAlongsideRelease(
-                methodologyVersion,
-                releaseVersion);
-            Assert.True(result);
-        }
-
-        [Fact]
-        public async Task IsBeingPublishedAlongsideRelease_Immediately_PublicationAlreadyPublished()
-        {
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Approved,
-                PublishingStrategy = Immediately,
-            };
-
-            var releaseVersion = new ReleaseVersion
-            {
-                PublicationId = Guid.NewGuid(),
-            };
-
-            await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
-            var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
-
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
-                .ReturnsAsync(true);
-
-            var methodologyService = SetupMethodologyService(contentDbContext,
-                publicationRepository: publicationRepository.Object);
-            var result = await methodologyService.IsBeingPublishedAlongsideRelease(
-                methodologyVersion,
-                releaseVersion);
-            Assert.False(result);
-        }
-
-        [Fact]
-        public async Task IsBeingPublishedAlongsideRelease_WithRelease()
-        {
-            var releaseVersion = new ReleaseVersion
+        var methodologies = AsList(
+            new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-            };
-
-            var methodologyVersion = new MethodologyVersion
-            {
+                PreviousVersionId = null,
+                PublishingStrategy = Immediately,
                 Status = Approved,
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersionId = releaseVersion.Id,
-            };
-
-            await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
-            var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
-
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
-                .ReturnsAsync(false);
-
-            var methodologyService = SetupMethodologyService(contentDbContext,
-                publicationRepository: publicationRepository.Object);
-            var result = await methodologyService.IsBeingPublishedAlongsideRelease(
-                methodologyVersion,
-                releaseVersion);
-            Assert.True(result);
-        }
-
-        [Fact]
-        public async Task IsBeingPublishedAlongsideRelease_WithRelease_IncorrectRelease()
-        {
-            var releaseVersion = new ReleaseVersion
+                Version = 0
+            },
+            new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublicationId = Guid.NewGuid(),
-            };
-
-            var methodologyVersion = new MethodologyVersion
-            {
+                PreviousVersionId = null,
+                PublishingStrategy = Immediately,
                 Status = Approved,
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersionId = Guid.NewGuid(),
-            };
+                Version = 0
+            });
 
-            await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
-            var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-            publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
-                .ReturnsAsync(false);
-
-            var methodologyService = SetupMethodologyService(contentDbContext,
-                publicationRepository: publicationRepository.Object);
-            var result = await methodologyService.IsBeingPublishedAlongsideRelease(
-                methodologyVersion,
-                releaseVersion);
-            Assert.False(result);
-        }
-
-        private static MethodologyService SetupMethodologyService(
-            ContentDbContext contentDbContext,
-            IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IPublicationRepository? publicationRepository = null)
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            return new(
-                contentDbContext,
-                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict),
-                publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict));
+            contentDbContext.ReleaseVersions.Add(releaseVersion);
+            await contentDbContext.SaveChangesAsync();
         }
+
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+
+        methodologyVersionRepository.Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+            .ReturnsAsync(methodologies);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupMethodologyService(contentDbContext,
+                methodologyVersionRepository.Object);
+
+            var result = await service.GetLatestVersionByRelease(releaseVersion);
+
+            Assert.Equal(methodologies, result);
+        }
+
+        MockUtils.VerifyAllMocks(methodologyVersionRepository);
+    }
+
+    [Fact]
+    public async Task IsBeingPublishedAlongsideRelease_NotApproved()
+    {
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Draft,
+        };
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var methodologyService = SetupMethodologyService(contentDbContext);
+        var result = await methodologyService.IsBeingPublishedAlongsideRelease(
+            methodologyVersion,
+            new ReleaseVersion());
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task IsBeingPublishedAlongsideRelease_Immediately()
+    {
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Approved,
+            PublishingStrategy = Immediately,
+        };
+
+        var releaseVersion = new ReleaseVersion
+        {
+            PublicationId = Guid.NewGuid(),
+        };
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
+
+        publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            .ReturnsAsync(false);
+
+        var methodologyService = SetupMethodologyService(contentDbContext,
+            publicationRepository: publicationRepository.Object);
+        var result = await methodologyService.IsBeingPublishedAlongsideRelease(
+            methodologyVersion,
+            releaseVersion);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task IsBeingPublishedAlongsideRelease_Immediately_PublicationAlreadyPublished()
+    {
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Approved,
+            PublishingStrategy = Immediately,
+        };
+
+        var releaseVersion = new ReleaseVersion
+        {
+            PublicationId = Guid.NewGuid(),
+        };
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
+
+        publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            .ReturnsAsync(true);
+
+        var methodologyService = SetupMethodologyService(contentDbContext,
+            publicationRepository: publicationRepository.Object);
+        var result = await methodologyService.IsBeingPublishedAlongsideRelease(
+            methodologyVersion,
+            releaseVersion);
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task IsBeingPublishedAlongsideRelease_WithRelease()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            PublicationId = Guid.NewGuid(),
+        };
+
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Approved,
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersionId = releaseVersion.Id,
+        };
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
+
+        publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            .ReturnsAsync(false);
+
+        var methodologyService = SetupMethodologyService(contentDbContext,
+            publicationRepository: publicationRepository.Object);
+        var result = await methodologyService.IsBeingPublishedAlongsideRelease(
+            methodologyVersion,
+            releaseVersion);
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task IsBeingPublishedAlongsideRelease_WithRelease_IncorrectRelease()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            PublicationId = Guid.NewGuid(),
+        };
+
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Approved,
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersionId = Guid.NewGuid(),
+        };
+
+        await using var contentDbContext = InMemoryContentDbContext(Guid.NewGuid().ToString());
+        var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
+
+        publicationRepository.Setup(mock => mock.IsPublished(releaseVersion.PublicationId))
+            .ReturnsAsync(false);
+
+        var methodologyService = SetupMethodologyService(contentDbContext,
+            publicationRepository: publicationRepository.Object);
+        var result = await methodologyService.IsBeingPublishedAlongsideRelease(
+            methodologyVersion,
+            releaseVersion);
+        Assert.False(result);
+    }
+
+    private static MethodologyService SetupMethodologyService(
+        ContentDbContext contentDbContext,
+        IMethodologyVersionRepository? methodologyVersionRepository = null,
+        IPublicationRepository? publicationRepository = null)
+    {
+        return new(
+            contentDbContext,
+            methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict),
+            publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict));
     }
 }

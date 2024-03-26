@@ -1,19 +1,18 @@
 ﻿#nullable enable
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public enum ReleaseType
 {
-    public enum ReleaseType
-    {
-        AdHocStatistics,
+    AdHocStatistics,
 
-        NationalStatistics,
+    NationalStatistics,
 
-        ExperimentalStatistics,
+    ExperimentalStatistics,
 
-        ManagementInformation,
+    ManagementInformation,
 
-        OfficialStatistics,
+    OfficialStatistics,
 
-        OfficialStatisticsInDevelopment
-    }
+    OfficialStatisticsInDevelopment
 }

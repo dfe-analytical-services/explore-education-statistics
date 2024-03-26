@@ -5,172 +5,171 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Extensions;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Extensions;
+
+public class PublisherExtensionTests
 {
-    public class PublisherExtensionTests
+    [Fact]
+    public void IsReleasePublished_ReleasePublished()
     {
-        [Fact]
-        public void IsReleasePublished_ReleasePublished()
+        var publication = new Publication();
+
+        var releaseVersion = new ReleaseVersion
         {
-            var publication = new Publication();
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Published = DateTime.UtcNow.AddSeconds(-1)
+        };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Published = DateTime.UtcNow.AddSeconds(-1)
-            };
-
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                releaseVersion
-            };
-
-            Assert.True(releaseVersion.IsReleasePublished());
-        }
-
-        [Fact]
-        public void IsReleasePublished_ReleaseNotPublished()
+        publication.ReleaseVersions = new List<ReleaseVersion>
         {
-            var publication = new Publication();
+            releaseVersion
+        };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Published = null
-            };
+        Assert.True(releaseVersion.IsReleasePublished());
+    }
 
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                releaseVersion
-            };
+    [Fact]
+    public void IsReleasePublished_ReleaseNotPublished()
+    {
+        var publication = new Publication();
 
-            Assert.False(releaseVersion.IsReleasePublished());
-        }
-
-        [Fact]
-        public void IsReleasePublished_ReleaseNotPublishedButIncluded()
+        var releaseVersion = new ReleaseVersion
         {
-            var publication = new Publication();
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Published = null
+        };
 
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Published = null
-            };
-
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                releaseVersion
-            };
-
-            Assert.True(releaseVersion.IsReleasePublished(new List<Guid>
-            {
-                releaseVersion.Id
-            }));
-        }
-
-        [Fact]
-        public void IsReleasePublished_AmendmentReleaseNotPublished()
+        publication.ReleaseVersions = new List<ReleaseVersion>
         {
-            var publication = new Publication();
+            releaseVersion
+        };
 
-            var originalReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Version = 0,
-                Published = DateTime.UtcNow.AddSeconds(-1)
-            };
+        Assert.False(releaseVersion.IsReleasePublished());
+    }
 
-            var amendmentReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                PreviousVersionId = originalReleaseVersion.Id,
-                Version = 1
-            };
+    [Fact]
+    public void IsReleasePublished_ReleaseNotPublishedButIncluded()
+    {
+        var publication = new Publication();
 
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                originalReleaseVersion,
-                amendmentReleaseVersion
-            };
-
-            Assert.True(originalReleaseVersion.IsReleasePublished());
-            Assert.False(amendmentReleaseVersion.IsReleasePublished());
-        }
-
-        [Fact]
-        public void IsReleasePublished_AmendmentReleasePublished()
+        var releaseVersion = new ReleaseVersion
         {
-            var publication = new Publication();
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Published = null
+        };
 
-            var originalReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Version = 0,
-                Published = DateTime.UtcNow.AddSeconds(-1)
-            };
-
-            var amendmentReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                PreviousVersionId = originalReleaseVersion.Id,
-                Version = 1,
-                Published = DateTime.UtcNow.AddSeconds(-1)
-            };
-
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                originalReleaseVersion,
-                amendmentReleaseVersion
-            };
-
-            Assert.False(originalReleaseVersion.IsReleasePublished());
-            Assert.True(amendmentReleaseVersion.IsReleasePublished());
-        }
-
-        [Fact]
-        public void IsReleasePublished_AmendmentReleaseNotPublishedButIncluded()
+        publication.ReleaseVersions = new List<ReleaseVersion>
         {
-            var publication = new Publication();
+            releaseVersion
+        };
 
-            var originalReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                Version = 0,
-                Published = DateTime.UtcNow.AddSeconds(-1)
-            };
+        Assert.True(releaseVersion.IsReleasePublished(new List<Guid>
+        {
+            releaseVersion.Id
+        }));
+    }
 
-            var amendmentReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Publication = publication,
-                PreviousVersionId = originalReleaseVersion.Id,
-                Version = 1
-            };
+    [Fact]
+    public void IsReleasePublished_AmendmentReleaseNotPublished()
+    {
+        var publication = new Publication();
 
-            publication.ReleaseVersions = new List<ReleaseVersion>
-            {
-                originalReleaseVersion,
-                amendmentReleaseVersion
-            };
+        var originalReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Version = 0,
+            Published = DateTime.UtcNow.AddSeconds(-1)
+        };
 
-            Assert.False(originalReleaseVersion.IsReleasePublished(new List<Guid>
-            {
-                amendmentReleaseVersion.Id
-            }));
+        var amendmentReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            PreviousVersionId = originalReleaseVersion.Id,
+            Version = 1
+        };
 
-            Assert.True(amendmentReleaseVersion.IsReleasePublished(new List<Guid>
-            {
-                amendmentReleaseVersion.Id
-            }));
-        }
+        publication.ReleaseVersions = new List<ReleaseVersion>
+        {
+            originalReleaseVersion,
+            amendmentReleaseVersion
+        };
+
+        Assert.True(originalReleaseVersion.IsReleasePublished());
+        Assert.False(amendmentReleaseVersion.IsReleasePublished());
+    }
+
+    [Fact]
+    public void IsReleasePublished_AmendmentReleasePublished()
+    {
+        var publication = new Publication();
+
+        var originalReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Version = 0,
+            Published = DateTime.UtcNow.AddSeconds(-1)
+        };
+
+        var amendmentReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            PreviousVersionId = originalReleaseVersion.Id,
+            Version = 1,
+            Published = DateTime.UtcNow.AddSeconds(-1)
+        };
+
+        publication.ReleaseVersions = new List<ReleaseVersion>
+        {
+            originalReleaseVersion,
+            amendmentReleaseVersion
+        };
+
+        Assert.False(originalReleaseVersion.IsReleasePublished());
+        Assert.True(amendmentReleaseVersion.IsReleasePublished());
+    }
+
+    [Fact]
+    public void IsReleasePublished_AmendmentReleaseNotPublishedButIncluded()
+    {
+        var publication = new Publication();
+
+        var originalReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            Version = 0,
+            Published = DateTime.UtcNow.AddSeconds(-1)
+        };
+
+        var amendmentReleaseVersion = new ReleaseVersion
+        {
+            Id = Guid.NewGuid(),
+            Publication = publication,
+            PreviousVersionId = originalReleaseVersion.Id,
+            Version = 1
+        };
+
+        publication.ReleaseVersions = new List<ReleaseVersion>
+        {
+            originalReleaseVersion,
+            amendmentReleaseVersion
+        };
+
+        Assert.False(originalReleaseVersion.IsReleasePublished(new List<Guid>
+        {
+            amendmentReleaseVersion.Id
+        }));
+
+        Assert.True(amendmentReleaseVersion.IsReleasePublished(new List<Guid>
+        {
+            amendmentReleaseVersion.Id
+        }));
     }
 }

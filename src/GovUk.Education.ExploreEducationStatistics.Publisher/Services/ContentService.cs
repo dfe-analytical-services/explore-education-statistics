@@ -12,205 +12,204 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+
+public class ContentService : IContentService
 {
-    public class ContentService : IContentService
+    private readonly IBlobCacheService _privateBlobCacheService;
+    private readonly IBlobCacheService _publicBlobCacheService;
+    private readonly IBlobStorageService _publicBlobStorageService;
+    private readonly IReleaseService _releaseService;
+    private readonly IMethodologyCacheService _methodologyCacheService;
+    private readonly IReleaseCacheService _releaseCacheService;
+    private readonly IPublicationCacheService _publicationCacheService;
+
+    public ContentService(
+        IBlobCacheService privateBlobCacheService,
+        IBlobCacheService publicBlobCacheService,
+        IBlobStorageService publicBlobStorageService,
+        IReleaseService releaseService,
+        IMethodologyCacheService methodologyCacheService,
+        IReleaseCacheService releaseCacheService,
+        IPublicationCacheService publicationCacheService)
     {
-        private readonly IBlobCacheService _privateBlobCacheService;
-        private readonly IBlobCacheService _publicBlobCacheService;
-        private readonly IBlobStorageService _publicBlobStorageService;
-        private readonly IReleaseService _releaseService;
-        private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IReleaseCacheService _releaseCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        _privateBlobCacheService = privateBlobCacheService;
+        _publicBlobCacheService = publicBlobCacheService;
+        _publicBlobStorageService = publicBlobStorageService;
+        _releaseService = releaseService;
+        _methodologyCacheService = methodologyCacheService;
+        _releaseCacheService = releaseCacheService;
+        _publicationCacheService = publicationCacheService;
+    }
 
-        public ContentService(
-            IBlobCacheService privateBlobCacheService,
-            IBlobCacheService publicBlobCacheService,
-            IBlobStorageService publicBlobStorageService,
-            IReleaseService releaseService,
-            IMethodologyCacheService methodologyCacheService,
-            IReleaseCacheService releaseCacheService,
-            IPublicationCacheService publicationCacheService)
+    public async Task DeletePreviousVersionsContent(params Guid[] releaseVersionIds)
+    {
+        var releaseVersions = await _releaseService.GetAmendedReleases(releaseVersionIds);
+
+        foreach (var releaseVersion in releaseVersions)
         {
-            _privateBlobCacheService = privateBlobCacheService;
-            _publicBlobCacheService = publicBlobCacheService;
-            _publicBlobStorageService = publicBlobStorageService;
-            _releaseService = releaseService;
-            _methodologyCacheService = methodologyCacheService;
-            _releaseCacheService = releaseCacheService;
-            _publicationCacheService = publicationCacheService;
-        }
+            var previousReleaseVersion = releaseVersion.PreviousVersion;
 
-        public async Task DeletePreviousVersionsContent(params Guid[] releaseVersionIds)
-        {
-            var releaseVersions = await _releaseService.GetAmendedReleases(releaseVersionIds);
-
-            foreach (var releaseVersion in releaseVersions)
+            if (previousReleaseVersion == null)
             {
-                var previousReleaseVersion = releaseVersion.PreviousVersion;
-
-                if (previousReleaseVersion == null)
-                {
-                    break;
-                }
-
-                // Delete any lazily-cached results that are owned by the previous Release
-                await DeleteLazilyCachedReleaseResults(previousReleaseVersion.Id, releaseVersion.Publication.Slug, previousReleaseVersion.Slug);
-
-                // Delete content which hasn't been overwritten because the Slug has changed
-                if (releaseVersion.Slug != previousReleaseVersion.Slug)
-                {
-                    await _publicBlobStorageService.DeleteBlob(
-                        PublicContent,
-                        PublicContentReleasePath(releaseVersion.Publication.Slug, previousReleaseVersion.Slug)
-                    );
-                }
-            }
-        }
-
-        private async Task DeleteLazilyCachedReleaseResults(Guid releaseVersionId,
-            string publicationSlug,
-            string releaseSlug)
-        {
-            await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
-
-            await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
-            await _publicBlobCacheService.DeleteItemAsync(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
-            await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
-        }
-
-        public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseVersionIds)
-        {
-            var releaseVersions = await _releaseService.List(releaseVersionIds);
-
-            foreach (var releaseVersion in releaseVersions)
-            {
-                if (releaseVersion.PreviousVersion != null)
-                {
-                    await _publicBlobStorageService.DeleteBlobs(
-                        containerName: PublicReleaseFiles,
-                        directoryPath: $"{releaseVersion.PreviousVersion.Id}/");
-                }
-            }
-        }
-
-        public async Task UpdateContent(params Guid[] releaseVersionIds)
-        {
-            var releaseVersions = (await _releaseService
-                    .List(releaseVersionIds))
-                .ToList();
-
-            foreach (var releaseVersion in releaseVersions)
-            {
-                await _releaseCacheService.UpdateRelease(
-                    releaseVersion.Id,
-                    publicationSlug: releaseVersion.Publication.Slug,
-                    releaseSlug: releaseVersion.Slug);
+                break;
             }
 
-            var publications = releaseVersions
-                .Select(rv => rv.Publication)
-                .DistinctByProperty(publication => publication.Id)
-                .ToList();
+            // Delete any lazily-cached results that are owned by the previous Release
+            await DeleteLazilyCachedReleaseResults(previousReleaseVersion.Id, releaseVersion.Publication.Slug, previousReleaseVersion.Slug);
 
-            foreach (var publication in publications)
+            // Delete content which hasn't been overwritten because the Slug has changed
+            if (releaseVersion.Slug != previousReleaseVersion.Slug)
             {
-                // Cache the latest release version for the publication as a separate cache entry
-                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
-                await _releaseCacheService.UpdateRelease(
-                    latestReleaseVersion.Id,
-                    publicationSlug: publication.Slug);
+                await _publicBlobStorageService.DeleteBlob(
+                    PublicContent,
+                    PublicContentReleasePath(releaseVersion.Publication.Slug, previousReleaseVersion.Slug)
+                );
             }
         }
+    }
 
-        public async Task UpdateContentStaged(DateTime expectedPublishDate,
-            params Guid[] releaseVersionIds)
+    private async Task DeleteLazilyCachedReleaseResults(Guid releaseVersionId,
+        string publicationSlug,
+        string releaseSlug)
+    {
+        await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseVersionId));
+
+        await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+        await _publicBlobCacheService.DeleteItemAsync(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
+        await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
+    }
+
+    public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseVersionIds)
+    {
+        var releaseVersions = await _releaseService.List(releaseVersionIds);
+
+        foreach (var releaseVersion in releaseVersions)
         {
-            var releaseVersions = (await _releaseService
-                    .List(releaseVersionIds))
-                .ToList();
-
-            foreach (var releaseVersion in releaseVersions)
+            if (releaseVersion.PreviousVersion != null)
             {
-                await _releaseCacheService.UpdateReleaseStaged(
-                    releaseVersion.Id,
-                    expectedPublishDate,
-                    publicationSlug: releaseVersion.Publication.Slug,
-                    releaseSlug: releaseVersion.Slug);
-            }
-
-            var publications = releaseVersions
-                .Select(rv => rv.Publication)
-                .DistinctByProperty(publication => publication.Id)
-                .ToList();
-
-            foreach (var publication in publications)
-            {
-                // Cache the latest release version for the publication as a separate cache entry
-                var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
-                await _releaseCacheService.UpdateReleaseStaged(
-                    latestReleaseVersion.Id,
-                    expectedPublishDate,
-                    publicationSlug: publication.Slug);
+                await _publicBlobStorageService.DeleteBlobs(
+                    containerName: PublicReleaseFiles,
+                    directoryPath: $"{releaseVersion.PreviousVersion.Id}/");
             }
         }
+    }
 
-        public async Task UpdateCachedTaxonomyBlobs()
+    public async Task UpdateContent(params Guid[] releaseVersionIds)
+    {
+        var releaseVersions = (await _releaseService
+                .List(releaseVersionIds))
+            .ToList();
+
+        foreach (var releaseVersion in releaseVersions)
         {
-            await _methodologyCacheService.UpdateSummariesTree();
-            await _publicationCacheService.UpdatePublicationTree();
+            await _releaseCacheService.UpdateRelease(
+                releaseVersion.Id,
+                publicationSlug: releaseVersion.Publication.Slug,
+                releaseSlug: releaseVersion.Slug);
         }
 
-        private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey
+        var publications = releaseVersions
+            .Select(rv => rv.Publication)
+            .DistinctByProperty(publication => publication.Id)
+            .ToList();
+
+        foreach (var publication in publications)
         {
-            private string PublicationSlug { get; }
-
-            private string ReleaseSlug { get; }
-
-            public ReleaseDataBlockResultsFolderCacheKey(string publicationSlug, string releaseSlug)
-            {
-                PublicationSlug = publicationSlug;
-                ReleaseSlug = releaseSlug;
-            }
-
-            public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
-
-            public IBlobContainer Container => PublicContent;
+            // Cache the latest release version for the publication as a separate cache entry
+            var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
+            await _releaseCacheService.UpdateRelease(
+                latestReleaseVersion.Id,
+                publicationSlug: publication.Slug);
         }
+    }
 
-        private record ReleaseSubjectsCacheKey : IBlobCacheKey
+    public async Task UpdateContentStaged(DateTime expectedPublishDate,
+        params Guid[] releaseVersionIds)
+    {
+        var releaseVersions = (await _releaseService
+                .List(releaseVersionIds))
+            .ToList();
+
+        foreach (var releaseVersion in releaseVersions)
         {
-            private string PublicationSlug { get; }
-
-            private string ReleaseSlug { get; }
-
-            public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug)
-            {
-                PublicationSlug = publicationSlug;
-                ReleaseSlug = releaseSlug;
-            }
-
-            public string Key => PublicContentReleaseSubjectsPath(PublicationSlug, ReleaseSlug);
-
-            public IBlobContainer Container => PublicContent;
+            await _releaseCacheService.UpdateReleaseStaged(
+                releaseVersion.Id,
+                expectedPublishDate,
+                publicationSlug: releaseVersion.Publication.Slug,
+                releaseSlug: releaseVersion.Slug);
         }
 
-        private record ReleaseSubjectMetaFolderCacheKey : IBlobCacheKey
+        var publications = releaseVersions
+            .Select(rv => rv.Publication)
+            .DistinctByProperty(publication => publication.Id)
+            .ToList();
+
+        foreach (var publication in publications)
         {
-            private string PublicationSlug { get; }
-
-            private string ReleaseSlug { get; }
-
-            public ReleaseSubjectMetaFolderCacheKey(string publicationSlug, string releaseSlug)
-            {
-                PublicationSlug = publicationSlug;
-                ReleaseSlug = releaseSlug;
-            }
-
-            public string Key => PublicContentSubjectMetaParentPath(PublicationSlug, ReleaseSlug);
-
-            public IBlobContainer Container => PublicContent;
+            // Cache the latest release version for the publication as a separate cache entry
+            var latestReleaseVersion = await _releaseService.GetLatestReleaseVersion(publication.Id, releaseVersionIds);
+            await _releaseCacheService.UpdateReleaseStaged(
+                latestReleaseVersion.Id,
+                expectedPublishDate,
+                publicationSlug: publication.Slug);
         }
+    }
+
+    public async Task UpdateCachedTaxonomyBlobs()
+    {
+        await _methodologyCacheService.UpdateSummariesTree();
+        await _publicationCacheService.UpdatePublicationTree();
+    }
+
+    private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey
+    {
+        private string PublicationSlug { get; }
+
+        private string ReleaseSlug { get; }
+
+        public ReleaseDataBlockResultsFolderCacheKey(string publicationSlug, string releaseSlug)
+        {
+            PublicationSlug = publicationSlug;
+            ReleaseSlug = releaseSlug;
+        }
+
+        public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
+
+        public IBlobContainer Container => PublicContent;
+    }
+
+    private record ReleaseSubjectsCacheKey : IBlobCacheKey
+    {
+        private string PublicationSlug { get; }
+
+        private string ReleaseSlug { get; }
+
+        public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug)
+        {
+            PublicationSlug = publicationSlug;
+            ReleaseSlug = releaseSlug;
+        }
+
+        public string Key => PublicContentReleaseSubjectsPath(PublicationSlug, ReleaseSlug);
+
+        public IBlobContainer Container => PublicContent;
+    }
+
+    private record ReleaseSubjectMetaFolderCacheKey : IBlobCacheKey
+    {
+        private string PublicationSlug { get; }
+
+        private string ReleaseSlug { get; }
+
+        public ReleaseSubjectMetaFolderCacheKey(string publicationSlug, string releaseSlug)
+        {
+            PublicationSlug = publicationSlug;
+            ReleaseSlug = releaseSlug;
+        }
+
+        public string Key => PublicContentSubjectMetaParentPath(PublicationSlug, ReleaseSlug);
+
+        public IBlobContainer Container => PublicContent;
     }
 }

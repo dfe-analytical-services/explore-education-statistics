@@ -7,47 +7,46 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement
 {
-    public class DeleteSpecificReleaseRequirement : IAuthorizationRequirement
+}
+
+public class DeleteSpecificReleaseAuthorizationHandler
+    : AuthorizationHandler<DeleteSpecificReleaseRequirement, ReleaseVersion>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public DeleteSpecificReleaseAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class DeleteSpecificReleaseAuthorizationHandler
-        : AuthorizationHandler<DeleteSpecificReleaseRequirement, ReleaseVersion>
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context,
+        DeleteSpecificReleaseRequirement requirement,
+        ReleaseVersion releaseVersion)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public DeleteSpecificReleaseAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (!releaseVersion.Amendment || releaseVersion.ApprovalStatus == Approved)
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            DeleteSpecificReleaseRequirement requirement,
-            ReleaseVersion releaseVersion)
+        if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
         {
-            if (!releaseVersion.Amendment || releaseVersion.ApprovalStatus == Approved)
-            {
-                return;
-            }
+            context.Succeed(requirement);
+            return;
+        }
 
-            if (SecurityUtils.HasClaim(context.User, DeleteAllReleaseAmendments))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        userId: context.User.GetUserId(),
-                        publicationId: releaseVersion.PublicationId,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    userId: context.User.GetUserId(),
+                    publicationId: releaseVersion.PublicationId,
+                    Owner))
+        {
+            context.Succeed(requirement);
         }
     }
 }

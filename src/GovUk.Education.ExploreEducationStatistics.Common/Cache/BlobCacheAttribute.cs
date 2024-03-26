@@ -7,118 +7,117 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Common.Cache;
+
+public class BlobCacheAttribute : CacheAttribute
 {
-    public class BlobCacheAttribute : CacheAttribute
+    private static Dictionary<string, IBlobCacheService> Services { get; set; } = new();
+
+    protected override Type BaseKey => typeof(IBlobCacheKey);
+
+    /// <summary>
+    /// Specify a service to use <see cref="Services"/>.
+    /// Otherwise, we use the first registered service.
+    /// </summary>
+    public string? ServiceName { get; set; }
+
+    public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
     {
-        private static Dictionary<string, IBlobCacheService> Services { get; set; } = new();
+    }
 
-        protected override Type BaseKey => typeof(IBlobCacheKey);
+    public static void AddService(string name, IBlobCacheService service)
+    {
+        Services[name] = service;
+    }
+    public static void RemoveService(string name)
+    {
+        Services.Remove(name);
+    }
 
-        /// <summary>
-        /// Specify a service to use <see cref="Services"/>.
-        /// Otherwise, we use the first registered service.
-        /// </summary>
-        public string? ServiceName { get; set; }
+    public static void ClearServices()
+    {
+        Services.Clear();
+    }
 
-        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
+    public override object? Get(ICacheKey cacheKey, Type returnType)
+    {
+        if (cacheKey is IBlobCacheKey key)
         {
-        }
+            var service = GetService();
 
-        public static void AddService(string name, IBlobCacheService service)
-        {
-            Services[name] = service;
-        }
-        public static void RemoveService(string name)
-        {
-            Services.Remove(name);
-        }
-
-        public static void ClearServices()
-        {
-            Services.Clear();
-        }
-
-        public override object? Get(ICacheKey cacheKey, Type returnType)
-        {
-            if (cacheKey is IBlobCacheKey key)
+            if (service is null)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return null;
-                }
-
-                return service.GetItem(key, returnType);
+                return null;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            return service.GetItem(key, returnType);
         }
 
-        public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
+        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+    }
+
+    public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
+    {
+        if (cacheKey is IBlobCacheKey key)
         {
-            if (cacheKey is IBlobCacheKey key)
+            var service = GetService();
+
+            if (service is null)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return null;
-                }
-
-                return await service.GetItemAsync(key, returnType);
+                return null;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            return await service.GetItemAsync(key, returnType);
         }
 
-        public override void Set(ICacheKey cacheKey, object value)
+        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+    }
+
+    public override void Set(ICacheKey cacheKey, object value)
+    {
+        if (cacheKey is IBlobCacheKey key)
         {
-            if (cacheKey is IBlobCacheKey key)
+            var service = GetService();
+
+            if (service is null)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return;
-                }
-
-                service.SetItem(key, value);
-
                 return;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            service.SetItem(key, value);
+
+            return;
         }
 
-        public override async Task SetAsync(ICacheKey cacheKey, object value)
+        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+    }
+
+    public override async Task SetAsync(ICacheKey cacheKey, object value)
+    {
+        if (cacheKey is IBlobCacheKey key)
         {
-            if (cacheKey is IBlobCacheKey key)
+            var service = GetService();
+
+            if (service is null)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return;
-                }
-
-                await service.SetItemAsync(key, value);
-
                 return;
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            await service.SetItemAsync(key, value);
+
+            return;
         }
 
-        private IBlobCacheService? GetService()
+        throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+    }
+
+    private IBlobCacheService? GetService()
+    {
+        if (ServiceName is not null)
         {
-            if (ServiceName is not null)
-            {
-                return Services[ServiceName];
-            }
-
-            return Services.Count > 0 ? Services.First().Value : null;
+            return Services[ServiceName];
         }
+
+        return Services.Count > 0 ? Services.First().Value : null;
     }
 }

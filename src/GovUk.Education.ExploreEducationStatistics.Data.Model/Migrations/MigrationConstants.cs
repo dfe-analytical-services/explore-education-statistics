@@ -1,7 +1,6 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
+
+internal static class MigrationConstants
 {
-    internal static class MigrationConstants
-    {
-        internal const string MigrationsPath = "Migrations";
-    }
+    internal const string MigrationsPath = "Migrations";
 }

@@ -17,52 +17,51 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseImageServicePermissionTests
 {
-    public class ReleaseImageServicePermissionTests
+    private readonly ReleaseVersion _releaseVersion = new()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        Id = Guid.NewGuid()
+    };
 
-        [Fact]
-        public async Task Upload()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseImageService(userService: userService.Object);
-                        return service.Upload(releaseVersionId: _releaseVersion.Id,
-                            formFile: new Mock<IFormFile>().Object);
-                    }
-                );
-        }
-
-        private ReleaseImageService SetupReleaseImageService(
-            ContentDbContext? contentDbContext = null,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPrivateBlobStorageService? privateBlobStorageService = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null,
-            IReleaseFileRepository? releaseFileRepository = null,
-            IUserService? userService = null)
-        {
-            return new ReleaseImageService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
-                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
-                userService ?? Mock.Of<IUserService>()
+    [Fact]
+    public async Task Upload()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseImageService(userService: userService.Object);
+                    return service.Upload(releaseVersionId: _releaseVersion.Id,
+                        formFile: new Mock<IFormFile>().Object);
+                }
             );
-        }
+    }
 
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
-        {
-            return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id,
-                _releaseVersion);
-        }
+    private ReleaseImageService SetupReleaseImageService(
+        ContentDbContext? contentDbContext = null,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IPrivateBlobStorageService? privateBlobStorageService = null,
+        IFileUploadsValidatorService? fileUploadsValidatorService = null,
+        IReleaseFileRepository? releaseFileRepository = null,
+        IUserService? userService = null)
+    {
+        return new ReleaseImageService(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
+            privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
+            fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
+            releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
+            userService ?? Mock.Of<IUserService>()
+        );
+    }
+
+    private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+    {
+        return MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>(_releaseVersion.Id,
+            _releaseVersion);
     }
 }

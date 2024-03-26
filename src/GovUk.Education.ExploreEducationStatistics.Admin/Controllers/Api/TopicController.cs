@@ -6,53 +6,52 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+
+[Route("api")]
+[Authorize]
+[ApiController]
+public class TopicController : ControllerBase
 {
-    [Route("api")]
-    [Authorize]
-    [ApiController]
-    public class TopicController : ControllerBase
+    private readonly ITopicService _topicService;
+
+    public TopicController(ITopicService topicService)
     {
-        private readonly ITopicService _topicService;
+        _topicService = topicService;
+    }
 
-        public TopicController(ITopicService topicService)
-        {
-            _topicService = topicService;
-        }
+    [HttpPost("topics")]
+    public async Task<ActionResult<TopicViewModel>> CreateTopic(
+        TopicSaveViewModel topic)
+    {
+        return await _topicService
+            .CreateTopic(topic)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPost("topics")]
-        public async Task<ActionResult<TopicViewModel>> CreateTopic(
-            TopicSaveViewModel topic)
-        {
-            return await _topicService
-                .CreateTopic(topic)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("topics/{topicId:guid}")]
+    public async Task<ActionResult<TopicViewModel>> UpdateTopic(
+        Guid topicId,
+        TopicSaveViewModel topic)
+    {
+        return await _topicService
+            .UpdateTopic(topicId, topic)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("topics/{topicId:guid}")]
-        public async Task<ActionResult<TopicViewModel>> UpdateTopic(
-            Guid topicId,
-            TopicSaveViewModel topic)
-        {
-            return await _topicService
-                .UpdateTopic(topicId, topic)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("topics/{topicId:guid}")]
+    public async Task<ActionResult<TopicViewModel>> GetTopic(Guid topicId)
+    {
+        return await _topicService
+            .GetTopic(topicId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("topics/{topicId:guid}")]
-        public async Task<ActionResult<TopicViewModel>> GetTopic(Guid topicId)
-        {
-            return await _topicService
-                .GetTopic(topicId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpDelete("topics/{topicId:guid}")]
-        public async Task<ActionResult> DeleteTopic(Guid topicId)
-        {
-            return await _topicService
-                .DeleteTopic(topicId)
-                .HandleFailuresOrNoContent();
-        }
+    [HttpDelete("topics/{topicId:guid}")]
+    public async Task<ActionResult> DeleteTopic(Guid topicId)
+    {
+        return await _topicService
+            .DeleteTopic(topicId)
+            .HandleFailuresOrNoContent();
     }
 }

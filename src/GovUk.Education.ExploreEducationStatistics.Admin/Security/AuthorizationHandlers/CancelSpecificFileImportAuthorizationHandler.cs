@@ -5,37 +5,36 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class CancelSpecificFileImportRequirement : IAuthorizationRequirement
 {
-    public class CancelSpecificFileImportRequirement : IAuthorizationRequirement
+}
+
+public class CancelSpecificFileImportAuthorizationHandler
+    : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
+{
+    private readonly IDataImportRepository _dataImportRepository;
+
+    public CancelSpecificFileImportAuthorizationHandler(IDataImportRepository dataImportRepository)
     {
+        _dataImportRepository = dataImportRepository;
     }
 
-    public class CancelSpecificFileImportAuthorizationHandler
-        : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
+        CancelSpecificFileImportRequirement requirement,
+        File file)
     {
-        private readonly IDataImportRepository _dataImportRepository;
+        var status = await _dataImportRepository.GetStatusByFileId(file.Id);
 
-        public CancelSpecificFileImportAuthorizationHandler(IDataImportRepository dataImportRepository)
+        if (status.IsFinishedOrAborting())
         {
-            _dataImportRepository = dataImportRepository;
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext ctx,
-            CancelSpecificFileImportRequirement requirement,
-            File file)
+        if (SecurityUtils.HasClaim(ctx.User, CancelAllFileImports))
         {
-            var status = await _dataImportRepository.GetStatusByFileId(file.Id);
-
-            if (status.IsFinishedOrAborting())
-            {
-                return;
-            }
-
-            if (SecurityUtils.HasClaim(ctx.User, CancelAllFileImports))
-            {
-                ctx.Succeed(requirement);
-            }
+            ctx.Succeed(requirement);
         }
     }
 }

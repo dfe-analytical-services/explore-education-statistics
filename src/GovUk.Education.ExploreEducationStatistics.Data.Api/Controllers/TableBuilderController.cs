@@ -19,167 +19,166 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
+
+[Route("api")]
+[ApiController]
+public class TableBuilderController : ControllerBase
 {
-    [Route("api")]
-    [ApiController]
-    public class TableBuilderController : ControllerBase
+    // Change this whenever there is a breaking change
+    // that requires cache invalidation.
+    public const string ApiVersion = "1";
+
+    private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+    private readonly IDataBlockService _dataBlockService;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
+    private readonly ITableBuilderService _tableBuilderService;
+
+    public TableBuilderController(
+        IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+        IDataBlockService dataBlockService,
+        IReleaseVersionRepository releaseVersionRepository,
+        ITableBuilderService tableBuilderService)
     {
-        // Change this whenever there is a breaking change
-        // that requires cache invalidation.
-        public const string ApiVersion = "1";
+        _contentPersistenceHelper = contentPersistenceHelper;
+        _dataBlockService = dataBlockService;
+        _releaseVersionRepository = releaseVersionRepository;
+        _tableBuilderService = tableBuilderService;
+    }
 
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IDataBlockService _dataBlockService;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
-        private readonly ITableBuilderService _tableBuilderService;
-
-        public TableBuilderController(
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IDataBlockService dataBlockService,
-            IReleaseVersionRepository releaseVersionRepository,
-            ITableBuilderService tableBuilderService)
+    [HttpPost("tablebuilder")]
+    [Produces("application/json", "text/csv")]
+    [CancellationTokenTimeout(TableBuilderQuery)]
+    public async Task Query(
+        [FromBody] ObservationQueryContext query,
+        CancellationToken cancellationToken = default)
+    {
+        if (Request.AcceptsCsv(exact: true))
         {
-            _contentPersistenceHelper = contentPersistenceHelper;
-            _dataBlockService = dataBlockService;
-            _releaseVersionRepository = releaseVersionRepository;
-            _tableBuilderService = tableBuilderService;
+            Response.ContentDispositionAttachment(ContentTypes.Csv);
+
+            await _tableBuilderService.QueryToCsvStream(query, Response.BodyWriter.AsStream(), cancellationToken);
+
+            return;
         }
 
-        [HttpPost("tablebuilder")]
-        [Produces("application/json", "text/csv")]
-        [CancellationTokenTimeout(TableBuilderQuery)]
-        public async Task Query(
-            [FromBody] ObservationQueryContext query,
-            CancellationToken cancellationToken = default)
+        var result = await _tableBuilderService
+            .Query(query, cancellationToken)
+            .HandleFailuresOr(Ok);
+
+        await result.ExecuteResultAsync(ControllerContext);
+    }
+
+    [HttpPost("tablebuilder/release/{releaseVersionId:guid}")]
+    [Produces("application/json", "text/csv")]
+    [CancellationTokenTimeout(TableBuilderQuery)]
+    public async Task Query(
+        Guid releaseVersionId,
+        [FromBody] ObservationQueryContext query,
+        CancellationToken cancellationToken = default)
+    {
+        if (Request.AcceptsCsv(exact: true))
         {
-            if (Request.AcceptsCsv(exact: true))
+            Response.ContentDispositionAttachment(
+                contentType: ContentTypes.Csv,
+                filename: $"{releaseVersionId}.csv");
+
+            await _tableBuilderService.QueryToCsvStream(
+                releaseVersionId,
+                query,
+                Response.BodyWriter.AsStream(),
+                cancellationToken
+            );
+
+            return;
+        }
+
+        var result = await _tableBuilderService
+            .Query(releaseVersionId, query, cancellationToken)
+            .HandleFailuresOr(Ok);
+
+        await result.ExecuteResultAsync(ControllerContext);
+    }
+
+    // Note that releaseVersionId is not necessary for this method to function any more in the Data API, but remains in place
+    // both in order to support legacy URLs in bookmarks and in content, but also to remain consistent with the equivalent
+    // endpoint in the Admin API, which does require the Release Id in order to differentiate between different 
+    // DataBlockVersions rather than simply picking the latest published one.
+    [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
+    public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
+        Guid dataBlockParentId)
+    {
+        var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+            .OnSuccessDo(dataBlockVersion => this
+                .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
+            .OnSuccess(GetDataBlockTableResult)
+            .HandleFailuresOrOk();
+
+        if (actionResult.Result is not NotFoundResult)
+        {
+            Response.Headers["Cache-Control"] = "public,max-age=300";
+        }
+
+        return actionResult;
+    }
+
+    [HttpGet("tablebuilder/fast-track/{dataBlockParentId:guid}")]
+    public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
+    {
+        return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
+            .OnSuccessCombineWith(GetDataBlockTableResult)
+            .OnSuccessCombineWith(tuple =>
+                _releaseVersionRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
+                    .OrNotFound())
+            .OnSuccess(tuple =>
             {
-                Response.ContentDispositionAttachment(ContentTypes.Csv);
+                var (dataBlockVersion, tableResult, latestReleaseVersion) = tuple;
+                return BuildFastTrackViewModel(dataBlockVersion, tableResult, latestReleaseVersion);
+            })
+            .HandleFailuresOrOk();
+    }
 
-                await _tableBuilderService.QueryToCsvStream(query, Response.BodyWriter.AsStream(), cancellationToken);
+    [BlobCache(typeof(DataBlockTableResultCacheKey))]
+    private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
+        DataBlockVersion dataBlockVersion)
+    {
+        return _dataBlockService.GetDataBlockTableResult(
+            releaseVersionId: dataBlockVersion.ReleaseVersionId,
+            dataBlockVersionId: dataBlockVersion.Id);
+    }
 
-                return;
-            }
+    private static FastTrackViewModel BuildFastTrackViewModel(
+        DataBlockVersion dataBlockVersion,
+        TableBuilderResultViewModel tableResult,
+        ReleaseVersion latestReleaseVersion)
+    {
+        var releaseVersion = dataBlockVersion.ReleaseVersion;
+        var dataBlock = dataBlockVersion.ContentBlock;
 
-            var result = await _tableBuilderService
-                .Query(query, cancellationToken)
-                .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
-        }
-
-        [HttpPost("tablebuilder/release/{releaseVersionId:guid}")]
-        [Produces("application/json", "text/csv")]
-        [CancellationTokenTimeout(TableBuilderQuery)]
-        public async Task Query(
-            Guid releaseVersionId,
-            [FromBody] ObservationQueryContext query,
-            CancellationToken cancellationToken = default)
+        return new FastTrackViewModel
         {
-            if (Request.AcceptsCsv(exact: true))
-            {
-                Response.ContentDispositionAttachment(
-                    contentType: ContentTypes.Csv,
-                    filename: $"{releaseVersionId}.csv");
+            DataBlockParentId = dataBlockVersion.DataBlockParentId,
+            Configuration = dataBlock.Table,
+            FullTable = tableResult,
+            Query = new TableBuilderQueryViewModel(releaseVersion.PublicationId, dataBlock.Query),
+            ReleaseId = releaseVersion.Id,
+            ReleaseSlug = releaseVersion.Slug,
+            ReleaseType = releaseVersion.Type,
+            LatestData = latestReleaseVersion.Id == releaseVersion.Id,
+            LatestReleaseTitle = latestReleaseVersion.Title
+        };
+    }
 
-                await _tableBuilderService.QueryToCsvStream(
-                    releaseVersionId,
-                    query,
-                    Response.BodyWriter.AsStream(),
-                    cancellationToken
-                );
-
-                return;
-            }
-
-            var result = await _tableBuilderService
-                .Query(releaseVersionId, query, cancellationToken)
-                .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
-        }
-
-        // Note that releaseVersionId is not necessary for this method to function any more in the Data API, but remains in place
-        // both in order to support legacy URLs in bookmarks and in content, but also to remain consistent with the equivalent
-        // endpoint in the Admin API, which does require the Release Id in order to differentiate between different 
-        // DataBlockVersions rather than simply picking the latest published one.
-        [HttpGet("tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
-        public async Task<ActionResult<TableBuilderResultViewModel>> QueryForTableBuilderResult(
-            Guid dataBlockParentId)
-        {
-            var actionResult = await GetLatestPublishedDataBlockVersion(dataBlockParentId)
-                .OnSuccessDo(dataBlockVersion => this
-                    .CacheWithLastModifiedAndETag(lastModified: dataBlockVersion.Published, ApiVersion))
-                .OnSuccess(GetDataBlockTableResult)
-                .HandleFailuresOrOk();
-
-            if (actionResult.Result is not NotFoundResult)
-            {
-                Response.Headers["Cache-Control"] = "public,max-age=300";
-            }
-
-            return actionResult;
-        }
-
-        [HttpGet("tablebuilder/fast-track/{dataBlockParentId:guid}")]
-        public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockParentId)
-        {
-            return await GetLatestPublishedDataBlockVersion(dataBlockParentId)
-                .OnSuccessCombineWith(GetDataBlockTableResult)
-                .OnSuccessCombineWith(tuple =>
-                    _releaseVersionRepository.GetLatestPublishedReleaseVersion(tuple.Item1.ReleaseVersion.PublicationId)
-                        .OrNotFound())
-                .OnSuccess(tuple =>
-                {
-                    var (dataBlockVersion, tableResult, latestReleaseVersion) = tuple;
-                    return BuildFastTrackViewModel(dataBlockVersion, tableResult, latestReleaseVersion);
-                })
-                .HandleFailuresOrOk();
-        }
-
-        [BlobCache(typeof(DataBlockTableResultCacheKey))]
-        private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
-            DataBlockVersion dataBlockVersion)
-        {
-            return _dataBlockService.GetDataBlockTableResult(
-                releaseVersionId: dataBlockVersion.ReleaseVersionId,
-                dataBlockVersionId: dataBlockVersion.Id);
-        }
-
-        private static FastTrackViewModel BuildFastTrackViewModel(
-            DataBlockVersion dataBlockVersion,
-            TableBuilderResultViewModel tableResult,
-            ReleaseVersion latestReleaseVersion)
-        {
-            var releaseVersion = dataBlockVersion.ReleaseVersion;
-            var dataBlock = dataBlockVersion.ContentBlock;
-
-            return new FastTrackViewModel
-            {
-                DataBlockParentId = dataBlockVersion.DataBlockParentId,
-                Configuration = dataBlock.Table,
-                FullTable = tableResult,
-                Query = new TableBuilderQueryViewModel(releaseVersion.PublicationId, dataBlock.Query),
-                ReleaseId = releaseVersion.Id,
-                ReleaseSlug = releaseVersion.Slug,
-                ReleaseType = releaseVersion.Type,
-                LatestData = latestReleaseVersion.Id == releaseVersion.Id,
-                LatestReleaseTitle = latestReleaseVersion.Title
-            };
-        }
-
-        // Get the latest published DataBlockVersion for the given parent id, also including its ReleaseVersion and
-        // Publication for the purposes of generating a cache key for Data Block table results.
-        private Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(Guid dataBlockParentId)
-        {
-            return _contentPersistenceHelper
-                .CheckEntityExists<DataBlockParent>(dataBlockParentId, q => q
-                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-                    .ThenInclude(dataBlockVersion => dataBlockVersion.ReleaseVersion)
-                    .ThenInclude(releaseVersion => releaseVersion.Publication))
-                .OnSuccess(dataBlock => dataBlock.LatestPublishedVersion)
-                .OrNotFound();
-        }
+    // Get the latest published DataBlockVersion for the given parent id, also including its ReleaseVersion and
+    // Publication for the purposes of generating a cache key for Data Block table results.
+    private Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(Guid dataBlockParentId)
+    {
+        return _contentPersistenceHelper
+            .CheckEntityExists<DataBlockParent>(dataBlockParentId, q => q
+                .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.ReleaseVersion)
+                .ThenInclude(releaseVersion => releaseVersion.Publication))
+            .OnSuccess(dataBlock => dataBlock.LatestPublishedVersion)
+            .OrNotFound();
     }
 }

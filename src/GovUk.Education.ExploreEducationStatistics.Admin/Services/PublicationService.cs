@@ -30,656 +30,655 @@ using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Ser
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class PublicationService : IPublicationService
 {
-    public class PublicationService : IPublicationService
+    private readonly ContentDbContext _context;
+    private readonly IMapper _mapper;
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IUserService _userService;
+    private readonly IPublicationRepository _publicationRepository;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
+    private readonly IMethodologyService _methodologyService;
+    private readonly IPublicationCacheService _publicationCacheService;
+    private readonly IMethodologyCacheService _methodologyCacheService;
+    private readonly IRedirectsCacheService _redirectsCacheService;
+
+    public PublicationService(
+        ContentDbContext context,
+        IMapper mapper,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IUserService userService,
+        IPublicationRepository publicationRepository,
+        IReleaseVersionRepository releaseVersionRepository,
+        IMethodologyService methodologyService,
+        IPublicationCacheService publicationCacheService,
+        IMethodologyCacheService methodologyCacheService,
+        IRedirectsCacheService redirectsCacheService)
     {
-        private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
-        private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseVersionRepository _releaseVersionRepository;
-        private readonly IMethodologyService _methodologyService;
-        private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IRedirectsCacheService _redirectsCacheService;
+        _context = context;
+        _mapper = mapper;
+        _persistenceHelper = persistenceHelper;
+        _userService = userService;
+        _publicationRepository = publicationRepository;
+        _releaseVersionRepository = releaseVersionRepository;
+        _methodologyService = methodologyService;
+        _publicationCacheService = publicationCacheService;
+        _methodologyCacheService = methodologyCacheService;
+        _redirectsCacheService = redirectsCacheService;
+    }
 
-        public PublicationService(
-            ContentDbContext context,
-            IMapper mapper,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IUserService userService,
-            IPublicationRepository publicationRepository,
-            IReleaseVersionRepository releaseVersionRepository,
-            IMethodologyService methodologyService,
-            IPublicationCacheService publicationCacheService,
-            IMethodologyCacheService methodologyCacheService,
-            IRedirectsCacheService redirectsCacheService)
-        {
-            _context = context;
-            _mapper = mapper;
-            _persistenceHelper = persistenceHelper;
-            _userService = userService;
-            _publicationRepository = publicationRepository;
-            _releaseVersionRepository = releaseVersionRepository;
-            _methodologyService = methodologyService;
-            _publicationCacheService = publicationCacheService;
-            _methodologyCacheService = methodologyCacheService;
-            _redirectsCacheService = redirectsCacheService;
-        }
-
-        public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            Guid? topicId = null)
-        {
-            return await _userService
-                .CheckCanAccessSystem()
-                .OnSuccess(_ => _userService.CheckCanViewAllPublications()
-                    .OnSuccess(async () =>
-                    {
-                        var hydratedPublication = HydratePublication(
-                            _publicationRepository.QueryPublicationsForTopic(topicId));
-                        return await hydratedPublication.ToListAsync();
-                    })
-                    .OrElse(() =>
-                    {
-                        var userId = _userService.GetUserId();
-                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
-                    })
-                )
-                .OnSuccess(async publications =>
+    public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
+        Guid? topicId = null)
+    {
+        return await _userService
+            .CheckCanAccessSystem()
+            .OnSuccess(_ => _userService.CheckCanViewAllPublications()
+                .OnSuccess(async () =>
                 {
-                    return await publications
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication))
-                        .OrderBy(publicationViewModel => publicationViewModel.Title)
-                        .ToListAsync();
+                    var hydratedPublication = HydratePublication(
+                        _publicationRepository.QueryPublicationsForTopic(topicId));
+                    return await hydratedPublication.ToListAsync();
+                })
+                .OrElse(() =>
+                {
+                    var userId = _userService.GetUserId();
+                    return _publicationRepository.ListPublicationsForUser(userId, topicId);
+                })
+            )
+            .OnSuccess(async publications =>
+            {
+                return await publications
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async publication => await GeneratePublicationViewModel(publication))
+                    .OrderBy(publicationViewModel => publicationViewModel.Title)
+                    .ToListAsync();
+            });
+    }
+
+    public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
+    {
+        return await _userService
+            .CheckCanViewAllPublications()
+            .OnSuccess(_ =>
+            {
+                return _context.Publications
+                    .Select(p => new PublicationSummaryViewModel
+                    {
+                        Id = p.Id,
+                        Title = p.Title,
+                        Slug = p.Slug,
+                    })
+                    .ToList();
+            });
+    }
+
+    public async Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
+        PublicationCreateRequest publication)
+    {
+        return await ValidateSelectedTopic(publication.TopicId)
+            .OnSuccess(_ => ValidatePublicationSlug(publication.Slug))
+            .OnSuccess(async _ =>
+            {
+                var contact = await _context.Contacts.AddAsync(new Contact
+                {
+                    ContactName = publication.Contact.ContactName,
+                    ContactTelNo = string.IsNullOrWhiteSpace(publication.Contact.ContactTelNo)
+                        ? null
+                        : publication.Contact.ContactTelNo,
+                    TeamName = publication.Contact.TeamName,
+                    TeamEmail = publication.Contact.TeamEmail
                 });
-        }
 
-        public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
-        {
-            return await _userService
-                .CheckCanViewAllPublications()
-                .OnSuccess(_ =>
+                var saved = await _context.Publications.AddAsync(new Publication
                 {
-                    return _context.Publications
-                        .Select(p => new PublicationSummaryViewModel
+                    Contact = contact.Entity,
+                    Title = publication.Title,
+                    Summary = publication.Summary,
+                    TopicId = publication.TopicId,
+                    Slug = publication.Slug,
+                });
+
+                await _context.SaveChangesAsync();
+
+                return await _persistenceHelper
+                    .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
+                    .OnSuccess(GeneratePublicationCreateViewModel);
+            });
+    }
+
+    public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
+        Guid publicationId,
+        PublicationSaveRequest updatedPublication)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccess(_userService.CheckCanUpdatePublicationSummary)
+            .OnSuccessDo(async publication =>
+            {
+                if (publication.Title != updatedPublication.Title)
+                {
+                    return await _userService.CheckCanUpdatePublication();
+                }
+
+                return Unit.Instance;
+            })
+            .OnSuccessDo(async publication =>
+            {
+                if (publication.SupersededById != updatedPublication.SupersededById)
+                {
+                    return await _userService.CheckCanUpdatePublication();
+                }
+
+                return Unit.Instance;
+            })
+            .OnSuccessDo(async publication =>
+            {
+                if (publication.TopicId != updatedPublication.TopicId)
+                {
+                    return await ValidateSelectedTopic(updatedPublication.TopicId);
+                }
+
+                return Unit.Instance;
+            })
+            .OnSuccessDo(async publication =>
+            {
+                if (publication.TopicId != updatedPublication.TopicId)
+                {
+                    return await _userService.CheckCanUpdatePublication();
+                }
+
+                return Unit.Instance;
+            })
+            .OnSuccess(async publication =>
+            {
+                var originalTitle = publication.Title;
+                var originalSlug = publication.Slug;
+
+                var titleChanged = originalTitle != updatedPublication.Title;
+                var slugChanged = originalSlug != updatedPublication.Slug;
+
+                if (slugChanged)
+                {
+                    var slugValidation =
+                        await ValidatePublicationSlug(updatedPublication.Slug, publication.Id);
+
+                    if (slugValidation.IsLeft)
+                    {
+                        return new Either<ActionResult, PublicationViewModel>(slugValidation.Left);
+                    }
+
+                    publication.Slug = updatedPublication.Slug;
+
+                    if (publication.Live
+                        && _context.PublicationRedirects.All(pr =>
+                            !(pr.PublicationId == publicationId && pr.Slug == originalSlug))) // don't create duplicate redirect
+                    {
+                        var publicationRedirect = new PublicationRedirect
                         {
-                            Id = p.Id,
-                            Title = p.Title,
-                            Slug = p.Slug,
-                        })
-                        .ToList();
-                });
-        }
-
-        public async Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
-            PublicationCreateRequest publication)
-        {
-            return await ValidateSelectedTopic(publication.TopicId)
-                .OnSuccess(_ => ValidatePublicationSlug(publication.Slug))
-                .OnSuccess(async _ =>
-                {
-                    var contact = await _context.Contacts.AddAsync(new Contact
-                    {
-                        ContactName = publication.Contact.ContactName,
-                        ContactTelNo = string.IsNullOrWhiteSpace(publication.Contact.ContactTelNo)
-                            ? null
-                            : publication.Contact.ContactTelNo,
-                        TeamName = publication.Contact.TeamName,
-                        TeamEmail = publication.Contact.TeamEmail
-                    });
-
-                    var saved = await _context.Publications.AddAsync(new Publication
-                    {
-                        Contact = contact.Entity,
-                        Title = publication.Title,
-                        Summary = publication.Summary,
-                        TopicId = publication.TopicId,
-                        Slug = publication.Slug,
-                    });
-
-                    await _context.SaveChangesAsync();
-
-                    return await _persistenceHelper
-                        .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
-                        .OnSuccess(GeneratePublicationCreateViewModel);
-                });
-        }
-
-        public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
-            Guid publicationId,
-            PublicationSaveRequest updatedPublication)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(_userService.CheckCanUpdatePublicationSummary)
-                .OnSuccessDo(async publication =>
-                {
-                    if (publication.Title != updatedPublication.Title)
-                    {
-                        return await _userService.CheckCanUpdatePublication();
+                            Slug = originalSlug,
+                            Publication = publication,
+                            PublicationId = publication.Id,
+                        };
+                        _context.PublicationRedirects.Add(publicationRedirect);
                     }
 
-                    return Unit.Instance;
-                })
-                .OnSuccessDo(async publication =>
-                {
-                    if (publication.SupersededById != updatedPublication.SupersededById)
+                    // If there is an existing redirects for the new slug, they're redundant. Remove them
+                    var redundantRedirects = await _context.PublicationRedirects
+                        .Where(pr => pr.Slug == updatedPublication.Slug)
+                        .ToListAsync();
+                    if (redundantRedirects.Count > 0)
                     {
-                        return await _userService.CheckCanUpdatePublication();
+                        _context.PublicationRedirects.RemoveRange(redundantRedirects);
                     }
+                }
 
-                    return Unit.Instance;
-                })
-                .OnSuccessDo(async publication =>
+                publication.Title = updatedPublication.Title;
+                publication.Summary = updatedPublication.Summary;
+                publication.TopicId = updatedPublication.TopicId;
+                publication.Updated = DateTime.UtcNow;
+                publication.SupersededById = updatedPublication.SupersededById;
+
+                _context.Publications.Update(publication);
+
+                await _context.SaveChangesAsync();
+
+                if (titleChanged || slugChanged)
                 {
-                    if (publication.TopicId != updatedPublication.TopicId)
-                    {
-                        return await ValidateSelectedTopic(updatedPublication.TopicId);
-                    }
+                    await _methodologyService.PublicationTitleOrSlugChanged(publicationId,
+                        originalSlug,
+                        publication.Title,
+                        publication.Slug);
+                }
 
-                    return Unit.Instance;
-                })
-                .OnSuccessDo(async publication =>
+                if (publication.Live)
                 {
-                    if (publication.TopicId != updatedPublication.TopicId)
-                    {
-                        return await _userService.CheckCanUpdatePublication();
-                    }
-
-                    return Unit.Instance;
-                })
-                .OnSuccess(async publication =>
-                {
-                    var originalTitle = publication.Title;
-                    var originalSlug = publication.Slug;
-
-                    var titleChanged = originalTitle != updatedPublication.Title;
-                    var slugChanged = originalSlug != updatedPublication.Slug;
+                    await _methodologyCacheService.UpdateSummariesTree();
+                    await _publicationCacheService.UpdatePublicationTree();
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     if (slugChanged)
                     {
-                        var slugValidation =
-                            await ValidatePublicationSlug(updatedPublication.Slug, publication.Id);
-
-                        if (slugValidation.IsLeft)
-                        {
-                            return new Either<ActionResult, PublicationViewModel>(slugValidation.Left);
-                        }
-
-                        publication.Slug = updatedPublication.Slug;
-
-                        if (publication.Live
-                            && _context.PublicationRedirects.All(pr =>
-                                !(pr.PublicationId == publicationId && pr.Slug == originalSlug))) // don't create duplicate redirect
-                        {
-                            var publicationRedirect = new PublicationRedirect
-                            {
-                                Slug = originalSlug,
-                                Publication = publication,
-                                PublicationId = publication.Id,
-                            };
-                            _context.PublicationRedirects.Add(publicationRedirect);
-                        }
-
-                        // If there is an existing redirects for the new slug, they're redundant. Remove them
-                        var redundantRedirects = await _context.PublicationRedirects
-                            .Where(pr => pr.Slug == updatedPublication.Slug)
-                            .ToListAsync();
-                        if (redundantRedirects.Count > 0)
-                        {
-                            _context.PublicationRedirects.RemoveRange(redundantRedirects);
-                        }
+                        await _publicationCacheService.RemovePublication(originalSlug);
+                        await _redirectsCacheService.UpdateRedirects();
                     }
 
-                    publication.Title = updatedPublication.Title;
-                    publication.Summary = updatedPublication.Summary;
-                    publication.TopicId = updatedPublication.TopicId;
-                    publication.Updated = DateTime.UtcNow;
-                    publication.SupersededById = updatedPublication.SupersededById;
+                    await UpdateCachedSupersededPublications(publication);
+                }
 
-                    _context.Publications.Update(publication);
+                return await GetPublication(publication.Id);
+            });
+    }
 
-                    await _context.SaveChangesAsync();
+    private async Task UpdateCachedSupersededPublications(Publication publication)
+    {
+        // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
+        // update any superseded publications that are cached
+        var supersededPublications = await _context.Publications
+            .Where(p => p.SupersededById == publication.Id)
+            .ToListAsync();
 
-                    if (titleChanged || slugChanged)
-                    {
-                        await _methodologyService.PublicationTitleOrSlugChanged(publicationId,
-                            originalSlug,
-                            publication.Title,
-                            publication.Slug);
-                    }
+        await supersededPublications
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
+    }
 
-                    if (publication.Live)
-                    {
-                        await _methodologyCacheService.UpdateSummariesTree();
-                        await _publicationCacheService.UpdatePublicationTree();
-                        await _publicationCacheService.UpdatePublication(publication.Slug);
+    private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
+        Guid? topicId)
+    {
+        var topic = await _context.Topics.FindAsync(topicId);
 
-                        if (slugChanged)
-                        {
-                            await _publicationCacheService.RemovePublication(originalSlug);
-                            await _redirectsCacheService.UpdateRedirects();
-                        }
-
-                        await UpdateCachedSupersededPublications(publication);
-                    }
-
-                    return await GetPublication(publication.Id);
-                });
+        if (topic == null)
+        {
+            return ValidationActionResult(TopicDoesNotExist);
         }
 
-        private async Task UpdateCachedSupersededPublications(Publication publication)
-        {
-            // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
-            // update any superseded publications that are cached
-            var supersededPublications = await _context.Publications
-                .Where(p => p.SupersededById == publication.Id)
-                .ToListAsync();
+        return await _userService.CheckCanCreatePublicationForTopic(topic)
+            .OnSuccess(_ => Unit.Instance);
+    }
 
-            await supersededPublications
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
-        }
+    public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
+        Guid publicationId, bool includePermissions = false)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId, HydratePublication)
+            .OnSuccess(_userService.CheckCanViewPublication)
+            .OnSuccess(publication => GeneratePublicationViewModel(publication, includePermissions));
+    }
 
-        private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
-            Guid? topicId)
-        {
-            var topic = await _context.Topics.FindAsync(topicId);
+    public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccessDo(_userService.CheckCanViewPublication)
+            .OnSuccess(publication => publication.ExternalMethodology != null
+                ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
+                : NotFound<ExternalMethodologyViewModel>());
+    }
 
-            if (topic == null)
+    public async Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
+        Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
+            .OnSuccess(async publication =>
             {
-                return ValidationActionResult(TopicDoesNotExist);
-            }
+                _context.Update(publication);
+                publication.ExternalMethodology ??= new ExternalMethodology();
+                publication.ExternalMethodology.Title = updatedExternalMethodology.Title;
+                publication.ExternalMethodology.Url = updatedExternalMethodology.Url;
+                await _context.SaveChangesAsync();
 
-            return await _userService.CheckCanCreatePublicationForTopic(topic)
-                .OnSuccess(_ => Unit.Instance);
-        }
+                // Update publication cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                await _publicationCacheService.UpdatePublication(publication.Slug);
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
-            Guid publicationId, bool includePermissions = false)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, HydratePublication)
-                .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => GeneratePublicationViewModel(publication, includePermissions));
-        }
+                return new ExternalMethodologyViewModel(publication.ExternalMethodology);
+            });
+    }
 
-        public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => publication.ExternalMethodology != null
-                    ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
-                    : NotFound<ExternalMethodologyViewModel>());
-        }
+    public async Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+        Guid publicationId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
+            .OnSuccess(async publication =>
+            {
+                _context.Update(publication);
+                publication.ExternalMethodology = null;
+                await _context.SaveChangesAsync();
 
-        public async Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
-            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
-                .OnSuccess(async publication =>
+                // Clear cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                return Unit.Instance;
+            });
+    }
+
+    public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId, query =>
+                query.Include(p => p.Contact))
+            .OnSuccessDo(_userService.CheckCanViewPublication)
+            .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
+    }
+
+    public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId, query =>
+                query.Include(p => p.Contact))
+            .OnSuccessDo(_userService.CheckCanUpdateContact)
+            .OnSuccess(async publication =>
+            {
+                // Replace existing contact that is shared with another publication with a new
+                // contact, as we want each publication to have its own contact.
+                if (_context.Publications
+                    .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
                 {
-                    _context.Update(publication);
-                    publication.ExternalMethodology ??= new ExternalMethodology();
-                    publication.ExternalMethodology.Title = updatedExternalMethodology.Title;
-                    publication.ExternalMethodology.Url = updatedExternalMethodology.Url;
-                    await _context.SaveChangesAsync();
+                    publication.Contact = new Contact();
+                }
 
-                    // Update publication cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
+                publication.Contact.ContactName = updatedContact.ContactName;
+                publication.Contact.ContactTelNo = string.IsNullOrWhiteSpace(updatedContact.ContactTelNo)
+                    ? null
+                    : updatedContact.ContactTelNo;
+                publication.Contact.TeamName = updatedContact.TeamName;
+                publication.Contact.TeamEmail = updatedContact.TeamEmail;
+                await _context.SaveChangesAsync();
 
-                    return new ExternalMethodologyViewModel(publication.ExternalMethodology);
-                });
-        }
+                // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
+                await _publicationCacheService.UpdatePublication(publication.Slug);
 
-        public async Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
-            Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
-                .OnSuccess(async publication =>
-                {
-                    _context.Update(publication);
-                    publication.ExternalMethodology = null;
-                    await _context.SaveChangesAsync();
+                return _mapper.Map<ContactViewModel>(publication.Contact);
+            });
+    }
 
-                    // Clear cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-
-                    return Unit.Instance;
-                });
-        }
-
-        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query =>
-                    query.Include(p => p.Contact))
-                .OnSuccessDo(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
-        }
-
-        public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query =>
-                    query.Include(p => p.Contact))
-                .OnSuccessDo(_userService.CheckCanUpdateContact)
-                .OnSuccess(async publication =>
-                {
-                    // Replace existing contact that is shared with another publication with a new
-                    // contact, as we want each publication to have its own contact.
-                    if (_context.Publications
-                        .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
-                    {
-                        publication.Contact = new Contact();
-                    }
-
-                    publication.Contact.ContactName = updatedContact.ContactName;
-                    publication.Contact.ContactTelNo = string.IsNullOrWhiteSpace(updatedContact.ContactTelNo)
-                        ? null
-                        : updatedContact.ContactTelNo;
-                    publication.Contact.TeamName = updatedContact.TeamName;
-                    publication.Contact.TeamEmail = updatedContact.TeamEmail;
-                    await _context.SaveChangesAsync();
-
-                    // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-
-                    return _mapper.Map<ContactViewModel>(publication.Contact);
-                });
-        }
-
-        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
-            ListLatestReleaseVersionsPaginated(
-                Guid publicationId,
-                int page = 1,
-                int pageSize = 5,
-                bool? live = null,
-                bool includePermissions = false)
-        {
-            return await ListLatestReleaseVersions(publicationId, live, includePermissions)
-                .OnSuccess(
-                    releases =>
-                        // This is not ideal - we should paginate results in the database, however,
-                        // this is not possible as we need to iterate over all releases to get the
-                        // latest/active versions of releases. Ideally, we should be able to
-                        // pagination entirely in the database, but this requires re-modelling of releases.
-                        // TODO: EES-3663 Use database pagination when ReleaseVersions are introduced
-                        PaginatedListViewModel<ReleaseSummaryViewModel>.Paginate(releases, page, pageSize)
-                );
-        }
-
-        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+    public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
+        ListLatestReleaseVersionsPaginated(
             Guid publicationId,
+            int page = 1,
+            int pageSize = 5,
             bool? live = null,
             bool includePermissions = false)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(async () =>
-                {
-                    // Note the 'live' filter is applied after the latest release versions are retrieved.
-                    // A published release with a current draft version is deliberately not returned when 'live' is true.
-                    var releaseVersions = (await _releaseVersionRepository.ListLatestReleaseVersions(publicationId))
-                        .Where(rv => live == null || rv.Live == live)
-                        .ToList();
+    {
+        return await ListLatestReleaseVersions(publicationId, live, includePermissions)
+            .OnSuccess(
+                releases =>
+                    // This is not ideal - we should paginate results in the database, however,
+                    // this is not possible as we need to iterate over all releases to get the
+                    // latest/active versions of releases. Ideally, we should be able to
+                    // pagination entirely in the database, but this requires re-modelling of releases.
+                    // TODO: EES-3663 Use database pagination when ReleaseVersions are introduced
+                    PaginatedListViewModel<ReleaseSummaryViewModel>.Paginate(releases, page, pageSize)
+            );
+    }
 
-                    return await releaseVersions
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async rv => await HydrateReleaseListItemViewModel(rv, includePermissions))
-                        .ToListAsync();
-                });
-        }
+    public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        Guid publicationId,
+        bool? live = null,
+        bool includePermissions = false)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccess(_userService.CheckCanViewPublication)
+            .OnSuccess(async () =>
+            {
+                // Note the 'live' filter is applied after the latest release versions are retrieved.
+                // A published release with a current draft version is deliberately not returned when 'live' is true.
+                var releaseVersions = (await _releaseVersionRepository.ListLatestReleaseVersions(publicationId))
+                    .Where(rv => live == null || rv.Live == live)
+                    .ToList();
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
-                .OnSuccess(async publication =>
+                return await releaseVersions
+                    .ToAsyncEnumerable()
+                    .SelectAwait(async rv => await HydrateReleaseListItemViewModel(rv, includePermissions))
+                    .ToListAsync();
+            });
+    }
+
+    public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<Publication>(publicationId)
+            .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+            .OnSuccess(async publication =>
+            {
+                var result = new List<ReleaseSeriesTableEntryViewModel>();
+                foreach (var seriesItem in publication.ReleaseSeries)
                 {
-                    var result = new List<ReleaseSeriesTableEntryViewModel>();
-                    foreach (var seriesItem in publication.ReleaseSeries)
+                    if (seriesItem.IsLegacyLink)
                     {
-                        if (seriesItem.IsLegacyLink)
+                        result.Add(new ReleaseSeriesTableEntryViewModel
                         {
-                            result.Add(new ReleaseSeriesTableEntryViewModel
-                            {
-                                Id = seriesItem.Id,
-                                IsLegacyLink = true,
-                                Description = seriesItem.LegacyLinkDescription!,
-                                LegacyLinkUrl = seriesItem.LegacyLinkUrl,
-                            });
-                        }
-                        else
+                            Id = seriesItem.Id,
+                            IsLegacyLink = true,
+                            Description = seriesItem.LegacyLinkDescription!,
+                            LegacyLinkUrl = seriesItem.LegacyLinkUrl,
+                        });
+                    }
+                    else
+                    {
+                        var latestVersion = await _releaseVersionRepository
+                            .GetLatestReleaseVersionForParent(
+                                seriesItem.ReleaseId!.Value,
+                                publishedOnly: true);
+
+                        if (latestVersion == null)
                         {
-                            var latestVersion = await _releaseVersionRepository
+                            // if no published version, look for an unpublished version
+                            latestVersion = await _releaseVersionRepository
                                 .GetLatestReleaseVersionForParent(
-                                    seriesItem.ReleaseId!.Value,
-                                    publishedOnly: true);
+                                    seriesItem.ReleaseId!.Value);
 
                             if (latestVersion == null)
                             {
-                                // if no published version, look for an unpublished version
-                                latestVersion = await _releaseVersionRepository
-                                    .GetLatestReleaseVersionForParent(
-                                        seriesItem.ReleaseId!.Value);
-
-                                if (latestVersion == null)
-                                {
-                                    throw new InvalidDataException(
-                                        "ReleaseSeriesItem with ReleaseId set should have an associated " +
-                                        $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
-                                        $"ReleaseSeriesItem: {seriesItem.Id}");
-                                }
+                                throw new InvalidDataException(
+                                    "ReleaseSeriesItem with ReleaseId set should have an associated " +
+                                    $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
+                                    $"ReleaseSeriesItem: {seriesItem.Id}");
                             }
-
-                            result.Add(new ReleaseSeriesTableEntryViewModel
-                                {
-                                    Id = seriesItem.Id,
-                                    IsLegacyLink = false,
-                                    Description = latestVersion.Title,
-                                    ReleaseId = latestVersion.ReleaseId,
-                                    ReleaseSlug = latestVersion.Slug,
-                                    IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
-                                    IsPublished = latestVersion.Live,
-                                });
                         }
+
+                        result.Add(new ReleaseSeriesTableEntryViewModel
+                            {
+                                Id = seriesItem.Id,
+                                IsLegacyLink = false,
+                                Description = latestVersion.Title,
+                                ReleaseId = latestVersion.ReleaseId,
+                                ReleaseSlug = latestVersion.Slug,
+                                IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
+                                IsPublished = latestVersion.Live,
+                            });
                     }
+                }
 
-                    return result;
-                });
-        }
+                return result;
+            });
+    }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
-            Guid publicationId,
-            ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
-        {
-            return await _context.Publications
-                .FirstOrNotFoundAsync(p => p.Id == publicationId)
-                .OnSuccess(_userService.CheckCanManageReleaseSeries)
-                .OnSuccess(async publication =>
+    public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
+        Guid publicationId,
+        ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
+    {
+        return await _context.Publications
+            .FirstOrNotFoundAsync(p => p.Id == publicationId)
+            .OnSuccess(_userService.CheckCanManageReleaseSeries)
+            .OnSuccess(async publication =>
+            {
+                publication.ReleaseSeries.Add(new ReleaseSeriesItem
                 {
-                    publication.ReleaseSeries.Add(new ReleaseSeriesItem
-                    {
-                        Id = Guid.NewGuid(),
-                        ReleaseId = null,
-                        LegacyLinkDescription = newLegacyLink.Description,
-                        LegacyLinkUrl = newLegacyLink.Url,
-                    });
-
-                    _context.Publications.Update(publication);
-                    await _context.SaveChangesAsync();
-
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-
-                    return await GetReleaseSeries(publication.Id)
-                        .OnSuccess(releaseSeries => releaseSeries);
+                    Id = Guid.NewGuid(),
+                    ReleaseId = null,
+                    LegacyLinkDescription = newLegacyLink.Description,
+                    LegacyLinkUrl = newLegacyLink.Url,
                 });
-        }
 
-        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
-            Guid publicationId,
-            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
-        {
-            return await _context.Publications
-                .Include(p => p.ReleaseVersions)
-                .FirstOrNotFoundAsync(p => p.Id == publicationId)
-                .OnSuccess(_userService.CheckCanManageReleaseSeries)
-                .OnSuccess(async publication =>
+                _context.Publications.Update(publication);
+                await _context.SaveChangesAsync();
+
+                await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                return await GetReleaseSeries(publication.Id)
+                    .OnSuccess(releaseSeries => releaseSeries);
+            });
+    }
+
+    public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
+        Guid publicationId,
+        List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
+    {
+        return await _context.Publications
+            .Include(p => p.ReleaseVersions)
+            .FirstOrNotFoundAsync(p => p.Id == publicationId)
+            .OnSuccess(_userService.CheckCanManageReleaseSeries)
+            .OnSuccess(async publication =>
+            {
+                // Check new series items details are correct
+                foreach (var seriesItem in updatedReleaseSeriesItems)
                 {
-                    // Check new series items details are correct
-                    foreach (var seriesItem in updatedReleaseSeriesItems)
-                    {
-                        if (seriesItem.ReleaseId != null && (
-                                seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkUrl != null))
-                        {
-                            throw new ArgumentException(
-                                $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
-                        }
-
-                        if (seriesItem.ReleaseId == null && (
-                                seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkUrl == null))
-                        {
-                            throw new ArgumentException(
-                                $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
-                        }
-                    }
-
-                    // Check all publication releases are included in updatedReleaseSeriesItems
-                    var publicationReleaseIds = publication.ReleaseVersions
-                        .Select(rv => rv.ReleaseId)
-                        .Distinct()
-                        .ToList();
-
-                    var updatedSeriesReleaseIds = updatedReleaseSeriesItems
-                        .Where(rsi => rsi.ReleaseId != null)
-                        .Select(rsi => rsi.ReleaseId!.Value)
-                        .ToList();
-
-                    if (!ComparerUtils.SequencesAreEqualIgnoringOrder(publicationReleaseIds, updatedSeriesReleaseIds))
+                    if (seriesItem.ReleaseId != null && (
+                            seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkUrl != null))
                     {
                         throw new ArgumentException(
-                            "Missing or duplicate release in new release series. Expected ReleaseIds: " +
-                            publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
+                            $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
                     }
 
-                    // NOTE: A malicious user could change the release series items' Ids, but we don't care
-
-                    var newReleaseSeries = updatedReleaseSeriesItems
-                        .Select(request => new ReleaseSeriesItem
-                        {
-                            Id = request.Id,
-                            ReleaseId = request.ReleaseId,
-                            LegacyLinkDescription = request.LegacyLinkDescription,
-                            LegacyLinkUrl = request.LegacyLinkUrl,
-                        }).ToList();
-
-                    publication.ReleaseSeries = newReleaseSeries;
-                    _context.Publications.Update(publication);
-
-                    await _context.SaveChangesAsync();
-
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
-
-                    return await GetReleaseSeries(publication.Id)
-                        .OnSuccess(releaseSeries => releaseSeries);
-                });
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidatePublicationSlug(
-            string newSlug, Guid? publicationId = null)
-        {
-            if (await _context.Publications.AsQueryable()
-                    .AnyAsync(publication =>
-                        publication.Id != publicationId
-                        && publication.Slug == newSlug))
-            {
-                return ValidationActionResult(PublicationSlugNotUnique);
-            }
-
-            var hasRedirect = await _context.PublicationRedirects
-                .AnyAsync(pr =>
-                    pr.PublicationId != publicationId // If publication previously used this slug, can change it back
-                    && pr.Slug == newSlug);
-
-            if (hasRedirect)
-            {
-                return ValidationActionResult(PublicationSlugUsedByRedirect);
-            }
-
-            if (publicationId.HasValue &&
-                _context.PublicationMethodologies.Any(pm =>
-                    pm.Publication.Id == publicationId
-                    && pm.Owner)
-                // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
-                // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
-                // this check is expensive and an unlikely edge case, so doesn't seem worth it.
-                )
-            {
-                var methodologySlugValidation = await _methodologyService
-                    .ValidateMethodologySlug(newSlug);
-                if (methodologySlugValidation.IsLeft)
-                {
-                    return methodologySlugValidation.Left;
+                    if (seriesItem.ReleaseId == null && (
+                            seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkUrl == null))
+                    {
+                        throw new ArgumentException(
+                            $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
+                    }
                 }
-            }
 
-            return Unit.Instance;
+                // Check all publication releases are included in updatedReleaseSeriesItems
+                var publicationReleaseIds = publication.ReleaseVersions
+                    .Select(rv => rv.ReleaseId)
+                    .Distinct()
+                    .ToList();
+
+                var updatedSeriesReleaseIds = updatedReleaseSeriesItems
+                    .Where(rsi => rsi.ReleaseId != null)
+                    .Select(rsi => rsi.ReleaseId!.Value)
+                    .ToList();
+
+                if (!ComparerUtils.SequencesAreEqualIgnoringOrder(publicationReleaseIds, updatedSeriesReleaseIds))
+                {
+                    throw new ArgumentException(
+                        "Missing or duplicate release in new release series. Expected ReleaseIds: " +
+                        publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
+                }
+
+                // NOTE: A malicious user could change the release series items' Ids, but we don't care
+
+                var newReleaseSeries = updatedReleaseSeriesItems
+                    .Select(request => new ReleaseSeriesItem
+                    {
+                        Id = request.Id,
+                        ReleaseId = request.ReleaseId,
+                        LegacyLinkDescription = request.LegacyLinkDescription,
+                        LegacyLinkUrl = request.LegacyLinkUrl,
+                    }).ToList();
+
+                publication.ReleaseSeries = newReleaseSeries;
+                _context.Publications.Update(publication);
+
+                await _context.SaveChangesAsync();
+
+                await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                return await GetReleaseSeries(publication.Id)
+                    .OnSuccess(releaseSeries => releaseSeries);
+            });
+    }
+
+    private async Task<Either<ActionResult, Unit>> ValidatePublicationSlug(
+        string newSlug, Guid? publicationId = null)
+    {
+        if (await _context.Publications.AsQueryable()
+                .AnyAsync(publication =>
+                    publication.Id != publicationId
+                    && publication.Slug == newSlug))
+        {
+            return ValidationActionResult(PublicationSlugNotUnique);
         }
 
-        public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
+        var hasRedirect = await _context.PublicationRedirects
+            .AnyAsync(pr =>
+                pr.PublicationId != publicationId // If publication previously used this slug, can change it back
+                && pr.Slug == newSlug);
+
+        if (hasRedirect)
         {
-            return values
-                .Include(p => p.Topic)
-                .ThenInclude(topic => topic.Theme);
+            return ValidationActionResult(PublicationSlugUsedByRedirect);
         }
 
-        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication,
-            bool includePermissions = false)
+        if (publicationId.HasValue &&
+            _context.PublicationMethodologies.Any(pm =>
+                pm.Publication.Id == publicationId
+                && pm.Owner)
+            // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
+            // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
+            // this check is expensive and an unlikely edge case, so doesn't seem worth it.
+            )
         {
-            var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
-
-            publicationViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-
-            if (includePermissions)
+            var methodologySlugValidation = await _methodologyService
+                .ValidateMethodologySlug(newSlug);
+            if (methodologySlugValidation.IsLeft)
             {
-                publicationViewModel.Permissions =
-                    await PermissionsUtils.GetPublicationPermissions(_userService, publication);
+                return methodologySlugValidation.Left;
             }
-
-            return publicationViewModel;
         }
 
-        private async Task<PublicationCreateViewModel> GeneratePublicationCreateViewModel(Publication publication)
+        return Unit.Instance;
+    }
+
+    public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
+    {
+        return values
+            .Include(p => p.Topic)
+            .ThenInclude(topic => topic.Theme);
+    }
+
+    private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication,
+        bool includePermissions = false)
+    {
+        var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+
+        publicationViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
+
+        if (includePermissions)
         {
-            var publicationCreateViewModel = _mapper.Map<PublicationCreateViewModel>(publication);
-
-            publicationCreateViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-
-            return publicationCreateViewModel;
+            publicationViewModel.Permissions =
+                await PermissionsUtils.GetPublicationPermissions(_userService, publication);
         }
 
-        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(ReleaseVersion releaseVersion,
-            bool includePermissions)
+        return publicationViewModel;
+    }
+
+    private async Task<PublicationCreateViewModel> GeneratePublicationCreateViewModel(Publication publication)
+    {
+        var publicationCreateViewModel = _mapper.Map<PublicationCreateViewModel>(publication);
+
+        publicationCreateViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
+
+        return publicationCreateViewModel;
+    }
+
+    private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(ReleaseVersion releaseVersion,
+        bool includePermissions)
+    {
+        var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
+
+        if (includePermissions)
         {
-            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(releaseVersion);
-
-            if (includePermissions)
-            {
-                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
-            }
-
-            return viewModel;
+            viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, releaseVersion);
         }
+
+        return viewModel;
     }
 }

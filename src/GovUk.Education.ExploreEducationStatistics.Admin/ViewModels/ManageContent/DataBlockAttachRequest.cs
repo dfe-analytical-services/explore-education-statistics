@@ -1,11 +1,10 @@
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
-{
-    public class DataBlockAttachRequest
-    {
-        public Guid ContentBlockId { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 
-        public int? Order { get; set; }
-    }
+public class DataBlockAttachRequest
+{
+    public Guid ContentBlockId { get; set; }
+
+    public int? Order { get; set; }
 }

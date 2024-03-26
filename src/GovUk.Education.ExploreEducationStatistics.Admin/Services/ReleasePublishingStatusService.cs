@@ -17,43 +17,42 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class ReleasePublishingStatusService : IReleasePublishingStatusService
 {
-    public class ReleasePublishingStatusService : IReleasePublishingStatusService
+    private readonly IMapper _mapper;
+    private readonly IPublisherTableStorageService _publisherTableStorageService;
+    private readonly IUserService _userService;
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+
+    public ReleasePublishingStatusService(
+        IMapper mapper,
+        IUserService userService,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IPublisherTableStorageService publisherTableStorageService)
     {
-        private readonly IMapper _mapper;
-        private readonly IPublisherTableStorageService _publisherTableStorageService;
-        private readonly IUserService _userService;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        _mapper = mapper;
+        _userService = userService;
+        _persistenceHelper = persistenceHelper;
+        _publisherTableStorageService = publisherTableStorageService;
+    }
 
-        public ReleasePublishingStatusService(
-            IMapper mapper,
-            IUserService userService,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IPublisherTableStorageService publisherTableStorageService)
-        {
-            _mapper = mapper;
-            _userService = userService;
-            _persistenceHelper = persistenceHelper;
-            _publisherTableStorageService = publisherTableStorageService;
-        }
+    public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
+        Guid releaseVersionId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId)
+            .OnSuccess(_userService.CheckCanViewReleaseVersion)
+            .OnSuccess(async _ =>
+            {
+                var query = new TableQuery<ReleasePublishingStatus>()
+                    .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
+                        QueryComparisons.Equal, releaseVersionId.ToString()));
 
-        public async Task<Either<ActionResult, ReleasePublishingStatusViewModel>> GetReleaseStatusAsync(
-            Guid releaseVersionId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewReleaseVersion)
-                .OnSuccess(async _ =>
-                {
-                    var query = new TableQuery<ReleasePublishingStatus>()
-                        .Where(TableQuery.GenerateFilterCondition(nameof(ReleasePublishingStatus.PartitionKey),
-                            QueryComparisons.Equal, releaseVersionId.ToString()));
-
-                    var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
-                    var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
-                    return _mapper.Map<ReleasePublishingStatusViewModel>(first);
-                });
-        }
+                var result = await _publisherTableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
+                var first = result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
+                return _mapper.Map<ReleasePublishingStatusViewModel>(first);
+            });
     }
 }

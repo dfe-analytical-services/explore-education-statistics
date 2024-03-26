@@ -23,615 +23,614 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class PublicationServicePermissionTests
 {
-    public class PublicationServicePermissionTests
+    private readonly Topic _topic = new()
     {
-        private readonly Topic _topic = new()
+        Id = Guid.NewGuid(),
+        Title = "Test topic"
+    };
+
+    private readonly Publication _publication = new()
+    {
+        Id = Guid.NewGuid(),
+        Title = "Test publication",
+    };
+
+    [Fact]
+    public async Task ListPublications_NoAccessOfSystem()
+    {
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(SecurityPolicies.RegisteredUser)
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildPublicationService(
+                    userService: userService.Object);
+                return await service.ListPublications(Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task ListPublicationSummaries()
+    {
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(SecurityPolicies.CanViewAllPublications)
+            .AssertForbidden(async userService =>
+            {
+                var service = BuildPublicationService(
+                    userService: userService.Object);
+                return await service.ListPublicationSummaries();
+            });
+    }
+
+    [Fact]
+    public async Task CreatePublication()
+    {
+        await using var context = InMemoryApplicationDbContext();
+        context.Add(_topic);
+        await context.SaveChangesAsync();
+
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service =>
+                await service.CreatePublication(new PublicationCreateRequest
+                {
+                    TopicId = _topic.Id,
+                }),
+            _topic,
+            userService,
+            publicationService,
+            SecurityPolicies.CanCreatePublicationForSpecificTopic);
+    }
+
+    [Fact]
+    public async Task UpdatePublication_CanUpdatePublicationTitles()
+    {
+        await using var context = InMemoryApplicationDbContext();
+        context.Add(_topic);
+        context.Add(_publication);
+        await context.SaveChangesAsync();
+
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service =>
+                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
+                {
+                    TopicId = _topic.Id,
+                    Title = "Updated publication",
+                }),
+            _publication,
+            userService,
+            publicationService,
+            SecurityPolicies.CanUpdatePublication);
+    }
+
+    [Fact]
+    public async Task UpdatePublication_CanUpdatePublication()
+    {
+        await using var context = InMemoryApplicationDbContext();
+        context.Add(_topic);
+        context.Add(_publication);
+        await context.SaveChangesAsync();
+
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service =>
+                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
+                {
+                    TopicId = _topic.Id,
+                    Title = "Updated publication",
+                }),
+            _publication,
+            userService,
+            publicationService,
+            SecurityPolicies.CanUpdateSpecificPublicationSummary);
+    }
+
+    [Fact]
+    public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
+    {
+        await using var context = InMemoryApplicationDbContext();
+        context.Add(_topic);
+        context.Add(_publication);
+        await context.SaveChangesAsync();
+
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service =>
+                await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
+                {
+                    TopicId = _topic.Id,
+                    Title = "Updated publication",
+                }),
+            _topic,
+            userService,
+            publicationService,
+            SecurityPolicies.CanCreatePublicationForSpecificTopic);
+    }
+
+    [Fact]
+    public async Task UpdatePublication_NoPermissionToChangeSummary()
+    {
+        var publication = new Publication
         {
-            Id = Guid.NewGuid(),
-            Title = "Test topic"
+            Title = "Old publication title",
+            Slug = "publication-slug",
+            Topic = new Topic { Title = "Old topic title" },
         };
 
-        private readonly Publication _publication = new()
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            Id = Guid.NewGuid(),
-            Title = "Test publication",
+            await context.AddRangeAsync(publication);
+            await context.SaveChangesAsync();
+        }
+
+        var userService = new Mock<IUserService>(Strict);
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Publication>(p => p.Id == publication.Id),
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+            .ReturnsAsync(true);
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .ReturnsAsync(false);
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context,
+                userService: userService.Object);
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
+                {
+                    Title = "New publication title",
+                }
+            );
+
+            VerifyAllMocks(userService);
+
+            result.AssertForbidden();
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePublication_NoPermissionToChangeTitle()
+    {
+        var publication = new Publication
+        {
+            Title = "Old publication title",
+            Slug = "publication-slug",
+            Topic = new Topic { Title = "Old topic title" },
+            SupersededById = Guid.NewGuid(),
         };
 
-        [Fact]
-        public async Task ListPublications_NoAccessOfSystem()
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(SecurityPolicies.RegisteredUser)
-                .AssertForbidden(async userService =>
+            await context.AddRangeAsync(publication);
+            await context.SaveChangesAsync();
+        }
+
+        var userService = new Mock<IUserService>(Strict);
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Publication>(p => p.Id == publication.Id),
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+            .ReturnsAsync(true);
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .ReturnsAsync(false);
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context,
+                userService: userService.Object);
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
                 {
-                    var service = BuildPublicationService(
-                        userService: userService.Object);
-                    return await service.ListPublications(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
-        public async Task ListPublicationSummaries()
-        {
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(SecurityPolicies.CanViewAllPublications)
-                .AssertForbidden(async userService =>
-                {
-                    var service = BuildPublicationService(
-                        userService: userService.Object);
-                    return await service.ListPublicationSummaries();
-                });
-        }
-
-        [Fact]
-        public async Task CreatePublication()
-        {
-            await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
-            await context.SaveChangesAsync();
-
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.CreatePublication(new PublicationCreateRequest
-                    {
-                        TopicId = _topic.Id,
-                    }),
-                _topic,
-                userService,
-                publicationService,
-                SecurityPolicies.CanCreatePublicationForSpecificTopic);
-        }
-
-        [Fact]
-        public async Task UpdatePublication_CanUpdatePublicationTitles()
-        {
-            await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
-            context.Add(_publication);
-            await context.SaveChangesAsync();
-
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                    {
-                        TopicId = _topic.Id,
-                        Title = "Updated publication",
-                    }),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanUpdatePublication);
-        }
-
-        [Fact]
-        public async Task UpdatePublication_CanUpdatePublication()
-        {
-            await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
-            context.Add(_publication);
-            await context.SaveChangesAsync();
-
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                    {
-                        TopicId = _topic.Id,
-                        Title = "Updated publication",
-                    }),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanUpdateSpecificPublicationSummary);
-        }
-
-        [Fact]
-        public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
-        {
-            await using var context = InMemoryApplicationDbContext();
-            context.Add(_topic);
-            context.Add(_publication);
-            await context.SaveChangesAsync();
-
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.UpdatePublication(_publication.Id, new PublicationSaveRequest
-                    {
-                        TopicId = _topic.Id,
-                        Title = "Updated publication",
-                    }),
-                _topic,
-                userService,
-                publicationService,
-                SecurityPolicies.CanCreatePublicationForSpecificTopic);
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeSummary()
-        {
-            var publication = new Publication
-            {
-                Title = "Old publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
-                .ReturnsAsync(true);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "New publication title",
-                    }
-                );
-
-                VerifyAllMocks(userService);
-
-                result.AssertForbidden();
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTitle()
-        {
-            var publication = new Publication
-            {
-                Title = "Old publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-                SupersededById = Guid.NewGuid(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
-                .ReturnsAsync(true);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "New publication title",
-                        Slug = "publication-slug",
-                    }
-                );
-
-                VerifyAllMocks(userService);
-
-                result.AssertForbidden();
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTopic()
-        {
-            var newTopic = new Topic
-            {
-                Title = "New topic title"
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication, newTopic);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
-                .ReturnsAsync(true);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Topic>(t => t.Id == newTopic.Id),
-                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "Publication title",
-                        TopicId = newTopic.Id,
-                    }
-                );
-
-                result.AssertForbidden();
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeSupersededById()
-        {
-            var newTopic = new Topic
-            {
-                Title = "New topic title"
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication, newTopic);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
-                .ReturnsAsync(true);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
-                .ReturnsAsync(false);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Topic>(t => t.Id == newTopic.Id),
-                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "Publication title",
-                        TopicId = publication.Topic.Id,
-                        SupersededById = Guid.NewGuid(),
-                    }
-                );
-
-                result.AssertForbidden();
-            }
-        }
-
-        [Fact]
-        public void GetPublication()
-        {
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
-
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.GetPublication(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
-        }
-
-        [Fact]
-        public async Task GetExternalMethodology()
-        {
-            var publication = new Publication
-            {
-                ExternalMethodology = new ExternalMethodology
-                {
-                    Title = "Test external methodology",
-                    Url = "http://test.external.methodology",
+                    Title = "New publication title",
+                    Slug = "publication-slug",
                 }
-            };
+            );
 
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
+            VerifyAllMocks(userService);
 
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.GetExternalMethodology(publication.Id);
-                });
+            result.AssertForbidden();
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePublication_NoPermissionToChangeTopic()
+    {
+        var newTopic = new Topic
+        {
+            Title = "New topic title"
+        };
+        var publication = new Publication
+        {
+            Title = "Publication title",
+            Slug = "publication-slug",
+            Topic = new Topic { Title = "Old topic title" },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.AddRangeAsync(publication, newTopic);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task UpdateExternalMethodology()
+        var userService = new Mock<IUserService>(Strict);
+
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Publication>(p => p.Id == publication.Id),
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+            .ReturnsAsync(true);
+
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Topic>(t => t.Id == newTopic.Id),
+                    SecurityPolicies.CanCreatePublicationForSpecificTopic))
+            .ReturnsAsync(false);
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
         {
-            var publication = new Publication
-            {
-                ExternalMethodology = new ExternalMethodology
-                {
-                    Title = "Test external methodology",
-                    Url = "http://test.external.methodology",
-                }
-            };
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication,
-                    SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
-
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.UpdateExternalMethodology(publication.Id,
-                        new ExternalMethodologySaveRequest());
-                });
-        }
-
-        [Fact]
-        public async Task RemoveExternalMethodology()
-        {
-            var publication = new Publication
-            {
-                ExternalMethodology = new ExternalMethodology
-                {
-                    Title = "Test external methodology",
-                    Url = "http://test.external.methodology",
-                }
-            };
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication,
-                    SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
-
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.RemoveExternalMethodology(publication.Id);
-                });
-        }
-
-        [Fact]
-        public async Task GetContact()
-        {
-            var publication = new Publication
-            {
-                Contact = new Contact
-                {
-                    ContactName = "contact name",
-                    ContactTelNo = "12345",
-                    TeamName = "team name",
-                    TeamEmail = "team@email.com",
-                },
-            };
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
-
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.GetContact(publication.Id);
-                });
-        }
-
-        [Fact]
-        public async Task UpdateContact()
-        {
-            var publication = new Publication
-            {
-                Contact = new Contact
-                {
-                    ContactName = "test",
-                    ContactTelNo = "1234",
-                    TeamEmail = "test@test.com",
-                    TeamName = "test",
-                },
-            };
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateContact)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
-
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.UpdateContact(publication.Id, new ContactSaveRequest());
-                });
-        }
-
-        [Fact]
-        public void ListLatestReleaseVersions()
-        {
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
+            var publicationService = BuildPublicationService(context,
                 userService: userService.Object);
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service => await service.ListLatestReleaseVersions(_publication.Id),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanViewSpecificPublication);
-        }
-
-        [Fact]
-        public async Task GetReleaseSeries()
-        {
-            var publication = new Publication();
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
-                .AssertForbidden(async userService =>
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
                 {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
+                    Title = "Publication title",
+                    TopicId = newTopic.Id,
+                }
+            );
 
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.GetReleaseSeries(publication.Id);
-                });
+            result.AssertForbidden();
+        }
+    }
+
+    [Fact]
+    public async Task UpdatePublication_NoPermissionToChangeSupersededById()
+    {
+        var newTopic = new Topic
+        {
+            Title = "New topic title"
+        };
+        var publication = new Publication
+        {
+            Title = "Publication title",
+            Slug = "publication-slug",
+            Topic = new Topic { Title = "Old topic title" },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            await context.AddRangeAsync(publication, newTopic);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task AddReleaseSeriesLegacyLinks()
-        {
-            var publication = new Publication();
+        var userService = new Mock<IUserService>(Strict);
 
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
-                .AssertForbidden(async userService =>
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Publication>(p => p.Id == publication.Id),
+                    SecurityPolicies.CanUpdateSpecificPublicationSummary))
+            .ReturnsAsync(true);
+
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+            .ReturnsAsync(false);
+
+        userService
+            .Setup(s =>
+                s.MatchesPolicy(
+                    It.Is<Topic>(t => t.Id == newTopic.Id),
+                    SecurityPolicies.CanCreatePublicationForSpecificTopic))
+            .ReturnsAsync(false);
+
+        await using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var publicationService = BuildPublicationService(context,
+                userService: userService.Object);
+
+            var result = await publicationService.UpdatePublication(
+                publication.Id,
+                new PublicationSaveRequest
                 {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
+                    Title = "Publication title",
+                    TopicId = publication.Topic.Id,
+                    SupersededById = Guid.NewGuid(),
+                }
+            );
 
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.AddReleaseSeriesLegacyLink(publication.Id, new ReleaseSeriesLegacyLinkAddRequest());
-                });
+            result.AssertForbidden();
         }
+    }
 
-        [Fact]
-        public async Task UpdateReleaseSeries()
+    [Fact]
+    public void GetPublication()
+    {
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service => await service.GetPublication(_publication.Id),
+            _publication,
+            userService,
+            publicationService,
+            SecurityPolicies.CanViewSpecificPublication);
+    }
+
+    [Fact]
+    public async Task GetExternalMethodology()
+    {
+        var publication = new Publication
         {
-            var publication = new Publication();
+            ExternalMethodology = new ExternalMethodology
+            {
+                Title = "Test external methodology",
+                Url = "http://test.external.methodology",
+            }
+        };
 
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.SaveChangesAsync();
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
 
-                    var service = BuildPublicationService(
-                        context: contentDbContext,
-                        userService: userService.Object);
-                    return await service.UpdateReleaseSeries(publication.Id, new List<ReleaseSeriesItemUpdateRequest>());
-                });
-        }
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.GetExternalMethodology(publication.Id);
+            });
+    }
 
-        private static PublicationService BuildPublicationService(
-            ContentDbContext? context = null,
-            IUserService? userService = null,
-            IPublicationRepository? publicationRepository = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
-            IMethodologyService? methodologyService = null,
-            IPublicationCacheService? publicationCacheService = null,
-            IMethodologyCacheService? methodologyCacheService = null,
-            IRedirectsCacheService? redirectsCacheService = null)
+    [Fact]
+    public async Task UpdateExternalMethodology()
+    {
+        var publication = new Publication
         {
-            context ??= Mock.Of<ContentDbContext>();
+            ExternalMethodology = new ExternalMethodology
+            {
+                Title = "Test external methodology",
+                Url = "http://test.external.methodology",
+            }
+        };
 
-            return new(
-                context,
-                AdminMapper(),
-                new PersistenceHelper<ContentDbContext>(context),
-                userService ?? AlwaysTrueUserService().Object,
-                publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
-                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
-                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
-        }
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication,
+                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.UpdateExternalMethodology(publication.Id,
+                    new ExternalMethodologySaveRequest());
+            });
+    }
+
+    [Fact]
+    public async Task RemoveExternalMethodology()
+    {
+        var publication = new Publication
+        {
+            ExternalMethodology = new ExternalMethodology
+            {
+                Title = "Test external methodology",
+                Url = "http://test.external.methodology",
+            }
+        };
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication,
+                SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.RemoveExternalMethodology(publication.Id);
+            });
+    }
+
+    [Fact]
+    public async Task GetContact()
+    {
+        var publication = new Publication
+        {
+            Contact = new Contact
+            {
+                ContactName = "contact name",
+                ContactTelNo = "12345",
+                TeamName = "team name",
+                TeamEmail = "team@email.com",
+            },
+        };
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.GetContact(publication.Id);
+            });
+    }
+
+    [Fact]
+    public async Task UpdateContact()
+    {
+        var publication = new Publication
+        {
+            Contact = new Contact
+            {
+                ContactName = "test",
+                ContactTelNo = "1234",
+                TeamEmail = "test@test.com",
+                TeamName = "test",
+            },
+        };
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateContact)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.UpdateContact(publication.Id, new ContactSaveRequest());
+            });
+    }
+
+    [Fact]
+    public void ListLatestReleaseVersions()
+    {
+        var userService = AlwaysTrueUserService();
+        var publicationService = BuildPublicationService(
+            userService: userService.Object);
+
+        PermissionTestUtil.AssertSecurityPoliciesChecked(
+            async service => await service.ListLatestReleaseVersions(_publication.Id),
+            _publication,
+            userService,
+            publicationService,
+            SecurityPolicies.CanViewSpecificPublication);
+    }
+
+    [Fact]
+    public async Task GetReleaseSeries()
+    {
+        var publication = new Publication();
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.GetReleaseSeries(publication.Id);
+            });
+    }
+
+    [Fact]
+    public async Task AddReleaseSeriesLegacyLinks()
+    {
+        var publication = new Publication();
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.AddReleaseSeriesLegacyLink(publication.Id, new ReleaseSeriesLegacyLinkAddRequest());
+            });
+    }
+
+    [Fact]
+    public async Task UpdateReleaseSeries()
+    {
+        var publication = new Publication();
+
+        await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object);
+                return await service.UpdateReleaseSeries(publication.Id, new List<ReleaseSeriesItemUpdateRequest>());
+            });
+    }
+
+    private static PublicationService BuildPublicationService(
+        ContentDbContext? context = null,
+        IUserService? userService = null,
+        IPublicationRepository? publicationRepository = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IMethodologyService? methodologyService = null,
+        IPublicationCacheService? publicationCacheService = null,
+        IMethodologyCacheService? methodologyCacheService = null,
+        IRedirectsCacheService? redirectsCacheService = null)
+    {
+        context ??= Mock.Of<ContentDbContext>();
+
+        return new(
+            context,
+            AdminMapper(),
+            new PersistenceHelper<ContentDbContext>(context),
+            userService ?? AlwaysTrueUserService().Object,
+            publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
+            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(Strict),
+            methodologyService ?? Mock.Of<IMethodologyService>(Strict),
+            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+            methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+            redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
     }
 }

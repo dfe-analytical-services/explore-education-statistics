@@ -25,662 +25,661 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseChecklistServiceTests
 {
-    public class ReleaseChecklistServiceTests
+    [Fact]
+    public async Task GetChecklist_AllErrors()
     {
-        [Fact]
-        public async Task GetChecklist_AllErrors()
+        var publication = new Publication();
+
+        var originalReleaseVersion = new ReleaseVersion
         {
-            var publication = new Publication();
-
-            var originalReleaseVersion = new ReleaseVersion
+            Publication = publication,
+            Version = 0,
+            Created = DateTime.UtcNow.AddMonths(-2),
+            Updates = new List<Update>
             {
-                Publication = publication,
-                Version = 0,
-                Created = DateTime.UtcNow.AddMonths(-2),
-                Updates = new List<Update>
+                new()
                 {
-                    new()
-                    {
-                        Reason = "Original release note",
-                        Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
-                    }
-                },
-            };
+                    Reason = "Original release note",
+                    Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
+                }
+            },
+        };
 
-            var releaseVersion = new ReleaseVersion
+        var releaseVersion = new ReleaseVersion
+        {
+            Publication = publication,
+            PreviousVersion = originalReleaseVersion,
+            Version = 1,
+            Created = DateTime.UtcNow.AddMonths(-1),
+            GenericContent = new List<ContentSection>
             {
-                Publication = publication,
-                PreviousVersion = originalReleaseVersion,
-                Version = 1,
-                Created = DateTime.UtcNow.AddMonths(-1),
-                GenericContent = new List<ContentSection>
+                new()
                 {
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>()
-                    },
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
-                        {
-                            new HtmlBlock
-                            {
-                                Body = "<p>Test</p>"
-                            },
-                            new DataBlock(),
-                            new HtmlBlock
-                            {
-                                Body = ""
-                            }
-                        }
-                    }
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>()
                 },
-                RelatedDashboardsSection = new ContentSection
+                new()
                 {
-                    Type = ContentSectionType.RelatedDashboards,
+                    Type = ContentSectionType.Generic,
                     Content = new List<ContentBlock>
                     {
                         new HtmlBlock
                         {
-                            Body = ""
-                        }
-                    }
-                },
-                SummarySection = new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock>
-                    {
+                            Body = "<p>Test</p>"
+                        },
+                        new DataBlock(),
                         new HtmlBlock
                         {
                             Body = ""
                         }
-                    }
-                },
-                Updates = new List<Update>
-                {
-                    new()
-                    {
-                        Reason = "Original release note",
-                        Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
                     }
                 }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
+            },
+            RelatedDashboardsSection = new ContentSection
             {
-                context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
-            var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-
-            await using (var context = InMemoryContentDbContext(contextId))
+                Type = ContentSectionType.RelatedDashboards,
+                Content = new List<ContentBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = ""
+                    }
+                }
+            },
+            SummarySection = new ContentSection
             {
-                methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                    .ReturnsAsync(new List<MethodologyVersion>());
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<File>
-                        {
-                            new()
-                        }
-                    );
-
-                dataImportService
-                    .Setup(s => s.HasIncompleteImports(releaseVersion.Id))
-                    .ReturnsAsync(true);
-
-                dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
-                    .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
-
-                var service = BuildReleaseChecklistService(
-                    context,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    dataImportService: dataImportService.Object,
-                    dataGuidanceService: dataGuidanceService.Object,
-                    methodologyVersionRepository: methodologyVersionRepository.Object
-                );
-
-                var result = await service.GetChecklist(releaseVersion.Id);
-
-                MockUtils.VerifyAllMocks(dataImportService,
-                    dataGuidanceService,
-                    methodologyVersionRepository,
-                    releaseDataFileRepository);
-
-                var checklist = result.AssertRight();
-
-                Assert.False(checklist.Valid);
-
-                var errors = checklist.Errors
-                    .Select(error => error.Code)
-                    .ToList();
-
-                Assert.Equal(9, errors.Count);
-
-                Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
-                Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
-                Assert.Equal(PublicDataGuidanceRequired, errors[2]);
-                Assert.Equal(ReleaseNoteRequired, errors[3]);
-                Assert.Equal(SummarySectionContainsEmptyHtmlBlock, errors[4]);
-                Assert.Equal(EmptyContentSectionExists, errors[5]);
-                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, errors[6]);
-                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
-                Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
+                Type = ContentSectionType.ReleaseSummary,
+                Content = new List<ContentBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = ""
+                    }
+                }
+            },
+            Updates = new List<Update>
+            {
+                new()
+                {
+                    Reason = "Original release note",
+                    Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
+                }
             }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task GetChecklist_AllWarningsWithNoDataFiles()
+        var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+        var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        await using (var context = InMemoryContentDbContext(contextId))
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+                .ReturnsAsync(new List<MethodologyVersion>());
 
-            var contextId = Guid.NewGuid().ToString();
+            releaseDataFileRepository
+                .Setup(r => r.ListDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                    .ReturnsAsync(new List<MethodologyVersion>());
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
-                    .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
-
-                var service = BuildReleaseChecklistService(
-                    context,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataGuidanceService: dataGuidanceService.Object
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<File>
+                    {
+                        new()
+                    }
                 );
 
-                var result = await service.GetChecklist(releaseVersion.Id);
+            dataImportService
+                .Setup(s => s.HasIncompleteImports(releaseVersion.Id))
+                .ReturnsAsync(true);
 
-                MockUtils.VerifyAllMocks(dataGuidanceService,
-                    methodologyVersionRepository,
-                    releaseDataFileRepository);
+            dataGuidanceService
+                .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
+                .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-                var checklist = result.AssertRight();
+            var service = BuildReleaseChecklistService(
+                context,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                dataImportService: dataImportService.Object,
+                dataGuidanceService: dataGuidanceService.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object
+            );
 
-                Assert.False(checklist.Valid);
+            var result = await service.GetChecklist(releaseVersion.Id);
 
-                Assert.Equal(4, checklist.Warnings.Count);
-                Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
-                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
-                Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
-            }
+            MockUtils.VerifyAllMocks(dataImportService,
+                dataGuidanceService,
+                methodologyVersionRepository,
+                releaseDataFileRepository);
+
+            var checklist = result.AssertRight();
+
+            Assert.False(checklist.Valid);
+
+            var errors = checklist.Errors
+                .Select(error => error.Code)
+                .ToList();
+
+            Assert.Equal(9, errors.Count);
+
+            Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
+            Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
+            Assert.Equal(PublicDataGuidanceRequired, errors[2]);
+            Assert.Equal(ReleaseNoteRequired, errors[3]);
+            Assert.Equal(SummarySectionContainsEmptyHtmlBlock, errors[4]);
+            Assert.Equal(EmptyContentSectionExists, errors[5]);
+            Assert.Equal(GenericSectionsContainEmptyHtmlBlock, errors[6]);
+            Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
+            Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
+        }
+    }
+
+    [Fact]
+    public async Task GetChecklist_AllWarningsWithNoDataFiles()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Publication = new Publication()
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task GetChecklist_AllWarningsWithDataFiles()
+        var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        await using (var context = InMemoryContentDbContext(contextId))
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = new Publication()
-            };
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+                .ReturnsAsync(new List<MethodologyVersion>());
 
-            var contextId = Guid.NewGuid().ToString();
+            releaseDataFileRepository
+                .Setup(r => r.ListDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+            dataGuidanceService
+                .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
+                .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
-                var otherSubject = new Subject
-                {
-                    Id = Guid.NewGuid(),
-                };
+            var service = BuildReleaseChecklistService(
+                context,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object,
+                dataGuidanceService: dataGuidanceService.Object
+            );
 
-                methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                    .ReturnsAsync(new List<MethodologyVersion>());
+            var result = await service.GetChecklist(releaseVersion.Id);
 
-                releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<File>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Filename = "test-file-1.csv",
-                                Type = FileType.Data,
-                                SubjectId = subject.Id
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Filename = "test-file-2.csv",
-                                Type = FileType.Data,
-                                SubjectId = otherSubject.Id
-                            }
-                        }
-                    );
+            MockUtils.VerifyAllMocks(dataGuidanceService,
+                methodologyVersionRepository,
+                releaseDataFileRepository);
 
-                dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
-                    .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
+            var checklist = result.AssertRight();
 
-                footnoteRepository
-                    .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<Subject>
-                        {
-                            subject,
-                        }
-                    );
+            Assert.False(checklist.Valid);
 
-                releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
+            Assert.Equal(4, checklist.Warnings.Count);
+            Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
+            Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
+            Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
+            Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
+        }
+    }
 
-                dataBlockService
-                    .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<DataBlock>
-                        {
-                            new(),
-                            new(),
-                        }
-                    );
+    [Fact]
+    public async Task GetChecklist_AllWarningsWithDataFiles()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Publication = new Publication()
+        };
 
-                var service = BuildReleaseChecklistService(
-                    context,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataGuidanceService: dataGuidanceService.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    dataBlockService: dataBlockService.Object
-                );
+        var contextId = Guid.NewGuid().ToString();
 
-                var result = await service.GetChecklist(releaseVersion.Id);
-
-                MockUtils.VerifyAllMocks(dataBlockService,
-                    footnoteRepository,
-                    dataGuidanceService,
-                    methodologyVersionRepository,
-                    releaseDataFileRepository);
-
-                var checklist = result.AssertRight();
-
-                Assert.False(checklist.Valid);
-
-                Assert.Equal(5, checklist.Warnings.Count);
-                Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
-                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
-
-                var noFootnotesWarning = Assert.IsType<NoFootnotesOnSubjectsWarning>(checklist.Warnings[2]);
-                Assert.Equal(NoFootnotesOnSubjects, noFootnotesWarning.Code);
-                Assert.Equal(1, noFootnotesWarning.TotalSubjects);
-
-                Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
-            }
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task GetChecklist_AllWarningsWithUnapprovedMethodology()
+        var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+        var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        await using (var context = InMemoryContentDbContext(contextId))
         {
-            var releaseVersion = new ReleaseVersion
+            var subject = new Subject
             {
-                Publication = new Publication()
+                Id = Guid.NewGuid()
+            };
+            var otherSubject = new Subject
+            {
+                Id = Guid.NewGuid(),
             };
 
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Draft
-            };
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+                .ReturnsAsync(new List<MethodologyVersion>());
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
-
-            var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                    .ReturnsAsync(AsList(methodologyVersion));
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
-                    .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
-
-                var service = BuildReleaseChecklistService(
-                    context,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataGuidanceService: dataGuidanceService.Object
+            releaseDataFileRepository
+                .Setup(r => r.ListDataFiles(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<File>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Filename = "test-file-1.csv",
+                            Type = FileType.Data,
+                            SubjectId = subject.Id
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Filename = "test-file-2.csv",
+                            Type = FileType.Data,
+                            SubjectId = otherSubject.Id
+                        }
+                    }
                 );
 
-                var result = await service.GetChecklist(releaseVersion.Id);
+            dataGuidanceService
+                .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
+                .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-                MockUtils.VerifyAllMocks(dataGuidanceService,
-                    methodologyVersionRepository,
-                    releaseDataFileRepository);
-
-                var checklist = result.AssertRight();
-
-                Assert.False(checklist.Valid);
-
-                Assert.Equal(4, checklist.Warnings.Count);
-
-                var methodologyMustBeApprovedError =
-                    Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
-                Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
-                Assert.Equal(methodologyVersion.Id, methodologyMustBeApprovedError.MethodologyId);
-
-                Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
-                Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
-                Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
-            }
-        }
-
-        [Fact]
-        public async Task GetChecklist_FullyValid()
-        {
-            var publication = new Publication();
-
-            var methodologyVersion = new MethodologyVersion
-            {
-                Status = Approved
-            };
-
-            var originalReleaseVersion = new ReleaseVersion
-            {
-                Publication = publication,
-                Version = 0,
-                Created = DateTime.UtcNow.AddMonths(-2),
-            };
-
-            var dataBlockId = Guid.NewGuid();
-
-            var releaseVersion = new ReleaseVersion
-            {
-                Publication = publication,
-                PreviousVersion = originalReleaseVersion,
-                Version = 1,
-                Created = DateTime.UtcNow.AddMonths(-1),
-                DataGuidance = "Test guidance",
-                PreReleaseAccessList = "Test access list",
-                GenericContent = new List<ContentSection>
-                {
-                    new()
+            footnoteRepository
+                .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<Subject>
                     {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
-                        {
-                            new HtmlBlock
-                            {
-                                Body = "<p>test</p>"
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Type = ContentSectionType.Generic,
-                        Content = new List<ContentBlock>
-                        {
-                            new DataBlock
-                            {
-                                Id = dataBlockId
-                            }
-                        }
+                        subject,
                     }
-                },
-                HeadlinesSection = new ContentSection
-                {
-                    Type = ContentSectionType.Headlines,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                RelatedDashboardsSection = new ContentSection
-                {
-                    Type = ContentSectionType.RelatedDashboards,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                SummarySection = new ContentSection
-                {
-                    Type = ContentSectionType.ReleaseSummary,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                },
-                NextReleaseDate = new PartialDate
-                {
-                    Month = "12",
-                    Year = "2021"
-                },
-                Updates = new List<Update>
-                {
-                    new()
-                    {
-                        Reason = "Test reason 2",
-                        // To avoid checklist error, this amendment requires an Update
-                        // created after release.Created
-                        Created = DateTime.UtcNow,
-                    }
-                },
-            };
-
-            var featuredTable = new FeaturedTable
-            {
-                DataBlockId = dataBlockId,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
-                context.FeaturedTables.AddRange(featuredTable);
-                await context.SaveChangesAsync();
-            }
-
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>();
-            var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var subject = new Subject
-                {
-                    Id = Guid.NewGuid()
-                };
-
-                methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
-                    .ReturnsAsync(ListOf(methodologyVersion));
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<File>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Filename = "test-file-1.csv",
-                                Type = FileType.Data,
-                                SubjectId = subject.Id,
-                            },
-                        }
-                    );
-
-                releaseDataFileRepository
-                    .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
-                    .ReturnsAsync(new List<File>());
-
-                dataGuidanceService
-                    .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
-                    .ReturnsAsync(Unit.Instance);
-
-                footnoteRepository
-                    .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
-                    .ReturnsAsync(new List<Subject>());
-
-                dataBlockService
-                    .Setup(s => s.ListDataBlocks(releaseVersion.Id))
-                    .ReturnsAsync(
-                        new List<DataBlock>
-                        {
-                            new()
-                            {
-                                Id = dataBlockId
-                            }
-                        }
-                    );
-
-                var service = BuildReleaseChecklistService(
-                    context,
-                    dataGuidanceService: dataGuidanceService.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    methodologyVersionRepository: methodologyVersionRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    dataBlockService: dataBlockService.Object
                 );
-                var result = await service.GetChecklist(releaseVersion.Id);
 
-                var checklist = result.AssertRight();
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-                Assert.Empty(checklist.Errors);
-                Assert.Empty(checklist.Warnings);
-                Assert.True(checklist.Valid);
-            }
+            dataBlockService
+                .Setup(s => s.ListDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<DataBlock>
+                    {
+                        new(),
+                        new(),
+                    }
+                );
+
+            var service = BuildReleaseChecklistService(
+                context,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object,
+                dataGuidanceService: dataGuidanceService.Object,
+                footnoteRepository: footnoteRepository.Object,
+                dataBlockService: dataBlockService.Object
+            );
+
+            var result = await service.GetChecklist(releaseVersion.Id);
 
             MockUtils.VerifyAllMocks(dataBlockService,
                 footnoteRepository,
                 dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository);
+
+            var checklist = result.AssertRight();
+
+            Assert.False(checklist.Valid);
+
+            Assert.Equal(5, checklist.Warnings.Count);
+            Assert.Equal(NoMethodology, checklist.Warnings[0].Code);
+            Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
+
+            var noFootnotesWarning = Assert.IsType<NoFootnotesOnSubjectsWarning>(checklist.Warnings[2]);
+            Assert.Equal(NoFootnotesOnSubjects, noFootnotesWarning.Code);
+            Assert.Equal(1, noFootnotesWarning.TotalSubjects);
+
+            Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
+            Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
+        }
+    }
+
+    [Fact]
+    public async Task GetChecklist_AllWarningsWithUnapprovedMethodology()
+    {
+        var releaseVersion = new ReleaseVersion
+        {
+            Publication = new Publication()
+        };
+
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Draft
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task GetChecklist_NotFound()
+        var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        await using (var context = InMemoryContentDbContext(contextId))
         {
-            var releaseVersion = new ReleaseVersion();
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+                .ReturnsAsync(AsList(methodologyVersion));
 
-            var contextId = Guid.NewGuid().ToString();
+            releaseDataFileRepository
+                .Setup(r => r.ListDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                context.ReleaseVersions.Add(releaseVersion);
-                await context.SaveChangesAsync();
-            }
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildReleaseChecklistService(context);
-                var result = await service.GetChecklist(Guid.NewGuid());
-                result.AssertNotFound();
-            }
-        }
+            dataGuidanceService
+                .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
+                .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-        private static ReleaseChecklistService BuildReleaseChecklistService(
-            ContentDbContext contentDbContext,
-            IDataImportService? dataImportService = null,
-            IUserService? userService = null,
-            IDataGuidanceService? dataGuidanceService = null,
-            IReleaseDataFileRepository? releaseDataFileRepository = null,
-            IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IFootnoteRepository? footnoteRepository = null,
-            IDataBlockService? dataBlockService = null)
-        {
-            return new(
-                contentDbContext,
-                dataImportService ?? new Mock<IDataImportService>().Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
-                dataGuidanceService ?? new Mock<IDataGuidanceService>().Object,
-                releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
-                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
-                footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object
+            var service = BuildReleaseChecklistService(
+                context,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object,
+                dataGuidanceService: dataGuidanceService.Object
             );
+
+            var result = await service.GetChecklist(releaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(dataGuidanceService,
+                methodologyVersionRepository,
+                releaseDataFileRepository);
+
+            var checklist = result.AssertRight();
+
+            Assert.False(checklist.Valid);
+
+            Assert.Equal(4, checklist.Warnings.Count);
+
+            var methodologyMustBeApprovedError =
+                Assert.IsType<MethodologyNotApprovedWarning>(checklist.Warnings[0]);
+            Assert.Equal(MethodologyNotApproved, methodologyMustBeApprovedError.Code);
+            Assert.Equal(methodologyVersion.Id, methodologyMustBeApprovedError.MethodologyId);
+
+            Assert.Equal(NoNextReleaseDate, checklist.Warnings[1].Code);
+            Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
+            Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
         }
+    }
+
+    [Fact]
+    public async Task GetChecklist_FullyValid()
+    {
+        var publication = new Publication();
+
+        var methodologyVersion = new MethodologyVersion
+        {
+            Status = Approved
+        };
+
+        var originalReleaseVersion = new ReleaseVersion
+        {
+            Publication = publication,
+            Version = 0,
+            Created = DateTime.UtcNow.AddMonths(-2),
+        };
+
+        var dataBlockId = Guid.NewGuid();
+
+        var releaseVersion = new ReleaseVersion
+        {
+            Publication = publication,
+            PreviousVersion = originalReleaseVersion,
+            Version = 1,
+            Created = DateTime.UtcNow.AddMonths(-1),
+            DataGuidance = "Test guidance",
+            PreReleaseAccessList = "Test access list",
+            GenericContent = new List<ContentSection>
+            {
+                new()
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "<p>test</p>"
+                        }
+                    }
+                },
+                new()
+                {
+                    Type = ContentSectionType.Generic,
+                    Content = new List<ContentBlock>
+                    {
+                        new DataBlock
+                        {
+                            Id = dataBlockId
+                        }
+                    }
+                }
+            },
+            HeadlinesSection = new ContentSection
+            {
+                Type = ContentSectionType.Headlines,
+                Content = new List<ContentBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = "Not empty"
+                    }
+                }
+            },
+            RelatedDashboardsSection = new ContentSection
+            {
+                Type = ContentSectionType.RelatedDashboards,
+                Content = new List<ContentBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = "Not empty"
+                    }
+                }
+            },
+            SummarySection = new ContentSection
+            {
+                Type = ContentSectionType.ReleaseSummary,
+                Content = new List<ContentBlock>
+                {
+                    new HtmlBlock
+                    {
+                        Body = "Not empty"
+                    }
+                }
+            },
+            NextReleaseDate = new PartialDate
+            {
+                Month = "12",
+                Year = "2021"
+            },
+            Updates = new List<Update>
+            {
+                new()
+                {
+                    Reason = "Test reason 2",
+                    // To avoid checklist error, this amendment requires an Update
+                    // created after release.Created
+                    Created = DateTime.UtcNow,
+                }
+            },
+        };
+
+        var featuredTable = new FeaturedTable
+        {
+            DataBlockId = dataBlockId,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.AddRange(originalReleaseVersion, releaseVersion);
+            context.FeaturedTables.AddRange(featuredTable);
+            await context.SaveChangesAsync();
+        }
+
+        var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+        var footnoteRepository = new Mock<IFootnoteRepository>();
+        var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
+        var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+        var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestVersionByPublication(releaseVersion.PublicationId))
+                .ReturnsAsync(ListOf(methodologyVersion));
+
+            releaseDataFileRepository
+                .Setup(r => r.ListDataFiles(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<File>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Filename = "test-file-1.csv",
+                            Type = FileType.Data,
+                            SubjectId = subject.Id,
+                        },
+                    }
+                );
+
+            releaseDataFileRepository
+                .Setup(r => r.ListReplacementDataFiles(releaseVersion.Id))
+                .ReturnsAsync(new List<File>());
+
+            dataGuidanceService
+                .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
+                .ReturnsAsync(Unit.Instance);
+
+            footnoteRepository
+                .Setup(r => r.GetSubjectsWithNoFootnotes(releaseVersion.Id))
+                .ReturnsAsync(new List<Subject>());
+
+            dataBlockService
+                .Setup(s => s.ListDataBlocks(releaseVersion.Id))
+                .ReturnsAsync(
+                    new List<DataBlock>
+                    {
+                        new()
+                        {
+                            Id = dataBlockId
+                        }
+                    }
+                );
+
+            var service = BuildReleaseChecklistService(
+                context,
+                dataGuidanceService: dataGuidanceService.Object,
+                releaseDataFileRepository: releaseDataFileRepository.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object,
+                footnoteRepository: footnoteRepository.Object,
+                dataBlockService: dataBlockService.Object
+            );
+            var result = await service.GetChecklist(releaseVersion.Id);
+
+            var checklist = result.AssertRight();
+
+            Assert.Empty(checklist.Errors);
+            Assert.Empty(checklist.Warnings);
+            Assert.True(checklist.Valid);
+        }
+
+        MockUtils.VerifyAllMocks(dataBlockService,
+            footnoteRepository,
+            dataGuidanceService,
+            methodologyVersionRepository,
+            releaseDataFileRepository);
+    }
+
+    [Fact]
+    public async Task GetChecklist_NotFound()
+    {
+        var releaseVersion = new ReleaseVersion();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildReleaseChecklistService(context);
+            var result = await service.GetChecklist(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+    }
+
+    private static ReleaseChecklistService BuildReleaseChecklistService(
+        ContentDbContext contentDbContext,
+        IDataImportService? dataImportService = null,
+        IUserService? userService = null,
+        IDataGuidanceService? dataGuidanceService = null,
+        IReleaseDataFileRepository? releaseDataFileRepository = null,
+        IMethodologyVersionRepository? methodologyVersionRepository = null,
+        IFootnoteRepository? footnoteRepository = null,
+        IDataBlockService? dataBlockService = null)
+    {
+        return new(
+            contentDbContext,
+            dataImportService ?? new Mock<IDataImportService>().Object,
+            userService ?? MockUtils.AlwaysTrueUserService().Object,
+            dataGuidanceService ?? new Mock<IDataGuidanceService>().Object,
+            releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
+            methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
+            footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
+            dataBlockService ?? new Mock<IDataBlockService>().Object
+        );
     }
 }

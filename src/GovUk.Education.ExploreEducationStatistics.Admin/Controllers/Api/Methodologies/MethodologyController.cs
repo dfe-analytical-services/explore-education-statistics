@@ -12,134 +12,133 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Methodologies;
+
+[Authorize]
+[ApiController]
+[Route("api")]
+public class MethodologyController : ControllerBase
 {
-    [Authorize]
-    [ApiController]
-    [Route("api")]
-    public class MethodologyController : ControllerBase
+    private readonly IMethodologyService _methodologyService;
+    private readonly IMethodologyAmendmentService _methodologyAmendmentService;
+
+    public MethodologyController(
+        IMethodologyService methodologyService,
+        IMethodologyAmendmentService methodologyAmendmentService)
     {
-        private readonly IMethodologyService _methodologyService;
-        private readonly IMethodologyAmendmentService _methodologyAmendmentService;
+        _methodologyService = methodologyService;
+        _methodologyAmendmentService = methodologyAmendmentService;
+    }
 
-        public MethodologyController(
-            IMethodologyService methodologyService,
-            IMethodologyAmendmentService methodologyAmendmentService)
-        {
-            _methodologyService = methodologyService;
-            _methodologyAmendmentService = methodologyAmendmentService;
-        }
+    [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
+    public async Task<ActionResult<Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
+    {
+        return await _methodologyService
+            .AdoptMethodology(publicationId, methodologyId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
-        public async Task<ActionResult<Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
-        {
-            return await _methodologyService
-                .AdoptMethodology(publicationId, methodologyId)
-                .HandleFailuresOrOk();
-        }
+    [HttpPost("publication/{publicationId:guid}/methodology")]
+    public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodology(Guid publicationId)
+    {
+        return _methodologyService
+            .CreateMethodology(publicationId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPost("publication/{publicationId:guid}/methodology")]
-        public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodology(Guid publicationId)
-        {
-            return _methodologyService
-                .CreateMethodology(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
+    public async Task<ActionResult> DropMethodology(Guid publicationId, Guid methodologyId)
+    {
+        return await _methodologyService
+            .DropMethodology(publicationId, methodologyId)
+            .HandleFailuresOrNoContent();
+    }
 
-        [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
-        public async Task<ActionResult> DropMethodology(Guid publicationId, Guid methodologyId)
-        {
-            return await _methodologyService
-                .DropMethodology(publicationId, methodologyId)
-                .HandleFailuresOrNoContent();
-        }
+    [HttpGet("publication/{publicationId:guid}/adoptable-methodologies")]
+    public async Task<ActionResult<List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+    {
+        return await _methodologyService
+            .GetAdoptableMethodologies(publicationId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("publication/{publicationId:guid}/adoptable-methodologies")]
-        public async Task<ActionResult<List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(Guid publicationId)
-        {
-            return await _methodologyService
-                .GetAdoptableMethodologies(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("methodology/{methodologyVersionId:guid}")]
+    public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId)
+    {
+        return await _methodologyService
+            .GetMethodology(methodologyVersionId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("methodology/{methodologyVersionId:guid}")]
-        public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId)
-        {
-            return await _methodologyService
-                .GetMethodology(methodologyVersionId)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("methodology/{methodologyVersionId:guid}/unpublished-releases")]
+    public async Task<ActionResult<List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
+        Guid methodologyVersionId)
+    {
+        return await _methodologyService
+            .GetUnpublishedReleasesUsingMethodology(methodologyVersionId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("methodology/{methodologyVersionId:guid}/unpublished-releases")]
-        public async Task<ActionResult<List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
-            Guid methodologyVersionId)
-        {
-            return await _methodologyService
-                .GetUnpublishedReleasesUsingMethodology(methodologyVersionId)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("publication/{publicationId:guid}/methodologies")]
+    public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
+        Guid publicationId,
+        [FromQuery] bool isPrerelease = false)
+    {
+        return await _methodologyService
+            .ListLatestMethodologyVersions(publicationId, isPrerelease)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("publication/{publicationId:guid}/methodologies")]
-        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(
-            Guid publicationId,
-            [FromQuery] bool isPrerelease = false)
-        {
-            return await _methodologyService
-                .ListLatestMethodologyVersions(publicationId, isPrerelease)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("methodology/{methodologyVersionId:guid}")]
+    public async Task<ActionResult<MethodologyVersionViewModel>> UpdateMethodology(
+        Guid methodologyVersionId,
+        MethodologyUpdateRequest request)
+    {
+        return await _methodologyService
+            .UpdateMethodology(methodologyVersionId, request)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("methodology/{methodologyVersionId:guid}")]
-        public async Task<ActionResult<MethodologyVersionViewModel>> UpdateMethodology(
-            Guid methodologyVersionId,
-            MethodologyUpdateRequest request)
-        {
-            return await _methodologyService
-                .UpdateMethodology(methodologyVersionId, request)
-                .HandleFailuresOrOk();
-        }
+    [HttpPatch("methodology/{methodologyVersionId:guid}/published")]
+    public async Task<ActionResult<Unit>> UpdateMethodologyPublished(
+        Guid methodologyVersionId,
+        MethodologyPublishedUpdateRequest request)
+    {
+        return await _methodologyService
+            .UpdateMethodologyPublished(methodologyVersionId, request)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPatch("methodology/{methodologyVersionId:guid}/published")]
-        public async Task<ActionResult<Unit>> UpdateMethodologyPublished(
-            Guid methodologyVersionId,
-            MethodologyPublishedUpdateRequest request)
-        {
-            return await _methodologyService
-                .UpdateMethodologyPublished(methodologyVersionId, request)
-                .HandleFailuresOrOk();
-        }
+    [HttpPost("methodology/{originalMethodologyVersionId:guid}/amendment")]
+    public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodologyAmendment(
+        Guid originalMethodologyVersionId)
+    {
+        return _methodologyAmendmentService
+            .CreateMethodologyAmendment(originalMethodologyVersionId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPost("methodology/{originalMethodologyVersionId:guid}/amendment")]
-        public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodologyAmendment(
-            Guid originalMethodologyVersionId)
-        {
-            return _methodologyAmendmentService
-                .CreateMethodologyAmendment(originalMethodologyVersionId)
-                .HandleFailuresOrOk();
-        }
+    [HttpDelete("methodology/{methodologyVersionId:guid}")]
+    public Task<ActionResult> DeleteMethodologyVersion(Guid methodologyVersionId)
+    {
+        return _methodologyService
+            .DeleteMethodologyVersion(methodologyVersionId)
+            .HandleFailuresOrNoContent();
+    }
 
-        [HttpDelete("methodology/{methodologyVersionId:guid}")]
-        public Task<ActionResult> DeleteMethodologyVersion(Guid methodologyVersionId)
-        {
-            return _methodologyService
-                .DeleteMethodologyVersion(methodologyVersionId)
-                .HandleFailuresOrNoContent();
-        }
+    [HttpGet("methodology/{methodologyVersionId:guid}/status")]
+    public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId)
+    {
+        return _methodologyService
+            .GetMethodologyStatuses(methodologyVersionId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("methodology/{methodologyVersionId:guid}/status")]
-        public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId)
-        {
-            return _methodologyService
-                .GetMethodologyStatuses(methodologyVersionId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("methodology/approvals")]
-        public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
-        {
-            return await _methodologyService
-                .ListUsersMethodologyVersionsForApproval()
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("methodology/approvals")]
+    public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
+    {
+        return await _methodologyService
+            .ListUsersMethodologyVersionsForApproval()
+            .HandleFailuresOrOk();
     }
 }

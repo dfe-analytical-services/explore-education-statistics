@@ -5,24 +5,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations;
+
+[ExcludeFromCodeCoverage]
+public partial class EES3993AlterStoredProcRebuildIndexes : Migration
 {
-    [ExcludeFromCodeCoverage]
-    public partial class EES3993AlterStoredProcRebuildIndexes : Migration
+    private const string PreviousRebuildIndexesMigrationId = InitialCreate_Custom.MigrationId;
+    internal const string MigrationId = "20230302161732";
+
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        private const string PreviousRebuildIndexesMigrationId = InitialCreate_Custom.MigrationId;
-        internal const string MigrationId = "20230302161732";
+        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
+            $"{MigrationId}_Routine_RebuildIndexes.sql");
+    }
 
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-                $"{MigrationId}_Routine_RebuildIndexes.sql");
-        }
-
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
-                $"{PreviousRebuildIndexesMigrationId}_Routine_RebuildIndexes.sql");
-        }
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.SqlFromFile(MigrationConstants.MigrationsPath,
+            $"{PreviousRebuildIndexesMigrationId}_Routine_RebuildIndexes.sql");
     }
 }

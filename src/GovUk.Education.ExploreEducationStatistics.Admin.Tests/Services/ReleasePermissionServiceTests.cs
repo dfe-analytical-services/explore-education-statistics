@@ -19,952 +19,951 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleasePermissionServiceTests
 {
-    public class ReleasePermissionServiceTests
+    private static readonly Guid UserId = Guid.NewGuid();
+
+    private readonly DataFixture _dataFixture = new();
+
+    [Fact]
+    public async Task ListReleaseRoles()
     {
-        private static readonly Guid UserId = Guid.NewGuid();
-
-        private readonly DataFixture _dataFixture = new();
-
-        [Fact]
-        public async Task ListReleaseRoles()
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Original = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Amendment = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            PreviousVersion = release2Original,
+        };
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release2Amendment,
-                Role = Contributor,
-            };
-            var user2ReleaseRole2 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release2Amendment,
+            Role = Contributor,
+        };
+        var user2ReleaseRole2 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-            var user3 = new User
-            {
-                FirstName = "User3",
-                LastName = "Three",
-                Email = "user3@test.com",
-            };
-            var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
-            {
-                User = user3,
-                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
-                Role = Contributor,
-            };
-            var user3ReleaseRole = new UserReleaseRole
-            {
-                User = user3,
-                ReleaseVersion = release1,
-                Role = PrereleaseViewer,
-            };
-            var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
-            {
-                User = user3,
-                ReleaseVersion = release2Original,
-                Role = Contributor,
-                Deleted = DateTime.UtcNow,
-            };
+        var user3 = new User
+        {
+            FirstName = "User3",
+            LastName = "Three",
+            Email = "user3@test.com",
+        };
+        var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
+        {
+            User = user3,
+            ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
+            Role = Contributor,
+        };
+        var user3ReleaseRole = new UserReleaseRole
+        {
+            User = user3,
+            ReleaseVersion = release1,
+            Role = PrereleaseViewer,
+        };
+        var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
+        {
+            User = user3,
+            ReleaseVersion = release2Original,
+            Role = Contributor,
+            Deleted = DateTime.UtcNow,
+        };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
-                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
-                    user3ReleaseRoleIgnored1, user3ReleaseRole, user3ReleaseRoleIgnored3);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result = await service.ListReleaseRoles(release1.Id);
-                var viewModel = result.AssertRight();
-
-                Assert.Equal(3, viewModel.Count);
-
-                Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
-                Assert.Equal(user1.Email, viewModel[0].UserEmail);
-                Assert.Equal(Contributor, viewModel[0].Role);
-
-                Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
-                Assert.Equal(user2.Email, viewModel[1].UserEmail);
-                Assert.Equal(Contributor, viewModel[1].Role);
-
-                Assert.Equal(user3.Id, viewModel[2].UserId);
-                Assert.Equal(user3.DisplayName, viewModel[2].UserDisplayName);
-                Assert.Equal(user3.Email, viewModel[2].UserEmail);
-                Assert.Equal(PrereleaseViewer, viewModel[2].Role);
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+            contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                user3ReleaseRoleIgnored1, user3ReleaseRole, user3ReleaseRoleIgnored3);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseRoles_ContributorsOnly()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release2Amendment,
-                Role = Contributor,
-            };
-            var user2ReleaseRole2 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var result = await service.ListReleaseRoles(release1.Id);
+            var viewModel = result.AssertRight();
 
-            var user3 = new User();
-            var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
-            {
-                User = user3,
-                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
-                Role = Contributor,
-            };
-            var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
-            {
-                User = user3,
-                ReleaseVersion = release1,
-                Role = PrereleaseViewer,
-            };
-            var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
-            {
-                User = user3,
-                ReleaseVersion = release2Original,
-                Role = Contributor,
-                Deleted = DateTime.UtcNow,
-            };
+            Assert.Equal(3, viewModel.Count);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
-                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
-                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
-                await contentDbContext.SaveChangesAsync();
-            }
+            Assert.Equal(user1.Id, viewModel[0].UserId);
+            Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
+            Assert.Equal(user1.Email, viewModel[0].UserEmail);
+            Assert.Equal(Contributor, viewModel[0].Role);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
+            Assert.Equal(user2.Id, viewModel[1].UserId);
+            Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
+            Assert.Equal(user2.Email, viewModel[1].UserEmail);
+            Assert.Equal(Contributor, viewModel[1].Role);
 
-                var result = await service.ListReleaseRoles(release1.Id, new[] { Contributor });
-                var viewModel = result.AssertRight();
+            Assert.Equal(user3.Id, viewModel[2].UserId);
+            Assert.Equal(user3.DisplayName, viewModel[2].UserDisplayName);
+            Assert.Equal(user3.Email, viewModel[2].UserEmail);
+            Assert.Equal(PrereleaseViewer, viewModel[2].Role);
+        }
+    }
 
-                Assert.Equal(2, viewModel.Count);
+    [Fact]
+    public async Task ListReleaseRoles_ContributorsOnly()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Original = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Amendment = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            PreviousVersion = release2Original,
+        };
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-                Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
-                Assert.Equal(user1.Email, viewModel[0].UserEmail);
-                Assert.Equal(Contributor, viewModel[0].Role);
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release2Amendment,
+            Role = Contributor,
+        };
+        var user2ReleaseRole2 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-                Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
-                Assert.Equal(user2.Email, viewModel[1].UserEmail);
-                Assert.Equal(Contributor, viewModel[1].Role);
-            }
+        var user3 = new User();
+        var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
+        {
+            User = user3,
+            ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
+            Role = Contributor,
+        };
+        var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
+        {
+            User = user3,
+            ReleaseVersion = release1,
+            Role = PrereleaseViewer,
+        };
+        var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because different release
+        {
+            User = user3,
+            ReleaseVersion = release2Original,
+            Role = Contributor,
+            Deleted = DateTime.UtcNow,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+            contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseRoles_NoPublication()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result = await service.ListReleaseRoles(release1.Id, new[] { Contributor });
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Count);
+
+            Assert.Equal(user1.Id, viewModel[0].UserId);
+            Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
+            Assert.Equal(user1.Email, viewModel[0].UserEmail);
+            Assert.Equal(Contributor, viewModel[0].Role);
+
+            Assert.Equal(user2.Id, viewModel[1].UserId);
+            Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
+            Assert.Equal(user2.Email, viewModel[1].UserEmail);
+            Assert.Equal(Contributor, viewModel[1].Role);
+        }
+    }
+
+    [Fact]
+    public async Task ListReleaseRoles_NoPublication()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        var service = SetupReleasePermissionService(contentDbContext);
+
+        var result = await service.ListReleaseRoles(Guid.NewGuid());
+        result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task ListReleaseRoles_NoRelease()
+    {
+        var publication = new Publication { Title = "Test Publication" };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
             var service = SetupReleasePermissionService(contentDbContext);
 
             var result = await service.ListReleaseRoles(Guid.NewGuid());
             result.AssertNotFound();
         }
+    }
 
-        [Fact]
-        public async Task ListReleaseRoles_NoRelease()
+    [Fact]
+    public async Task ListReleaseRoles_NoUserReleaseRoles()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
         {
-            var publication = new Publication { Title = "Test Publication" };
+            ReleaseName = "2000",
+            Publication = publication,
+        };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result = await service.ListReleaseRoles(Guid.NewGuid());
-                result.AssertNotFound();
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.AddAsync(release1);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseRoles_NoUserReleaseRoles()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = publication,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release1);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var result = await service
+                .ListReleaseRoles(release1.Id);
+            var viewModel = result.AssertRight();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
+            Assert.Empty(viewModel);
+        }
+    }
 
-                var result = await service
-                    .ListReleaseRoles(release1.Id);
-                var viewModel = result.AssertRight();
+    [Fact]
+    public async Task ListReleaseInvites()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Original = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Amendment = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            PreviousVersion = release2Original,
+        };
 
-                Assert.Empty(viewModel);
-            }
+        var user1ReleaseInvite = new UserReleaseInvite
+        {
+            Email = "user1@test.com",
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var user2ReleaseInviteIgnored = new UserReleaseInvite
+        {
+            Email = "user2@test.com",
+            ReleaseVersion = release2Amendment, // ignored because not release1
+            Role = Contributor,
+        };
+
+        var user3ReleaseInvite = new UserReleaseInvite
+        {
+            Email = "user3@test.com",
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var user4ReleaseInviteIgnored = new UserReleaseInvite
+        {
+            Email = "user4@test.com",
+            ReleaseVersion = release1,
+            Role = Lead
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+            contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
+                user3ReleaseInvite,
+                user4ReleaseInviteIgnored);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseInvites()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var user1ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user1@test.com",
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var result = await service.ListReleaseInvites(release1.Id);
+            var viewModel = result.AssertRight();
 
-            var user2ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user2@test.com",
-                ReleaseVersion = release2Amendment, // ignored because not release1
-                Role = Contributor,
-            };
+            Assert.Equal(3, viewModel.Count);
 
-            var user3ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user3@test.com",
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            Assert.Equal("user1@test.com", viewModel[0].Email);
+            Assert.Equal(Contributor, viewModel[0].Role);
 
-            var user4ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user4@test.com",
-                ReleaseVersion = release1,
-                Role = Lead
-            };
+            Assert.Equal("user3@test.com", viewModel[1].Email);
+            Assert.Equal(Contributor, viewModel[1].Role);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
-                contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
-                    user3ReleaseInvite,
-                    user4ReleaseInviteIgnored);
-                await contentDbContext.SaveChangesAsync();
-            }
+            Assert.Equal("user4@test.com", viewModel[2].Email);
+            Assert.Equal(Lead, viewModel[2].Role);
+        }
+    }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
+    [Fact]
+    public async Task ListReleaseInvites_ContributorsOnly()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Original = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Amendment = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            PreviousVersion = release2Original,
+        };
 
-                var result = await service.ListReleaseInvites(release1.Id);
-                var viewModel = result.AssertRight();
+        var user1ReleaseInvite = new UserReleaseInvite
+        {
+            Email = "user1@test.com",
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-                Assert.Equal(3, viewModel.Count);
+        var user2ReleaseInviteIgnored = new UserReleaseInvite
+        {
+            Email = "user2@test.com",
+            ReleaseVersion = release2Amendment, // ignored because not release1
+            Role = Contributor,
+        };
 
-                Assert.Equal("user1@test.com", viewModel[0].Email);
-                Assert.Equal(Contributor, viewModel[0].Role);
+        var user3ReleaseInvite = new UserReleaseInvite
+        {
+            Email = "user3@test.com",
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
 
-                Assert.Equal("user3@test.com", viewModel[1].Email);
-                Assert.Equal(Contributor, viewModel[1].Role);
+        var user3ReleaseInviteIgnored = new UserReleaseInvite
+        {
+            Email = "user4@test.com",
+            ReleaseVersion = release1,
+            Role = Lead, // ignored because not a Contributor
+        };
 
-                Assert.Equal("user4@test.com", viewModel[2].Email);
-                Assert.Equal(Lead, viewModel[2].Role);
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+            contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
+                user3ReleaseInvite,
+                user3ReleaseInviteIgnored);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseInvites_ContributorsOnly()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var user1ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user1@test.com",
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var result = await service.ListReleaseInvites(release1.Id, new[] { Contributor });
+            var viewModel = result.AssertRight();
 
-            var user2ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user2@test.com",
-                ReleaseVersion = release2Amendment, // ignored because not release1
-                Role = Contributor,
-            };
+            Assert.Equal(2, viewModel.Count);
 
-            var user3ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user3@test.com",
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            Assert.Equal("user1@test.com", viewModel[0].Email);
+            Assert.Equal(Contributor, viewModel[0].Role);
 
-            var user3ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user4@test.com",
-                ReleaseVersion = release1,
-                Role = Lead, // ignored because not a Contributor
-            };
+            Assert.Equal("user3@test.com", viewModel[1].Email);
+            Assert.Equal(Contributor, viewModel[1].Role);
+        }
+    }
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
-                contentDbContext.UserReleaseInvites.AddRange(user1ReleaseInvite, user2ReleaseInviteIgnored,
-                    user3ReleaseInvite,
-                    user3ReleaseInviteIgnored);
-                await contentDbContext.SaveChangesAsync();
-            }
+    [Fact]
+    public async Task ListReleaseInvites_NoPublication()
+    {
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        var service = SetupReleasePermissionService(contentDbContext);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
+        var result = await service.ListReleaseInvites(Guid.NewGuid());
+        result.AssertNotFound();
+    }
 
-                var result = await service.ListReleaseInvites(release1.Id, new[] { Contributor });
-                var viewModel = result.AssertRight();
+    [Fact]
+    public async Task ListReleaseInvites_NoRelease()
+    {
+        var publication = new Publication { Title = "Test Publication" };
 
-                Assert.Equal(2, viewModel.Count);
-
-                Assert.Equal("user1@test.com", viewModel[0].Email);
-                Assert.Equal(Contributor, viewModel[0].Role);
-
-                Assert.Equal("user3@test.com", viewModel[1].Email);
-                Assert.Equal(Contributor, viewModel[1].Role);
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseInvites_NoPublication()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleasePermissionService(contentDbContext);
 
             var result = await service.ListReleaseInvites(Guid.NewGuid());
             result.AssertNotFound();
         }
+    }
 
-        [Fact]
-        public async Task ListReleaseInvites_NoRelease()
+    [Fact]
+    public async Task ListReleaseInvites_NoUserReleaseInvites()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
         {
-            var publication = new Publication { Title = "Test Publication" };
+            ReleaseName = "2000",
+            Publication = publication,
+        };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result = await service.ListReleaseInvites(Guid.NewGuid());
-                result.AssertNotFound();
-            }
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            await contentDbContext.AddAsync(release1);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListReleaseInvites_NoUserReleaseInvites()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                ReleaseName = "2000",
-                Publication = publication,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release1);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var result = await service
+                .ListReleaseInvites(release1.Id);
+            var viewModel = result.AssertRight();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
+            Assert.Empty(viewModel);
+        }
+    }
 
-                var result = await service
-                    .ListReleaseInvites(release1.Id);
-                var viewModel = result.AssertRight();
+    [Fact]
+    public async Task ListPublicationContributors()
+    {
+        Release release1 = _dataFixture
+            .DefaultRelease(publishedVersions: 1);
 
-                Assert.Empty(viewModel);
-            }
+        Release release2 = _dataFixture
+            .DefaultRelease(publishedVersions: 1, draftVersion: true);
+
+        Publication publication = _dataFixture
+            .DefaultPublication()
+            .WithReleases(ListOf(release1, release2));
+
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1.Versions[0],
+            Role = Contributor,
+        };
+
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release2.Versions[1],
+            Role = Contributor,
+        };
+
+        var user3 = new User();
+        var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
+        {
+            User = user3,
+            ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
+            Role = Contributor,
+        };
+        var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
+        {
+            User = user3,
+            ReleaseVersion = release1.Versions[0],
+            Role = PrereleaseViewer,
+        };
+        var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
+        {
+            User = user3,
+            ReleaseVersion = release2.Versions[0],
+            Role = Contributor,
+            Deleted = DateTime.UtcNow,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.Publications.Add(publication);
+            contentDbContext.UserReleaseRoles.AddRange(
+                user1ReleaseRole1, user2ReleaseRole1,
+                user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListPublicationContributors()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            Release release1 = _dataFixture
-                .DefaultRelease(publishedVersions: 1);
-
-            Release release2 = _dataFixture
-                .DefaultRelease(publishedVersions: 1, draftVersion: true);
-
-            Publication publication = _dataFixture
-                .DefaultPublication()
-                .WithReleases(ListOf(release1, release2));
-
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1.Versions[0],
-                Role = Contributor,
-            };
-
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release2.Versions[1],
-                Role = Contributor,
-            };
-
-            var user3 = new User();
-            var user3ReleaseRoleIgnored1 = new UserReleaseRole // Ignored because different publication
-            {
-                User = user3,
-                ReleaseVersion = new ReleaseVersion { Publication = new Publication() },
-                Role = Contributor,
-            };
-            var user3ReleaseRoleIgnored2 = new UserReleaseRole // Ignored because not Contributor role
-            {
-                User = user3,
-                ReleaseVersion = release1.Versions[0],
-                Role = PrereleaseViewer,
-            };
-            var user3ReleaseRoleIgnored3 = new UserReleaseRole // Ignored because not latest version of release
-            {
-                User = user3,
-                ReleaseVersion = release2.Versions[0],
-                Role = Contributor,
-                Deleted = DateTime.UtcNow,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.Publications.Add(publication);
-                contentDbContext.UserReleaseRoles.AddRange(
-                    user1ReleaseRole1, user2ReleaseRole1,
-                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.ListPublicationContributors(publication.Id);
-                var viewModel = result.AssertRight();
-
-                Assert.Equal(2, viewModel.Count);
-
-                Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
-                Assert.Equal(user1.Email, viewModel[0].UserEmail);
-
-                Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
-                Assert.Equal(user2.Email, viewModel[1].UserEmail);
-            }
-        }
-
-        [Fact]
-        public async Task ListPublicationContributors_NoPublication()
-        {
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
             var service = SetupReleasePermissionService(contentDbContext);
 
             var result =
-                await service.ListPublicationContributors(Guid.NewGuid());
-            result.AssertNotFound();
+                await service.ListPublicationContributors(publication.Id);
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Count);
+
+            Assert.Equal(user1.Id, viewModel[0].UserId);
+            Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
+            Assert.Equal(user1.Email, viewModel[0].UserEmail);
+
+            Assert.Equal(user2.Id, viewModel[1].UserId);
+            Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
+            Assert.Equal(user2.Email, viewModel[1].UserEmail);
         }
+    }
+
+    [Fact]
+    public async Task ListPublicationContributors_NoPublication()
+    {
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+        var service = SetupReleasePermissionService(contentDbContext);
+
+        var result =
+            await service.ListPublicationContributors(Guid.NewGuid());
+        result.AssertNotFound();
+    }
 
 
-        [Fact]
-        public async Task ListPublicationContributors_NoRelease()
+    [Fact]
+    public async Task ListPublicationContributors_NoRelease()
+    {
+        var publication = new Publication();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.ListPublicationContributors(publication.Id);
-                var viewModel = result.AssertRight();
-
-                Assert.Empty(viewModel);
-            }
+            await contentDbContext.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task ListPublicationContributors_NoUserReleaseRoles()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(release1);
-                await contentDbContext.SaveChangesAsync();
-            }
+            var result =
+                await service.ListPublicationContributors(publication.Id);
+            var viewModel = result.AssertRight();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.ListPublicationContributors(publication.Id);
-                var viewModel = result.AssertRight();
-
-                Assert.Empty(viewModel);
-            }
+            Assert.Empty(viewModel);
         }
+    }
 
-        [Fact]
-        public async Task UpdateReleaseContributors()
+    [Fact]
+    public async Task ListPublicationContributors_NoUserReleaseRoles()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1,
-                Role = Contributor,
-                Created = new DateTime(2000, 12, 25),
-                CreatedById = Guid.NewGuid(),
-            };
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
-            var user3 = new User();
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(release1);
-                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.UpdateReleaseContributors(release1.Id, ListOf(user1.Id, user3.Id));
-                result.AssertRight();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsAsyncEnumerable()
-                    .Where(urr =>
-                        urr.ReleaseVersionId == release1.Id
-                        && urr.Role == Contributor)
-                    .ToListAsync();
-
-                Assert.Equal(2, userReleaseRoles.Count);
-
-                Assert.Equal(user1ReleaseRole1.Id, userReleaseRoles[0].Id);
-                Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
-                Assert.Equal(user1ReleaseRole1.Created, userReleaseRoles[0].Created);
-                Assert.Equal(user1ReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
-
-                // userReleaseRole[1] is newly created, so cannot check Id
-                Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds,
-                    0, 1500);
-                Assert.Equal(UserId, userReleaseRoles[1].CreatedById);
-            }
-        }
-
-        [Fact]
-        public async Task UpdateReleaseContributors_RemoveAllContributorsFromRelease()
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
-
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.Add(release1);
-                contentDbContext.AddRange(user1ReleaseRole1, user2ReleaseRole1);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.UpdateReleaseContributors(release1.Id, new List<Guid>());
-                result.AssertRight();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsAsyncEnumerable()
-                    .Where(urr =>
-                        urr.ReleaseVersionId == release1.Id
-                        && urr.Role == Contributor)
-                    .ToListAsync();
-
-                Assert.Empty(userReleaseRoles);
-            }
+            await contentDbContext.AddAsync(release1);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task RemoveAllUserContributorPermissionForPublication()
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
         {
-            var publication = new Publication();
-            var release1 = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Original = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-            };
-            var release2Amendment = new ReleaseVersion
-            {
-                Publication = publication,
-                ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                PreviousVersion = release2Original,
-            };
-            var user1 = new User
-            {
-                FirstName = "User1",
-                LastName = "One",
-                Email = "user1@test.com",
-            };
-            var user1ReleaseRole1 = new UserReleaseRole
-            {
-                User = user1,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var service = SetupReleasePermissionService(contentDbContext);
 
-            var user2 = new User
-            {
-                FirstName = "User2",
-                LastName = "Two",
-                Email = "user2@test.com",
-            };
-            var user2ReleaseRole1 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release2Amendment,
-                Role = Contributor,
-            };
-            var user2ReleaseRole2 = new UserReleaseRole
-            {
-                User = user2,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
+            var result =
+                await service.ListPublicationContributors(publication.Id);
+            var viewModel = result.AssertRight();
 
-            var user3 = new User
-            {
-                FirstName = "User3",
-                LastName = "Three",
-                Email = "user3@test.com",
-            };
-            var user3ReleaseRole1 = new UserReleaseRole
-            {
-                User = user3,
-                ReleaseVersion = release2Amendment,
-                Role = Contributor,
-            };
-
-            var user1Release1Invite = new UserReleaseInvite
-            {
-                Email = user1.Email,
-                ReleaseVersion = release1,
-                Role = Contributor,
-            };
-            var user2Release2Invite = new UserReleaseInvite
-            {
-                Email = user2.Email,
-                ReleaseVersion = release2Original,
-                Role = Contributor,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
-                contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
-                    user3ReleaseRole1);
-                contentDbContext.UserReleaseInvites.AddRange(user1Release1Invite, user2Release2Invite);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupReleasePermissionService(contentDbContext);
-
-                var result =
-                    await service.RemoveAllUserContributorPermissionsForPublication(publication.Id, user2.Id);
-                result.AssertRight();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsAsyncEnumerable()
-                    .Where(urr => urr.Role == Contributor)
-                    .ToListAsync();
-
-                Assert.Equal(2, userReleaseRoles.Count);
-                Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
-                Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
-
-                var userReleaseInvites = await contentDbContext.UserReleaseInvites
-                    .ToAsyncEnumerable()
-                    .ToListAsync();
-
-                Assert.Single(userReleaseInvites); // user1's invite remains
-                Assert.Equal(user1Release1Invite.Id, userReleaseInvites[0].Id);
-            }
+            Assert.Empty(viewModel);
         }
+    }
 
-        private static ReleasePermissionService SetupReleasePermissionService(
-            ContentDbContext contentDbContext,
-            IUserService? userService = null)
+    [Fact]
+    public async Task UpdateReleaseContributors()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
         {
-            return new(
-                contentDbContext,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
-                new ReleaseVersionRepository(contentDbContext),
-                new UserReleaseRoleRepository(contentDbContext),
-                new UserReleaseInviteRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService(UserId).Object
-            );
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1,
+            Role = Contributor,
+            Created = new DateTime(2000, 12, 25),
+            CreatedById = Guid.NewGuid(),
+        };
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+        var user3 = new User();
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(release1);
+            contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1);
+            await contentDbContext.SaveChangesAsync();
         }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result =
+                await service.UpdateReleaseContributors(release1.Id, ListOf(user1.Id, user3.Id));
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                .AsAsyncEnumerable()
+                .Where(urr =>
+                    urr.ReleaseVersionId == release1.Id
+                    && urr.Role == Contributor)
+                .ToListAsync();
+
+            Assert.Equal(2, userReleaseRoles.Count);
+
+            Assert.Equal(user1ReleaseRole1.Id, userReleaseRoles[0].Id);
+            Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
+            Assert.Equal(user1ReleaseRole1.Created, userReleaseRoles[0].Created);
+            Assert.Equal(user1ReleaseRole1.CreatedById, userReleaseRoles[0].CreatedById);
+
+            // userReleaseRole[1] is newly created, so cannot check Id
+            Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
+            Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds,
+                0, 1500);
+            Assert.Equal(UserId, userReleaseRoles[1].CreatedById);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateReleaseContributors_RemoveAllContributorsFromRelease()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.Add(release1);
+            contentDbContext.AddRange(user1ReleaseRole1, user2ReleaseRole1);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result =
+                await service.UpdateReleaseContributors(release1.Id, new List<Guid>());
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                .AsAsyncEnumerable()
+                .Where(urr =>
+                    urr.ReleaseVersionId == release1.Id
+                    && urr.Role == Contributor)
+                .ToListAsync();
+
+            Assert.Empty(userReleaseRoles);
+        }
+    }
+
+    [Fact]
+    public async Task RemoveAllUserContributorPermissionForPublication()
+    {
+        var publication = new Publication();
+        var release1 = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2000",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Original = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+        };
+        var release2Amendment = new ReleaseVersion
+        {
+            Publication = publication,
+            ReleaseName = "2001",
+            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            PreviousVersion = release2Original,
+        };
+        var user1 = new User
+        {
+            FirstName = "User1",
+            LastName = "One",
+            Email = "user1@test.com",
+        };
+        var user1ReleaseRole1 = new UserReleaseRole
+        {
+            User = user1,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var user2 = new User
+        {
+            FirstName = "User2",
+            LastName = "Two",
+            Email = "user2@test.com",
+        };
+        var user2ReleaseRole1 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release2Amendment,
+            Role = Contributor,
+        };
+        var user2ReleaseRole2 = new UserReleaseRole
+        {
+            User = user2,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+
+        var user3 = new User
+        {
+            FirstName = "User3",
+            LastName = "Three",
+            Email = "user3@test.com",
+        };
+        var user3ReleaseRole1 = new UserReleaseRole
+        {
+            User = user3,
+            ReleaseVersion = release2Amendment,
+            Role = Contributor,
+        };
+
+        var user1Release1Invite = new UserReleaseInvite
+        {
+            Email = user1.Email,
+            ReleaseVersion = release1,
+            Role = Contributor,
+        };
+        var user2Release2Invite = new UserReleaseInvite
+        {
+            Email = user2.Email,
+            ReleaseVersion = release2Original,
+            Role = Contributor,
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            contentDbContext.ReleaseVersions.AddRange(release1, release2Original, release2Amendment);
+            contentDbContext.UserReleaseRoles.AddRange(user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
+                user3ReleaseRole1);
+            contentDbContext.UserReleaseInvites.AddRange(user1Release1Invite, user2Release2Invite);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result =
+                await service.RemoveAllUserContributorPermissionsForPublication(publication.Id, user2.Id);
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+        {
+            var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                .AsAsyncEnumerable()
+                .Where(urr => urr.Role == Contributor)
+                .ToListAsync();
+
+            Assert.Equal(2, userReleaseRoles.Count);
+            Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
+            Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
+
+            var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                .ToAsyncEnumerable()
+                .ToListAsync();
+
+            Assert.Single(userReleaseInvites); // user1's invite remains
+            Assert.Equal(user1Release1Invite.Id, userReleaseInvites[0].Id);
+        }
+    }
+
+    private static ReleasePermissionService SetupReleasePermissionService(
+        ContentDbContext contentDbContext,
+        IUserService? userService = null)
+    {
+        return new(
+            contentDbContext,
+            new PersistenceHelper<ContentDbContext>(contentDbContext),
+            new ReleaseVersionRepository(contentDbContext),
+            new UserReleaseRoleRepository(contentDbContext),
+            new UserReleaseInviteRepository(contentDbContext),
+            userService ?? MockUtils.AlwaysTrueUserService(UserId).Object
+        );
     }
 }

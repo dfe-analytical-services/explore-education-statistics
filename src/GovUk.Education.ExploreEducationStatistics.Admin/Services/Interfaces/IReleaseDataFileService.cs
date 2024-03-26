@@ -7,39 +7,38 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IReleaseDataFileService
 {
-    public interface IReleaseDataFileService
-    {
-        Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-            Guid fileId,
-            bool forceDelete = false);
+    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+        Guid fileId,
+        bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
-            IEnumerable<Guid> fileIds,
-            bool forceDelete = false);
+    Task<Either<ActionResult, Unit>> Delete(Guid releaseVersionId,
+        IEnumerable<Guid> fileIds,
+        bool forceDelete = false);
 
-        Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId,
-            bool forceDelete = false);
+    Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseVersionId,
+        bool forceDelete = false);
 
-        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
-            Guid fileId);
+    Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseVersionId,
+        Guid fileId);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
+    Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseVersionId);
 
-        Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
-            Guid releaseVersionId,
-            List<Guid> fileIds);
+    Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
+        Guid releaseVersionId,
+        List<Guid> fileIds);
 
-        Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
-            IFormFile dataFormFile,
-            IFormFile metaFormFile,
-            Guid? replacingFileId = null,
-            string? subjectName = null);
+    Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseVersionId,
+        IFormFile dataFormFile,
+        IFormFile metaFormFile,
+        Guid? replacingFileId = null,
+        string? subjectName = null);
 
-        Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
-            IFormFile zipFormFile,
-            Guid? replacingFileId = null,
-            string? subjectName = null);
-    }
+    Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseVersionId,
+        IFormFile zipFormFile,
+        Guid? replacingFileId = null,
+        string? subjectName = null);
 }

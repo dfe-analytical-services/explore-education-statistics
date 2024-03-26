@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+
+public interface IGuidGenerator
 {
-    public interface IGuidGenerator
-    {
-        Guid NewGuid();
-    }
+    Guid NewGuid();
 }

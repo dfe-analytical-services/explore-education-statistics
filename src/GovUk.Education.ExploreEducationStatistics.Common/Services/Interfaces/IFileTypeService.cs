@@ -5,16 +5,15 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+
+public interface IFileTypeService
 {
-    public interface IFileTypeService
-    {
-        Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes);
+    Task<bool> HasMatchingMimeType(IFormFile file, IEnumerable<Regex> mimeTypes);
 
-        bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
+    bool HasMatchingEncodingType(IFormFile file, IEnumerable<string> encodingTypes);
 
-        Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename);
-        
-        Task<bool> IsValidCsvFile(IFormFile file);
-    }
+    Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename);
+    
+    Task<bool> IsValidCsvFile(IFormFile file);
 }

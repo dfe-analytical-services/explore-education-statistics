@@ -8,48 +8,47 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
+
+public class MethodologyControllerTests
 {
-    public class MethodologyControllerTests
+    [Fact]
+    public async Task GetLatestMethodologyBySlug()
     {
-        [Fact]
-        public async Task GetLatestMethodologyBySlug()
-        {
-            var methodologyId = Guid.NewGuid();
+        var methodologyId = Guid.NewGuid();
 
-            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+        var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
-                .ReturnsAsync(new MethodologyVersionViewModel
-                {
-                    Id = methodologyId
-                });
+        methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
+            .ReturnsAsync(new MethodologyVersionViewModel
+            {
+                Id = methodologyId
+            });
 
-            var controller = new MethodologyController(methodologyService.Object);
+        var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.GetLatestMethodologyBySlug("test-slug");
-            var methodologyViewModel = result.Value;
+        var result = await controller.GetLatestMethodologyBySlug("test-slug");
+        var methodologyViewModel = result.Value;
 
-            Assert.Equal(methodologyId, methodologyViewModel.Id);
+        Assert.Equal(methodologyId, methodologyViewModel.Id);
 
-            MockUtils.VerifyAllMocks(methodologyService);
-        }
+        MockUtils.VerifyAllMocks(methodologyService);
+    }
 
-        [Fact]
-        public async Task GetLatestMethodologyBySlug_NotFound()
-        {
-            var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
+    [Fact]
+    public async Task GetLatestMethodologyBySlug_NotFound()
+    {
+        var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
-                .ReturnsAsync(new NotFoundResult());
+        methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
+            .ReturnsAsync(new NotFoundResult());
 
-            var controller = new MethodologyController(methodologyService.Object);
+        var controller = new MethodologyController(methodologyService.Object);
 
-            var result = await controller.GetLatestMethodologyBySlug("unknown-slug");
+        var result = await controller.GetLatestMethodologyBySlug("unknown-slug");
 
-            Assert.IsType<NotFoundResult>(result.Result);
+        Assert.IsType<NotFoundResult>(result.Result);
 
-            MockUtils.VerifyAllMocks(methodologyService);
-        }
+        MockUtils.VerifyAllMocks(methodologyService);
     }
 }

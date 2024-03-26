@@ -1,7 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
+
+public interface ICustomMigration
 {
-    public interface ICustomMigration
-    {
-        void Apply();
-    }
+    void Apply();
 }

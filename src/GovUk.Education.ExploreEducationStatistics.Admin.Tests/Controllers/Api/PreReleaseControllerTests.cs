@@ -7,34 +7,33 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
+
+public class PreReleaseControllerTests
 {
-    public class PreReleaseControllerTests
+    [Fact]
+    public async Task GetPreReleaseSummaryAsync_Returns_Ok()
     {
-        [Fact]
-        public async Task GetPreReleaseSummaryAsync_Returns_Ok()
-        {
-            var (preReleaseContactsService, preReleaseSummaryService) = Mocks();
+        var (preReleaseContactsService, preReleaseSummaryService) = Mocks();
 
-            var preReleaseSummaryViewModel = new PreReleaseSummaryViewModel();
-            var releaseVersionId = Guid.NewGuid();
+        var preReleaseSummaryViewModel = new PreReleaseSummaryViewModel();
+        var releaseVersionId = Guid.NewGuid();
 
-            preReleaseSummaryService
-                .Setup(s => s.GetPreReleaseSummaryViewModelAsync(It.Is<Guid>(id => id == releaseVersionId)))
-                .ReturnsAsync(preReleaseSummaryViewModel);
+        preReleaseSummaryService
+            .Setup(s => s.GetPreReleaseSummaryViewModelAsync(It.Is<Guid>(id => id == releaseVersionId)))
+            .ReturnsAsync(preReleaseSummaryViewModel);
 
-            var controller =
-                new PreReleaseController(preReleaseContactsService.Object, preReleaseSummaryService.Object);
+        var controller =
+            new PreReleaseController(preReleaseContactsService.Object, preReleaseSummaryService.Object);
 
-            var result = await controller.GetPreReleaseSummaryAsync(releaseVersionId);
-            result.AssertOkResult();
-        }
+        var result = await controller.GetPreReleaseSummaryAsync(releaseVersionId);
+        result.AssertOkResult();
+    }
 
-        private static (Mock<IPreReleaseUserService> PreReleaseContactsService,
-            Mock<IPreReleaseSummaryService> PreReleaseSummaryService) Mocks()
-        {
-            return (new Mock<IPreReleaseUserService>(),
-                new Mock<IPreReleaseSummaryService>());
-        }
+    private static (Mock<IPreReleaseUserService> PreReleaseContactsService,
+        Mock<IPreReleaseSummaryService> PreReleaseSummaryService) Mocks()
+    {
+        return (new Mock<IPreReleaseUserService>(),
+            new Mock<IPreReleaseSummaryService>());
     }
 }

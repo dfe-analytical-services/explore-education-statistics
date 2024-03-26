@@ -11,75 +11,74 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
+
+public class GlossaryControllerTests
 {
-    public class GlossaryControllerTests
+    [Fact]
+    public async Task GetGlossary()
     {
-        [Fact]
-        public async Task GetGlossary()
+        var glossaryEntries = new List<GlossaryCategoryViewModel>
         {
-            var glossaryEntries = new List<GlossaryCategoryViewModel>
-            {
-                new(
-                    Heading: 'A',
-                    Entries: new List<GlossaryEntryViewModel>
-                    {
-                        new(
-                            Body: "A body",
-                            Slug: "A slug",
-                            Title: "A title")
-                    })
-            };
+            new(
+                Heading: 'A',
+                Entries: new List<GlossaryEntryViewModel>
+                {
+                    new(
+                        Body: "A body",
+                        Slug: "A slug",
+                        Title: "A title")
+                })
+        };
 
-            var (controller, mocks) = BuildControllerAndDependencies();
+        var (controller, mocks) = BuildControllerAndDependencies();
 
-            mocks.glossaryCacheService
-                .Setup(s => s.GetGlossary())
-                .ReturnsAsync(glossaryEntries);
+        mocks.glossaryCacheService
+            .Setup(s => s.GetGlossary())
+            .ReturnsAsync(glossaryEntries);
 
-            var result = await controller.GetGlossary();
-            VerifyAllMocks(mocks);
+        var result = await controller.GetGlossary();
+        VerifyAllMocks(mocks);
 
-            Assert.Equal(glossaryEntries, result);
-        }
+        Assert.Equal(glossaryEntries, result);
+    }
 
-        [Fact]
-        public async Task GetGlossaryEntry()
-        {
-            var glossaryEntry = new GlossaryEntryViewModel(
-                Body: "A body",
-                Slug: "A slug",
-                Title: "A title"
-            );
+    [Fact]
+    public async Task GetGlossaryEntry()
+    {
+        var glossaryEntry = new GlossaryEntryViewModel(
+            Body: "A body",
+            Slug: "A slug",
+            Title: "A title"
+        );
 
-            var (controller, mocks) =
-                BuildControllerAndDependencies();
+        var (controller, mocks) =
+            BuildControllerAndDependencies();
 
-            mocks.glossaryService
-                .Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
-                .ReturnsAsync(glossaryEntry);
+        mocks.glossaryService
+            .Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
+            .ReturnsAsync(glossaryEntry);
 
-            var result = await controller.GetGlossaryEntry(glossaryEntry.Slug);
-            VerifyAllMocks(mocks);
+        var result = await controller.GetGlossaryEntry(glossaryEntry.Slug);
+        VerifyAllMocks(mocks);
 
-            result.AssertOkResult(glossaryEntry);
-        }
+        result.AssertOkResult(glossaryEntry);
+    }
 
-        private static (
-            GlossaryController controller,
-            (
-            Mock<IGlossaryCacheService> glossaryCacheService,
-            Mock<IGlossaryService> glossaryService) mocks
-            )
-            BuildControllerAndDependencies()
-        {
-            var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
-            var glossaryService = new Mock<IGlossaryService>(Strict);
+    private static (
+        GlossaryController controller,
+        (
+        Mock<IGlossaryCacheService> glossaryCacheService,
+        Mock<IGlossaryService> glossaryService) mocks
+        )
+        BuildControllerAndDependencies()
+    {
+        var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
+        var glossaryService = new Mock<IGlossaryService>(Strict);
 
-            var controller = new GlossaryController(
-                glossaryCacheService.Object,
-                glossaryService.Object);
-            return (controller, (glossaryCacheService, glossaryService));
-        }
+        var controller = new GlossaryController(
+            glossaryCacheService.Object,
+            glossaryService.Object);
+        return (controller, (glossaryCacheService, glossaryService));
     }
 }

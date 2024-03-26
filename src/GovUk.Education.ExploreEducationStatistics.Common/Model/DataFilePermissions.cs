@@ -1,7 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public class DataFilePermissions
 {
-    public class DataFilePermissions
-    {
-        public bool CanCancelImport { get; set; }
-    }
+    public bool CanCancelImport { get; set; }
 }

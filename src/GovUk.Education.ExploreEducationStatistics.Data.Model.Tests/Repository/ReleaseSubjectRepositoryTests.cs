@@ -13,359 +13,358 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository;
+
+public class ReleaseSubjectRepositoryTests
 {
-    public class ReleaseSubjectRepositoryTests
+    private readonly DataFixture _fixture = new();
+
+    [Fact]
+    public async Task DeleteReleaseSubject()
     {
-        private readonly DataFixture _fixture = new();
+        var subject = _fixture.DefaultSubject().Generate();
 
-        [Fact]
-        public async Task DeleteReleaseSubject()
+        var releaseSubject = new ReleaseSubject
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject
+        };
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-                Subject = subject
-            };
+        var contextId = Guid.NewGuid().ToString();
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
-                .Returns(Task.CompletedTask);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object);
-
-                await service.DeleteReleaseSubject(releaseVersionId: releaseSubject.ReleaseVersionId,
-                    subjectId: releaseSubject.SubjectId);
-
-                MockUtils.VerifyAllMocks(footnoteRepository);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-
-                var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
-                Assert.Single(subjects);
-                Assert.Equal(subject.Id, subjects[0].Id);
-                Assert.True(subjects[0].SoftDeleted);
-            }
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task DeleteReleaseSubject_NonOrphanedSubject()
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
+                releaseSubject.ReleaseVersionId, releaseSubject.SubjectId))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object);
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-                Subject = subject
-            };
+            await service.DeleteReleaseSubject(releaseVersionId: releaseSubject.ReleaseVersionId,
+                subjectId: releaseSubject.SubjectId);
 
-            var releaseSubject2 = new ReleaseSubject
-            {
-                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-                Subject = subject
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject2.ReleaseVersionId, releaseSubject2.SubjectId))
-                .Returns(Task.CompletedTask);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object);
-
-                await service.DeleteReleaseSubject(releaseVersionId: releaseSubject2.ReleaseVersionId,
-                    subjectId: releaseSubject2.SubjectId);
-
-                MockUtils.VerifyAllMocks(footnoteRepository);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
-                Assert.Single(releaseSubjects);
-                Assert.Equal(releaseSubject1.ReleaseVersionId, releaseSubjects[0].ReleaseVersionId);
-                Assert.Equal(subject.Id, releaseSubjects[0].SubjectId);
-
-                var subjects = statisticsDbContext.Subject.ToList();
-                Assert.Single(subjects);
-                Assert.Equal(subject.Id, subjects[0].Id);
-            }
+            MockUtils.VerifyAllMocks(footnoteRepository);
         }
 
-        [Fact]
-        public async Task DeleteReleaseSubject_SoftDeleteFalse()
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var subject = _fixture.DefaultSubject();
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-                Subject = subject
-            };
+            var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
+            Assert.Single(subjects);
+            Assert.Equal(subject.Id, subjects[0].Id);
+            Assert.True(subjects[0].SoftDeleted);
+        }
+    }
 
-            var contextId = Guid.NewGuid().ToString();
+    [Fact]
+    public async Task DeleteReleaseSubject_NonOrphanedSubject()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
+        var releaseSubject1 = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject
+        };
 
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+        var releaseSubject2 = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject
+        };
 
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    releaseSubject.ReleaseVersionId,
-                    releaseSubject.SubjectId))
-                .Returns(Task.CompletedTask);
+        var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
-
-                subjectDeleter
-                    .Setup(
-                        s =>
-                            s.Delete(
-                                releaseSubject.SubjectId,
-                                It.IsAny<StatisticsDbContext>()
-                            )
-                    );
-
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object,
-                    subjectDeleter: subjectDeleter.Object);
-
-                await service.DeleteReleaseSubject(
-                    releaseVersionId: releaseSubject.ReleaseVersionId,
-                    subjectId: releaseSubject.SubjectId,
-                    softDeleteOrphanedSubject: false);
-
-                MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-            }
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task DeleteReleaseSubject_NotFound()
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
+                releaseSubject2.ReleaseVersionId, releaseSubject2.SubjectId))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var subject = _fixture.DefaultSubject().Generate();
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object);
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
-                Subject = subject
-            };
+            await service.DeleteReleaseSubject(releaseVersionId: releaseSubject2.ReleaseVersionId,
+                subjectId: releaseSubject2.SubjectId);
 
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
-                    It.IsAny<Guid>(), It.IsAny<Guid>()))
-                .Returns(Task.CompletedTask);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object);
-
-                // Try to delete non-existing ReleaseSubject
-                await service.DeleteReleaseSubject(releaseVersionId: Guid.NewGuid(),
-                    subjectId: Guid.NewGuid());
-
-                MockUtils.VerifyAllMocks(footnoteRepository);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                // Check that other ReleaseSubject has not been deleted
-                var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
-                Assert.Single(releaseSubjects);
-                Assert.Equal(subject.Id, releaseSubjects[0].SubjectId);
-
-                var subjects = statisticsDbContext.Subject.ToList();
-                Assert.Single(subjects);
-                Assert.Equal(subject.Id, subjects[0].Id);
-            }
+            MockUtils.VerifyAllMocks(footnoteRepository);
         }
 
-        [Fact]
-        public async Task DeleteAllReleaseSubjects()
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+            var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
+            Assert.Single(releaseSubjects);
+            Assert.Equal(releaseSubject1.ReleaseVersionId, releaseSubjects[0].ReleaseVersionId);
+            Assert.Equal(subject.Id, releaseSubjects[0].SubjectId);
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                ReleaseVersion = releaseVersion,
-                Subject = _fixture.DefaultSubject()
-            };
+            var subjects = statisticsDbContext.Subject.ToList();
+            Assert.Single(subjects);
+            Assert.Equal(subject.Id, subjects[0].Id);
+        }
+    }
 
-            var releaseSubject2 = new ReleaseSubject
-            {
-                ReleaseVersion = releaseVersion,
-                Subject = _fixture.DefaultSubject()
-            };
+    [Fact]
+    public async Task DeleteReleaseSubject_SoftDeleteFalse()
+    {
+        var subject = _fixture.DefaultSubject();
 
-            var contextId = Guid.NewGuid().ToString();
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject
+        };
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-                statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
+        var contextId = Guid.NewGuid().ToString();
 
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
-                    It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
-                .Returns(Task.CompletedTask);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object);
-
-                await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id);
-
-                MockUtils.VerifyAllMocks(footnoteRepository);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-
-                var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
-                Assert.Equal(2, subjects.Count);
-                Assert.Equal(releaseSubject1.SubjectId, subjects[0].Id);
-                Assert.True(subjects[0].SoftDeleted);
-
-                Assert.Equal(releaseSubject2.SubjectId, subjects[1].Id);
-                Assert.True(subjects[1].SoftDeleted);
-            }
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task DeleteAllReleaseSubjects_SoftDeleteFalse()
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
+                releaseSubject.ReleaseVersionId,
+                releaseSubject.SubjectId))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+            var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                ReleaseVersion = releaseVersion,
-                Subject = _fixture.DefaultSubject()
-            };
-
-            var releaseSubject2 = new ReleaseSubject
-            {
-                ReleaseVersion = releaseVersion,
-                Subject = _fixture.DefaultSubject()
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
-                statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-
-            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
-                    It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
-                .Returns(Task.CompletedTask);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
-
-                subjectDeleter
-                    .Setup(
-                        s =>
-                            s.Delete(
-                                releaseSubject1.SubjectId,
-                                It.IsAny<StatisticsDbContext>()
-                            )
-                    );
-                subjectDeleter
-                    .Setup(
-                        s => s.Delete(
-                            releaseSubject2.SubjectId,
+            subjectDeleter
+                .Setup(
+                    s =>
+                        s.Delete(
+                            releaseSubject.SubjectId,
                             It.IsAny<StatisticsDbContext>()
                         )
-                    );
+                );
 
-                var service = BuildReleaseSubjectRepository(statisticsDbContext,
-                    footnoteRepository: footnoteRepository.Object,
-                    subjectDeleter: subjectDeleter.Object);
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                subjectDeleter: subjectDeleter.Object);
 
-                await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id,
-                    softDeleteOrphanedSubjects: false);
+            await service.DeleteReleaseSubject(
+                releaseVersionId: releaseSubject.ReleaseVersionId,
+                subjectId: releaseSubject.SubjectId,
+                softDeleteOrphanedSubject: false);
 
-                MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
-            }
+            MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
         }
 
-        private static ReleaseSubjectRepository BuildReleaseSubjectRepository(
-            StatisticsDbContext statisticsDbContext,
-            IFootnoteRepository? footnoteRepository = null,
-            ReleaseSubjectRepository.SubjectDeleter? subjectDeleter = null)
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            return new ReleaseSubjectRepository(
-                statisticsDbContext,
-                footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-                subjectDeleter ?? Mock.Of<ReleaseSubjectRepository.SubjectDeleter>(MockBehavior.Strict)
-            );
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
         }
+    }
+
+    [Fact]
+    public async Task DeleteReleaseSubject_NotFound()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersion = _fixture.DefaultStatsReleaseVersion(),
+            Subject = subject
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await statisticsDbContext.Subject.AddRangeAsync(subject);
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
+                It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object);
+
+            // Try to delete non-existing ReleaseSubject
+            await service.DeleteReleaseSubject(releaseVersionId: Guid.NewGuid(),
+                subjectId: Guid.NewGuid());
+
+            MockUtils.VerifyAllMocks(footnoteRepository);
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            // Check that other ReleaseSubject has not been deleted
+            var releaseSubjects = statisticsDbContext.ReleaseSubject.ToList();
+            Assert.Single(releaseSubjects);
+            Assert.Equal(subject.Id, releaseSubjects[0].SubjectId);
+
+            var subjects = statisticsDbContext.Subject.ToList();
+            Assert.Single(subjects);
+            Assert.Equal(subject.Id, subjects[0].Id);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAllReleaseSubjects()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubject1 = new ReleaseSubject
+        {
+            ReleaseVersion = releaseVersion,
+            Subject = _fixture.DefaultSubject()
+        };
+
+        var releaseSubject2 = new ReleaseSubject
+        {
+            ReleaseVersion = releaseVersion,
+            Subject = _fixture.DefaultSubject()
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
+                It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object);
+
+            await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id);
+
+            MockUtils.VerifyAllMocks(footnoteRepository);
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+
+            var subjects = statisticsDbContext.Subject.IgnoreQueryFilters().ToList();
+            Assert.Equal(2, subjects.Count);
+            Assert.Equal(releaseSubject1.SubjectId, subjects[0].Id);
+            Assert.True(subjects[0].SoftDeleted);
+
+            Assert.Equal(releaseSubject2.SubjectId, subjects[1].Id);
+            Assert.True(subjects[1].SoftDeleted);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteAllReleaseSubjects_SoftDeleteFalse()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubject1 = new ReleaseSubject
+        {
+            ReleaseVersion = releaseVersion,
+            Subject = _fixture.DefaultSubject()
+        };
+
+        var releaseSubject2 = new ReleaseSubject
+        {
+            ReleaseVersion = releaseVersion,
+            Subject = _fixture.DefaultSubject()
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            statisticsDbContext.ReleaseVersion.AddRange(releaseVersion);
+            statisticsDbContext.ReleaseSubject.AddRange(releaseSubject1, releaseSubject2);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
+
+        footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(releaseVersion.Id,
+                It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
+            .Returns(Task.CompletedTask);
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var subjectDeleter = new Mock<ReleaseSubjectRepository.SubjectDeleter>();
+
+            subjectDeleter
+                .Setup(
+                    s =>
+                        s.Delete(
+                            releaseSubject1.SubjectId,
+                            It.IsAny<StatisticsDbContext>()
+                        )
+                );
+            subjectDeleter
+                .Setup(
+                    s => s.Delete(
+                        releaseSubject2.SubjectId,
+                        It.IsAny<StatisticsDbContext>()
+                    )
+                );
+
+            var service = BuildReleaseSubjectRepository(statisticsDbContext,
+                footnoteRepository: footnoteRepository.Object,
+                subjectDeleter: subjectDeleter.Object);
+
+            await service.DeleteAllReleaseSubjects(releaseVersionId: releaseVersion.Id,
+                softDeleteOrphanedSubjects: false);
+
+            MockUtils.VerifyAllMocks(footnoteRepository, subjectDeleter);
+        }
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            Assert.Empty(statisticsDbContext.ReleaseSubject.ToList());
+        }
+    }
+
+    private static ReleaseSubjectRepository BuildReleaseSubjectRepository(
+        StatisticsDbContext statisticsDbContext,
+        IFootnoteRepository? footnoteRepository = null,
+        ReleaseSubjectRepository.SubjectDeleter? subjectDeleter = null)
+    {
+        return new ReleaseSubjectRepository(
+            statisticsDbContext,
+            footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
+            subjectDeleter ?? Mock.Of<ReleaseSubjectRepository.SubjectDeleter>(MockBehavior.Strict)
+        );
     }
 }

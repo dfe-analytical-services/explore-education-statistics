@@ -1,11 +1,10 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
-{
-    public class ErrorViewModel
-    {
-        public string RequestId { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Models;
 
-        public bool ShowRequestId => !RequestId.IsNullOrEmpty();
-    }
+public class ErrorViewModel
+{
+    public string RequestId { get; set; }
+
+    public bool ShowRequestId => !RequestId.IsNullOrEmpty();
 }

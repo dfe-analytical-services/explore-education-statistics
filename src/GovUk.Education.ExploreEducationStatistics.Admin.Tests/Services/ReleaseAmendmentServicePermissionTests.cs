@@ -14,44 +14,43 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityP
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseAmendmentServicePermissionTests
 {
-    public class ReleaseAmendmentServicePermissionTests
+    private readonly ReleaseVersion _releaseVersion = new()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = Guid.NewGuid(),
-            Publication = new Publication(),
-            Release = new Release()
-        };
+        Id = Guid.NewGuid(),
+        Publication = new Publication(),
+        Release = new Release()
+    };
 
-        [Fact]
-        public async Task CreateReleaseAmendment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanMakeAmendmentOfSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contentDbContext = InMemoryApplicationDbContext();
-                        contentDbContext.ReleaseVersions.Add(_releaseVersion);
-                        contentDbContext.SaveChanges();
+    [Fact]
+    public async Task CreateReleaseAmendment()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanMakeAmendmentOfSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    using var contentDbContext = InMemoryApplicationDbContext();
+                    contentDbContext.ReleaseVersions.Add(_releaseVersion);
+                    contentDbContext.SaveChanges();
 
-                        var service = BuildService(userService.Object, contentDbContext);
-                        return service.CreateReleaseAmendment(_releaseVersion.Id);
-                    }
-                );
-        }
+                    var service = BuildService(userService.Object, contentDbContext);
+                    return service.CreateReleaseAmendment(_releaseVersion.Id);
+                }
+            );
+    }
 
-        private ReleaseAmendmentService BuildService(
-            IUserService userService,
-            ContentDbContext? context = null)
-        {
-            return new ReleaseAmendmentService(
-                context ?? Mock.Of<ContentDbContext>(),
-                userService,
-                Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
-                Mock.Of<StatisticsDbContext>(MockBehavior.Strict));
-        }
+    private ReleaseAmendmentService BuildService(
+        IUserService userService,
+        ContentDbContext? context = null)
+    {
+        return new ReleaseAmendmentService(
+            context ?? Mock.Of<ContentDbContext>(),
+            userService,
+            Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
+            Mock.Of<StatisticsDbContext>(MockBehavior.Strict));
     }
 }

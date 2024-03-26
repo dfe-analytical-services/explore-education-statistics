@@ -5,12 +5,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+
+public interface IManageContentPageService
 {
-    public interface IManageContentPageService
-    {
-        Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
-            Guid releaseVersionId,
-            bool isPrerelease = false);
-    }
+    Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
+        Guid releaseVersionId,
+        bool isPrerelease = false);
 }

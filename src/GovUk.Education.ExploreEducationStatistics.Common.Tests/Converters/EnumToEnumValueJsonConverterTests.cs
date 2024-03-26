@@ -3,62 +3,61 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters;
+
+public class EnumToEnumValueJsonConverterTests
 {
-    public class EnumToEnumValueJsonConverterTests
+    private enum SampleEnum
     {
-        private enum SampleEnum
+        [EnumLabelValue("SampleLabel", "SampleValue")]
+        Sample
+    }
+
+    private class SampleClass
+    {
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
+        public SampleEnum SampleField { get; set; }
+
+        protected bool Equals(SampleClass other)
         {
-            [EnumLabelValue("SampleLabel", "SampleValue")]
-            Sample
+            return SampleField == other.SampleField;
         }
 
-        private class SampleClass
+        public override bool Equals(object obj)
         {
-            [JsonConverter(typeof(EnumToEnumValueJsonConverter<SampleEnum>))]
-            public SampleEnum SampleField { get; set; }
-
-            protected bool Equals(SampleClass other)
-            {
-                return SampleField == other.SampleField;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((SampleClass) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                return (int) SampleField;
-            }
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((SampleClass) obj);
         }
 
-        [Fact]
-        public void SerializeObject()
+        public override int GetHashCode()
         {
-            var objectToSerialize = new SampleClass
-            {
-                SampleField = SampleEnum.Sample
-            };
-
-            Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
+            return (int) SampleField;
         }
+    }
 
-        [Fact]
-        public void DeserializeObject()
+    [Fact]
+    public void SerializeObject()
+    {
+        var objectToSerialize = new SampleClass
         {
-            const string jsonText = "{\"SampleField\":\"SampleValue\"}";
+            SampleField = SampleEnum.Sample
+        };
 
-            var expected = new SampleClass
-            {
-                SampleField = SampleEnum.Sample
-            };
+        Assert.Equal("{\"SampleField\":\"SampleValue\"}", JsonConvert.SerializeObject(objectToSerialize));
+    }
 
-            Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
-        }
+    [Fact]
+    public void DeserializeObject()
+    {
+        const string jsonText = "{\"SampleField\":\"SampleValue\"}";
+
+        var expected = new SampleClass
+        {
+            SampleField = SampleEnum.Sample
+        };
+
+        Assert.Equal(expected, JsonConvert.DeserializeObject<SampleClass>(jsonText));
     }
 }

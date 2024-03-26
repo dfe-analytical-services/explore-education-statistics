@@ -5,38 +5,37 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
+
+public partial class EES3988KeyStatisticCleanUp : Migration
 {
-    public partial class EES3988KeyStatisticCleanUp : Migration
+    private const string MigrationId = "20230224161839";
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        private const string MigrationId = "20230224161839";
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "ContentBlockIdTemp",
-                table: "KeyStatistics");
+        migrationBuilder.DropColumn(
+            name: "ContentBlockIdTemp",
+            table: "KeyStatistics");
 
-            migrationBuilder.DropColumn(
-                name: "DataBlock_Summary",
-                table: "ContentBlock");
+        migrationBuilder.DropColumn(
+            name: "DataBlock_Summary",
+            table: "ContentBlock");
 
-            migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_CleanUpKeyStatData.sql");
-        }
+        migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_CleanUpKeyStatData.sql");
+    }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<Guid>(
-                name: "ContentBlockIdTemp",
-                table: "KeyStatistics",
-                type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AddColumn<Guid>(
+            name: "ContentBlockIdTemp",
+            table: "KeyStatistics",
+            type: "uniqueidentifier",
+            nullable: false,
+            defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
-            migrationBuilder.AddColumn<string>(
-                name: "DataBlock_Summary",
-                table: "ContentBlock",
-                type: "nvarchar(max)",
-                nullable: true);
-        }
+        migrationBuilder.AddColumn<string>(
+            name: "DataBlock_Summary",
+            table: "ContentBlock",
+            type: "nvarchar(max)",
+            nullable: true);
     }
 }

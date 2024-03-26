@@ -5,21 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
-{
-    public static class PermissionTestUtils
-    {
-        public static PolicyCheckBuilder<T> PolicyCheckBuilder<T>(Mock<IUserService> userService = null)
-            where T : Enum
-        {
-            return new PolicyCheckBuilder<T>(userService);
-        }
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 
-        public static void AssertForbidden<T>(Either<ActionResult,T> result)
-        {
-            Assert.NotNull(result);
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<ForbidResult>(result.Left);
-        }
+public static class PermissionTestUtils
+{
+    public static PolicyCheckBuilder<T> PolicyCheckBuilder<T>(Mock<IUserService> userService = null)
+        where T : Enum
+    {
+        return new PolicyCheckBuilder<T>(userService);
+    }
+
+    public static void AssertForbidden<T>(Either<ActionResult,T> result)
+    {
+        Assert.NotNull(result);
+        Assert.True(result.IsLeft);
+        Assert.IsAssignableFrom<ForbidResult>(result.Left);
     }
 }

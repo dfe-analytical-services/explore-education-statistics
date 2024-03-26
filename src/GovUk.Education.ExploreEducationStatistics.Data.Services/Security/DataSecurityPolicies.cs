@@ -1,7 +1,6 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security
+﻿namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
+
+public enum DataSecurityPolicies
 {
-    public enum DataSecurityPolicies
-    {
-        CanViewSubjectData
-    }
+    CanViewSubjectData
 }

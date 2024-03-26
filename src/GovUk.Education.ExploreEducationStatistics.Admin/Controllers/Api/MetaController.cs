@@ -5,24 +5,23 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+
+[Route("api/meta")]
+[ApiController]
+[Authorize]
+public class MetaController : ControllerBase
 {
-    [Route("api/meta")]
-    [ApiController]
-    [Authorize]
-    public class MetaController : ControllerBase
+    private readonly IMetaService _metaService;
+
+    public MetaController(IMetaService metaService)
     {
-        private readonly IMetaService _metaService;
+        _metaService = metaService;
+    }
 
-        public MetaController(IMetaService metaService)
-        {
-            _metaService = metaService;
-        }
-
-        [HttpGet("timeidentifiers")]
-        public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
-        {
-            return _metaService.GetTimeIdentifiersByCategory();
-        }
+    [HttpGet("timeidentifiers")]
+    public ActionResult<List<TimeIdentifierCategoryModel>> GetTimeIdentifiersByCategory()
+    {
+        return _metaService.GetTimeIdentifiersByCategory();
     }
 }

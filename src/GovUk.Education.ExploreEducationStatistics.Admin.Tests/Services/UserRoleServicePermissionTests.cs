@@ -22,249 +22,248 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class UserRoleServicePermissionTests
 {
-    public class UserRoleServicePermissionTests
+    private readonly Publication _publication = new()
     {
-        private readonly Publication _publication = new()
+        Id = Guid.NewGuid(),
+    };
+
+    [Fact]
+    public async Task SetGlobalRole()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.SetGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            });
+    }
+
+    [Fact]
+    public async Task AddPublicationRole()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.AddPublicationRole(Guid.NewGuid(), Guid.NewGuid(), Owner);
+            });
+    }
+
+    [Fact]
+    public async Task AddReleaseRole()
+    {
+        var userId = Guid.NewGuid();
+        var releaseVersion = new ReleaseVersion();
+        var publication = new Publication
         {
             Id = Guid.NewGuid(),
+            ReleaseVersions = new List<ReleaseVersion>
+            {
+                releaseVersion,
+            }
         };
 
-        [Fact]
-        public async Task SetGlobalRole()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.SetGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
-                });
-        }
-
-        [Fact]
-        public async Task AddPublicationRole()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.AddPublicationRole(Guid.NewGuid(), Guid.NewGuid(), Owner);
-                });
-        }
-
-        [Fact]
-        public async Task AddReleaseRole()
-        {
-            var userId = Guid.NewGuid();
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                CanUpdateSpecificReleaseRole)
+            .AssertForbidden(async userService =>
             {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = new List<ReleaseVersion>
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    releaseVersion,
-                }
-            };
-
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
-                    CanUpdateSpecificReleaseRole)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddRangeAsync(publication);
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var service = SetupUserRoleService(contentDbContext: contentDbContext,
-                            userService: userService.Object);
-                        return await service.AddReleaseRole(userId: userId,
-                            releaseVersionId: releaseVersion.Id,
-                            Contributor);
-                    }
-                });
-        }
-
-        [Fact]
-        public async Task GetAllGlobalRoles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetAllGlobalRoles();
-                });
-        }
-
-        [Fact]
-        public async Task GetAllResourceRoles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetAllResourceRoles();
-                });
-        }
-
-        [Fact]
-        public async Task GetGlobalRoles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetGlobalRoles(Guid.NewGuid().ToString());
-                });
-        }
-
-        [Fact]
-        public async Task GetPublicationRolesForUser()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetPublicationRolesForUser(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
-        public async Task GetPublicationRolesForPublication()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
-                .AssertForbidden(async userService =>
-                {
-                    await using var contentDbContext = InMemoryApplicationDbContext();
-                    await contentDbContext.AddAsync(_publication);
+                    await contentDbContext.AddRangeAsync(publication);
                     await contentDbContext.SaveChangesAsync();
-
-                    var service = SetupUserRoleService(
-                        contentDbContext: contentDbContext,
-                        userService: userService.Object);
-
-                    return await service.GetPublicationRolesForPublication(_publication.Id);
-                });
-        }
-
-        [Fact]
-        public async Task GetReleaseRoles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetReleaseRoles(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
-        public async Task RemoveUserPublicationRole()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.RemoveUserPublicationRole(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
-        public async Task RemoveUserReleaseRole()
-        {
-            var releaseVersion = new ReleaseVersion();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                ReleaseVersions = new List<ReleaseVersion>
-                {
-                    releaseVersion,
                 }
-            };
-            var userReleaseRole = new UserReleaseRole
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupUserRoleService(contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                    return await service.AddReleaseRole(userId: userId,
+                        releaseVersionId: releaseVersion.Id,
+                        Contributor);
+                }
+            });
+    }
+
+    [Fact]
+    public async Task GetAllGlobalRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
             {
-                ReleaseVersion = releaseVersion,
-                Role = Contributor,
-                User = new User(),
-            };
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.GetAllGlobalRoles();
+            });
+    }
 
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
-                    CanUpdateSpecificReleaseRole)
-                .AssertForbidden(async userService =>
-                {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        await contentDbContext.AddRangeAsync(publication, userReleaseRole);
-                        await contentDbContext.SaveChangesAsync();
-                    }
+    [Fact]
+    public async Task GetAllResourceRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.GetAllResourceRoles();
+            });
+    }
 
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var service = SetupUserRoleService(contentDbContext: contentDbContext,
-                            userService: userService.Object);
-                        return await service.RemoveUserReleaseRole(userReleaseRole.Id);
-                    }
-                });
-        }
+    [Fact]
+    public async Task GetGlobalRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.GetGlobalRoles(Guid.NewGuid().ToString());
+            });
+    }
 
-        [Fact]
-        public async Task RemoveAllUserResourceRoles()
+    [Fact]
+    public async Task GetPublicationRolesForUser()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.GetPublicationRolesForUser(Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task GetPublicationRolesForPublication()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
+            .AssertForbidden(async userService =>
+            {
+                await using var contentDbContext = InMemoryApplicationDbContext();
+                await contentDbContext.AddAsync(_publication);
+                await contentDbContext.SaveChangesAsync();
+
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    userService: userService.Object);
+
+                return await service.GetPublicationRolesForPublication(_publication.Id);
+            });
+    }
+
+    [Fact]
+    public async Task GetReleaseRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.GetReleaseRoles(Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task RemoveUserPublicationRole()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.RemoveUserPublicationRole(Guid.NewGuid());
+            });
+    }
+
+    [Fact]
+    public async Task RemoveUserReleaseRole()
+    {
+        var releaseVersion = new ReleaseVersion();
+        var publication = new Publication
         {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.RemoveAllUserResourceRoles(Guid.NewGuid());
-                });
-        }
-
-        private static UserRoleService SetupUserRoleService(
-            ContentDbContext? contentDbContext = null,
-            UsersAndRolesDbContext? usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService? emailTemplateService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
-            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            UserManager<ApplicationUser>? userManager = null,
-            IUserService? userService = null)
+            Id = Guid.NewGuid(),
+            ReleaseVersions = new List<ReleaseVersion>
+            {
+                releaseVersion,
+            }
+        };
+        var userReleaseRole = new UserReleaseRole
         {
-            contentDbContext ??= InMemoryApplicationDbContext();
-            usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+            ReleaseVersion = releaseVersion,
+            Role = Contributor,
+            User = new User(),
+        };
 
-            return new UserRoleService(
-                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
-                contentDbContext,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
-                emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
-                userService ?? Mock.Of<IUserService>(),
-                releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
-                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
-                userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
-                userManager ?? MockUserManager().Object);
-        }
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                CanUpdateSpecificReleaseRole)
+            .AssertForbidden(async userService =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await contentDbContext.AddRangeAsync(publication, userReleaseRole);
+                    await contentDbContext.SaveChangesAsync();
+                }
+
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupUserRoleService(contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                    return await service.RemoveUserReleaseRole(userReleaseRole.Id);
+                }
+            });
+    }
+
+    [Fact]
+    public async Task RemoveAllUserResourceRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserRoleService(userService: userService.Object);
+                return await service.RemoveAllUserResourceRoles(Guid.NewGuid());
+            });
+    }
+
+    private static UserRoleService SetupUserRoleService(
+        ContentDbContext? contentDbContext = null,
+        UsersAndRolesDbContext? usersAndRolesDbContext = null,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+        IEmailTemplateService? emailTemplateService = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+        IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+        UserManager<ApplicationUser>? userManager = null,
+        IUserService? userService = null)
+    {
+        contentDbContext ??= InMemoryApplicationDbContext();
+        usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+
+        return new UserRoleService(
+            usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
+            contentDbContext,
+            contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
+            emailTemplateService ?? Mock.Of<IEmailTemplateService>(),
+            userService ?? Mock.Of<IUserService>(),
+            releaseVersionRepository ?? Mock.Of<IReleaseVersionRepository>(),
+            userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(),
+            userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(),
+            userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(),
+            userManager ?? MockUserManager().Object);
     }
 }

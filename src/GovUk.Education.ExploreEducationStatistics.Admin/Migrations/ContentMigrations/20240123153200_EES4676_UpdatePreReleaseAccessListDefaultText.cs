@@ -4,22 +4,21 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Migrati
 
 #nullable disable
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations;
+
+public partial class EES4676_UpdatePreReleaseAccessListDefaultText : Migration
 {
-    public partial class EES4676_UpdatePreReleaseAccessListDefaultText : Migration
+    private const string MigrationId = "20240123153200";
+
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        private const string MigrationId = "20240123153200";
+        migrationBuilder.SqlFromFile(
+            ContentMigrationsPath,
+            $"{MigrationId}_{nameof(EES4676_UpdatePreReleaseAccessListDefaultText)}.sql");
+    }
 
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.SqlFromFile(
-                ContentMigrationsPath,
-                $"{MigrationId}_{nameof(EES4676_UpdatePreReleaseAccessListDefaultText)}.sql");
-        }
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-
-        }
     }
 }

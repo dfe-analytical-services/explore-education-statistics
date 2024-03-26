@@ -669,7 +669,7 @@ public class SeedDataCommand : ICommand
         private List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
         {
             return allowedColumns
-                .Where(col => CsvColumnsToGeographicLevel.ContainsKey(col))
+                .Where(CsvColumnsToGeographicLevel.ContainsKey)
                 .Select(col => CsvColumnsToGeographicLevel[col])
                 .Distinct()
                 .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)

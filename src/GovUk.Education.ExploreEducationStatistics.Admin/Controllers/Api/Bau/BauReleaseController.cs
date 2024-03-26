@@ -6,31 +6,30 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
+
+[Route("api")]
+[ApiController]
+[Authorize]
+public class BauReleaseController : ControllerBase
 {
-    [Route("api")]
-    [ApiController]
-    [Authorize]
-    public class BauReleaseController : ControllerBase
+    private readonly IPublishingService _publishingService;
+
+    public BauReleaseController(IPublishingService publishingService)
     {
-        private readonly IPublishingService _publishingService;
+        _publishingService = publishingService;
+    }
 
-        public BauReleaseController(IPublishingService publishingService)
-        {
-            _publishingService = publishingService;
-        }
-
-        /// <summary>
-        /// Retry a combination of the Content and Publishing stages of the publishing workflow.
-        /// </summary>
-        /// <param name="releaseVersionId"></param>
-        /// <returns></returns>
-        [HttpPut("bau/release/{releaseVersionId:guid}/publish/content")]
-        public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseVersionId)
-        {
-            return await _publishingService
-                .RetryReleasePublishing(releaseVersionId)
-                .HandleFailuresOrOk();
-        }
+    /// <summary>
+    /// Retry a combination of the Content and Publishing stages of the publishing workflow.
+    /// </summary>
+    /// <param name="releaseVersionId"></param>
+    /// <returns></returns>
+    [HttpPut("bau/release/{releaseVersionId:guid}/publish/content")]
+    public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseVersionId)
+    {
+        return await _publishingService
+            .RetryReleasePublishing(releaseVersionId)
+            .HandleFailuresOrOk();
     }
 }

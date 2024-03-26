@@ -166,13 +166,7 @@ public class FixedInformationDataFileReader
 
     public int GetYear(IReadOnlyList<string> rowValues)
     {
-        var year = rowValues[_yearColumnIndex];
-
-        if (year == null)
-        {
-            throw new InvalidTimePeriodException(null);
-        }
-
+        var year = rowValues[_yearColumnIndex] ?? throw new InvalidTimePeriodException(null);
         return int.Parse(year.Substring(0, 4));
     }
 

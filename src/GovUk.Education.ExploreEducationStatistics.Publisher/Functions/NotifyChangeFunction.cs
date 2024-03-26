@@ -9,100 +9,99 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
+
+public class NotifyChangeFunction(
+    ILogger<NotifyChangeFunction> logger,
+    IFileStorageService fileStorageService,
+    IQueueService queueService,
+    IReleasePublishingStatusService releasePublishingStatusService,
+    IValidationService validationService)
 {
-    public class NotifyChangeFunction(
-        ILogger<NotifyChangeFunction> logger,
-        IFileStorageService fileStorageService,
-        IQueueService queueService,
-        IReleasePublishingStatusService releasePublishingStatusService,
-        IValidationService validationService)
+    /// <summary>
+    /// Azure function which validates that a release version is in a state to be published.
+    /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
+    /// </summary>
+    /// <remarks>
+    /// Validation will fail if the release version is already in the process of being published.
+    /// A future schedule for publishing a release version that's not yet started will be cancelled.
+    /// </remarks>
+    /// <param name="message"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    [Function("NotifyChange")]
+    public async Task NotifyChange(
+        [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
+        FunctionContext context)
     {
-        /// <summary>
-        /// Azure function which validates that a release version is in a state to be published.
-        /// Creates a ReleaseStatus entry scheduling its publication or triggers publishing files if immediate.
-        /// </summary>
-        /// <remarks>
-        /// Validation will fail if the release version is already in the process of being published.
-        /// A future schedule for publishing a release version that's not yet started will be cancelled.
-        /// </remarks>
-        /// <param name="message"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        [Function("NotifyChange")]
-        public async Task NotifyChange(
-            [QueueTrigger(NotifyChangeQueue)] NotifyChangeMessage message,
-            FunctionContext context)
+        logger.LogInformation("{FunctionName} triggered: {Message}",
+            context.FunctionDefinition.Name,
+            message);
+        var lease = await fileStorageService.AcquireLease(message.ReleaseVersionId.ToString());
+        try
         {
-            logger.LogInformation("{FunctionName} triggered: {Message}",
-                context.FunctionDefinition.Name,
-                message);
-            var lease = await fileStorageService.AcquireLease(message.ReleaseVersionId.ToString());
-            try
+            await MarkScheduledReleaseStatusAsSuperseded(message);
+            if (await validationService.ValidatePublishingState(message.ReleaseVersionId))
             {
-                await MarkScheduledReleaseStatusAsSuperseded(message);
-                if (await validationService.ValidatePublishingState(message.ReleaseVersionId))
-                {
-                    await validationService
-                        .ValidateRelease(message.ReleaseVersionId)
-                        .OnSuccessDo(async () =>
+                await validationService
+                    .ValidateRelease(message.ReleaseVersionId)
+                    .OnSuccessDo(async () =>
+                    {
+                        if (message.Immediate)
                         {
-                            if (message.Immediate)
-                            {
-                                var releaseStatus =
-                                    await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                                await queueService.QueuePublishReleaseFilesMessage(
-                                    releaseVersionId: releaseStatus.ReleaseVersionId,
-                                    releaseStatusId: releaseStatus.Id);
-                                await queueService.QueuePublishReleaseContentMessage(
-                                    releaseVersionId: message.ReleaseVersionId,
-                                    releaseStatusId: message.ReleaseStatusId);
-                            }
-                            else
-                            {
-                                // Create a Release Status entry here for the midnight job to pick up.
-                                await CreateReleaseStatusAsync(message, ScheduledState);
-                            }
-                        })
-                        .OnFailureDo(async logMessages =>
+                            var releaseStatus =
+                                await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
+                            await queueService.QueuePublishReleaseFilesMessage(
+                                releaseVersionId: releaseStatus.ReleaseVersionId,
+                                releaseStatusId: releaseStatus.Id);
+                            await queueService.QueuePublishReleaseContentMessage(
+                                releaseVersionId: message.ReleaseVersionId,
+                                releaseStatusId: message.ReleaseStatusId);
+                        }
+                        else
                         {
-                            await CreateReleaseStatusAsync(message, InvalidState, logMessages);
-                        });
-                }
+                            // Create a Release Status entry here for the midnight job to pick up.
+                            await CreateReleaseStatusAsync(message, ScheduledState);
+                        }
+                    })
+                    .OnFailureDo(async logMessages =>
+                    {
+                        await CreateReleaseStatusAsync(message, InvalidState, logMessages);
+                    });
             }
-            finally
-            {
-                await lease.Release();
-            }
-
-            logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
+        }
+        finally
+        {
+            await lease.Release();
         }
 
-        private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
-            ReleasePublishingStatusState state,
-            IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
-        {
-            return await releasePublishingStatusService.CreateAsync(
-                releaseVersionId: message.ReleaseVersionId,
-                releaseStatusId: message.ReleaseStatusId,
-                state,
-                message.Immediate,
-                logMessages);
-        }
+        logger.LogInformation("{FunctionName} completed", context.FunctionDefinition.Name);
+    }
 
-        private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)
+    private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
+        ReleasePublishingStatusState state,
+        IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
+    {
+        return await releasePublishingStatusService.CreateAsync(
+            releaseVersionId: message.ReleaseVersionId,
+            releaseStatusId: message.ReleaseStatusId,
+            state,
+            message.Immediate,
+            logMessages);
+    }
+
+    private async Task MarkScheduledReleaseStatusAsSuperseded(NotifyChangeMessage message)
+    {
+        // There may be an existing scheduled ReleaseStatus entry if this release version has been validated before
+        // If so, mark it as superseded
+        var scheduled = await releasePublishingStatusService.GetAllByOverallStage(
+            message.ReleaseVersionId,
+            Scheduled);
+        foreach (var releaseStatus in scheduled)
         {
-            // There may be an existing scheduled ReleaseStatus entry if this release version has been validated before
-            // If so, mark it as superseded
-            var scheduled = await releasePublishingStatusService.GetAllByOverallStage(
-                message.ReleaseVersionId,
-                Scheduled);
-            foreach (var releaseStatus in scheduled)
-            {
-                await releasePublishingStatusService.UpdateStateAsync(releaseVersionId: message.ReleaseVersionId,
-                    releaseStatusId: releaseStatus.Id,
-                    SupersededState);
-            }
+            await releasePublishingStatusService.UpdateStateAsync(releaseVersionId: message.ReleaseVersionId,
+                releaseStatusId: releaseStatus.Id,
+                SupersededState);
         }
     }
 }

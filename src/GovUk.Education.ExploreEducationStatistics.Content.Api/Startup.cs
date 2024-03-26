@@ -43,203 +43,202 @@ using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.S
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api;
+
+[ExcludeFromCodeCoverage]
+public class Startup
 {
-    [ExcludeFromCodeCoverage]
-    public class Startup
+    private IConfiguration Configuration { get; }
+    private IHostEnvironment HostEnvironment { get; }
+
+    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
+        Configuration = configuration;
+        HostEnvironment = hostEnvironment;
+    }
 
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddHealthChecks();
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+        services.AddApplicationInsightsTelemetry()
+            .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+        services.AddMvc(options =>
+            {
+                options.Filters.Add(new OperationCancelledExceptionFilter());
+                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.EnableEndpointRouting = false;
+            })
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            });
+
+        services.AddControllers(options =>
         {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
+            options.AddCommaSeparatedQueryModelBinderProvider();
+            options.AddTrimStringBinderProvider();
+        });
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        services.AddFluentValidation();
+        services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
+
+        services.AddDbContext<StatisticsDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    providerOptions => 
+                        providerOptions
+                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
+
+        services.AddDbContext<ContentDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    providerOptions => 
+                        providerOptions
+                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
+
+        // Adds Brotli and Gzip compressing
+        services.AddResponseCompression(options =>
         {
-            services.AddHealthChecks();
+            options.EnableForHttps = true;
+        });
 
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            services.AddApplicationInsightsTelemetry()
-                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
-
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.Filters.Add(new ProblemDetailsResultFilter());
-                    options.EnableEndpointRouting = false;
-                })
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-
-            services.AddControllers(options =>
-            {
-                options.AddCommaSeparatedQueryModelBinderProvider();
-                options.AddTrimStringBinderProvider();
-            });
-
-            services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
-
-            services.AddDbContext<StatisticsDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        providerOptions => 
-                            providerOptions
-                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            services.AddDbContext<ContentDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions => 
-                            providerOptions
-                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            // Adds Brotli and Gzip compressing
-            services.AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-            });
-
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "Explore education statistics - Content API",
-                    Version = "v1"
-                });
-            });
-
-            services.AddCors();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
-                provider.GetRequiredService<IPublicBlobStorageService>(),
-                provider.GetRequiredService<ILogger<BlobCacheService>>()));
-            services.AddSingleton<IMemoryCacheService>(provider =>
-            {
-                var memoryCacheConfig = Configuration.GetSection("MemoryCache");
-                var maxCacheSizeMb = memoryCacheConfig.GetValue<int>("MaxCacheSizeMb");
-                var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>("ExpirationScanFrequencySeconds");
-                return new MemoryCacheService(
-                    new MemoryCache(new MemoryCacheOptions
-                    {
-                        SizeLimit = maxCacheSizeMb * 1000000,
-                        ExpirationScanFrequency = TimeSpan.FromSeconds(expirationScanFrequencySeconds),
-                    }),
-                    provider.GetRequiredService<ILogger<MemoryCacheService>>());
-            });
-            services.AddTransient<IFilterRepository, FilterRepository>();
-            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-            services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<IDataSetService, DataSetService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-            services.AddTransient<IPublicationRepository, PublicationRepository>();
-            services.AddTransient<IPublicationService, PublicationService>();
-            services.AddTransient<ITimePeriodService, TimePeriodService>();
-            services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
-            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IMethodologyImageService, MethodologyImageService>();
-            services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IMethodologyRepository, MethodologyRepository>();
-            services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
-            services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
-            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
-            services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
-            services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
-            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
-            services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
-            services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
-            services.AddTransient<IGlossaryService, GlossaryService>();
-            services.AddTransient<IThemeService, ThemeService>();
-            services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
-            services.AddTransient<IRedirectsService, RedirectsService>();
-
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
-            StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
-
-            AddPersistenceHelper<ContentDbContext>(services);
-            AddPersistenceHelper<StatisticsDbContext>(services);
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app,
-            IWebHostEnvironment env,
-            ILogger<Startup> logger)
+        // Register the Swagger generator, defining 1 or more Swagger documents
+        services.AddSwaggerGen(options =>
         {
-            // Enable caching and register any caching services
-            CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Explore education statistics - Content API",
+                Version = "v1"
+            });
+        });
 
-            // Register the MemoryCacheService only if the Memory Caching is enabled. 
+        services.AddCors();
+        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+        services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+            provider.GetRequiredService<IPublicBlobStorageService>(),
+            provider.GetRequiredService<ILogger<BlobCacheService>>()));
+        services.AddSingleton<IMemoryCacheService>(provider =>
+        {
             var memoryCacheConfig = Configuration.GetSection("MemoryCache");
-            if (memoryCacheConfig.GetValue("Enabled", false))
-            {
-                MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
-                MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>()!);
-            }
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHttpsRedirection();
-                app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
-            }
-
-            var rewriteOptions = new RewriteOptions()
-                .Add(new LowercasePathRule());
-
-            if(Configuration.GetValue<bool>("enableSwagger"))
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
+            var maxCacheSizeMb = memoryCacheConfig.GetValue<int>("MaxCacheSizeMb");
+            var expirationScanFrequencySeconds = memoryCacheConfig.GetValue<int>("ExpirationScanFrequencySeconds");
+            return new MemoryCacheService(
+                new MemoryCache(new MemoryCacheOptions
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
-                    c.RoutePrefix = "docs";
-                });
+                    SizeLimit = maxCacheSizeMb * 1000000,
+                    ExpirationScanFrequency = TimeSpan.FromSeconds(expirationScanFrequencySeconds),
+                }),
+                provider.GetRequiredService<ILogger<MemoryCacheService>>());
+        });
+        services.AddTransient<IFilterRepository, FilterRepository>();
+        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+        services.AddTransient<IDataSetService, DataSetService>();
+        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+        services.AddTransient<IPublicationRepository, PublicationRepository>();
+        services.AddTransient<IPublicationService, PublicationService>();
+        services.AddTransient<ITimePeriodService, TimePeriodService>();
+        services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
+        services.AddTransient<IFootnoteRepository, FootnoteRepository>();
+        services.AddTransient<IMethodologyImageService, MethodologyImageService>();
+        services.AddTransient<IMethodologyService, MethodologyService>();
+        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
+        services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
+        services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
+        services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
+        services.AddTransient<IReleaseService, ReleaseService>();
+        services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+        services.AddTransient<IReleaseFileService, ReleaseFileService>();
+        services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
+        services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
+        services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
+        services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
+        services.AddTransient<IGlossaryService, GlossaryService>();
+        services.AddTransient<IThemeService, ThemeService>();
+        services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
+        services.AddTransient<IRedirectsService, RedirectsService>();
 
-                rewriteOptions.AddRedirect("^$", "docs");
-            }
+        StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
+        StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
 
-            app.UseRewriter(rewriteOptions);
+        AddPersistenceHelper<ContentDbContext>(services);
+        AddPersistenceHelper<StatisticsDbContext>(services);
+    }
 
-            app.UseCors(options => options
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://localhost:3001",
-                    "https://localhost:3000",
-                    "https://localhost:3001")
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app,
+        IWebHostEnvironment env,
+        ILogger<Startup> logger)
+    {
+        // Enable caching and register any caching services
+        CacheAspect.Enabled = true;
+        BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
 
-            app.UseMvc();
-            app.UseHealthChecks("/api/health");
-
-            app.UseResponseCompression();
-
-            app.ServerFeatures.Get<IServerAddressesFeature>()
-                ?.Addresses
-                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+        // Register the MemoryCacheService only if the Memory Caching is enabled. 
+        var memoryCacheConfig = Configuration.GetSection("MemoryCache");
+        if (memoryCacheConfig.GetValue("Enabled", false))
+        {
+            MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
+            MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>()!);
         }
+
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseHttpsRedirection();
+            app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
+        }
+
+        var rewriteOptions = new RewriteOptions()
+            .Add(new LowercasePathRule());
+
+        if(Configuration.GetValue<bool>("enableSwagger"))
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Content API V1");
+                c.RoutePrefix = "docs";
+            });
+
+            rewriteOptions.AddRedirect("^$", "docs");
+        }
+
+        app.UseRewriter(rewriteOptions);
+
+        app.UseCors(options => options
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://localhost:3000",
+                "https://localhost:3001")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+
+        app.UseMvc();
+        app.UseHealthChecks("/api/health");
+
+        app.UseResponseCompression();
+
+        app.ServerFeatures.Get<IServerAddressesFeature>()
+            ?.Addresses
+            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
     }
 }

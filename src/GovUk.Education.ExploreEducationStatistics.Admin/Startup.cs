@@ -95,595 +95,594 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin
+namespace GovUk.Education.ExploreEducationStatistics.Admin;
+
+public class Startup
 {
-    public class Startup
+    private IConfiguration Configuration { get; }
+    private IHostEnvironment HostEnvironment { get; }
+
+    public Startup(
+        IConfiguration configuration,
+        IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
+        Configuration = configuration;
+        HostEnvironment = hostEnvironment;
+    }
 
-        public Startup(
-            IConfiguration configuration,
-            IHostEnvironment hostEnvironment)
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public virtual void ConfigureServices(IServiceCollection services)
+    {
+        services.AddHealthChecks();
+
+        /*
+         * Logging
+         */
+
+        services.AddApplicationInsightsTelemetry()
+            .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+        /*
+         * Web configuration
+         */
+
+        services.Configure<CookiePolicyOptions>(options =>
         {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
+            // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            options.CheckConsentNeeded = _ => true;
+            options.MinimumSameSitePolicy = SameSiteMode.None;
+            options.Secure = CookieSecurePolicy.Always;
+        });
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public virtual void ConfigureServices(IServiceCollection services)
-        {
-            services.AddHealthChecks();
-
-            /*
-             * Logging
-             */
-
-            services.AddApplicationInsightsTelemetry()
-                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
-
-            /*
-             * Web configuration
-             */
-
-            services.Configure<CookiePolicyOptions>(options =>
+        services.AddControllers(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = _ => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.Secure = CookieSecurePolicy.Always;
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            })
+            .AddControllersAsServices();
+
+        services.AddHttpContextAccessor();
+
+        services.AddMvc(options =>
+            {
+                options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
+                options.Filters.Add(new OperationCancelledExceptionFilter());
+                options.EnableEndpointRouting = false;
+                options.AllowEmptyInputInBodyModelBinding = true;
+            })
+            .AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
             });
 
-            services.AddControllers(options =>
-                {
-                    options.AddCommaSeparatedQueryModelBinderProvider();
-                    options.AddTrimStringBinderProvider();
-                })
-                .AddControllersAsServices();
+        // Adds Brotli and Gzip compressing
+        services.AddResponseCompression(options => { options.EnableForHttps = true; });
 
-            services.AddHttpContextAccessor();
+        // In production, the React files will be served from this directory
+        services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+        services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.EnableEndpointRouting = false;
-                    options.AllowEmptyInputInBodyModelBinding = true;
-                })
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
+        /*
+         * Database contexts
+         */
 
-            // Adds Brotli and Gzip compressing
-            services.AddResponseCompression(options => { options.EnableForHttps = true; });
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
-            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-
-            /*
-             * Database contexts
-             */
-
-            // TODO EES-4869 - review if we need to retain these tables.
-            services.AddDbContext<UsersAndRolesDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions =>
-                            providerOptions
-                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            services.AddDbContext<ContentDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions =>
-                            providerOptions
-                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            services.AddDbContext<StatisticsDbContext>(options =>
-                options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        providerOptions =>
-                            providerOptions
-                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
-                                .AddBulkOperationSupport()
-                                .EnableCustomRetryOnFailure()
-                    )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-            );
-
-            /*
-             * Authentication and Authorization
-             */
-
-            //
-            // This configuration sets up out-of-the-box Services to support the Identity Framework's Users, Roles and
-            // Claims. It sets up the UserManager and RoleManager in DI, and links them to the database via the
-            // UsersAndRolesDbContext.
-            //
-            // AddIdentityCore() sets up the bare minimum configuration to provide JWT validation and setting of the
-            // ClaimsPrincipal on the HttpContext based upon the content of incoming JWTs, as opposed to AddIdentity()
-            // which sets up additional configuration such as Forbidden and Login routes, which we don't need.
-            //
-            // In order to provide it with strategies for how to deal with invalid JWTs, unauthenticated users etc
-            // though, we need to register a handler for these.
-            //
-            // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
-            services
-                .AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
-                .AddUserManager<UserManager<ApplicationUser>>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
-                .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
-                .AddRoleStore<RoleStore<IdentityRole, UsersAndRolesDbContext>>()
-                .AddEntityFrameworkStores<UsersAndRolesDbContext>();
-
-            // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
-            // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
-            // ClaimsPrincipal already from information in the JWT).
-            services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
-
-            if (!HostEnvironment.IsIntegrationTest())
-            {
-                services
-                        // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
-                        // headers as a way of identifying users.
-                    .AddAuthentication(options =>
-                    {
-                        // This line tells Identity Framework to use the JWT mechanism for verifying users based upon
-                        // JWTs found in Bearer tokens carried in the Authorization headers of requests made to the
-                        // Admin API.  It also tells Identity Framework to use its default AuthenticationHandler
-                        // implementation for handling challenges, forbid errors etc with appropriate status code
-                        // responses rather than redirect responses.
-                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    })
-                    // This adds verification of the incoming JWTs after they have been located in the
-                    // Authorization headers above.
-                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
-
-                // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
-                // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an
-                // "access_token" query parameter. This code grabs the token from the query parameter and makes it
-                // available for Identity Framework to find (in order for it to validate it and build its
-                // ClaimsPrincipal).
-                services.Configure<JwtBearerOptions>(
-                    JwtBearerDefaults.AuthenticationScheme,
-                    options =>
-                    {
-                        var originalOnMessageReceived = options.Events.OnMessageReceived;
-
-                        options.Events.OnMessageReceived = async context =>
-                        {
-                            await originalOnMessageReceived(context);
-
-                            if (!context.Token.IsNullOrEmpty())
-                            {
-                                return;
-                            }
-
-                            if (context.Request.Query.ContainsKey("access_token"))
-                            {
-                                context.Token = context.Request.Query["access_token"];
-                            }
-                        };
-                    });
-            }
-
-            /*
-             * SignalR
-             */
-
-            var signalRBuilder = services
-                .AddSignalR(
-                    options =>
-                    {
-                        options.AddFilter<HttpContextHubFilter>();
-                    }
+        // TODO EES-4869 - review if we need to retain these tables.
+        services.AddDbContext<UsersAndRolesDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    providerOptions =>
+                        providerOptions
+                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                            .EnableCustomRetryOnFailure()
                 )
-                .AddNewtonsoftJsonProtocol();
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
 
-            var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
+        services.AddDbContext<ContentDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    providerOptions =>
+                        providerOptions
+                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
 
-            if (!azureSignalRConnectionString.IsNullOrEmpty())
-            {
-                signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
-            }
+        services.AddDbContext<StatisticsDbContext>(options =>
+            options
+                .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    providerOptions =>
+                        providerOptions
+                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                            .AddBulkOperationSupport()
+                            .EnableCustomRetryOnFailure()
+                )
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+        );
 
-            /*
-             * Configuration options
-             */
+        /*
+         * Authentication and Authorization
+         */
 
-            services.Configure<PreReleaseOptions>(Configuration);
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
-            services.Configure<ReleaseApprovalOptions>(
-                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
-            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
-            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
-                OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
+        //
+        // This configuration sets up out-of-the-box Services to support the Identity Framework's Users, Roles and
+        // Claims. It sets up the UserManager and RoleManager in DI, and links them to the database via the
+        // UsersAndRolesDbContext.
+        //
+        // AddIdentityCore() sets up the bare minimum configuration to provide JWT validation and setting of the
+        // ClaimsPrincipal on the HttpContext based upon the content of incoming JWTs, as opposed to AddIdentity()
+        // which sets up additional configuration such as Forbidden and Login routes, which we don't need.
+        //
+        // In order to provide it with strategies for how to deal with invalid JWTs, unauthenticated users etc
+        // though, we need to register a handler for these.
+        //
+        // TODO EES-4869 - review if we want to keep these features of Identity Framework or not.
+        services
+            .AddIdentityCore<ApplicationUser>()
+            .AddRoles<IdentityRole>()
+            .AddUserManager<UserManager<ApplicationUser>>()
+            .AddRoleManager<RoleManager<IdentityRole>>()
+            .AddUserStore<UserStore<ApplicationUser, IdentityRole, UsersAndRolesDbContext>>()
+            .AddRoleStore<RoleStore<IdentityRole, UsersAndRolesDbContext>>()
+            .AddEntityFrameworkStores<UsersAndRolesDbContext>();
 
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, Configuration);
+        // This service helps to add additional information to the ClaimsPrincipal on the HttpContext after
+        // Identity Framework has verified that the incoming JWTs are valid (and has created the basic
+        // ClaimsPrincipal already from information in the JWT).
+        services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
-            /*
-             * Services
-             */
-
-            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
-
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-            // This service is responsible for handling calls immediately following successful login into the Admin SPA.
-            // It will determine if the user is an existing or a new user, and will register them locally if a new user.
-            services.AddTransient<ISignInService, SignInService>();
-
-            // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
-            // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
-            // being done from Admin directly, and so these DI dependencies should eventually be removed.
-            services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
-            services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
-            services.AddTransient<IContentPublicationService, ContentPublicationService>();
-            services.AddTransient<IContentReleaseService, ContentReleaseService>();
-            services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
-            services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-            services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
-
-            services.AddTransient<IFileRepository, FileRepository>();
-            services.AddTransient<IDataImportRepository, DataImportRepository>();
-            services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
-            services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
-
-            services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
-            services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
-            services.AddTransient<IReleaseFileService, ReleaseFileService>();
-            services.AddTransient<IReleaseImageService, ReleaseImageService>();
-            services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
-            services.AddTransient<IDataImportService, DataImportService>();
-            services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
-
-            services.AddTransient<IPublishingService, PublishingService>(provider =>
-                new PublishingService(
-                    provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new StorageQueueService(
-                        publisherStorageConnectionString,
-                        new StorageInstanceCreationUtil()),
-                    provider.GetService<IUserService>(),
-                    provider.GetRequiredService<ILogger<PublishingService>>()));
-            services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>();
-            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>();
-            services.AddTransient<IThemeService, ThemeService>();
-            services.AddTransient<ITopicService, TopicService>();
-            services.AddTransient<IPublicationService, PublicationService>();
-            services.AddTransient<IPublicationRepository, PublicationRepository>();
-            services.AddTransient<IMetaService, MetaService>();
-            services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
-            services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
-            services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
-            services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
-            services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
-            services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
-            services.AddTransient<IMethodologyService, MethodologyService>();
-            services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
-            services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
-            services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
-            services.AddTransient<IMethodologyRepository, MethodologyRepository>();
-            services.AddTransient<IMethodologyContentService, MethodologyContentService>();
-            services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
-            services.AddTransient<IMethodologyImageService, MethodologyImageService>();
-            services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
-            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>();
-            services.AddTransient<IDataBlockService, DataBlockService>();
-            services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
-            services.AddTransient<IPreReleaseService, PreReleaseService>();
-            services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
-
-            services.AddTransient<IManageContentPageService, ManageContentPageService>();
-            services.AddTransient<IContentBlockService, ContentBlockService>();
-            services.AddTransient<IContentService, ContentService>();
-            services.AddTransient<IEmbedBlockService, EmbedBlockService>();
-            services.AddTransient<IContentBlockLockService, ContentBlockLockService>();
-            services.AddTransient<IKeyStatisticService, KeyStatisticService>();
-            services.AddTransient<IFeaturedTableService, FeaturedTableService>();
-            services.AddTransient<ICommentService, CommentService>();
-            services.AddTransient<IRelatedInformationService, RelatedInformationService>();
-            services.AddTransient<IReplacementService, ReplacementService>();
-            services.AddTransient<IUserRoleService, UserRoleService>();
-            services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
-            services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
-            services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
-            services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
-            services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
-            services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
-            services.AddTransient<IRedirectsService, RedirectsService>();
-
-            services.AddTransient<INotificationClient>(s =>
-            {
-                var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
-
-                if (!HostEnvironment.IsDevelopment() && !HostEnvironment.IsIntegrationTest())
+        if (!HostEnvironment.IsIntegrationTest())
+        {
+            services
+                    // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
+                    // headers as a way of identifying users.
+                .AddAuthentication(options =>
                 {
-                    return new NotificationClient(notifyApiKey);
-                }
+                    // This line tells Identity Framework to use the JWT mechanism for verifying users based upon
+                    // JWTs found in Bearer tokens carried in the Authorization headers of requests made to the
+                    // Admin API.  It also tells Identity Framework to use its default AuthenticationHandler
+                    // implementation for handling challenges, forbid errors etc with appropriate status code
+                    // responses rather than redirect responses.
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                // This adds verification of the incoming JWTs after they have been located in the
+                // Authorization headers above.
+                .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
 
-                if (notifyApiKey != null && notifyApiKey != "change-me")
+            // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
+            // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an
+            // "access_token" query parameter. This code grabs the token from the query parameter and makes it
+            // available for Identity Framework to find (in order for it to validate it and build its
+            // ClaimsPrincipal).
+            services.Configure<JwtBearerOptions>(
+                JwtBearerDefaults.AuthenticationScheme,
+                options =>
                 {
-                    return new NotificationClient(notifyApiKey);
-                }
+                    var originalOnMessageReceived = options.Events.OnMessageReceived;
 
-                var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
-                return new LoggingNotificationClient(logger);
-            });
-            services.AddTransient<IEmailService, EmailService>();
-
-            services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
-            services.AddTransient<IEmailTemplateService, EmailTemplateService>();
-            services.AddTransient<ITableBuilderService, TableBuilderService>();
-            services.AddTransient<IFilterRepository, FilterRepository>();
-            services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-            services.AddTransient<IFootnoteService, FootnoteService>();
-            services.AddTransient<IFootnoteRepository, FootnoteRepository>();
-            services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
-            services.AddTransient<IGlossaryService, GlossaryService>();
-            services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
-            services.AddTransient<IIndicatorRepository, IndicatorRepository>();
-            services.AddTransient<ILocationRepository, LocationRepository>();
-            services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
-            services.AddTransient<IObservationService, ObservationService>();
-            services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
-            services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
-            services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
-            services.AddTransient<Content.Model.Repository.Interfaces.IReleaseVersionRepository,
-                Content.Model.Repository.ReleaseVersionRepository>();
-            services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
-                Content.Model.Repository.PublicationRepository>();
-            services.AddTransient<ISubjectRepository, SubjectRepository>();
-            services.AddTransient<ITimePeriodService, TimePeriodService>();
-            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
-            services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
-            services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
-            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<IUserManagementService, UserManagementService>();
-            services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IUserInviteRepository, UserInviteRepository>();
-            services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
-            services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-
-            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
-
-            services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
-            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
-            services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
-                new StorageQueueService(
-                    coreStorageConnectionString,
-                    new StorageInstanceCreationUtil()));
-            services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
-            AddPersistenceHelper<ContentDbContext>(services);
-            AddPersistenceHelper<StatisticsDbContext>(services);
-            AddPersistenceHelper<UsersAndRolesDbContext>(services);
-            services.AddTransient<AuthorizationHandlerService>();
-            services.AddScoped<DateTimeProvider>();
-
-            // This service allows a set of users to be pre-invited to the service on startup.
-            if (HostEnvironment.IsDevelopment())
-            {
-                services.AddTransient<BootstrapUsersService>();
-            }
-
-            // These services allow us to check our Policies within Controllers and Services
-            StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
-
-            services.AddSingleton<IFileTypeService, FileTypeService>();
-            services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>(provider =>
-                new BlobCacheService(
-                    provider.GetRequiredService<IPrivateBlobStorageService>(),
-                    provider.GetRequiredService<ILogger<BlobCacheService>>()
-                ));
-            services.AddTransient<ICacheKeyService, CacheKeyService>();
-
-            /*
-             * Swagger
-             */
-
-            if (Configuration.GetValue<bool>("enableSwagger"))
-                services.AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1",
-                        new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
-                    c.CustomSchemaIds((type) => type.FullName);
-                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    options.Events.OnMessageReceived = async context =>
                     {
-                        Description =
-                            "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
-                        Name = "Authorization",
-                        In = ParameterLocation.Header,
-                        Type = SecuritySchemeType.ApiKey
-                    });
-                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {
+                        await originalOnMessageReceived(context);
+
+                        if (!context.Token.IsNullOrEmpty())
                         {
-                            new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"}
-                            },
-                            new[] {string.Empty}
+                            return;
                         }
-                    });
+
+                        if (context.Request.Query.ContainsKey("access_token"))
+                        {
+                            context.Token = context.Request.Query["access_token"];
+                        }
+                    };
                 });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            var provider = app.ApplicationServices;
+        /*
+         * SignalR
+         */
 
-            // Enable caching and register any caching services.
-            CacheAspect.Enabled = true;
-            var privateCacheService = new BlobCacheService(
-                app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
-                provider.GetRequiredService<ILogger<BlobCacheService>>()
-            );
-            var publicCacheService = new BlobCacheService(
-                app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
-                provider.GetRequiredService<ILogger<BlobCacheService>>()
-            );
-            BlobCacheAttribute.AddService("default", privateCacheService);
-            BlobCacheAttribute.AddService("public", publicCacheService);
-
-            if (!env.IsIntegrationTest())
-            {
-                UpdateDatabase(app, env);
-            }
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts(opts =>
+        var signalRBuilder = services
+            .AddSignalR(
+                options =>
                 {
-                    opts.MaxAge(365);
-                    opts.IncludeSubdomains();
-                    opts.Preload();
-                });
-            }
-
-            app.UseResponseCompression();
-
-            if (Configuration.GetValue<bool>("enableSwagger"))
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
-                    c.RoutePrefix = "docs";
-                });
-            }
-
-            // Security Headers
-            app.UseXContentTypeOptions();
-            app.UseXXssProtection(opts => opts.EnabledWithBlockMode());
-            app.UseXfo(opts => opts.SameOrigin());
-            app.UseReferrerPolicy(opts => opts.NoReferrerWhenDowngrade());
-            app.UseCsp(opts => opts
-                .BlockAllMixedContent()
-                .StyleSources(s => s.Self())
-                .StyleSources(s => s
-                    .CustomSources(" https://cdnjs.cloudflare.com")
-                    .UnsafeInline())
-                .FontSources(s => s.Self())
-                .FormActions(s =>
-                {
-                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
-                    var loginAuthorityUri = new Uri(loginAuthorityUrl);
-                    s
-                        .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
-                        .Self();
-                })
-                .FrameAncestors(s => s.Self())
-                .ImageSources(s => s.Self())
-                .ImageSources(s => s.CustomSources("data:"))
-                .ScriptSources(s => s.Self())
-                .ScriptSources(s => s.UnsafeInline())
-            );
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-            app.UseCookiePolicy();
-            app.UseRouting();
-            app.UseHealthChecks("/api/health");
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+                    options.AddFilter<HttpContextHubFilter>();
                 }
-            );
+            )
+            .AddNewtonsoftJsonProtocol();
 
-            app.UseMvc();
+        var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
 
-            if (!env.IsIntegrationTest())
+        if (!azureSignalRConnectionString.IsNullOrEmpty())
+        {
+            signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
+        }
+
+        /*
+         * Configuration options
+         */
+
+        services.Configure<PreReleaseOptions>(Configuration);
+        services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+        services.Configure<ReleaseApprovalOptions>(
+            Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
+        services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
+        services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+        services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
+            OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
+
+        StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, Configuration);
+
+        /*
+         * Services
+         */
+
+        var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+        var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+        // This service is responsible for handling calls immediately following successful login into the Admin SPA.
+        // It will determine if the user is an existing or a new user, and will register them locally if a new user.
+        services.AddTransient<ISignInService, SignInService>();
+
+        // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
+        // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
+        // being done from Admin directly, and so these DI dependencies should eventually be removed.
+        services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
+        services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
+        services.AddTransient<IContentPublicationService, ContentPublicationService>();
+        services.AddTransient<IContentReleaseService, ContentReleaseService>();
+        services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
+        services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
+        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+        services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+        services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
+
+        services.AddTransient<IFileRepository, FileRepository>();
+        services.AddTransient<IDataImportRepository, DataImportRepository>();
+        services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
+        services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
+
+        services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
+        services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
+        services.AddTransient<IReleaseFileService, ReleaseFileService>();
+        services.AddTransient<IReleaseImageService, ReleaseImageService>();
+        services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
+        services.AddTransient<IDataImportService, DataImportService>();
+        services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
+
+        services.AddTransient<IPublishingService, PublishingService>(provider =>
+            new PublishingService(
+                provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                new StorageQueueService(
+                    publisherStorageConnectionString,
+                    new StorageInstanceCreationUtil()),
+                provider.GetService<IUserService>(),
+                provider.GetRequiredService<ILogger<PublishingService>>()));
+        services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>();
+        services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>();
+        services.AddTransient<IThemeService, ThemeService>();
+        services.AddTransient<ITopicService, TopicService>();
+        services.AddTransient<IPublicationService, PublicationService>();
+        services.AddTransient<IPublicationRepository, PublicationRepository>();
+        services.AddTransient<IMetaService, MetaService>();
+        services.AddTransient<IReleaseService, ReleaseService>();
+        services.AddTransient<IReleaseAmendmentService, ReleaseAmendmentService>();
+        services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
+        services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
+        services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
+        services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
+        services.AddTransient<IReleaseVersionRepository, ReleaseVersionRepository>();
+        services.AddTransient<IMethodologyService, MethodologyService>();
+        services.AddTransient<IMethodologyNoteService, MethodologyNoteService>();
+        services.AddTransient<IMethodologyNoteRepository, MethodologyNoteRepository>();
+        services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
+        services.AddTransient<IMethodologyRepository, MethodologyRepository>();
+        services.AddTransient<IMethodologyContentService, MethodologyContentService>();
+        services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
+        services.AddTransient<IMethodologyImageService, MethodologyImageService>();
+        services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
+        services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>();
+        services.AddTransient<IDataBlockService, DataBlockService>();
+        services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
+        services.AddTransient<IPreReleaseService, PreReleaseService>();
+        services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
+
+        services.AddTransient<IManageContentPageService, ManageContentPageService>();
+        services.AddTransient<IContentBlockService, ContentBlockService>();
+        services.AddTransient<IContentService, ContentService>();
+        services.AddTransient<IEmbedBlockService, EmbedBlockService>();
+        services.AddTransient<IContentBlockLockService, ContentBlockLockService>();
+        services.AddTransient<IKeyStatisticService, KeyStatisticService>();
+        services.AddTransient<IFeaturedTableService, FeaturedTableService>();
+        services.AddTransient<ICommentService, CommentService>();
+        services.AddTransient<IRelatedInformationService, RelatedInformationService>();
+        services.AddTransient<IReplacementService, ReplacementService>();
+        services.AddTransient<IUserRoleService, UserRoleService>();
+        services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
+        services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
+        services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
+        services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
+        services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
+        services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
+        services.AddTransient<IRedirectsService, RedirectsService>();
+
+        services.AddTransient<INotificationClient>(s =>
+        {
+            var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
+
+            if (!HostEnvironment.IsDevelopment() && !HostEnvironment.IsIntegrationTest())
             {
-                app.UseSpa(spa =>
+                return new NotificationClient(notifyApiKey);
+            }
+
+            if (notifyApiKey != null && notifyApiKey != "change-me")
+            {
+                return new NotificationClient(notifyApiKey);
+            }
+
+            var logger = s.GetRequiredService<ILogger<LoggingNotificationClient>>();
+            return new LoggingNotificationClient(logger);
+        });
+        services.AddTransient<IEmailService, EmailService>();
+
+        services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
+        services.AddTransient<IEmailTemplateService, EmailTemplateService>();
+        services.AddTransient<ITableBuilderService, TableBuilderService>();
+        services.AddTransient<IFilterRepository, FilterRepository>();
+        services.AddTransient<IFilterItemRepository, FilterItemRepository>();
+        services.AddTransient<IFootnoteService, FootnoteService>();
+        services.AddTransient<IFootnoteRepository, FootnoteRepository>();
+        services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+        services.AddTransient<IGlossaryService, GlossaryService>();
+        services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
+        services.AddTransient<IIndicatorRepository, IndicatorRepository>();
+        services.AddTransient<ILocationRepository, LocationRepository>();
+        services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+        services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
+        services.AddTransient<IObservationService, ObservationService>();
+        services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
+        services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
+        services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
+        services.AddTransient<Content.Model.Repository.Interfaces.IReleaseVersionRepository,
+            Content.Model.Repository.ReleaseVersionRepository>();
+        services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
+            Content.Model.Repository.PublicationRepository>();
+        services.AddTransient<ISubjectRepository, SubjectRepository>();
+        services.AddTransient<ITimePeriodService, TimePeriodService>();
+        services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+        services.AddTransient<ISubjectMetaService, SubjectMetaService>();
+        services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
+        services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
+        services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
+        services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+        services.AddTransient<IUserManagementService, UserManagementService>();
+        services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
+        services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IUserInviteRepository, UserInviteRepository>();
+        services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+        services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+
+        services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
+        services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+
+        services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
+        services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
+        services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
+            new StorageQueueService(
+                coreStorageConnectionString,
+                new StorageInstanceCreationUtil()));
+        services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
+        AddPersistenceHelper<ContentDbContext>(services);
+        AddPersistenceHelper<StatisticsDbContext>(services);
+        AddPersistenceHelper<UsersAndRolesDbContext>(services);
+        services.AddTransient<AuthorizationHandlerService>();
+        services.AddScoped<DateTimeProvider>();
+
+        // This service allows a set of users to be pre-invited to the service on startup.
+        if (HostEnvironment.IsDevelopment())
+        {
+            services.AddTransient<BootstrapUsersService>();
+        }
+
+        // These services allow us to check our Policies within Controllers and Services
+        StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);
+
+        services.AddSingleton<IFileTypeService, FileTypeService>();
+        services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
+        services.AddTransient<IBlobCacheService, BlobCacheService>(provider =>
+            new BlobCacheService(
+                provider.GetRequiredService<IPrivateBlobStorageService>(),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            ));
+        services.AddTransient<ICacheKeyService, CacheKeyService>();
+
+        /*
+         * Swagger
+         */
+
+        if (Configuration.GetValue<bool>("enableSwagger"))
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1",
+                    new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                c.CustomSchemaIds((type) => type.FullName);
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    if (env.IsDevelopment())
+                    Description =
+                        "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
                     {
-                        spa.Options.SourcePath = "../explore-education-statistics-admin";
-                        spa.UseReactDevelopmentServer("start");
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"}
+                        },
+                        new[] {string.Empty}
                     }
                 });
-            }
+            });
+    }
 
-            app.ServerFeatures.Get<IServerAddressesFeature>()
-                ?.Addresses
-                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        var provider = app.ApplicationServices;
+
+        // Enable caching and register any caching services.
+        CacheAspect.Enabled = true;
+        var privateCacheService = new BlobCacheService(
+            app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
+            provider.GetRequiredService<ILogger<BlobCacheService>>()
+        );
+        var publicCacheService = new BlobCacheService(
+            app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
+            provider.GetRequiredService<ILogger<BlobCacheService>>()
+        );
+        BlobCacheAttribute.AddService("default", privateCacheService);
+        BlobCacheAttribute.AddService("public", publicCacheService);
+
+        if (!env.IsIntegrationTest())
+        {
+            UpdateDatabase(app, env);
         }
 
-        private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
+        if (env.IsDevelopment())
         {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                       .CreateScope())
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
+            app.UseExceptionHandler("/Error");
+            app.UseHsts(opts =>
             {
-                using (var context = serviceScope.ServiceProvider.GetRequiredService<StatisticsDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
-                }
+                opts.MaxAge(365);
+                opts.IncludeSubdomains();
+                opts.Preload();
+            });
+        }
 
-                using (var context = serviceScope.ServiceProvider.GetRequiredService<UsersAndRolesDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
-                }
+        app.UseResponseCompression();
 
-                using (var context = serviceScope.ServiceProvider.GetRequiredService<ContentDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
+        if (Configuration.GetValue<bool>("enableSwagger"))
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Admin API V1");
+                c.RoutePrefix = "docs";
+            });
+        }
 
-                    ApplyCustomMigrations();
+        // Security Headers
+        app.UseXContentTypeOptions();
+        app.UseXXssProtection(opts => opts.EnabledWithBlockMode());
+        app.UseXfo(opts => opts.SameOrigin());
+        app.UseReferrerPolicy(opts => opts.NoReferrerWhenDowngrade());
+        app.UseCsp(opts => opts
+            .BlockAllMixedContent()
+            .StyleSources(s => s.Self())
+            .StyleSources(s => s
+                .CustomSources(" https://cdnjs.cloudflare.com")
+                .UnsafeInline())
+            .FontSources(s => s.Self())
+            .FormActions(s =>
+            {
+                var loginAuthorityUrl = Configuration.GetSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
+                var loginAuthorityUri = new Uri(loginAuthorityUrl);
+                s
+                    .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
+                    .Self();
+            })
+            .FrameAncestors(s => s.Self())
+            .ImageSources(s => s.Self())
+            .ImageSources(s => s.CustomSources("data:"))
+            .ScriptSources(s => s.Self())
+            .ScriptSources(s => s.UnsafeInline())
+        );
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseSpaStaticFiles();
+        app.UseCookiePolicy();
+        app.UseRouting();
+        app.UseHealthChecks("/api/health");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+            }
+        );
+
+        app.UseMvc();
+
+        if (!env.IsIntegrationTest())
+        {
+            app.UseSpa(spa =>
+            {
+                if (env.IsDevelopment())
+                {
+                    spa.Options.SourcePath = "../explore-education-statistics-admin";
+                    spa.UseReactDevelopmentServer("start");
                 }
+            });
+        }
+
+        app.ServerFeatures.Get<IServerAddressesFeature>()
+            ?.Addresses
+            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+    }
+
+    private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                   .CreateScope())
+        {
+            using (var context = serviceScope.ServiceProvider.GetRequiredService<StatisticsDbContext>())
+            {
+                context.Database.SetCommandTimeout(int.MaxValue);
+                context.Database.Migrate();
             }
 
-            if (env.IsDevelopment())
+            using (var context = serviceScope.ServiceProvider.GetRequiredService<UsersAndRolesDbContext>())
             {
-                using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                    .CreateScope();
+                context.Database.SetCommandTimeout(int.MaxValue);
+                context.Database.Migrate();
+            }
 
-                serviceScope.ServiceProvider
-                    .GetRequiredService<BootstrapUsersService>()
-                    .AddBootstrapUsers();
+            using (var context = serviceScope.ServiceProvider.GetRequiredService<ContentDbContext>())
+            {
+                context.Database.SetCommandTimeout(int.MaxValue);
+                context.Database.Migrate();
+
+                ApplyCustomMigrations();
             }
         }
 
-        private static void ApplyCustomMigrations(params ICustomMigration[] migrations)
+        if (env.IsDevelopment())
         {
-            foreach (var migration in migrations)
-            {
-                migration.Apply();
-            }
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                .CreateScope();
+
+            serviceScope.ServiceProvider
+                .GetRequiredService<BootstrapUsersService>()
+                .AddBootstrapUsers();
+        }
+    }
+
+    private static void ApplyCustomMigrations(params ICustomMigration[] migrations)
+    {
+        foreach (var migration in migrations)
+        {
+            migration.Apply();
         }
     }
 }

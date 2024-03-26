@@ -16,167 +16,166 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
+
+public class MethodologyImageServiceTests
 {
-    public class MethodologyImageServiceTests
+    [Fact]
+    public async Task Stream()
     {
-        [Fact]
-        public async Task Stream()
+        var methodologyVersion = new MethodologyVersion();
+
+        var methodologyFile = new MethodologyFile
         {
-            var methodologyVersion = new MethodologyVersion();
-
-            var methodologyFile = new MethodologyFile
+            MethodologyVersion = methodologyVersion,
+            File = new File
             {
-                MethodologyVersion = methodologyVersion,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    ContentType = "image/png",
-                    Type = Image
-                }
-            };
-
-            var fileData = new byte[] { 0 };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
-                await contentDbContext.SaveChangesAsync();
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                ContentType = "image/png",
+                Type = Image
             }
+        };
 
-            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+        var fileData = new byte[] { 0 };
 
-            publicBlobStorageService
-                .SetupDownloadToStream(PublicMethodologyFiles, methodologyFile.Path(), fileData);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
-
-                var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
-
-                MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-                var fileStreamResult = result.AssertRight();
-
-                Assert.Equal("image/png", fileStreamResult.ContentType);
-                Assert.Equal("image.png", fileStreamResult.FileDownloadName);
-                Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
-            }
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+            await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_MethodologyNotFound()
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+
+        publicBlobStorageService
+            .SetupDownloadToStream(PublicMethodologyFiles, methodologyFile.Path(), fileData);
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var methodologyFile = new MethodologyFile
-            {
-                MethodologyVersion = new MethodologyVersion(),
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    Type = Image
-                }
-            };
+            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+            var fileStreamResult = result.AssertRight();
+
+            Assert.Equal("image/png", fileStreamResult.ContentType);
+            Assert.Equal("image.png", fileStreamResult.FileDownloadName);
+            Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
+        }
+    }
+
+    [Fact]
+    public async Task Stream_MethodologyNotFound()
+    {
+        var methodologyFile = new MethodologyFile
+        {
+            MethodologyVersion = new MethodologyVersion(),
+            File = new File
             {
-                await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
-                await contentDbContext.SaveChangesAsync();
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image
             }
+        };
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-                var result = await service.Stream(Guid.NewGuid(), methodologyFile.File.Id);
-
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_MethodologyFileNotFound()
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var methodologyVersion = new MethodologyVersion();
+            var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var result = await service.Stream(Guid.NewGuid(), methodologyFile.File.Id);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
+            result.AssertNotFound();
+        }
+    }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
+    [Fact]
+    public async Task Stream_MethodologyFileNotFound()
+    {
+        var methodologyVersion = new MethodologyVersion();
 
-                var result = await service.Stream(methodologyVersion.Id, Guid.NewGuid());
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Stream_BlobDoesNotExist()
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            var methodologyVersion = new MethodologyVersion();
+            var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-            var methodologyFile = new MethodologyFile
+            var result = await service.Stream(methodologyVersion.Id, Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task Stream_BlobDoesNotExist()
+    {
+        var methodologyVersion = new MethodologyVersion();
+
+        var methodologyFile = new MethodologyFile
+        {
+            MethodologyVersion = methodologyVersion,
+            File = new File
             {
-                MethodologyVersion = methodologyVersion,
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "image.png",
-                    Type = Image
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
-                await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
-                await contentDbContext.SaveChangesAsync();
+                RootPath = Guid.NewGuid(),
+                Filename = "image.png",
+                Type = Image
             }
+        };
 
-            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+        var contentDbContextId = Guid.NewGuid().ToString();
 
-            publicBlobStorageService.SetupDownloadToStreamNotFound(PublicMethodologyFiles, methodologyFile.Path());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    publicBlobStorageService: publicBlobStorageService.Object);
-
-                var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
-
-                MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-                result.AssertNotFound();
-            }
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+            await contentDbContext.MethodologyFiles.AddAsync(methodologyFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        private static MethodologyImageService SetupMethodologyImageService(
-            ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPublicBlobStorageService? publicBlobStorageService = null)
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
+
+        publicBlobStorageService.SetupDownloadToStreamNotFound(PublicMethodologyFiles, methodologyFile.Path());
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
-            return new MethodologyImageService(
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                publicBlobStorageService ?? new Mock<IPublicBlobStorageService>(Strict).Object,
-                MockUtils.AlwaysTrueUserService().Object
-            );
+            var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
+                publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
+
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNotFound();
         }
+    }
+
+    private static MethodologyImageService SetupMethodologyImageService(
+        ContentDbContext contentDbContext,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IPublicBlobStorageService? publicBlobStorageService = null)
+    {
+        return new MethodologyImageService(
+            contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+            publicBlobStorageService ?? new Mock<IPublicBlobStorageService>(Strict).Object,
+            MockUtils.AlwaysTrueUserService().Object
+        );
     }
 }

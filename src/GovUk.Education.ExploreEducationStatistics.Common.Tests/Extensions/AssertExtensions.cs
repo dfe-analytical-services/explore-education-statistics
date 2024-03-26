@@ -6,86 +6,85 @@ using KellermanSoftware.CompareNetObjects;
 using Xunit;
 using Xunit.Sdk;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+
+
+public static class AssertExtensions
 {
-
-    public static class AssertExtensions
+    public const int TimeWithinMillis = 750;
+    /**
+     * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
+     * other testing frameworks.
+     */
+    public static XunitException AssertFail(string message)
     {
-        public const int TimeWithinMillis = 750;
-        /**
-         * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
-         * other testing frameworks.
-         */
-        public static XunitException AssertFail(string message)
-        {
-            throw new XunitException(message);
-        }
+        throw new XunitException(message);
+    }
 
-        public static bool AssertDeepEqualTo<T>(
-            this T actual,
-            T expected,
-            Expression<Func<T, object>>[]? notEqualProperties = null)
+    public static bool AssertDeepEqualTo<T>(
+        this T actual,
+        T expected,
+        Expression<Func<T, object>>[]? notEqualProperties = null)
+    {
+        var compareLogic = new CompareLogic();
+        notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
+        var comparison = compareLogic.Compare(actual, expected);
+        Assert.True(comparison.AreEqual, comparison.DifferencesString);
+        notEqualProperties?.ForEach(notEqualField =>
         {
-            var compareLogic = new CompareLogic();
-            notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
-            var comparison = compareLogic.Compare(actual, expected);
-            Assert.True(comparison.AreEqual, comparison.DifferencesString);
-            notEqualProperties?.ForEach(notEqualField =>
+            var fieldGetter = notEqualField.Compile();
+            var expectedValue = fieldGetter.Invoke(expected);
+            var actualValue = fieldGetter.Invoke(actual);
+
+            try
             {
-                var fieldGetter = notEqualField.Compile();
-                var expectedValue = fieldGetter.Invoke(expected);
-                var actualValue = fieldGetter.Invoke(actual);
+                Assert.NotEqual(expectedValue, actualValue);
+            }
+            catch (NotEqualException)
+            {
+                throw new XunitException($"Expected values for expression {notEqualField} to not be equal, " +
+                                         $"but they were both of value \"{expectedValue}\".");
+            }
 
-                try
-                {
-                    Assert.NotEqual(expectedValue, actualValue);
-                }
-                catch (NotEqualException)
-                {
-                    throw new XunitException($"Expected values for expression {notEqualField} to not be equal, " +
-                                             $"but they were both of value \"{expectedValue}\".");
-                }
+        });
+        return true;
+    }
 
-            });
-            return true;
-        }
+    /// <summary>
+    /// A convenience method for combining AssertDeepEqualTo with one or more inequality assertions for specific
+    /// fields.  This allows us to check for a general equality rule for the majority of an object's fields, whilst
+    /// also checking the opposite case for a smaller subset of fields.
+    /// </summary>
+    public static Expression<Func<T, object>>[] Except<T>(params Expression<Func<T, object>>[] properties)
+    {
+        return properties;
+    }
 
-        /// <summary>
-        /// A convenience method for combining AssertDeepEqualTo with one or more inequality assertions for specific
-        /// fields.  This allows us to check for a general equality rule for the majority of an object's fields, whilst
-        /// also checking the opposite case for a smaller subset of fields.
-        /// </summary>
-        public static Expression<Func<T, object>>[] Except<T>(params Expression<Func<T, object>>[] properties)
-        {
-            return properties;
-        }
+    public static bool IsDeepEqualTo<T>(
+        this T actual,
+        T expected,
+        Expression<Func<T, object>>[]? ignoreProperties = null)
+    {
+        var compareLogic = new CompareLogic();
+        ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
+        var comparison = compareLogic.Compare(actual, expected);
+        return comparison.AreEqual;
+    }
 
-        public static bool IsDeepEqualTo<T>(
-            this T actual,
-            T expected,
-            Expression<Func<T, object>>[]? ignoreProperties = null)
-        {
-            var compareLogic = new CompareLogic();
-            ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
-            var comparison = compareLogic.Compare(actual, expected);
-            return comparison.AreEqual;
-        }
+    /// <summary>
+    /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
+    /// </summary>
+    public static void AssertUtcNow(this DateTime dateTime, int withinMillis = TimeWithinMillis)
+    {
+        Assert.InRange(DateTime.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
+    }
 
-        /// <summary>
-        /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
-        /// </summary>
-        public static void AssertUtcNow(this DateTime dateTime, int withinMillis = TimeWithinMillis)
-        {
-            Assert.InRange(DateTime.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
-        }
-
-        /// <summary>
-        /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
-        /// </summary>
-        public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = TimeWithinMillis)
-        {
-            Assert.NotNull(dateTime);
-            AssertUtcNow(dateTime!.Value, withinMillis);
-        }
+    /// <summary>
+    /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
+    /// </summary>
+    public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = TimeWithinMillis)
+    {
+        Assert.NotNull(dateTime);
+        AssertUtcNow(dateTime!.Value, withinMillis);
     }
 }

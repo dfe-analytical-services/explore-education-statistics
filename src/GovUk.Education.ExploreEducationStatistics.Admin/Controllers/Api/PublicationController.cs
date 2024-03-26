@@ -16,154 +16,153 @@ using ExternalMethodologyViewModel =
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+
+[Authorize]
+[ApiController]
+public class PublicationController : ControllerBase
 {
-    [Authorize]
-    [ApiController]
-    public class PublicationController : ControllerBase
+    private readonly IPublicationService _publicationService;
+    private readonly IUserRoleService _roleService;
+
+    public PublicationController(
+        IPublicationService publicationService,
+        IUserRoleService roleService)
     {
-        private readonly IPublicationService _publicationService;
-        private readonly IUserRoleService _roleService;
+        _publicationService = publicationService;
+        _roleService = roleService;
+    }
 
-        public PublicationController(
-            IPublicationService publicationService,
-            IUserRoleService roleService)
-        {
-            _publicationService = publicationService;
-            _roleService = roleService;
-        }
+    [HttpGet("api/publications")]
+    public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
+        [FromQuery] Guid? topicId)
+    {
+        return await _publicationService
+            .ListPublications(topicId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publications")]
-        public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] Guid? topicId)
-        {
-            return await _publicationService
-                .ListPublications(topicId)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publication-summaries")]
+    public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
+    {
+        return await _publicationService
+            .ListPublicationSummaries()
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publication-summaries")]
-        public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
-        {
-            return await _publicationService
-                .ListPublicationSummaries()
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publications/{publicationId:guid}")]
+    public async Task<ActionResult<PublicationViewModel>> GetPublication(
+        [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
+    {
+        return await _publicationService
+            .GetPublication(publicationId, includePermissions)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publications/{publicationId:guid}")]
-        public async Task<ActionResult<PublicationViewModel>> GetPublication(
-            [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
-        {
-            return await _publicationService
-                .GetPublication(publicationId, includePermissions)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
+    public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
+    {
+        return await _publicationService.GetExternalMethodology(publicationId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
-        public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
-        {
-            return await _publicationService.GetExternalMethodology(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("api/publication/{publicationId:guid}/external-methodology")]
+    public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
+        Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
+    {
+        return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("api/publication/{publicationId:guid}/external-methodology")]
-        public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
-            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
-        {
-            return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
-                .HandleFailuresOrOk();
-        }
+    [HttpDelete("api/publication/{publicationId:guid}/external-methodology")]
+    public async Task<ActionResult<Unit>> RemoveExternalMethodology(
+        Guid publicationId)
+    {
+        return await _publicationService.RemoveExternalMethodology(publicationId)
+            .HandleFailuresOrNoContent();
+    }
 
-        [HttpDelete("api/publication/{publicationId:guid}/external-methodology")]
-        public async Task<ActionResult<Unit>> RemoveExternalMethodology(
-            Guid publicationId)
-        {
-            return await _publicationService.RemoveExternalMethodology(publicationId)
-                .HandleFailuresOrNoContent();
-        }
+    [HttpGet("api/publication/{publicationId:guid}/contact")]
+    public async Task<ActionResult<ContactViewModel>> GetContact(
+        Guid publicationId)
+    {
+        return await _publicationService.GetContact(publicationId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publication/{publicationId:guid}/contact")]
-        public async Task<ActionResult<ContactViewModel>> GetContact(
-            Guid publicationId)
-        {
-            return await _publicationService.GetContact(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("api/publication/{publicationId:guid}/contact")]
+    public async Task<ActionResult<ContactViewModel>> UpdateContact(
+        Guid publicationId, ContactSaveRequest updatedContact)
+    {
+        return await _publicationService.UpdateContact(publicationId, updatedContact)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("api/publication/{publicationId:guid}/contact")]
-        public async Task<ActionResult<ContactViewModel>> UpdateContact(
-            Guid publicationId, ContactSaveRequest updatedContact)
-        {
-            return await _publicationService.UpdateContact(publicationId, updatedContact)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publication/{publicationId:guid}/releases")]
+    public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        [Required] Guid publicationId,
+        [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
+        [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
+        [FromQuery] bool? live = null,
+        [FromQuery] bool includePermissions = false)
+    {
+        return await _publicationService
+            .ListLatestReleaseVersionsPaginated(publicationId, page, pageSize, live, includePermissions)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publication/{publicationId:guid}/releases")]
-        public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
-            [Required] Guid publicationId,
-            [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
-            [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
-            [FromQuery] bool? live = null,
-            [FromQuery] bool includePermissions = false)
-        {
-            return await _publicationService
-                .ListLatestReleaseVersionsPaginated(publicationId, page, pageSize, live, includePermissions)
-                .HandleFailuresOrOk();
-        }
+    [HttpPost("api/publications")]
+    public async Task<ActionResult<PublicationCreateViewModel>> CreatePublication(
+        PublicationCreateRequest publication)
+    {
+        return await _publicationService
+            .CreatePublication(publication)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPost("api/publications")]
-        public async Task<ActionResult<PublicationCreateViewModel>> CreatePublication(
-            PublicationCreateRequest publication)
-        {
-            return await _publicationService
-                .CreatePublication(publication)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("api/publications/{publicationId:guid}")]
+    public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
+        Guid publicationId,
+        PublicationSaveRequest updatedPublication)
+    {
+        return await _publicationService
+            .UpdatePublication(publicationId, updatedPublication)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("api/publications/{publicationId:guid}")]
-        public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
-            Guid publicationId,
-            PublicationSaveRequest updatedPublication)
-        {
-            return await _publicationService
-                .UpdatePublication(publicationId, updatedPublication)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publications/{publicationId:guid}/release-series")]
+    public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
+    {
+        return await _publicationService
+            .GetReleaseSeries(publicationId)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpGet("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
-        {
-            return await _publicationService
-                .GetReleaseSeries(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpPost("api/publications/{publicationId:guid}/release-series")]
+    public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
+        Guid publicationId,
+        ReleaseSeriesLegacyLinkAddRequest request)
+    {
+        return await _publicationService
+            .AddReleaseSeriesLegacyLink(publicationId, request)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPost("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
-            Guid publicationId,
-            ReleaseSeriesLegacyLinkAddRequest request)
-        {
-            return await _publicationService
-                .AddReleaseSeriesLegacyLink(publicationId, request)
-                .HandleFailuresOrOk();
-        }
+    [HttpPut("api/publications/{publicationId:guid}/release-series")]
+    public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
+        Guid publicationId,
+        List<ReleaseSeriesItemUpdateRequest> releaseSeries)
+    {
+        return await _publicationService
+            .UpdateReleaseSeries(publicationId, releaseSeries)
+            .HandleFailuresOrOk();
+    }
 
-        [HttpPut("api/publications/{publicationId:guid}/release-series")]
-        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
-            Guid publicationId,
-            List<ReleaseSeriesItemUpdateRequest> releaseSeries)
-        {
-            return await _publicationService
-                .UpdateReleaseSeries(publicationId, releaseSeries)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("api/publications/{publicationId:guid}/roles")]
-        public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
-        {
-            return await _roleService
-                .GetPublicationRolesForPublication(publicationId)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("api/publications/{publicationId:guid}/roles")]
+    public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
+    {
+        return await _roleService
+            .GetPublicationRolesForPublication(publicationId)
+            .HandleFailuresOrOk();
     }
 }
