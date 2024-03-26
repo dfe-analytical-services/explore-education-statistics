@@ -58,13 +58,13 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'themeId',
         nextValue: 'selected-theme-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {},
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
         themeId: 'selected-theme-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
       });
     });
 
@@ -72,7 +72,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'themeId',
         nextValue: 'selected-theme-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
@@ -82,7 +82,7 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        orderBy: 'newest',
+        sortBy: 'newest',
         themeId: 'selected-theme-id',
       });
     });
@@ -91,7 +91,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'themeId',
         nextValue: 'all',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
@@ -101,7 +101,7 @@ describe('getUpdatedQueryParams', () => {
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        orderBy: 'newest',
+        sortBy: 'newest',
       });
     });
 
@@ -109,7 +109,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'themeId',
         nextValue: 'selected-theme-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           latestOnly: 'false',
           page: '4',
@@ -121,7 +121,7 @@ describe('getUpdatedQueryParams', () => {
       });
       expect(result).toEqual({
         latestOnly: 'false',
-        orderBy: 'newest',
+        sortBy: 'newest',
         themeId: 'selected-theme-id',
       });
     });
@@ -134,7 +134,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'publicationId',
         nextValue: 'selected-publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           themeId: 'theme-id',
         },
@@ -145,7 +145,7 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         releaseId: 'release-id-3',
         themeId: 'theme-id',
       });
@@ -159,7 +159,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'publicationId',
         nextValue: 'selected-publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           publicationId: 'publication-id',
           themeId: 'theme-id',
@@ -171,7 +171,7 @@ describe('getUpdatedQueryParams', () => {
 
       expect(result).toEqual({
         publicationId: 'selected-publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         releaseId: 'release-id-4',
         themeId: 'theme-id',
       });
@@ -183,7 +183,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'publicationId',
         nextValue: 'all',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           page: '4',
           releaseId: 'release-id',
@@ -195,7 +195,7 @@ describe('getUpdatedQueryParams', () => {
       expect(handleFetchReleases).not.toHaveBeenCalled();
 
       expect(result).toEqual({
-        orderBy: 'newest',
+        sortBy: 'newest',
         themeId: 'theme-id',
       });
     });
@@ -206,7 +206,7 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'publicationId',
         nextValue: 'selected-publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           latestOnly: 'false',
           themeId: 'theme-id',
@@ -215,7 +215,7 @@ describe('getUpdatedQueryParams', () => {
       });
 
       expect(result).toEqual({
-        orderBy: 'newest',
+        sortBy: 'newest',
         publicationId: 'selected-publication-id',
         releaseId: 'release-id-3',
         themeId: 'theme-id',
@@ -228,12 +228,12 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'selected-release-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
           releaseId: 'release-id',
-          orderBy: 'newest',
+          sortBy: 'newest',
           themeId: 'theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -241,7 +241,7 @@ describe('getUpdatedQueryParams', () => {
       expect(result).toEqual({
         publicationId: 'publication-id',
         releaseId: 'selected-release-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         themeId: 'theme-id',
       });
     });
@@ -250,12 +250,12 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'all',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           page: '4',
           publicationId: 'publication-id',
           releaseId: 'release-id',
-          orderBy: 'newest',
+          sortBy: 'newest',
           themeId: 'theme-id',
         },
         onFetchReleases: () => Promise.resolve([]),
@@ -263,7 +263,7 @@ describe('getUpdatedQueryParams', () => {
       expect(result).toEqual({
         latestOnly: 'false',
         publicationId: 'publication-id',
-        orderBy: 'newest',
+        sortBy: 'newest',
         themeId: 'theme-id',
       });
     });
@@ -272,41 +272,41 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'all',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {},
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
         latestOnly: 'false',
-        orderBy: 'newest',
+        sortBy: 'newest',
       });
     });
     test('sets latestOnly to true when changing from all to latest releases', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'releaseId',
         nextValue: 'latest',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {},
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
         latestOnly: 'true',
-        orderBy: 'newest',
+        sortBy: 'newest',
       });
     });
   });
 
   describe('filter by search term', () => {
-    test('adds the search term to the params and sets orderBy to relevance when search', async () => {
+    test('adds the search term to the params and sets sortBy to relevance when search', async () => {
       const result = await getUpdatedQueryParams({
         filterType: 'searchTerm',
         nextValue: 'find me',
-        orderBy: 'newest',
-        query: { orderBy: 'newest' },
+        sortBy: 'newest',
+        query: { sortBy: 'newest' },
         onFetchReleases: () => Promise.resolve([]),
       });
       expect(result).toEqual({
-        orderBy: 'relevance',
+        sortBy: 'relevance',
         searchTerm: 'find me',
       });
     });
@@ -315,10 +315,10 @@ describe('getUpdatedQueryParams', () => {
       const result = await getUpdatedQueryParams({
         filterType: 'searchTerm',
         nextValue: 'find me',
-        orderBy: 'newest',
+        sortBy: 'newest',
         query: {
           latestOnly: 'false',
-          orderBy: 'newest',
+          sortBy: 'newest',
           publicationId: 'publication-id',
           releaseId: 'release-id',
           themeId: 'theme-id',
@@ -327,7 +327,7 @@ describe('getUpdatedQueryParams', () => {
       });
       expect(result).toEqual({
         latestOnly: 'false',
-        orderBy: 'relevance',
+        sortBy: 'relevance',
         publicationId: 'publication-id',
         releaseId: 'release-id',
         searchTerm: 'find me',

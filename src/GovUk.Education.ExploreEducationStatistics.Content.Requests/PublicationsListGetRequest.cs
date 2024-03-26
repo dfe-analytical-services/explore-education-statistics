@@ -9,6 +9,6 @@ public record PublicationsListGetRequest(
     Guid? ThemeId,
     [MinLength(3)] string? Search,
     PublicationsSortBy? Sort,
-    SortOrder? Order,
+    SortDirection? SortDirection,
     [Range(1, int.MaxValue)] int Page = 1,
     [Range(1, int.MaxValue)] int PageSize = 10);

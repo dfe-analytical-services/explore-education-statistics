@@ -40,8 +40,8 @@ public class DataSetsController : ControllerBase
                 releaseVersionId: request.ReleaseId,
                 request.LatestOnly,
                 request.SearchTerm,
-                request.OrderBy,
                 request.Sort,
+                request.SortDirection,
                 page: request.Page,
                 pageSize: request.PageSize,
                 cancellationToken: cancellationToken)

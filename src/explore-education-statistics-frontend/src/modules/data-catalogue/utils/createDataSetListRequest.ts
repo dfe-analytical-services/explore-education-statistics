@@ -1,12 +1,12 @@
+import { SortDirection } from '@common/services/types/sort';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
 import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import {
-  DataSetOrderParam,
   DataSetSortParam,
-  dataSetOrderOptions,
-  DataSetOrderOption,
+  dataSetSortOptions,
+  DataSetSortOption,
   DataSetListRequest,
 } from '@frontend/services/dataSetService';
 import omitBy from 'lodash/omitBy';
@@ -16,14 +16,14 @@ export default function createDataSetListRequest(
 ): DataSetListRequest {
   const {
     latestOnly,
-    orderBy: orderByParam,
+    sortBy,
     publicationId,
     releaseId,
     searchTerm: searchParam,
     themeId,
   } = getParamsFromQuery(query);
 
-  const { orderBy, sort } = getOrderParams(orderByParam);
+  const { sort, sortDirection } = getSortParams(sortBy);
 
   const minSearchCharacters = 3;
   const searchTerm =
@@ -32,11 +32,11 @@ export default function createDataSetListRequest(
   return omitBy(
     {
       latestOnly,
-      orderBy,
       page: parseNumber(query.page) ?? 1,
       publicationId,
       releaseId,
       sort,
+      sortDirection,
       searchTerm,
       themeId,
     },
@@ -44,40 +44,40 @@ export default function createDataSetListRequest(
   );
 }
 
-function getOrderParams(orderBy: DataSetOrderOption): {
-  orderBy?: DataSetOrderParam;
+function getSortParams(orderBy: DataSetSortOption): {
   sort?: DataSetSortParam;
+  sortDirection?: SortDirection;
 } {
   if (orderBy === 'relevance') {
     return {
-      orderBy: 'relevance',
-      sort: 'desc',
+      sort: 'relevance',
+      sortDirection: 'Desc',
     };
   }
   if (orderBy === 'title') {
     return {
-      orderBy: 'title',
-      sort: 'asc',
+      sort: 'title',
+      sortDirection: 'Asc',
     };
   }
   if (orderBy === 'oldest') {
     return {
-      orderBy: 'published',
-      sort: 'asc',
+      sort: 'published',
+      sortDirection: 'Asc',
     };
   }
   return {
-    orderBy: 'published',
-    sort: 'desc',
+    sort: 'published',
+    sortDirection: 'Desc',
   };
 }
 
 export function getParamsFromQuery(query: DataCataloguePageQuery) {
   return {
     latestOnly: getFirst(query.latestOnly),
-    orderBy:
-      query.orderBy && isOneOf(query.orderBy, dataSetOrderOptions)
-        ? query.orderBy
+    sortBy:
+      query.sortBy && isOneOf(query.sortBy, dataSetSortOptions)
+        ? query.sortBy
         : 'newest',
     publicationId: getFirst(query.publicationId),
     releaseId: getFirst(query.releaseId),

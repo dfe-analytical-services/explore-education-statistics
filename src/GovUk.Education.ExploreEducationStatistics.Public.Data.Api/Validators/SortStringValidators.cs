@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 

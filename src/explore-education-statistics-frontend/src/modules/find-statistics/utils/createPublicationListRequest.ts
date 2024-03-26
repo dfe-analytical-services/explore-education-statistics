@@ -1,11 +1,11 @@
 import {
   PublicationListRequest,
-  PublicationOrderParam,
   PublicationSortOption,
   publicationSortOptions,
   PublicationSortParam,
 } from '@common/services/publicationService';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
+import { SortDirection } from '@common/services/types/sort';
 import getFirst from '@common/utils/getFirst';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
@@ -22,7 +22,7 @@ export default function createPublicationListRequest(
     themeId,
   } = getParamsFromQuery(query);
 
-  const { order, sort } = getSortParams(sortBy);
+  const { sortDirection, sort } = getSortParams(sortBy);
 
   const minSearchCharacters = 3;
   const search =
@@ -30,11 +30,11 @@ export default function createPublicationListRequest(
 
   return omitBy(
     {
-      order,
       page: parseNumber(query.page) ?? 1,
-      sort,
       releaseType,
       search,
+      sort,
+      sortDirection,
       themeId,
     },
     value => typeof value === 'undefined',
@@ -42,30 +42,30 @@ export default function createPublicationListRequest(
 }
 
 function getSortParams(sortBy: PublicationSortOption): {
-  order?: PublicationOrderParam;
+  sortDirection?: SortDirection;
   sort?: PublicationSortParam;
 } {
   if (sortBy === 'relevance') {
     return {
-      order: 'desc',
       sort: 'relevance',
+      sortDirection: 'Desc',
     };
   }
   if (sortBy === 'title') {
     return {
-      order: 'asc',
       sort: 'title',
+      sortDirection: 'Asc',
     };
   }
   if (sortBy === 'oldest') {
     return {
-      order: 'asc',
       sort: 'published',
+      sortDirection: 'Asc',
     };
   }
   return {
-    order: 'desc',
     sort: 'published',
+    sortDirection: 'Desc',
   };
 }
 

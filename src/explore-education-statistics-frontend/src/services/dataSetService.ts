@@ -1,6 +1,7 @@
 import { PaginatedList } from '@common/services/types/pagination';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
+import { SortDirection } from '@common/services/types/sort';
 
 export interface DataSet {
   file: { id: string; name: string; size: string };
@@ -61,18 +62,16 @@ export interface DataSetSummary {
   indicators: string[];
 }
 
-export const dataSetOrderOptions = [
+export const dataSetSortOptions = [
   'newest',
   'oldest',
   'relevance',
   'title',
 ] as const;
 
-export type DataSetOrderOption = (typeof dataSetOrderOptions)[number];
+export type DataSetSortOption = (typeof dataSetSortOptions)[number];
 
-export type DataSetSortParam = 'asc' | 'desc';
-
-export type DataSetOrderParam = 'published' | 'title' | 'relevance';
+export type DataSetSortParam = 'published' | 'title' | 'relevance';
 
 export const dataSetFilters = [
   'latest',
@@ -86,13 +85,13 @@ export type DataSetFilter = (typeof dataSetFilters)[number];
 
 export interface DataSetListRequest {
   latestOnly?: 'true' | 'false';
-  orderBy?: DataSetOrderParam;
   page?: number;
   pageSize?: number;
   publicationId?: string;
   releaseId?: string;
   searchTerm?: string;
   sort?: DataSetSortParam;
+  sortDirection?: SortDirection;
   themeId?: string;
 }
 

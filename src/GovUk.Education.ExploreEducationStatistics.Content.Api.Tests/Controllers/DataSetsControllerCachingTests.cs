@@ -32,8 +32,8 @@ public class DataSetsControllerCachingTests
             ReleaseId: Guid.NewGuid(),
             LatestOnly: true,
             SearchTerm: "term",
-            DataSetsListRequestOrderBy.Published,
-            SortOrder.Asc,
+            DataSetsListRequestSortBy.Published,
+            SortDirection.Asc,
             Page: 1,
             PageSize: 10
         );
@@ -96,8 +96,8 @@ public class DataSetsControllerCachingTests
                     _query.ReleaseId,
                     _query.LatestOnly,
                     _query.SearchTerm,
-                    _query.OrderBy,
                     _query.Sort,
+                    _query.SortDirection,
                     _query.Page,
                     _query.PageSize,
                     default))
