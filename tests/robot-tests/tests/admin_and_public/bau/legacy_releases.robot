@@ -34,11 +34,12 @@ Validate created legacy release
     user checks element count is x    css:tbody tr    2
 
     user checks table cell contains    1    1    Academic year 2020/21
-    user checks table cell contains    1    1    Unpublished
     user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    user checks table cell contains    1    3    Unpublished
 
     user checks table cell contains    2    1    ${DESCRIPTION}
     user checks table cell contains    2    2    http://test.com
+    user checks table cell contains    2    3    Legacy release
 
 Navigate to admin dashboard to create new release
     user navigates to admin dashboard    Bau1
@@ -92,16 +93,17 @@ Validate updated legacy release
     user checks element count is x    css:tbody tr    2
 
     user checks table cell contains    1    1    Academic year 2020/21
-    user checks table cell contains    1    1    Latest
-    user checks table cell does not contain    1    1    Unpublished
     user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
-    user checks table cell does not contain    1    3    Edit
-    user checks table cell does not contain    1    3    Delete
+    user checks table cell contains    1    3    Latest
+    user checks table cell does not contain    1    3    Unpublished
+    user checks table cell does not contain    1    4    Edit
+    user checks table cell does not contain    1    4    Delete
 
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
-    user checks table cell contains    2    3    Edit
-    user checks table cell contains    2    3    Delete
+    user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
 
 Validate public frontend shows changes made to legacy release after saving publication
     user waits for caches to expire
@@ -142,17 +144,20 @@ Validate legacy release order
     user checks element count is x    css:tbody tr    4
 
     user checks table cell contains    1    1    Academic year 2020/21
-    user checks table cell contains    1    1    Latest
     user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    user checks table cell contains    1    3    Latest
 
     user checks table cell contains    2    1    Test collection 1
     user checks table cell contains    2    2    http://test-1.com
+    user checks table cell contains    2    3    Legacy release
 
     user checks table cell contains    3    1    Test collection 2
     user checks table cell contains    3    2    http://test-2.com
+    user checks table cell contains    3    3    Legacy release
 
     user checks table cell contains    4    1    Test collection 3
     user checks table cell contains    4    2    http://test-3.com
+    user checks table cell contains    4    3    Legacy release
 
 Reorder releases
     user clicks button    Reorder releases
@@ -173,13 +178,16 @@ Validate reordered legacy releases
 
     user checks table cell contains    1    1    Test collection 1
     user checks table cell contains    1    2    http://test-1.com
+    user checks table cell contains    1    3    Legacy release
 
     user checks table cell contains    2    1    Test collection 2
     user checks table cell contains    2    2    http://test-2.com
+    user checks table cell contains    2    3    Legacy release
 
     user checks table cell contains    3    1    Academic year 2020/21
-    user checks table cell contains    3    1    Latest
     user checks table cell contains    3    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_SLUG}/2020-21
+    user checks table cell contains    3    3    Latest
 
     user checks table cell contains    4    1    Test collection 3
     user checks table cell contains    4    2    http://test-3.com
+    user checks table cell contains    4    3    Legacy release
