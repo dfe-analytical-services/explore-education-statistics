@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 

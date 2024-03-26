@@ -9,7 +9,7 @@ public record PublicationsListPostRequest(
     Guid? ThemeId = null,
     [MinLength(3)] string? Search = null,
     PublicationsSortBy? Sort = null,
-    SortOrder? Order = null,
+    SortDirection? SortDirection = null,
     [Range(1, int.MaxValue)] int Page = 1,
     [Range(1, int.MaxValue)] int PageSize = 10,
     IEnumerable<Guid>? PublicationIds = null);

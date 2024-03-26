@@ -24,7 +24,7 @@ public interface IPublicationService
         Guid? themeId = null,
         string? search = null,
         PublicationsSortBy? sort = null,
-        SortOrder? order = null,
+        SortDirection? sortDirection = null,
         int page = 1,
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null);

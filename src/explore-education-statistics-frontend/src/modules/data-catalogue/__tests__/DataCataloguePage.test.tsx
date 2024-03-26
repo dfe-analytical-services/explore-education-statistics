@@ -1762,7 +1762,7 @@ describe('DataCataloguePage', () => {
         await waitFor(() => {
           expect(mockRouter).toMatchObject({
             pathname: '/data-catalogue',
-            query: { orderBy: 'title' },
+            query: { sortBy: 'title' },
           });
         });
       });
@@ -1798,7 +1798,7 @@ describe('DataCataloguePage', () => {
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
-          query: { orderBy: 'relevance' },
+          query: { sortBy: 'relevance' },
         });
       });
 
@@ -1839,7 +1839,7 @@ describe('DataCataloguePage', () => {
 
         expect(mockRouter).toMatchObject({
           pathname: '/data-catalogue',
-          query: { orderBy: 'newest' },
+          query: { sortBy: 'newest' },
         });
       });
     });

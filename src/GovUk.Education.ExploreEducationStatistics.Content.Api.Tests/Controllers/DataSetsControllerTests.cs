@@ -726,17 +726,17 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class OrderByTests : ListDataSetsTests
+        public class SortByTests : ListDataSetsTests
         {
-            public OrderByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+            public SortByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
             }
 
             [Theory]
-            [InlineData(SortOrder.Asc)]
+            [InlineData(SortDirection.Asc)]
             [InlineData(null)]
-            public async Task OrderByTitle_OrdersByTitleInAscendingSortOrderAndIsAscendingByDefault(
-                SortOrder? sortOrder)
+            public async Task SortByTitle_SortsByTitleInAscendingOrderAndIsAscendingByDefault(
+                SortDirection? sortDirection)
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -760,8 +760,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    OrderBy = DataSetsListRequestOrderBy.Title,
-                    Sort = sortOrder
+                    Sort = DataSetsListRequestSortBy.Title,
+                    SortDirection = sortDirection
                 };
                 var response = await ListDataSets(client, query);
 
@@ -780,7 +780,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByTitleDescending_OrdersByTitleInDescendingSortOrder()
+            public async Task SortByTitleDescending_SortsByTitleInDescendingOrder()
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -804,8 +804,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    OrderBy = DataSetsListRequestOrderBy.Title,
-                    Sort = SortOrder.Desc
+                    Sort = DataSetsListRequestSortBy.Title,
+                    SortDirection = SortDirection.Desc
                 };
                 var response = await ListDataSets(client, query);
 
@@ -824,10 +824,10 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Theory]
-            [InlineData(SortOrder.Asc)]
+            [InlineData(SortDirection.Asc)]
             [InlineData(null)]
-            public async Task OrderByNatural_OrdersByNaturalInAscendingSortOrderAndIsAscendingByDefault(
-                SortOrder? sortOrder)
+            public async Task SortByNatural_SortsByNaturalInAscendingOrderAndIsAscendingByDefault(
+                SortDirection? sortDirection)
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -852,8 +852,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var query = new DataSetsListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
-                    OrderBy = DataSetsListRequestOrderBy.Natural,
-                    Sort = sortOrder
+                    Sort = DataSetsListRequestSortBy.Natural,
+                    SortDirection = sortDirection
                 };
                 var response = await ListDataSets(client, query);
 
@@ -873,7 +873,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByNaturalDescending_OrdersByNaturalInDescendingSortOrder()
+            public async Task SortByNaturalDescending_SortsByNaturalInDescendingOrder()
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -898,8 +898,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var query = new DataSetsListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
-                    OrderBy = DataSetsListRequestOrderBy.Natural,
-                    Sort = SortOrder.Desc
+                    Sort = DataSetsListRequestSortBy.Natural,
+                    SortDirection = SortDirection.Desc
                 };
                 var response = await ListDataSets(client, query);
 
@@ -919,7 +919,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByPublishedAscending_OrdersByPublishedInAscendingSortOrder()
+            public async Task SortByPublishedAscending_SortsByPublishedInAscendingOrder()
             {
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
@@ -954,8 +954,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    OrderBy = DataSetsListRequestOrderBy.Published,
-                    Sort = SortOrder.Asc
+                    Sort = DataSetsListRequestSortBy.Published,
+                    SortDirection = SortDirection.Asc
                 };
                 var response = await ListDataSets(client, query);
 
@@ -977,10 +977,10 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Theory]
-            [InlineData(SortOrder.Desc)]
+            [InlineData(SortDirection.Desc)]
             [InlineData(null)]
-            public async Task OrderByPublished_OrdersByPublishedInDescendingSortOrderAndIsDescendingByDefault(
-                SortOrder? sortOrder)
+            public async Task SortByPublished_SortsByPublishedInDescendingOrderAndIsDescendingByDefault(
+                SortDirection? sortDirection)
             {
                 var (publication1, publication2) = _fixture
                     .DefaultPublication()
@@ -1015,8 +1015,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest
                 {
-                    OrderBy = DataSetsListRequestOrderBy.Published,
-                    Sort = sortOrder
+                    Sort = DataSetsListRequestSortBy.Published,
+                    SortDirection = sortDirection
                 };
                 var response = await ListDataSets(client, query);
 
@@ -1038,7 +1038,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByRelevanceAscending_OrdersByRelevanceInAscendingSortOrder()
+            public async Task SortByRelevanceAscending_SortsByRelevanceInAscendingOrder()
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -1070,8 +1070,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var query = new DataSetsListRequest
                 {
                     SearchTerm = "aaa",
-                    OrderBy = DataSetsListRequestOrderBy.Relevance,
-                    Sort = SortOrder.Asc
+                    Sort = DataSetsListRequestSortBy.Relevance,
+                    SortDirection = SortDirection.Asc
                 };
                 var response = await ListDataSets(client, query);
 
@@ -1091,10 +1091,10 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Theory]
-            [InlineData(SortOrder.Desc)]
+            [InlineData(SortDirection.Desc)]
             [InlineData(null)]
-            public async Task OrderByRelevance_OrdersByRelevanceInDescendingSortOrderAndIsDescendingByDefault(
-                SortOrder? sortOrder)
+            public async Task SortByRelevance_SortsByRelevanceInDescendingOrderAndIsDescendingByDefault(
+                SortDirection? sortDirection)
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -1126,8 +1126,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var query = new DataSetsListRequest
                 {
                     SearchTerm = "aaa",
-                    OrderBy = DataSetsListRequestOrderBy.Relevance,
-                    Sort = sortOrder
+                    Sort = DataSetsListRequestSortBy.Relevance,
+                    SortDirection = sortDirection
                 };
                 var response = await ListDataSets(client, query);
 
@@ -1418,13 +1418,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByNaturalWithoutReleaseId_ReturnsValidationError()
+            public async Task SortByNaturalWithoutReleaseId_ReturnsValidationError()
             {
                 var client = BuildApp().CreateClient();
 
                 var query = new DataSetsListRequest(
                     ReleaseId: null,
-                    OrderBy: DataSetsListRequestOrderBy.Natural
+                    Sort: DataSetsListRequestSortBy.Natural
                 );
                 var response = await ListDataSets(client, query);
 
@@ -1436,7 +1436,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByNaturalWithReleaseId_Success()
+            public async Task SortByNaturalWithReleaseId_Success()
             {
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1445,7 +1445,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest(
                     ReleaseId: Guid.NewGuid(),
-                    OrderBy: DataSetsListRequestOrderBy.Natural
+                    Sort: DataSetsListRequestSortBy.Natural
                 );
                 var response = await ListDataSets(client, query);
 
@@ -1455,13 +1455,13 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByRelevanceWithoutSearchTerm_ReturnsValidationError()
+            public async Task SortByRelevanceWithoutSearchTerm_ReturnsValidationError()
             {
                 var client = BuildApp().CreateClient();
 
                 var query = new DataSetsListRequest(
                     SearchTerm: null,
-                    OrderBy: DataSetsListRequestOrderBy.Relevance
+                    Sort: DataSetsListRequestSortBy.Relevance
                 );
                 var response = await ListDataSets(client, query);
 
@@ -1475,7 +1475,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task OrderByRelevanceWithSearchTerm_Success()
+            public async Task SortByRelevanceWithSearchTerm_Success()
             {
                 MemoryCacheService
                     .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
@@ -1487,7 +1487,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetsListRequest(
                     SearchTerm: "aaa",
-                    OrderBy: DataSetsListRequestOrderBy.Relevance
+                    Sort: DataSetsListRequestSortBy.Relevance
                 );
                 var response = await ListDataSets(client, query);
 
@@ -1572,8 +1572,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 { "releaseId", request.ReleaseId?.ToString() },
                 { "latestOnly", request.LatestOnly?.ToString() },
                 { "searchTerm", request.SearchTerm },
-                { "orderBy", request.OrderBy?.ToString() },
                 { "sort", request.Sort?.ToString() },
+                { "sortDirection", request.SortDirection?.ToString() },
                 { "page", request.Page.ToString() },
                 { "pageSize", request.PageSize.ToString() }
             };

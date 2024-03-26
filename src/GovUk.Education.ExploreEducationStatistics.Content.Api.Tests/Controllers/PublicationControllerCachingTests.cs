@@ -31,7 +31,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         ThemeId: Guid.Empty,
         Search: "",
         PublicationsSortBy.Published,
-        SortOrder.Asc,
+        SortDirection.Asc,
         Page: 1,
         PageSize: 10
     );
@@ -41,7 +41,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         ThemeId: Guid.Empty,
         Search: "",
         PublicationsSortBy.Published,
-        SortOrder.Asc,
+        SortDirection.Asc,
         Page: 1,
         PageSize: 10,
         PublicationIds: ListOf(Guid.Empty)
@@ -87,7 +87,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
                 _getQuery.ThemeId,
                 _getQuery.Search,
                 _getQuery.Sort,
-                _getQuery.Order,
+                _getQuery.SortDirection,
                 _getQuery.Page,
                 _getQuery.PageSize,
                 null))
@@ -147,7 +147,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
                 _postQuery.ThemeId,
                 _postQuery.Search,
                 _postQuery.Sort,
-                _postQuery.Order,
+                _postQuery.SortDirection,
                 _postQuery.Page,
                 _postQuery.PageSize,
                 _postQuery.PublicationIds))

@@ -18,8 +18,8 @@ public interface IDataSetService
         Guid? releaseVersionId,
         bool? latestOnly,
         string? searchTerm,
-        DataSetsListRequestOrderBy? orderBy,
-        SortOrder? sort,
+        DataSetsListRequestSortBy? sort,
+        SortDirection? sortDirection,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
