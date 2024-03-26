@@ -532,10 +532,9 @@ describe('DataCataloguePage', () => {
         'href',
         '/data-catalogue?page=3',
       );
-      expect(pagination.getByRole('link', { name: 'Next' })).toHaveAttribute(
-        'href',
-        '/data-catalogue?page=2',
-      );
+      expect(
+        pagination.getByRole('link', { name: 'Next page' }),
+      ).toHaveAttribute('href', '/data-catalogue?page=2');
 
       expect(
         screen.queryByText('No data currently published.'),

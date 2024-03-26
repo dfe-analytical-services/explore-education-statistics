@@ -32,6 +32,7 @@ interface FormProviderProps<TFormValues extends FieldValues> {
   fallbackErrorMapping?: FieldMessageMapper<TFormValues>;
   fallbackSubmitError?: string;
   initialValues?: UseFormProps<TFormValues>['defaultValues'];
+  resetAfterSubmit?: boolean;
   validationSchema?: ObjectSchema<TFormValues> & Schema<TFormValues>;
 }
 
@@ -43,6 +44,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
   fallbackServerValidationError = 'The form submission is invalid and could not be processed',
   fallbackSubmitError = 'Something went wrong whilst submitting the form',
   initialValues,
+  resetAfterSubmit = false,
   validationSchema,
 }: FormProviderProps<TFormValues>) {
   const form = useForm<TFormValues>({
@@ -78,6 +80,9 @@ export default function FormProvider<TFormValues extends FieldValues>({
       return form.handleSubmit(async (values, event) => {
         try {
           await onValid(values, event);
+          if (resetAfterSubmit) {
+            form.reset();
+          }
         } catch (error) {
           if (isServerValidationError(error) && error.response?.data) {
             const fieldErrors = mapServerFieldErrors(

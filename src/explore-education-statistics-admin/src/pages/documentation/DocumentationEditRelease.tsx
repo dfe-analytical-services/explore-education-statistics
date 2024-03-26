@@ -331,9 +331,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                       !
                     </span>
                     <strong className="govuk-warning-text__text">
-                      <span className="govuk-warning-text__assistive">
-                        Warning
-                      </span>
+                      <span className="govuk-visually-hidden">Warning</span>
                       Make sure you enter any relevant notes about the current
                       status of your release into the ‘Internal notes’ text box.
                     </strong>

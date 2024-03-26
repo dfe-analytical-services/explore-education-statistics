@@ -145,11 +145,11 @@ Add basic release content
 
 Add release note to amendment
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note
+    user enters text into element    id:create-release-note-form-reason    Test release note
     user clicks button    Save note
     ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note
+    user waits until element contains    css:#release-notes li:nth-of-type(1) time    ${date}
+    user waits until element contains    css:#release-notes li:nth-of-type(1) p    Test release note
 
 Check amendment has no prerelease users
     user clicks link    Pre-release access

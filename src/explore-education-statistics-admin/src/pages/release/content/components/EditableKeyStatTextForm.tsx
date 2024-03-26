@@ -1,4 +1,4 @@
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
 import {
   pluginsConfigSimple,
   toolbarConfigSimple,
@@ -7,11 +7,11 @@ import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldTextInput } from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
-import { Formik } from 'formik';
 import React from 'react';
 import classNames from 'classnames';
 import Yup from '@common/validation/yup';
@@ -34,22 +34,22 @@ interface EditableKeyStatTextFormProps {
 
 export default function EditableKeyStatTextForm({
   keyStat,
-  isReordering,
+  isReordering = false,
   onSubmit,
   onCancel,
   testId,
 }: EditableKeyStatTextFormProps) {
-  const handleSubmit = useFormSubmit<KeyStatTextFormValues>(async values => {
+  const handleSubmit = async (values: KeyStatTextFormValues) => {
     await onSubmit({
       ...values,
       guidanceTitle: values.guidanceTitle,
       guidanceText: toMarkdown(values.guidanceText),
     });
-  });
+  };
 
   return (
     <div data-testid={testId}>
-      <Formik<KeyStatTextFormValues>
+      <FormProvider
         initialValues={{
           title: keyStat?.title ?? '',
           statistic: keyStat?.statistic ?? '',
@@ -66,67 +66,69 @@ export default function EditableKeyStatTextForm({
           guidanceTitle: Yup.string().max(65),
           guidanceText: Yup.string(),
         })}
-        onSubmit={handleSubmit}
       >
-        {form => (
-          <Form
-            id={
-              keyStat
-                ? `editableKeyStatTextForm-${keyStat.id}`
-                : 'editableKeyStatTextForm-create'
-            }
-          >
-            <div className={styles.textTile}>
-              <FormFieldTextInput<KeyStatTextFormValues>
-                name="title"
+        {({ formState }) => {
+          return (
+            <RHFForm
+              id={
+                keyStat
+                  ? `editableKeyStatTextForm-${keyStat.id}`
+                  : 'editableKeyStatTextForm-create'
+              }
+              onSubmit={handleSubmit}
+            >
+              <div className={styles.textTile}>
+                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                  name="title"
+                  className={classNames({
+                    'govuk-!-width-one-third': isReordering,
+                  })}
+                  label={<span>Title</span>}
+                />
+                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                  name="statistic"
+                  className={classNames({
+                    'govuk-!-width-one-third': isReordering,
+                  })}
+                  label={<span>Statistic</span>}
+                />
+                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                  name="trend"
+                  className={classNames({
+                    'govuk-!-width-one-third': isReordering,
+                  })}
+                  label={<span>Trend</span>}
+                />
+              </div>
+
+              <RHFFormFieldTextInput<KeyStatTextFormValues>
+                formGroupClass="govuk-!-margin-top-2"
+                name="guidanceTitle"
                 className={classNames({
                   'govuk-!-width-one-third': isReordering,
                 })}
-                label={<span>Title</span>}
+                label="Guidance title"
               />
-              <FormFieldTextInput<KeyStatTextFormValues>
-                name="statistic"
-                className={classNames({
-                  'govuk-!-width-one-third': isReordering,
-                })}
-                label={<span>Statistic</span>}
+
+              <RHFFormFieldEditor<KeyStatTextFormValues>
+                name="guidanceText"
+                includePlugins={pluginsConfigSimple}
+                toolbarConfig={toolbarConfigSimple}
+                label="Guidance text"
               />
-              <FormFieldTextInput<KeyStatTextFormValues>
-                name="trend"
-                className={classNames({
-                  'govuk-!-width-one-third': isReordering,
-                })}
-                label={<span>Trend</span>}
-              />
-            </div>
 
-            <FormFieldTextInput<KeyStatTextFormValues>
-              formGroupClass="govuk-!-margin-top-2"
-              name="guidanceTitle"
-              className={classNames({
-                'govuk-!-width-one-third': isReordering,
-              })}
-              label="Guidance title"
-            />
-
-            <FormFieldEditor<KeyStatTextFormValues>
-              name="guidanceText"
-              includePlugins={pluginsConfigSimple}
-              toolbarConfig={toolbarConfigSimple}
-              label="Guidance text"
-            />
-
-            <ButtonGroup>
-              <Button disabled={form.isSubmitting} type="submit">
-                Save
-              </Button>
-              <Button variant="secondary" onClick={onCancel}>
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </Form>
-        )}
-      </Formik>
+              <ButtonGroup>
+                <Button disabled={formState.isSubmitting} type="submit">
+                  Save
+                </Button>
+                <Button variant="secondary" onClick={onCancel}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+            </RHFForm>
+          );
+        }}
+      </FormProvider>
     </div>
   );
 }

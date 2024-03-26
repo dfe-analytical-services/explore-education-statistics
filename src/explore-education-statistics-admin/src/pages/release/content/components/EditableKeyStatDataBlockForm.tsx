@@ -1,17 +1,17 @@
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { toolbarConfigSimple } from '@admin/config/ckEditorConfig';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldTextInput } from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
-import { Formik } from 'formik';
-import React from 'react';
 import Yup from '@common/validation/yup';
+import React from 'react';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;
@@ -20,36 +20,34 @@ export interface KeyStatDataBlockFormValues {
 }
 
 export interface EditableKeyStatDataBlockFormProps {
-  keyStat: KeyStatisticDataBlock;
-  title: string;
-  statistic: string;
   isReordering?: boolean;
+  keyStat: KeyStatisticDataBlock;
+  statistic: string;
   testId: string;
+  title: string;
   onSubmit: (values: KeyStatDataBlockFormValues) => void;
   onCancel: () => void;
 }
 
-const EditableKeyStatDataBlockForm = ({
+export default function EditableKeyStatDataBlockForm({
+  isReordering = false,
   keyStat,
-  title,
   statistic,
-  isReordering,
   testId,
+  title,
   onSubmit,
   onCancel,
-}: EditableKeyStatDataBlockFormProps) => {
-  const handleSubmit = useFormSubmit<KeyStatDataBlockFormValues>(
-    async values => {
-      await onSubmit({
-        ...values,
-        guidanceTitle: values.guidanceTitle,
-        guidanceText: toMarkdown(values.guidanceText),
-      });
-    },
-  );
+}: EditableKeyStatDataBlockFormProps) {
+  const handleSubmit = async (values: KeyStatDataBlockFormValues) => {
+    onSubmit({
+      ...values,
+      guidanceTitle: values.guidanceTitle,
+      guidanceText: toMarkdown(values.guidanceText),
+    });
+  };
 
   return (
-    <Formik<KeyStatDataBlockFormValues>
+    <FormProvider
       initialValues={{
         trend: keyStat.trend ?? '',
         guidanceTitle: keyStat.guidanceTitle ?? 'Help',
@@ -60,47 +58,49 @@ const EditableKeyStatDataBlockForm = ({
         guidanceTitle: Yup.string().max(65),
         guidanceText: Yup.string(),
       })}
-      onSubmit={handleSubmit}
     >
-      {form => (
-        <Form id={`editableKeyStatDataBlockForm-${keyStat.id}`}>
-          <KeyStatTile
-            title={title}
-            titleTag="h4"
-            testId={testId}
-            value={statistic}
-            isReordering={isReordering}
+      {({ formState }) => {
+        return (
+          <RHFForm
+            id={`editableKeyStatDataBlockForm-${keyStat.id}`}
+            onSubmit={handleSubmit}
           >
-            <FormFieldTextInput<KeyStatDataBlockFormValues>
-              name="trend"
-              label={<span className={styles.trendText}>Trend</span>}
+            <KeyStatTile
+              title={title}
+              titleTag="h4"
+              testId={testId}
+              value={statistic}
+              isReordering={isReordering}
+            >
+              <RHFFormFieldTextInput<KeyStatDataBlockFormValues>
+                name="trend"
+                label={<span className={styles.trendText}>Trend</span>}
+              />
+            </KeyStatTile>
+
+            <RHFFormFieldTextInput<KeyStatDataBlockFormValues>
+              formGroupClass="govuk-!-margin-top-2"
+              name="guidanceTitle"
+              label="Guidance title"
             />
-          </KeyStatTile>
 
-          <FormFieldTextInput<KeyStatDataBlockFormValues>
-            formGroupClass="govuk-!-margin-top-2"
-            name="guidanceTitle"
-            label="Guidance title"
-          />
+            <RHFFormFieldEditor<KeyStatDataBlockFormValues>
+              name="guidanceText"
+              toolbarConfig={toolbarConfigSimple}
+              label="Guidance text"
+            />
 
-          <FormFieldEditor<KeyStatDataBlockFormValues>
-            name="guidanceText"
-            toolbarConfig={toolbarConfigSimple}
-            label="Guidance text"
-          />
-
-          <ButtonGroup>
-            <Button disabled={form.isSubmitting} type="submit">
-              Save
-            </Button>
-            <Button variant="secondary" onClick={onCancel}>
-              Cancel
-            </Button>
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+            <ButtonGroup>
+              <Button disabled={formState.isSubmitting} type="submit">
+                Save
+              </Button>
+              <Button variant="secondary" onClick={onCancel}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
-};
-
-export default EditableKeyStatDataBlockForm;
+}

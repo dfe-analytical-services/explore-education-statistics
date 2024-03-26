@@ -3,35 +3,35 @@ import {
   ReleaseRouteParams,
   releaseDataRoute,
 } from '@admin/routes/releaseRoutes';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import React from 'react';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Link from '@admin/components/Link';
 import { generatePath, RouteComponentProps } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import { Form, FormFieldTextInput } from '@common/components/form';
 import Button from '@common/components/Button';
 
 interface FormValues {
   title: string;
 }
 
-const ReleaseDataFilePage = ({
+export default function ReleaseDataFilePage({
   history,
   match: {
     params: { publicationId, releaseId, fileId },
   },
-}: RouteComponentProps<ReleaseDataFileRouteParams>) => {
+}: RouteComponentProps<ReleaseDataFileRouteParams>) {
   const { value: dataFile, isLoading: dataFileLoading } = useAsyncRetry(
     () => releaseDataFileService.getDataFile(releaseId, fileId),
     [releaseId, fileId],
   );
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
+  const handleSubmit = async (values: FormValues) => {
     await releaseDataFileService.updateFile(releaseId, fileId, {
       title: values.title,
     });
@@ -42,7 +42,7 @@ const ReleaseDataFilePage = ({
         releaseId,
       }),
     );
-  });
+  };
 
   return (
     <>
@@ -62,23 +62,22 @@ const ReleaseDataFilePage = ({
           <h2>Edit data file details</h2>
 
           {dataFile ? (
-            <Formik<FormValues>
+            <FormProvider
               initialValues={{ title: dataFile.title }}
               validationSchema={Yup.object<FormValues>({
                 title: Yup.string().required('Enter a title'),
               })}
-              onSubmit={handleSubmit}
             >
-              <Form id="dataFileForm">
-                <FormFieldTextInput<FormValues>
+              <RHFForm id="dataFileForm" onSubmit={handleSubmit}>
+                <RHFFormFieldTextInput<FormValues>
                   className="govuk-!-width-two-thirds"
                   label="Title"
                   name="title"
                 />
 
                 <Button type="submit">Save changes</Button>
-              </Form>
-            </Formik>
+              </RHFForm>
+            </FormProvider>
           ) : (
             <WarningMessage>Could not load data file details</WarningMessage>
           )}
@@ -86,6 +85,4 @@ const ReleaseDataFilePage = ({
       </LoadingSpinner>
     </>
   );
-};
-
-export default ReleaseDataFilePage;
+}

@@ -2,24 +2,25 @@ import { AncillaryFile } from '@admin/services/releaseAncillaryFileService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldTextArea } from '@common/components/form';
-import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFFormFieldFileInput from '@common/components/form/rhf/RHFFormFieldFileInput';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import FormFieldTextInput from 'explore-education-statistics-common/src/components/form/FormFieldTextInput';
-import { Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 
 export interface AncillaryFileFormValues {
   title: string;
   summary: string;
-  file: File | null;
+  file?: File | null;
 }
 
 const formId = 'ancillaryFileForm';
+const MAX_FILE_SIZE = 2147483647; // 2GB
 
 const errorMappings = [
   mapFieldErrors<AncillaryFileFormValues>({
@@ -44,43 +45,60 @@ const errorMappings = [
 
 export interface AncillaryFileFormProps {
   files?: AncillaryFile[];
-  fileFieldLabel?: string;
   initialValues?: AncillaryFileFormValues;
-  resetAfterSubmit?: boolean;
-  submitText?: string;
-  submittingText?: string;
-  validationSchema?: ObjectSchema<Partial<AncillaryFileFormValues>>;
+  isEditing?: boolean;
   onCancel?: () => void;
   onSubmit: (values: AncillaryFileFormValues) => void;
 }
 
 export default function AncillaryFileForm({
   files = [],
-  fileFieldLabel = 'Upload file',
   initialValues,
-  resetAfterSubmit,
-  submitText = 'Save file',
-  submittingText = 'Saving file',
-  validationSchema,
+  isEditing = false,
   onCancel,
   onSubmit,
 }: AncillaryFileFormProps) {
-  const handleSubmit = useFormSubmit<AncillaryFileFormValues>(
-    async (values, actions) => {
-      await onSubmit(values);
+  const validationSchema = useMemo<
+    ObjectSchema<AncillaryFileFormValues>
+  >(() => {
+    const schema = Yup.object({
+      title: Yup.string()
+        .required('Enter a title')
+        .test({
+          name: 'unique',
+          message: 'Enter a unique title',
+          test(value: string) {
+            if (!value) {
+              return true;
+            }
 
-      if (resetAfterSubmit) {
-        actions.resetForm();
-      }
-    },
-    errorMappings,
-  );
+            return files.every(
+              f => f.title.toUpperCase() !== value.toUpperCase(),
+            );
+          },
+        }),
+      summary: Yup.string().required('Enter a summary'),
+      file: Yup.file()
+        .minSize(0, 'Choose a file that is not empty')
+        .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB')
+        .notRequired(),
+    });
 
-  const MAX_FILE_SIZE = 2147483647; // 2GB
+    if (!isEditing) {
+      return schema.shape({
+        file: Yup.file()
+          .required('Choose a file')
+          .minSize(0, 'Choose a file that is not empty')
+          .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB'),
+      });
+    }
+
+    return schema;
+  }, [files, isEditing]);
 
   return (
-    <Formik<AncillaryFileFormValues>
-      enableReinitialize
+    <FormProvider
+      errorMappings={errorMappings}
       initialValues={
         initialValues ?? {
           title: '',
@@ -88,87 +106,60 @@ export default function AncillaryFileForm({
           file: null,
         }
       }
-      onReset={() => {
-        document
-          .querySelectorAll(`#${formId} input[type='file']`)
-          .forEach(input => {
-            const fileInput = input as HTMLInputElement;
-            fileInput.value = '';
-          });
-      }}
-      onSubmit={handleSubmit}
-      validationSchema={Yup.object<AncillaryFileFormValues>({
-        title: Yup.string()
-          .required('Enter a title')
-          .test({
-            name: 'unique',
-            message: 'Enter a unique title',
-            test(value: string) {
-              if (!value) {
-                return true;
-              }
-
-              return files.every(
-                f => f.title.toUpperCase() !== value.toUpperCase(),
-              );
-            },
-          }),
-        summary: Yup.string().required('Enter a summary'),
-        file: Yup.file()
-          .minSize(0, 'Choose a file that is not empty')
-          .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB')
-          .notRequired(),
-      }).concat(validationSchema ?? Yup.object().notRequired())}
+      resetAfterSubmit
+      validationSchema={validationSchema}
     >
-      {form => (
-        <Form id={formId}>
-          <FormFieldTextInput<AncillaryFileFormValues>
-            className="govuk-!-width-one-half"
-            disabled={form.isSubmitting}
-            label="Title"
-            name="title"
-          />
-
-          <FormFieldTextArea<AncillaryFileFormValues>
-            className="govuk-!-width-one-half"
-            disabled={form.isSubmitting}
-            label="Summary"
-            name="summary"
-          />
-
-          <FormFieldFileInput<AncillaryFileFormValues>
-            disabled={form.isSubmitting}
-            hint="Maximum file size 2GB"
-            label={fileFieldLabel}
-            name="file"
-          />
-
-          <ButtonGroup>
-            <Button type="submit" disabled={form.isSubmitting}>
-              {submitText}
-            </Button>
-
-            <ButtonText
-              disabled={form.isSubmitting}
-              onClick={() => {
-                onCancel?.();
-                form.resetForm();
-              }}
-            >
-              Cancel
-            </ButtonText>
-
-            <LoadingSpinner
-              alert
-              className="govuk-!-margin-left-2"
-              inline
-              loading={form.isSubmitting}
-              size="sm"
-              text={submittingText}
+      {({ formState, reset }) => {
+        return (
+          <RHFForm id={formId} onSubmit={onSubmit}>
+            <RHFFormFieldTextInput<AncillaryFileFormValues>
+              className="govuk-!-width-one-half"
+              disabled={formState.isSubmitting}
+              label="Title"
+              name="title"
             />
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+
+            <RHFFormFieldTextArea<AncillaryFileFormValues>
+              className="govuk-!-width-one-half"
+              disabled={formState.isSubmitting}
+              label="Summary"
+              name="summary"
+            />
+
+            <RHFFormFieldFileInput<AncillaryFileFormValues>
+              disabled={formState.isSubmitting}
+              hint="Maximum file size 2GB"
+              label={isEditing ? 'Upload new file' : 'Upload file'}
+              name="file"
+            />
+
+            <ButtonGroup>
+              <Button type="submit" disabled={formState.isSubmitting}>
+                {isEditing ? 'Save file' : 'Add file'}
+              </Button>
+
+              <ButtonText
+                disabled={formState.isSubmitting}
+                onClick={() => {
+                  onCancel?.();
+                  reset();
+                }}
+              >
+                Cancel
+              </ButtonText>
+
+              <LoadingSpinner
+                alert
+                className="govuk-!-margin-left-2"
+                inline
+                loading={formState.isSubmitting}
+                size="sm"
+                text="Saving file"
+              />
+            </ButtonGroup>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 }

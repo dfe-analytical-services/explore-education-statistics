@@ -45,7 +45,9 @@ describe('ReleaseStatusPage', () => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('Current status')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Current status-value')).toHaveTextContent(
+      'In draft',
+    );
     expect(
       screen.queryByTestId('Release process status'),
     ).not.toBeInTheDocument();

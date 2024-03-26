@@ -1,9 +1,11 @@
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormGroup from '@common/components/form/FormGroup';
 import useRegister from '@common/components/form/rhf/hooks/useRegister';
+import { CheckboxChangeEventHandler } from '@common/components/form/FormCheckbox';
 import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
 import { mergeRefs } from '@common/utils/mergeRefs';
 import React, {
+  ChangeEvent,
   ChangeEventHandler,
   ComponentType,
   FocusEventHandler,
@@ -27,11 +29,12 @@ interface FormFieldInputProps {
   id: string;
   inputRef?: Ref<Element>;
   name: string;
-  onChange?: ChangeEventHandler;
+  onChange?: ChangeEventHandler | CheckboxChangeEventHandler;
   onBlur?: FocusEventHandler;
 }
 
 export type FormFieldProps<TFormValues> = {
+  children?: ReactNode;
   id?: string;
   formGroup?: boolean;
   formGroupClass?: string;
@@ -51,6 +54,7 @@ export default function RHFFormField<
   TProps extends FormFieldInputProps,
 >({
   as,
+  children,
   formGroup = true,
   formGroupClass,
   id: customId,
@@ -78,32 +82,36 @@ export default function RHFFormField<
 
   const component = useMemo(() => {
     const Component = as as ComponentType<FormFieldInputProps>;
+    if (Component) {
+      return (
+        <Component
+          {...props}
+          error={error}
+          id={fieldId(name, customId)}
+          name={name}
+          inputRef={mergeRefs(fieldRef, inputRef)}
+          onChange={async (event: ChangeEvent) => {
+            onChange?.(event);
 
-    return (
-      <Component
-        {...props}
-        error={error}
-        id={fieldId(name, customId)}
-        name={name}
-        inputRef={mergeRefs(fieldRef, inputRef)}
-        onChange={async event => {
-          onChange?.(event);
+            if (!event.defaultPrevented) {
+              await fieldOnChange(event);
+            }
+          }}
+          onBlur={async event => {
+            onBlur?.(event);
 
-          if (!event.defaultPrevented) {
-            await fieldOnChange(event);
-          }
-        }}
-        onBlur={async event => {
-          onBlur?.(event);
+            if (!event.isDefaultPrevented()) {
+              await fieldOnBlur(event);
+            }
+          }}
+        />
+      );
+    }
 
-          if (!event.isDefaultPrevented()) {
-            await fieldOnBlur(event);
-          }
-        }}
-      />
-    );
+    return children;
   }, [
     as,
+    children,
     props,
     error,
     fieldId,

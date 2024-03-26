@@ -51,7 +51,7 @@ export default function ReleaseForm({
           label: option.title,
           hint:
             option.latestRelease && !hideLatestDataTag ? (
-              <Tag strong>This is the latest data</Tag>
+              <Tag>This is the latest data</Tag>
             ) : undefined,
           inlineHint: true,
           value: option.id,

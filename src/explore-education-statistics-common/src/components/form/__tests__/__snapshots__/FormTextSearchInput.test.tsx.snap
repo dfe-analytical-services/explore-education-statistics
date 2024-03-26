@@ -8,6 +8,7 @@ exports[`FormTextSearchInput renders correctly with error 1`] = `
 </label>
 <span class="govuk-error-message"
       id="test-input-error"
+      data-testid="test-input-error"
 >
   <span class="govuk-visually-hidden">
     Error:

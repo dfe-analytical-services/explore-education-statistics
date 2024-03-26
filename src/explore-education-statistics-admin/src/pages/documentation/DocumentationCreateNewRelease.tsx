@@ -345,7 +345,7 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
                   !
                 </span>
                 <strong className="govuk-warning-text__text">
-                  <span className="govuk-warning-text__assistive">Warning</span>
+                  <span className="govuk-visually-hidden">Warning</span>
                   You can’t create data blocks, tables and charts for your
                   release until your data has been uploaded and processed.
                 </strong>

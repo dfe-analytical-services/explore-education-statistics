@@ -15,11 +15,6 @@ describe('Accordion', () => {
     const button = screen.getByRole('button', { name: /Test heading/ });
 
     expect(button).toHaveAttribute('aria-expanded', 'false');
-
-    expect(screen.getByText('Test content')).toHaveAttribute(
-      'aria-labelledby',
-      button.id,
-    );
   });
 
   test('renders with section content not expanded by default', () => {

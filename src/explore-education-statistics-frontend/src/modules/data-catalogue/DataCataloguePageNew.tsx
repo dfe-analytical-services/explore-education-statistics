@@ -474,7 +474,6 @@ export default function DataCataloguePageNew() {
                                     {releaseTypes[selectedRelease.type]}
                                   </Tag>
                                   <Tag
-                                    strong
                                     colour={
                                       selectedRelease.latestRelease
                                         ? undefined

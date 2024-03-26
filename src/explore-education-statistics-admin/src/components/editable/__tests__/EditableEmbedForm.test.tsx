@@ -115,13 +115,10 @@ describe('EditableEmbedForm', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith(
-        {
-          title: 'Dashboard title',
-          url: 'https://department-for-education.shinyapps.io/test-dashboard',
-        },
-        expect.anything(),
-      );
+      expect(handleSubmit).toHaveBeenCalledWith({
+        title: 'Dashboard title',
+        url: 'https://department-for-education.shinyapps.io/test-dashboard',
+      });
     });
   });
 
