@@ -3,10 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+
+public interface IIndicatorGroupRepository
 {
-    public interface IIndicatorGroupRepository
-    {
-        Task<List<IndicatorGroup>> GetIndicatorGroups(Guid subjectId);
-    }
+    Task<List<IndicatorGroup>> GetIndicatorGroups(Guid subjectId);
 }

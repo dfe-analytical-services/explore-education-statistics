@@ -6,26 +6,25 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
+
+[Route("api")]
+[ApiController]
+[Authorize]
+public class ImportStatusController : ControllerBase
 {
-    [Route("api")]
-    [ApiController]
-    [Authorize]
-    public class ImportStatusController : ControllerBase
+    private readonly IImportStatusBauService _importStatusBauService;
+
+    public ImportStatusController(IImportStatusBauService importStatusBauService)
     {
-        private readonly IImportStatusBauService _importStatusBauService;
+        _importStatusBauService = importStatusBauService;
+    }
 
-        public ImportStatusController(IImportStatusBauService importStatusBauService)
-        {
-            _importStatusBauService = importStatusBauService;
-        }
-
-        [HttpGet("imports/incomplete")]
-        public async Task<ActionResult<List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
-        {
-            return await _importStatusBauService
-                .GetAllIncompleteImports()
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("imports/incomplete")]
+    public async Task<ActionResult<List<ImportStatusBauViewModel>>> GetAllIncompleteImports()
+    {
+        return await _importStatusBauService
+            .GetAllIncompleteImports()
+            .HandleFailuresOrOk();
     }
 }

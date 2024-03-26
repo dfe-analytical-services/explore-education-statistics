@@ -2,233 +2,232 @@ using System;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
+
+public class MethodologyVersionTests
 {
-    public class MethodologyVersionTests
+    [Fact]
+    public void ScheduledForPublishingImmediately_TrueWhenPublishingStrategyIsImmediately()
     {
-        [Fact]
-        public void ScheduledForPublishingImmediately_TrueWhenPublishingStrategyIsImmediately()
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = Immediately
-            };
+            PublishingStrategy = Immediately
+        };
 
-            Assert.True(methodology.ScheduledForPublishingImmediately);
-        }
+        Assert.True(methodology.ScheduledForPublishingImmediately);
+    }
 
-        [Fact]
-        public void ScheduledForPublishingImmediately_FalseWhenPublishingStrategyIsWithRelease()
+    [Fact]
+    public void ScheduledForPublishingImmediately_FalseWhenPublishingStrategyIsWithRelease()
+    {
+        var releaseVersion = new ReleaseVersion
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
+            Id = Guid.NewGuid()
+        };
 
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersionId = releaseVersion.Id,
-                ScheduledWithReleaseVersion = releaseVersion
-            };
-
-            Assert.False(methodology.ScheduledForPublishingImmediately);
-        }
-
-        [Fact]
-        public void ScheduledForPublishingWithRelease_FalseWhenPublishingStrategyIsImmediately()
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = Immediately
-            };
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersionId = releaseVersion.Id,
+            ScheduledWithReleaseVersion = releaseVersion
+        };
 
-            Assert.False(methodology.ScheduledForPublishingWithRelease);
-        }
+        Assert.False(methodology.ScheduledForPublishingImmediately);
+    }
 
-        [Fact]
-        public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
+    [Fact]
+    public void ScheduledForPublishingWithRelease_FalseWhenPublishingStrategyIsImmediately()
+    {
+        var methodology = new MethodologyVersion
         {
-            var releaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
+            PublishingStrategy = Immediately
+        };
 
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersionId = releaseVersion.Id,
-                ScheduledWithReleaseVersion = releaseVersion
-            };
+        Assert.False(methodology.ScheduledForPublishingWithRelease);
+    }
 
-            Assert.True(methodology.ScheduledForPublishingWithRelease);
-        }
-
-        [Fact]
-        public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
+    [Fact]
+    public void ScheduledForPublishingWithRelease_TrueWhenPublishingStrategyIsWithRelease()
+    {
+        var releaseVersion = new ReleaseVersion
         {
-            var liveReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow
-            };
+            Id = Guid.NewGuid()
+        };
 
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersion = liveReleaseVersion,
-                ScheduledWithReleaseVersionId = liveReleaseVersion.Id
-            };
-
-            Assert.True(methodology.ScheduledForPublishingWithPublishedRelease);
-        }
-
-        [Fact]
-        public void ScheduledForPublishingWithPublishedRelease_FalseWhenScheduledWithNonLiveRelease()
+        var methodology = new MethodologyVersion
         {
-            var nonLiveReleaseVersion = new ReleaseVersion
-            {
-                Id = Guid.NewGuid()
-            };
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersionId = releaseVersion.Id,
+            ScheduledWithReleaseVersion = releaseVersion
+        };
 
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersion = nonLiveReleaseVersion,
-                ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
-            };
+        Assert.True(methodology.ScheduledForPublishingWithRelease);
+    }
 
-            Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
-        }
-
-        [Fact]
-        public void ScheduledForPublishingWithPublishedRelease_FalseWhenPublishingStrategyIsImmediately()
+    [Fact]
+    public void ScheduledForPublishingWithPublishedRelease_TrueWhenScheduledWithLiveRelease()
+    {
+        var liveReleaseVersion = new ReleaseVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = Immediately
-            };
+            Id = Guid.NewGuid(),
+            Published = DateTime.UtcNow
+        };
 
-            Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
-        }
-
-        [Fact]
-        public void ScheduledForPublishingWithPublishedRelease_ScheduledWithReleaseNotIncluded()
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                PublishingStrategy = WithRelease,
-                ScheduledWithReleaseVersionId = Guid.NewGuid()
-            };
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersion = liveReleaseVersion,
+            ScheduledWithReleaseVersionId = liveReleaseVersion.Id
+        };
 
-            Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);
-        }
+        Assert.True(methodology.ScheduledForPublishingWithPublishedRelease);
+    }
 
-        [Fact]
-        public void GetTitle_NoAlternativeTitleSet()
+    [Fact]
+    public void ScheduledForPublishingWithPublishedRelease_FalseWhenScheduledWithNonLiveRelease()
+    {
+        var nonLiveReleaseVersion = new ReleaseVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                Methodology = new Methodology
-                {
-                    OwningPublicationTitle = "Owning Publication Title"
-                }
-            };
+            Id = Guid.NewGuid()
+        };
 
-            Assert.Equal(methodology.Methodology.OwningPublicationTitle, methodology.Title);
-        }
-
-        [Fact]
-        public void GetTitle_AlternativeTitleSet()
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
-            {
-                Methodology = new Methodology
-                {
-                    OwningPublicationTitle = "Owning Publication Title"
-                },
-                AlternativeTitle = "Alternative Title"
-            };
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersion = nonLiveReleaseVersion,
+            ScheduledWithReleaseVersionId = nonLiveReleaseVersion.Id
+        };
 
-            Assert.Equal(methodology.AlternativeTitle, methodology.Title);
-        }
+        Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
+    }
 
-        [Fact]
-        public void GetSlug_OwningPublicationSlug()
+    [Fact]
+    public void ScheduledForPublishingWithPublishedRelease_FalseWhenPublishingStrategyIsImmediately()
+    {
+        var methodology = new MethodologyVersion
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                AlternativeSlug = null,
-                Methodology = new Methodology
-                {
-                    OwningPublicationSlug = "owning-publication-slug",
-                },
-            };
+            PublishingStrategy = Immediately
+        };
 
-            Assert.Equal(methodologyVersion.Methodology.OwningPublicationSlug, methodologyVersion.Slug);
-        }
+        Assert.False(methodology.ScheduledForPublishingWithPublishedRelease);
+    }
 
-        [Fact]
-        public void GetSlug_AlternativeSlug()
+    [Fact]
+    public void ScheduledForPublishingWithPublishedRelease_ScheduledWithReleaseNotIncluded()
+    {
+        var methodology = new MethodologyVersion
         {
-            var methodologyVersion = new MethodologyVersion
-            {
-                AlternativeSlug = "alternativeSlug",
-                Methodology = new Methodology
-                {
-                    OwningPublicationSlug = "owning-publication-slug",
-                },
-            };
+            PublishingStrategy = WithRelease,
+            ScheduledWithReleaseVersionId = Guid.NewGuid()
+        };
 
-            Assert.Equal(methodologyVersion.AlternativeSlug, methodologyVersion.Slug);
-        }
+        Assert.Throws<InvalidOperationException>(() => methodology.ScheduledForPublishingWithPublishedRelease);
+    }
 
-        [Fact]
-        public void AmendmentFlag_NotAmendment_FirstUnpublishedVersion()
+    [Fact]
+    public void GetTitle_NoAlternativeTitleSet()
+    {
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
+            Methodology = new Methodology
             {
-                PreviousVersionId = null,
-                Published = null
-            };
+                OwningPublicationTitle = "Owning Publication Title"
+            }
+        };
 
-            Assert.False(methodology.Amendment);
-        }
+        Assert.Equal(methodology.Methodology.OwningPublicationTitle, methodology.Title);
+    }
 
-        [Fact]
-        public void AmendmentFlag_NotAmendment_FirstPublishedVersion()
+    [Fact]
+    public void GetTitle_AlternativeTitleSet()
+    {
+        var methodology = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
+            Methodology = new Methodology
             {
-                PreviousVersionId = null,
-                Published = DateTime.Now
-            };
+                OwningPublicationTitle = "Owning Publication Title"
+            },
+            AlternativeTitle = "Alternative Title"
+        };
 
-            Assert.False(methodology.Amendment);
-        }
+        Assert.Equal(methodology.AlternativeTitle, methodology.Title);
+    }
 
-        [Fact]
-        public void AmendmentFlag_Amendment_UnpublishedNewVersion()
+    [Fact]
+    public void GetSlug_OwningPublicationSlug()
+    {
+        var methodologyVersion = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
+            AlternativeSlug = null,
+            Methodology = new Methodology
             {
-                PreviousVersionId = Guid.NewGuid(),
-                Published = null
-            };
+                OwningPublicationSlug = "owning-publication-slug",
+            },
+        };
 
-            Assert.True(methodology.Amendment);
-        }
+        Assert.Equal(methodologyVersion.Methodology.OwningPublicationSlug, methodologyVersion.Slug);
+    }
 
-        [Fact]
-        public void AmendmentFlag_NotAmendment_PublishedNewVersion()
+    [Fact]
+    public void GetSlug_AlternativeSlug()
+    {
+        var methodologyVersion = new MethodologyVersion
         {
-            var methodology = new MethodologyVersion
+            AlternativeSlug = "alternativeSlug",
+            Methodology = new Methodology
             {
-                PreviousVersionId = Guid.NewGuid(),
-                Published = DateTime.Now
-            };
+                OwningPublicationSlug = "owning-publication-slug",
+            },
+        };
 
-            Assert.False(methodology.Amendment);
-        }
+        Assert.Equal(methodologyVersion.AlternativeSlug, methodologyVersion.Slug);
+    }
+
+    [Fact]
+    public void AmendmentFlag_NotAmendment_FirstUnpublishedVersion()
+    {
+        var methodology = new MethodologyVersion
+        {
+            PreviousVersionId = null,
+            Published = null
+        };
+
+        Assert.False(methodology.Amendment);
+    }
+
+    [Fact]
+    public void AmendmentFlag_NotAmendment_FirstPublishedVersion()
+    {
+        var methodology = new MethodologyVersion
+        {
+            PreviousVersionId = null,
+            Published = DateTime.Now
+        };
+
+        Assert.False(methodology.Amendment);
+    }
+
+    [Fact]
+    public void AmendmentFlag_Amendment_UnpublishedNewVersion()
+    {
+        var methodology = new MethodologyVersion
+        {
+            PreviousVersionId = Guid.NewGuid(),
+            Published = null
+        };
+
+        Assert.True(methodology.Amendment);
+    }
+
+    [Fact]
+    public void AmendmentFlag_NotAmendment_PublishedNewVersion()
+    {
+        var methodology = new MethodologyVersion
+        {
+            PreviousVersionId = Guid.NewGuid(),
+            Published = DateTime.Now
+        };
+
+        Assert.False(methodology.Amendment);
     }
 }

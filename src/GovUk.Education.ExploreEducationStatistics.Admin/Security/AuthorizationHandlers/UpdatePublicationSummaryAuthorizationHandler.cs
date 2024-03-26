@@ -6,40 +6,39 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+public class UpdatePublicationSummaryRequirement : IAuthorizationRequirement
 {
-    public class UpdatePublicationSummaryRequirement : IAuthorizationRequirement
+}
+
+public class UpdatePublicationSummaryAuthorizationHandler : AuthorizationHandler<UpdatePublicationSummaryRequirement, Publication>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+
+    public UpdatePublicationSummaryAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    public class UpdatePublicationSummaryAuthorizationHandler : AuthorizationHandler<UpdatePublicationSummaryRequirement, Publication>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        UpdatePublicationSummaryRequirement summaryRequirement,
+        Publication publication)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public UpdatePublicationSummaryAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            context.Succeed(summaryRequirement);
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            UpdatePublicationSummaryRequirement summaryRequirement,
-            Publication publication)
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    publication.Id,
+                    Owner))
         {
-            if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))
-            {
-                context.Succeed(summaryRequirement);
-                return;
-            }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        publication.Id,
-                        Owner))
-            {
-                context.Succeed(summaryRequirement);
-            }
+            context.Succeed(summaryRequirement);
         }
     }
 }

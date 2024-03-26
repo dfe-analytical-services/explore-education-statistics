@@ -77,7 +77,7 @@ public class FluentValidationActionFilter : IAsyncActionFilter
             }
 
             errors.AddRange(
-                validationResult.Errors.Select(failure => CreateErrorViewModel(failure))
+                validationResult.Errors.Select(CreateErrorViewModel)
             );
         }
 

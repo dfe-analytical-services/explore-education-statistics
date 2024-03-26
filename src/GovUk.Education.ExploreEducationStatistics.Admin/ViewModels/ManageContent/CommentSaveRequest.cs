@@ -2,11 +2,10 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+
+public class CommentSaveRequest
 {
-    public class CommentSaveRequest
-    {
-        [Required] public string Content { get; set; } = string.Empty;
-        public bool? SetResolved { get; set; }
-    }
+    [Required] public string Content { get; set; } = string.Empty;
+    public bool? SetResolved { get; set; }
 }

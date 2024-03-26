@@ -24,212 +24,211 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.Permi
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class ReleaseDataFileServicePermissionTests
 {
-    public class ReleaseDataFileServicePermissionTests
+    private readonly ReleaseVersion _releaseVersion = new()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
+        Id = Guid.NewGuid()
+    };
+
+    [Fact]
+    public async Task Delete()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.Delete(releaseVersionId: _releaseVersion.Id,
+                        fileId: Guid.NewGuid());
+                }
+            );
+    }
+
+    [Fact]
+    public async Task Delete_MultipleFiles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.Delete(releaseVersionId: _releaseVersion.Id,
+                        fileIds: new List<Guid>
+                    {
+                        Guid.NewGuid()
+                    });
+                }
+            );
+    }
+
+    [Fact]
+    public async Task DeleteAll()
+    {
+        var releaseFile = new ReleaseFile
         {
-            Id = Guid.NewGuid()
+            ReleaseVersion = _releaseVersion,
+            File = new File
+            {
+                Filename = "ancillary.pdf",
+                Type = Ancillary
+            }
         };
 
-        [Fact]
-        public async Task Delete()
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
         {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.Delete(releaseVersionId: _releaseVersion.Id,
-                            fileId: Guid.NewGuid());
-                    }
-                );
+            await contentDbContext.AddAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
         }
 
-        [Fact]
-        public async Task Delete_MultipleFiles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.Delete(releaseVersionId: _releaseVersion.Id,
-                            fileIds: new List<Guid>
-                        {
-                            Guid.NewGuid()
-                        });
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task DeleteAll()
-        {
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersion = _releaseVersion,
-                File = new File
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
                 {
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
+                    var service = SetupReleaseDataFileService(
+                        contentDbContext: DbUtils.InMemoryApplicationDbContext(contentDbContextId),
+                        userService: userService.Object);
+                    return service.DeleteAll(_releaseVersion.Id);
                 }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(releaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(
-                            contentDbContext: DbUtils.InMemoryApplicationDbContext(contentDbContextId),
-                            userService: userService.Object);
-                        return service.DeleteAll(_releaseVersion.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task GetInfo()
-        {
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersion = _releaseVersion,
-                File = new File
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
-
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(releaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object,
-                            contentPersistenceHelper: persistenceHelper.Object);
-                        return service.GetInfo(releaseVersionId: releaseFile.ReleaseVersion.Id,
-                            fileId: releaseFile.File.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task ListAll()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.ListAll(_releaseVersion.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task ReorderDataFiles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.ReorderDataFiles(_releaseVersion.Id, new List<Guid>());
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task Upload()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.Upload(releaseVersionId: _releaseVersion.Id,
-                            dataFormFile: new Mock<IFormFile>().Object,
-                            metaFormFile: new Mock<IFormFile>().Object,
-                            replacingFileId: null,
-                            subjectName: "");
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task UploadAsZip()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.UploadAsZip(releaseVersionId: _releaseVersion.Id,
-                            zipFormFile: new Mock<IFormFile>().Object,
-                            replacingFileId: null,
-                            subjectName: "");
-                    }
-                );
-        }
-
-        private ReleaseDataFileService SetupReleaseDataFileService(
-            ContentDbContext? contentDbContext = null,
-            StatisticsDbContext? statisticsDbContext = null,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPrivateBlobStorageService? privateBlobStorageService = null,
-            IDataArchiveValidationService? dataArchiveValidationService = null,
-            IFileUploadsValidatorService? fileUploadsValidatorService = null,
-            IFileRepository? fileRepository = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
-            IReleaseFileRepository? releaseFileRepository = null,
-            IReleaseFileService? releaseFileService = null,
-            IReleaseDataFileRepository? releaseDataFileRepository = null,
-            IDataImportService? dataImportService = null,
-            IUserService? userService = null)
-        {
-            contentDbContext ??= new Mock<ContentDbContext>().Object;
-
-            return new ReleaseDataFileService(
-                contentDbContext,
-                contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
-                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>(MockBehavior.Strict).Object,
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
-                fileRepository ?? new FileRepository(contentDbContext),
-                releaseVersionRepository ?? new ReleaseVersionRepository(
-                    contentDbContext,
-                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object),
-                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
-                releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
-                dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
-                userService ?? new Mock<IUserService>().Object
             );
-        }
+    }
 
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+    [Fact]
+    public async Task GetInfo()
+    {
+        var releaseFile = new ReleaseFile
         {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
-            MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
-            return mock;
-        }
+            ReleaseVersion = _releaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid()
+            }
+        };
+
+        var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
+
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(releaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object,
+                        contentPersistenceHelper: persistenceHelper.Object);
+                    return service.GetInfo(releaseVersionId: releaseFile.ReleaseVersion.Id,
+                        fileId: releaseFile.File.Id);
+                }
+            );
+    }
+
+    [Fact]
+    public async Task ListAll()
+    {
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.ListAll(_releaseVersion.Id);
+                }
+            );
+    }
+
+    [Fact]
+    public async Task ReorderDataFiles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.ReorderDataFiles(_releaseVersion.Id, new List<Guid>());
+                }
+            );
+    }
+
+    [Fact]
+    public async Task Upload()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.Upload(releaseVersionId: _releaseVersion.Id,
+                        dataFormFile: new Mock<IFormFile>().Object,
+                        metaFormFile: new Mock<IFormFile>().Object,
+                        replacingFileId: null,
+                        subjectName: "");
+                }
+            );
+    }
+
+    [Fact]
+    public async Task UploadAsZip()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_releaseVersion, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupReleaseDataFileService(userService: userService.Object);
+                    return service.UploadAsZip(releaseVersionId: _releaseVersion.Id,
+                        zipFormFile: new Mock<IFormFile>().Object,
+                        replacingFileId: null,
+                        subjectName: "");
+                }
+            );
+    }
+
+    private ReleaseDataFileService SetupReleaseDataFileService(
+        ContentDbContext? contentDbContext = null,
+        StatisticsDbContext? statisticsDbContext = null,
+        IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+        IPrivateBlobStorageService? privateBlobStorageService = null,
+        IDataArchiveValidationService? dataArchiveValidationService = null,
+        IFileUploadsValidatorService? fileUploadsValidatorService = null,
+        IFileRepository? fileRepository = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IReleaseFileRepository? releaseFileRepository = null,
+        IReleaseFileService? releaseFileService = null,
+        IReleaseDataFileRepository? releaseDataFileRepository = null,
+        IDataImportService? dataImportService = null,
+        IUserService? userService = null)
+    {
+        contentDbContext ??= new Mock<ContentDbContext>().Object;
+
+        return new ReleaseDataFileService(
+            contentDbContext,
+            contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
+            privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(MockBehavior.Strict).Object,
+            dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>(MockBehavior.Strict).Object,
+            fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
+            fileRepository ?? new FileRepository(contentDbContext),
+            releaseVersionRepository ?? new ReleaseVersionRepository(
+                contentDbContext,
+                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object),
+            releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+            releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
+            releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
+            dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
+            userService ?? new Mock<IUserService>().Object
+        );
+    }
+
+    private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+    {
+        var mock = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+        MockUtils.SetupCall(mock, _releaseVersion.Id, _releaseVersion);
+        return mock;
     }
 }

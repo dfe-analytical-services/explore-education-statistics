@@ -3,29 +3,28 @@ using System;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+
+public static class ReleaseVersionExtensions
 {
-    public static class ReleaseVersionExtensions
+    /// <summary>
+    /// The storage blob path of the "All files" zip file for a release version.
+    /// </summary>
+    /// <param name="releaseVersion"></param>
+    /// <returns></returns>
+    public static string AllFilesZipPath(this ReleaseVersion releaseVersion)
     {
-        /// <summary>
-        /// The storage blob path of the "All files" zip file for a release version.
-        /// </summary>
-        /// <param name="releaseVersion"></param>
-        /// <returns></returns>
-        public static string AllFilesZipPath(this ReleaseVersion releaseVersion)
+        return $"{FilesPath(releaseVersion.Id, AllFilesZip)}{releaseVersion.AllFilesZipFileName()}";
+    }
+
+    public static string AllFilesZipFileName(this ReleaseVersion releaseVersion)
+    {
+        if (releaseVersion.Publication == null)
         {
-            return $"{FilesPath(releaseVersion.Id, AllFilesZip)}{releaseVersion.AllFilesZipFileName()}";
+            throw new ArgumentException(
+                "ReleaseVersion must be hydrated with Publication to create All Files zip file name");
         }
 
-        public static string AllFilesZipFileName(this ReleaseVersion releaseVersion)
-        {
-            if (releaseVersion.Publication == null)
-            {
-                throw new ArgumentException(
-                    "ReleaseVersion must be hydrated with Publication to create All Files zip file name");
-            }
-
-            return $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
-        }
+        return $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
     }
 }

@@ -1,9 +1,8 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
-{
-    public class ContentBlockUpdateRequest
-    {
-        public string? Heading { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 
-        public string Body { get; set; }
-    }
+public class ContentBlockUpdateRequest
+{
+    public string? Heading { get; set; }
+
+    public string Body { get; set; }
 }

@@ -23,180 +23,179 @@ using static Moq.MockBehavior;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class UserManagementServicePermissionTest
 {
-    public class UserManagementServicePermissionTest
+    [Fact]
+    public async Task ListAllUsers()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.ListAllUsers();
+            });
+    }
+
+    [Fact]
+    public async Task ListReleases()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.ListReleases();
+            });
+    }
+
+    [Fact]
+    public async Task ListRoles()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.ListRoles();
+            });
+    }
+
+    [Fact]
+    public async Task GetUser()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+                {
+                    var service = SetupUserManagementService(userService: userService.Object);
+                    return await service.GetUser(Guid.NewGuid());
+                }
+            );
+    }
+
+    [Fact]
+    public async Task ListPendingInvites()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.ListPendingInvites();
+            });
+    }
+
+    [Fact]
+    public async Task InviteUser()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.InviteUser(new UserInviteCreateRequest());
+            });
+    }
+
+    [Fact]
+    public async Task CancelInvite()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+            {
+                var service = SetupUserManagementService(userService: userService.Object);
+                return await service.CancelInvite("test@test.com");
+            });
+    }
+
+    [Fact]
+    public async Task UpdateUser()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .ExpectCheckToFail(CanManageUsersOnSystem)
+            .AssertForbidden(async userService =>
+                {
+                    var service = SetupUserManagementService(userService: userService.Object);
+                    return await service.UpdateUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                }
+            );
+    }
+
+    public class DeleteUserTests
     {
         [Fact]
-        public async Task ListAllUsers()
+        public async Task Success()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.ListAllUsers();
-                });
-        }
-
-        [Fact]
-        public async Task ListReleases()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.ListReleases();
-                });
-        }
-
-        [Fact]
-        public async Task ListRoles()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.ListRoles();
-                });
-        }
-
-        [Fact]
-        public async Task GetUser()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
+                .AssertSuccess(async userService =>
                     {
-                        var service = SetupUserManagementService(userService: userService.Object);
-                        return await service.GetUser(Guid.NewGuid());
+                        var service = SetupUserManagementService(
+                            userService: userService.Object,
+                            enableDeletion: true);
+                        return await service.DeleteUser("ees-test.user@education.gov.uk");
                     }
                 );
         }
 
         [Fact]
-        public async Task ListPendingInvites()
+        public async Task Forbidden_EnvironmentConfiguration()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.ListPendingInvites();
-                });
-        }
-
-        [Fact]
-        public async Task InviteUser()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.InviteUser(new UserInviteCreateRequest());
-                });
-        }
-
-        [Fact]
-        public async Task CancelInvite()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.CancelInvite("test@test.com");
-                });
-        }
-
-        [Fact]
-        public async Task UpdateUser()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                     {
                         var service = SetupUserManagementService(userService: userService.Object);
-                        return await service.UpdateUser(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                        return await service.DeleteUser("ees.test-user@education.gov.uk");
                     }
                 );
         }
 
-        public class DeleteUserTests
+        [Fact]
+        public async Task Forbidden_InvalidEmailAddressFormat()
         {
-            [Fact]
-            public async Task Success()
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .AssertSuccess(async userService =>
-                        {
-                            var service = SetupUserManagementService(
-                                userService: userService.Object,
-                                enableDeletion: true);
-                            return await service.DeleteUser("ees-test.user@education.gov.uk");
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task Forbidden_EnvironmentConfiguration()
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .AssertForbidden(async userService =>
-                        {
-                            var service = SetupUserManagementService(userService: userService.Object);
-                            return await service.DeleteUser("ees.test-user@education.gov.uk");
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task Forbidden_InvalidEmailAddressFormat()
-            {
-                await PolicyCheckBuilder<SecurityPolicies>()
-                    .AssertForbidden(async userService =>
-                        {
-                            var service = SetupUserManagementService(userService: userService.Object);
-                            return await service.DeleteUser("invalid-email-to-delete@education.gov.uk");
-                        }
-                    );
-            }
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .AssertForbidden(async userService =>
+                    {
+                        var service = SetupUserManagementService(userService: userService.Object);
+                        return await service.DeleteUser("invalid-email-to-delete@education.gov.uk");
+                    }
+                );
         }
+    }
 
-        private static UserManagementService SetupUserManagementService(
-            ContentDbContext? contentDbContext = null,
-            UsersAndRolesDbContext? usersAndRolesDbContext = null,
-            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService? emailTemplateService = null,
-            IReleaseVersionRepository? releaseVersionRepository = null,
-            IUserRoleService? userRoleService = null,
-            IUserService? userService = null,
-            IUserInviteRepository? userInviteRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
-            IUserPublicationInviteRepository? userPublicationInviteRepository = null,
-            UserManager<ApplicationUser>? userManager = null,
-            bool? enableDeletion = false)
-        {
-            contentDbContext ??= InMemoryApplicationDbContext();
-            usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
+    private static UserManagementService SetupUserManagementService(
+        ContentDbContext? contentDbContext = null,
+        UsersAndRolesDbContext? usersAndRolesDbContext = null,
+        IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+        IEmailTemplateService? emailTemplateService = null,
+        IReleaseVersionRepository? releaseVersionRepository = null,
+        IUserRoleService? userRoleService = null,
+        IUserService? userService = null,
+        IUserInviteRepository? userInviteRepository = null,
+        IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+        IUserPublicationInviteRepository? userPublicationInviteRepository = null,
+        UserManager<ApplicationUser>? userManager = null,
+        bool? enableDeletion = false)
+    {
+        contentDbContext ??= InMemoryApplicationDbContext();
+        usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
-            return new UserManagementService(
-                usersAndRolesDbContext,
-                contentDbContext,
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
-                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
-                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-                userService ?? AlwaysTrueUserService().Object,
-                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
-                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
-                userManager ?? MockUserManager().Object,
-                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableDeletion + "")).Object
-            );
-        }
+        return new UserManagementService(
+            usersAndRolesDbContext,
+            contentDbContext,
+            usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
+            emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+            releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
+            userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+            userService ?? AlwaysTrueUserService().Object,
+            userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
+            userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
+            userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext),
+            userManager ?? MockUserManager().Object,
+            CreateMockConfiguration(TupleOf("enableThemeDeletion", enableDeletion + "")).Object
+        );
     }
 }

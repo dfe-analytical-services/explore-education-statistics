@@ -13,50 +13,49 @@ using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+
+public interface IPublicationService
 {
-    public interface IPublicationService
-    {
-        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(Guid? topicId);
+    Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(Guid? topicId);
 
-        Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
+    Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
-        Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
-            PublicationCreateRequest publication);
+    Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
+        PublicationCreateRequest publication);
 
-        Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
-            Guid publicationId,
-            PublicationSaveRequest updatedPublication);
+    Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
+        Guid publicationId,
+        PublicationSaveRequest updatedPublication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions);
+    Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions);
 
-        Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
+    Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
 
-        Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
-            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology);
+    Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
+        Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology);
 
-        Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
-            Guid publicationId);
+    Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+        Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
+    Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
-            ContactSaveRequest updatedContact);
+    Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId,
+        ContactSaveRequest updatedContact);
 
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
-            Guid publicationId,
-            int page,
-            int pageSize,
-            bool? live = null,
-            bool includePermissions = false);
+    Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListLatestReleaseVersionsPaginated(
+        Guid publicationId,
+        int page,
+        int pageSize,
+        bool? live = null,
+        bool includePermissions = false);
 
-        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
-            Guid publicationId,
-            bool? live = null,
-            bool includePermissions = false);
+    Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListLatestReleaseVersions(
+        Guid publicationId,
+        bool? live = null,
+        bool includePermissions = false);
 
-        Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases);
-    }
+    Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
+        Guid publicationId,
+        List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases);
 }

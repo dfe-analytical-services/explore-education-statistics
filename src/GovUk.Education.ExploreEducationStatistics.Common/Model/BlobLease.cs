@@ -1,20 +1,19 @@
 using System.Threading.Tasks;
 using Azure.Storage.Blobs.Specialized;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+public class BlobLease
 {
-    public class BlobLease
+    private readonly BlobLeaseClient _leaseClient;
+
+    public BlobLease(BlobLeaseClient leaseClient)
     {
-        private readonly BlobLeaseClient _leaseClient;
+        _leaseClient = leaseClient;
+    }
 
-        public BlobLease(BlobLeaseClient leaseClient)
-        {
-            _leaseClient = leaseClient;
-        }
-
-        public async Task Release()
-        {
-            await _leaseClient.ReleaseAsync();
-        }
+    public async Task Release()
+    {
+        await _leaseClient.ReleaseAsync();
     }
 }

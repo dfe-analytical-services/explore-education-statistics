@@ -13,104 +13,103 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class DataArchiveValidationService : IDataArchiveValidationService
 {
-    public class DataArchiveValidationService : IDataArchiveValidationService
+    private readonly IFileTypeService _fileTypeService;
+
+    private const int MaxFilenameSize = 150;
+
+    private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
+        new()
+        {
+            {DataZip, AllowedArchiveMimeTypes}
+        };
+
+    public DataArchiveValidationService(IFileTypeService fileTypeService)
     {
-        private readonly IFileTypeService _fileTypeService;
+        _fileTypeService = fileTypeService;
+    }
 
-        private const int MaxFilenameSize = 150;
-
-        private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
-            new()
-            {
-                {DataZip, AllowedArchiveMimeTypes}
-            };
-
-        public DataArchiveValidationService(IFileTypeService fileTypeService)
+    public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
+    {
+        if (!await IsZipFile(zipFile))
         {
-            _fileTypeService = fileTypeService;
+            return ValidationActionResult(DataZipMustBeZipFile);
         }
 
-        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
+        await using var stream = zipFile.OpenReadStream();
+        using var archive = new ZipArchive(stream);
+
+        if (archive.Entries.Count != 2)
         {
-            if (!await IsZipFile(zipFile))
-            {
-                return ValidationActionResult(DataZipMustBeZipFile);
-            }
-
-            await using var stream = zipFile.OpenReadStream();
-            using var archive = new ZipArchive(stream);
-
-            if (archive.Entries.Count != 2)
-            {
-                return ValidationActionResult(DataZipFileCanOnlyContainTwoFiles);
-            }
-
-            var file1 = archive.Entries[0];
-            var file2 = archive.Entries[1];
-
-            if (!file1.FullName.EndsWith(".csv") || !file2.FullName.EndsWith(".csv"))
-            {
-                return ValidationActionResult(DataZipFileDoesNotContainCsvFiles);
-            }
-
-            var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
-            var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
-
-            var filenamesValid = ValidateFilenameLengths(
-                zipFile.FileName.Length,
-                dataFile.Name.Length,
-                metaFile.Name.Length);
-
-            if (filenamesValid.IsLeft)
-            {
-                return filenamesValid.Left;
-            }
-
-            return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
+            return ValidationActionResult(DataZipFileCanOnlyContainTwoFiles);
         }
 
-        private async Task<bool> IsZipFile(IFormFile file)
-        {
-            if (!file.FileName.ToLower().EndsWith(".zip"))
-            {
-                return false;
-            }
+        var file1 = archive.Entries[0];
+        var file2 = archive.Entries[1];
 
-            return await _fileTypeService.HasMatchingMimeType(
-                       file,
-                       AllowedMimeTypesByFileType[DataZip]
-                   )
-                   && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
+        if (!file1.FullName.EndsWith(".csv") || !file2.FullName.EndsWith(".csv"))
+        {
+            return ValidationActionResult(DataZipFileDoesNotContainCsvFiles);
         }
 
-        private static Either<ActionResult, Unit> ValidateFilenameLengths(
-            int zipFilenameLength,
-            int dataFilenameLength,
-            int metaFilenameLength)
+        var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
+        var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
+
+        var filenamesValid = ValidateFilenameLengths(
+            zipFile.FileName.Length,
+            dataFile.Name.Length,
+            metaFile.Name.Length);
+
+        if (filenamesValid.IsLeft)
         {
-            if (zipFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(DataZipFilenameTooLong);
-            }
-
-            if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(DataZipContentFilenamesTooLong);
-            }
-
-            if (dataFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(DataFilenameTooLong);
-            }
-
-            if (metaFilenameLength > MaxFilenameSize)
-            {
-                return ValidationActionResult(MetaFilenameTooLong);
-            }
-
-            return Unit.Instance;
+            return filenamesValid.Left;
         }
+
+        return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
+    }
+
+    private async Task<bool> IsZipFile(IFormFile file)
+    {
+        if (!file.FileName.ToLower().EndsWith(".zip"))
+        {
+            return false;
+        }
+
+        return await _fileTypeService.HasMatchingMimeType(
+                   file,
+                   AllowedMimeTypesByFileType[DataZip]
+               )
+               && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
+    }
+
+    private static Either<ActionResult, Unit> ValidateFilenameLengths(
+        int zipFilenameLength,
+        int dataFilenameLength,
+        int metaFilenameLength)
+    {
+        if (zipFilenameLength > MaxFilenameSize)
+        {
+            return ValidationActionResult(DataZipFilenameTooLong);
+        }
+
+        if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
+        {
+            return ValidationActionResult(DataZipContentFilenamesTooLong);
+        }
+
+        if (dataFilenameLength > MaxFilenameSize)
+        {
+            return ValidationActionResult(DataFilenameTooLong);
+        }
+
+        if (metaFilenameLength > MaxFilenameSize)
+        {
+            return ValidationActionResult(MetaFilenameTooLong);
+        }
+
+        return Unit.Instance;
     }
 }

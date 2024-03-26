@@ -9,144 +9,143 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+
+public class ReleaseDataFileRepository : IReleaseDataFileRepository
 {
-    public class ReleaseDataFileRepository : IReleaseDataFileRepository
+    private readonly ContentDbContext _contentDbContext;
+
+    private static readonly List<FileType> SupportedFileTypes = new()
     {
-        private readonly ContentDbContext _contentDbContext;
+        Data,
+        Metadata
+    };
 
-        private static readonly List<FileType> SupportedFileTypes = new()
-        {
-            Data,
-            Metadata
-        };
+    public ReleaseDataFileRepository(ContentDbContext contentDbContext)
+    {
+        _contentDbContext = contentDbContext;
+    }
 
-        public ReleaseDataFileRepository(ContentDbContext contentDbContext)
+    public async Task<File> Create(
+        Guid releaseVersionId,
+        Guid subjectId,
+        string filename,
+        long contentLength,
+        FileType type,
+        Guid createdById,
+        string? name = null,
+        File? replacingFile = null,
+        File? source = null,
+        int order = 0)
+    {
+        if (!SupportedFileTypes.Contains(type))
         {
-            _contentDbContext = contentDbContext;
+            throw new ArgumentOutOfRangeException(nameof(type), type, "Cannot create file for file type");
         }
 
-        public async Task<File> Create(
-            Guid releaseVersionId,
-            Guid subjectId,
-            string filename,
-            long contentLength,
-            FileType type,
-            Guid createdById,
-            string? name = null,
-            File? replacingFile = null,
-            File? source = null,
-            int order = 0)
+        if (type == Metadata && replacingFile != null)
         {
-            if (!SupportedFileTypes.Contains(type))
-            {
-                throw new ArgumentOutOfRangeException(nameof(type), type, "Cannot create file for file type");
-            }
-
-            if (type == Metadata && replacingFile != null)
-            {
-                throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
-            }
-
-            var releaseFile = new ReleaseFile
-            {
-                ReleaseVersionId = releaseVersionId,
-                Name = name,
-                Order = order,
-                File = new File
-                {
-                    CreatedById = createdById,
-                    RootPath = releaseVersionId,
-                    SubjectId = subjectId,
-                    Filename = filename,
-                    ContentLength = contentLength,
-                    ContentType = "text/csv",
-                    Type = type,
-                    Replacing = replacingFile,
-                    Source = source
-                },
-            };
-            var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
-            if (replacingFile != null)
-            {
-                _contentDbContext.Update(replacingFile);
-                replacingFile.ReplacedBy = releaseFile.File;
-            }
-
-            await _contentDbContext.SaveChangesAsync();
-            return created.File;
+            throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
         }
 
-        public async Task<File> CreateZip(Guid releaseVersionId,
-            string filename,
-            long contentLength,
-            string contentType,
-            Guid createdById)
+        var releaseFile = new ReleaseFile
         {
-            var file = (await _contentDbContext.Files.AddAsync(new File
+            ReleaseVersionId = releaseVersionId,
+            Name = name,
+            Order = order,
+            File = new File
             {
                 CreatedById = createdById,
                 RootPath = releaseVersionId,
+                SubjectId = subjectId,
                 Filename = filename,
                 ContentLength = contentLength,
-                ContentType = contentType,
-                Type = DataZip
-            })).Entity;
-
-            await _contentDbContext.SaveChangesAsync();
-
-            return file;
-        }
-
-        public async Task<IList<File>> ListDataFiles(Guid releaseVersionId)
+                ContentType = "text/csv",
+                Type = type,
+                Replacing = replacingFile,
+                Source = source
+            },
+        };
+        var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
+        if (replacingFile != null)
         {
-            return await ListDataFilesQuery(releaseVersionId).ToListAsync();
+            _contentDbContext.Update(replacingFile);
+            replacingFile.ReplacedBy = releaseFile.File;
         }
 
-        public async Task<bool> HasAnyDataFiles(Guid releaseVersionId)
-        {
-            return await ListDataFilesQuery(releaseVersionId).AnyAsync();
-        }
+        await _contentDbContext.SaveChangesAsync();
+        return created.File;
+    }
 
-        public async Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId)
+    public async Task<File> CreateZip(Guid releaseVersionId,
+        string filename,
+        long contentLength,
+        string contentType,
+        Guid createdById)
+    {
+        var file = (await _contentDbContext.Files.AddAsync(new File
         {
-            return await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .Where(
-                    rf => rf.ReleaseVersionId == releaseVersionId
-                          && rf.File.Type == Data
-                          && rf.File.ReplacingId != null
-                          && rf.File.SubjectId.HasValue
-                )
-                .Select(rf => rf.File)
-                .ToListAsync();
-        }
+            CreatedById = createdById,
+            RootPath = releaseVersionId,
+            Filename = filename,
+            ContentLength = contentLength,
+            ContentType = contentType,
+            Type = DataZip
+        })).Entity;
 
-        public async Task<ReleaseFile> GetBySubject(Guid releaseVersionId, Guid subjectId)
-        {
-            return await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.SubjectId == subjectId
-                    && rf.File.Type == Data);
-        }
+        await _contentDbContext.SaveChangesAsync();
 
-        private IQueryable<File> ListDataFilesQuery(Guid releaseVersionId)
-        {
-            return _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .Where(
-                    rf => rf.ReleaseVersionId == releaseVersionId
-                          && rf.File.Type == Data
-                          && rf.File.ReplacingId == null
-                )
-                .OrderBy(rf => rf.Order)
-                .ThenBy(rf => rf.Name) // For data sets existing before ordering was added
-                .Select(rf => rf.File);
-        }
+        return file;
+    }
+
+    public async Task<IList<File>> ListDataFiles(Guid releaseVersionId)
+    {
+        return await ListDataFilesQuery(releaseVersionId).ToListAsync();
+    }
+
+    public async Task<bool> HasAnyDataFiles(Guid releaseVersionId)
+    {
+        return await ListDataFilesQuery(releaseVersionId).AnyAsync();
+    }
+
+    public async Task<IList<File>> ListReplacementDataFiles(Guid releaseVersionId)
+    {
+        return await _contentDbContext
+            .ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(
+                rf => rf.ReleaseVersionId == releaseVersionId
+                      && rf.File.Type == Data
+                      && rf.File.ReplacingId != null
+                      && rf.File.SubjectId.HasValue
+            )
+            .Select(rf => rf.File)
+            .ToListAsync();
+    }
+
+    public async Task<ReleaseFile> GetBySubject(Guid releaseVersionId, Guid subjectId)
+    {
+        return await _contentDbContext
+            .ReleaseFiles
+            .Include(rf => rf.File)
+            .SingleAsync(rf =>
+                rf.ReleaseVersionId == releaseVersionId
+                && rf.File.SubjectId == subjectId
+                && rf.File.Type == Data);
+    }
+
+    private IQueryable<File> ListDataFilesQuery(Guid releaseVersionId)
+    {
+        return _contentDbContext
+            .ReleaseFiles
+            .Include(rf => rf.File)
+            .Where(
+                rf => rf.ReleaseVersionId == releaseVersionId
+                      && rf.File.Type == Data
+                      && rf.File.ReplacingId == null
+            )
+            .OrderBy(rf => rf.Order)
+            .ThenBy(rf => rf.Name) // For data sets existing before ordering was added
+            .Select(rf => rf.File);
     }
 }

@@ -7,32 +7,31 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+
+[Route("api")]
+public class GlossaryController : ControllerBase
 {
-    [Route("api")]
-    public class GlossaryController : ControllerBase
+    private readonly IGlossaryCacheService _glossaryCacheService;
+    private readonly IGlossaryService _glossaryService;
+
+    public GlossaryController(IGlossaryCacheService glossaryCacheService,
+        IGlossaryService glossaryService)
     {
-        private readonly IGlossaryCacheService _glossaryCacheService;
-        private readonly IGlossaryService _glossaryService;
+        _glossaryCacheService = glossaryCacheService;
+        _glossaryService = glossaryService;
+    }
 
-        public GlossaryController(IGlossaryCacheService glossaryCacheService,
-            IGlossaryService glossaryService)
-        {
-            _glossaryCacheService = glossaryCacheService;
-            _glossaryService = glossaryService;
-        }
+    [HttpGet("glossary-entries")]
+    public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
+    {
+        return await _glossaryCacheService.GetGlossary();
+    }
 
-        [HttpGet("glossary-entries")]
-        public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
-        {
-            return await _glossaryCacheService.GetGlossary();
-        }
-
-        [HttpGet("glossary-entries/{slug}")]
-        public async Task<ActionResult<GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
-        {
-            return await _glossaryService.GetGlossaryEntry(slug)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("glossary-entries/{slug}")]
+    public async Task<ActionResult<GlossaryEntryViewModel>> GetGlossaryEntry(string slug)
+    {
+        return await _glossaryService.GetGlossaryEntry(slug)
+            .HandleFailuresOrOk();
     }
 }

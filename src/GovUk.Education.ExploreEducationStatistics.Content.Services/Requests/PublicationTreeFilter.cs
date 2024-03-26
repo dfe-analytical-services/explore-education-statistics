@@ -1,11 +1,10 @@
 #nullable enable
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+
+public enum PublicationTreeFilter
 {
-    public enum PublicationTreeFilter
-    {
-        DataTables,
-        DataCatalogue,
-        FastTrack,
-    }
+    DataTables,
+    DataCatalogue,
+    FastTrack,
 }

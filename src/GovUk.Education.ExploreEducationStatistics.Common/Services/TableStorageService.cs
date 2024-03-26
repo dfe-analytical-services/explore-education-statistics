@@ -6,81 +6,80 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Services
+namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
+
+public abstract class TableStorageService : ITableStorageService
 {
-    public abstract class TableStorageService : ITableStorageService
+    private readonly CloudTableClient _client;
+    private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new();
+
+    protected TableStorageService(
+        IConfiguration configuration,
+        string connectionStringKey)
     {
-        private readonly CloudTableClient _client;
-        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new();
+        var connectionString = configuration.GetValue<string>(connectionStringKey);
+        var account = CloudStorageAccount.Parse(connectionString);
+        _client = account.CreateCloudTableClient();
+    }
 
-        protected TableStorageService(
-            IConfiguration configuration,
-            string connectionStringKey)
-        {
-            var connectionString = configuration.GetValue<string>(connectionStringKey);
-            var account = CloudStorageAccount.Parse(connectionString);
-            _client = account.CreateCloudTableClient();
-        }
+    /// <summary>
+    /// Gets a table by name, will create the table if it does not exist
+    /// </summary>
+    /// <param name="tableName">The name of the table to get.</param>
+    /// <returns>The table</returns>
+    public CloudTable GetTable(string tableName)
+    {
+        var table = _client.GetTableReference(tableName);
 
-        /// <summary>
-        /// Gets a table by name, will create the table if it does not exist
-        /// </summary>
-        /// <param name="tableName">The name of the table to get.</param>
-        /// <returns>The table</returns>
-        public CloudTable GetTable(string tableName)
-        {
-            var table = _client.GetTableReference(tableName);
+        _storageInstanceCreationUtil.CreateInstanceIfNotExists(
+            _client.StorageUri.ToString(),
+            AzureStorageType.Table,
+            tableName,
+            () => table.CreateIfNotExists());
 
-            _storageInstanceCreationUtil.CreateInstanceIfNotExists(
-                _client.StorageUri.ToString(),
-                AzureStorageType.Table,
-                tableName,
-                () => table.CreateIfNotExists());
+        return table;
+    }
 
-            return table;
-        }
-
-        public async Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity)
-        {
-            try
-            {
-                var table = _client.GetTableReference(tableName);
-                entity.ETag = "*";
-                var result = await table.ExecuteAsync(TableOperation.Delete(entity));
-                return result != null;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
+    public async Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity)
+    {
+        try
         {
             var table = _client.GetTableReference(tableName);
-            return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey, entity.RowKey, columns));
+            entity.ETag = "*";
+            var result = await table.ExecuteAsync(TableOperation.Delete(entity));
+            return result != null;
         }
-
-        public async Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity)
+        catch
         {
-            var table = _client.GetTableReference(tableName);
-            return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
+            return false;
         }
+    }
 
-        public async Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName,
-            TableQuery<TElement> query) where TElement : ITableEntity, new()
+    public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
+    {
+        var table = _client.GetTableReference(tableName);
+        return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey, entity.RowKey, columns));
+    }
+
+    public async Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity)
+    {
+        var table = _client.GetTableReference(tableName);
+        return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
+    }
+
+    public async Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName,
+        TableQuery<TElement> query) where TElement : ITableEntity, new()
+    {
+        var results = new List<TElement>();
+        var table = GetTable(tableName);
+        TableContinuationToken? token = null;
+        do
         {
-            var results = new List<TElement>();
-            var table = GetTable(tableName);
-            TableContinuationToken? token = null;
-            do
-            {
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query, token);
-                results.AddRange(queryResult.Results);
-                token = queryResult.ContinuationToken;
-            } while (token != null);
+            var queryResult = await table.ExecuteQuerySegmentedAsync(query, token);
+            results.AddRange(queryResult.Results);
+            token = queryResult.ContinuationToken;
+        } while (token != null);
 
-            return results;
-        }
+        return results;
     }
 }

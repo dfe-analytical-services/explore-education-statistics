@@ -15,79 +15,78 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
+
+public class ReleaseFileServicePermissionTests
 {
-    public class ReleaseFileServicePermissionTests
+    private static readonly ReleaseVersion ReleaseVersion = new()
     {
-        private static readonly ReleaseVersion ReleaseVersion = new()
-        {
-            Id = Guid.NewGuid()
-        };
+        Id = Guid.NewGuid()
+    };
 
-        private static readonly ReleaseFile ReleaseFile = new()
-        {
-            ReleaseVersion = ReleaseVersion,
-            File = new File(),
-        };
+    private static readonly ReleaseFile ReleaseFile = new()
+    {
+        ReleaseVersion = ReleaseVersion,
+        File = new File(),
+    };
 
-        [Fact]
-        public async Task StreamFile()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var persistenceHelper =
-                            MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
+    [Fact]
+    public async Task StreamFile()
+    {
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(ReleaseFile.ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var persistenceHelper =
+                        MockPersistenceHelper<ContentDbContext, ReleaseFile>(ReleaseFile);
 
-                        var service = BuildReleaseFileService(
-                            userService: userService.Object,
-                            persistenceHelper: persistenceHelper.Object
-                        );
-                        return service.StreamFile(releaseVersionId: ReleaseFile.ReleaseVersionId,
-                            fileId: ReleaseFile.FileId);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task ZipFilesToStream()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseFileService(userService: userService.Object);
-                        return service.ZipFilesToStream(
-                            releaseVersionId: ReleaseVersion.Id,
-                            outputStream: Stream.Null,
-                            fileIds: ListOf(Guid.NewGuid())
-                        );
-                    }
-                );
-        }
-
-        private ReleaseFileService BuildReleaseFileService(
-            ContentDbContext? contentDbContext = null,
-            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IPublicBlobStorageService? publicBlobStorageService = null,
-            IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
-            IUserService? userService = null)
-        {
-            return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
-                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                userService ?? Mock.Of<IUserService>()
+                    var service = BuildReleaseFileService(
+                        userService: userService.Object,
+                        persistenceHelper: persistenceHelper.Object
+                    );
+                    return service.StreamFile(releaseVersionId: ReleaseFile.ReleaseVersionId,
+                        fileId: ReleaseFile.FileId);
+                }
             );
-        }
+    }
 
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
-        {
-            return MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion);
-        }
+    [Fact]
+    public async Task ZipFilesToStream()
+    {
+        await PolicyCheckBuilder<ContentSecurityPolicies>()
+            .SetupResourceCheckToFail(ReleaseVersion, ContentSecurityPolicies.CanViewSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = BuildReleaseFileService(userService: userService.Object);
+                    return service.ZipFilesToStream(
+                        releaseVersionId: ReleaseVersion.Id,
+                        outputStream: Stream.Null,
+                        fileIds: ListOf(Guid.NewGuid())
+                    );
+                }
+            );
+    }
+
+    private ReleaseFileService BuildReleaseFileService(
+        ContentDbContext? contentDbContext = null,
+        IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IPublicBlobStorageService? publicBlobStorageService = null,
+        IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
+        IUserService? userService = null)
+    {
+        return new(
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
+            persistenceHelper ?? DefaultPersistenceHelperMock().Object,
+            publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
+            dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
+            userService ?? Mock.Of<IUserService>()
+        );
+    }
+
+    private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
+    {
+        return MockPersistenceHelper<ContentDbContext, ReleaseVersion>(ReleaseVersion.Id, ReleaseVersion);
     }
 }

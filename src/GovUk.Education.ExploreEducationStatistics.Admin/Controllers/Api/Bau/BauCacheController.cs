@@ -17,230 +17,229 @@ using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
+
+[Route("api/bau")]
+[ApiController]
+[Authorize(Roles = RoleNames.BauUser)]
+public class BauCacheController : ControllerBase
 {
-    [Route("api/bau")]
-    [ApiController]
-    [Authorize(Roles = RoleNames.BauUser)]
-    public class BauCacheController : ControllerBase
+    private readonly IPrivateBlobStorageService _privateBlobStorageService;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
+    private readonly IGlossaryCacheService _glossaryCacheService;
+    private readonly IMethodologyCacheService _methodologyCacheService;
+    private readonly IPublicationCacheService _publicationCacheService;
+
+    public BauCacheController(
+        IPrivateBlobStorageService privateBlobStorageService,
+        IPublicBlobStorageService publicBlobStorageService,
+        IGlossaryCacheService glossaryCacheService,
+        IMethodologyCacheService methodologyCacheService,
+        IPublicationCacheService publicationCacheService)
     {
-        private readonly IPrivateBlobStorageService _privateBlobStorageService;
-        private readonly IPublicBlobStorageService _publicBlobStorageService;
-        private readonly IGlossaryCacheService _glossaryCacheService;
-        private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        _privateBlobStorageService = privateBlobStorageService;
+        _publicBlobStorageService = publicBlobStorageService;
+        _glossaryCacheService = glossaryCacheService;
+        _methodologyCacheService = methodologyCacheService;
+        _publicationCacheService = publicationCacheService;
+    }
 
-        public BauCacheController(
-            IPrivateBlobStorageService privateBlobStorageService,
-            IPublicBlobStorageService publicBlobStorageService,
-            IGlossaryCacheService glossaryCacheService,
-            IMethodologyCacheService methodologyCacheService,
-            IPublicationCacheService publicationCacheService)
+    [HttpDelete("private-cache")]
+    public async Task<ActionResult> ClearPrivateCache(ClearPrivateCachePathsViewModel request)
+    {
+        if (request.Paths.Any())
         {
-            _privateBlobStorageService = privateBlobStorageService;
-            _publicBlobStorageService = publicBlobStorageService;
-            _glossaryCacheService = glossaryCacheService;
-            _methodologyCacheService = methodologyCacheService;
-            _publicationCacheService = publicationCacheService;
+            var pathString = request.Paths.JoinToString('|');
+
+            await _privateBlobStorageService.DeleteBlobs(
+                BlobContainers.PrivateContent,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex($"^releases/[^/]+/({pathString})/")
+                }
+            );
         }
 
-        [HttpDelete("private-cache")]
-        public async Task<ActionResult> ClearPrivateCache(ClearPrivateCachePathsViewModel request)
-        {
-            if (request.Paths.Any())
-            {
-                var pathString = request.Paths.JoinToString('|');
+        return NoContent();
+    }
 
-                await _privateBlobStorageService.DeleteBlobs(
-                    BlobContainers.PrivateContent,
-                    options: new DeleteBlobsOptions
+    [HttpPut("public-cache/glossary")]
+    public async Task<ActionResult> UpdatePublicCacheGlossary()
+    {
+        await _glossaryCacheService.UpdateGlossary();
+        return NoContent();
+    }
+
+    [HttpPut("public-cache/trees")]
+    public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
+    {
+        if (request.CacheEntries.Any())
+        {
+            await request.CacheEntries
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(
+
+                    async entry =>
                     {
-                        IncludeRegex = new Regex($"^releases/[^/]+/({pathString})/")
-                    }
-                );
-            }
+                        var allowedPath =
+                            EnumUtil.GetFromEnumValue<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
 
-            return NoContent();
-        }
-
-        [HttpPut("public-cache/glossary")]
-        public async Task<ActionResult> UpdatePublicCacheGlossary()
-        {
-            await _glossaryCacheService.UpdateGlossary();
-            return NoContent();
-        }
-
-        [HttpPut("public-cache/trees")]
-        public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
-        {
-            if (request.CacheEntries.Any())
-            {
-                await request.CacheEntries
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-
-                        async entry =>
+                        switch (allowedPath)
                         {
-                            var allowedPath =
-                                EnumUtil.GetFromEnumValue<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
-
-                            switch (allowedPath)
-                            {
-                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree:
-                                    await _methodologyCacheService.UpdateSummariesTree();
-                                    break;
-                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                    await _publicationCacheService.UpdatePublicationTree();
-                                    break;
-                                default:
-                                    throw new ArgumentException($"Unsupported cache entry {entry}");
-                            }
-                        });
-            }
-
-            return NoContent();
+                            case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree:
+                                await _methodologyCacheService.UpdateSummariesTree();
+                                break;
+                            case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                                await _publicationCacheService.UpdatePublicationTree();
+                                break;
+                            default:
+                                throw new ArgumentException($"Unsupported cache entry {entry}");
+                        }
+                    });
         }
 
-        [HttpDelete("public-cache/releases")]
-        public async Task<ActionResult> ClearPublicCacheReleases(ClearPublicCacheReleasePathsViewModel request)
+        return NoContent();
+    }
+
+    [HttpDelete("public-cache/releases")]
+    public async Task<ActionResult> ClearPublicCacheReleases(ClearPublicCacheReleasePathsViewModel request)
+    {
+        if (request.Paths.Any())
         {
-            if (request.Paths.Any())
-            {
-                var pathString = request.Paths.JoinToString('|');
-
-                await _publicBlobStorageService.DeleteBlobs(
-                    BlobContainers.PublicContent,
-                    options: new DeleteBlobsOptions
-                    {
-                        IncludeRegex = new Regex($"^publications/[^/]+/releases/[^/]+/({pathString})/")
-                    }
-                );
-            }
-
-            return NoContent();
-        }
-
-        [HttpDelete("public-cache/publication/{publicationSlug}")]
-        public async Task<ActionResult> ClearPublicCachePublication(string publicationSlug)
-        {
-            await _publicBlobStorageService.DeleteBlobs(
-                containerName: BlobContainers.PublicContent,
-                options: new DeleteBlobsOptions
-                {
-                    IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
-                }
-            );
-
-            return NoContent();
-        }
-
-        [HttpDelete("public-cache/publications")]
-        public async Task<ActionResult> ClearPublicCachePublications()
-        {
-            await _publicBlobStorageService.DeleteBlobs(
-                containerName: BlobContainers.PublicContent,
-                options: new DeleteBlobsOptions
-                {
-                    IncludeRegex = new Regex("^publications/.+$")
-                }
-            );
-
-            return NoContent();
-        }
-
-        /// <summary>
-        /// Clears all publication.json files
-        ///
-        /// Useful for when the PublicationCacheViewModel has been changed to invalidate all publication JSON files.
-        /// </summary>
-        /// <returns></returns>
-        [HttpDelete("public-cache/publications/publication-json")]
-        public async Task<ActionResult> ClearPublicCachePublicationJson()
-        {
-            var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+            var pathString = request.Paths.JoinToString('|');
 
             await _publicBlobStorageService.DeleteBlobs(
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/[^/]+/{publicationJsonFilenameRegex}$")
-                });
-
-            return NoContent();
+                    IncludeRegex = new Regex($"^publications/[^/]+/releases/[^/]+/({pathString})/")
+                }
+            );
         }
 
-        /// <summary>
-        /// Clears all latest-release.json and releases/[yyyy-*].json.
-        ///
-        /// Useful for when the ReleaseCacheViewModel has been changed to invalidate all release JSON files, as this
-        /// will target both the latest-release.json and individual [release-year-and-time-identifier].json files in
-        /// the same call.
-        /// </summary>
-        [HttpDelete("public-cache/publications/release-json")]
-        public async Task<ActionResult> ClearPublicCacheReleaseJson()
-        {
-            var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+        return NoContent();
+    }
 
-            await _publicBlobStorageService.DeleteBlobs(
-                BlobContainers.PublicContent,
-                options: new DeleteBlobsOptions
-                {
-                    // Match against patterns:
-                    //
-                    // publications/***/latest-release.json
-                    // publications/***/releases/1234.json
-                    // publications/***/releases/1234-35.json
-                    // publications/***/releases/1234-q1.json
-                    // publications/***/releases/1234-35-q1.json
-                    IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
-                });
-
-            return NoContent();
-        }
-
-        public class UpdatePublicCacheTreePathsViewModel
-        {
-            public enum CacheEntry
+    [HttpDelete("public-cache/publication/{publicationSlug}")]
+    public async Task<ActionResult> ClearPublicCachePublication(string publicationSlug)
+    {
+        await _publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicContent,
+            options: new DeleteBlobsOptions
             {
-                MethodologyTree,
-                PublicationTree
+                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
             }
+        );
 
-            private static readonly HashSet<string> AllowedCacheEntries = new()
+        return NoContent();
+    }
+
+    [HttpDelete("public-cache/publications")]
+    public async Task<ActionResult> ClearPublicCachePublications()
+    {
+        await _publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicContent,
+            options: new DeleteBlobsOptions
             {
-                CacheEntry.MethodologyTree.ToString(),
-                CacheEntry.PublicationTree.ToString()
-            };
+                IncludeRegex = new Regex("^publications/.+$")
+            }
+        );
 
-            [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedCacheEntries))]
-            public HashSet<string> CacheEntries { get; set; } = new();
-        }
+        return NoContent();
+    }
 
-        public class ClearPublicCacheReleasePathsViewModel
+    /// <summary>
+    /// Clears all publication.json files
+    ///
+    /// Useful for when the PublicationCacheViewModel has been changed to invalidate all publication JSON files.
+    /// </summary>
+    /// <returns></returns>
+    [HttpDelete("public-cache/publications/publication-json")]
+    public async Task<ActionResult> ClearPublicCachePublicationJson()
+    {
+        var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+
+        await _publicBlobStorageService.DeleteBlobs(
+            BlobContainers.PublicContent,
+            options: new DeleteBlobsOptions
+            {
+                IncludeRegex = new Regex($"^publications/[^/]+/{publicationJsonFilenameRegex}$")
+            });
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Clears all latest-release.json and releases/[yyyy-*].json.
+    ///
+    /// Useful for when the ReleaseCacheViewModel has been changed to invalidate all release JSON files, as this
+    /// will target both the latest-release.json and individual [release-year-and-time-identifier].json files in
+    /// the same call.
+    /// </summary>
+    [HttpDelete("public-cache/publications/release-json")]
+    public async Task<ActionResult> ClearPublicCacheReleaseJson()
+    {
+        var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+
+        await _publicBlobStorageService.DeleteBlobs(
+            BlobContainers.PublicContent,
+            options: new DeleteBlobsOptions
+            {
+                // Match against patterns:
+                //
+                // publications/***/latest-release.json
+                // publications/***/releases/1234.json
+                // publications/***/releases/1234-35.json
+                // publications/***/releases/1234-q1.json
+                // publications/***/releases/1234-35-q1.json
+                IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
+            });
+
+        return NoContent();
+    }
+
+    public class UpdatePublicCacheTreePathsViewModel
+    {
+        public enum CacheEntry
         {
-            private static readonly HashSet<string> AllowedPaths = new()
-            {
-                FileStoragePathUtils.DataBlocksDirectory,
-                FileStoragePathUtils.SubjectMetaDirectory
-            };
-
-            [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new();
+            MethodologyTree,
+            PublicationTree
         }
 
-        public class ClearPrivateCachePathsViewModel
+        private static readonly HashSet<string> AllowedCacheEntries = new()
         {
-            private static readonly HashSet<string> AllowedPaths = new()
-            {
-                FileStoragePathUtils.DataBlocksDirectory,
-                FileStoragePathUtils.SubjectMetaDirectory
-            };
+            CacheEntry.MethodologyTree.ToString(),
+            CacheEntry.PublicationTree.ToString()
+        };
 
-            [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new();
-        }
+        [MinLength(1)]
+        [ContainsOnly(AllowedValuesProvider = nameof(AllowedCacheEntries))]
+        public HashSet<string> CacheEntries { get; set; } = new();
+    }
+
+    public class ClearPublicCacheReleasePathsViewModel
+    {
+        private static readonly HashSet<string> AllowedPaths = new()
+        {
+            FileStoragePathUtils.DataBlocksDirectory,
+            FileStoragePathUtils.SubjectMetaDirectory
+        };
+
+        [MinLength(1)]
+        [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+        public HashSet<string> Paths { get; set; } = new();
+    }
+
+    public class ClearPrivateCachePathsViewModel
+    {
+        private static readonly HashSet<string> AllowedPaths = new()
+        {
+            FileStoragePathUtils.DataBlocksDirectory,
+            FileStoragePathUtils.SubjectMetaDirectory
+        };
+
+        [MinLength(1)]
+        [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+        public HashSet<string> Paths { get; set; } = new();
     }
 }

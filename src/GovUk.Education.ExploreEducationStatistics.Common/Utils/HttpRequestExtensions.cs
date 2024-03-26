@@ -21,13 +21,7 @@ public static class HttpRequestExtensions
             return null;
         }
         
-        var json = JsonConvert.DeserializeObject<TJsonType>(requestBody);
-
-        if (json == null)
-        {
-            throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
-        }
-
+        var json = JsonConvert.DeserializeObject<TJsonType>(requestBody) ?? throw new ArgumentException($"Could not deserialize request body to type {typeof(TJsonType)}");
         return json;
     }
     

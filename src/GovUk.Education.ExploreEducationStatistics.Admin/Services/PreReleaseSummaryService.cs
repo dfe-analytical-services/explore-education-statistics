@@ -12,35 +12,34 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
+
+public class PreReleaseSummaryService : IPreReleaseSummaryService
 {
-    public class PreReleaseSummaryService : IPreReleaseSummaryService
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IUserService _userService;
+
+    public PreReleaseSummaryService(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IUserService userService)
     {
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
+        _persistenceHelper = persistenceHelper;
+        _userService = userService;
+    }
 
-        public PreReleaseSummaryService(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IUserService userService)
-        {
-            _persistenceHelper = persistenceHelper;
-            _userService = userService;
-        }
-
-        public async Task<Either<ActionResult, PreReleaseSummaryViewModel>> GetPreReleaseSummaryViewModelAsync(
-            Guid releaseVersionId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<ReleaseVersion>(releaseVersionId, queryable =>
-                    queryable.Include(releaseVersion => releaseVersion.Publication)
-                        .ThenInclude(publication => publication.Contact))
-                .OnSuccess(_userService.CheckCanViewPreReleaseSummary)
-                .OnSuccess(releaseVersion => new PreReleaseSummaryViewModel(
-                    releaseVersion.Publication.Slug,
-                    releaseVersion.Publication.Title,
-                    releaseVersion.Slug,
-                    releaseVersion.Title,
-                    releaseVersion.Publication.Contact.TeamEmail,
-                    releaseVersion.Publication.Contact.TeamName));
-        }
+    public async Task<Either<ActionResult, PreReleaseSummaryViewModel>> GetPreReleaseSummaryViewModelAsync(
+        Guid releaseVersionId)
+    {
+        return await _persistenceHelper
+            .CheckEntityExists<ReleaseVersion>(releaseVersionId, queryable =>
+                queryable.Include(releaseVersion => releaseVersion.Publication)
+                    .ThenInclude(publication => publication.Contact))
+            .OnSuccess(_userService.CheckCanViewPreReleaseSummary)
+            .OnSuccess(releaseVersion => new PreReleaseSummaryViewModel(
+                releaseVersion.Publication.Slug,
+                releaseVersion.Publication.Title,
+                releaseVersion.Slug,
+                releaseVersion.Title,
+                releaseVersion.Publication.Contact.TeamEmail,
+                releaseVersion.Publication.Contact.TeamName));
     }
 }

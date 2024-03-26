@@ -1,9 +1,8 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public enum ReleaseApprovalStatus
 {
-    public enum ReleaseApprovalStatus
-    {
-        Draft,
-        HigherLevelReview,
-        Approved,
-    }
+    Draft,
+    HigherLevelReview,
+    Approved,
 }

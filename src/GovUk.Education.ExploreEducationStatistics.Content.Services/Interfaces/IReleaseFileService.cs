@@ -7,25 +7,24 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
-{
-    public interface IReleaseFileService
-    {
-        Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId,
-            Guid fileId);
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
-        /// <summary>
-        /// Pipe a zip file containing some release files to a stream.
-        /// </summary>
-        /// <param name="releaseVersionId">The release version to fetch files from</param>
-        /// <param name="outputStream">The stream to output the zip file to</param>
-        /// <param name="fileIds">Files to include in the zip file. Set to null to include all files.</param>
-        /// <param name="cancellationToken">To cancel the appending of any further files to the stream</param>
-        /// <returns>An Either returning nothing if successful</returns>
-        Task<Either<ActionResult, Unit>> ZipFilesToStream(
-            Guid releaseVersionId,
-            Stream outputStream,
-            IEnumerable<Guid>? fileIds = null,
-            CancellationToken cancellationToken = default);
-    }
+public interface IReleaseFileService
+{
+    Task<Either<ActionResult, FileStreamResult>> StreamFile(Guid releaseVersionId,
+        Guid fileId);
+
+    /// <summary>
+    /// Pipe a zip file containing some release files to a stream.
+    /// </summary>
+    /// <param name="releaseVersionId">The release version to fetch files from</param>
+    /// <param name="outputStream">The stream to output the zip file to</param>
+    /// <param name="fileIds">Files to include in the zip file. Set to null to include all files.</param>
+    /// <param name="cancellationToken">To cancel the appending of any further files to the stream</param>
+    /// <returns>An Either returning nothing if successful</returns>
+    Task<Either<ActionResult, Unit>> ZipFilesToStream(
+        Guid releaseVersionId,
+        Stream outputStream,
+        IEnumerable<Guid>? fileIds = null,
+        CancellationToken cancellationToken = default);
 }

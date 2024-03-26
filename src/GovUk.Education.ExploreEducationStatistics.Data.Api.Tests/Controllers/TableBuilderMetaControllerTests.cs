@@ -21,212 +21,211 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
-{
-    public class TableBuilderMetaControllerTests : CacheServiceTestFixture
-    {
-        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
-        private static readonly Guid SubjectId = Guid.NewGuid();
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-        private static readonly ObservationQueryContext QueryContext = new()
+public class TableBuilderMetaControllerTests : CacheServiceTestFixture
+{
+    private static readonly Guid ReleaseVersionId = Guid.NewGuid();
+    private static readonly Guid SubjectId = Guid.NewGuid();
+
+    private static readonly ObservationQueryContext QueryContext = new()
+    {
+        SubjectId = SubjectId
+    };
+
+    [Fact]
+    public async Task GetSubjectMeta_LatestRelease()
+    {
+        var contentReleaseVersion = new ReleaseVersion
         {
+            Id = ReleaseVersionId,
+            Slug = "release-slug",
+            Publication = new Publication
+            {
+                Slug = "publication-slug"
+            }
+        };
+
+        var releaseSubject = new ReleaseSubject
+        {
+            ReleaseVersionId = ReleaseVersionId,
             SubjectId = SubjectId
         };
 
-        [Fact]
-        public async Task GetSubjectMeta_LatestRelease()
+        var subjectMetaViewModel = new SubjectMetaViewModel();
+
+        var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
+
+        var (controller, mocks) = BuildControllerAndMocks();
+
+        SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
+
+        mocks.cacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
+            .ReturnsAsync(null);
+
+        mocks.cacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
+            .Returns(Task.CompletedTask);
+
+        mocks.releaseSubjectService
+            .Setup(mock => mock.Find(SubjectId, null))
+            .ReturnsAsync(releaseSubject);
+
+        mocks.subjectMetaService
+            .Setup(s => s.GetSubjectMeta(releaseSubject))
+            .ReturnsAsync(subjectMetaViewModel);
+
+        var result = await controller.GetSubjectMeta(SubjectId);
+        VerifyAllMocks(mocks);
+
+        result.AssertOkResult(subjectMetaViewModel);
+    }
+
+    [Fact]
+    public async Task GetSubjectMeta_SpecificRelease()
+    {
+        var contentReleaseVersion = new ReleaseVersion
         {
-            var contentReleaseVersion = new ReleaseVersion
+            Id = ReleaseVersionId,
+            Slug = "release-slug",
+            Publication = new Publication
             {
-                Id = ReleaseVersionId,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
+                Slug = "publication-slug"
+            }
+        };
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersionId = ReleaseVersionId,
-                SubjectId = SubjectId
-            };
-
-            var subjectMetaViewModel = new SubjectMetaViewModel();
-
-            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
-
-            var (controller, mocks) = BuildControllerAndMocks();
-
-            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
-
-            mocks.cacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            mocks.cacheService
-                .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
-                .Returns(Task.CompletedTask);
-
-            mocks.releaseSubjectService
-                .Setup(mock => mock.Find(SubjectId, null))
-                .ReturnsAsync(releaseSubject);
-
-            mocks.subjectMetaService
-                .Setup(s => s.GetSubjectMeta(releaseSubject))
-                .ReturnsAsync(subjectMetaViewModel);
-
-            var result = await controller.GetSubjectMeta(SubjectId);
-            VerifyAllMocks(mocks);
-
-            result.AssertOkResult(subjectMetaViewModel);
-        }
-
-        [Fact]
-        public async Task GetSubjectMeta_SpecificRelease()
+        var releaseSubject = new ReleaseSubject
         {
-            var contentReleaseVersion = new ReleaseVersion
-            {
-                Id = ReleaseVersionId,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
+            ReleaseVersionId = ReleaseVersionId,
+            SubjectId = SubjectId
+        };
 
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseVersionId = ReleaseVersionId,
-                SubjectId = SubjectId
-            };
+        var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var subjectMetaViewModel = new SubjectMetaViewModel();
+        var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
 
-            var cacheKey = GetCacheKey(contentReleaseVersion, releaseSubject);
+        var (controller, mocks) = BuildControllerAndMocks();
 
-            var (controller, mocks) = BuildControllerAndMocks();
+        SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
 
-            SetupCall(mocks.contentPersistenceHelper, ReleaseVersionId, contentReleaseVersion);
+        mocks.cacheService
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
+            .ReturnsAsync(null);
 
-            mocks.cacheService
-                .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
+        mocks.cacheService
+            .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
+            .Returns(Task.CompletedTask);
 
-            mocks.cacheService
-                .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
-                .Returns(Task.CompletedTask);
+        mocks.releaseSubjectService
+            .Setup(s => s.Find(SubjectId, ReleaseVersionId))
+            .ReturnsAsync(releaseSubject);
 
-            mocks.releaseSubjectService
-                .Setup(s => s.Find(SubjectId, ReleaseVersionId))
-                .ReturnsAsync(releaseSubject);
+        mocks.subjectMetaService
+            .Setup(s => s.GetSubjectMeta(releaseSubject))
+            .ReturnsAsync(subjectMetaViewModel);
 
-            mocks.subjectMetaService
-                .Setup(s => s.GetSubjectMeta(releaseSubject))
-                .ReturnsAsync(subjectMetaViewModel);
+        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
+            subjectId: SubjectId);
+        VerifyAllMocks(mocks);
 
-            var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
-                subjectId: SubjectId);
-            VerifyAllMocks(mocks);
+        result.AssertOkResult(subjectMetaViewModel);
+    }
 
-            result.AssertOkResult(subjectMetaViewModel);
-        }
+    [Fact]
+    public async Task GetSubjectMeta_LatestRelease_ReleaseSubjectNotFound()
+    {
+        var (controller, mocks) = BuildControllerAndMocks();
 
-        [Fact]
-        public async Task GetSubjectMeta_LatestRelease_ReleaseSubjectNotFound()
-        {
-            var (controller, mocks) = BuildControllerAndMocks();
+        mocks.releaseSubjectService
+            .Setup(mock => mock.Find(SubjectId, null))
+            .ReturnsAsync(new NotFoundResult());
 
-            mocks.releaseSubjectService
-                .Setup(mock => mock.Find(SubjectId, null))
-                .ReturnsAsync(new NotFoundResult());
+        var result = await controller.GetSubjectMeta(SubjectId);
+        VerifyAllMocks(mocks);
 
-            var result = await controller.GetSubjectMeta(SubjectId);
-            VerifyAllMocks(mocks);
+        result.AssertNotFoundResult();
+    }
 
-            result.AssertNotFoundResult();
-        }
+    [Fact]
+    public async Task GetSubjectMeta_SpecificRelease_ReleaseSubjectNotFound()
+    {
+        var (controller, mocks) = BuildControllerAndMocks();
 
-        [Fact]
-        public async Task GetSubjectMeta_SpecificRelease_ReleaseSubjectNotFound()
-        {
-            var (controller, mocks) = BuildControllerAndMocks();
+        mocks.releaseSubjectService
+            .Setup(mock => mock.Find(SubjectId, ReleaseVersionId))
+            .ReturnsAsync(new NotFoundResult());
 
-            mocks.releaseSubjectService
-                .Setup(mock => mock.Find(SubjectId, ReleaseVersionId))
-                .ReturnsAsync(new NotFoundResult());
+        var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
+            subjectId: SubjectId);
+        VerifyAllMocks(mocks);
 
-            var result = await controller.GetSubjectMeta(releaseVersionId: ReleaseVersionId,
-                subjectId: SubjectId);
-            VerifyAllMocks(mocks);
+        result.AssertNotFoundResult();
+    }
 
-            result.AssertNotFoundResult();
-        }
+    [Fact]
+    public async Task FilterSubjectMeta_LatestRelease()
+    {
+        var subjectMetaViewModel = new SubjectMetaViewModel();
+        var cancellationToken = new CancellationTokenSource().Token;
 
-        [Fact]
-        public async Task FilterSubjectMeta_LatestRelease()
-        {
-            var subjectMetaViewModel = new SubjectMetaViewModel();
-            var cancellationToken = new CancellationTokenSource().Token;
+        var (controller, mocks) = BuildControllerAndMocks();
 
-            var (controller, mocks) = BuildControllerAndMocks();
+        mocks.subjectMetaService
+            .Setup(s => s.FilterSubjectMeta(null, QueryContext, cancellationToken))
+            .ReturnsAsync(subjectMetaViewModel);
 
-            mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(null, QueryContext, cancellationToken))
-                .ReturnsAsync(subjectMetaViewModel);
+        var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
+        VerifyAllMocks(mocks);
 
-            var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
+        result.AssertOkResult(subjectMetaViewModel);
+    }
 
-            result.AssertOkResult(subjectMetaViewModel);
-        }
+    [Fact]
+    public async Task FilterSubjectMeta_SpecificRelease()
+    {
+        var subjectMetaViewModel = new SubjectMetaViewModel();
+        var cancellationToken = new CancellationTokenSource().Token;
 
-        [Fact]
-        public async Task FilterSubjectMeta_SpecificRelease()
-        {
-            var subjectMetaViewModel = new SubjectMetaViewModel();
-            var cancellationToken = new CancellationTokenSource().Token;
+        var (controller, mocks) = BuildControllerAndMocks();
 
-            var (controller, mocks) = BuildControllerAndMocks();
+        mocks.subjectMetaService
+            .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken))
+            .ReturnsAsync(subjectMetaViewModel);
 
-            mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken))
-                .ReturnsAsync(subjectMetaViewModel);
+        var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken);
+        VerifyAllMocks(mocks);
 
-            var result = await controller.FilterSubjectMeta(ReleaseVersionId, QueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
+        result.AssertOkResult(subjectMetaViewModel);
+    }
 
-            result.AssertOkResult(subjectMetaViewModel);
-        }
+    private static SubjectMetaCacheKey GetCacheKey(ReleaseVersion releaseVersion, ReleaseSubject releaseSubject)
+    {
+        return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Publication.Slug,
+            releaseSlug: releaseVersion.Slug,
+            releaseSubject.SubjectId);
+    }
 
-        private static SubjectMetaCacheKey GetCacheKey(ReleaseVersion releaseVersion, ReleaseSubject releaseSubject)
-        {
-            return new SubjectMetaCacheKey(publicationSlug: releaseVersion.Publication.Slug,
-                releaseSlug: releaseVersion.Slug,
-                releaseSubject.SubjectId);
-        }
+    private static (TableBuilderMetaController controller, (
+        Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
+        Mock<IReleaseSubjectService> releaseSubjectService,
+        Mock<ISubjectMetaService> subjectMetaService,
+        Mock<IBlobCacheService> cacheService) mocks)
+        BuildControllerAndMocks()
+    {
+        var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
+        var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+        var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
 
-        private static (TableBuilderMetaController controller, (
-            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
-            Mock<IReleaseSubjectService> releaseSubjectService,
-            Mock<ISubjectMetaService> subjectMetaService,
-            Mock<IBlobCacheService> cacheService) mocks)
-            BuildControllerAndMocks()
-        {
-            var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
-            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
-            var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
+        var controller = new TableBuilderMetaController(
+            contentPersistenceHelper.Object,
+            releaseSubjectService.Object,
+            subjectMetaService.Object);
 
-            var controller = new TableBuilderMetaController(
-                contentPersistenceHelper.Object,
-                releaseSubjectService.Object,
-                subjectMetaService.Object);
-
-            return (controller, (
-                contentPersistenceHelper,
-                releaseSubjectService,
-                subjectMetaService,
-                BlobCacheService));
-        }
+        return (controller, (
+            contentPersistenceHelper,
+            releaseSubjectService,
+            subjectMetaService,
+            BlobCacheService));
     }
 }

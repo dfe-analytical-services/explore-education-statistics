@@ -15,172 +15,171 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils
-{
-    public static class PublicationAuthorizationHandlersTestUtil
-    {
-        public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params PublicationRole[] publicationRolesExpectedToPass)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var publication = new Publication();
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(handlerSupplier, publication, publicationRolesExpectedToPass);
-        }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
 
-        public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Publication publication,
-            params PublicationRole[] publicationRolesExpectedToPass)
-            where TRequirement : IAuthorizationRequirement
+public static class PublicationAuthorizationHandlersTestUtil
+{
+    public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
+        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+        params PublicationRole[] publicationRolesExpectedToPass)
+        where TRequirement : IAuthorizationRequirement
+    {
+        var publication = new Publication();
+        await AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(handlerSupplier, publication, publicationRolesExpectedToPass);
+    }
+
+    public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
+        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+        Publication publication,
+        params PublicationRole[] publicationRolesExpectedToPass)
+        where TRequirement : IAuthorizationRequirement
+    {
+        var user = CreateClaimsPrincipal(Guid.NewGuid());
+
+        await ForEachPublicationRoleAsync(async role =>
         {
-            var user = CreateClaimsPrincipal(Guid.NewGuid());
+            // Test the handler succeeds with the Owner role on the Publication for the User
+            await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
+                new PublicationHandlerTestScenario
+                {
+                    User = user,
+                    Entity = publication,
+                    // Setup a UserPublicationRole for this Publication and User
+                    UserPublicationRoles = ListOf(
+                        new UserPublicationRole
+                        {
+                            PublicationId = publication.Id,
+                            UserId = user.GetUserId(),
+                            Role = role
+                        }),
+                    ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
+                    UnexpectedFailMessage =
+                        $"Expected having role {role} on the Publication to have made the handler succeed",
+                });
 
             await ForEachPublicationRoleAsync(async role =>
             {
-                // Test the handler succeeds with the Owner role on the Publication for the User
+                // Test the handler fails without the role on the correct Publication or the correct User
                 await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
                     new PublicationHandlerTestScenario
                     {
                         User = user,
                         Entity = publication,
-                        // Setup a UserPublicationRole for this Publication and User
+                        // Setup a UserPublicationRole for this Publication but a different User
                         UserPublicationRoles = ListOf(
                             new UserPublicationRole
                             {
                                 PublicationId = publication.Id,
+                                UserId = Guid.NewGuid(),
+                                Role = role
+                            },
+                            // Setup a UserPublicationRoles for this User but a different Publication
+                            new UserPublicationRole
+                            {
+                                PublicationId = Guid.NewGuid(),
                                 UserId = user.GetUserId(),
                                 Role = role
                             }),
-                        ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
-                        UnexpectedFailMessage =
-                            $"Expected having role {role} on the Publication to have made the handler succeed",
+                        ExpectedToPass = false,
+                        UnexpectedPassMessage =
+                            $"Expected not having {role} role on the Publication would have made the handler fail"
                     });
-
-                await ForEachPublicationRoleAsync(async role =>
-                {
-                    // Test the handler fails without the role on the correct Publication or the correct User
-                    await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
-                        new PublicationHandlerTestScenario
-                        {
-                            User = user,
-                            Entity = publication,
-                            // Setup a UserPublicationRole for this Publication but a different User
-                            UserPublicationRoles = ListOf(
-                                new UserPublicationRole
-                                {
-                                    PublicationId = publication.Id,
-                                    UserId = Guid.NewGuid(),
-                                    Role = role
-                                },
-                                // Setup a UserPublicationRoles for this User but a different Publication
-                                new UserPublicationRole
-                                {
-                                    PublicationId = Guid.NewGuid(),
-                                    UserId = user.GetUserId(),
-                                    Role = role
-                                }),
-                            ExpectedToPass = false,
-                            UnexpectedPassMessage =
-                                $"Expected not having {role} role on the Publication would have made the handler fail"
-                        });
-                });
             });
-        }
+        });
+    }
 
-        public class PublicationHandlerTestScenario : HandlerTestScenario
-        {
-            public List<UserPublicationRole>? UserPublicationRoles { get; set; }
-        }
+    public class PublicationHandlerTestScenario : HandlerTestScenario
+    {
+        public List<UserPublicationRole>? UserPublicationRoles { get; set; }
+    }
 
-        public static async Task AssertHandlerOnlySucceedsWithPublicationRoles<TRequirement, TEntity>(
-            Guid publicationId,
-            TEntity handleRequirementArgument,
-            Action<ContentDbContext> addToDbHandler,
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params PublicationRole[] rolesExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var allPublicationRoles = GetEnums<PublicationRole>();
-            var userId = Guid.NewGuid();
+    public static async Task AssertHandlerOnlySucceedsWithPublicationRoles<TRequirement, TEntity>(
+        Guid publicationId,
+        TEntity handleRequirementArgument,
+        Action<ContentDbContext> addToDbHandler,
+        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+        params PublicationRole[] rolesExpectedToSucceed)
+        where TRequirement : IAuthorizationRequirement
+    {
+        var allPublicationRoles = GetEnums<PublicationRole>();
+        var userId = Guid.NewGuid();
 
-            await allPublicationRoles
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async role =>
+        await allPublicationRoles
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async role =>
+            {
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    var contentDbContextId = Guid.NewGuid().ToString();
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    addToDbHandler(contentDbContext);
+                    await contentDbContext.AddAsync(new UserPublicationRole
                     {
-                        addToDbHandler(contentDbContext);
-                        await contentDbContext.AddAsync(new UserPublicationRole
-                        {
-                            UserId = userId,
-                            Role = role,
-                            PublicationId = publicationId,
-                        });
-                        await contentDbContext.SaveChangesAsync();
-                    }
-
-                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                    {
-                        var user = CreateClaimsPrincipal(userId);
-                        var authContext = new AuthorizationHandlerContext(
-                            new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                            user, handleRequirementArgument);
-
-                        var handler = handlerSupplier(contentDbContext);
-                        await handler.HandleAsync(authContext);
-                        if (rolesExpectedToSucceed.Contains(role))
-                        {
-                            Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
-                        }
-                        else
-                        {
-                            Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
-                        }
-                    }
-                });
-
-            // NOTE: Permission should fail if user no publication role
-            await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
-            {
-                addToDbHandler(contentDbContext);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
-            {
-                var user = CreateClaimsPrincipal(userId);
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
-                    user, handleRequirementArgument);
-
-                var handler = handlerSupplier(contentDbContext);
-                await handler.HandleAsync(authContext);
-                Assert.False(authContext.HasSucceeded, $"Should fail when user has no publication role");
-            }
-        }
-
-        private static async Task AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            PublicationHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
-        {
-            var contextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                if (scenario.UserPublicationRoles != null)
-                {
-                    await context.AddRangeAsync(scenario.UserPublicationRoles);
-                    await context.SaveChangesAsync();
+                        UserId = userId,
+                        Role = role,
+                        PublicationId = publicationId,
+                    });
+                    await contentDbContext.SaveChangesAsync();
                 }
-            }
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var user = CreateClaimsPrincipal(userId);
+                    var authContext = new AuthorizationHandlerContext(
+                        new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
+                        user, handleRequirementArgument);
+
+                    var handler = handlerSupplier(contentDbContext);
+                    await handler.HandleAsync(authContext);
+                    if (rolesExpectedToSucceed.Contains(role))
+                    {
+                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role}");
+                    }
+                    else
+                    {
+                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role}");
+                    }
+                }
+            });
+
+        // NOTE: Permission should fail if user no publication role
+        await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
+        {
+            addToDbHandler(contentDbContext);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
+        {
+            var user = CreateClaimsPrincipal(userId);
+            var authContext = new AuthorizationHandlerContext(
+                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                user, handleRequirementArgument);
+
+            var handler = handlerSupplier(contentDbContext);
+            await handler.HandleAsync(authContext);
+            Assert.False(authContext.HasSucceeded, $"Should fail when user has no publication role");
+        }
+    }
+
+    private static async Task AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(
+        Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+        PublicationHandlerTestScenario scenario) where TRequirement : IAuthorizationRequirement
+    {
+        var contextId = Guid.NewGuid().ToString();
+
+        using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            if (scenario.UserPublicationRoles != null)
             {
-                var handler = handlerSupplier(context);
-                await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
+                await context.AddRangeAsync(scenario.UserPublicationRoles);
+                await context.SaveChangesAsync();
             }
+        }
+
+        using (var context = InMemoryApplicationDbContext(contextId))
+        {
+            var handler = handlerSupplier(context);
+            await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
         }
     }
 }

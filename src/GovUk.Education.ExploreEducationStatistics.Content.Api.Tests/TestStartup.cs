@@ -17,70 +17,69 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests;
+
+/// <summary>
+/// Generic test application startup for use in integration tests.
+/// </summary>
+/// <remarks>
+/// Use in combination with <see cref="TestApplicationFactory{TStartup}"/>
+/// as a test class fixture.
+/// </remarks>
+public class TestStartup
 {
-    /// <summary>
-    /// Generic test application startup for use in integration tests.
-    /// </summary>
-    /// <remarks>
-    /// Use in combination with <see cref="TestApplicationFactory{TStartup}"/>
-    /// as a test class fixture.
-    /// </remarks>
-    public class TestStartup
+    public void ConfigureServices(IServiceCollection services)
     {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvcCore(options =>
-                {
-                    options.Filters.Add(new ProblemDetailsResultFilter());
-                    options.EnableEndpointRouting = false;
-                })
-                .AddNewtonsoftJson(
-                    options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
-                );
-
-            services.AddControllers(options =>
-                {
-                    options.AddCommaSeparatedQueryModelBinderProvider();
-                    options.AddTrimStringBinderProvider();
-                })
-                .AddApplicationPart(typeof(Startup).Assembly);
-
-            services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
-
-            services.AddDbContext<StatisticsDbContext>(
-                options =>
-                    options.UseInMemoryDatabase("TestStatisticsDb",
-                        b => b.EnableNullChecks(false))
+        services.AddMvcCore(options =>
+            {
+                options.Filters.Add(new ProblemDetailsResultFilter());
+                options.EnableEndpointRouting = false;
+            })
+            .AddNewtonsoftJson(
+                options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
             );
 
-            services.AddDbContext<ContentDbContext>(
-                options =>
-                    options.UseInMemoryDatabase("TestContentDb",
-                        b => b.EnableNullChecks(false))
-            );
+        services.AddControllers(options =>
+            {
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            })
+            .AddApplicationPart(typeof(Startup).Assembly);
 
-            AddPersistenceHelper<ContentDbContext>(services);
-            AddPersistenceHelper<StatisticsDbContext>(services);
-        }
+        services.AddFluentValidation();
+        services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
 
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseRewriter(new RewriteOptions()
-                .Add(new LowercasePathRule()));
-            app.UseMvc();
-        }
+        services.AddDbContext<StatisticsDbContext>(
+            options =>
+                options.UseInMemoryDatabase("TestStatisticsDb",
+                    b => b.EnableNullChecks(false))
+        );
+
+        services.AddDbContext<ContentDbContext>(
+            options =>
+                options.UseInMemoryDatabase("TestContentDb",
+                    b => b.EnableNullChecks(false))
+        );
+
+        AddPersistenceHelper<ContentDbContext>(services);
+        AddPersistenceHelper<StatisticsDbContext>(services);
     }
 
-    public static class TestStartupExtensions
+    public void Configure(IApplicationBuilder app)
     {
-        public static WebApplicationFactory<TestStartup> ResetDbContexts(
-            this WebApplicationFactory<TestStartup> testApp)
-        {
-            return testApp
-                .ResetContentDbContext()
-                .ResetStatisticsDbContext();
-        }
+        app.UseRewriter(new RewriteOptions()
+            .Add(new LowercasePathRule()));
+        app.UseMvc();
+    }
+}
+
+public static class TestStartupExtensions
+{
+    public static WebApplicationFactory<TestStartup> ResetDbContexts(
+        this WebApplicationFactory<TestStartup> testApp)
+    {
+        return testApp
+            .ResetContentDbContext()
+            .ResetStatisticsDbContext();
     }
 }

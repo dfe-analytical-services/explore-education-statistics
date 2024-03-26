@@ -1,11 +1,10 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public enum ReleaseRole
 {
-    public enum ReleaseRole
-    {
-        Viewer,
-        Contributor,
-        Lead,
-        Approver,
-        PrereleaseViewer
-    }
+    Viewer,
+    Contributor,
+    Lead,
+    Approver,
+    PrereleaseViewer
 }

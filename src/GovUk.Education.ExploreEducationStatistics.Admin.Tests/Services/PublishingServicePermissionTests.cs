@@ -13,58 +13,57 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
+
+public class PublishingServicePermissionTests
 {
-    public class PublishingServicePermissionTests
+    private readonly ReleaseVersion _releaseVersion = new()
     {
-        private readonly ReleaseVersion _releaseVersion = new()
-        {
-            Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
-            ApprovalStatus = ReleaseApprovalStatus.Approved,
-            Version = 0,
-            PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
-        };
+        Id = new Guid("af032e3c-67c2-4562-9717-9a305a468263"),
+        ApprovalStatus = ReleaseApprovalStatus.Approved,
+        Version = 0,
+        PreviousVersionId = new Guid("af032e3c-67c2-4562-9717-9a305a468263")
+    };
 
-        [Fact]
-        public void RetryReleasePublishing()
-        {
-            var mocks = Mocks();
-            var publishingService = BuildPublishingService(mocks);
+    [Fact]
+    public void RetryReleasePublishing()
+    {
+        var mocks = Mocks();
+        var publishingService = BuildPublishingService(mocks);
 
-            AssertSecurityPoliciesChecked(service =>
-                    service.RetryReleasePublishing(_releaseVersion.Id),
-                _releaseVersion,
-                mocks.UserService,
-                publishingService,
-                CanPublishSpecificRelease);
-        }
+        AssertSecurityPoliciesChecked(service =>
+                service.RetryReleasePublishing(_releaseVersion.Id),
+            _releaseVersion,
+            mocks.UserService,
+            publishingService,
+            CanPublishSpecificRelease);
+    }
 
-        private PublishingService BuildPublishingService((Mock<IStorageQueueService> storageQueueService,
-            Mock<IUserService> userService,
-            Mock<ILogger<PublishingService>> logger) mocks)
-        {
-            var (storageQueueService, userService, logger) = mocks;
+    private PublishingService BuildPublishingService((Mock<IStorageQueueService> storageQueueService,
+        Mock<IUserService> userService,
+        Mock<ILogger<PublishingService>> logger) mocks)
+    {
+        var (storageQueueService, userService, logger) = mocks;
 
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
-            MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
+        var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseVersion>();
+        MockUtils.SetupCall(persistenceHelper, _releaseVersion.Id, _releaseVersion);
 
-            return new PublishingService(persistenceHelper.Object,
-                storageQueueService.Object,
-                userService.Object,
-                logger.Object);
-        }
+        return new PublishingService(persistenceHelper.Object,
+            storageQueueService.Object,
+            userService.Object,
+            logger.Object);
+    }
 
-        private static (Mock<IStorageQueueService> StorageQueueService,
-            Mock<IUserService> UserService,
-            Mock<ILogger<PublishingService>> Logger) Mocks()
-        {
-            var mockConf = new Mock<IConfiguration>();
-            mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);
+    private static (Mock<IStorageQueueService> StorageQueueService,
+        Mock<IUserService> UserService,
+        Mock<ILogger<PublishingService>> Logger) Mocks()
+    {
+        var mockConf = new Mock<IConfiguration>();
+        mockConf.Setup(c => c.GetSection(It.IsAny<string>())).Returns(new Mock<IConfigurationSection>().Object);
 
-            return (
-                new Mock<IStorageQueueService>(),
-                MockUtils.AlwaysTrueUserService(),
-                new Mock<ILogger<PublishingService>>());
-        }
+        return (
+            new Mock<IStorageQueueService>(),
+            MockUtils.AlwaysTrueUserService(),
+            new Mock<ILogger<PublishingService>>());
     }
 }

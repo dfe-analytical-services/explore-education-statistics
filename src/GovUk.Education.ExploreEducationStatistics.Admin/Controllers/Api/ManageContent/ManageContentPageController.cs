@@ -6,27 +6,26 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.ManageContent;
+
+[Route("api")]
+[ApiController]
+[Authorize]
+public class ManageContentPageController : ControllerBase
 {
-    [Route("api")]
-    [ApiController]
-    [Authorize]
-    public class ManageContentPageController : ControllerBase
+    private readonly IManageContentPageService _manageContentPageService;
+
+    public ManageContentPageController(IManageContentPageService manageContentPageService)
     {
-        private readonly IManageContentPageService _manageContentPageService;
+        _manageContentPageService = manageContentPageService;
+    }
 
-        public ManageContentPageController(IManageContentPageService manageContentPageService)
-        {
-            _manageContentPageService = manageContentPageService;
-        }
-
-        [HttpGet("release/{releaseVersionId:guid}/content")]
-        public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseVersionId,
-            [FromQuery] bool isPrerelease = false)
-        {
-            return await _manageContentPageService
-                .GetManageContentPageViewModel(releaseVersionId, isPrerelease)
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("release/{releaseVersionId:guid}/content")]
+    public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseVersionId,
+        [FromQuery] bool isPrerelease = false)
+    {
+        return await _manageContentPageService
+            .GetManageContentPageViewModel(releaseVersionId, isPrerelease)
+            .HandleFailuresOrOk();
     }
 }

@@ -7,147 +7,146 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
+// Create
+public class ManageLegacyReleasesRequirement : IAuthorizationRequirement
+{}
+
+public class ManageLegacyReleasesAuthorizationHandler 
+    : AuthorizationHandler<ManageLegacyReleasesRequirement, Publication>
 {
-    // Create
-    public class ManageLegacyReleasesRequirement : IAuthorizationRequirement
-    {}
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
 
-    public class ManageLegacyReleasesAuthorizationHandler 
-        : AuthorizationHandler<ManageLegacyReleasesRequirement, Publication>
+    public ManageLegacyReleasesAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-
-        public ManageLegacyReleasesAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
-        {
-            _authorizationHandlerService = authorizationHandlerService;
-        }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            ManageLegacyReleasesRequirement requirement,
-            Publication publication)
-        {
-            if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        publication.Id,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
-        }
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    // View
-    public class ViewLegacyReleaseRequirement : IAuthorizationRequirement
-    {}
-
-    public class ViewLegacyReleaseAuthorizationHandler 
-        : AuthorizationHandler<ViewLegacyReleaseRequirement, LegacyRelease>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        ManageLegacyReleasesRequirement requirement,
+        Publication publication)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-        
-        public ViewLegacyReleaseAuthorizationHandler(
-            AuthorizationHandlerService authorizationHandlerService)
+        if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            context.Succeed(requirement);
+            return;
         }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            ViewLegacyReleaseRequirement requirement,
-            LegacyRelease legacyRelease)
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    publication.Id,
+                    Owner))
         {
-            if (SecurityUtils.HasClaim(context.User, AccessAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        legacyRelease.PublicationId,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+            context.Succeed(requirement);
         }
     }
+}
 
-    // Update
-    public class UpdateLegacyReleaseRequirement : IAuthorizationRequirement
-    {}
+// View
+public class ViewLegacyReleaseRequirement : IAuthorizationRequirement
+{}
 
-    public class UpdateLegacyReleaseAuthorizationHandler 
-        : AuthorizationHandler<UpdateLegacyReleaseRequirement, LegacyRelease>
+public class ViewLegacyReleaseAuthorizationHandler 
+    : AuthorizationHandler<ViewLegacyReleaseRequirement, LegacyRelease>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+    
+    public ViewLegacyReleaseAuthorizationHandler(
+        AuthorizationHandlerService authorizationHandlerService)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-        
-        public UpdateLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
-        {
-            _authorizationHandlerService = authorizationHandlerService;
-        }
-
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            UpdateLegacyReleaseRequirement requirement,
-            LegacyRelease legacyRelease)
-        {
-            if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-            
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        legacyRelease.PublicationId,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
-        }
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
-    // Delete
-    public class DeleteLegacyReleaseRequirement : IAuthorizationRequirement
-    {}
-
-    public class DeleteLegacyReleaseAuthorizationHandler 
-        : AuthorizationHandler<DeleteLegacyReleaseRequirement, LegacyRelease>
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        ViewLegacyReleaseRequirement requirement,
+        LegacyRelease legacyRelease)
     {
-        private readonly AuthorizationHandlerService _authorizationHandlerService;
-        
-        public DeleteLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
+        if (SecurityUtils.HasClaim(context.User, AccessAllReleases))
         {
-            _authorizationHandlerService = authorizationHandlerService;
+            context.Succeed(requirement);
+            return;
+        }
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    legacyRelease.PublicationId,
+                    Owner))
+        {
+            context.Succeed(requirement);
+        }
+    }
+}
+
+// Update
+public class UpdateLegacyReleaseRequirement : IAuthorizationRequirement
+{}
+
+public class UpdateLegacyReleaseAuthorizationHandler 
+    : AuthorizationHandler<UpdateLegacyReleaseRequirement, LegacyRelease>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+    
+    public UpdateLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
+    {
+        _authorizationHandlerService = authorizationHandlerService;
+    }
+
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        UpdateLegacyReleaseRequirement requirement,
+        LegacyRelease legacyRelease)
+    {
+        if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+        
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    legacyRelease.PublicationId,
+                    Owner))
+        {
+            context.Succeed(requirement);
+        }
+    }
+}
+
+// Delete
+public class DeleteLegacyReleaseRequirement : IAuthorizationRequirement
+{}
+
+public class DeleteLegacyReleaseAuthorizationHandler 
+    : AuthorizationHandler<DeleteLegacyReleaseRequirement, LegacyRelease>
+{
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
+    
+    public DeleteLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
+    {
+        _authorizationHandlerService = authorizationHandlerService;
+    }
+
+    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        DeleteLegacyReleaseRequirement requirement,
+        LegacyRelease legacyRelease)
+    {
+        if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
+        {
+            context.Succeed(requirement);
+            return;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            DeleteLegacyReleaseRequirement requirement,
-            LegacyRelease legacyRelease)
+        if (await _authorizationHandlerService
+                .HasRolesOnPublication(
+                    context.User.GetUserId(),
+                    legacyRelease.PublicationId,
+                    Owner))
         {
-            if (SecurityUtils.HasClaim(context.User, UpdateAllReleases))
-            {
-                context.Succeed(requirement);
-                return;
-            }
-
-            if (await _authorizationHandlerService
-                    .HasRolesOnPublication(
-                        context.User.GetUserId(),
-                        legacyRelease.PublicationId,
-                        Owner))
-            {
-                context.Succeed(requirement);
-            }
+            context.Succeed(requirement);
         }
     }
 }

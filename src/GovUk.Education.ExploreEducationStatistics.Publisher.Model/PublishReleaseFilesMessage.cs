@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+
+public class PublishReleaseFilesMessage
 {
-    public class PublishReleaseFilesMessage
+    public IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> Releases;
+
+    public PublishReleaseFilesMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases)
     {
-        public IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> Releases;
+        Releases = releases;
+    }
 
-        public PublishReleaseFilesMessage(IEnumerable<(Guid ReleaseVersionId, Guid ReleaseStatusId)> releases)
-        {
-            Releases = releases;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(Releases)}: {string.Join(", ", Releases)}";
-        }
+    public override string ToString()
+    {
+        return $"{nameof(Releases)}: {string.Join(", ", Releases)}";
     }
 }

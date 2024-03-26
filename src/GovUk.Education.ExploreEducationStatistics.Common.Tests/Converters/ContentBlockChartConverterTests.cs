@@ -4,72 +4,71 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Converters;
+
+public class ContentBlockChartConverterTests
 {
-    public class ContentBlockChartConverterTests
+    [Fact]
+    public void ContentBlockChartConverterReturnsLine()
     {
-        [Fact]
-        public void ContentBlockChartConverterReturnsLine()
-        {
-            const string testString = "{\"Type\":\"line\"}";
+        const string testString = "{\"Type\":\"line\"}";
 
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.Converters.Add(new ContentBlockChartConverter());
+        var serializerSettings = new JsonSerializerSettings();
+        serializerSettings.Converters.Add(new ContentBlockChartConverter());
 
-            var serializer = JsonSerializer.Create(serializerSettings);
+        var serializer = JsonSerializer.Create(serializerSettings);
 
-            var jObject = JObject.Parse(testString);
-            var result = jObject.ToObject<LineChart>(serializer);
+        var jObject = JObject.Parse(testString);
+        var result = jObject.ToObject<LineChart>(serializer);
 
-            Assert.IsType<LineChart>(result);
-        }
+        Assert.IsType<LineChart>(result);
+    }
 
-        [Fact]
-        public void ContentBlockChartConverterReturnsHorizontalBar()
-        {
-            const string testString = "{\"Type\":\"horizontalbar\"}";
+    [Fact]
+    public void ContentBlockChartConverterReturnsHorizontalBar()
+    {
+        const string testString = "{\"Type\":\"horizontalbar\"}";
 
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.Converters.Add(new ContentBlockChartConverter());
+        var serializerSettings = new JsonSerializerSettings();
+        serializerSettings.Converters.Add(new ContentBlockChartConverter());
 
-            var serializer = JsonSerializer.Create(serializerSettings);
+        var serializer = JsonSerializer.Create(serializerSettings);
 
-            var jObject = JObject.Parse(testString);
-            var result = jObject.ToObject<HorizontalBarChart>(serializer);
+        var jObject = JObject.Parse(testString);
+        var result = jObject.ToObject<HorizontalBarChart>(serializer);
 
-            Assert.IsType<HorizontalBarChart>(result);
-        }
+        Assert.IsType<HorizontalBarChart>(result);
+    }
 
-        [Fact]
-        public void ContentBlockChartConverterReturnsVerticalBar()
-        {
-            const string testString = "{\"Type\":\"verticalbar\"}";
+    [Fact]
+    public void ContentBlockChartConverterReturnsVerticalBar()
+    {
+        const string testString = "{\"Type\":\"verticalbar\"}";
 
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.Converters.Add(new ContentBlockChartConverter());
+        var serializerSettings = new JsonSerializerSettings();
+        serializerSettings.Converters.Add(new ContentBlockChartConverter());
 
-            var serializer = JsonSerializer.Create(serializerSettings);
+        var serializer = JsonSerializer.Create(serializerSettings);
 
-            var jObject = JObject.Parse(testString);
-            var result = jObject.ToObject<VerticalBarChart>(serializer);
+        var jObject = JObject.Parse(testString);
+        var result = jObject.ToObject<VerticalBarChart>(serializer);
 
-            Assert.IsType<VerticalBarChart>(result);
-        }
+        Assert.IsType<VerticalBarChart>(result);
+    }
 
-        [Fact]
-        public void ContentBlockChartConverterReturnsMap()
-        {
-            const string testString = "{\"Type\":\"map\"}";
+    [Fact]
+    public void ContentBlockChartConverterReturnsMap()
+    {
+        const string testString = "{\"Type\":\"map\"}";
 
-            var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.Converters.Add(new ContentBlockChartConverter());
+        var serializerSettings = new JsonSerializerSettings();
+        serializerSettings.Converters.Add(new ContentBlockChartConverter());
 
-            var serializer = JsonSerializer.Create(serializerSettings);
+        var serializer = JsonSerializer.Create(serializerSettings);
 
-            var jObject = JObject.Parse(testString);
-            var result = jObject.ToObject<MapChart>(serializer);
+        var jObject = JObject.Parse(testString);
+        var result = jObject.ToObject<MapChart>(serializer);
 
-            Assert.IsType<MapChart>(result);
-        }
+        Assert.IsType<MapChart>(result);
     }
 }

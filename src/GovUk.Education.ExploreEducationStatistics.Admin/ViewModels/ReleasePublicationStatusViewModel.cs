@@ -2,15 +2,14 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+
+public class ReleasePublicationStatusViewModel
 {
-    public class ReleasePublicationStatusViewModel
-    {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus;
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ReleaseApprovalStatus ApprovalStatus;
 
-        public bool Amendment;
+    public bool Amendment;
 
-        public bool Live;
-    }
+    public bool Live;
 }

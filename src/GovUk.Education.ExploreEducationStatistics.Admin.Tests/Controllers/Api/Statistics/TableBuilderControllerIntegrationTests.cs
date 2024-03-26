@@ -23,116 +23,115 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics;
+
+public class TableBuilderControllerIntegrationTests : IntegrationTest<TestStartup>
 {
-    public class TableBuilderControllerIntegrationTests : IntegrationTest<TestStartup>
+    public TableBuilderControllerIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
-        public TableBuilderControllerIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+    }
+
+    private static readonly Guid ReleaseVersionId = Guid.NewGuid();
+    private static readonly Guid SubjectId = Guid.NewGuid();
+
+    private static readonly ObservationQueryContext ObservationQueryContext = new()
+    {
+        SubjectId = SubjectId,
+        Filters = new List<Guid>(),
+        Indicators = new List<Guid>(),
+        LocationIds = new List<Guid>(),
+        TimePeriod = new TimePeriodQuery
         {
+            StartYear = 2021,
+            StartCode = CalendarYear,
+            EndYear = 2022,
+            EndCode = CalendarYear
         }
+    };
 
-        private static readonly Guid ReleaseVersionId = Guid.NewGuid();
-        private static readonly Guid SubjectId = Guid.NewGuid();
-
-        private static readonly ObservationQueryContext ObservationQueryContext = new()
+    private readonly TableBuilderResultViewModel _tableBuilderResults = new()
+    {
+        SubjectMeta = new SubjectResultMetaViewModel
         {
-            SubjectId = SubjectId,
-            Filters = new List<Guid>(),
-            Indicators = new List<Guid>(),
-            LocationIds = new List<Guid>(),
-            TimePeriod = new TimePeriodQuery
+            TimePeriodRange = new List<TimePeriodMetaViewModel>
             {
-                StartYear = 2021,
-                StartCode = CalendarYear,
-                EndYear = 2022,
-                EndCode = CalendarYear
+                new(2020, AcademicYear),
+                new(2021, AcademicYear),
             }
-        };
-
-        private readonly TableBuilderResultViewModel _tableBuilderResults = new()
+        },
+        Results = new List<ObservationViewModel>
         {
-            SubjectMeta = new SubjectResultMetaViewModel
+            new()
             {
-                TimePeriodRange = new List<TimePeriodMetaViewModel>
-                {
-                    new(2020, AcademicYear),
-                    new(2021, AcademicYear),
-                }
+                TimePeriod = "2020_AY"
             },
-            Results = new List<ObservationViewModel>
+            new()
             {
-                new()
-                {
-                    TimePeriod = "2020_AY"
-                },
-                new()
-                {
-                    TimePeriod = "2021_AY"
-                }
-            },
-        };
+                TimePeriod = "2021_AY"
+            }
+        },
+    };
 
-        [Fact]
-        public async Task Query()
-        {
-            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-            tableBuilderService
-                .Setup(s => s.Query(
-                    ReleaseVersionId,
-                    ItIs.DeepEqualTo(ObservationQueryContext),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(_tableBuilderResults);
+    [Fact]
+    public async Task Query()
+    {
+        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+        tableBuilderService
+            .Setup(s => s.Query(
+                ReleaseVersionId,
+                ItIs.DeepEqualTo(ObservationQueryContext),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(_tableBuilderResults);
 
-            var client = SetupApp(
-                    tableBuilderService: tableBuilderService.Object)
-                .SetUser(AuthenticatedUser())
-                .CreateClient();
+        var client = SetupApp(
+                tableBuilderService: tableBuilderService.Object)
+            .SetUser(AuthenticatedUser())
+            .CreateClient();
 
-            var response = await client.PostAsync(
-                $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-                new JsonNetContent(ObservationQueryContext));
+        var response = await client.PostAsync(
+            $"/api/data/tablebuilder/release/{ReleaseVersionId}",
+            new JsonNetContent(ObservationQueryContext));
 
-            VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(tableBuilderService);
 
-            response.AssertOk(_tableBuilderResults);
-        }
+        response.AssertOk(_tableBuilderResults);
+    }
 
-        [Fact]
-        public async Task Query_Csv()
-        {
-            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-            tableBuilderService
-                .Setup(s => s.QueryToCsvStream(
-                    ReleaseVersionId,
-                    ItIs.DeepEqualTo(ObservationQueryContext),
-                    It.IsAny<Stream>(),
-                    It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
-                    (_, _, stream, _) => { stream.WriteText("Test csv"); });
+    [Fact]
+    public async Task Query_Csv()
+    {
+        var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+        tableBuilderService
+            .Setup(s => s.QueryToCsvStream(
+                ReleaseVersionId,
+                ItIs.DeepEqualTo(ObservationQueryContext),
+                It.IsAny<Stream>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Unit.Instance)
+            .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                (_, _, stream, _) => { stream.WriteText("Test csv"); });
 
-            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
-                .SetUser(AuthenticatedUser())
-                .CreateClient();
+        var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+            .SetUser(AuthenticatedUser())
+            .CreateClient();
 
-            var response = await client.PostAsync(
-                $"/api/data/tablebuilder/release/{ReleaseVersionId}",
-                content: new JsonNetContent(ObservationQueryContext),
-                headers: new Dictionary<string, string>
-                {
-                    { HeaderNames.Accept, ContentTypes.Csv}
-                });
+        var response = await client.PostAsync(
+            $"/api/data/tablebuilder/release/{ReleaseVersionId}",
+            content: new JsonNetContent(ObservationQueryContext),
+            headers: new Dictionary<string, string>
+            {
+                { HeaderNames.Accept, ContentTypes.Csv}
+            });
 
-            VerifyAllMocks(tableBuilderService);
+        VerifyAllMocks(tableBuilderService);
 
-            response.AssertOk("Test csv");
-        }
+        response.AssertOk("Test csv");
+    }
 
-        private WebApplicationFactory<TestStartup> SetupApp(
-            ITableBuilderService? tableBuilderService = null)
-        {
-            return TestApp.ConfigureServices(services =>
-                services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
-        }
+    private WebApplicationFactory<TestStartup> SetupApp(
+        ITableBuilderService? tableBuilderService = null)
+    {
+        return TestApp.ConfigureServices(services =>
+            services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
     }
 }

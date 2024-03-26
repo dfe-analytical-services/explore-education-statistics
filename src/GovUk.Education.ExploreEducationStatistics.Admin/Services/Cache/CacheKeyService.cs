@@ -10,26 +10,25 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
+
+public class CacheKeyService : ICacheKeyService
 {
-    public class CacheKeyService : ICacheKeyService
+    private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+
+    public CacheKeyService(IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
     {
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        _contentPersistenceHelper = contentPersistenceHelper;
+    }
 
-        public CacheKeyService(IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
-        {
-            _contentPersistenceHelper = contentPersistenceHelper;
-        }
-
-        public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
-            Guid releaseVersionId,
-            Guid dataBlockVersionId)
-        {
-            return await _contentPersistenceHelper
-                .CheckEntityExists<DataBlockVersion>(query => query
-                    .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId
-                                               && dataBlockVersion.ReleaseVersionId == releaseVersionId))
-                .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
-        }
+    public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
+        Guid releaseVersionId,
+        Guid dataBlockVersionId)
+    {
+        return await _contentPersistenceHelper
+            .CheckEntityExists<DataBlockVersion>(query => query
+                .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId
+                                           && dataBlockVersion.ReleaseVersionId == releaseVersionId))
+            .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
     }
 }

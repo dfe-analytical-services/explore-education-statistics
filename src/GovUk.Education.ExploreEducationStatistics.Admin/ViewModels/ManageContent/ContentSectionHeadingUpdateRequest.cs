@@ -1,7 +1,6 @@
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+
+public class ContentSectionHeadingUpdateRequest
 {
-    public class ContentSectionHeadingUpdateRequest
-    {
-        public string Heading { get; set; }
-    }
+    public string Heading { get; set; }
 }

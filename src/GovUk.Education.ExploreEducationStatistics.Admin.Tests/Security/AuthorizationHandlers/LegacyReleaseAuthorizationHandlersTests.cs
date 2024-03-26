@@ -17,156 +17,155 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 using static Moq.MockBehavior;
 using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class LegacyReleaseAuthorizationHandlersTests
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class LegacyReleaseAuthorizationHandlersTests
+    public class ManageLegacyReleaseAuthorizationHandlerTests
     {
-        public class ManageLegacyReleaseAuthorizationHandlerTests
+        [Fact]
+        public async Task ManageLegacyRelease_Claims()
         {
-            [Fact]
-            public async Task ManageLegacyRelease_Claims()
-            {
-                await AssertHandlerSucceedsWithCorrectClaims<Publication, ManageLegacyReleasesRequirement>(
-                    CreateHandler,
-                    new Publication(),
-                    CreateAnyRelease
-                );
-            }
-
-            [Fact]
-            public async Task ManageLegacyRelease_PublicationRoles()
-            {
-                await AssertPublicationHandlerSucceedsWithPublicationRoles<ManageLegacyReleasesRequirement>(
-                    CreateHandler, Owner);
-            }
-
-            private static ManageLegacyReleasesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-            {
-                return new ManageLegacyReleasesAuthorizationHandler(
-                    new AuthorizationHandlerService(
-                        new ReleaseVersionRepository(contentDbContext),
-                        Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPreReleaseService>(Strict)));
-            }
+            await AssertHandlerSucceedsWithCorrectClaims<Publication, ManageLegacyReleasesRequirement>(
+                CreateHandler,
+                new Publication(),
+                CreateAnyRelease
+            );
         }
 
-        public class ViewLegacyReleaseAuthorizationHandlerTests
+        [Fact]
+        public async Task ManageLegacyRelease_PublicationRoles()
         {
-            [Fact]
-            public async Task ViewLegacyRelease_Claims()
-            {
-                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, ViewLegacyReleaseRequirement>(
-                    CreateHandler,
-                    new LegacyRelease(),
-                    AccessAllReleases
-                );
-            }
-
-            [Fact]
-            public async Task ViewLegacyRelease_PublicationRoles()
-            {
-                var legacyRelease = new LegacyRelease
-                {
-                    PublicationId = Guid.NewGuid(),
-                };
-
-                await AssertHandlerOnlySucceedsWithPublicationRoles<ViewLegacyReleaseRequirement, LegacyRelease>(
-                    legacyRelease.PublicationId,
-                    legacyRelease,
-                    contentDbContext => contentDbContext.Add(legacyRelease),
-                    CreateHandler,
-                    Owner);
-            }
-
-            private static ViewLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-            {
-                return new ViewLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerService(
-                        new ReleaseVersionRepository(contentDbContext),
-                        Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPreReleaseService>(Strict)));
-            }
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<ManageLegacyReleasesRequirement>(
+                CreateHandler, Owner);
         }
 
-        public class UpdateLegacyReleaseAuthorizationHandlerTests
+        private static ManageLegacyReleasesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
-            [Fact]
-            public async Task UpdateLegacyRelease_Claims()
-            {
-                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, UpdateLegacyReleaseRequirement>(
-                    CreateHandler,
-                    new LegacyRelease(),
-                    UpdateAllReleases
-                );
-            }
+            return new ManageLegacyReleasesAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    new ReleaseVersionRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
+        }
+    }
 
-            [Fact]
-            public async Task UpdateLegacyRelease_PublicationRoles()
-            {
-                var legacyRelease = new LegacyRelease
-                {
-                    PublicationId = Guid.NewGuid(),
-                };
-
-                await AssertHandlerOnlySucceedsWithPublicationRoles<UpdateLegacyReleaseRequirement, LegacyRelease>(
-                    legacyRelease.PublicationId,
-                    legacyRelease,
-                    contentDbContext => contentDbContext.Add(legacyRelease),
-                    CreateHandler,
-                    Owner);
-            }
-
-            private static UpdateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
-            {
-                return new UpdateLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerService(
-                        new ReleaseVersionRepository(contentDbContext),
-                        Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPreReleaseService>(Strict)));
-            }
+    public class ViewLegacyReleaseAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task ViewLegacyRelease_Claims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, ViewLegacyReleaseRequirement>(
+                CreateHandler,
+                new LegacyRelease(),
+                AccessAllReleases
+            );
         }
 
-        public class DeleteLegacyReleaseAuthorizationHandlerTests
+        [Fact]
+        public async Task ViewLegacyRelease_PublicationRoles()
         {
-            [Fact]
-            public async Task DeleteLegacyRelease_Claims()
+            var legacyRelease = new LegacyRelease
             {
-                await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, DeleteLegacyReleaseRequirement>(
-                    CreateHandler,
-                    new LegacyRelease(),
-                    UpdateAllReleases
-                );
-            }
+                PublicationId = Guid.NewGuid(),
+            };
 
-            [Fact]
-            public async Task DeleteLegacyRelease_PublicationRoles()
+            await AssertHandlerOnlySucceedsWithPublicationRoles<ViewLegacyReleaseRequirement, LegacyRelease>(
+                legacyRelease.PublicationId,
+                legacyRelease,
+                contentDbContext => contentDbContext.Add(legacyRelease),
+                CreateHandler,
+                Owner);
+        }
+
+        private static ViewLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new ViewLegacyReleaseAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    new ReleaseVersionRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
+        }
+    }
+
+    public class UpdateLegacyReleaseAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task UpdateLegacyRelease_Claims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, UpdateLegacyReleaseRequirement>(
+                CreateHandler,
+                new LegacyRelease(),
+                UpdateAllReleases
+            );
+        }
+
+        [Fact]
+        public async Task UpdateLegacyRelease_PublicationRoles()
+        {
+            var legacyRelease = new LegacyRelease
             {
-                var legacyRelease = new LegacyRelease
-                {
-                    PublicationId = Guid.NewGuid(),
-                };
+                PublicationId = Guid.NewGuid(),
+            };
 
-                await AssertHandlerOnlySucceedsWithPublicationRoles<DeleteLegacyReleaseRequirement, LegacyRelease>(
-                    legacyRelease.PublicationId,
-                    legacyRelease,
-                    contentDbContext => contentDbContext.Add(legacyRelease),
-                    CreateHandler,
-                    Owner);
-            }
+            await AssertHandlerOnlySucceedsWithPublicationRoles<UpdateLegacyReleaseRequirement, LegacyRelease>(
+                legacyRelease.PublicationId,
+                legacyRelease,
+                contentDbContext => contentDbContext.Add(legacyRelease),
+                CreateHandler,
+                Owner);
+        }
 
-            private static DeleteLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static UpdateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new UpdateLegacyReleaseAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    new ReleaseVersionRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
+        }
+    }
+
+    public class DeleteLegacyReleaseAuthorizationHandlerTests
+    {
+        [Fact]
+        public async Task DeleteLegacyRelease_Claims()
+        {
+            await AssertHandlerSucceedsWithCorrectClaims<LegacyRelease, DeleteLegacyReleaseRequirement>(
+                CreateHandler,
+                new LegacyRelease(),
+                UpdateAllReleases
+            );
+        }
+
+        [Fact]
+        public async Task DeleteLegacyRelease_PublicationRoles()
+        {
+            var legacyRelease = new LegacyRelease
             {
-                return new DeleteLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerService(
-                        new ReleaseVersionRepository(contentDbContext),
-                        Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPreReleaseService>(Strict)));
-            }
+                PublicationId = Guid.NewGuid(),
+            };
+
+            await AssertHandlerOnlySucceedsWithPublicationRoles<DeleteLegacyReleaseRequirement, LegacyRelease>(
+                legacyRelease.PublicationId,
+                legacyRelease,
+                contentDbContext => contentDbContext.Add(legacyRelease),
+                CreateHandler,
+                Owner);
+        }
+
+        private static DeleteLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new DeleteLegacyReleaseAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    new ReleaseVersionRepository(contentDbContext),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

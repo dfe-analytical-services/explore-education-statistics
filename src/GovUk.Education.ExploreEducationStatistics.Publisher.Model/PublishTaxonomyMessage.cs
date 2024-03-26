@@ -1,6 +1,5 @@
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+
+public class PublishTaxonomyMessage
 {
-    public class PublishTaxonomyMessage
-    {
-    }
 }

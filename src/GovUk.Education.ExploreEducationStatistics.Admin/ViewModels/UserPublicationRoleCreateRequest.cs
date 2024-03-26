@@ -3,13 +3,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
-{
-    public class UserPublicationRoleCreateRequest
-    {
-        public Guid PublicationId { get; set; }
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
-        [JsonConverter(typeof(StringEnumConverter))]
-        public PublicationRole PublicationRole { get; set; }
-    }
+public class UserPublicationRoleCreateRequest
+{
+    public Guid PublicationId { get; set; }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public PublicationRole PublicationRole { get; set; }
 }

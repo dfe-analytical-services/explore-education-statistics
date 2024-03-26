@@ -1,10 +1,9 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Content.Security
+namespace GovUk.Education.ExploreEducationStatistics.Content.Security;
+
+public enum ContentSecurityPolicies
 {
-    public enum ContentSecurityPolicies
-    {
-        CanViewSpecificMethodologyVersion,
-        CanViewSpecificPublication,
-        CanViewSpecificRelease
-    }
+    CanViewSpecificMethodologyVersion,
+    CanViewSpecificPublication,
+    CanViewSpecificRelease
 }

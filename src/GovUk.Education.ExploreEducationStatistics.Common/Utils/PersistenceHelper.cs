@@ -7,67 +7,66 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
+
+public class PersistenceHelper<TDbContext> : IPersistenceHelper<TDbContext>
+    where TDbContext : DbContext
 {
-    public class PersistenceHelper<TDbContext> : IPersistenceHelper<TDbContext>
-        where TDbContext : DbContext
+    private readonly TDbContext _context;
+
+    public PersistenceHelper(
+        TDbContext context)
     {
-        private readonly TDbContext _context;
+        _context = context;
+    }
 
-        public PersistenceHelper(
-            TDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
+        TEntityId id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
+        where TEntity : class
+    {
+        var queryableEntities = _context.Set<TEntity>()
+            .FindByPrimaryKey(_context, id);
 
-        public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
-            TEntityId id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
-            where TEntity : class
-        {
-            var queryableEntities = _context.Set<TEntity>()
-                .FindByPrimaryKey(_context, id);
+        var hydratedEntities = hydrateEntityFn != null
+            ? hydrateEntityFn.Invoke(queryableEntities)
+            : queryableEntities;
 
-            var hydratedEntities = hydrateEntityFn != null
-                ? hydrateEntityFn.Invoke(queryableEntities)
-                : queryableEntities;
+        var entity = await hydratedEntities
+            .FirstOrDefaultAsync();
 
-            var entity = await hydratedEntities
-                .FirstOrDefaultAsync();
+        return entity == null
+            ? new NotFoundResult()
+            : new Either<ActionResult, TEntity>(entity);
+    }
 
-            return entity == null
-                ? new NotFoundResult()
-                : new Either<ActionResult, TEntity>(entity);
-        }
+    public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+        Guid id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
+        where TEntity : class
+    {
+        return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
+    }
 
-        public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
-            Guid id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
-            where TEntity : class
-        {
-            return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
-        }
+    public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
+        Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
+        where TEntity : class
+    {
+        var queryableEntities = _context.Set<TEntity>();
 
-        public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
-            where TEntity : class
-        {
-            var queryableEntities = _context.Set<TEntity>();
+        var entity = await query.Invoke(queryableEntities)
+            .FirstOrDefaultAsync();
 
-            var entity = await query.Invoke(queryableEntities)
-                .FirstOrDefaultAsync();
+        return entity == null
+            ? new NotFoundResult()
+            : new Either<ActionResult, TEntity>(entity);
+    }
 
-            return entity == null
-                ? new NotFoundResult()
-                : new Either<ActionResult, TEntity>(entity);
-        }
-
-        public async Task<Either<ActionResult, TEntity?>> CheckOptionalEntityExists<TEntity>(Guid? id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null) where TEntity : class
-        {
-            return id.HasValue
-                ? await CheckEntityExists(id.Value, hydrateEntityFn)
-                : (TEntity) null;
-        }
+    public async Task<Either<ActionResult, TEntity?>> CheckOptionalEntityExists<TEntity>(Guid? id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null) where TEntity : class
+    {
+        return id.HasValue
+            ? await CheckEntityExists(id.Value, hydrateEntityFn)
+            : (TEntity) null;
     }
 }

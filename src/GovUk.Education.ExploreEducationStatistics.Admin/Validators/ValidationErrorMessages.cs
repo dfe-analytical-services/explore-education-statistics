@@ -1,139 +1,138 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+
+public enum ValidationErrorMessages
 {
-    public enum ValidationErrorMessages
-    {
-        // Slug
-        SlugNotUnique,
-        PublicationSlugNotUnique,
-        PublicationSlugUsedByRedirect,
-        MethodologySlugNotUnique,
-        MethodologySlugUsedByRedirect,
+    // Slug
+    SlugNotUnique,
+    PublicationSlugNotUnique,
+    PublicationSlugUsedByRedirect,
+    MethodologySlugNotUnique,
+    MethodologySlugUsedByRedirect,
 
-        // Partial date
-        PartialDateNotValid,
+    // Partial date
+    PartialDateNotValid,
 
-        // Content
-        IncorrectContentBlockTypeForUpdate,
-        ContentBlockAlreadyAttachedToContentSection,
-        ContentSectionNotAttachedToRelease,
-        ContentBlockNotAttachedToRelease,
-        EmbedBlockUrlDomainNotPermitted,
+    // Content
+    IncorrectContentBlockTypeForUpdate,
+    ContentBlockAlreadyAttachedToContentSection,
+    ContentSectionNotAttachedToRelease,
+    ContentBlockNotAttachedToRelease,
+    EmbedBlockUrlDomainNotPermitted,
 
-        // User Management
-        UserAlreadyExists,
-        UserAlreadyHasResourceRole,
+    // User Management
+    UserAlreadyExists,
+    UserAlreadyHasResourceRole,
 
-        // Invite
-        InviteAlreadyAccepted,
-        InviteNotFound,
-        InvalidEmailAddress,
-        InvalidUserRole,
-        NoInvitableEmails,
-        NotAllReleasesBelongToPublication,
-        UserAlreadyHasReleaseRoleInvites,
-        UserAlreadyHasReleaseRoles,
+    // Invite
+    InviteAlreadyAccepted,
+    InviteNotFound,
+    InvalidEmailAddress,
+    InvalidUserRole,
+    NoInvitableEmails,
+    NotAllReleasesBelongToPublication,
+    UserAlreadyHasReleaseRoleInvites,
+    UserAlreadyHasReleaseRoles,
 
-        // Methodology
-        MethodologyCannotDependOnPublishedRelease,
-        MethodologyCannotDependOnRelease,
-        CannotAdoptMethodologyAlreadyLinkedToPublication,
+    // Methodology
+    MethodologyCannotDependOnPublishedRelease,
+    MethodologyCannotDependOnRelease,
+    CannotAdoptMethodologyAlreadyLinkedToPublication,
 
-        // Methodology published update
-        MethodologyPublishedCannotBeFutureDate,
-        MethodologyNotPublished,
+    // Methodology published update
+    MethodologyPublishedCannotBeFutureDate,
+    MethodologyNotPublished,
 
-        // Theme
-        ThemeDoesNotExist,
+    // Theme
+    ThemeDoesNotExist,
 
-        // Topic
-        TopicDoesNotExist,
+    // Topic
+    TopicDoesNotExist,
 
-        // File
-        CannotOverwriteFile,
-        FileCannotBeEmpty,
-        FileTypeInvalid,
-        FileSizeLimitExceeded,
+    // File
+    CannotOverwriteFile,
+    FileCannotBeEmpty,
+    FileTypeInvalid,
+    FileSizeLimitExceeded,
 
-        // Data file
-        SubjectTitleCannotBeEmpty,
-        SubjectTitleCannotContainSpecialCharacters,
-        SubjectTitleMustBeUnique,
-        DataFilenameNotUnique,
-        DataAndMetadataFilesCannotHaveTheSameName,
-        DataFileCannotBeEmpty,
-        DataFileMustBeCsvFile,
-        DataFilenameCannotContainSpacesOrSpecialCharacters,
-        CannotRemoveDataFilesUntilImportComplete,
-        CannotRemoveDataFilesOnceReleaseApproved,
-        FileTypeMustBeData,
-        FileIdsShouldBeDistinct,
-        IncorrectNumberOfFileIds,
-        DataFilenameTooLong,
+    // Data file
+    SubjectTitleCannotBeEmpty,
+    SubjectTitleCannotContainSpecialCharacters,
+    SubjectTitleMustBeUnique,
+    DataFilenameNotUnique,
+    DataAndMetadataFilesCannotHaveTheSameName,
+    DataFileCannotBeEmpty,
+    DataFileMustBeCsvFile,
+    DataFilenameCannotContainSpacesOrSpecialCharacters,
+    CannotRemoveDataFilesUntilImportComplete,
+    CannotRemoveDataFilesOnceReleaseApproved,
+    FileTypeMustBeData,
+    FileIdsShouldBeDistinct,
+    IncorrectNumberOfFileIds,
+    DataFilenameTooLong,
 
-        // Data zip file
-        DataZipMustBeZipFile,
-        DataZipFileCanOnlyContainTwoFiles,
-        DataZipFileDoesNotContainCsvFiles,
-        DataZipFilenameTooLong,
-        DataZipContentFilenamesTooLong,
+    // Data zip file
+    DataZipMustBeZipFile,
+    DataZipFileCanOnlyContainTwoFiles,
+    DataZipFileDoesNotContainCsvFiles,
+    DataZipFilenameTooLong,
+    DataZipContentFilenamesTooLong,
 
-        // Meta file
-        MetadataFileCannotBeEmpty,
-        MetaFileMustBeCsvFile,
-        UnableToFindMetadataFileToDelete,
-        MetaFilenameCannotContainSpacesOrSpecialCharacters,
-        MetaFileIsIncorrectlyNamed,
-        MetaFilenameTooLong,
+    // Meta file
+    MetadataFileCannotBeEmpty,
+    MetaFileMustBeCsvFile,
+    UnableToFindMetadataFileToDelete,
+    MetaFilenameCannotContainSpacesOrSpecialCharacters,
+    MetaFileIsIncorrectlyNamed,
+    MetaFilenameTooLong,
 
-        // Data replacement
-        ReplacementMustBeValid,
+    // Data replacement
+    ReplacementMustBeValid,
 
-        // Release
-        ReleaseTypeInvalid,
+    // Release
+    ReleaseTypeInvalid,
 
-        // Release approval
-        ReleaseNotApproved,
-        PublishedReleaseCannotBeUnapproved,
-        PublishDateCannotBeEmpty,
-        PublishDateCannotBeScheduled,
+    // Release approval
+    ReleaseNotApproved,
+    PublishedReleaseCannotBeUnapproved,
+    PublishDateCannotBeEmpty,
+    PublishDateCannotBeScheduled,
 
-        // Release update
-        ReleasePublishedCannotBeFutureDate,
-        ReleaseNotPublished,
+    // Release update
+    ReleasePublishedCannotBeFutureDate,
+    ReleaseNotPublished,
 
-        // Release checklist errors
-        DataFileImportsMustBeCompleted,
-        DataFileReplacementsMustBeCompleted,
-        ReleaseNoteRequired,
-        PublicDataGuidanceRequired,
-        EmptyContentSectionExists,
-        GenericSectionsContainEmptyHtmlBlock,
-        RelatedDashboardsSectionContainsEmptyHtmlBlock,
-        ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
-        SummarySectionContainsEmptyHtmlBlock,
+    // Release checklist errors
+    DataFileImportsMustBeCompleted,
+    DataFileReplacementsMustBeCompleted,
+    ReleaseNoteRequired,
+    PublicDataGuidanceRequired,
+    EmptyContentSectionExists,
+    GenericSectionsContainEmptyHtmlBlock,
+    RelatedDashboardsSectionContainsEmptyHtmlBlock,
+    ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
+    SummarySectionContainsEmptyHtmlBlock,
 
-        // Data guidance
-        DataGuidanceDataSetNotAttachedToRelease,
+    // Data guidance
+    DataGuidanceDataSetNotAttachedToRelease,
 
-        // Release checklist warnings
-        NoMethodology,
-        NoNextReleaseDate,
-        NoDataFiles,
-        NoFootnotesOnSubjects,
-        NoFeaturedTables,
-        NoPublicPreReleaseAccessList,
-        MethodologyNotApproved,
+    // Release checklist warnings
+    NoMethodology,
+    NoNextReleaseDate,
+    NoDataFiles,
+    NoFootnotesOnSubjects,
+    NoFeaturedTables,
+    NoPublicPreReleaseAccessList,
+    MethodologyNotApproved,
 
-        // Footnotes
-        FootnotesDifferFromReleaseFootnotes,
+    // Footnotes
+    FootnotesDifferFromReleaseFootnotes,
 
-        // Key statistics
-        DataBlockShouldBeUnattached,
-        ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
+    // Key statistics
+    DataBlockShouldBeUnattached,
+    ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
 
-        // Featured tables
-        DataBlockAlreadyHasFeaturedTable,
-        ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
-    }
+    // Featured tables
+    DataBlockAlreadyHasFeaturedTable,
+    ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
 }

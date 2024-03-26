@@ -5,24 +5,23 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+
+[Route("api")]
+public class RedirectsController : ControllerBase
 {
-    [Route("api")]
-    public class RedirectsController : ControllerBase
+    private readonly IRedirectsCacheService _redirectsCacheService;
+
+    public RedirectsController(
+        IRedirectsCacheService redirectsCacheService)
     {
-        private readonly IRedirectsCacheService _redirectsCacheService;
+        _redirectsCacheService = redirectsCacheService;
+    }
 
-        public RedirectsController(
-            IRedirectsCacheService redirectsCacheService)
-        {
-            _redirectsCacheService = redirectsCacheService;
-        }
-
-        [HttpGet("redirects")]
-        public async Task<ActionResult<RedirectsViewModel>> List()
-        {
-            return await _redirectsCacheService.List()
-                .HandleFailuresOrOk();
-        }
+    [HttpGet("redirects")]
+    public async Task<ActionResult<RedirectsViewModel>> List()
+    {
+        return await _redirectsCacheService.List()
+            .HandleFailuresOrOk();
     }
 }

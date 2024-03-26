@@ -1,19 +1,18 @@
 ﻿using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+
+public class PublishMethodologyFilesMessage
 {
-    public class PublishMethodologyFilesMessage
+    public Guid MethodologyId { get; set; }
+
+    public PublishMethodologyFilesMessage(Guid methodologyId)
     {
-        public Guid MethodologyId { get; set; }
+        MethodologyId = methodologyId;
+    }
 
-        public PublishMethodologyFilesMessage(Guid methodologyId)
-        {
-            MethodologyId = methodologyId;
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(MethodologyId)}: {MethodologyId}";
-        }
+    public override string ToString()
+    {
+        return $"{nameof(MethodologyId)}: {MethodologyId}";
     }
 }

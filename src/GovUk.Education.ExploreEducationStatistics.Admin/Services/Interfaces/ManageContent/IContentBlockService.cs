@@ -2,12 +2,11 @@
 using System;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent
-{
-    public interface IContentBlockService
-    {
-        Task DeleteContentBlockAndReorder(Guid blockToRemoveId);
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 
-        Task DeleteSectionContentBlocks(Guid contentSectionId);
-    }
+public interface IContentBlockService
+{
+    Task DeleteContentBlockAndReorder(Guid blockToRemoveId);
+
+    Task DeleteSectionContentBlocks(Guid contentSectionId);
 }

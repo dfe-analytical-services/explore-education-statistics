@@ -6,35 +6,34 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationH
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers
+namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers;
+
+public class ViewPublicationAuthorizationHandlerTests
 {
-    public class ViewPublicationAuthorizationHandlerTests
+    [Fact]
+    public async Task HasPublishedRelease()
     {
-        [Fact]
-        public async Task HasPublishedRelease()
+        var publication = new Publication
         {
-            var publication = new Publication
-            {
-                LatestPublishedReleaseVersionId = Guid.NewGuid()
-            };
+            LatestPublishedReleaseVersionId = Guid.NewGuid()
+        };
 
-            var handler = new ViewPublicationAuthorizationHandler();
-            var authContext = CreateAnonymousAuthContext<ViewPublicationRequirement, Publication>(publication);
-            await handler.HandleAsync(authContext);
+        var handler = new ViewPublicationAuthorizationHandler();
+        var authContext = CreateAnonymousAuthContext<ViewPublicationRequirement, Publication>(publication);
+        await handler.HandleAsync(authContext);
 
-            Assert.True(authContext.HasSucceeded);
-        }
+        Assert.True(authContext.HasSucceeded);
+    }
 
-        [Fact]
-        public async Task HasNoPublishedRelease()
-        {
-            var publication = new Publication();
+    [Fact]
+    public async Task HasNoPublishedRelease()
+    {
+        var publication = new Publication();
 
-            var handler = new ViewPublicationAuthorizationHandler();
-            var authContext = CreateAnonymousAuthContext<ViewPublicationRequirement, Publication>(publication);
-            await handler.HandleAsync(authContext);
+        var handler = new ViewPublicationAuthorizationHandler();
+        var authContext = CreateAnonymousAuthContext<ViewPublicationRequirement, Publication>(publication);
+        await handler.HandleAsync(authContext);
 
-            Assert.False(authContext.HasSucceeded);
-        }
+        Assert.False(authContext.HasSucceeded);
     }
 }

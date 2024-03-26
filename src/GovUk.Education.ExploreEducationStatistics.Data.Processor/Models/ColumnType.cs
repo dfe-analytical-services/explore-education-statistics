@@ -1,8 +1,7 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
+
+public enum ColumnType
 {
-    public enum ColumnType
-    {
-        Filter,
-        Indicator
-    }
+    Filter,
+    Indicator
 }
