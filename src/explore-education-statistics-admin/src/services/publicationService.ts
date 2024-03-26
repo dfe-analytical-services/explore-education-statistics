@@ -2,7 +2,10 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { PublicationSummary } from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseSeriesItem,
+} from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
 import { isAxiosError } from 'axios';
@@ -82,9 +85,7 @@ export interface ReleaseSeriesLegacyLinkAddRequest {
 
 export interface ReleaseSeriesItemUpdateRequest {
   id: string;
-
   releaseId?: string;
-
   legacyLinkDescription?: string;
   legacyLinkUrl?: string;
 }
@@ -96,17 +97,9 @@ export interface ListReleasesParams {
   includePermissions?: boolean;
 }
 
-export interface ReleaseSeriesTableEntry {
-  id: string;
-  isLegacyLink: boolean;
-  description: string;
-
-  releaseId?: string;
-  releaseSlug?: string;
+export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
   isLatest?: boolean;
   isPublished?: boolean;
-
-  legacyLinkUrl?: string;
 }
 
 const publicationService = {

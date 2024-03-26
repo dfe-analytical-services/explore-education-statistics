@@ -42,10 +42,8 @@ export interface ReleaseSeriesItem {
   id: string;
   isLegacyLink: boolean;
   description: string;
-
   releaseId?: string;
   releaseSlug?: string;
-
   legacyLinkUrl?: string;
 }
 

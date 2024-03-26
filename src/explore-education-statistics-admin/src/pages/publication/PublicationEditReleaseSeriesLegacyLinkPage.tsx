@@ -5,89 +5,91 @@ import {
   PublicationEditReleaseSeriesLegacyLinkRouteParams,
   publicationReleaseSeriesRoute,
 } from '@admin/routes/publicationRoutes';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
-import { generatePath, RouteComponentProps, useHistory } from 'react-router';
+import publicationQueries from '@admin/queries/publicationQueries';
 import publicationService, {
   ReleaseSeriesItemUpdateRequest,
   ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import React from 'react';
+import { generatePath, RouteComponentProps, useHistory } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 
 export const mapToReleaseSeriesItemUpdateRequest = (
   releaseSeries: ReleaseSeriesTableEntry[],
 ): ReleaseSeriesItemUpdateRequest[] => {
   return releaseSeries.map(seriesItem => ({
     id: seriesItem.id,
-    releaseId: !seriesItem.isLegacyLink ? seriesItem.releaseId : undefined,
+    releaseId: seriesItem.releaseId,
     legacyLinkDescription: seriesItem.isLegacyLink
       ? seriesItem.description
       : undefined,
-    legacyLinkUrl: seriesItem.isLegacyLink
-      ? seriesItem.legacyLinkUrl
-      : undefined,
+    legacyLinkUrl: seriesItem.legacyLinkUrl,
   }));
 };
 
-const PublicationEditReleaseSeriesLegacyLinkPage = ({
+export default function PublicationEditReleaseSeriesLegacyLinkPage({
   match,
-}: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) => {
+}: RouteComponentProps<PublicationEditReleaseSeriesLegacyLinkRouteParams>) {
   const { releaseSeriesItemId } = match.params;
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 
-  const { value: releaseSeries = [], isLoading } = useAsyncHandledRetry(() =>
-    publicationService.getReleaseSeries(publicationId),
+  const { data: releaseSeries = [], isLoading } = useQuery(
+    publicationQueries.getReleaseSeries(publicationId),
   );
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
-  const itemIndex = releaseSeries?.findIndex(
-    rsi => rsi.id === releaseSeriesItemId,
+  const legacyRelease = releaseSeries.find(
+    release => release.id === releaseSeriesItemId,
   );
 
-  if (itemIndex === -1) {
-    return <p>Release series item not found.</p>;
-  }
-
-  if (releaseSeries[itemIndex].releaseId !== undefined) {
-    return <p>Release series item isn't a legacy link.</p>;
-  }
-
-  const publicationEditPath = generatePath(publicationReleaseSeriesRoute.path, {
-    publicationId,
-  });
+  const publicationReleaseSeriesPath = generatePath(
+    publicationReleaseSeriesRoute.path,
+    {
+      publicationId,
+    },
+  );
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       <h2>Edit legacy release</h2>
-      {releaseSeries && (
+
+      {!legacyRelease || legacyRelease.releaseId !== undefined ? (
+        <>
+          <p>Legacy release not found.</p>
+          <Link to={publicationReleaseSeriesPath}>Go back</Link>
+        </>
+      ) : (
         <ReleaseSeriesLegacyLinkForm
           initialValues={{
-            description: releaseSeries[itemIndex].description,
-            url: releaseSeries[itemIndex].legacyLinkUrl ?? '',
+            description: legacyRelease.description,
+            url: legacyRelease.legacyLinkUrl ?? '',
           }}
           cancelButton={
-            <Link unvisited to={publicationEditPath}>
+            <Link unvisited to={publicationReleaseSeriesPath}>
               Cancel
             </Link>
           }
           onSubmit={async values => {
-            releaseSeries[itemIndex].description = values.description;
-            releaseSeries[itemIndex].legacyLinkUrl = values.url;
+            const updatedReleaseSeries = releaseSeries.map(release => {
+              return release.id === releaseSeriesItemId
+                ? {
+                    ...release,
+                    description: values.description,
+                    legacyLinkUrl: values.url,
+                  }
+                : release;
+            });
+
             await publicationService.updateReleaseSeries(
               publicationId,
-              mapToReleaseSeriesItemUpdateRequest(releaseSeries),
+              mapToReleaseSeriesItemUpdateRequest(updatedReleaseSeries),
             );
 
-            history.push(publicationEditPath);
+            history.push(publicationReleaseSeriesPath);
           }}
         />
       )}
-    </>
+    </LoadingSpinner>
   );
-};
-
-export default PublicationEditReleaseSeriesLegacyLinkPage;
+}

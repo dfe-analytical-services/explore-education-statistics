@@ -9,12 +9,13 @@ import _publicationService, {
   PublicationWithPermissions,
   ReleaseSeriesTableEntry,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router-dom';
 import { generatePath } from 'react-router';
 import noop from 'lodash/noop';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
