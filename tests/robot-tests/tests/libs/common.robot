@@ -690,6 +690,11 @@ user checks element count is x
     [Arguments]    ${locator}    ${count}
     page should contain element    ${locator}    count=${count}
 
+user checks element contains valid URL
+    [Arguments]    ${locator}    ${expected_url}
+    ${actual_url}=    get value    ${locator}
+    should be equal as strings    ${actual_url}    ${expected_url}
+
 user checks url contains
     [Arguments]    ${text}
     ${current_url}=    get location
