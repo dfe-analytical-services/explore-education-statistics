@@ -14,7 +14,12 @@ public partial class EES4807_AddPermissionsToDataProcessorUser : Migration
         // This migration grants permissions on database tables created by this resource's database user to the Data
         // Processor user.
         var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
-        migrationBuilder.Sql($"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+
+        if (dataProcessorFunctionAppIdentityName != null)
+        {
+            migrationBuilder.Sql(
+                $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+        }
     }
 
     /// <inheritdoc />
