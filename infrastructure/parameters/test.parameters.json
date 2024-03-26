@@ -93,7 +93,7 @@
       "value": 268435456000
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
-      "value": false
+      "value": true
     }
   }
 }
