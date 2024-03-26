@@ -1809,6 +1809,7 @@ public class PublicationServiceTests
 
             result.AssertBadRequest(PublicationSlugNotUnique);
         }
+    }
 
         await using (var context = InMemoryApplicationDbContext(contextId))
         {
