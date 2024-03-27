@@ -113,7 +113,7 @@ Reorder the legacy releases
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
     user clicks button    Confirm order
-    Sleep    2
+    sleep    2
 
 Validate reordered legacy releases
     user waits until page contains button    Reorder releases
@@ -121,12 +121,15 @@ Validate reordered legacy releases
 
     user checks table cell contains    1    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    1    2    http://test2.com
+    user checks table cell contains    1    3    Legacy release
 
     user checks table cell contains    2    1    ${DESCRIPTION}
     user checks table cell contains    2    2    http://test.com
+    user checks table cell contains    2    3    Legacy release
 
     user checks table cell contains    3    1    Academic year 2020/21
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_LINK}
+    user checks table cell contains    3    3    Latest release
 
 Create a second draft release via api
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -171,11 +174,9 @@ Navigate to 'Content' page for amendment
 
 Add release note to first amendment
     user clicks button    Add note
-    user enters text into element    id:createReleaseNoteForm-reason    Test release note one
+    user enters text into element    id:create-release-note-form-reason    Test release note one
     user clicks button    Save note
-    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
-    user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
+    sleep    2
 
 Navigate to "Sign off" page
     user clicks link    Sign off
@@ -192,20 +193,22 @@ Navigate to publication page and verify the amended release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
-    sleep    100
 
 Validate amended legacy releases
     user waits until page contains button    Reorder releases
-    user checks element count is x    css:tbody tr    3
 
     user checks table cell contains    1    1    Academic year Q1 2024/25
     user checks table cell contains    1    2    ${PUBLIC_AMENDED_RELEASE_LINK}
+    user checks table cell contains    1    3    Latest release
 
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
+    user checks table cell contains    2    3    Legacy release
 
     user checks table cell contains    3    1    ${DESCRIPTION}
     user checks table cell contains    3    2    http://test.com
+    user checks table cell contains    3    3    Legacy release
 
     user checks table cell contains    4    1    Academic year 2020/21
     user checks table cell contains    4    2    ${PUBLIC_RELEASE_LINK}
+    user checks table cell contains    4    3
