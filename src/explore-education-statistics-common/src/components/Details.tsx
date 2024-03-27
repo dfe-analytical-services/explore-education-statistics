@@ -35,6 +35,7 @@ export interface DetailsProps {
   summaryAfter?: ReactNode;
   hiddenText?: string;
   preventToggle?: boolean;
+  testId?: string;
 }
 
 const Details = ({
@@ -49,6 +50,7 @@ const Details = ({
   summaryAfter,
   hiddenText,
   preventToggle = false,
+  testId,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLDetailsElement>(null);
@@ -94,6 +96,7 @@ const Details = ({
       open={open}
       ref={ref}
       role={onMounted('group')}
+      data-testid={testId}
     >
       <summary
         aria-controls={onMounted(id)}
