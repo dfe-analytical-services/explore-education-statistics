@@ -237,11 +237,17 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
     ///
     /// The `field` can be one of the following:
     ///
-    /// - `time_period` to sort by time period
-    /// - `geographic_level` to sort by the geographic level
-    /// - A location level code (e.g. `REG`, `LA`) to sort by the locations in that level
+    /// - `timePeriod` to sort by time period
+    /// - `geographicLevel` to sort by the geographic level of the data
+    /// - `location|{level}` to sort by locations in a geographic level where `{level}` is the level code (e.g. `REG`, `LA`)
     /// - A filter ID (e.g. `characteristic`, `school_type`) to sort by the options in that filter
     /// - An indicator ID (e.g. `sess_authorised`, `enrolments`) to sort by the values in that indicator
+    ///
+    /// ### Examples
+    ///
+    /// - `time_period|Desc` sorts by time period in descending order
+    /// - `geographic_level|Asc` sorts by geographic level in ascending order
+    /// - `location|REG|Asc` sorts by regions in ascending order
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]
     [Produces("application/json")]
