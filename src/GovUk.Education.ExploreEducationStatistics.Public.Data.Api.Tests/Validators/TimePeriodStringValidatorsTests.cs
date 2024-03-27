@@ -117,7 +117,7 @@ public class TimePeriodStringValidatorsTests
 
             var state = Assert.IsType<TimePeriodStringValidators.RangeErrorDetail>(error.CustomState);
 
-            Assert.Equal(timePeriod, state.Value);
+            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
         }
 
         [Theory]
@@ -141,8 +141,8 @@ public class TimePeriodStringValidatorsTests
 
             var state = Assert.IsType<TimePeriodStringValidators.AllowedCodeErrorDetail>(error.CustomState);
 
-            Assert.Equal(timePeriod, state.Value);
-            Assert.Equal(TimeIdentifierUtils.DataCodes.Order(), state.Allowed);
+            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
+            Assert.Equal(TimeIdentifierUtils.DataCodes.Order(), state.AllowedCodes);
         }
 
         [Theory]
@@ -173,9 +173,9 @@ public class TimePeriodStringValidatorsTests
 
             var state = Assert.IsType<TimePeriodStringValidators.AllowedCodeErrorDetail>(error.CustomState);
 
-            Assert.Equal(timePeriod, state.Value);
+            Assert.Equal(timePeriod, $"{state.Value.Period}|{state.Value.Code}");
 
-            Assert.All(state.Allowed, code =>
+            Assert.All(state.AllowedCodes, code =>
             {
                 var yearFormat = EnumUtil
                     .GetFromEnumValue<TimeIdentifier>(code)

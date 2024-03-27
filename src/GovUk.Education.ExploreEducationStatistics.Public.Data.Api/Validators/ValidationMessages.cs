@@ -21,7 +21,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage LocationMaxValueLength = new(
         Code: "LocationMaxLengthValue",
-        Message: "Must be a location with an identifying value that is {MaxLength} characters or fewer."
+        Message: "Must be a location with an identifying value that is {MaxValueLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage TimePeriodFormat = new(
