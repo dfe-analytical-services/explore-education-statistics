@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -109,8 +110,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>((provider, httpClient) =>
         {
-            var options = provider.GetRequiredService<ContentApiOptions>();
-            httpClient.BaseAddress = new Uri(options.Url);
+            var options = provider.GetRequiredService<IOptions<ContentApiOptions>>();
+            httpClient.BaseAddress = new Uri(options.Value.Url);
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
