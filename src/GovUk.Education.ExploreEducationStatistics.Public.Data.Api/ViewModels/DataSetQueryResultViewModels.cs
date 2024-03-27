@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -29,6 +31,7 @@ public record DataSetQueryResultViewModel
     /// <summary>
     /// The geographic level relevant to this result's data.
     /// </summary>
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
     public required GeographicLevel GeographicLevel { get; init; }
 
     /// <summary>
@@ -37,7 +40,7 @@ public record DataSetQueryResultViewModel
     /// This is a dictionary where the key is the location's geographic
     /// level and the value is the location's ID.
     /// </summary>
-    public required Dictionary<string, string> Locations { get; init; }
+    public required Dictionary<string, string?> Locations { get; init; }
 
     /// <summary>
     /// The data values for the result's indicators.
