@@ -46,7 +46,7 @@ public static class ValidationMessages
 
     public static readonly LocalizableMessage SortMaxFieldLength = new(
         Code: "SortMaxFieldLength",
-        Message: "Must be a sort with a field that is {MaxLength} characters or fewer."
+        Message: "Must be a sort with a field that is {MaxFieldLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage SortDirection = new(

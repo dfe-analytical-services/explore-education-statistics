@@ -27,10 +27,12 @@ public class SortStringValidatorsTests
         private readonly Validator _validator = new();
 
         [Theory]
-        [InlineData("TimePeriod|Asc")]
-        [InlineData("TimePeriod|Desc")]
-        [InlineData("GeographicLevel|Asc")]
-        [InlineData("GeographicLevel|Desc")]
+        [InlineData("timePeriod|Asc")]
+        [InlineData("timePeriod|Desc")]
+        [InlineData("geographicLevel|Asc")]
+        [InlineData("geographicLevel|Desc")]
+        [InlineData("locations|REG|Desc")]
+        [InlineData("locations|LA|Desc")]
         [InlineData("characteristic|Asc")]
         [InlineData("characteristic|Desc")]
         [InlineData("school_type|Asc")]
@@ -50,14 +52,17 @@ public class SortStringValidatorsTests
         [InlineData("Asc")]
         [InlineData("|Asc")]
         [InlineData(" |Asc")]
-        [InlineData("TimePeriod:Asc")]
-        [InlineData("TimePeriod|")]
-        [InlineData(" TimePeriod|Asc")]
-        [InlineData("TimePeriod| ")]
-        [InlineData("TimePeriod| Asc")]
-        [InlineData(" TimePeriod|Asc ")]
-        [InlineData("TimePeriod |Asc ")]
-        [InlineData("TimePeriod|Asc1")]
+        [InlineData("timePeriod:Asc")]
+        [InlineData("timePeriod|")]
+        [InlineData(" timePeriod|Asc")]
+        [InlineData("timePeriod| ")]
+        [InlineData("timePeriod| Asc")]
+        [InlineData(" timePeriod|Asc ")]
+        [InlineData("timePeriod |Asc ")]
+        [InlineData("timePeriod|Asc1")]
+        [InlineData("locations||Asc")]
+        [InlineData("locations| |Asc")]
+        [InlineData("locations| |")]
         [InlineData("school-type|Asc")]
         [InlineData("school_type| Asc")]
         [InlineData("school_type|Asc ")]
@@ -99,14 +104,14 @@ public class SortStringValidatorsTests
 
             var state = Assert.IsType<SortStringValidators.MaxFieldLengthErrorDetail>(error.CustomState);
 
-            Assert.Equal(sort, state.Value);
-            Assert.Equal(40, state.MaxLength);
+            Assert.Equal(sort, $"{state.Value.Field}|{state.Value.Direction}");
+            Assert.Equal(40, state.MaxFieldLength);
         }
 
         [Theory]
-        [InlineData("TimePeriod|Invalid")]
-        [InlineData("TimePeriod|asc")]
-        [InlineData("TimePeriod|desc")]
+        [InlineData("timePeriod|Invalid")]
+        [InlineData("timePeriod|asc")]
+        [InlineData("timePeriod|desc")]
         public void Failure_InvalidDirection(string sort)
         {
             var testObj = new TestClass { Sort = sort };
@@ -123,8 +128,8 @@ public class SortStringValidatorsTests
 
             var state = Assert.IsType<SortStringValidators.DirectionErrorDetail>(error.CustomState);
 
-            Assert.Equal(sort, state.Value);
-            Assert.Equal([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()], state.Allowed);
+            Assert.Equal(sort, $"{state.Value.Field}|{state.Value.Direction}");
+            Assert.Equal([SortDirection.Asc.ToString(), SortDirection.Desc.ToString()], state.AllowedDirections);
         }
     }
 }
