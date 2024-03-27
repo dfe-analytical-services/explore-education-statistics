@@ -100,6 +100,7 @@ Validate the updated legacy release
     user checks element count is x    css:tbody tr    3
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
+    user checks table cell contains    2    3    Legacy release
 
 Reorder the legacy releases
     user clicks button    Reorder releases
