@@ -1,4 +1,4 @@
-@description('The full name of the existing VNet')
+@description('Specifies the full name of the existing VNet')
 param vNetName string
 
 @description('Specifies the Subscription name')

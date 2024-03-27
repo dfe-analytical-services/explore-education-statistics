@@ -51,13 +51,15 @@ stages:
       stageName: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
+      parameterFile: devParamFile
 
   - template: deploy-stage-template.yml
     parameters:
       stageName: 'Deploy_to_Development'
+      dependsOn: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
-      dependsOn: 'Validate_Against_Development'
+      parameterFile: devParamFile
 
 - ${{ if variables.isTest }}:
   - template: validate-stage-template.yml
@@ -65,32 +67,43 @@ stages:
       stageName: 'Validate_Against_Test'
       environment: 'Test'
       serviceConnection: $(serviceConnectionTest)
+      parameterFile: testParamFile
 
   - template: deploy-stage-template.yml
     parameters:
       stageName: 'Deploy_to_Test'
+      dependsOn: 'Validate_Against_Test'
       environment: 'Test'
       serviceConnection: $(serviceConnectionTest)
-      dependsOn: 'Validate_Against_Test'
+      parameterFile: testParamFile
 
-#  - template: deploy-stage-template.yml
-#    parameters:
-#      environment: 'Test'
-#      dependsOn: DeployDevelopment
-#      resourceGroupName: ${{parameters.resourceGroupName}}
-#      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-#
-#- ${{ if eq(variables.isMaster, 'true') }}:
-#  - template: deploy-stage-template.yml
-#    parameters:
-#      environment: 'PreProduction'
-#      dependsOn: DeployDevelopment
-#      resourceGroupName: ${{parameters.resourceGroupName}}
-#      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
-#
-#  - template: deploy-stage-template.yml
-#    parameters:
-#      environment: 'Production'
-#      dependsOn: DeployPreProduction
-#      resourceGroupName: ${{parameters.resourceGroupName}}
-#      psqlDbUsersAdded: ${{parameters.psqlDbUsersAdded}}
+- ${{ if variables.isMaster }}:
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_PreProduction'
+      environment: 'PreProduction'
+      serviceConnection: $(serviceConnectionPreProduction)
+      parameterFile: preProdParamFile
+
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_PreProduction'
+      dependsOn: 'Validate_Against_PreProduction'
+      environment: 'PreProduction'
+      serviceConnection: $(serviceConnectionPreProduction)
+      parameterFile: preProdParamFile
+
+  - template: validate-stage-template.yml
+    parameters:
+      stageName: 'Validate_Against_Production'
+      environment: 'Production'
+      serviceConnection: $(serviceConnectionProduction)
+      parameterFile: prodParamFile
+
+  - template: deploy-stage-template.yml
+    parameters:
+      stageName: 'Deploy_to_Production'
+      dependsOn: 'Validate_Against_Production'
+      environment: 'Production'
+      serviceConnection: $(serviceConnectionProduction)
+      parameterFile: prodParamFile

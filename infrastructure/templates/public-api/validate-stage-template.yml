@@ -8,6 +8,8 @@ parameters:
     type: string
   - name: serviceConnection
     type: string
+  - name: parameterFile
+    type: string
 
 stages:
   - stage: ${{parameters.stageName}}
@@ -19,25 +21,6 @@ stages:
           - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
         steps:
           - checkout: self
-          - task: CmdLine@2
-            displayName: 'List source files'
-            inputs:
-              script: |
-
-          - task: Bash@3
-            displayName: 'Display information about this pipeline run'
-            inputs:
-              targetType: 'inline'
-              script: |
-                echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the Docker images to deploy with this pipeline run.'
-                echo 'Using "$(upstreamPipelineBuildNumber)" as the tag to identify the published build artifacts to deploy with this pipeline run.'
-                echo 'Using Service Connection ${{parameters.serviceConnection}}.'
-                echo 'Using VNet $(vNetName).'
-                echo 'Using ACR $(acrName).'
-                echo 'Using Core Storage Account $(coreStorageAccountName).'
-                echo
-                echo 'Structure of work folder of this pipeline:'
-                tree $(Build.SourcesDirectory)
 
           - task: AzureCLI@2
             displayName: 'Install Bicep'
@@ -45,6 +28,7 @@ stages:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
+              failOnStandardError: true
               inlineScript: 'az bicep install'
 
           - task: AzureCLI@2
@@ -53,12 +37,12 @@ stages:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
+              failOnStandardError: true
               inlineScript: |
-                set -e
                 az deployment group validate \
                 --resource-group $(resourceGroupName) \
                 --template-file $(templateFile) \
-                --parameters $(devParamFile) \
+                --parameters ${{parameters.parameterFile}} \
                 --parameters \
                     subscription='$(subscription)' \
                     vNetName='$(vNetName)' \
