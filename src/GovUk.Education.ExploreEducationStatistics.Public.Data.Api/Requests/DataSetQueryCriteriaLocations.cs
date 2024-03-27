@@ -34,4 +34,19 @@ public record DataSetQueryCriteriaLocations
     /// Filter the results to not be in one of these locations.
     /// </summary>
     public IReadOnlyList<DataSetQueryLocation>? NotIn { get; init; }
+
+    public HashSet<DataSetQueryLocation> GetOptions()
+    {
+        List<DataSetQueryLocation?> locations =
+        [
+            Eq,
+            NotEq,
+            ..In ?? [],
+            ..NotIn ?? []
+        ];
+
+        return locations
+            .OfType<DataSetQueryLocation>()
+            .ToHashSet();
+    }
 }

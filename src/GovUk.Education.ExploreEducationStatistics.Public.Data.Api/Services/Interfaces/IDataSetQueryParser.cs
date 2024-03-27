@@ -1,0 +1,15 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Query;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using InterpolatedSql;
+
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+
+public interface IDataSetQueryParser
+{
+    Task<IInterpolatedSql> ParseCriteria(
+        DataSetQueryCriteria criteria,
+        DataSetVersion dataSetVersion,
+        QueryState queryState,
+        CancellationToken cancellationToken = default);
+}
