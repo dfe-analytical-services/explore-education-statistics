@@ -51,7 +51,7 @@ stages:
       stageName: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
-      parameterFile: devParamFile
+      parameterFile: $(devParamFile)
 
   - template: deploy-stage-template.yml
     parameters:
@@ -59,51 +59,51 @@ stages:
       dependsOn: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
-      parameterFile: devParamFile
+      parameterFile: $(devParamFile)
 
-- ${{ if variables.isTest }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Test'
-      environment: 'Test'
-      serviceConnection: $(serviceConnectionTest)
-      parameterFile: testParamFile
-
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Test'
-      dependsOn: 'Validate_Against_Test'
-      environment: 'Test'
-      serviceConnection: $(serviceConnectionTest)
-      parameterFile: testParamFile
-
-- ${{ if variables.isMaster }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_PreProduction'
-      environment: 'PreProduction'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: preProdParamFile
-
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_PreProduction'
-      dependsOn: 'Validate_Against_PreProduction'
-      environment: 'PreProduction'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: preProdParamFile
-
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: prodParamFile
-
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Production'
-      dependsOn: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: prodParamFile
+#- ${{ if variables.isTest }}:
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_Test'
+#      environment: 'Test'
+#      serviceConnection: $(serviceConnectionTest)
+#      parameterFile: testParamFile
+#
+#  - template: deploy-stage-template.yml
+#    parameters:
+#      stageName: 'Deploy_to_Test'
+#      dependsOn: 'Validate_Against_Test'
+#      environment: 'Test'
+#      serviceConnection: $(serviceConnectionTest)
+#      parameterFile: testParamFile
+#
+#- ${{ if variables.isMaster }}:
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_PreProduction'
+#      environment: 'Pre-production'
+#      serviceConnection: $(serviceConnectionPreProduction)
+#      parameterFile: preProdParamFile
+#
+#  - template: deploy-stage-template.yml
+#    parameters:
+#      stageName: 'Deploy_to_PreProduction'
+#      dependsOn: 'Validate_Against_PreProduction'
+#      environment: 'Pre-production'
+#      serviceConnection: $(serviceConnectionPreProduction)
+#      parameterFile: preProdParamFile
+#
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_Production'
+#      environment: 'Production'
+#      serviceConnection: $(serviceConnectionProduction)
+#      parameterFile: prodParamFile
+#
+#  - template: deploy-stage-template.yml
+#    parameters:
+#      stageName: 'Deploy_to_Production'
+#      dependsOn: 'Validate_Against_Production'
+#      environment: 'Production'
+#      serviceConnection: $(serviceConnectionProduction)
+#      parameterFile: prodParamFile

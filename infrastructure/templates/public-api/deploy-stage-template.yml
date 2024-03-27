@@ -33,7 +33,6 @@ stages:
           steps:
           - bash: echo "##vso[task.setvariable variable=dataProcessorFunctionAppName;]$(subscription)-ees-papi-fa-processor"
             displayName: 'Set additional pipeline variables'
-            failOnStandardError: true
 
           - download: EESBuildPipeline
             displayName: 'Download Data Processor Function App ZIP file'

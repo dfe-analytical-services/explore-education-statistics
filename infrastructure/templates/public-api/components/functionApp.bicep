@@ -48,6 +48,12 @@ param keyVaultName string
 @description('Specifies whether or not the Function App already exists. This is used to determine whether or not to look for existing appsettings')
 param functionAppExists bool
 
+@description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
+param preWarmedInstanceCount int?
+
+@description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
+param alwaysOn bool?
+
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'
 var reserved = appServicePlanOS == 'Linux'
 var fullFunctionAppName = '${subscription}-ees-papi-fa-${functionAppName}'
@@ -133,7 +139,8 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     clientAffinityEnabled: true
     reserved: reserved
     siteConfig: {
-      alwaysOn: true
+      alwaysOn: alwaysOn ?? null
+      preWarmedInstanceCount: preWarmedInstanceCount ?? null
       netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     }
