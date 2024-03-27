@@ -44,4 +44,19 @@ public record DataSetQueryCriteriaGeographicLevels
     [JsonIgnore]
     public IReadOnlyList<GeographicLevel>? ParsedNotIn
         => NotIn?.Select(EnumUtil.GetFromEnumValue<GeographicLevel>).ToList();
+
+    public HashSet<GeographicLevel> GetOptions()
+    {
+        List<GeographicLevel?> options =
+        [
+            ParsedEq,
+            ParsedNotEq,
+            ..ParsedIn ?? [],
+            ..ParsedNotIn ?? []
+        ];
+
+        return options
+            .OfType<GeographicLevel>()
+            .ToHashSet();
+    }
 }

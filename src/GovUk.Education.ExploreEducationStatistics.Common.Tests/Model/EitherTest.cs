@@ -1331,7 +1331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async Task OnFailureFailWith()
+        public async Task OnFailureFailWith_NoArg()
         {
             var result = await Task.FromResult(new Either<int, string>(500))
                 .OnFailureFailWith(() => 600);
@@ -1340,19 +1340,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
-        public async Task OnFailureFailWith_GenericTask()
+        public async Task OnFailureFailWith_FailureArg()
         {
             var result = await Task.FromResult(new Either<int, string>(500))
-                .OnFailureFailWith(_ => Task.FromResult(600));
+                .OnFailureFailWith(failure => failure + 100);
 
             result.AssertLeft(600);
         }
 
         [Fact]
-        public async Task OnFailureFailWith_GenericTask_PriorFailure()
+        public async Task OnFailureFailWith_GenericTaskWithFailureArg()
+        {
+            var result = await Task.FromResult(new Either<int, string>(500))
+                .OnFailureFailWith(failure => Task.FromResult(failure + 100));
+
+            result.AssertLeft(600);
+        }
+
+        [Fact]
+        public async Task OnFailureFailWith_GenericTaskWithFailureArg_PriorSuccess()
         {
             var result = await Task.FromResult(new Either<int, string>("Success"))
-                .OnFailureFailWith(_ => Task.FromResult(500));
+                .OnFailureFailWith(failure => Task.FromResult(failure + 100));
 
             result.AssertRight("Success");
         }

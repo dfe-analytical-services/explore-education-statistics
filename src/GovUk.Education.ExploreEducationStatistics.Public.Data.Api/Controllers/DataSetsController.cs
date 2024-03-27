@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -12,7 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [ApiVersion(1.0)]
 [ApiController]
 [Route("api/v{version:apiVersion}/data-sets")]
-public class DataSetsController(IDataSetService dataSetService) : ControllerBase
+public class DataSetsController(
+    IDataSetService dataSetService,
+    IDataSetQueryService dataSetQueryService)
+    : ControllerBase
 {
     /// <summary>
     /// Get a data set’s summary
@@ -261,6 +263,8 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
         [FromQuery] DataSetGetQueryRequest request,
         CancellationToken cancellationToken)
     {
-        return Ok();
+        return await dataSetQueryService
+            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .HandleFailuresOrOk();
     }
 }

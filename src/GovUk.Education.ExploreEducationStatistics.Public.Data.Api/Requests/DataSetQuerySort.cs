@@ -33,6 +33,8 @@ public record DataSetQuerySort
     [JsonIgnore]
     public SortDirection ParsedDirection => EnumUtil.GetFromEnumValue<SortDirection>(Direction);
 
+    public string ToSortString() => $"{Field}|{Direction}";
+
     public static DataSetQuerySort FromString(string sort)
     {
         var directionDelimiter = sort.LastIndexOf('|');

@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
@@ -175,6 +177,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<IParquetPathResolver, ParquetPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();
+        services.AddScoped<IDataSetQueryService, DataSetQueryService>();
+        services.AddScoped<IDataSetQueryParser, DataSetQueryParser>();
+
+        services.AddScoped<IParquetDataRepository, ParquetDataRepository>();
+        services.AddScoped<IParquetFilterRepository, ParquetFilterRepository>();
+        services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
+        services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
+        services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

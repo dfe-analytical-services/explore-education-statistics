@@ -40,7 +40,7 @@ public record DataSetQueryResultViewModel
     /// This is a dictionary where the key is the location's geographic
     /// level and the value is the location's ID.
     /// </summary>
-    public required Dictionary<string, string?> Locations { get; init; }
+    public required Dictionary<string, string> Locations { get; init; }
 
     /// <summary>
     /// The data values for the result's indicators.
