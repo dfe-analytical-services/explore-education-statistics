@@ -28,7 +28,6 @@ stages:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
-              failOnStandardError: true
               inlineScript: 'az bicep install'
 
           - task: AzureCLI@2

@@ -17,7 +17,7 @@ resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-
   properties: {
     accessPolicies: [for principalId in principalIds: {
       objectId: principalId
-      tenantId: tenantId: subscription().tenantId
+      tenantId: subscription().tenantId
       permissions: permissions
     }]
   }

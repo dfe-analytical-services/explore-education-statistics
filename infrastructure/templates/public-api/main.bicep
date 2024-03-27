@@ -128,39 +128,26 @@ module applicationInsightsModule 'components/appInsights.bicep' = {
 }
 
 // Create a generic, shared Log Analytics Workspace for any relevant resources to use.
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: '${subscription}-ees-log'
-  location: location
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
+module logAnalyticsWorkspaceModule 'components/logAnalyticsWorkspace.bicep' = {
+  name: 'logAnalyticsWorkspaceDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    tagValues: tagValues
   }
-  tags: tagValues
 }
 
 // Create a generic Container App Environment for any Container Apps to use.
-resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
-  name: '${subscription}-ees-cae'
-  location: location
-  properties: {
-    vnetConfiguration: {
-      infrastructureSubnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
-    }
-    daprAIInstrumentationKey: applicationInsightsModule.outputs.applicationInsightsKey
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspace.properties.customerId
-        sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
-      }
-    }
-    workloadProfiles: [{
-      name: 'Consumption'
-      workloadProfileType: 'Consumption'
-    }]
+module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' = {
+  name: 'containerAppEnvironmentDeploy'
+  params: {
+    subscription: subscription
+    location: location
+    subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
+    applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    tagValues: tagValues
   }
-  tags: tagValues
 }
 
 // Deploy File Share.
@@ -239,7 +226,7 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
     acrLoginServer: containerRegistry.properties.loginServer
     containerAppImageName: 'ees-public-api/api:${dockerImagesTag}'
     managedIdentityName: apiContainerAppManagedIdentity.name
-    managedEnvironmentId: containerAppEnvironment.id
+    managedEnvironmentId: containerAppEnvironmentModule.outputs.containerAppEnvironmentId
     appSettings: [
       {
         name: 'ConnectionStrings__PublicDataDb'
@@ -289,6 +276,7 @@ module dataProcessorFunctionAppModule 'components/functionApp.bicep' = {
       tier: 'ElasticPremium'
       family: 'EP'
     }
+    preWarmedInstanceCount: 1
   }
 }
 
