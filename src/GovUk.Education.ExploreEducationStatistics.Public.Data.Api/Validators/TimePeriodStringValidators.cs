@@ -20,7 +20,7 @@ public static partial class TimePeriodStringValidators
             {
                 context.AddFailure(
                     message: ValidationMessages.TimePeriodFormat,
-                    detail: new FormatErrorDetail(value, ExpectedFormat: ExpectedFormat)
+                    detail: new FormatErrorDetail(Value: value, ExpectedFormat: ExpectedFormat)
                 );
                 return;
             }
@@ -31,7 +31,7 @@ public static partial class TimePeriodStringValidators
             {
                 context.AddFailure(
                     message: ValidationMessages.TimePeriodYearRange,
-                    detail: new RangeErrorDetail(timePeriod.String)
+                    detail: new RangeErrorDetail(timePeriod)
                 );
             }
 
@@ -39,10 +39,10 @@ public static partial class TimePeriodStringValidators
             {
                 context.AddFailure(
                     message: ValidationMessages.TimePeriodAllowedCode,
-                    detail: new AllowedCodeErrorDetail(timePeriod.String)
-                    {
-                        Allowed = timePeriod.HasRangePeriod() ? AllowedRangeCodes : AllowedCodes
-                    }
+                    detail: new AllowedCodeErrorDetail(
+                        Value: timePeriod,
+                        AllowedCodes: timePeriod.HasRangePeriod() ? AllowedRangeCodes : AllowedCodes
+                    )
                 );
             }
         });
@@ -106,17 +106,13 @@ public static partial class TimePeriodStringValidators
             : AllowedTimeIdentifiers.Contains(code);
     }
 
-    public record RangeErrorDetail(string Value) : InvalidErrorDetail<string>(Value);
+    public record RangeErrorDetail(ParsedTimePeriod Value) : InvalidErrorDetail<ParsedTimePeriod>(Value);
 
-    public record AllowedCodeErrorDetail(string Value) : InvalidErrorDetail<string>(Value)
-    {
-        public required IReadOnlyList<string> Allowed { get; init; }
-    }
+    public record AllowedCodeErrorDetail(ParsedTimePeriod Value, IReadOnlyList<string> AllowedCodes)
+        : InvalidErrorDetail<ParsedTimePeriod>(Value);
 
     public record ParsedTimePeriod
     {
-        public string String { get; init; }
-        
         public string Period { get; init; }
         
         public string Code { get; init; }
@@ -125,7 +121,6 @@ public static partial class TimePeriodStringValidators
         {
             var parts = value.Split('|');
 
-            String = value;
             Period = parts[0];
             Code = parts[1];
         }
