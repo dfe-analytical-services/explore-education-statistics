@@ -27,7 +27,8 @@ export const testPublication: Publication = {
       id: 'legacy-release-3',
       isLegacyLink: true,
       description: 'Academic year 2014/15',
-      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+      legacyLinkUrl:
+        'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     },
     {
       id: 'release-1',
@@ -39,13 +40,15 @@ export const testPublication: Publication = {
       id: 'legacy-release-2',
       isLegacyLink: true,
       description: 'Academic year 2013/14',
-      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
+      legacyLinkUrl:
+        'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     },
     {
       id: 'legacy-release-1',
       isLegacyLink: true,
       description: 'Academic year 2012/13',
-      legacyLinkUrl: 'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
+      legacyLinkUrl:
+        'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
     },
   ],
   topic: {
