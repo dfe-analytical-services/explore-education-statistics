@@ -855,12 +855,40 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateParquetMetaTables(DataSetVersion version)
         {
-            await CreateParquetLocationMetaTables(version);
+            await CreateParquetIndicatorTable(version);
+            await CreateParquetLocationMetaTable(version);
             await CreateParquetFilterMetaTable(version);
             await CreateParquetTimePeriodMetaTable(version);
         }
 
-        private async Task CreateParquetLocationMetaTables(DataSetVersion version)
+        private async Task CreateParquetIndicatorTable(DataSetVersion version)
+        {
+            await _duckDb.ExecuteAsync(
+                $"""
+                 CREATE TABLE {IndicatorsTable.TableName}(
+                     {IndicatorsTable.Cols.Id} VARCHAR PRIMARY KEY,
+                     {IndicatorsTable.Cols.Label} VARCHAR,
+                     {IndicatorsTable.Cols.Unit} VARCHAR,
+                     {IndicatorsTable.Cols.DecimalPlaces} TINYINT,
+                 )
+                 """
+            );
+
+            using var appender = _duckDb.CreateAppender(table: IndicatorsTable.TableName);
+
+            foreach (var meta in version.IndicatorMetas)
+            {
+                var insertRow = appender.CreateRow();
+
+                insertRow.AppendValue(meta.PublicId);
+                insertRow.AppendValue(meta.Label);
+                insertRow.AppendValue(meta.Unit?.GetEnumLabel() ?? string.Empty);
+                insertRow.AppendValue(meta.DecimalPlaces);
+                insertRow.EndRow();
+            }
+        }
+
+        private async Task CreateParquetLocationMetaTable(DataSetVersion version)
         {
             await _duckDb.ExecuteAsync(
                 $"""

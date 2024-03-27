@@ -69,6 +69,10 @@ public abstract class ParquetPathResolverTests
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
+                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                resolver.IndicatorsPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedBasePath, version.LocationsParquetPath),
                 resolver.LocationsPath(version)
             );
@@ -111,6 +115,10 @@ public abstract class ParquetPathResolverTests
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
+                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                resolver.IndicatorsPath(version)
+            );
+            Assert.Equal(
                 Path.Combine(expectedBasePath, version.LocationsParquetPath),
                 resolver.LocationsPath(version)
             );
@@ -150,6 +158,10 @@ public abstract class ParquetPathResolverTests
             Assert.Equal(
                 Path.Combine(expectedBasePath, version.FiltersParquetPath),
                 resolver.FiltersPath(version)
+            );
+            Assert.Equal(
+                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                resolver.IndicatorsPath(version)
             );
             Assert.Equal(
                 Path.Combine(expectedBasePath, version.LocationsParquetPath),
