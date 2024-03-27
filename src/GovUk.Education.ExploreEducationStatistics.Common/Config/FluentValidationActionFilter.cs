@@ -132,7 +132,7 @@ public class FluentValidationActionFilter : IAsyncActionFilter
 
     private static IDictionary<string, object?> GetErrorDetail(ValidationFailure failure)
     {
-        var detail = failure.FormattedMessagePlaceholderValues
+        var detail = (failure.FormattedMessagePlaceholderValues ?? [])
             .Where(kv => !IgnoredMessagePlaceholders.Contains(kv.Key))
             .ToDictionary(kv => kv.Key.ToLowerFirst(), kv => kv.Value)
             as Dictionary<string, object?>;
