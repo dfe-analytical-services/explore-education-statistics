@@ -133,6 +133,8 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     clientAffinityEnabled: true
     reserved: reserved
     siteConfig: {
+      alwaysOn: true
+      netFrameworkVersion: '8.0'
       linuxFxVersion: appServicePlanOS == 'Linux' ? 'DOTNET-ISOLATED|8.0' : null
     }
   }
@@ -221,36 +223,16 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  name: keyVaultName
-}
-
-// Allow Key Vault references passed as secure appsettings to be resolved by the Data Processor Function App itself.
-resource dataProcessorFunctionAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-06-01-preview' = {
-  name: 'add'
-  parent: keyVault
-  properties: {
-    accessPolicies: [
-    {
-      tenantId: functionApp.identity.tenantId
-      objectId: functionApp.identity.principalId
-      permissions: {
-        secrets: [
-          'list'
-          'get'
-        ]
-      }
-    }
-    {
-      tenantId: functionApp.identity.tenantId
-      objectId: functionAppSlotSettings.outputs.stagingSlotPrincipalId
-      permissions: {
-        secrets: [
-          'list'
-          'get'
-        ]
-      }
-    }]
+// Allow Key Vault references passed as secure appsettings to be resolved by the Data Processor Function App and its
+// deployment slots.
+module dataProcessorFunctionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: 'dataProcessorFunctionAppKeyVaultAccessPolicy'
+  params: {
+    keyVaultName: keyVaultName
+    principalIds: [
+      functionApp.identity.principalId
+      functionAppSlotSettings.outputs.stagingSlotPrincipalId
+    ]
   }
 }
 

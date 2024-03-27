@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Functions;
 
-public class HelloWorldFunction
+public class DataProcessorFunction
 {
-    private readonly ILogger<HelloWorldFunction> _logger;
+    private readonly ILogger<DataProcessorFunction> _logger;
     private readonly PublicDataDbContext _context;
 
-    public HelloWorldFunction(
-        ILogger<HelloWorldFunction> logger, 
+    public DataProcessorFunction(
+        ILogger<DataProcessorFunction> logger,
         PublicDataDbContext context)
     {
         _logger = logger;

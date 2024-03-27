@@ -45,6 +45,6 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-        <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
+        <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
     </ItemGroup>
 </Project>
