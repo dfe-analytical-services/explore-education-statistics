@@ -69,6 +69,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string FiltersParquetPath => ParquetPaths.FiltersPath(this);
 
+    public string IndicatorsParquetPath  => ParquetPaths.IndicatorsPath(this);
+
     public string LocationsParquetPath => ParquetPaths.LocationsPath(this);
 
     public string TimePeriodsParquetPath => ParquetPaths.TimePeriodsPath(this);
