@@ -34,6 +34,7 @@ export default function DataSetSummary({
   showLatestDataTag = true,
 }: Props) {
   const {
+    id: dataSetId,
     content,
     fileId,
     filters = [],
@@ -49,7 +50,7 @@ export default function DataSetSummary({
   } = dataSet;
   const [showMoreContent, toggleMoreContent] = useToggle(false);
   const [showDetails, toggleDetails] = useToggle(false);
-  const id = `data-set-${fileId}`;
+  const id = `data-set-${dataSetId}`;
   const truncateContent = content.length > maxContentLength;
 
   useEffect(() => {
@@ -77,9 +78,7 @@ export default function DataSetSummary({
           className: `govuk-heading-m govuk-!-margin-bottom-2`,
           id: `${id}-heading`,
         },
-        <Link to={`/data-catalogue/release/${release.id}/data-set/${fileId}`}>
-          {title}
-        </Link>,
+        <Link to={`/data-catalogue/data-set/${dataSetId}`}>{title}</Link>,
       )}
 
       <ContentHtml

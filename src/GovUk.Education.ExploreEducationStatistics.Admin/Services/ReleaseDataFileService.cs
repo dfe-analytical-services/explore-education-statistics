@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
-                                replacingFile: replacingFile,
+                                replacingDataFile: replacingFile,
                                 order: releaseDataFileOrder);
 
                             var metaFile = await _releaseDataFileRepository.Create(
@@ -355,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
-                                                        replacingFile: replacingFile,
+                                                        replacingDataFile: replacingFile,
                                                         source: zipFile,
                                                         order: releaseDataFileOrder);
 

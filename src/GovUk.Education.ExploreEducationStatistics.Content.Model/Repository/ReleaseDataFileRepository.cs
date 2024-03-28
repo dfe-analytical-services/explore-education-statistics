@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             FileType type,
             Guid createdById,
             string? name = null,
-            File? replacingFile = null,
+            File? replacingDataFile = null,
             File? source = null,
             int order = 0)
         {
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 throw new ArgumentOutOfRangeException(nameof(type), type, "Cannot create file for file type");
             }
 
-            if (type == Metadata && replacingFile != null)
+            if (type == Metadata && replacingDataFile != null)
             {
                 throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
             }
@@ -58,19 +58,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     CreatedById = createdById,
                     RootPath = releaseVersionId,
                     SubjectId = subjectId,
+                    DataSetFileId = type != Data
+                        ? null
+                        : replacingDataFile?.DataSetFileId ?? Guid.NewGuid(),
+                    DataSetFileVersion = type != Data
+                        ? null
+                        : replacingDataFile?.DataSetFileVersion + 1 ?? 0,
                     Filename = filename,
                     ContentLength = contentLength,
                     ContentType = "text/csv",
                     Type = type,
-                    Replacing = replacingFile,
-                    Source = source
+                    Replacing = replacingDataFile,
+                    Source = source,
                 },
             };
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
-            if (replacingFile != null)
+            if (replacingDataFile != null)
             {
-                _contentDbContext.Update(replacingFile);
-                replacingFile.ReplacedBy = releaseFile.File;
+                _contentDbContext.Update(replacingDataFile);
+                replacingDataFile.ReplacedBy = releaseFile.File;
             }
 
             await _contentDbContext.SaveChangesAsync();

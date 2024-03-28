@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             FileType type,
             Guid createdById,
             string? name = null,
-            File? replacingFile = null,
+            File? replacingDataFile = null,
             File? source = null,
             int order = 0);
 

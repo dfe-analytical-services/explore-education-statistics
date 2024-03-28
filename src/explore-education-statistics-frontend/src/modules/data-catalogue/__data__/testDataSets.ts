@@ -2,6 +2,7 @@ import { DataSet, DataSetSummary } from '@frontend/services/dataSetService';
 
 export const testDataSetSummaries: DataSetSummary[] = [
   {
+    id: 'dataset-id-1',
     fileExtension: 'csv',
     fileId: 'file-id-1',
     filename: 'file-name-1',
@@ -31,6 +32,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
     title: 'Data set 1',
   },
   {
+    id: 'dataset-id-2',
     fileExtension: 'csv',
     fileId: 'file-id-2',
     filename: 'file-name-2',
@@ -60,6 +62,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
     title: 'Data set 2',
   },
   {
+    id: 'dataset-id-3',
     fileExtension: 'csv',
     fileId: 'file-id-3',
     filename: 'file-name-3',
@@ -91,6 +94,7 @@ export const testDataSetSummaries: DataSetSummary[] = [
 ];
 
 export const testDataSet: DataSet = {
+  id: 'dataset-id',
   file: { id: 'file-id', name: 'file name', size: 'file size' },
   release: {
     id: 'release-id',

@@ -18,6 +18,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public FileType Type { get; set; }
 
+        public Guid? DataSetFileId { get; set; }
+
+        public int? DataSetFileVersion { get; set; }
+
         public Guid? ReplacedById { get; set; }
 
         public File? ReplacedBy { get; set; }

@@ -25,6 +25,5 @@ public interface IDataSetService
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseVersionId,
-        Guid fileId);
+        Guid dataSetId);
 }

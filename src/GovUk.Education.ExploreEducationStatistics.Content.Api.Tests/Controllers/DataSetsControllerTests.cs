@@ -1668,7 +1668,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/data-set/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetDetailsViewModel>();
@@ -1696,7 +1696,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
-        public async Task NoRelease_ReturnsNotFound()
+        public async Task NoDataSetFile_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
                 .WithReleases(
@@ -1716,35 +1716,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{Guid.NewGuid()}/data-sets/{releaseFile.FileId}";
-
-            var response = await client.GetAsync(uri);
-
-            response.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task NoFile_ReturnsNotFound()
-        {
-            Publication publication = _fixture.DefaultPublication()
-                .WithReleases(
-                    _fixture.DefaultRelease(publishedVersions: 1)
-                        .Generate(1))
-                .WithTopic(_fixture.DefaultTopic()
-                    .WithTheme(_fixture.DefaultTheme()));
-
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(publication.ReleaseVersions[0])
-                .WithFile(_fixture.DefaultFile());
-
-            var client = BuildApp()
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/releases/{publication.ReleaseVersions[0].Id}/data-sets/{Guid.NewGuid()}";
+            var uri = $"/api/data-set/{Guid.NewGuid()}";
 
             var response = await client.GetAsync(uri);
 
@@ -1772,7 +1744,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/data-set/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1780,7 +1752,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
-        public async Task AmendmentNotPublished_ReturnsNotFound()
+        public async Task AmendmentNotPublished_ReturnsOk()
         {
             Publication publication = _fixture.DefaultPublication()
                 .WithReleases(
@@ -1810,11 +1782,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{publication.ReleaseVersions[2].Id}/data-sets/{releaseFile2.FileId}";
+            var uri = $"/api/data-set/{releaseFile2.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
-            response.AssertNotFound();
+            var viewModel = response.AssertOk<DataSetDetailsViewModel>();
+
+            // Fetches latest published version, not amendment
+            Assert.Equal(publication.ReleaseVersions[1].Id, viewModel.Release.Id);
         }
     }
 

@@ -51,7 +51,7 @@ interface Props {
 
 export default function DataSetPage({ dataSetId, releaseId }: Props) {
   const { data: dataSet } = useQuery({
-    ...dataSetQueries.get(dataSetId, releaseId),
+    ...dataSetQueries.get(dataSetId),
     keepPreviousData: true,
     staleTime: 60000,
     retry: false,
@@ -318,7 +318,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
       context.query as Dictionary<string>;
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(dataSetQueries.get(dataSetId, releaseId));
+    await queryClient.prefetchQuery(dataSetQueries.get(dataSetId));
 
     const props: Props = {
       dataSetId,
