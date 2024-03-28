@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=                        Academic year Q1 2022/23
-${PUBLICATION_NAME}=                    UI-tests-legacy-releases %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=                    ui-tests-legacy-releases-%{RUN_IDENTIFIER}
 ${PUBLIC_PUBLICATION_URL_ENDING}=       /find-statistics/${PUBLICATION_NAME}
 ${DESCRIPTION}=                         legacy release description
 ${UPDATED_DESCRIPTION}=                 updated legacy release description
@@ -46,10 +46,26 @@ Create 2nd legacy release
     user waits until h2 is visible    Legacy releases
     user creates legacy release    ${DESCRIPTION}    http://test.com
 
-Validate that two legacy releases exist in the page
+Validate that publication and legacy releases exist in the page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
+
+    user checks table cell contains    1    1    Academic year 2020/21
+    user checks table cell contains    1    2    %{PUBLIC_URL}/find-statistics/${PUBLICATION_NAME}/2020-21
+    user checks table cell contains    1    3    Unpublished
+
+    user checks table cell contains    2    1    ${DESCRIPTION}
+    user checks table cell contains    2    2    http://test.com
+    user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
+
+    user checks table cell contains    3    1    ${DESCRIPTION}
+    user checks table cell contains    3    2    http://test.com
+    user checks table cell contains    3    3    Legacy release
+    user checks table cell contains    3    4    Edit
+    user checks table cell contains    3    4    Delete
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -101,6 +117,8 @@ Validate the updated legacy release
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
     user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
 
 Reorder the legacy releases
     user clicks button    Reorder releases
@@ -123,10 +141,14 @@ Validate reordered legacy releases
     user checks table cell contains    1    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    1    2    http://test2.com
     user checks table cell contains    1    3    Legacy release
+    user checks table cell contains    1    4    Edit
+    user checks table cell contains    1    4    Delete
 
     user checks table cell contains    2    1    ${DESCRIPTION}
     user checks table cell contains    2    2    http://test.com
     user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
 
     user checks table cell contains    3    1    Academic year 2020/21
     user checks table cell contains    3    2    ${PUBLIC_RELEASE_LINK}
@@ -205,11 +227,39 @@ Validate amended legacy releases
     user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
     user checks table cell contains    2    2    http://test2.com
     user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
 
     user checks table cell contains    3    1    ${DESCRIPTION}
     user checks table cell contains    3    2    http://test.com
     user checks table cell contains    3    3    Legacy release
+    user checks table cell contains    3    4    Edit
+    user checks table cell contains    3    4    Delete
 
     user checks table cell contains    4    1    Academic year 2020/21
     user checks table cell contains    4    2    ${PUBLIC_RELEASE_LINK}
-    user checks table cell contains    4    3
+    user checks table cell does not contain    4    3    Latest
+
+Delete legacy release
+    user clicks element    xpath://tr[3]//*[text()="Delete"]
+
+    ${modal}=    user waits until modal is visible    Delete legacy release
+    user clicks button    Confirm    ${modal}
+    user waits until page does not contain element    xpath://tr[4]
+
+Validate that deleted legacy release does not exist
+    user waits until page contains button    Reorder releases
+
+    user checks table cell contains    1    1    Academic year Q1 2024/25
+    user checks table cell contains    1    2    ${PUBLIC_AMENDED_RELEASE_LINK}
+    user checks table cell contains    1    3    Latest release
+
+    user checks table cell contains    2    1    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    2    2    http://test2.com
+    user checks table cell contains    2    3    Legacy release
+    user checks table cell contains    2    4    Edit
+    user checks table cell contains    2    4    Delete
+
+    user checks table cell contains    3    1    Academic year 2020/21
+    user checks table cell contains    3    2    ${PUBLIC_RELEASE_LINK}
+    user checks table cell does not contain    3    3    Latest
