@@ -17,8 +17,8 @@ parameters:
 stages:
 - stage: ${{parameters.stageName}}
   variables:
-    - group: EES Bicep Infrastructure public - ${{parameters.environment}}
-    - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
+    - group: Public API Infrastructure - ${{parameters.environment}}
+    - group: Public API Infrastructure secrets - ${{parameters.environment}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
   ${{ if not(eq(parameters.dependsOn, '')) }}:
@@ -57,10 +57,6 @@ stages:
                   --parameters ${{parameters.parameterFile}} \
                   --parameters \
                       subscription='$(subscription)' \
-                      vNetName='$(vNetName)' \
-                      acrName='$(acrName)' \
-                      coreStorageAccountName='$(coreStorageAccountName)' \
-                      keyVaultName='$(keyVaultName)' \
                       resourceTags='$(resourceTags)' \
                       publicUrls='$(publicUrls)' \
                       postgreSqlAdminName='$(postgreSqlAdminName)' \
