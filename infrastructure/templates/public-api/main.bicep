@@ -142,6 +142,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
+    infrastructureResourceGroupName: '${subscription}-ees-cae-rg'
     tagValues: tagValues
   }
 }
