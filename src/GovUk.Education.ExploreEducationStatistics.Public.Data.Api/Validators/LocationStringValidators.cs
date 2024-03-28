@@ -31,7 +31,10 @@ public static partial class LocationStringValidators
             {
                 context.AddFailure(
                     message: ValidationMessages.LocationAllowedLevel,
-                    detail: new AllowedLevelErrorDetail(location.String)
+                    detail: new AllowedLevelErrorDetail(
+                        Value: location,
+                        AllowedLevels: EnumUtil.GetEnumValues<GeographicLevel>().Order().ToList()
+                    )
                 );
                 return;
             }
@@ -40,21 +43,21 @@ public static partial class LocationStringValidators
             {
                 context.AddFailure(
                     message: ValidationMessages.LocationAllowedProperty,
-                    detail: new AllowedPropertyErrorDetail(location.String, GetAllowedProperties(location))
+                    detail: new AllowedPropertyErrorDetail(location, GetAllowedProperties(location))
                 );
             }
 
             if (!HasValidValueLength(location))
             {
-                var maxLength = GetMaxLength(location);
+                var maxValueLength = GetMaxValueLength(location);
 
                 context.AddFailure(
                     message: ValidationMessages.LocationMaxValueLength,
-                    detail: new MaxValueLengthErrorDetail(location.String, maxLength),
+                    detail: new MaxValueLengthErrorDetail(location, maxValueLength),
                     messagePlaceholders: new Dictionary<string, object>
                     {
                         {
-                            "MaxLength", maxLength
+                            "MaxValueLength", maxValueLength
                         }
                     }
                 );
@@ -81,7 +84,7 @@ public static partial class LocationStringValidators
 
     private static bool HasValidValueLength(ParsedLocation location)
     {
-        return location.Value.Length <= GetMaxLength(location);
+        return location.Value.Length <= GetMaxValueLength(location);
     }
 
     private static string[] GetAllowedProperties(ParsedLocation location)
@@ -116,7 +119,7 @@ public static partial class LocationStringValidators
             .ToArray();
     }
 
-    private static int GetMaxLength(ParsedLocation location)
+    private static int GetMaxValueLength(ParsedLocation location)
     {
         var geographicLevel = EnumUtil.GetFromEnumValue<GeographicLevel>(location.Level);
         var property = location.Property.ToUpperFirst();
@@ -148,20 +151,17 @@ public static partial class LocationStringValidators
         };
     }
 
-    public record AllowedLevelErrorDetail(string Value) : InvalidErrorDetail<string>(Value)
+    public record AllowedLevelErrorDetail(ParsedLocation Value, IEnumerable<string> AllowedLevels)
+        : InvalidErrorDetail<ParsedLocation>(Value);
+
+    public record AllowedPropertyErrorDetail(ParsedLocation Value, IEnumerable<string> AllowedProperties)
+        : InvalidErrorDetail<ParsedLocation>(Value);
+
+    public record MaxValueLengthErrorDetail(ParsedLocation Value, int MaxValueLength)
+        : InvalidErrorDetail<ParsedLocation>(Value);
+
+    public record ParsedLocation
     {
-        public IReadOnlyList<string> Allowed => EnumUtil.GetEnumValues<GeographicLevel>().Order().ToList();
-    }
-
-    public record AllowedPropertyErrorDetail(string Value, IEnumerable<string> Allowed)
-        : InvalidErrorDetail<string>(Value);
-
-    public record MaxValueLengthErrorDetail(string Value, int MaxLength) : InvalidErrorDetail<string>(Value);
-
-    private record ParsedLocation
-    {
-        public string String { get; init; }
-
         public string Level { get; init; }
 
         public string Property { get; init; }
@@ -169,11 +169,10 @@ public static partial class LocationStringValidators
         public string Value { get; init; }
 
 
-        public ParsedLocation(string locationString)
+        public ParsedLocation(string value)
         {
-            var parts = locationString.Split('|');
+            var parts = value.Split('|');
 
-            String = locationString;
             Level = parts[0];
             Property = parts[1];
             Value = parts[2];

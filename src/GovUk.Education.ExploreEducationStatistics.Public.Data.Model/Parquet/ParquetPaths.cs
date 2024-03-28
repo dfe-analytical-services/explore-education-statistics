@@ -28,4 +28,9 @@ public static class ParquetPaths
         DirectoryPath(dataSetVersion),
         $"{TimePeriodsTable.TableName}.parquet"
     );
+
+    public static string IndicatorsPath(DataSetVersion dataSetVersion) => Path.Combine(
+        DirectoryPath(dataSetVersion),
+        $"{IndicatorsTable.TableName}.parquet"
+    );
 }

@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using FluentValidation;
+using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -29,6 +31,7 @@ public record DataSetGetQueryRequest
     /// <summary>
     /// The IDs of indicators to return values for.
     /// </summary>
+    [FromQuery, QuerySeparator]
     public required IReadOnlyList<string> Indicators { get; init; }
 
     /// <summary>
@@ -37,6 +40,7 @@ public record DataSetGetQueryRequest
     ///
     /// By default, results are sorted by time period in descending order.
     /// </summary>
+    [FromQuery, QuerySeparator]
     public IReadOnlyList<string>? Sorts { get; init; }
 
     /// <summary>
