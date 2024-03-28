@@ -6,9 +6,9 @@ import PublicationExternalMethodologyPage from '@admin/pages/publication/Publica
 import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMethodologiesPage';
 import PublicationInviteUsersPage from '@admin/pages/publication/PublicationInviteUsersPage';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
-import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
-import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
-import PublicationLegacyReleaseEditPage from '@admin/pages/publication/PublicationLegacyReleaseEditPage';
+import PublicationReleaseSeriesPage from '@admin/pages/publication/PublicationReleaseSeriesPage';
+import PublicationCreateReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationCreateReleaseSeriesLegacyLinkPage';
+import PublicationEditReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationEditReleaseSeriesLegacyLinkPage';
 import PublicationTeamAccessPage from '@admin/pages/publication/PublicationTeamAccessPage';
 import { RouteProps } from 'react-router';
 
@@ -16,9 +16,9 @@ export type PublicationRouteParams = {
   publicationId: string;
 };
 
-export type PublicationEditLegacyReleaseRouteParams = {
+export type PublicationEditReleaseSeriesLegacyLinkRouteParams = {
   publicationId: string;
-  legacyReleaseId: string;
+  releaseSeriesItemId: string;
 };
 
 export type PublicationTeamRouteParams = {
@@ -91,20 +91,22 @@ export const publicationInviteUsersPageRoute: PublicationRouteProps = {
   component: PublicationInviteUsersPage,
 };
 
-export const publicationLegacyReleasesRoute: PublicationRouteProps = {
+export const publicationReleaseSeriesRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/legacy',
   title: 'Legacy releases',
-  component: PublicationLegacyReleasesPage,
+  component: PublicationReleaseSeriesPage,
 };
 
-export const publicationCreateLegacyReleaseRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/legacy/create',
-  title: 'Create legacy release',
-  component: PublicationLegacyReleaseCreatePage,
-};
+export const publicationCreateReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
+  {
+    path: '/publication/:publicationId/legacy/create',
+    title: 'Create legacy release',
+    component: PublicationCreateReleaseSeriesLegacyLinkPage,
+  };
 
-export const publicationEditLegacyReleaseRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/legacy/:legacyReleaseId/edit',
-  title: 'Edit legacy release',
-  component: PublicationLegacyReleaseEditPage,
-};
+export const publicationEditReleaseSeriesLegacyLinkRoute: PublicationRouteProps =
+  {
+    path: '/publication/:publicationId/legacy/:releaseSeriesItemId/edit',
+    title: 'Edit legacy release',
+    component: PublicationEditReleaseSeriesLegacyLinkPage,
+  };

@@ -187,7 +187,7 @@ describe('PublicationReleasePage', () => {
     expect(quickLinks[3]).toHaveAttribute('href', '#help-and-support');
   });
 
-  test(`renders other releases including legacy releases`, async () => {
+  test(`renders other releases including legacy links`, async () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     const usefulInfo = within(screen.getByRole('complementary'));
@@ -214,16 +214,16 @@ describe('PublicationReleasePage', () => {
       '/find-statistics/pupil-absence-in-schools-in-england/2018-19',
     );
 
-    expect(otherReleaseLinks[1]).toHaveTextContent('Academic year 2017/18');
+    expect(otherReleaseLinks[1]).toHaveTextContent('Academic year 2014/15');
     expect(otherReleaseLinks[1]).toHaveAttribute(
       'href',
-      '/find-statistics/pupil-absence-in-schools-in-england/2017-18',
+      'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     );
 
-    expect(otherReleaseLinks[2]).toHaveTextContent('Academic year 2014/15');
+    expect(otherReleaseLinks[2]).toHaveTextContent('Academic year 2017/18');
     expect(otherReleaseLinks[2]).toHaveAttribute(
       'href',
-      'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+      '/find-statistics/pupil-absence-in-schools-in-england/2017-18',
     );
 
     expect(otherReleaseLinks[3]).toHaveTextContent('Academic year 2013/14');

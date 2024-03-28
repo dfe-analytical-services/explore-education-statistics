@@ -8,6 +8,12 @@ const publicationQueries = createQueryKeys('publication', {
       queryFn: () => publicationService.getPublication(publicationId),
     };
   },
+  getReleaseSeries(publicationId: string) {
+    return {
+      queryKey: [publicationId],
+      queryFn: () => publicationService.getReleaseSeries(publicationId),
+    };
+  },
 });
 
 export default publicationQueries;

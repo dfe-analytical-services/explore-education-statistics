@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public List<PreviousReleaseViewModel> Releases { get; set; }
 
-            public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
+            public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; set; }
 
             public TopicViewModel Topic { get; set; }
 

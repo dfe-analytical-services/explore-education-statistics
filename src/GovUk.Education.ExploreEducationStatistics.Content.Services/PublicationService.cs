@@ -69,7 +69,6 @@ public class PublicationService : IPublicationService
             .CheckEntityExists<Publication>(query => query
                 .Include(p => p.ReleaseVersions)
                 .Include(p => p.Contact)
-                .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Include(p => p.SupersededBy)
@@ -81,9 +80,47 @@ public class PublicationService : IPublicationService
                     return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
                 }
 
+                var publishedReleaseVersions = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
+
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
-                var publishedReleases = await _releaseVersionRepository.ListLatestPublishedReleaseVersions(publication.Id);
-                return BuildPublicationViewModel(publication, publishedReleases, isSuperseded);
+
+                // Only show legacy links and published releases in ReleaseSeries
+                var filteredReleaseSeries = publication.ReleaseSeries
+                    .Where(rsi =>
+                        rsi.IsLegacyLink
+                        || publishedReleaseVersions
+                            .Any(rv => rsi.ReleaseId == rv.ReleaseId)
+                    ).ToList();
+
+                var releaseSeriesItemViewModels = filteredReleaseSeries
+                    .Select(rsi =>
+                    {
+                        if (rsi.IsLegacyLink)
+                        {
+                            return new ReleaseSeriesItemViewModel
+                            {
+                                Id = rsi.Id,
+                                IsLegacyLink = rsi.IsLegacyLink,
+                                Description = rsi.LegacyLinkDescription!,
+                                LegacyLinkUrl = rsi.LegacyLinkUrl,
+                            };
+                        }
+
+                        var latestReleaseVersion = publishedReleaseVersions
+                            .Single(rv => rv.ReleaseId == rsi.ReleaseId);
+
+                        return new ReleaseSeriesItemViewModel
+                        {
+                            Id = rsi.Id,
+                            IsLegacyLink = rsi.IsLegacyLink,
+                            Description = latestReleaseVersion.Title,
+
+                            ReleaseId = latestReleaseVersion.ReleaseId,
+                            ReleaseSlug = latestReleaseVersion.Slug,
+                        };
+                    }).ToList();
+
+                return BuildPublicationViewModel(publication, publishedReleaseVersions, isSuperseded, releaseSeriesItemViewModels);
             });
     }
 
@@ -187,7 +224,8 @@ public class PublicationService : IPublicationService
     private static PublicationCacheViewModel BuildPublicationViewModel(
         Publication publication,
         List<ReleaseVersion> releaseVersions,
-        bool isSuperseded)
+        bool isSuperseded,
+        List<ReleaseSeriesItemViewModel> releaseSeries)
     {
         var topic = new TopicViewModel(new ThemeViewModel(
             publication.Topic.Theme.Id,
@@ -201,10 +239,6 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            LegacyReleases = publication.LegacyReleases
-                .OrderByDescending(legacyRelease => legacyRelease.Order)
-                .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
-                .ToList(),
             Topic = topic,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
@@ -221,13 +255,14 @@ public class PublicationService : IPublicationService
                 }
                 : null,
             Releases = releaseVersions
-                .Select(releaseVersion => new ReleaseTitleViewModel
+                .Select(releaseVersion => new ReleaseVersionTitleViewModel
                 {
                     Id = releaseVersion.Id,
                     Slug = releaseVersion.Slug,
-                    Title = releaseVersion.Title
+                    Title = releaseVersion.Title,
                 })
-                .ToList()
+                .ToList(),
+            ReleaseSeries = releaseSeries,
         };
     }
 

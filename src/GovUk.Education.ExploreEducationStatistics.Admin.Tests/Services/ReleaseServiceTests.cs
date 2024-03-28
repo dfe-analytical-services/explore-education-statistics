@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
+        public async Task UpdateReleaseVersion_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
         {
             var releaseUpdateRequest = new ReleaseUpdateRequest
             {
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
 
-            var result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
+            var result = await releaseService.UpdateReleaseVersion(It.IsAny<Guid>(), releaseUpdateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
@@ -251,8 +251,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var newRelease = result.AssertRight();
-                newReleaseVersionId = newRelease.Id;
+                var newReleaseVersion = result.AssertRight();
+                newReleaseVersionId = newReleaseVersion.Id;
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReleaseVersions
                     .Include(releaseVersion => releaseVersion.Content)
                     .ThenInclude(section => section.Content)
-                    .Single(releaseVersion => releaseVersion.Id == newReleaseVersionId);
+                    .Single(rv => rv.Id == newReleaseVersionId);
 
                 var contentSections = newReleaseVersion.GenericContent.ToList();
                 Assert.Single(contentSections);
@@ -632,7 +632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease()
+        public async Task UpdateReleaseVersion()
         {
             var releaseVersion = new ReleaseVersion
             {
@@ -658,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = await releaseService
-                    .UpdateRelease(
+                    .UpdateReleaseVersion(
                         releaseVersion.Id,
                         new ReleaseUpdateRequest
                         {
@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateRelease_FailsNonUniqueSlug()
+        public async Task UpdateReleaseVersion_FailsNonUniqueSlug()
         {
             var publication = new Publication();
 
@@ -735,7 +735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = await releaseService
-                    .UpdateRelease(
+                    .UpdateReleaseVersion(
                         releaseVersion.Id,
                         new ReleaseUpdateRequest
                         {

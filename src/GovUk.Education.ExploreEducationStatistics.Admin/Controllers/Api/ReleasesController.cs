@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseVersionId)
         {
             return await _releaseService
-                .UpdateRelease(releaseVersionId, request)
+                .UpdateReleaseVersion(releaseVersionId, request)
                 .HandleFailuresOrOk();
         }
 

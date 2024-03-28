@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var releaseService = new Mock<IReleaseService>(Strict);
 
             releaseService
-                .Setup(s => s.UpdateRelease(
+                .Setup(s => s.UpdateReleaseVersion(
                     It.Is<Guid>(id => id.Equals(_releaseVersionId)),
                     It.IsAny<ReleaseUpdateRequest>())
                 )

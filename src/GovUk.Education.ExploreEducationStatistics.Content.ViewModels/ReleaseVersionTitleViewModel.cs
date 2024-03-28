@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record ReleaseTitleViewModel
+public record ReleaseVersionTitleViewModel
 {
     public Guid Id { get; set; }
 

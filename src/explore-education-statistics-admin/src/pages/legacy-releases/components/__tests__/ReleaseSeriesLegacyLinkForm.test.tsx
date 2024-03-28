@@ -1,12 +1,12 @@
-import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
+import ReleaseSeriesLegacyLinkForm from '@admin/pages/legacy-releases/components/ReleaseSeriesLegacyLinkForm';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
-describe('LegacyReleaseForm', () => {
+describe('ReleaseSeriesLegacyLinkForm', () => {
   test('shows validation error for empty `description`', async () => {
-    render(<LegacyReleaseForm onSubmit={noop} />);
+    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a description')).not.toBeInTheDocument();
 
@@ -18,14 +18,14 @@ describe('LegacyReleaseForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a description', {
-          selector: '#legacyReleaseForm-description-error',
+          selector: '#releaseSeriesLegacyLinkForm-description-error',
         }),
       ).toBeInTheDocument();
     });
   });
 
   test('shows validation error for empty `url`', async () => {
-    render(<LegacyReleaseForm onSubmit={noop} />);
+    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a URL')).not.toBeInTheDocument();
 
@@ -35,14 +35,14 @@ describe('LegacyReleaseForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a URL', {
-          selector: '#legacyReleaseForm-url-error',
+          selector: '#releaseSeriesLegacyLinkForm-url-error',
         }),
       ).toBeInTheDocument();
     });
   });
 
   test('shows validation error for invalid `url`', async () => {
-    render(<LegacyReleaseForm onSubmit={noop} />);
+    render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
     expect(screen.queryByText('Enter a valid URL')).not.toBeInTheDocument();
 
@@ -52,7 +52,7 @@ describe('LegacyReleaseForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a valid URL', {
-          selector: '#legacyReleaseForm-url-error',
+          selector: '#releaseSeriesLegacyLinkForm-url-error',
         }),
       ).toBeInTheDocument();
     });
@@ -60,17 +60,16 @@ describe('LegacyReleaseForm', () => {
 
   describe('with no `initialValues`', () => {
     test('renders correctly`', () => {
-      render(<LegacyReleaseForm onSubmit={noop} />);
+      render(<ReleaseSeriesLegacyLinkForm onSubmit={noop} />);
 
       expect(screen.getByLabelText('Description')).toHaveAttribute('value', '');
       expect(screen.getByLabelText('URL')).toHaveAttribute('value', '');
-      expect(screen.queryByLabelText('Order')).not.toBeInTheDocument();
     });
 
     test('cannot submit with only invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<LegacyReleaseForm onSubmit={handleSubmit} />);
+      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
 
       await userEvent.click(
         screen.getByRole('button', {
@@ -86,7 +85,7 @@ describe('LegacyReleaseForm', () => {
     test('cannot submit with some invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<LegacyReleaseForm onSubmit={handleSubmit} />);
+      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
 
       await userEvent.type(
         screen.getByLabelText('Description'),
@@ -107,7 +106,7 @@ describe('LegacyReleaseForm', () => {
     test('can submit with valid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<LegacyReleaseForm onSubmit={handleSubmit} />);
+      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
 
       await userEvent.type(
         screen.getByLabelText('Description'),
@@ -133,11 +132,10 @@ describe('LegacyReleaseForm', () => {
   describe('with `initialValues`', () => {
     test('renders correctly', () => {
       render(
-        <LegacyReleaseForm
+        <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: 'Test',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={noop}
         />,
@@ -145,13 +143,12 @@ describe('LegacyReleaseForm', () => {
 
       expect(screen.getByLabelText('Description')).toHaveValue('Test');
       expect(screen.getByLabelText('URL')).toHaveValue('http://test.com');
-      expect(screen.getByLabelText('Order')).toHaveValue(1);
     });
 
     test('cannot submit with invalid values', async () => {
       const handleSubmit = jest.fn();
 
-      render(<LegacyReleaseForm onSubmit={handleSubmit} />);
+      render(<ReleaseSeriesLegacyLinkForm onSubmit={handleSubmit} />);
 
       await userEvent.clear(screen.getByLabelText('Description'));
 
@@ -170,11 +167,10 @@ describe('LegacyReleaseForm', () => {
       const handleSubmit = jest.fn();
 
       render(
-        <LegacyReleaseForm
+        <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: 'Test description',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={handleSubmit}
         />,
@@ -190,7 +186,6 @@ describe('LegacyReleaseForm', () => {
         expect(handleSubmit.mock.calls[0][0]).toEqual({
           description: 'Test description',
           url: 'http://test.com',
-          order: 1,
         });
       });
     });
@@ -199,11 +194,10 @@ describe('LegacyReleaseForm', () => {
       const handleSubmit = jest.fn();
 
       render(
-        <LegacyReleaseForm
+        <ReleaseSeriesLegacyLinkForm
           initialValues={{
             description: 'Test description',
             url: 'http://test.com',
-            order: 1,
           }}
           onSubmit={handleSubmit}
         />,
@@ -211,7 +205,6 @@ describe('LegacyReleaseForm', () => {
 
       await userEvent.type(screen.getByLabelText('Description'), ' 2');
       await userEvent.type(screen.getByLabelText('URL'), '/updated');
-      await userEvent.type(screen.getByLabelText('Order'), '0');
 
       await userEvent.click(
         screen.getByRole('button', {
@@ -223,7 +216,6 @@ describe('LegacyReleaseForm', () => {
         expect(handleSubmit.mock.calls[0][0]).toEqual({
           description: 'Test description 2',
           url: 'http://test.com/updated',
-          order: 10,
         });
       });
     });

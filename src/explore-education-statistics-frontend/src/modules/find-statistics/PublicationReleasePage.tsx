@@ -36,11 +36,9 @@ interface Props {
 }
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
-  const otherPublicationReleases = release.publication.releases.filter(
-    r => r.id !== release.id,
+  const releaseSeries = release.publication.releaseSeries.filter(
+    rsi => rsi.isLegacyLink || rsi.description !== release.title,
   );
-  const otherReleasesCount =
-    otherPublicationReleases.length + release.publication.legacyReleases.length;
 
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
@@ -312,7 +310,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <a href="#contact-us">Contact us</a>
               </li>
             </ul>
-            {!!otherReleasesCount && (
+            {!!releaseSeries.length && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
@@ -320,7 +318,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View releases (${otherReleasesCount})`}
+                  summary={`View releases (${releaseSeries.length})`}
                   hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
@@ -334,21 +332,24 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...otherPublicationReleases.map(
-                          ({ id, slug, title }) => (
+                        ...releaseSeries.map(
+                          ({
+                            id,
+                            isLegacyLink,
+                            description,
+                            legacyLinkUrl,
+                            releaseSlug,
+                          }) => (
                             <li key={id} data-testid="other-release-item">
-                              <Link
-                                to={`/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <a href={url}>{description}</a>
+                              {isLegacyLink ? (
+                                <a href={legacyLinkUrl}>{description}</a>
+                              ) : (
+                                <Link
+                                  to={`/find-statistics/${release.publication.slug}/${releaseSlug}`}
+                                >
+                                  {description}
+                                </Link>
+                              )}
                             </li>
                           ),
                         ),

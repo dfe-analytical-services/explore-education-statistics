@@ -85,7 +85,6 @@ const defaultPublication: Publication = {
     teamName: 'Team name',
   },
   id: 'publication-id',
-  legacyReleases: [],
   methodologies: [
     {
       id: 'methodology-id',
@@ -93,11 +92,13 @@ const defaultPublication: Publication = {
       slug: 'methodology-slug',
     },
   ],
-  releases: [
+  releases: [],
+  releaseSeries: [
     {
-      id: 'previous-release-id',
-      slug: 'previous-release-slug',
-      title: 'Previous release title',
+      id: 'legacylink-id',
+      isLegacyLink: true,
+      description: 'legacy link 1',
+      legacyLinkUrl: 'https://test.com/1',
     },
   ],
   slug: 'publication-slug',

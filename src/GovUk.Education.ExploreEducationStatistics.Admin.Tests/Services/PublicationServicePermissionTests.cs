@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -22,8 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using IPublicationRepository =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -552,20 +550,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void PartialUpdateLegacyReleases()
+        public async Task GetReleaseSeries()
         {
-            var userService = AlwaysTrueUserService();
-            var publicationService = BuildPublicationService(
-                userService: userService.Object);
+            var publication = new Publication();
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(
-                async service =>
-                    await service.PartialUpdateLegacyReleases(_publication.Id,
-                        new List<LegacyReleasePartialUpdateViewModel>()),
-                _publication,
-                userService,
-                publicationService,
-                SecurityPolicies.CanManageLegacyReleases);
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.GetReleaseSeries(publication.Id);
+                });
+        }
+
+        [Fact]
+        public async Task AddReleaseSeriesLegacyLinks()
+        {
+            var publication = new Publication();
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.AddReleaseSeriesLegacyLink(publication.Id, new ReleaseSeriesLegacyLinkAddRequest());
+                });
+        }
+
+        [Fact]
+        public async Task UpdateReleaseSeries()
+        {
+            var publication = new Publication();
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManagePublicationReleaseSeries)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.UpdateReleaseSeries(publication.Id, new List<ReleaseSeriesItemUpdateRequest>());
+                });
         }
 
         private static PublicationService BuildPublicationService(

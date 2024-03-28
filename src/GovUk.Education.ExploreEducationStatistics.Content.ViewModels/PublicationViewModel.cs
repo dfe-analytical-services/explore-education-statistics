@@ -16,9 +16,9 @@ public record PublicationViewModel
 
     public PublicationSupersededByViewModel? SupersededBy { get; init; } = new();
 
-    public List<ReleaseTitleViewModel> Releases { get; init; } = new();
+    public List<ReleaseVersionTitleViewModel> Releases { get; init; } = new();
 
-    public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
+    public List<ReleaseSeriesItemViewModel> ReleaseSeries { get; init; } = new();
 
     public TopicViewModel Topic { get; init; } = null!;
 
@@ -42,7 +42,7 @@ public record PublicationViewModel
         IsSuperseded = publication.IsSuperseded;
         SupersededBy = publication.SupersededBy;
         Releases = publication.Releases;
-        LegacyReleases = publication.LegacyReleases;
+        ReleaseSeries = publication.ReleaseSeries;
         Topic = publication.Topic;
         Contact = publication.Contact;
         ExternalMethodology = publication.ExternalMethodology;

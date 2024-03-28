@@ -130,7 +130,7 @@ describe('ReleaseContentPage', () => {
       title: 'Publication 1',
       slug: 'publication-1',
       releases: [],
-      legacyReleases: [],
+      releaseSeries: [],
       topic: { theme: { title: 'Theme 1' } },
       contact: {
         contactName: 'John Smith',

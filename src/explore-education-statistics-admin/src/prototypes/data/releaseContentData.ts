@@ -121,7 +121,6 @@ const prototypeReleaseContent: ReleaseContent = {
         teamName: 'Team name',
       },
       id: 'publication-id',
-      legacyReleases: [],
       methodologies: [
         {
           id: 'methodology-id',
@@ -136,6 +135,7 @@ const prototypeReleaseContent: ReleaseContent = {
           title: 'Previous release title',
         },
       ],
+      releaseSeries: [],
       slug: 'publication-slug',
       title: 'Initial Teacher Training Census',
       topic: {

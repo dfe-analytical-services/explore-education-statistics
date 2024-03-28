@@ -275,7 +275,7 @@ export const testPublicationRelease: Release = {
     slug: '',
     title: '',
     releases: [],
-    legacyReleases: [],
+    releaseSeries: [],
     topic: {
       theme: {
         title: '',

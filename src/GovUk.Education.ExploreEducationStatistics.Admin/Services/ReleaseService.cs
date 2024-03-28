@@ -29,10 +29,9 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseVersionRepository;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -117,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await ReleaseCreateRequestValidator.Validate(releaseCreate)
                 .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
-                .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
-                .OnSuccess(async () =>
+                .OnSuccessDo(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
+                .OnSuccess(async publication =>
                 {
                     var newReleaseVersion = new ReleaseVersion
                     {
@@ -161,7 +160,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     newReleaseVersion.Created = DateTime.UtcNow;
                     newReleaseVersion.CreatedById = _userService.GetUserId();
 
-                    _context.ReleaseVersions.Add(newReleaseVersion);
+                    await _context.ReleaseVersions.AddAsync(newReleaseVersion);
+
+                    publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseId = newReleaseVersion.ReleaseId,
+                    });
+                    _context.Publications.Update(publication);
+
                     await _context.SaveChangesAsync();
                     return await GetRelease(newReleaseVersion.Id);
                 });
@@ -190,15 +197,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<ReleaseVersion>(releaseVersionId)
-                .OnSuccess(_userService.CheckCanDeleteReleaseVersion)
+                .OnSuccess(_userService.CheckCanDeleteReleaseVersion) // only allows unapproved amendments to be removed
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseVersionId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseVersionId))
-                .OnSuccessVoid(async release =>
+                .OnSuccessVoid(async releaseVersion =>
                 {
-                    release.SoftDeleted = true;
-                    _context.Update(release);
+                    // NOTE: As only removing unapproved amendments, releaseVersion.Release will not be orphaned
+                    // and associated item in releaseVersion.Publication.ReleaseSeries will also not be orphaned
+                    // so no need to remove them.
+
+                    releaseVersion.SoftDeleted = true;
+                    _context.ReleaseVersions.Update(releaseVersion);
 
                     var roles = await _context
                         .UserReleaseRoles
@@ -247,11 +258,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_mapper.Map<ReleasePublicationStatusViewModel>);
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
+        public async Task<Either<ActionResult, ReleaseViewModel>> UpdateReleaseVersion(
             Guid releaseVersionId, ReleaseUpdateRequest request)
         {
             return await ReleaseUpdateRequestValidator.Validate(request)
-                .OnSuccess(async () => await CheckReleaseExists(releaseVersionId))
+                .OnSuccess(async () => await CheckReleaseVersionExists(releaseVersionId))
                 .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
                 .OnSuccessDo(async releaseVersion =>
                     await ValidateReleaseSlugUniqueToPublication(request.Slug,
@@ -503,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseExists(Guid releaseVersionId)
+        private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(Guid releaseVersionId)
         {
             return await _context
                 .ReleaseVersions

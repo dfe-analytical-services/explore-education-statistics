@@ -337,6 +337,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithOne()
                 .HasForeignKey<Publication>(p => p.LatestPublishedReleaseVersionId)
                 .IsRequired(false);
+
+            modelBuilder.Entity<Publication>()
+                .Property(p => p.ReleaseSeries)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<ReleaseSeriesItem>>(v));
         }
 
         private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)

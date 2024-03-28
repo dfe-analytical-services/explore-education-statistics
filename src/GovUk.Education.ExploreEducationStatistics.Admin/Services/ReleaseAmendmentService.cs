@@ -115,8 +115,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             Updates = CopyUpdates(originalReleaseVersion, amendmentReleaseVersionId, createdDate, createdByUserId)
         };
 
-        // What to do about ReleaseStatuses?
-
         _context.ReleaseVersions.Add(amendmentReleaseVersion);
         await _context.SaveChangesAsync();
         return amendmentReleaseVersion;

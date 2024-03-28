@@ -24,6 +24,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
+using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
+using ReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.ReleaseVersionRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -32,8 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         [Fact]
         public async Task GetManageContentPageViewModel()
         {
+            var releaseId = Guid.NewGuid();
+            var releaseVersionId = Guid.NewGuid();
+
             var publication = new Publication
             {
+                LatestPublishedReleaseVersionId = releaseVersionId,
                 Contact = new Contact
                 {
                     ContactName = "Name",
@@ -41,20 +47,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     TeamEmail = "test@test.com",
                     TeamName = "Team Name"
                 },
-                LegacyReleases = new List<LegacyRelease>
+                ReleaseSeries = new List<ReleaseSeriesItem>
                 {
                     new()
                     {
-                        Description = "Legacy 2017/18",
-                        Order = 0,
-                        Url = "https://legacy-2017-18"
+                        Id = Guid.NewGuid(),
+                        ReleaseId = releaseId,
                     },
                     new()
                     {
-                        Description = "Legacy 2018/19",
-                        Order = 1,
-                        Url = "https://legacy-2018-19"
-                    }
+                        Id = Guid.NewGuid(),
+                        LegacyLinkDescription = "Legacy 2018/19",
+                        LegacyLinkUrl = "https://legacy-2018-19"
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        LegacyLinkDescription = "Legacy 2017/18",
+                        LegacyLinkUrl = "https://legacy-2017-18"
+                    },
                 },
                 Slug = "test-publication",
                 Title = "Publication",
@@ -69,12 +80,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var releaseVersion = new ReleaseVersion
             {
-                Id = Guid.NewGuid(),
+                Id = releaseVersionId,
                 NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
                 PreReleaseAccessList = "Test access list",
                 Publication = publication,
+                Release = new Release { Id = releaseId },
                 PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
-                Published = null,
+                Published = DateTime.UtcNow,
                 ReleaseName = "2020",
                 RelatedInformation = new List<Link>
                 {
@@ -302,12 +314,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(releaseVersion.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
                 Assert.Equal(releaseVersion.RelatedDashboardsSection.Id,
                     contentRelease.RelatedDashboardsSection.Id);
-                Assert.False(contentRelease.LatestRelease);
+                Assert.True(contentRelease.LatestRelease);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Day);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Month);
                 Assert.Equal("2040", contentRelease.NextReleaseDate.Year);
                 Assert.Equal("2020", contentRelease.ReleaseName);
-                Assert.Null(contentRelease.Published);
+                Assert.NotNull(contentRelease.Published);
+                Assert.InRange(DateTime.UtcNow.Subtract(contentRelease.Published!.Value).Milliseconds,
+                    0, 1500);
                 Assert.Equal(publication.Id, contentRelease.PublicationId);
                 Assert.Equal(DateTime.Parse("2020-09-09T00:00:00.00"), contentRelease.PublishScheduled);
                 Assert.Equal("2020-21", contentRelease.Slug);
@@ -368,12 +382,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentPublication.Topic);
                 Assert.NotNull(contentPublication.Topic.Theme);
 
-                var contentPublicationLegacyReleases = contentPublication.LegacyReleases;
-                Assert.Equal(2, contentPublicationLegacyReleases.Count);
-                Assert.Equal("Legacy 2018/19", contentPublicationLegacyReleases[0].Description);
-                Assert.Equal("https://legacy-2018-19", contentPublicationLegacyReleases[0].Url);
-                Assert.Equal("Legacy 2017/18", contentPublicationLegacyReleases[1].Description);
-                Assert.Equal("https://legacy-2017-18", contentPublicationLegacyReleases[1].Url);
+                var contentPublicationReleaseSeries = contentPublication.ReleaseSeries;
+                Assert.Equal(3, contentPublicationReleaseSeries.Count);
+
+                Assert.False(contentPublicationReleaseSeries[0].IsLegacyLink);
+                Assert.Equal(releaseId, contentPublicationReleaseSeries[0].ReleaseId);
+                Assert.Equal(releaseVersion.Slug, contentPublicationReleaseSeries[0].ReleaseSlug);
+                Assert.Equal(releaseVersion.Title, contentPublicationReleaseSeries[0].Description);
+                Assert.Null(contentPublicationReleaseSeries[0].LegacyLinkUrl);
+
+                Assert.True(contentPublicationReleaseSeries[1].IsLegacyLink);
+                Assert.Null(contentPublicationReleaseSeries[1].ReleaseId);
+                Assert.Null(contentPublicationReleaseSeries[1].ReleaseSlug);
+                Assert.Equal("Legacy 2018/19", contentPublicationReleaseSeries[1].Description);
+                Assert.Equal("https://legacy-2018-19", contentPublicationReleaseSeries[1].LegacyLinkUrl);
+
+                Assert.True(contentPublicationReleaseSeries[2].IsLegacyLink);
+                Assert.Null(contentPublicationReleaseSeries[2].ReleaseId);
+                Assert.Null(contentPublicationReleaseSeries[2].ReleaseSlug);
+                Assert.Equal("Legacy 2017/18", contentPublicationReleaseSeries[2].Description);
+                Assert.Equal("https://legacy-2017-18", contentPublicationReleaseSeries[2].LegacyLinkUrl);
 
                 var contentPublicationReleases = contentPublication.Releases;
                 Assert.Single(contentPublicationReleases);
@@ -734,6 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IDataBlockService? dataBlockService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IReleaseFileService? releaseFileService = null,
+            IReleaseVersionRepository? releaseVersionRepository = null,
             IUserService? userService = null)
         {
             return new(
@@ -743,6 +772,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
+                releaseVersionRepository ?? new ReleaseVersionRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );
         }
