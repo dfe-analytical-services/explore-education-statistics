@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -41,6 +43,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -63,6 +66,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Npgsql;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
@@ -188,6 +192,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     )
                     .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
+
+            // Only set up the `PublicDataDbContext` in non-integration test
+            // environments. Otherwise, the connection string will be null and
+            // cause the data source builder to throw a host exception.
+            if (!hostEnvironment.IsIntegrationTest())
+            {
+                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
+
+                if (hostEnvironment.IsDevelopment())
+                {
+                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
+
+                    // Set up the data source outside the `AddDbContext` action as this
+                    // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                    // creating over 20 `IServiceProvider` instances.
+                    var dbDataSource = dataSourceBuilder.Build();
+
+                    services.AddDbContext<PublicDataDbContext>(options =>
+                    {
+                        options
+                            .UseNpgsql(dbDataSource)
+                            .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
+                    });
+                }
+                else
+                {
+                    // TODO EES-5049 Admin needs user managed identity to access the public data database
+                    // services.AddDbContext<PublicDataDbContext>(options =>
+                    // {
+                    //     var sqlServerTokenProvider = new DefaultAzureCredential();
+                    //     var accessToken = sqlServerTokenProvider.GetToken(
+                    //             new TokenRequestContext(scopes:
+                    //                 ["https://ossrdbms-aad.database.windows.net/.default"]))
+                    //         .Token;
+                    //     var connectionStringWithAccessToken =
+                    //         publicDataDbConnectionString.Replace("[access_token]", accessToken);
+                    //     var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+                    //     options.UseNpgsql(dbDataSource);
+                    // });
+                }
+            }
 
             /*
              * Authentication and Authorization
