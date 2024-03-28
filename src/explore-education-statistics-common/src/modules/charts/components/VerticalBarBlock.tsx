@@ -59,7 +59,7 @@ const VerticalBarBlock = ({
   stacked,
   width,
 }: VerticalBarProps) => {
-  const [legendProps, renderLegend] = useLegend();
+  const [legendProps, renderLegend] = useLegend({ reverseOrder: stacked });
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -164,6 +164,7 @@ const VerticalBarBlock = ({
               <CustomTooltip
                 dataSetCategories={dataSetCategories}
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
+                order={stacked ? 'reverse' : 'default'}
               />
             }
             wrapperStyle={{ zIndex: 1000 }}
