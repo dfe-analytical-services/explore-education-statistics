@@ -48,13 +48,12 @@ public class DataSetsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("releases/{releaseVersionId:guid}/data-sets/{fileId:guid}")]
+    [HttpGet("data-set/{dataSetId:guid}")]
     public async Task<ActionResult<DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseVersionId,
-        Guid fileId)
+        Guid dataSetId)
     {
         return await _dataSetService
-            .GetDataSet(releaseVersionId: releaseVersionId, fileId: fileId)
+            .GetDataSet(dataSetId)
             .HandleFailuresOrOk();
     }
 }

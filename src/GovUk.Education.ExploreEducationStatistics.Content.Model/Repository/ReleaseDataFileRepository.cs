@@ -58,12 +58,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     CreatedById = createdById,
                     RootPath = releaseVersionId,
                     SubjectId = subjectId,
+                    DataSetId = replacingFile?.DataSetId ?? Guid.NewGuid(),
                     Filename = filename,
                     ContentLength = contentLength,
                     ContentType = "text/csv",
                     Type = type,
                     Replacing = replacingFile,
-                    Source = source
+                    Source = source,
                 },
             };
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;

@@ -8,10 +8,10 @@ import { ParsedUrlQuery } from 'querystring';
 import { UseQueryOptions } from '@tanstack/react-query';
 
 const dataSetQueries = {
-  get(dataSetId: string, releaseId: string): UseQueryOptions<DataSet> {
+  get(dataSetId: string): UseQueryOptions<DataSet> {
     return {
       queryKey: [dataSetId],
-      queryFn: () => dataSetService.getDataSet(dataSetId, releaseId),
+      queryFn: () => dataSetService.getDataSet(dataSetId),
     };
   },
   list(query: ParsedUrlQuery): UseQueryOptions<PaginatedList<DataSetSummary>> {

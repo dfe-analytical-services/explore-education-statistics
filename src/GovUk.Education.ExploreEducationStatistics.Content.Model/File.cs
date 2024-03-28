@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? SubjectId { get; set; }
 
+        public Guid DataSetId { get; set; }
+
         public string Filename { get; set; } = string.Empty;
 
         public FileType Type { get; set; }

@@ -4,6 +4,7 @@ import { contentApi } from '@common/services/api';
 import { SortDirection } from '@common/services/types/sort';
 
 export interface DataSet {
+  id: string;
   file: { id: string; name: string; size: string };
   release: {
     id: string;
@@ -32,6 +33,7 @@ export interface DataSet {
 }
 
 export interface DataSetSummary {
+  id: string;
   content: string;
   fileId: string;
   filename: string;
@@ -96,8 +98,8 @@ export interface DataSetListRequest {
 }
 
 const dataSetService = {
-  getDataSet(dataSetId: string, releaseId: string): Promise<DataSet> {
-    return contentApi.get(`/releases/${releaseId}/data-sets/${dataSetId}`);
+  getDataSet(dataSetId: string): Promise<DataSet> {
+    return contentApi.get(`/data-set/${dataSetId}`);
   },
   listDataSets(
     params: DataSetListRequest,
