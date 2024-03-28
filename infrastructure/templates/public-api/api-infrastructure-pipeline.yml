@@ -7,6 +7,9 @@ resources:
       trigger: none
 
 parameters:
+  - name: apiContainerAppUserCreatedWithAcrPull
+    displayName: Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?
+    default: true
   - name: psqlDbUsersAdded
     displayName: Have database users been added to PSQL yet for Container App and Function App?
     default: true
@@ -14,7 +17,7 @@ parameters:
 variables:
   - group: Public API Infrastructure - common
   - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4807-small-tweaks-after-merge')]
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster

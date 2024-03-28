@@ -53,4 +53,5 @@ stages:
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     psqlDbUsersAdded=true \
+                    apiContainerAppUserCreatedWithAcrPull=true \
                     dataProcessorFunctionAppExists=true
