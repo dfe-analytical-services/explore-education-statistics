@@ -1,30 +1,25 @@
 import Page from '@admin/components/Page';
-import userService, {
-  ResourceRoles,
-  Role,
-  UserInvite,
-} from '@admin/services/userService';
+import userService, { UserInvite } from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import Form from '@common/components/form/Form';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import { ErrorControlState } from '@common/contexts/ErrorControlContext';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import orderBy from 'lodash/orderBy';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import publicationQueries from '@admin/queries/publicationQueries';
+import userQueries from '@admin/queries/userQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { IdTitlePair } from '@admin/services/types/common';
 import ButtonGroup from '@common/components/ButtonGroup';
 import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserReleaseRoleForm';
-import publicationService from '@admin/services/publicationService';
-import { PublicationSummary } from '@common/services/publicationService';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import { ObjectSchema } from 'yup';
+import { useQuery } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
+import { RouteComponentProps } from 'react-router';
+import orderBy from 'lodash/orderBy';
 
 export interface InviteUserReleaseRole {
   releaseId: string;
@@ -38,15 +33,19 @@ export interface InviteUserPublicationRole {
   publicationRole: string;
 }
 
-interface FormValues {
+export interface UserInviteFormValues {
   userEmail: string;
   roleId: string;
-  userReleaseRoles: InviteUserReleaseRole[];
-  userPublicationRoles: InviteUserPublicationRole[];
+  userReleaseRoles?: InviteUserReleaseRole[];
+  userPublicationRoles?: InviteUserPublicationRole[];
+  publicationId?: string;
+  publicationRole?: string;
+  releaseId?: string;
+  releaseRole?: string;
 }
 
 const errorMappings = [
-  mapFieldErrors<FormValues>({
+  mapFieldErrors<UserInviteFormValues>({
     target: 'userEmail',
     messages: {
       UserAlreadyExists: 'User already exists',
@@ -54,46 +53,47 @@ const errorMappings = [
   }),
 ];
 
-interface InviteUserModel {
-  roles: Role[];
-  resourceRoles: ResourceRoles;
-  releases: IdTitlePair[];
-  publications: PublicationSummary[];
-}
-
-const UserInvitePage = ({
+export default function UserInvitePage({
   history,
-}: RouteComponentProps & ErrorControlState) => {
+}: RouteComponentProps & ErrorControlState) {
   const formId = 'inviteUserForm';
 
-  const { value: model, isLoading } =
-    useAsyncHandledRetry<InviteUserModel>(async () => {
-      const [roles, resourceRoles, releases, publications] = await Promise.all([
-        userService.getRoles(),
-        userService.getResourceRoles(),
-        userService.getReleases(),
-        publicationService.getPublicationSummaries(),
-      ]);
-      return { roles, resourceRoles, releases, publications };
-    }, []);
+  const { data: roles, isLoading: isLoadingRoles } = useQuery(
+    userQueries.getRoles,
+  );
+  const { data: resourceRoles, isLoading: isLoadingResourceRoles } = useQuery(
+    userQueries.getResourceRoles,
+  );
+  const { data: releases, isLoading: isLoadingReleases } = useQuery(
+    userQueries.getReleases,
+  );
+  const { data: publications, isLoading: isLoadingPublications } = useQuery(
+    publicationQueries.getPublicationSummaries,
+  );
+
+  const isLoading =
+    isLoadingRoles ||
+    isLoadingResourceRoles ||
+    isLoadingReleases ||
+    isLoadingPublications;
 
   const cancelHandler = () => history.push('/administration/users/invites');
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
-    const userReleaseRoles = values.userReleaseRoles.map(userReleaseRole => {
-      return {
-        releaseId: userReleaseRole.releaseId,
-        releaseRole: userReleaseRole.releaseRole,
-      };
-    });
-    const userPublicationRoles = values.userPublicationRoles.map(
-      userPublicationRole => {
+  const handleSubmit = async (values: UserInviteFormValues) => {
+    const userReleaseRoles =
+      values.userReleaseRoles?.map(userReleaseRole => {
+        return {
+          releaseId: userReleaseRole.releaseId,
+          releaseRole: userReleaseRole.releaseRole,
+        };
+      }) ?? [];
+    const userPublicationRoles =
+      values.userPublicationRoles?.map(userPublicationRole => {
         return {
           publicationId: userPublicationRole.publicationId,
           publicationRole: userPublicationRole.publicationRole,
         };
-      },
-    );
+      }) ?? [];
     const submission: UserInvite = {
       email: values.userEmail,
       roleId: values.roleId,
@@ -104,10 +104,41 @@ const UserInvitePage = ({
     await userService.inviteUser(submission);
 
     history.push(`/administration/users/invites`);
-  }, errorMappings);
+  };
+
+  const validationSchema = useMemo<ObjectSchema<UserInviteFormValues>>(() => {
+    return Yup.object({
+      userEmail: Yup.string()
+        .required('Provide the users email')
+        .email('Provide a valid email address'),
+      roleId: Yup.string().required('Choose role for the user'),
+      userReleaseRoles: Yup.array().of(
+        Yup.object({
+          releaseId: Yup.string().required(
+            'Choose release to give the user access to',
+          ),
+          releaseTitle: Yup.string(),
+          releaseRole: Yup.string().required(
+            'Choose release role for the user',
+          ),
+        }),
+      ),
+      userPublicationRoles: Yup.array(
+        Yup.object({
+          publicationId: Yup.string().required(),
+          publicationTitle: Yup.string(),
+          publicationRole: Yup.string().required(),
+        }),
+      ),
+      publicationId: Yup.string(),
+      publicationRole: Yup.string(),
+      releaseId: Yup.string(),
+      releaseRole: Yup.string(),
+    });
+  }, []);
 
   return (
-    <LoadingSpinner loading={!model || isLoading}>
+    <LoadingSpinner loading={isLoading}>
       <Page
         title="Invite user"
         caption="Manage access to this service"
@@ -118,98 +149,52 @@ const UserInvitePage = ({
           { name: 'Invite user' },
         ]}
       >
-        <Formik<FormValues>
-          enableReinitialize
+        <FormProvider
+          errorMappings={errorMappings}
           initialValues={{
             userEmail: '',
-            roleId: orderBy(model?.roles, role => role.name)?.[0]?.id ?? '',
+            roleId: orderBy(roles, role => role.name)?.[0]?.id ?? '',
             userReleaseRoles: [],
             userPublicationRoles: [],
           }}
-          validationSchema={Yup.object<FormValues>({
-            userEmail: Yup.string()
-              .required('Provide the users email')
-              .email('Provide a valid email address'),
-            roleId: Yup.string().required('Choose role for the user'),
-            userReleaseRoles: Yup.array(),
-            userPublicationRoles: Yup.array(),
-          })}
-          onSubmit={handleSubmit}
+          validationSchema={validationSchema}
         >
-          {form => {
-            return (
-              <Form id={formId}>
-                <FormFieldTextInput<FormValues>
-                  label="User email"
-                  name="userEmail"
-                  width={20}
-                  hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
-                />
+          <RHFForm id={formId} onSubmit={handleSubmit}>
+            <RHFFormFieldTextInput<UserInviteFormValues>
+              label="User email"
+              name="userEmail"
+              width={20}
+              hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
+            />
 
-                <FormFieldSelect<FormValues>
-                  label="Role"
-                  name="roleId"
-                  hint="The user's role within the service."
-                  placeholder="Choose role"
-                  options={model?.roles?.map(role => ({
-                    label: role.name,
-                    value: role.id,
-                  }))}
-                />
+            <RHFFormFieldSelect<UserInviteFormValues>
+              label="Role"
+              name="roleId"
+              hint="The user's role within the service."
+              placeholder="Choose role"
+              options={roles?.map(role => ({
+                label: role.name,
+                value: role.id,
+              }))}
+            />
 
-                <InviteUserReleaseRoleForm
-                  releases={model?.releases}
-                  releaseRoles={model?.resourceRoles.Release}
-                  userReleaseRoles={form.values.userReleaseRoles}
-                  onAddUserReleaseRole={newUserReleaseRole => {
-                    form.setFieldValue('userReleaseRoles', [
-                      ...form.values.userReleaseRoles,
-                      newUserReleaseRole,
-                    ]);
-                  }}
-                  onRemoveUserReleaseRole={userReleaseRoleToRemove => {
-                    form.setFieldValue(
-                      'userReleaseRoles',
-                      form.values.userReleaseRoles.filter(
-                        userReleaseRole =>
-                          userReleaseRoleToRemove !== userReleaseRole,
-                      ),
-                    );
-                  }}
-                />
+            <InviteUserReleaseRoleForm
+              releases={releases}
+              releaseRoles={resourceRoles?.Release}
+            />
 
-                <InviteUserPublicationRoleForm
-                  publications={model?.publications}
-                  publicationRoles={model?.resourceRoles.Publication}
-                  userPublicationRoles={form.values.userPublicationRoles}
-                  onAddUserPublicationRole={newUserPublicationRole => {
-                    form.setFieldValue('userPublicationRoles', [
-                      ...form.values.userPublicationRoles,
-                      newUserPublicationRole,
-                    ]);
-                  }}
-                  onRemoveUserPublicationRole={userPublicationRoleToRemove => {
-                    form.setFieldValue(
-                      'userPublicationRoles',
-                      form.values.userPublicationRoles.filter(
-                        userPublicationRole =>
-                          userPublicationRoleToRemove !== userPublicationRole,
-                      ),
-                    );
-                  }}
-                />
+            <InviteUserPublicationRoleForm
+              publications={publications}
+              publicationRoles={resourceRoles?.Publication}
+            />
 
-                <ButtonGroup className="govuk-!-margin-top-6">
-                  <Button type="submit">Send invite</Button>
-                  <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
-                </ButtonGroup>
-              </Form>
-            );
-          }}
-        </Formik>
+            <ButtonGroup className="govuk-!-margin-top-6">
+              <Button type="submit">Send invite</Button>
+              <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
+            </ButtonGroup>
+          </RHFForm>
+        </FormProvider>
       </Page>
     </LoadingSpinner>
   );
-};
-
-export default UserInvitePage;
+}

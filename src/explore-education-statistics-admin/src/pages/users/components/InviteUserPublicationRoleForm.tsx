@@ -1,154 +1,165 @@
 import Button from '@common/components/Button';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
-import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
+import { FormFieldset } from '@common/components/form';
 import React, { useMemo } from 'react';
-import { InviteUserPublicationRole } from '@admin/pages/users/UserInvitePage';
+import {
+  InviteUserPublicationRole,
+  UserInviteFormValues,
+} from '@admin/pages/users/UserInvitePage';
 import ButtonText from '@common/components/ButtonText';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import { PublicationSummary } from '@common/services/publicationService';
-
-interface FormValues {
-  publicationId: string;
-  publicationRole: string;
-}
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import { useFormContext } from 'react-hook-form';
 
 interface Props {
   publications?: PublicationSummary[];
   publicationRoles?: string[];
-  userPublicationRoles: InviteUserPublicationRole[];
-  onAddUserPublicationRole: (
-    userPublicationRole: InviteUserPublicationRole,
-  ) => void;
-  onRemoveUserPublicationRole: (
-    userPublicationRole: InviteUserPublicationRole,
-  ) => void;
 }
 
-const InviteUserPublicationRoleForm = ({
+export default function InviteUserPublicationRoleForm({
   publications,
   publicationRoles,
-  userPublicationRoles,
-  onAddUserPublicationRole,
-  onRemoveUserPublicationRole,
-}: Props) => {
+}: Props) {
   const publicationTitlesById = useMemo(() => {
     return keyBy(publications, publication => publication.id);
   }, [publications]);
 
-  return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={{
-        publicationId: '',
-        publicationRole: '',
-      }}
-      validationSchema={Yup.object<FormValues>({
-        publicationId: Yup.string()
-          .required('Choose publication to give the user access to')
-          .test(
-            'uniquePublicationRole',
-            'You can only add one role for each publication',
-            function uniquePublicationRole(publicationId: string) {
-              return !userPublicationRoles.some(
-                userPublicationRole =>
-                  userPublicationRole.publicationId === publicationId,
-              );
-            },
-          ),
-        publicationRole: Yup.string().required(
-          'Choose publication role for the user',
-        ),
-      })}
-      onSubmit={newUserPublicationRole =>
-        onAddUserPublicationRole(newUserPublicationRole)
+  const { getValues, resetField, setError, setValue, watch } =
+    useFormContext<UserInviteFormValues>();
+
+  const selectedUserPublicationRoles: InviteUserPublicationRole[] =
+    watch('userPublicationRoles') ?? [];
+
+  const handleAddUserPublicationRole = () => {
+    const publicationId = getValues('publicationId');
+    const publicationRole = getValues('publicationRole');
+
+    if (
+      selectedUserPublicationRoles.find(
+        role => role.publicationId === publicationId,
+      )
+    ) {
+      setError('publicationId', {
+        type: 'custom',
+        message: 'You can only add one role for each publication',
+      });
+      return;
+    }
+
+    if (!publicationId || !publicationRole) {
+      if (!publicationId) {
+        setError('publicationId', {
+          type: 'custom',
+          message: 'Choose publication to give the user access to',
+        });
       }
+      if (!publicationRole) {
+        setError('publicationRole', {
+          type: 'custom',
+          message: 'Choose publication role for the user',
+        });
+      }
+
+      return;
+    }
+
+    if (publicationId && publicationRole) {
+      setValue('userPublicationRoles', [
+        ...selectedUserPublicationRoles,
+        { publicationId, publicationRole },
+      ]);
+      resetField('publicationId');
+      resetField('publicationRole');
+    }
+  };
+
+  const handleRemoveUserPublicationRole = (
+    userPublicationRoleToRemove: InviteUserPublicationRole,
+  ) => {
+    setValue(
+      'userPublicationRoles',
+      selectedUserPublicationRoles.filter(
+        userPublicationRole =>
+          userPublicationRoleToRemove !== userPublicationRole,
+      ),
+    );
+  };
+
+  return (
+    <FormFieldset
+      id="publication-roles"
+      legend="Publication roles"
+      legendSize="m"
+      hint="The user's publication roles within the service."
     >
-      {form => {
-        return (
-          <FormFieldset
-            id="publication-roles"
-            legend="Publication roles"
-            legendSize="m"
-            hint="The user's publication roles within the service."
-          >
-            <FormFieldSelect<FormValues>
-              label="Publication"
-              name="publicationId"
-              placeholder="Choose publication"
-              options={publications?.map(publication => ({
-                label: publication.title,
-                value: publication.id,
-              }))}
-            />
-            <FormFieldSelect<FormValues>
-              label="Publication role"
-              name="publicationRole"
-              placeholder="Choose publication role"
-              options={publicationRoles?.map(role => ({
-                label: role,
-                value: role,
-              }))}
-            />
-            <Button
-              type="button"
-              className="govuk-!-margin-top-6"
-              onClick={async () => {
-                await form.submitForm();
-              }}
-            >
-              Add publication role
-            </Button>
+      <RHFFormFieldSelect<UserInviteFormValues>
+        label="Publication"
+        name="publicationId"
+        placeholder="Choose publication"
+        options={publications?.map(publication => ({
+          label: publication.title,
+          value: publication.id,
+        }))}
+      />
+      <RHFFormFieldSelect<UserInviteFormValues>
+        label="Publication role"
+        name="publicationRole"
+        placeholder="Choose publication role"
+        options={publicationRoles?.map(role => ({
+          label: role,
+          value: role,
+        }))}
+      />
+      <Button
+        type="button"
+        className="govuk-!-margin-top-6"
+        onClick={handleAddUserPublicationRole}
+      >
+        Add publication role
+      </Button>
 
-            {userPublicationRoles.length === 0 ? (
-              <p>No user publication roles added</p>
-            ) : (
-              <table data-testid="publication-role-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Publication Title</th>
-                    <th scope="col">Publication Role</th>
-                    <th scope="col">Options</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orderBy(
-                    userPublicationRoles,
-                    userPublicationRole =>
-                      publicationTitlesById[userPublicationRole.publicationId]
-                        .title,
-                  ).map(userPublicationRole => (
-                    <tr
-                      key={`${userPublicationRole.publicationId}_${userPublicationRole.publicationRole}`}
-                    >
-                      <td>
-                        {
-                          publicationTitlesById[
-                            userPublicationRole.publicationId
-                          ].title
-                        }
-                      </td>
-                      <td>{userPublicationRole.publicationRole}</td>
-                      <td>
-                        <ButtonText
-                          onClick={() => {
-                            onRemoveUserPublicationRole(userPublicationRole);
-                          }}
-                        >
-                          Remove
-                        </ButtonText>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </FormFieldset>
-        );
-      }}
-    </Formik>
+      {selectedUserPublicationRoles.length === 0 ? (
+        <p>No user publication roles added</p>
+      ) : (
+        <table data-testid="publication-role-table">
+          <thead>
+            <tr>
+              <th scope="col">Publication Title</th>
+              <th scope="col">Publication Role</th>
+              <th scope="col">Options</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orderBy(
+              selectedUserPublicationRoles,
+              userPublicationRole =>
+                publicationTitlesById[userPublicationRole.publicationId].title,
+            ).map(userPublicationRole => (
+              <tr
+                key={`${userPublicationRole.publicationId}_${userPublicationRole.publicationRole}`}
+              >
+                <td>
+                  {
+                    publicationTitlesById[userPublicationRole.publicationId]
+                      .title
+                  }
+                </td>
+                <td>{userPublicationRole.publicationRole}</td>
+                <td>
+                  <ButtonText
+                    onClick={() => {
+                      handleRemoveUserPublicationRole(userPublicationRole);
+                    }}
+                  >
+                    Remove
+                  </ButtonText>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </FormFieldset>
   );
-};
-
-export default InviteUserPublicationRoleForm;
+}

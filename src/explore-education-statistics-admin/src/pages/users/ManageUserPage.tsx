@@ -1,147 +1,40 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService, {
-  User,
-  UserPublicationRole,
-  UserPublicationRoleSubmission,
-  UserReleaseRole,
-  UserReleaseRoleSubmission,
-  UserUpdate,
-} from '@admin/services/userService';
+import userQueries from '@admin/queries/userQueries';
+import publicationQueries from '@admin/queries/publicationQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
-import { mapFieldErrors } from '@common/validation/serverValidations';
-import React, { useCallback, useEffect, useState } from 'react';
+import RoleForm from '@admin/pages/users/components/RoleForm';
+import ReleaseAccessForm from '@admin/pages/users/components/ReleaseAccessForm';
+import PublicationAccessForm from '@admin/pages/users/components/PublicationAccessForm';
+import { useQuery } from '@tanstack/react-query';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import RoleForm, {
-  UpdateRoleFormValues,
-} from '@admin/pages/users/components/RoleForm';
-import ReleaseAccessForm, {
-  AddReleaseRoleFormValues,
-} from '@admin/pages/users/components/ReleaseAccessForm';
-import PublicationAccessForm, {
-  AddPublicationRoleFormValues,
-} from '@admin/pages/users/components/PublicationAccessForm';
-import publicationService from '@admin/services/publicationService';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 
-const updateRoleFormErrorMappings = [
-  mapFieldErrors<UpdateRoleFormValues>({
-    target: 'selectedRoleId',
-    messages: {
-      RoleDoesNotExist: 'Role does not exist',
-    },
-  }),
-];
-
-const addReleaseFormErrorMappings = [
-  mapFieldErrors<AddReleaseRoleFormValues>({
-    target: 'selectedReleaseRole',
-    messages: {
-      UserAlreadyHasResourceRole: 'The user already has this release role',
-    },
-  }),
-];
-
-const addPublicationFormErrorMappings = [
-  mapFieldErrors<AddPublicationRoleFormValues>({
-    target: 'selectedPublicationRole',
-    messages: {
-      UserAlreadyHasResourceRole: 'The user already has this publication role',
-    },
-  }),
-];
-
-interface Model {
-  user: User;
-}
-
-const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
-  const [model, setModel] = useState<Model>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [, setErrorStatus] = useState<number>();
-
+export default function ManageUserPage({
+  match,
+}: RouteComponentProps<{ userId: string }>) {
   const { userId } = match.params;
 
-  const getUser = useCallback(() => {
-    setIsLoading(true);
-    userService
-      .getUser(userId)
-      .then(u => {
-        setModel({
-          user: u,
-        });
-      })
-      .catch(error => {
-        setErrorStatus(error.response.status);
-      })
-      .then(() => setIsLoading(false));
-  }, [userId]);
+  const {
+    data: user,
+    isLoading: isLoadingUser,
+    refetch,
+  } = useQuery(userQueries.get(userId));
 
-  const { value: roles } = useAsyncRetry(() => userService.getRoles());
-  const { value: releases } = useAsyncRetry(() => userService.getReleases());
-  const { value: publications } = useAsyncRetry(() =>
-    publicationService.getPublicationSummaries(),
+  const { data: roles, isLoading: isLoadingRoles } = useQuery(
+    userQueries.getRoles,
   );
-  const { value: resourceRoles } = useAsyncRetry(() =>
-    userService.getResourceRoles(),
+  const { data: resourceRoles, isLoading: isLoadingResourceRoles } = useQuery(
+    userQueries.getResourceRoles,
   );
-
-  const handleUpdateRoleFormSubmit = useFormSubmit<UpdateRoleFormValues>(
-    async values => {
-      const submission: UserUpdate = {
-        roleId: values.selectedRoleId,
-      };
-
-      await userService.updateUser(userId, submission);
-      getUser();
-    },
-    updateRoleFormErrorMappings,
+  const { data: releases, isLoading: isLoadingReleases } = useQuery(
+    userQueries.getReleases,
   );
-
-  const handleAddReleaseRole = useFormSubmit<AddReleaseRoleFormValues>(
-    async values => {
-      const submission: UserReleaseRoleSubmission = {
-        releaseId: values.selectedReleaseId,
-        releaseRole: values.selectedReleaseRole,
-      };
-
-      await userService.addUserReleaseRole(userId, submission);
-
-      getUser();
-    },
-    addReleaseFormErrorMappings,
+  const { data: publications, isLoading: isLoadingPublications } = useQuery(
+    publicationQueries.getPublicationSummaries,
   );
-
-  const handleRemoveReleaseAccess = (userReleaseRole: UserReleaseRole) => {
-    userService.removeUserReleaseRole(userReleaseRole.id).then(() => getUser());
-  };
-
-  const handleAddPublicationRole = useFormSubmit<AddPublicationRoleFormValues>(
-    async values => {
-      const submission: UserPublicationRoleSubmission = {
-        publicationId: values.selectedPublicationId,
-        publicationRole: values.selectedPublicationRole,
-      };
-
-      await userService.addUserPublicationRole(userId, submission);
-
-      getUser();
-    },
-    addPublicationFormErrorMappings,
-  );
-
-  const handleRemovePublicationAccess = (
-    userPublicationRole: UserPublicationRole,
-  ) => {
-    userService
-      .removeUserPublicationRole(userId, userPublicationRole)
-      .then(() => getUser());
-  };
-
-  useEffect(() => {
-    getUser();
-  }, [getUser]);
 
   return (
     <Page
@@ -151,37 +44,45 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
         { name: 'Users', link: '/administration/users' },
         { name: 'Manage user' },
       ]}
-      title="Manage user"
+      caption="Manage user"
+      title={user && user.name}
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Manage user</span>
-        {model?.user.name}
-      </h1>
-
-      <LoadingSpinner loading={isLoading} text="Loading user details">
-        {model && (
+      <LoadingSpinner loading={isLoadingUser} text="Loading user details">
+        {user && (
           <>
-            <RoleForm
-              roles={roles}
-              user={model.user}
-              onSubmit={handleUpdateRoleFormSubmit}
-            />
+            <h2 className="govuk-heading-m">Details</h2>
+            <SummaryList>
+              <SummaryListItem term="Name">{user.name}</SummaryListItem>
+              <SummaryListItem term="Email">
+                <a href={`mailto:${user.email}`}>{user.email}</a>
+              </SummaryListItem>
+            </SummaryList>
 
-            <ReleaseAccessForm
-              releases={releases}
-              releaseRoles={resourceRoles?.Release}
-              user={model.user}
-              onRemove={handleRemoveReleaseAccess}
-              onSubmit={handleAddReleaseRole}
-            />
+            <LoadingSpinner loading={isLoadingRoles}>
+              <RoleForm roles={roles} user={user} onUpdate={refetch} />
+            </LoadingSpinner>
 
-            <PublicationAccessForm
-              publications={publications}
-              publicationRoles={resourceRoles?.Publication}
-              user={model.user}
-              onRemove={handleRemovePublicationAccess}
-              onSubmit={handleAddPublicationRole}
-            />
+            <LoadingSpinner
+              loading={isLoadingReleases || isLoadingResourceRoles}
+            >
+              <ReleaseAccessForm
+                releases={releases}
+                releaseRoles={resourceRoles?.Release}
+                user={user}
+                onUpdate={refetch}
+              />
+            </LoadingSpinner>
+
+            <LoadingSpinner
+              loading={isLoadingPublications || isLoadingResourceRoles}
+            >
+              <PublicationAccessForm
+                publications={publications}
+                publicationRoles={resourceRoles?.Publication}
+                user={user}
+                onUpdate={refetch}
+              />
+            </LoadingSpinner>
           </>
         )}
       </LoadingSpinner>
@@ -192,6 +93,4 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
       </div>
     </Page>
   );
-};
-
-export default ManageUserPage;
+}

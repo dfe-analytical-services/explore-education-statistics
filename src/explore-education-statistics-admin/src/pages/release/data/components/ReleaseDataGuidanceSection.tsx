@@ -153,9 +153,6 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                             </InsetText>
                           ) : (
                             <ContentHtml
-                              // html={form.values.content}
-                              // html={getValues('content')}
-                              // html={dataGuidance.content}
                               html={values.content}
                               testId="mainGuidanceContent"
                             />

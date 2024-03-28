@@ -67,38 +67,36 @@ Select a user to manage
     user creates test release via api    ${PUBLICATION_ID}    AY    2000
 
     user clicks link    Manage    ${PRE_RELEASE_ROW}
-    user waits until page contains title    Manage user
+    user waits until page contains    Manage user
     user waits until page finishes loading
     user waits until h1 is visible    Prerelease2 User2    10
 
 Check the initial manage user page
-    user checks select contains x options    //*[@name="selectedRoleId"]    4
-    user checks select contains option    //*[@name="selectedRoleId"]    Choose role
-    user checks select contains option    //*[@name="selectedRoleId"]    Analyst
-    user checks select contains option    //*[@name="selectedRoleId"]    BAU User
-    user checks select contains option    //*[@name="selectedRoleId"]    Prerelease User
-    user checks selected option label    //*[@name="selectedRoleId"]    Choose role
+    user checks select contains x options    //*[@name="roleId"]    4
+    user checks select contains option    //*[@name="roleId"]    Choose role
+    user checks select contains option    //*[@name="roleId"]    Analyst
+    user checks select contains option    //*[@name="roleId"]    BAU User
+    user checks select contains option    //*[@name="roleId"]    Prerelease User
+    user checks selected option label    //*[@name="roleId"]    Choose role
 
-    user checks select contains option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user checks select contains option    name:selectedReleaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
-    user checks select contains x options    name:selectedReleaseRole    5
-    user checks select contains option    name:selectedReleaseRole    Approver
-    user checks select contains option    name:selectedReleaseRole    Contributor
-    user checks select contains option    name:selectedReleaseRole    Lead
-    user checks select contains option    name:selectedReleaseRole    PrereleaseViewer
-    user checks select contains option    name:selectedReleaseRole    Viewer
-    user checks table body has x rows    0    testid:releaseAccessTable
+    user checks select contains option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user checks select contains option    name:releaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
+    user checks select contains x options    name:releaseRole    5
+    user checks select contains option    name:releaseRole    Approver
+    user checks select contains option    name:releaseRole    Contributor
+    user checks select contains option    name:releaseRole    Lead
+    user checks select contains option    name:releaseRole    PrereleaseViewer
+    user checks select contains option    name:releaseRole    Viewer
 
-    user checks select contains option    name:selectedPublicationId    ${PUBLICATION_NAME}
-    user checks select contains option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
-    user checks select contains x options    name:selectedPublicationRole    2
-    user checks select contains option    name:selectedPublicationRole    Owner
-    user checks select contains option    name:selectedPublicationRole    Approver
-    user checks table body has x rows    0    testid:publicationAccessTable
+    user checks select contains option    name:publicationId    ${PUBLICATION_NAME}
+    user checks select contains option    name:publicationId    ${PUBLICATION_2_NAME}
+    user checks select contains x options    name:publicationRole    2
+    user checks select contains option    name:publicationRole    Owner
+    user checks select contains option    name:publicationRole    Approver
 
 Give the user prerelease access to a release
-    user chooses select option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user chooses select option    name:selectedReleaseRole    PrereleaseViewer
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseRole    PrereleaseViewer
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
     user checks table column heading contains    1    1    Publication    testid:releaseAccessTable
@@ -110,11 +108,11 @@ Give the user prerelease access to a release
     user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
     user checks table cell contains    1    4    Remove    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Prerelease User
+    user checks selected option label    //*[@name="roleId"]    Prerelease User
 
 Give the user approver access to a release
-    user chooses select option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user chooses select option    name:selectedReleaseRole    Approver
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    2    testid:releaseAccessTable
 
@@ -126,7 +124,7 @@ Give the user approver access to a release
     user checks table cell contains    2    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks table cell contains    2    3    Approver    testid:releaseAccessTable
     user checks table cell contains    2    4    Remove    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Analyst
+    user checks selected option label    //*[@name="roleId"]    Analyst
 
 Remove approver access for release from user
     user clicks button in table cell    2    4    Remove    testid:releaseAccessTable
@@ -135,25 +133,25 @@ Remove approver access for release from user
     user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
     user checks table cell contains    1    4    Remove    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Prerelease User
+    user checks selected option label    //*[@name="roleId"]    Prerelease User
 
 Remove prerelease access for release from user
     user clicks button in table cell    1    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    0    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Choose role
+    user checks selected option label    //*[@name="roleId"]    Choose role
 
 Give the user owner access to some publications
-    user chooses select option    name:selectedPublicationId    ${PUBLICATION_NAME}
-    user chooses select option    name:selectedPublicationRole    Owner
+    user chooses select option    name:publicationId    ${PUBLICATION_NAME}
+    user chooses select option    name:publicationRole    Owner
     user clicks button    Add publication access
     user checks table body has x rows    1    testid:publicationAccessTable
     user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
     user checks table cell contains    1    2    Owner    testid:publicationAccessTable
     user checks table cell contains    1    3    Remove    testid:publicationAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Analyst
+    user checks selected option label    //*[@name="roleId"]    Analyst
 
-    user chooses select option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
-    user chooses select option    name:selectedPublicationRole    Owner
+    user chooses select option    name:publicationId    ${PUBLICATION_2_NAME}
+    user chooses select option    name:publicationRole    Owner
     user clicks button    Add publication access
     user checks table body has x rows    2    testid:publicationAccessTable
     user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
@@ -162,13 +160,13 @@ Give the user owner access to some publications
     user checks table cell contains    2    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
     user checks table cell contains    2    2    Owner    testid:publicationAccessTable
     user checks table cell contains    2    3    Remove    testid:publicationAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Analyst
+    user checks selected option label    //*[@name="roleId"]    Analyst
 
 Give the user the BAU User role
-    user chooses select option    //*[@name="selectedRoleId"]    BAU User
+    user chooses select option    //*[@name="roleId"]    BAU User
     user clicks button    Update role
     user waits until page finishes loading
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
 Remove publication owner access for one of the publications from user while they are BAU
     user clicks button in table cell    1    3    Remove    testid:publicationAccessTable
@@ -176,46 +174,46 @@ Remove publication owner access for one of the publications from user while they
     user checks table cell contains    1    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
     user checks table cell contains    1    2    Owner    testid:publicationAccessTable
     user checks table cell contains    1    3    Remove    testid:publicationAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
 Give the user approver access to a release while they are BAU
-    user chooses select option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user chooses select option    name:selectedReleaseRole    Approver
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
     user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    3    Approver    testid:releaseAccessTable
     user checks table cell contains    1    4    Remove    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
 Remove approver access for release from user while they are BAU
     user clicks button in table cell    1    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    0    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
 Remove publication owner access for the final publication from user while they are BAU
     user clicks button in table cell    1    3    Remove    testid:publicationAccessTable
     user checks table body has x rows    0    testid:publicationAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
 Give the user approver access to a release while they are BAU and manually set their role to Analyst
-    user chooses select option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user chooses select option    name:selectedReleaseRole    Approver
+    user chooses select option    name:releaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user chooses select option    name:releaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
     user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks table cell contains    1    3    Approver    testid:releaseAccessTable
     user checks table cell contains    1    4    Remove    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    BAU User
+    user checks selected option label    //*[@name="roleId"]    BAU User
 
-    user chooses select option    //*[@name="selectedRoleId"]    Analyst
+    user chooses select option    //*[@name="roleId"]    Analyst
     user clicks button    Update role
     user waits until page finishes loading
-    user checks selected option label    //*[@name="selectedRoleId"]    Analyst
+    user checks selected option label    //*[@name="roleId"]    Analyst
 
 Remove approver access for release from user after they have manually been set to Analyst
     user clicks button in table cell    1    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    0    testid:releaseAccessTable
-    user checks selected option label    //*[@name="selectedRoleId"]    Choose role
+    user checks selected option label    //*[@name="roleId"]    Choose role

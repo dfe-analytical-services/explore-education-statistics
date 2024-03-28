@@ -617,7 +617,4 @@ describe('FootnoteForm', () => {
       }),
     ).toBeChecked();
   });
-
-  // renders correctly with selected indicators and filters items
-  // renders correctly with selected filters and filter groups
 });

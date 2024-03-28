@@ -68,8 +68,8 @@ export interface Role {
 }
 
 export interface ResourceRoles {
-  Publication?: [];
-  Release?: [];
+  Publication?: string[];
+  Release?: string[];
 }
 
 export interface UsersService {
