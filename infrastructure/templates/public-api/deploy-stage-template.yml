@@ -13,6 +13,9 @@ parameters:
     default: ''
   - name: parameterFile
     type: string
+  - name: condition
+    type: string
+    default: succeeded()
 
 stages:
 - stage: ${{parameters.stageName}}
@@ -20,7 +23,7 @@ stages:
     - group: EES Bicep Infrastructure public - ${{parameters.environment}}
     - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
-  condition: succeeded()
+  condition: ${{parameters.condition}}
   ${{ if not(eq(parameters.dependsOn, '')) }}:
     dependsOn: ${{parameters.dependsOn}}
   jobs:

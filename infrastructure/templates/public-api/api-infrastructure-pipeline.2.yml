@@ -14,9 +14,9 @@ parameters:
 variables:
   - group: EES Bicep Infrastructure common
   - name: isDev
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
+  - name: isTest
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/EES-4807-build-and-deploy-function-app')]
-  - name: isDev
-    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/test')]
   - name: isMaster
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
   - name: vmImageName
@@ -45,9 +45,19 @@ pool:
   name: dfe-development-dw agent pool
 
 stages:
-- ${{ if variables.isDev }}:
+  - stage: A
+    condition: eq(variables.isTest, true)
+    jobs:
+      - job: Print
+        steps:
+        - bash: |
+            echo $(isDev)
+            echo $(Build.SourceBranch)
+            echo ${{ eq(variables['Build.SourceBranch'], 'refs/heads/EES-4807-build-and-deploy-function-app') }}
+            echo ${{ eq(variables.isDev, true) }}
   - template: validate-stage-template.yml
     parameters:
+      condition: eq(variables.isDev, true)
       stageName: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
@@ -55,55 +65,60 @@ stages:
 
   - template: deploy-stage-template.yml
     parameters:
+      condition: and(succeeded(), eq(variables.isDev, true))
       stageName: 'Deploy_to_Development'
       dependsOn: 'Validate_Against_Development'
       environment: 'Development'
       serviceConnection: $(serviceConnectionDevelopment)
       parameterFile: $(devParamFile)
 
-#- ${{ if variables.isTest }}:
+  - template: validate-stage-template.yml
+    parameters:
+      condition: eq(variables.isTest, true)
+      stageName: 'Validate_Against_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
+      parameterFile: $(testParamFile)
+
+  - template: deploy-stage-template.yml
+    parameters:
+      condition: eq(variables.isTest, true)
+      stageName: 'Deploy_to_Test'
+      dependsOn: 'Validate_Against_Test'
+      environment: 'Test'
+      serviceConnection: $(serviceConnectionTest)
+      parameterFile: $(testParamFile)
+
 #  - template: validate-stage-template.yml
 #    parameters:
-#      stageName: 'Validate_Against_Test'
-#      environment: 'Test'
-#      serviceConnection: $(serviceConnectionTest)
-#      parameterFile: testParamFile
-#
-#  - template: deploy-stage-template.yml
-#    parameters:
-#      stageName: 'Deploy_to_Test'
-#      dependsOn: 'Validate_Against_Test'
-#      environment: 'Test'
-#      serviceConnection: $(serviceConnectionTest)
-#      parameterFile: testParamFile
-#
-#- ${{ if variables.isMaster }}:
-#  - template: validate-stage-template.yml
-#    parameters:
+#      condition: and(succeeded(), eq(variables.isMaster, true))
 #      stageName: 'Validate_Against_PreProduction'
 #      environment: 'Pre-production'
 #      serviceConnection: $(serviceConnectionPreProduction)
-#      parameterFile: preProdParamFile
+#      parameterFile: $(preProdParamFile)
 #
 #  - template: deploy-stage-template.yml
 #    parameters:
+#      condition: and(succeeded(), eq(variables.isMaster, true))
 #      stageName: 'Deploy_to_PreProduction'
 #      dependsOn: 'Validate_Against_PreProduction'
 #      environment: 'Pre-production'
 #      serviceConnection: $(serviceConnectionPreProduction)
-#      parameterFile: preProdParamFile
+#      parameterFile: $(preProdParamFile)
 #
 #  - template: validate-stage-template.yml
 #    parameters:
+#      condition: and(succeeded(), eq(variables.isMaster, true))
 #      stageName: 'Validate_Against_Production'
 #      environment: 'Production'
 #      serviceConnection: $(serviceConnectionProduction)
-#      parameterFile: prodParamFile
+#      parameterFile: $(prodParamFile)
 #
 #  - template: deploy-stage-template.yml
 #    parameters:
+#      condition: and(succeeded(), eq(variables.isMaster, true))
 #      stageName: 'Deploy_to_Production'
 #      dependsOn: 'Validate_Against_Production'
 #      environment: 'Production'
 #      serviceConnection: $(serviceConnectionProduction)
-#      parameterFile: prodParamFile
+#      parameterFile: $(prodParamFile)

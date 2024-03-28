@@ -10,15 +10,19 @@ parameters:
     type: string
   - name: parameterFile
     type: string
+  - name: condition
+    type: string
+    default: succeeded()
 
 stages:
   - stage: ${{parameters.stageName}}
     displayName: 'Validate ${{parameters.environment}} Infrastructure'
+    variables:
+      - group: EES Bicep Infrastructure public - ${{parameters.environment}}
+      - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
+    condition: ${{parameters.condition}}
     jobs:
       - job: Validate_Infrastructure
-        variables:
-          - group: EES Bicep Infrastructure public - ${{parameters.environment}}
-          - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
         steps:
           - checkout: self
 

@@ -44,65 +44,70 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-- ${{ if variables.isDev }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Development'
-      environment: 'Development'
-      serviceConnection: $(serviceConnectionDevelopment)
-      parameterFile: $(devParamFile)
+- template: validate-stage-template.yml
+  condition: eq(variables.isDev, true)
+  parameters:
+    stageName: 'Validate_Against_Development'
+    environment: 'Development'
+    serviceConnection: $(serviceConnectionDevelopment)
+    parameterFile: $(devParamFile)
 
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Development'
-      dependsOn: 'Validate_Against_Development'
-      environment: 'Development'
-      serviceConnection: $(serviceConnectionDevelopment)
-      parameterFile: $(devParamFile)
+- template: deploy-stage-template.yml
+  condition: and(succeeded(), eq(variables.isDev, true))
+  parameters:
+    stageName: 'Deploy_to_Development'
+    dependsOn: 'Validate_Against_Development'
+    environment: 'Development'
+    serviceConnection: $(serviceConnectionDevelopment)
+    parameterFile: $(devParamFile)
 
-- ${{ if variables.isTest }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Test'
-      environment: 'Test'
-      serviceConnection: $(serviceConnectionTest)
-      parameterFile: $(testParamFile)
+- template: validate-stage-template.yml
+  condition: and(succeeded(), eq(variables.isTest, true))
+  parameters:
+    stageName: 'Validate_Against_Test'
+    environment: 'Test'
+    serviceConnection: $(serviceConnectionTest)
+    parameterFile: $(testParamFile)
 
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Test'
-      dependsOn: 'Validate_Against_Test'
-      environment: 'Test'
-      serviceConnection: $(serviceConnectionTest)
-      parameterFile: $(testParamFile)
+- template: deploy-stage-template.yml
+  condition: and(succeeded(), eq(variables.isTest, true))
+  parameters:
+    stageName: 'Deploy_to_Test'
+    dependsOn: 'Validate_Against_Test'
+    environment: 'Test'
+    serviceConnection: $(serviceConnectionTest)
+    parameterFile: $(testParamFile)
 
-- ${{ if variables.isMaster }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_PreProduction'
-      environment: 'Pre-production'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: $(preProdParamFile)
+- template: validate-stage-template.yml
+  condition: and(succeeded(), eq(variables.isMaster, true))
+  parameters:
+    stageName: 'Validate_Against_PreProduction'
+    environment: 'Pre-production'
+    serviceConnection: $(serviceConnectionPreProduction)
+    parameterFile: $(preProdParamFile)
 
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_PreProduction'
-      dependsOn: 'Validate_Against_PreProduction'
-      environment: 'Pre-production'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: $(preProdParamFile)
+- template: deploy-stage-template.yml
+  condition: and(succeeded(), eq(variables.isMaster, true))
+  parameters:
+    stageName: 'Deploy_to_PreProduction'
+    dependsOn: 'Validate_Against_PreProduction'
+    environment: 'Pre-production'
+    serviceConnection: $(serviceConnectionPreProduction)
+    parameterFile: $(preProdParamFile)
 
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: $(prodParamFile)
+- template: validate-stage-template.yml
+  condition: and(succeeded(), eq(variables.isMaster, true))
+  parameters:
+    stageName: 'Validate_Against_Production'
+    environment: 'Production'
+    serviceConnection: $(serviceConnectionProduction)
+    parameterFile: $(prodParamFile)
 
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Production'
-      dependsOn: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: $(prodParamFile)
+- template: deploy-stage-template.yml
+  condition: and(succeeded(), eq(variables.isMaster, true))
+  parameters:
+    stageName: 'Deploy_to_Production'
+    dependsOn: 'Validate_Against_Production'
+    environment: 'Production'
+    serviceConnection: $(serviceConnectionProduction)
+    parameterFile: $(prodParamFile)
