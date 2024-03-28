@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -97,19 +96,8 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
-    public class Startup
+    public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
-
-        public Startup(
-            IConfiguration configuration,
-            IHostEnvironment hostEnvironment)
-        {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
@@ -169,36 +157,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // TODO EES-4869 - review if we need to retain these tables.
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             /*
@@ -232,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // ClaimsPrincipal already from information in the JWT).
             services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
-            if (!HostEnvironment.IsIntegrationTest())
+            if (!hostEnvironment.IsIntegrationTest())
             {
                 services
                         // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
@@ -248,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     })
                     // This adds verification of the incoming JWTs after they have been located in the
                     // Authorization headers above.
-                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
+                    .AddMicrosoftIdentityWebApi(configuration.GetRequiredSection("OpenIdConnectIdentityFramework"));
 
                 // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
                 // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an
@@ -291,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 )
                 .AddNewtonsoftJsonProtocol();
 
-            var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
+            var azureSignalRConnectionString = configuration.GetValue<string>("Azure:SignalR:ConnectionString");
 
             if (!azureSignalRConnectionString.IsNullOrEmpty())
             {
@@ -302,23 +290,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
-            services.Configure<PreReleaseOptions>(Configuration);
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+            services.Configure<PreReleaseOptions>(configuration);
+            services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
-                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
-            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
+                configuration.GetRequiredSection(ReleaseApprovalOptions.ReleaseApproval));
+            services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
+            services.Configure<OpenIdConnectSpaClientOptions>(configuration.GetSection(
                 OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, Configuration);
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, configuration);
 
             /*
              * Services
              */
 
-            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
+            var coreStorageConnectionString = configuration.GetValue<string>("CoreStorage");
+            var publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -410,9 +398,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<INotificationClient>(s =>
             {
-                var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
+                var notifyApiKey = configuration.GetValue<string>("NotifyApiKey");
 
-                if (!HostEnvironment.IsDevelopment() && !HostEnvironment.IsIntegrationTest())
+                if (!hostEnvironment.IsDevelopment() && !hostEnvironment.IsIntegrationTest())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
@@ -481,7 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddScoped<DateTimeProvider>();
 
             // This service allows a set of users to be pre-invited to the service on startup.
-            if (HostEnvironment.IsDevelopment())
+            if (hostEnvironment.IsDevelopment())
             {
                 services.AddTransient<BootstrapUsersService>();
             }
@@ -502,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Swagger
              */
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("enableSwagger"))
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -569,7 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             app.UseResponseCompression();
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
@@ -593,7 +581,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
+                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))
