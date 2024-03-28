@@ -44,7 +44,7 @@ pool:
   vmImage: $(vmImageName)
 
 stages:
-- ${{ if variables.isDev }}:
+- ${{ if eq(variables.isDev, true) }}:
   - template: validate-stage-template.yml
     parameters:
       stageName: 'Validate_Against_Development'
@@ -60,7 +60,7 @@ stages:
       serviceConnection: $(serviceConnectionDevelopment)
       parameterFile: $(devParamFile)
 
-- ${{ if variables.isTest }}:
+- ${{ if eq(variables.isTest, true) }}:
   - template: validate-stage-template.yml
     parameters:
       stageName: 'Validate_Against_Test'
@@ -76,7 +76,7 @@ stages:
       serviceConnection: $(serviceConnectionTest)
       parameterFile: $(testParamFile)
 
-#- ${{ if variables.isMaster }}:
+#- ${{ if eq(variables.isMaster, true) }}:
 #  - template: validate-stage-template.yml
 #    parameters:
 #      stageName: 'Validate_Against_PreProduction'
