@@ -56,6 +56,9 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
+@description('Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?')
+param apiContainerAppUserCreatedWithAcrPull bool = true
+
 @description('Have database users been added to PSQL yet for Container App and Function App?')
 param psqlDbUsersAdded bool = true
 
@@ -192,25 +195,12 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   }
 }
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (apiContainerAppUserCreatedWithAcrPull) {
   name: apiContainerAppManagedIdentityName
-  location: location
-}
-
-var acrPullRole = resourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
-
-@description('This allows the managed identity of the container app to access the registry, note scope is applied to the wider ResourceGroup not the ACR')
-resource apiContainerAppManagedIdentityRBAC 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, apiContainerAppManagedIdentity.id, acrPullRole)
-  properties: {
-    roleDefinitionId: acrPullRole
-    principalId: apiContainerAppManagedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-  }
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAdded) {
+module apiContainerAppModule 'components/containerApp.bicep' = if (apiContainerAppUserCreatedWithAcrPull && psqlDbUsersAdded) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix
