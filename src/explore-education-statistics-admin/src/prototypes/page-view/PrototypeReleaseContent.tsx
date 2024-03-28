@@ -44,7 +44,7 @@ const PrototypeReleaseContent = ({
 }: {
   transformFeaturedTableLinks?: (url: string, text: string) => void;
 }) => {
-  const config = useConfig();
+  const { publicAppUrl } = useConfig();
   const location = useLocation();
   const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
     useEditingContext();
@@ -117,9 +117,7 @@ const PrototypeReleaseContent = ({
       (file.type === 'Ancillary' && file.name !== 'All files'),
   );
 
-  const releaseCount =
-    release.publication.releases.length +
-    release.publication.legacyReleases.length;
+  const { releaseSeries } = release.publication;
 
   return (
     <>
@@ -289,7 +287,7 @@ const PrototypeReleaseContent = ({
               </li>
             </ul>
 
-            {!!releaseCount && (
+            {!!releaseSeries.length && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
                   Releases in this series
@@ -297,26 +295,29 @@ const PrototypeReleaseContent = ({
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View releases (${releaseCount})`}
+                  summary={`View releases (${releaseSeries.length})`}
                 >
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
-                        ...release.publication.releases.map(
-                          ({ id, title, slug }) => (
+                        ...releaseSeries.map(
+                          ({
+                            id,
+                            isLegacyLink,
+                            description,
+                            legacyLinkUrl,
+                            releaseSlug,
+                          }) => (
                             <li key={id} data-testid="other-release-item">
-                              <Link
-                                to={`${config?.publicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link to={url}>{description}</Link>
+                              {isLegacyLink ? (
+                                <a href={legacyLinkUrl}>{description}</a>
+                              ) : (
+                                <Link
+                                  to={`${publicAppUrl}/find-statistics/${publication.slug}/${releaseSlug}`}
+                                >
+                                  {description}
+                                </Link>
+                              )}
                             </li>
                           ),
                         ),
