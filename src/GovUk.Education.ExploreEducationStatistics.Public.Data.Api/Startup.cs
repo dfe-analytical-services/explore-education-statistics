@@ -74,14 +74,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         // Only set up the `PublicDataDbContext` in non-integration test
         // environments. Otherwise, the connection string will be null and
         // cause the data source builder to throw a host exception.
-        if (!_hostEnvironment.IsIntegrationTest())
+        if (!hostEnvironment.IsIntegrationTest())
         {
-            var connectionString = _configuration.GetConnectionString("PublicDataDb")!;
+            var connectionString = configuration.GetConnectionString("PublicDataDb")!;
 
-            if (_hostEnvironment.IsDevelopment())
+            if (hostEnvironment.IsDevelopment())
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
-                    _configuration.GetConnectionString("PublicDataDb"));
+                    configuration.GetConnectionString("PublicDataDb"));
 
                 // Set up the data source outside the `AddDbContext` action as this
                 // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
