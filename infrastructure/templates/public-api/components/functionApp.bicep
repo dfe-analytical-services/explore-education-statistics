@@ -75,7 +75,7 @@ var dedicatedStorageAccountName = replace('${subscription}eessa${functionAppName
 //
 // For performance, it is considered good practice for each Function App to have its own dedicated Storage Account. See
 // https://learn.microsoft.com/en-us/azure/azure-functions/storage-considerations?tabs=azure-cli#optimize-storage-performance.
-resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2022-05-01' = {
+resource dedicatedStorageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: dedicatedStorageAccountName
   location: location
   sku: {
