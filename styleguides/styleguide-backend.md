@@ -15,13 +15,20 @@
             +   [2.2.1.1 Annotations VS Fluent API](#s2.2.1.1)
             +   [2.2.1.2 Stored Procedures VS Linq VS SQL](#s2.2.1.2)
     *   [2.3 Best Practices](#s2.3)
+        +   [2.3.1 Collections](#s2.3.1)
         +   [2.3.2 Entity Framework (EF)](#s2.3.2)
 -   [3 C# Testing Rules](#s3)
     *   [3.1 Style](#s3.1)
-        +   [3.1.1 Test Naming Conventon](#s3.1.1)
+        +   [3.1.1 Test Naming Convention](#s3.1.1)
+        +   [3.1.2 Separating common aspects of tests from the main test suites](#s3.1.2)
     *   [3.2 Test Setup](#s3.2)
+        +   [3.2.1 Test Data Generators](#s3.2.1)
+        +   [3.2.2 Mocking](#s3.2.2)
+            +   [3.2.2.1 Creating Mocks](#s3.2.2.1)
+            +   [3.2.2.2 When To Use Mocks](#s3.2.2.2)
     *   [3.3 Best Practices](#s3.3)
         +   [3.3.1 Synchronous VS Asynchronous Test Methods](#s3.3.1)
+        +   [3.3.2 Integration VS Unit Tests](#s3.3.2)
 
 </details>
 
@@ -97,6 +104,14 @@ of agreed coding standards to conform to when writing C# code for this repositor
 <a id="s2.3"></a>
 ### 2.3 Best Practices 
 
+<a id="s2.3.1"></a>
+#### 2.3.1 Collections
+
+- Prefer Sets over Lists.
+- Use IList over ICollection for more useful features in tests.
+- Use read-only collections like IReadOnlyList where applicable.
+- Return IQueryable, not Queryable, when not wanting to materialise a query.
+
 <a id="s2.3.2"></a>
 #### 2.3.2 Entity Framework (EF)
 
@@ -106,7 +121,7 @@ of agreed coding standards to conform to when writing C# code for this repositor
 
 
 <a id="s3"></a>
-## 2 C# Testing Rules 
+## 3 C# Testing Rules 
 
 <a id="s3.1"></a>
 ### 3.1 Style 
@@ -199,6 +214,11 @@ parameters. See [PermalinkServiceTests](src/GovUk.Education.ExploreEducationStat
 of usage.
   - Concrete examples of the naming convention for the construction methods so far include `BuildController`, `BuildService` and `BuildApp`.
 
+<a id="s3.2.2.2"></a>
+#### 3.2.2.2 When To Use Mocks
+
+- Prefer using real dependencies rather than mocks for non-integration tests - unless the circumstances make this difficult.
+
 
 <a id="s3.3"></a>
 ### 3.3 Best Practices 
@@ -207,3 +227,8 @@ of usage.
 #### 3.3.1 Synchronous VS Asynchronous Test Methods
 
 - If a test methods is using async method(s), then the method declaration should be marked as `async Task` or `async Task<T>`.
+
+<a id="s3.3.2"></a>
+#### 3.3.2 Integration VS Unit Tests
+
+- Prefer integration tests at the controller level rather than tests at a lower level (i.e. service or repository).
