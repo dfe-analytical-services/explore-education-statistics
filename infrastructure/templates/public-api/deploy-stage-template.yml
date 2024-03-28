@@ -18,7 +18,7 @@ stages:
 - stage: ${{parameters.stageName}}
   variables:
     - group: Public API Infrastructure - ${{parameters.environment}}
-    - group: Public API Infrastructure secrets - ${{parameters.environment}}
+    - group: Public API Infrastructure - ${{parameters.environment}} secrets
   displayName: 'Deploy ${{parameters.environment}} Infrastructure and Applications'
   condition: succeeded()
   ${{ if not(eq(parameters.dependsOn, '')) }}:
