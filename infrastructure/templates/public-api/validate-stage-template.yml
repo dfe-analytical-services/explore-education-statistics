@@ -17,8 +17,8 @@ stages:
     jobs:
       - job: Validate_Infrastructure
         variables:
-          - group: EES Bicep Infrastructure public - ${{parameters.environment}}
-          - group: EES Bicep Infrastructure secrets - ${{parameters.environment}}
+          - group: Public API Infrastructure public - ${{parameters.environment}}
+          - group: Public API Infrastructure secrets - ${{parameters.environment}}
         steps:
           - checkout: self
 
@@ -44,10 +44,6 @@ stages:
                 --parameters ${{parameters.parameterFile}} \
                 --parameters \
                     subscription='$(subscription)' \
-                    vNetName='$(vNetName)' \
-                    acrName='$(acrName)' \
-                    coreStorageAccountName='$(coreStorageAccountName)' \
-                    keyVaultName='$(keyVaultName)' \
                     resourceTags='$(resourceTags)' \
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \

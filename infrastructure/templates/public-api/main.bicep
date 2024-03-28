@@ -64,18 +64,6 @@ param publicUrls {
   contentApi: string
 }?
 
-@description('The full name of the existing VNet.')
-param vNetName string = ''
-
-@description('The full name of the existing ACR.')
-param acrName string = ''
-
-@description('The full name of the existing Core Storage account.')
-param coreStorageAccountName string = ''
-
-@description('The full name of the existing Key Vault.')
-param keyVaultName string = ''
-
 @description('Specifies whether or not the Data Processor Function App already exists.')
 param dataProcessorFunctionAppExists bool = false
 
@@ -85,6 +73,10 @@ var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerApp
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
+var coreStorageAccountName = '${subscription}saeescore'
+var keyVaultName = '${subscription}-kv-ees-01'
+var acrName = 'eesacr'
+var vNetName = '${subscription}-vnet-ees'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName

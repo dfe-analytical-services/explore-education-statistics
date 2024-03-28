@@ -12,7 +12,7 @@ parameters:
     default: true
 
 variables:
-  - group: EES Bicep Infrastructure common
+  - group: Public API Infrastructure - common
   - name: isDev
     value: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev')]
   - name: isTest
@@ -76,33 +76,33 @@ stages:
       serviceConnection: $(serviceConnectionTest)
       parameterFile: $(testParamFile)
 
-- ${{ if variables.isMaster }}:
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_PreProduction'
-      environment: 'Pre-production'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: $(preProdParamFile)
-
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_PreProduction'
-      dependsOn: 'Validate_Against_PreProduction'
-      environment: 'Pre-production'
-      serviceConnection: $(serviceConnectionPreProduction)
-      parameterFile: $(preProdParamFile)
-
-  - template: validate-stage-template.yml
-    parameters:
-      stageName: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: $(prodParamFile)
-
-  - template: deploy-stage-template.yml
-    parameters:
-      stageName: 'Deploy_to_Production'
-      dependsOn: 'Validate_Against_Production'
-      environment: 'Production'
-      serviceConnection: $(serviceConnectionProduction)
-      parameterFile: $(prodParamFile)
+#- ${{ if variables.isMaster }}:
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_PreProduction'
+#      environment: 'Pre-production'
+#      serviceConnection: $(serviceConnectionPreProduction)
+#      parameterFile: $(preProdParamFile)
+#
+#  - template: deploy-stage-template.yml
+#    parameters:
+#      stageName: 'Deploy_to_PreProduction'
+#      dependsOn: 'Validate_Against_PreProduction'
+#      environment: 'Pre-production'
+#      serviceConnection: $(serviceConnectionPreProduction)
+#      parameterFile: $(preProdParamFile)
+#
+#  - template: validate-stage-template.yml
+#    parameters:
+#      stageName: 'Validate_Against_Production'
+#      environment: 'Production'
+#      serviceConnection: $(serviceConnectionProduction)
+#      parameterFile: $(prodParamFile)
+#
+#  - template: deploy-stage-template.yml
+#    parameters:
+#      stageName: 'Deploy_to_Production'
+#      dependsOn: 'Validate_Against_Production'
+#      environment: 'Production'
+#      serviceConnection: $(serviceConnectionProduction)
+#      parameterFile: $(prodParamFile)
