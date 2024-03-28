@@ -27,9 +27,6 @@ param storageFirewallRules array = []
 ])
 param skuStorageResource string = 'Standard_LRS'
 
-@description('The name of the Key Vault to store the connection strings')
-param keyVaultName string
-
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
