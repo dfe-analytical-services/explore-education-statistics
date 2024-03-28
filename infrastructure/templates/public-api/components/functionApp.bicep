@@ -51,7 +51,7 @@ param functionAppExists bool
 @description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
 param preWarmedInstanceCount int?
 
-@description('Specifies the number of pre-warmed instances for this Function App - must be compatible with the chosen hosting plan')
+@description('Specifies whether or not the Function App will always be on and not idle after periods of no traffic - must be compatible with the chosen hosting plan')
 param alwaysOn bool?
 
 var appServicePlanName = '${resourcePrefix}-asp-${functionAppName}'

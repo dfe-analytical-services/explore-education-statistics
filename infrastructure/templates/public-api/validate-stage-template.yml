@@ -36,8 +36,8 @@ stages:
               azureSubscription: ${{parameters.serviceConnection}}
               scriptType: bash
               scriptLocation: inlineScript
-              failOnStandardError: true
               inlineScript: |
+                set -e
                 az deployment group validate \
                 --resource-group $(resourceGroupName) \
                 --template-file $(templateFile) \
