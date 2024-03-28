@@ -49,17 +49,17 @@ public static class DataSetVersionMetaSummaryGeneratorExtensions
     public static InstanceSetters<DataSetVersionMetaSummary> SetFilters(
         this InstanceSetters<DataSetVersionMetaSummary> setters,
         IEnumerable<string> filters)
-        => setters.Set(ms => ms.Filters, filters);
+        => setters.Set(ms => ms.Filters, filters.ToList);
 
     public static InstanceSetters<DataSetVersionMetaSummary> SetIndicators(
         this InstanceSetters<DataSetVersionMetaSummary> setters,
         IEnumerable<string> indicators)
-        => setters.Set(ms => ms.Indicators, indicators);
+        => setters.Set(ms => ms.Indicators, indicators.ToList);
 
     public static InstanceSetters<DataSetVersionMetaSummary> SetGeographicLevels(
         this InstanceSetters<DataSetVersionMetaSummary> setters,
         IEnumerable<GeographicLevel> geographicLevels)
-        => setters.Set(ms => ms.GeographicLevels, geographicLevels);
+        => setters.Set(ms => ms.GeographicLevels, geographicLevels.ToList);
 
     private static TimePeriodRange DefaultTimePeriodRange(Faker faker)
     {
