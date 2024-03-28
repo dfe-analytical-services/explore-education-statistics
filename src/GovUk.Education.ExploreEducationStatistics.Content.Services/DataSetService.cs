@@ -19,8 +19,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
-using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestOrderBy;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
+using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
@@ -43,8 +43,8 @@ public class DataSetService : IDataSetService
         Guid? releaseVersionId,
         bool? latestOnly,
         string? searchTerm,
-        DataSetsListRequestOrderBy? orderBy,
-        SortOrder? sort,
+        DataSetsListRequestSortBy? sort,
+        SortDirection? sortDirection,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -52,8 +52,8 @@ public class DataSetService : IDataSetService
         // If latestOnly is null default it to true except when a releaseVersionId is provided
         latestOnly ??= !releaseVersionId.HasValue;
 
-        orderBy ??= searchTerm == null ? Title : Relevance;
-        sort ??= orderBy is Title or Natural ? Asc : Desc;
+        sort ??= searchTerm == null ? Title : Relevance;
+        sortDirection ??= sort is Title or Natural ? Asc : Desc;
 
         var latestPublishedReleaseVersions =
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
@@ -68,7 +68,7 @@ public class DataSetService : IDataSetService
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
         var results = await query
-            .OrderBy(orderBy.Value, sort.Value)
+            .OrderBy(sort.Value, sortDirection.Value)
             .Paginate(page: page, pageSize: pageSize)
             .Select(BuildResultViewModel())
             .ToListAsync(cancellationToken: cancellationToken);
@@ -176,28 +176,28 @@ internal static class FreeTextReleaseFileValueResultQueryableExtensions
 {
     internal static IOrderedQueryable<FreeTextValueResult<ReleaseFile>> OrderBy(
         this IQueryable<FreeTextValueResult<ReleaseFile>> query,
-        DataSetsListRequestOrderBy orderBy,
-        SortOrder sort)
+        DataSetsListRequestSortBy sort,
+        SortDirection sortDirection)
     {
-        var orderedQuery = orderBy switch
+        var orderedQuery = sort switch
         {
             Natural =>
-                sort == Asc
+                sortDirection == Asc
                     ? query.OrderBy(result => result.Value.Order)
                     : query.OrderByDescending(result => result.Value.Order),
             Published =>
-                sort == Asc
+                sortDirection == Asc
                     ? query.OrderBy(result => result.Value.ReleaseVersion.Published)
                     : query.OrderByDescending(result => result.Value.ReleaseVersion.Published),
             Relevance =>
-                sort == Asc
+                sortDirection == Asc
                     ? query.OrderBy(result => result.Rank)
                     : query.OrderByDescending(result => result.Rank),
             Title =>
-                sort == Asc
+                sortDirection == Asc
                     ? query.OrderBy(result => result.Value.Name)
                     : query.OrderByDescending(result => result.Value.Name),
-            _ => throw new ArgumentOutOfRangeException(nameof(orderBy), orderBy, message: null)
+            _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)
         };
 
         // Then sort by id to provide a stable sort order

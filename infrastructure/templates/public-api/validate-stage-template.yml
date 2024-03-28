@@ -1,0 +1,53 @@
+# This is a reusable Deploy stage definition that is parameterised to be reusable
+# to support deployment to different environments
+
+parameters:
+  - name: stageName
+    type: string
+  - name: environment
+    type: string
+  - name: serviceConnection
+    type: string
+  - name: parameterFile
+    type: string
+
+stages:
+  - stage: ${{parameters.stageName}}
+    displayName: 'Validate ${{parameters.environment}} Infrastructure'
+    jobs:
+      - job: Validate_Infrastructure
+        variables:
+          - group: Public API Infrastructure - ${{parameters.environment}}
+          - group: Public API Infrastructure - ${{parameters.environment}} secrets
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: 'Install Bicep'
+            inputs:
+              azureSubscription: ${{parameters.serviceConnection}}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: 'az bicep install'
+
+          - task: AzureCLI@2
+            displayName: 'Validate bicep scripts'
+            inputs:
+              azureSubscription: ${{parameters.serviceConnection}}
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+                az deployment group validate \
+                --resource-group $(resourceGroupName) \
+                --template-file $(templateFile) \
+                --parameters ${{parameters.parameterFile}} \
+                --parameters \
+                    subscription='$(subscription)' \
+                    resourceTags='$(resourceTags)' \
+                    publicUrls='$(publicUrls)' \
+                    postgreSqlAdminName='$(postgreSqlAdminName)' \
+                    postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    dockerImagesTag='$(upstreamPipelineBuildNumber)' \
+                    psqlDbUsersAdded=true \
+                    dataProcessorFunctionAppExists=true

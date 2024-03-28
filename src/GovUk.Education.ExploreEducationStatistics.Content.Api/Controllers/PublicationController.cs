@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     request.ThemeId,
                     request.Search,
                     request.Sort,
-                    request.Order,
+                    request.SortDirection,
                     page: request.Page,
                     pageSize: request.PageSize)
                 .HandleFailuresOrOk();
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     request.ThemeId,
                     request.Search,
                     request.Sort,
-                    request.Order,
+                    request.SortDirection,
                     page: request.Page,
                     pageSize: request.PageSize,
                     publicationIds: request.PublicationIds)

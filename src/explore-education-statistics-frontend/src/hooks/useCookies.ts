@@ -13,7 +13,7 @@ import {
 } from 'nookies';
 import { useState } from 'react';
 
-export const userTestingBannerVersion = 1;
+export const userTestingBannerVersion = 2;
 
 interface Cookie {
   name: string;

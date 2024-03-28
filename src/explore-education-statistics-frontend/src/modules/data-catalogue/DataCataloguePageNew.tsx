@@ -13,6 +13,7 @@ import { releaseTypes } from '@common/services/types/releaseType';
 import downloadService from '@common/services/downloadService';
 import { Theme } from '@common/services/publicationService';
 import { useMobileMedia } from '@common/hooks/useMedia';
+import { SortDirection } from '@common/services/types/sort';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
@@ -21,8 +22,7 @@ import dataSetQueries from '@frontend/queries/dataSetQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
   DataSetFilter,
-  DataSetOrderOption,
-  DataSetSortParam,
+  DataSetSortOption,
   dataSetFilters,
 } from '@frontend/services/dataSetService';
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
@@ -43,12 +43,12 @@ import { useRouter } from 'next/router';
 
 export interface DataCataloguePageQuery {
   latestOnly?: string;
-  orderBy?: DataSetOrderOption;
   page?: number;
   publicationId?: string;
   releaseId?: string;
   searchTerm?: string;
-  sort?: DataSetSortParam;
+  sortBy?: DataSetSortOption;
+  sortDirection?: SortDirection;
   themeId?: string;
 }
 
@@ -57,7 +57,7 @@ export default function DataCataloguePageNew() {
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const { latestOnly, orderBy, publicationId, releaseId, searchTerm, themeId } =
+  const { latestOnly, sortBy, publicationId, releaseId, searchTerm, themeId } =
     getParamsFromQuery(router.query);
 
   const {
@@ -139,7 +139,7 @@ export default function DataCataloguePageNew() {
       const newParams = await getUpdatedQueryParams({
         filterType: 'publicationId',
         nextValue: publicationId,
-        orderBy,
+        sortBy,
         query: {
           ...router.query,
           themeId: publicationThemeId,
@@ -175,7 +175,7 @@ export default function DataCataloguePageNew() {
     const newParams = await getUpdatedQueryParams({
       filterType,
       nextValue,
-      orderBy,
+      sortBy,
       query: router.query,
       ...(filterType === 'publicationId' && {
         onFetchReleases: () =>
@@ -206,7 +206,7 @@ export default function DataCataloguePageNew() {
       ...(filterType === 'all'
         ? omit(router.query, 'page', ...dataSetFilters)
         : omit(router.query, getFiltersToRemove(filterType), 'page')),
-      orderBy: searchTerm && orderBy === 'relevance' ? 'newest' : orderBy,
+      sortBy: searchTerm && sortBy === 'relevance' ? 'newest' : sortBy,
     });
 
     logEvent({
@@ -229,16 +229,16 @@ export default function DataCataloguePageNew() {
     });
   };
 
-  const handleChangeOrderBy = async (nextOrderBy: DataSetOrderOption) => {
+  const handleSortByChange = async (nextSortBy: DataSetSortOption) => {
     await updateQueryParams({
       ...omit(router.query, 'page'),
-      orderBy: nextOrderBy,
+      sortBy: nextSortBy,
     });
 
     logEvent({
       category: 'Data catalogue',
       action: 'Data sets sorted',
-      label: nextOrderBy,
+      label: nextSortBy,
     });
   };
 
@@ -336,7 +336,7 @@ export default function DataCataloguePageNew() {
                 )}
 
                 <VisuallyHidden>{` Sorted by ${
-                  orderBy === 'title' ? 'A to Z' : orderBy
+                  sortBy === 'title' ? 'A to Z' : sortBy
                 }`}</VisuallyHidden>
               </p>
 
@@ -456,8 +456,8 @@ export default function DataCataloguePageNew() {
                                 ]
                               : []),
                           ]}
-                          sortBy={orderBy}
-                          onChange={handleChangeOrderBy}
+                          sortBy={sortBy}
+                          onChange={handleSortByChange}
                         />
                       )}
                       {selectedPublication && selectedRelease && (

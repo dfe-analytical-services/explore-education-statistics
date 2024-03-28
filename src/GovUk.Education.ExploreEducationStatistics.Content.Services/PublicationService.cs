@@ -15,7 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
@@ -145,13 +145,13 @@ public class PublicationService : IPublicationService
         Guid? themeId = null,
         string? search = null,
         PublicationsSortBy? sort = null,
-        SortOrder? order = null,
+        SortDirection? sortDirection = null,
         int page = 1,
         int pageSize = 10,
         IEnumerable<Guid>? publicationIds = null)
     {
         sort ??= search == null ? Title : Relevance;
-        order ??= sort == Title ? Asc : Desc;
+        sortDirection ??= sort == Title ? Asc : Desc;
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
@@ -182,15 +182,15 @@ public class PublicationService : IPublicationService
         var orderedQueryable = sort switch
         {
             Published =>
-                order == Asc
+                sortDirection == Asc
                     ? queryable.OrderBy(result => result.Value.LatestPublishedReleaseVersion!.Published)
                     : queryable.OrderByDescending(result => result.Value.LatestPublishedReleaseVersion!.Published),
             Relevance =>
-                order == Asc
+                sortDirection == Asc
                     ? queryable.OrderBy(result => result.Rank)
                     : queryable.OrderByDescending(result => result.Rank),
             Title =>
-                order == Asc
+                sortDirection == Asc
                     ? queryable.OrderBy(result => result.Value.Title)
                     : queryable.OrderByDescending(result => result.Value.Title),
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)

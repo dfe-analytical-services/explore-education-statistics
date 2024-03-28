@@ -40,20 +40,15 @@ param dbSkuTier string = 'Burstable'
   '13'
   '14'
   '15'
+  '16'
 ])
-param postgresqlVersion string = '14'
+param postgreSqlVersion string = '16'
 
 @description('PostgreSQL Server backup retention days')
 param backupRetentionDays int = 7
 
 @description('Geo-Redundant Backup setting')
 param geoRedundantBackup string = 'Disabled'
-
-@description('The name of the Key Vault to store the connection strings')
-param keyVaultName string
-
-@description('Specifies the VNet id')
-param vNetId string
 
 @description('Specifies the subnet id')
 param subnetId string
@@ -71,29 +66,24 @@ param firewallRules {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
+@description('Id of the PostgreSQL Private DNS Zone')
+param privateDnsZoneId string
+
+@description('Create mode for the PostgreSQL Flexible Server resource')
+@allowed([
+  'Create'
+  'Default'
+  'GeoRestore'
+  'PointInTimeRestore'
+  'Replica'
+  'ReviveDropped'
+  'Update'
+])
+param createMode string = 'Default'
+
 var databaseServerName = empty(serverName)
   ? '${resourcePrefix}-psql-flexibleserver'
   : '${resourcePrefix}-psql-flexibleserver-${serverName}'
-
-var connectionStringSecretName = '${databaseServerName}-connectionString'
-var connectionString = 'Server=${postgreSQLDatabase.name}${az.environment().suffixes.sqlServerHostname};${adminName}Database=<database>;Port=5432;${postgreSQLDatabase.name}User Id=${adminPassword};'
-
-// In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
-// with "postgres.database.azure.com".
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-  name: 'private.postgres.database.azure.com'
-  location: 'global'
-  resource vNetLink 'virtualNetworkLinks' = {
-    name: '${databaseServerName}-vnet-link'
-    location: 'global'
-    properties: {
-      registrationEnabled: false
-      virtualNetwork: {
-        id: vNetId
-      }
-    }
-  }
-}
 
 resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-01-preview' = {
   name: databaseServerName
@@ -103,10 +93,15 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     tier: dbSkuTier
   }
   properties: {
-    createMode: 'Default'
-    version: postgresqlVersion
+    createMode: createMode
+    version: postgreSqlVersion
     administratorLogin: adminName
     administratorLoginPassword: adminPassword
+    authConfig: {
+      activeDirectoryAuth: 'Enabled'
+      passwordAuth: 'Disabled'
+      tenantId: tenant().tenantId
+    }
     storage: {
       storageSizeGB: dbStorageSizeGB
       autoGrow: dbAutoGrowStatus
@@ -120,7 +115,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     }
     network: {
       delegatedSubnetResourceId: subnetId
-      privateDnsZoneArmResourceId: privateDnsZone.id
+      privateDnsZoneArmResourceId: privateDnsZoneId
     }
   }
 
@@ -139,20 +134,7 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
   tags: tagValues
 }
 
-// Store the connections string in Key Vault and output the URI to the generated secret.
-module storeADOConnectionStringToKeyVault './keyVaultSecret.bicep' = {
-  name: 'dbConnectionStringSecretDeploy'
-  params: {
-    keyVaultName: keyVaultName
-    isEnabled: true
-    secretValue: connectionString 
-    contentType: 'text/plain'
-    secretName: connectionStringSecretName
-  }
-}
-
 @description('The fully qualified Azure resource ID of the Database Server.')
 output databaseRef string = resourceId('Microsoft.DBforPostgreSQL/flexibleServers', databaseServerName)
 
-@description('Connection String Secrets.')
-output connectionStringSecretName string = connectionStringSecretName
+output managedIdentityConnectionStringTemplate string = 'Server=${postgreSQLDatabase.name}.postgres.database.azure.com;Database=[database_name];Port=5432;User Id=[managed_identity_name];Password=[access_token]'
