@@ -22,7 +22,6 @@ interface Props {
   publicationSubject: PublicationSubject;
   subject: PrototypeSubject;
   onEditSubject: (publicationSubject: PublicationSubject) => void;
-  onTogglePreview: (subject: PrototypeSubject) => void;
 }
 
 const PrototypePublicationSubject = ({
@@ -33,7 +32,6 @@ const PrototypePublicationSubject = ({
   publicationSubject,
   subject,
   onEditSubject,
-  onTogglePreview,
 }: Props) => {
   const [showVersionHistory, toggleVersionHistory] = useToggle(false);
   const [showNextVersionHistory, toggleNextVersionHistory] = useToggle(false);
@@ -151,7 +149,7 @@ const PrototypePublicationSubject = ({
                 <h4 className="govuk-heading-m">
                   Preview API data set for version 1.0
                 </h4>
-                <PreviewExample initialVersion />
+                <PreviewExample />
               </div>
             )}
           </SummaryListItem>

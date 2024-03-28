@@ -1,14 +1,12 @@
 import classNames from 'classnames';
 import React, { ReactNode, useState } from 'react';
-import styles from '@common/components/Accordion.module.scss';
 
 interface Props {
   children: ReactNode;
-  className?: string;
   listCompact?: boolean;
 }
 
-const ToggleMoreDetails = ({ children, className, listCompact }: Props) => {
+const ToggleMoreDetails = ({ children, listCompact }: Props) => {
   const [listCompactView, setListCompact] = useState(listCompact);
 
   return (

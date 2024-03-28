@@ -1,4 +1,3 @@
-import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
 import {
   matcherHint,
   printReceived,

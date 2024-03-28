@@ -15,6 +15,7 @@ const PrototypeHomepage = () => {
   const urlDataType = params.get('dataType');
   const latestRelease = 'Academic year 2021/22';
   const contentRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [fullWidth, setFullWidth] = useState(false);
   const [fullTable, setFullTable] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
@@ -22,6 +23,7 @@ const PrototypeHomepage = () => {
   const [sectionSelected, setSectionSelected] = useState(
     'dataSummary' as string | undefined,
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sectionShowAll, setSectionShowAll] = useState(true);
 
   const changeSectionState = (newSection: string | undefined) => {

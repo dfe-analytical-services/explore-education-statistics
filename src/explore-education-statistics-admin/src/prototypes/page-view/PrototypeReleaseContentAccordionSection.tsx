@@ -202,8 +202,6 @@ const ReleaseContentAccordionSection = ({
                 allowComments
                 allowImages
                 block={block}
-                sectionId={sectionId}
-                sectionKey="content"
                 editable={!isReordering}
                 publicationId={release.publication.id}
                 releaseId={release.id}

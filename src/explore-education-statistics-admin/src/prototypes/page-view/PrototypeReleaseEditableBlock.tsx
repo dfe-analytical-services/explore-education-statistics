@@ -5,7 +5,6 @@ import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import { releaseToolbarConfigFull } from '@admin/config/ckEditorConfig';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
-import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import {
   releaseDataBlockEditRoute,
@@ -28,8 +27,6 @@ interface Props {
   editable?: boolean;
   publicationId: string;
   releaseId: string;
-  sectionId: string;
-  sectionKey: ContentSectionKeys;
   visible?: boolean;
 }
 
@@ -40,8 +37,6 @@ const PrototypeReleaseEditableBlock = ({
   editable = true,
   publicationId,
   releaseId,
-  sectionId,
-  sectionKey,
   visible,
 }: Props) => {
   const getChartFile = useGetChartFile(releaseId);

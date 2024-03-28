@@ -142,6 +142,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
       fallbackServerValidationError,
       form,
       handleError,
+      resetAfterSubmit,
     ],
   );
 

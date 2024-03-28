@@ -1,13 +1,10 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 import RelatedInformation from '@common/components/RelatedInformation';
-import { useMobileMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import { releaseTypes } from '@common/services/types/releaseType';
-import PrototypeSortFilters, {
-  PrototypeMobileSortFilters,
-} from '@admin/prototypes/components/PrototypeSortFilters';
+import PrototypeSortFilters from '@admin/prototypes/components/PrototypeSortFilters';
 import styles from '@admin/prototypes/PrototypePublicPage.module.scss';
 import { publications, themes } from '@admin/prototypes/data/newThemesData';
 import orderBy from 'lodash/orderBy';
@@ -18,14 +15,12 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import ToggleMoreDetails from '@admin/prototypes/components/PrototypeToggleMoreDetails';
 
 const PrototypeDataCatalogue = () => {
-  const { isMedia: isMobileMedia } = useMobileMedia();
   const params = new URLSearchParams(window.location.search);
   const urlTheme = params.get('theme');
   const urlPublication = params.get('publication');
   const urlSource = params.get('source');
   const urlDataType = params.get('dataType');
   const urlCompactList = params.get('compactList');
-  const [showFilters, setShowFilters] = useState(false);
 
   const [fullList] = useState(true);
   const [listCompact, setListCompact] = useState(
