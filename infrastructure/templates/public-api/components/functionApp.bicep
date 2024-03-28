@@ -230,10 +230,9 @@ module functionAppSlotSettings 'appServiceSlotConfig.bicep' = {
   ]
 }
 
-// Allow Key Vault references passed as secure appsettings to be resolved by the Data Processor Function App and its
-// deployment slots.
-module dataProcessorFunctionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
-  name: 'dataProcessorFunctionAppKeyVaultAccessPolicy'
+// Allow Key Vault references passed as secure appsettings to be resolved by the Function App and its deployment slots.
+module functionAppKeyVaultAccessPolicy 'keyVaultAccessPolicy.bicep' = {
+  name: '${functionAppName}FunctionAppKeyVaultAccessPolicy'
   params: {
     keyVaultName: keyVaultName
     principalIds: [
