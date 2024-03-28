@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var actual = await context
                     .ReleaseVersions
-                    .SingleAsync(r => r.PublicationId == publication.Id);
+                    .SingleAsync(rv => rv.PublicationId == publication.Id);
 
                 Assert.Equal(2018, actual.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
