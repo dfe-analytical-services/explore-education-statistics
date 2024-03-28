@@ -17,18 +17,12 @@ param applicationInsightsKey string
 param workloadProfiles {
  name: string
  workloadProfileType: string
-}[] = [{
- name: 'Consumption'
- workloadProfileType: 'Consumption'
-}]
+}[]?
 
 @description('Specifies a set of tags with which to tag the resource in Azure')
 param tagValues object
 
-@description('Specifies the name of the new Resource Group created to host the resources of the Container App Environment')
-param infrastructureResourceGroupName string
-
-var containerAppEnvironmentName = '${subscription}-ees-cae'
+var containerAppEnvironmentName = '${subscription}-ees-cae-01'
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
   name: logAnalyticsWorkspaceName
@@ -38,9 +32,9 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
   name: containerAppEnvironmentName
   location: location
   properties: {
-    vnetConfiguration: {
-      infrastructureSubnetId: subnetId
-    }
+    //vnetConfiguration: {
+    //  infrastructureSubnetId: subnetId
+    //}
     daprAIInstrumentationKey: applicationInsightsKey
     appLogsConfiguration: {
       destination: 'log-analytics'
@@ -49,7 +43,6 @@ resource containerAppEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' 
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
-    infrastructureResourceGroup: infrastructureResourceGroupName
     workloadProfiles: workloadProfiles
   }
   tags: tagValues
