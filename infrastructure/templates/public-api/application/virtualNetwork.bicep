@@ -15,12 +15,12 @@ param postgreSqlServerName string
 
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
 var postgreSqlSubnetName = '${subscription}-snet-${postgreSqlServerName}'
-var containerAppEnvironmentSubnetName = '${subscription}-snet-cae'
+var containerAppEnvironmentSubnetName = '${subscription}-snet-cae-01'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetPrefix = '10.0.6.0/24'
 var postgreSqlSubnetPrefix = '10.0.7.0/24'
-var containerAppEnvironmentSubnetPrefix = '10.0.8.0/24'
+var containerAppEnvironmentSubnetPrefix = '10.0.10.0/23'
 
 // Reference the existing VNet.
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
@@ -65,14 +65,6 @@ var containerAppEnvironmentSubnet = {
   name: containerAppEnvironmentSubnetName
   properties: {
     addressPrefix: containerAppEnvironmentSubnetPrefix
-    delegations: [
-      {
-        name: '${resourcePrefix}-snet-delegation-cae'
-        properties: {
-          serviceName: 'Microsoft.App/environments'
-        }
-      }
-    ]
   }
 }
 
