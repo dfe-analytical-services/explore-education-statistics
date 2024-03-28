@@ -3,7 +3,7 @@ trigger: none
 resources:
   pipelines:
     - pipeline: EESBuildPipeline
-      source: Explore Education Statistics
+      source: Explore Education Statistics disabled
       trigger: true
 
 parameters:
