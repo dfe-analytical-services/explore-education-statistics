@@ -3,8 +3,8 @@ trigger: none
 resources:
   pipelines:
     - pipeline: EESBuildPipeline
-      source: Explore Education Statistics disabled
-      trigger: true
+      source: Explore Education Statistics
+      trigger: false
 
 parameters:
   - name: psqlDbUsersAdded
