@@ -108,14 +108,14 @@ var dedicatedStorageAccountString = 'DefaultEndpointsProtocol=https;AccountName=
 var fileShareName1 = '${toLower(fullFunctionAppName)}-1'
 var fileShareName2 = '${toLower(fullFunctionAppName)}-2'
 
-resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+resource fileShare1 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name: '${dedicatedStorageAccountName}/default/${fileShareName1}'
   dependsOn: [
     dedicatedStorageAccount
   ]
 }
 
-resource fileShare2 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-05-01' = {
+resource fileShare2 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
   name: '${dedicatedStorageAccountName}/default/${fileShareName2}'
   dependsOn: [
     dedicatedStorageAccount
