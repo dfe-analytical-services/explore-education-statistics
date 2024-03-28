@@ -48,7 +48,7 @@
   "scripts": {
     "prepare": "husky install",
     "preinstall": "pnpm check:node",
-    "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules",
+    "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules && rm -rf src/explore-education-statistics-frontend/.next",
     "check:node": "check-node-version --package",
     "fix": "pnpm fix:js && pnpm fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx .",
