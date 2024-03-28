@@ -217,7 +217,6 @@ const PrototypePublicationSubjects = () => {
         publicationSubjects={publicationSubjects}
         onCreateNotification={setCreateNotification}
         onEditSubject={setSubjectToChange}
-        onTogglePreview={setPreviewPublicPage}
       />
     </PrototypeNextSubjectContextProvider>
   );

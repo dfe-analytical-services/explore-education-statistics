@@ -59,8 +59,6 @@ const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
               block={block}
               publicationId={release.publication.id}
               releaseId={release.id}
-              sectionId={release.headlinesSection.id}
-              sectionKey="headlinesSection"
             />
           )}
         />

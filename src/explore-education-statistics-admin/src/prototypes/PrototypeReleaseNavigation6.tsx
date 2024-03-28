@@ -24,7 +24,6 @@ const getDimensions = (e: any) => {
 const PrototypeReleaseData = () => {
   const { isMedia: isMobileMedia } = useMobileMedia();
   const [showContents, setShowContents] = useState(!isMobileMedia);
-  const [navSelected, setNavSelected] = useState('none');
 
   const [visibleSection, setVisibleSection] = useState<string>();
 
@@ -84,6 +83,7 @@ const PrototypeReleaseData = () => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visibleSection]);
 
   return (
@@ -371,9 +371,6 @@ const PrototypeReleaseData = () => {
                               },
                             )}
                             href="#help"
-                            onClick={() => {
-                              setNavSelected('help');
-                            }}
                           >
                             Help and support
                           </a>

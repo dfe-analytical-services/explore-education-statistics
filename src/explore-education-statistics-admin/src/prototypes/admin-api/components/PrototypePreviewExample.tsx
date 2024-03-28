@@ -4,25 +4,15 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import ButtonLink from '@common/components/ButtonLink';
 import ButtonText from '@common/components/ButtonText';
 import UrlContainer from '@common/components/UrlContainer';
 import Details from '@common/components/Details';
-import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
-import useStorageItem from '@common/hooks/useStorageItem';
-import ChangelogExample from './PrototypeChangelogExamples';
-import { Changelog } from '../contexts/PrototypeNextSubjectContext';
 
 export const apiPreviewTabIds = {
   dataGuidance: 'data-guidance',
   changeLog: 'change-log',
   generateToken: 'generate-token',
 };
-
-interface Props {
-  initialVersion?: boolean;
-  // versionUpdate?: string;
-}
 
 const today = new Date();
 const monthNames = [
@@ -53,19 +43,17 @@ const date = `${today.getDate() < 10 ? '0' : ''} ${today.getDate()}  ${
 }
  ${today.getFullYear()}`;
 
-const PrototypePreviewExample = ({ initialVersion }: Props) => {
+const PrototypePreviewExample = () => {
   const [tokenTerms, setTokenTerms] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [deleteToken, setDeleteToken] = useState(false);
   const [fullTable, setFullTable] = useState(false);
-  const [screenReaderMessage, setScreenReaderMessage] = useState('');
 
   const apiTokenUrl =
     'https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57';
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(apiTokenUrl);
-    setScreenReaderMessage('Link copied to the clipboard.');
   };
 
   return (

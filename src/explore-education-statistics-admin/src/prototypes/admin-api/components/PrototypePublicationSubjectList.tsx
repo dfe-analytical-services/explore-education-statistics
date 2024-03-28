@@ -18,7 +18,6 @@ interface Props {
   publicationSubjects: PublicationSubject[];
   onCreateNotification: (publicationSubject: PrototypeSubject) => void;
   onEditSubject: (publicationSubject: PublicationSubject) => void;
-  onTogglePreview: (subject: PrototypeSubject) => void;
 }
 
 const PrototypePublicationSubjectList = ({
@@ -27,7 +26,6 @@ const PrototypePublicationSubjectList = ({
   publicationSubjects,
   onCreateNotification,
   onEditSubject,
-  onTogglePreview,
 }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params: any = useParams();
@@ -95,7 +93,6 @@ const PrototypePublicationSubjectList = ({
                       subject={subject}
                       currentRelease={currentRelease}
                       onEditSubject={onEditSubject}
-                      onTogglePreview={onTogglePreview}
                     />
                   </AccordionSection>
                 );
