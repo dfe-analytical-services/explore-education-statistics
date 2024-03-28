@@ -40,7 +40,7 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
 }
 
 @description('Set specific appsettings to be slot specific values')
-resource functionSlotConfig 'Microsoft.Web/sites/config@2021-03-01' = {
+resource functionSlotConfig 'Microsoft.Web/sites/config@2023-01-01' = {
   name: '${appName}/slotConfigNames'
   properties: {
     appSettingNames: slotSpecificSettingKeys
@@ -63,7 +63,7 @@ resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2021-03-01' = 
 }
 
 @description('Set appsettings on production slot')
-resource appProductionSettings 'Microsoft.Web/sites/config@2021-03-01' = {
+resource appProductionSettings 'Microsoft.Web/sites/config@2023-01-01' = {
   name: '${appName}/appsettings'
   properties: combinedProductionSettings
 }
