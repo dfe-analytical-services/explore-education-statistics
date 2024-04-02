@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
-import DataSetPageSection from '@frontend/modules/data-catalogue/components/DataSetPageSection';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetPage';
+import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
+import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 // TODO EES-4856 replace with real data
@@ -41,7 +41,7 @@ const variables = [
 const tableId = 'variables-table';
 const defaultVisible = 5;
 
-export default function DataSetVariables() {
+export default function DataSetFileVariables() {
   const [showAll, toggleShowAll] = useToggle(false);
   const displayVariables = showAll
     ? variables
@@ -49,7 +49,7 @@ export default function DataSetVariables() {
   const totalVariables = variables.length;
 
   return (
-    <DataSetPageSection heading={pageSections.variables} id="variables">
+    <DataSetFilePageSection heading={pageSections.variables} id="variables">
       <table id={tableId}>
         <caption className="govuk-!-margin-bottom-3">
           {showAll
@@ -83,6 +83,6 @@ export default function DataSetVariables() {
           ? `Show only ${defaultVisible} variables`
           : `Show all ${totalVariables} variables`}
       </ButtonText>
-    </DataSetPageSection>
+    </DataSetFilePageSection>
   );
 }

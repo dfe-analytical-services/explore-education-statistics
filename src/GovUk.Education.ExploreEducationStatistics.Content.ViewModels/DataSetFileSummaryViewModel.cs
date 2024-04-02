@@ -2,7 +2,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record DataSetListViewModel
+public record DataSetFileSummaryViewModel
 {
     public Guid Id { get; init; }
 

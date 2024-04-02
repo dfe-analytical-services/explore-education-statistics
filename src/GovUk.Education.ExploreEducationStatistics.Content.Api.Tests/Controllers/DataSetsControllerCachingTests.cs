@@ -26,7 +26,7 @@ public class DataSetsControllerCachingTests
 {
     public class ListDataSetsTests : CacheServiceTestFixture
     {
-        private readonly DataSetsListRequest _query = new(
+        private readonly DataSetFileListRequest _query = new(
             ThemeId: Guid.NewGuid(),
             PublicationId: Guid.NewGuid(),
             ReleaseId: Guid.NewGuid(),
@@ -38,8 +38,8 @@ public class DataSetsControllerCachingTests
             PageSize: 10
         );
 
-        private readonly PaginatedListViewModel<DataSetListViewModel> _dataSets = new(
-            new List<DataSetListViewModel>
+        private readonly PaginatedListViewModel<DataSetFileSummaryViewModel> _dataSets = new(
+            new List<DataSetFileSummaryViewModel>
             {
                 new()
                 {
@@ -71,12 +71,12 @@ public class DataSetsControllerCachingTests
         [Fact]
         public async Task NoCachedEntryExists_CreatesCache()
         {
-            var dataSetService = new Mock<IDataSetService>(Strict);
+            var dataSetService = new Mock<IDataSetFileService>(Strict);
 
             MemoryCacheService
                 .Setup(s => s.GetItem(
-                    new ListDataSetsCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetListViewModel>)))
+                    new ListDataSetFilesCacheKey(_query),
+                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
                 .Returns((object?) null);
 
             var expectedCacheConfiguration = new MemoryCacheConfiguration(
@@ -84,13 +84,13 @@ public class DataSetsControllerCachingTests
 
             MemoryCacheService
                 .Setup(s => s.SetItem<object>(
-                    new ListDataSetsCacheKey(_query),
+                    new ListDataSetFilesCacheKey(_query),
                     _dataSets,
                     ItIs.DeepEqualTo(expectedCacheConfiguration),
                     null));
 
             dataSetService
-                .Setup(s => s.ListDataSets(
+                .Setup(s => s.ListDataSetFiles(
                     _query.ThemeId,
                     _query.PublicationId,
                     _query.ReleaseId,
@@ -117,8 +117,8 @@ public class DataSetsControllerCachingTests
         {
             MemoryCacheService
                 .Setup(s => s.GetItem(
-                    new ListDataSetsCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetListViewModel>)))
+                    new ListDataSetFilesCacheKey(_query),
+                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
                 .Returns(_dataSets);
 
             var controller = BuildController();
@@ -133,19 +133,19 @@ public class DataSetsControllerCachingTests
         [Fact]
         public void PaginatedDataSetListViewModel_SerializeAndDeserialize_Success()
         {
-            var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<DataSetListViewModel>>(
+            var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<DataSetFileSummaryViewModel>>(
                 JsonConvert.SerializeObject(_dataSets));
 
             converted.AssertDeepEqualTo(_dataSets);
         }
     }
 
-    private static DataSetsController BuildController(
-        IDataSetService? dataSetService = null
+    private static DataSetFilesController BuildController(
+        IDataSetFileService? dataSetService = null
     )
     {
-        return new DataSetsController(
-            dataSetService ?? Mock.Of<IDataSetService>(Strict)
+        return new DataSetFilesController(
+            dataSetService ?? Mock.Of<IDataSetFileService>(Strict)
         );
     }
 }

@@ -183,7 +183,7 @@ Validate Related information section and links exist
     ...    ${relatedInformation}
 
 Validate data sets list
-    user checks list has x items    testid:data-sets-list    10
+    user checks list has x items    testid:data-set-file-list    10
 
     ${dataSet}=    user gets testid element    data-set-summary-${SUBJECT_NAME_3}
 
@@ -277,7 +277,7 @@ Searching
     user presses keys    Exclusions by geographic level
     user clicks button    Search
     user checks page contains button    Exclusions by geographic level
-    user checks list item contains    testid:data-sets-list    1    Exclusions by geographic level
+    user checks list item contains    testid:data-set-file-list    1    Exclusions by geographic level
 
 Removing search
     user clicks button    Exclusions by geographic level

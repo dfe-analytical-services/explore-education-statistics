@@ -18,23 +18,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 [ApiController]
 [Route("api")]
 [Produces(MediaTypeNames.Application.Json)]
-public class DataSetsController : ControllerBase
+public class DataSetFilesController : ControllerBase
 {
-    private readonly IDataSetService _dataSetService;
+    private readonly IDataSetFileService _dataSetFileService;
 
-    public DataSetsController(IDataSetService dataSetService)
+    public DataSetFilesController(IDataSetFileService dataSetFileService)
     {
-        _dataSetService = dataSetService;
+        _dataSetFileService = dataSetFileService;
     }
 
-    [HttpGet("data-sets")]
-    [MemoryCache(typeof(ListDataSetsCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
-        [FromQuery] DataSetsListRequest request,
+    [HttpGet("data-set-files")]
+    [MemoryCache(typeof(ListDataSetFilesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSets(
+        [FromQuery] DataSetFileListRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _dataSetService
-            .ListDataSets(
+        return await _dataSetFileService
+            .ListDataSetFiles(
                 themeId: request.ThemeId,
                 publicationId: request.PublicationId,
                 releaseVersionId: request.ReleaseId,
@@ -48,12 +48,12 @@ public class DataSetsController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("data-set/{dataSetId:guid}")]
-    public async Task<ActionResult<DataSetDetailsViewModel>> GetDataSet(
-        Guid dataSetId)
+    [HttpGet("data-set-file/{dataSetFileId:guid}")]
+    public async Task<ActionResult<DataSetFileViewModel>> GetDataSet(
+        Guid dataSetFileId)
     {
-        return await _dataSetService
-            .GetDataSet(dataSetId)
+        return await _dataSetFileService
+            .GetDataSetFile(dataSetFileId)
             .HandleFailuresOrOk();
     }
 }

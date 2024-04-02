@@ -1,13 +1,13 @@
 import _downloadService from '@common/services/downloadService';
 import render from '@common-test/render';
-import DataSetPage from '@frontend/modules/data-catalogue/DataSetPage';
-import _dataSetService from '@frontend/services/dataSetService';
+import DataSetFilePage from '@frontend/modules/data-catalogue/DataSetFilePage';
+import _dataSetService from '@frontend/services/dataSetFileService';
 import { testDataSet } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-jest.mock('@frontend/services/dataSetService');
+jest.mock('@frontend/services/dataSetFileService');
 jest.mock('@common/services/downloadService');
 
 const dataSetService = _dataSetService as jest.Mocked<typeof _dataSetService>;
@@ -15,10 +15,10 @@ const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
 >;
 
-describe('DataSetPage', () => {
+describe('DataSetFilePage', () => {
   test('renders the page correctly', async () => {
-    dataSetService.getDataSet.mockResolvedValue(testDataSet);
-    render(<DataSetPage dataSetId="data-set-id" releaseId="release-id" />);
+    dataSetService.getDataSetFile.mockResolvedValue(testDataSet);
+    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
     await waitFor(() =>
       expect(screen.getByText('On this page')).toBeInTheDocument(),
@@ -73,8 +73,8 @@ describe('DataSetPage', () => {
   });
 
   test('renders the `latest data` tag when it is the latest data', async () => {
-    dataSetService.getDataSet.mockResolvedValue(testDataSet);
-    render(<DataSetPage dataSetId="data-set-id" releaseId="release-id" />);
+    dataSetService.getDataSetFile.mockResolvedValue(testDataSet);
+    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
     await waitFor(() =>
       expect(screen.getByText('On this page')).toBeInTheDocument(),
@@ -85,11 +85,11 @@ describe('DataSetPage', () => {
   });
 
   test('renders the `not the latest data` tag when it is not the latest data', async () => {
-    dataSetService.getDataSet.mockResolvedValue({
+    dataSetService.getDataSetFile.mockResolvedValue({
       ...testDataSet,
       release: { ...testDataSet.release, isLatestPublishedRelease: false },
     });
-    render(<DataSetPage dataSetId="data-set-id" releaseId="release-id" />);
+    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
     await waitFor(() =>
       expect(screen.getByText('On this page')).toBeInTheDocument(),
@@ -101,8 +101,8 @@ describe('DataSetPage', () => {
   });
 
   test('calls the download service with the correct id when the download button is clicked', async () => {
-    dataSetService.getDataSet.mockResolvedValue(testDataSet);
-    render(<DataSetPage dataSetId="data-set-id" releaseId="release-id" />);
+    dataSetService.getDataSetFile.mockResolvedValue(testDataSet);
+    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
     await waitFor(() =>
       expect(screen.getByText('On this page')).toBeInTheDocument(),
@@ -120,8 +120,8 @@ describe('DataSetPage', () => {
   });
 
   test('clicking the release type shows the modal', async () => {
-    dataSetService.getDataSet.mockResolvedValue(testDataSet);
-    render(<DataSetPage dataSetId="data-set-id" releaseId="release-id" />);
+    dataSetService.getDataSetFile.mockResolvedValue(testDataSet);
+    render(<DataSetFilePage dataSetFileId="datasetfile-id" />);
 
     await waitFor(() =>
       expect(screen.getByText('On this page')).toBeInTheDocument(),

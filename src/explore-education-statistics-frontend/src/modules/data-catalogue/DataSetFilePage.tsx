@@ -19,12 +19,12 @@ import ChevronCard from '@common/components/ChevronCard';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
-import DataSetPageSection from '@frontend/modules/data-catalogue/components/DataSetPageSection';
-import DataSetPageNav from '@frontend/modules/data-catalogue/components/DataSetPageNav';
-import DataSetPreview from '@frontend/modules/data-catalogue/components/DataSetPreview';
+import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
+import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
+import DataSetFilePreview from '@frontend/modules/data-catalogue/components/DataSetFilePreview';
 import styles from '@frontend/modules/data-catalogue/DataSetPage.module.scss';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
-import dataSetQueries from '@frontend/queries/dataSetQueries';
+import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import React, { useEffect, useState } from 'react';
@@ -45,13 +45,12 @@ export const pageSections: Dictionary<string> = {
 export type PageSection = keyof typeof pageSections & string;
 
 interface Props {
-  dataSetId: string;
-  releaseId: string;
+  dataSetFileId: string;
 }
 
-export default function DataSetPage({ dataSetId, releaseId }: Props) {
-  const { data: dataSet } = useQuery({
-    ...dataSetQueries.get(dataSetId),
+export default function DataSetFilePage({ dataSetFileId }: Props) {
+  const { data: dataSetFile } = useQuery({
+    ...dataSetFileQueries.get(dataSetFileId),
     keepPreviousData: true,
     staleTime: 60000,
     retry: false,
@@ -100,7 +99,7 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
     };
   }, [handleScroll]);
 
-  if (!dataSet) {
+  if (!dataSetFile) {
     return <NotFoundPage />;
   }
 
@@ -113,7 +112,7 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
     summary,
     timePeriods,
     title,
-  } = dataSet;
+  } = dataSetFile;
 
   return (
     <Page
@@ -123,7 +122,7 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
       wide={fullScreenPreview}
     >
       {fullScreenPreview ? (
-        <DataSetPreview
+        <DataSetFilePreview
           fullScreen={fullScreenPreview}
           showAll={showAllPreview}
           onToggleFullScreen={toggleFullScreenPreview}
@@ -163,13 +162,16 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
           <hr className="govuk-!-margin-bottom-8 govuk-!-margin-top-6" />
 
           <div className="govuk-grid-row">
-            <DataSetPageNav
+            <DataSetFilePageNav
               activeSection={activeSection}
               onClickItem={setActiveSection}
             />
 
             <div className="govuk-grid-column-two-thirds">
-              <DataSetPageSection heading={pageSections.details} id="details">
+              <DataSetFilePageSection
+                heading={pageSections.details}
+                id="details"
+              >
                 <SummaryList
                   ariaLabel={`Details list for ${title}`}
                   className="govuk-!-margin-bottom-4 govuk-!-margin-top-4"
@@ -259,10 +261,10 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
                     </SummaryListItem>
                   )}
                 </SummaryList>
-              </DataSetPageSection>
+              </DataSetFilePageSection>
 
               {/* TODO EES-4856 */}
-              {/* <DataSetPreview
+              {/* <DataSetFilePreview
                 fullScreen={fullScreenPreview}
                 showAll={showAllPreview}
                 onToggleFullScreen={() => {
@@ -273,12 +275,12 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
               /> */}
 
               {/* TODO EES-4856 */}
-              {/* <DataSetVariables /> */}
+              {/* <DataSetFileVariables /> */}
 
               {/* TODO EES-4856 */}
-              {/* <DataSetFootnotes /> */}
+              {/* <DataSetFileFootnotes /> */}
 
-              <DataSetPageSection heading={pageSections.using} id="using">
+              <DataSetFilePageSection heading={pageSections.using} id="using">
                 <ChevronGrid>
                   <ChevronCard
                     cardSize="l"
@@ -303,7 +305,7 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
                     }
                   />
                 </ChevronGrid>
-              </DataSetPageSection>
+              </DataSetFilePageSection>
             </div>
           </div>
         </>
@@ -314,15 +316,13 @@ export default function DataSetPage({ dataSetId, releaseId }: Props) {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async context => {
-    const { dataSetId = '', releaseId = '' } =
-      context.query as Dictionary<string>;
+    const { dataSetFileId = '' } = context.query as Dictionary<string>;
 
     const queryClient = new QueryClient();
-    await queryClient.prefetchQuery(dataSetQueries.get(dataSetId));
+    await queryClient.prefetchQuery(dataSetFileQueries.get(dataSetFileId));
 
     const props: Props = {
-      dataSetId,
-      releaseId,
+      dataSetFileId,
     };
 
     return {

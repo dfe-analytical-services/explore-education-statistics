@@ -1,5 +1,5 @@
-import DataSetSummary from '@frontend/modules/data-catalogue/components/DataSetSummary';
-import { testDataSetSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
+import { testDataSetFileSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -13,9 +13,9 @@ const longSummary = `Number of places approved and available for use,
   closed on 31 May 2014. It included the homes Newton House, Willows House 
   and Vardy House. - Adel Beck was previously known as East Moor until January 2015.`;
 
-describe('DataSetSummary', () => {
+describe('DataSetFileSummary', () => {
   test('renders the collapsed view correctly', () => {
-    render(<DataSetSummary dataSet={testDataSetSummaries[0]} />);
+    render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
 
     expect(
       screen.getByRole('heading', { name: 'Data set 1' }),
@@ -38,7 +38,7 @@ describe('DataSetSummary', () => {
   });
 
   test('renders the expanded view when show more details is clicked', async () => {
-    render(<DataSetSummary dataSet={testDataSetSummaries[0]} />);
+    render(<DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} />);
 
     await userEvent.click(
       screen.getByRole('button', {
@@ -75,7 +75,9 @@ describe('DataSetSummary', () => {
   });
 
   test('renders the expanded view when `expanded` is true', () => {
-    render(<DataSetSummary dataSet={testDataSetSummaries[0]} expanded />);
+    render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,
+    );
 
     expect(
       within(screen.getByTestId('Geographic levels')).getByText(
@@ -107,8 +109,8 @@ describe('DataSetSummary', () => {
 
   test('renders the `read more` button when the content is long', () => {
     render(
-      <DataSetSummary
-        dataSet={{ ...testDataSetSummaries[0], content: longSummary }}
+      <DataSetFileSummary
+        dataSetFile={{ ...testDataSetFileSummaries[0], content: longSummary }}
         expanded
       />,
     );
@@ -119,7 +121,9 @@ describe('DataSetSummary', () => {
   });
 
   test('does not render the `read more` button when the content is short', () => {
-    render(<DataSetSummary dataSet={testDataSetSummaries[0]} expanded />);
+    render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,
+    );
 
     expect(
       screen.queryByRole('button', { name: 'Read more about Data set 1' }),
@@ -127,7 +131,9 @@ describe('DataSetSummary', () => {
   });
 
   test('renders the `latest data` tag when it is the latest release', () => {
-    render(<DataSetSummary dataSet={testDataSetSummaries[0]} expanded />);
+    render(
+      <DataSetFileSummary dataSetFile={testDataSetFileSummaries[0]} expanded />,
+    );
 
     expect(screen.getByText('This is the latest data')).toBeInTheDocument();
     expect(
@@ -137,8 +143,8 @@ describe('DataSetSummary', () => {
 
   test('renders the `not the latest data` tag when it is not the latest release', () => {
     render(
-      <DataSetSummary
-        dataSet={{ ...testDataSetSummaries[0], latestData: false }}
+      <DataSetFileSummary
+        dataSetFile={{ ...testDataSetFileSummaries[0], latestData: false }}
         expanded
       />,
     );

@@ -4,16 +4,16 @@ import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
 import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import {
-  DataSetSortParam,
-  dataSetSortOptions,
-  DataSetSortOption,
-  DataSetListRequest,
-} from '@frontend/services/dataSetService';
+  DataSetFileSortParam,
+  dataSetFileSortOptions,
+  DataSetFileSortOption,
+  DataSetFileListRequest,
+} from '@frontend/services/dataSetFileService';
 import omitBy from 'lodash/omitBy';
 
-export default function createDataSetListRequest(
+export default function createDataSetFileListRequest(
   query: DataCataloguePageQuery,
-): DataSetListRequest {
+): DataSetFileListRequest {
   const {
     latestOnly,
     sortBy,
@@ -44,8 +44,8 @@ export default function createDataSetListRequest(
   );
 }
 
-function getSortParams(orderBy: DataSetSortOption): {
-  sort?: DataSetSortParam;
+function getSortParams(orderBy: DataSetFileSortOption): {
+  sort?: DataSetFileSortParam;
   sortDirection?: SortDirection;
 } {
   if (orderBy === 'relevance') {
@@ -76,7 +76,7 @@ export function getParamsFromQuery(query: DataCataloguePageQuery) {
   return {
     latestOnly: getFirst(query.latestOnly),
     sortBy:
-      query.sortBy && isOneOf(query.sortBy, dataSetSortOptions)
+      query.sortBy && isOneOf(query.sortBy, dataSetFileSortOptions)
         ? query.sortBy
         : 'newest',
     publicationId: getFirst(query.publicationId),

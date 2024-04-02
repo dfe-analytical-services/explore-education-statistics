@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -24,20 +23,16 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSet
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class DataSetService : IDataSetService
+public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
-    private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-    public DataSetService(
-        ContentDbContext contentDbContext,
-        IReleaseVersionRepository releaseVersionRepository)
+    public DataSetFileService(ContentDbContext contentDbContext)
     {
         _contentDbContext = contentDbContext;
-        _releaseVersionRepository = releaseVersionRepository;
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
+    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
@@ -73,7 +68,7 @@ public class DataSetService : IDataSetService
             .Select(BuildResultViewModel())
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return new PaginatedListViewModel<DataSetListViewModel>(
+        return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
             // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
             await ChangeSummaryHtmlToText(results),
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
@@ -81,11 +76,11 @@ public class DataSetService : IDataSetService
             pageSize);
     }
 
-    private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetListViewModel>>
+    private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetFileSummaryViewModel>>
         BuildResultViewModel()
     {
         return result =>
-            new DataSetListViewModel
+            new DataSetFileSummaryViewModel
             {
                 Id = result.Value.File.DataSetFileId!.Value, // we fetch OfFileType(FileType.Data), so this must be set
                 FileId = result.Value.FileId,
@@ -114,8 +109,8 @@ public class DataSetService : IDataSetService
             };
     }
 
-    private static async Task<List<DataSetListViewModel>> ChangeSummaryHtmlToText(
-        IList<DataSetListViewModel> results)
+    private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
+        IList<DataSetFileSummaryViewModel> results)
     {
         return await results
             .ToAsyncEnumerable()
@@ -126,7 +121,7 @@ public class DataSetService : IDataSetService
             .ToListAsync();
     }
 
-    public async Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
+    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetId)
     {
         var releaseFile = await _contentDbContext.ReleaseFiles
@@ -144,12 +139,12 @@ public class DataSetService : IDataSetService
             return new NotFoundResult();
         }
 
-        return new DataSetDetailsViewModel
+        return new DataSetFileViewModel
         {
             Id = releaseFile.File.DataSetFileId!.Value, // we ensure this is set when fetching releaseFile
             Title = releaseFile.Name ?? string.Empty,
             Summary = releaseFile.Summary ?? string.Empty,
-            Release = new DataSetDetailsReleaseViewModel
+            Release = new DataSetFileReleaseViewModel
             {
                 Id = releaseFile.ReleaseVersionId,
                 Title = releaseFile.ReleaseVersion.Title,
@@ -159,7 +154,7 @@ public class DataSetService : IDataSetService
                     releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
                     releaseFile.ReleaseVersionId,
                 Published = releaseFile.ReleaseVersion.Published!.Value,
-                Publication = new DataSetDetailsPublicationViewModel
+                Publication = new DataSetFilePublicationViewModel
                 {
                     Id = releaseFile.ReleaseVersion.PublicationId,
                     Title = releaseFile.ReleaseVersion.Publication.Title,
@@ -167,7 +162,7 @@ public class DataSetService : IDataSetService
                     ThemeTitle = releaseFile.ReleaseVersion.Publication.Topic.Theme.Title,
                 },
             },
-            File = new DataSetDetailsFileViewModel
+            File = new DataSetFileFileViewModel
             {
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,

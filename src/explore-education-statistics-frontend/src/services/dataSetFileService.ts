@@ -3,7 +3,7 @@ import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
 import { SortDirection } from '@common/services/types/sort';
 
-export interface DataSet {
+export interface DataSetFile {
   id: string;
   file: { id: string; name: string; size: string };
   release: {
@@ -32,7 +32,7 @@ export interface DataSet {
   };
 }
 
-export interface DataSetSummary {
+export interface DataSetFileSummary {
   id: string;
   content: string;
   fileId: string;
@@ -64,18 +64,18 @@ export interface DataSetSummary {
   indicators: string[];
 }
 
-export const dataSetSortOptions = [
+export const dataSetFileSortOptions = [
   'newest',
   'oldest',
   'relevance',
   'title',
 ] as const;
 
-export type DataSetSortOption = (typeof dataSetSortOptions)[number];
+export type DataSetFileSortOption = (typeof dataSetFileSortOptions)[number];
 
-export type DataSetSortParam = 'published' | 'title' | 'relevance';
+export type DataSetFileSortParam = 'published' | 'title' | 'relevance';
 
-export const dataSetFilters = [
+export const dataSetFileFilters = [
   'latest',
   'publicationId',
   'releaseId',
@@ -83,30 +83,30 @@ export const dataSetFilters = [
   'themeId',
 ] as const;
 
-export type DataSetFilter = (typeof dataSetFilters)[number];
+export type DataSetFileFilter = (typeof dataSetFileFilters)[number];
 
-export interface DataSetListRequest {
+export interface DataSetFileListRequest {
   latestOnly?: 'true' | 'false';
   page?: number;
   pageSize?: number;
   publicationId?: string;
   releaseId?: string;
   searchTerm?: string;
-  sort?: DataSetSortParam;
+  sort?: DataSetFileSortParam;
   sortDirection?: SortDirection;
   themeId?: string;
 }
 
-const dataSetService = {
-  getDataSet(dataSetId: string): Promise<DataSet> {
-    return contentApi.get(`/data-set/${dataSetId}`);
-  },
-  listDataSets(
-    params: DataSetListRequest,
-  ): Promise<PaginatedList<DataSetSummary>> {
-    return contentApi.get(`/data-sets`, {
+const dataSetFileService = {
+  listDataSetFiles(
+    params: DataSetFileListRequest,
+  ): Promise<PaginatedList<DataSetFileSummary>> {
+    return contentApi.get(`/data-set-files`, {
       params,
     });
   },
+  getDataSetFile(dataSetId: string): Promise<DataSetFile> {
+    return contentApi.get(`/data-set-file/${dataSetId}`);
+  },
 };
-export default dataSetService;
+export default dataSetFileService;

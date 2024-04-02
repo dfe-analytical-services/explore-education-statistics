@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record DataSetDetailsViewModel
+public record DataSetFileViewModel
 {
     public Guid Id { get; init; }
 
@@ -12,12 +12,12 @@ public record DataSetDetailsViewModel
 
     public string Summary { get; init; } = string.Empty;
 
-    public DataSetDetailsFileViewModel File { get; init; } = null!;
+    public DataSetFileFileViewModel File { get; init; } = null!;
 
-    public DataSetDetailsReleaseViewModel Release { get; init; } = null!;
+    public DataSetFileReleaseViewModel Release { get; init; } = null!;
 }
 
-public record DataSetDetailsPublicationViewModel
+public record DataSetFilePublicationViewModel
 {
     public Guid Id { get; init; }
 
@@ -28,7 +28,7 @@ public record DataSetDetailsPublicationViewModel
     public string ThemeTitle { get; init; } = string.Empty;
 }
 
-public record DataSetDetailsReleaseViewModel
+public record DataSetFileReleaseViewModel
 {
     public Guid Id { get; init; }
 
@@ -43,10 +43,10 @@ public record DataSetDetailsReleaseViewModel
 
     public DateTime Published { get; init; }
 
-    public DataSetDetailsPublicationViewModel Publication { get; init; } = null!;
+    public DataSetFilePublicationViewModel Publication { get; init; } = null!;
 }
 
-public record DataSetDetailsFileViewModel
+public record DataSetFileFileViewModel
 {
     public Guid Id { get; init; }
 

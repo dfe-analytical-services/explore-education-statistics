@@ -1,9 +1,9 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
-import styles from '@frontend/modules/data-catalogue/components/DataSetPageNav.module.scss';
+import styles from '@frontend/modules/data-catalogue/components/DataSetFilePageNav.module.scss';
 import {
   PageSection,
   pageSections,
-} from '@frontend/modules/data-catalogue/DataSetPage';
+} from '@frontend/modules/data-catalogue/DataSetFilePage';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -11,7 +11,10 @@ interface Props {
   activeSection: PageSection;
   onClickItem: (id: PageSection) => void;
 }
-export default function DataSetPageNav({ activeSection, onClickItem }: Props) {
+export default function DataSetFilePageNav({
+  activeSection,
+  onClickItem,
+}: Props) {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (

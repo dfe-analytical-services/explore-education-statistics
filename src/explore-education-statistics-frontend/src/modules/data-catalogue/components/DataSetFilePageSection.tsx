@@ -1,5 +1,5 @@
 import { useMobileMedia } from '@common/hooks/useMedia';
-import { PageSection } from '@frontend/modules/data-catalogue/DataSetPage';
+import { PageSection } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React, { ReactNode } from 'react';
 
 interface Props {
@@ -7,7 +7,11 @@ interface Props {
   heading: string;
   id: PageSection;
 }
-export default function DataSetPageSection({ children, heading, id }: Props) {
+export default function DataSetFilePageSection({
+  children,
+  heading,
+  id,
+}: Props) {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   return (
