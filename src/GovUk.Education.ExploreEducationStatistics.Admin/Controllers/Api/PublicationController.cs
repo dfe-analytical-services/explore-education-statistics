@@ -1,10 +1,15 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -21,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     [Authorize]
     [ApiController]
     public class PublicationController(
+        IDataSetService dataSetService,
         IPublicationService publicationService,
         IUserRoleService roleService)
         : ControllerBase
@@ -155,6 +161,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await roleService
                 .GetPublicationRolesForPublication(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("api/publications/{publicationId:guid}/data-sets")]
+        [Produces("application/json")]
+        public async Task<ActionResult<PaginatedListViewModel<DataSetViewModel>>> ListPublicationDataSets(
+            [FromQuery] DataSetListRequest request,
+            Guid publicationId,
+            CancellationToken cancellationToken)
+        {
+            return await dataSetService
+                .ListPublicationDataSets(
+                    page: request.Page,
+                    pageSize: request.PageSize,
+                    publicationId: publicationId,
+                    cancellationToken: cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

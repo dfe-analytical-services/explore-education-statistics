@@ -77,9 +77,11 @@ using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Con
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
+using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
+using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
@@ -134,6 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
+
+            services.AddFluentValidation();
 
             services.AddMvc(options =>
                 {
@@ -440,6 +444,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
+            services.AddTransient<IDataSetService, DataSetService>(provider =>
+                // TODO EES-5049 Remove this in favour of using services.AddTransient<IDataSetService, DataSetService>()
+                // once PublicDataDbContext is configured for non-local environments.
+                new DataSetService(provider.GetRequiredService<ContentDbContext>(),
+                    provider.GetService<PublicDataDbContext>(),
+                    provider.GetRequiredService<IUserService>()));
 
             services.AddTransient<INotificationClient>(s =>
             {
