@@ -112,7 +112,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                     {
                         Email = unrelatedUserEmail,
                         Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                        Created = DateTime.Now.AddDays(-1)
+                        Created = DateTime.UtcNow.AddDays(-1)
                     });
 
                     // Add a global role invite for the user.
@@ -121,7 +121,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         // Change the case of the email address in the invite to test this scenario.
                         Email = email.ToLower(),
                         Role = globalRoles.Single(r => r.Name == globalRoleNameInInvite),
-                        Created = DateTime.Now.AddDays(-1)
+                        Created = DateTime.UtcNow.AddDays(-1)
                     });
                 })
                 .AddContentDbTestData(context =>
@@ -143,7 +143,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         ReleaseVersionId = releaseVersionId,
                         Email = unrelatedUserEmail,
                         Role = ReleaseRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
 
                     if (releaseRoleInInvite != null)
@@ -154,7 +154,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                             ReleaseVersionId = releaseVersionId,
                             Email = email.ToLower(),
                             Role = Enum.Parse<ReleaseRole>(releaseRoleInInvite),
-                            Created = DateTime.Now.AddDays(-1),
+                            Created = DateTime.UtcNow.AddDays(-1),
                         });
                     }
 
@@ -164,7 +164,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         PublicationId = publicationId,
                         Email = unrelatedUserEmail,
                         Role = PublicationRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
 
                     if (publicationRoleInInvite != null)
@@ -175,7 +175,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                             PublicationId = releaseVersion.Publication.Id,
                             Email = email.ToLower(),
                             Role = Enum.Parse<PublicationRole>(publicationRoleInInvite),
-                            Created = DateTime.Now.AddDays(-1),
+                            Created = DateTime.UtcNow.AddDays(-1),
                         });
                     }
                 })
@@ -278,7 +278,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         // Change the case of the email address in the invite to test this scenario.
                         Email = email.ToLower(),
                         Role = globalRoles.First(),
-                        Created = DateTime.Now.AddDays(-daysOld),
+                        Created = DateTime.UtcNow.AddDays(-daysOld),
                     });
                 })
                 .AddContentDbTestData(context =>
@@ -300,7 +300,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         ReleaseVersionId = releaseVersionId,
                         Email = email.ToLower(),
                         Role = ReleaseRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
 
                     // Add a publication role invite for this user.
@@ -309,7 +309,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         PublicationId = releaseVersion.Publication.Id,
                         Email = email.ToLower(),
                         Role = PublicationRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
                 })
                 .CreateClient();
@@ -379,7 +379,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         // Change the case of the email address in the invite to test this scenario.
                         Email = "unrelated-user@education.gov.uk",
                         Role = globalRoles.First(),
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
                 })
                 .AddContentDbTestData(context =>
@@ -401,7 +401,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         ReleaseVersionId = releaseVersionId,
                         Email = email.ToLower(),
                         Role = ReleaseRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
 
                     // Add a publication role invite for this user.
@@ -410,7 +410,7 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
                         PublicationId = releaseVersion.Publication.Id,
                         Email = email.ToLower(),
                         Role = PublicationRole.Approver,
-                        Created = DateTime.Now.AddDays(-1),
+                        Created = DateTime.UtcNow.AddDays(-1),
                     });
                 })
                 .CreateClient();
