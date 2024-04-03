@@ -15,7 +15,7 @@ type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
 export default function RHFFormFieldNumberInput<
   TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
-  return <RHFFormField {...props} as={RHFFormNumberInput} />;
+  return <RHFFormField {...props} as={RHFFormNumberInput} isNumberField />;
 }
 
 interface RHFFormNumberInputProps extends FormBaseInputProps {

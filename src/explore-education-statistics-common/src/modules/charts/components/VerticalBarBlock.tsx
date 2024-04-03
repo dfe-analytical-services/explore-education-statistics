@@ -270,7 +270,11 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
   capabilities: {
+    canIncludeNonNumericData: true,
     canPositionLegendInline: false,
+    canSetBarThickness: true,
+    canSetDataLabelPosition: false,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -284,7 +288,11 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   },
   options: {
     defaults: {
+      barThickness: undefined,
       height: 300,
+      includeNonNumericData: false,
+      showDataLabels: false,
+      stacked: false,
     },
   },
   legend: {

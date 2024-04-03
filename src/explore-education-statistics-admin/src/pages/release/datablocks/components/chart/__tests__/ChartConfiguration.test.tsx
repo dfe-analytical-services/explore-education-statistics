@@ -15,7 +15,11 @@ import React from 'react';
 
 describe('ChartConfiguration', () => {
   const testLineChartCapabilities: ChartCapabilities = {
+    canIncludeNonNumericData: true,
     canPositionLegendInline: true,
+    canSetBarThickness: false,
+    canSetDataLabelPosition: true,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -28,7 +32,11 @@ describe('ChartConfiguration', () => {
     stackable: false,
   };
   const testBarChartCapabilities: ChartCapabilities = {
-    canPositionLegendInline: false,
+    canIncludeNonNumericData: true,
+    canPositionLegendInline: true,
+    canSetBarThickness: true,
+    canSetDataLabelPosition: true,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -248,6 +256,7 @@ describe('ChartConfiguration', () => {
   });
 
   test('submitting fails with default options', async () => {
+    const user = userEvent.setup();
     const handleSubmit = jest.fn();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -260,7 +269,7 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -276,6 +285,7 @@ describe('ChartConfiguration', () => {
   });
 
   test('submitting succeeds with valid options', async () => {
+    const user = userEvent.setup();
     const handleSubmit = jest.fn();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -288,19 +298,13 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Subtitle'),
-      'This is the subtitle',
-    );
-    await userEvent.type(
-      screen.getByLabelText('Alt text'),
-      'This is the alt text',
-    );
-    await userEvent.type(screen.getByLabelText('Width (pixels)'), '500');
+    await user.type(screen.getByLabelText('Subtitle'), 'This is the subtitle');
+    await user.type(screen.getByLabelText('Alt text'), 'This is the alt text');
+    await user.type(screen.getByLabelText('Width (pixels)'), '500');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -310,6 +314,8 @@ describe('ChartConfiguration', () => {
         boundaryLevel: undefined,
         dataLabelPosition: 'above',
         height: 300,
+        includeNonNumericData: false,
+        showDataLabels: false,
         subtitle: 'This is the subtitle',
         title: '',
         titleType: 'default',
@@ -319,6 +325,7 @@ describe('ChartConfiguration', () => {
   });
 
   test('calls the `onChange` handler when form values change', async () => {
+    const user = userEvent.setup();
     const handleChange = jest.fn();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -331,10 +338,7 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Alt text'),
-      'This is the alt text',
-    );
+    await user.type(screen.getByLabelText('Alt text'), 'This is the alt text');
 
     await waitFor(() => {
       expect(handleChange).toHaveBeenCalledWith({
@@ -342,8 +346,12 @@ describe('ChartConfiguration', () => {
         boundaryLevel: undefined,
         dataLabelPosition: 'above',
         height: 300,
+        includeNonNumericData: false,
+        showDataLabels: false,
+        subtitle: '',
         title: '',
         titleType: 'default',
+        width: undefined,
       });
     });
   });
@@ -376,6 +384,7 @@ describe('ChartConfiguration', () => {
   });
 
   test('setting an alternative title', async () => {
+    const user = userEvent.setup();
     const handleSubmit = jest.fn();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -388,13 +397,10 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(screen.getByLabelText('Set an alternative title'));
-    await userEvent.type(
-      screen.getByLabelText('Enter chart title'),
-      'The title',
-    );
+    await user.click(screen.getByLabelText('Set an alternative title'));
+    await user.type(screen.getByLabelText('Enter chart title'), 'The title');
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -404,13 +410,18 @@ describe('ChartConfiguration', () => {
         boundaryLevel: undefined,
         dataLabelPosition: 'above',
         height: 300,
+        includeNonNumericData: false,
+        showDataLabels: false,
+        subtitle: '',
         title: 'The title',
         titleType: 'alternative',
+        width: undefined,
       });
     });
   });
 
   test('setting `showDataLabels`', async () => {
+    const user = userEvent.setup();
     const handleSubmit = jest.fn();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -423,14 +434,13 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(screen.getByLabelText('Show data labels'));
+    await user.click(screen.getByLabelText('Show data labels'));
 
-    await userEvent.selectOptions(
-      screen.getByLabelText('Data label position'),
-      ['below'],
-    );
+    await user.selectOptions(screen.getByLabelText('Data label position'), [
+      'below',
+    ]);
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -440,14 +450,18 @@ describe('ChartConfiguration', () => {
         boundaryLevel: undefined,
         dataLabelPosition: 'below',
         height: 300,
+        includeNonNumericData: false,
         showDataLabels: true,
+        subtitle: '',
         title: '',
         titleType: 'default',
+        width: undefined,
       });
     });
   });
 
   test('shows a validation error when `showDataLabels` is true and legend position is inline', async () => {
+    const user = userEvent.setup();
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
@@ -460,14 +474,13 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.click(screen.getByLabelText('Show data labels'));
+    await user.click(screen.getByLabelText('Show data labels'));
 
-    await userEvent.selectOptions(
-      screen.getByLabelText('Data label position'),
-      ['below'],
-    );
+    await user.selectOptions(screen.getByLabelText('Data label position'), [
+      'below',
+    ]);
 
-    await userEvent.tab();
+    await user.tab();
 
     await waitFor(() => {
       expect(

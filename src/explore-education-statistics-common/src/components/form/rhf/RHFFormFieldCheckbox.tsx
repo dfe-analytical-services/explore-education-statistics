@@ -5,7 +5,6 @@ import FormCheckbox, {
   FormCheckboxProps,
 } from '@common/components/form/FormCheckbox';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
-import useRegister from '@common/components/form/rhf/hooks/useRegister';
 import classNames from 'classnames';
 import React from 'react';
 import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
@@ -23,7 +22,10 @@ export default function RHFFormFieldCheckbox<TFormValues extends FieldValues>({
   ...props
 }: Props<TFormValues>) {
   const { register } = useFormContext<TFormValues>();
-  const { ref: inputRef, ...field } = useRegister(name, register);
+
+  // Use standard register instead of `useRegister` as the memoisation
+  // there causes the field to not work after reseting the form.
+  const { ref: inputRef, ...field } = register(name);
   const { fieldId } = useFormIdContext();
   const id = fieldId(name, props.id);
   const value = useWatch({ name }) || '';

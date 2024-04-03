@@ -266,7 +266,11 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   type: 'horizontalbar',
   name: 'Horizontal bar',
   capabilities: {
+    canIncludeNonNumericData: true,
     canPositionLegendInline: false,
+    canSetBarThickness: true,
+    canSetDataLabelPosition: true,
+    canShowDataLabels: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,
@@ -280,7 +284,11 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   },
   options: {
     defaults: {
+      barThickness: undefined,
       height: 300,
+      includeNonNumericData: false,
+      showDataLabels: false,
+      stacked: false,
     },
   },
   legend: {
