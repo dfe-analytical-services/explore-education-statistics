@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-public enum SortOrder
+public enum SortDirection
 {
     Asc,
     Desc

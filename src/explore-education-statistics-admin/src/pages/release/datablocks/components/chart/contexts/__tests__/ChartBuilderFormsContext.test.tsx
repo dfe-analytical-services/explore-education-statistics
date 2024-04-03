@@ -7,7 +7,7 @@ import {
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import { OmitStrict } from '@common/types';
 import { renderHook, waitFor } from '@testing-library/react';
-import React, { FC, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('useChartBuilderFormsContext', () => {
   interface Props

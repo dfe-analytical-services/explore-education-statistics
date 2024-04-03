@@ -3,7 +3,7 @@ import { FormRadioGroup, FormSelect } from '@common/components/form';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import { PublicationSortOption } from '@common/services/publicationService';
 import styles from '@frontend/components/SortControls.module.scss';
-import { DataSetOrderOption } from '@frontend/services/dataSetService';
+import { DataSetSortOption } from '@frontend/services/dataSetService';
 import classNames from 'classnames';
 import React from 'react';
 
@@ -12,7 +12,7 @@ export interface SortOption {
   value: PublicationSortOption;
 }
 
-type OptionType = PublicationSortOption | DataSetOrderOption;
+type OptionType = PublicationSortOption | DataSetSortOption;
 
 const formId = 'sortControlsForm';
 const fieldId = `${formId}-sortBy`;

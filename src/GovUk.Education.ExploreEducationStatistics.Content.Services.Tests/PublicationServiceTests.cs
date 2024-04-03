@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using MockQueryable.Moq;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -1536,8 +1536,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var pagedResult = (await service.ListPublications(
                     search: "term",
-                    sort: null, // Sort should default to relevance
-                    order: null // Order should default to descending
+                    sort: null, // Default to relevance
+                    sortDirection: null // Default to descending
                 )).AssertRight();
                 var results = pagedResult.Results;
 
@@ -1633,7 +1633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var pagedResult = (await service.ListPublications(
                     search: "term",
                     sort: null, // Sort should default to relevance
-                    order: Asc
+                    sortDirection: Asc
                 )).AssertRight();
                 var results = pagedResult.Results;
 
@@ -1723,7 +1723,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                     var pagedResult = (await service.ListPublications(
                         sort: Published,
-                        order: null // Order should default to descending
+                        sortDirection: null // Default to descending
                     )).AssertRight();
                     var results = pagedResult.Results;
 
@@ -1814,7 +1814,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                     var pagedResult = (await service.ListPublications(
                         sort: Published,
-                        order: Asc
+                        sortDirection: Asc
                     )).AssertRight();
                     var results = pagedResult.Results;
 
@@ -1898,8 +1898,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     var service = SetupPublicationService(contentDbContext);
 
                     var pagedResult = (await service.ListPublications(
-                        sort: null, // Sort should default to title
-                        order: Desc
+                        sort: null, // Default to title
+                        sortDirection: Desc
                     )).AssertRight();
                     var results = pagedResult.Results;
 
@@ -1983,8 +1983,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     var service = SetupPublicationService(contentDbContext);
 
                     var pagedResult = (await service.ListPublications(
-                        sort: null, // Sort should default to title
-                        order: null // Order should default to ascending
+                        sort: null, // Default to title
+                        sortDirection: null // Default to ascending
                     )).AssertRight();
                     var results = pagedResult.Results;
 

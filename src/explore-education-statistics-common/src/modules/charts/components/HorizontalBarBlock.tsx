@@ -64,7 +64,7 @@ const HorizontalBarBlock = ({
   showDataLabels,
   dataLabelPosition,
 }: HorizontalBarProps) => {
-  const [legendProps, renderLegend] = useLegend();
+  const [legendProps, renderLegend] = useLegend({});
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   if (

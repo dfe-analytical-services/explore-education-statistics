@@ -10,6 +10,7 @@ import {
   ExternalMethodology,
 } from '@common/services/types/methodology';
 import { PaginatedList } from '@common/services/types/pagination';
+import { SortDirection } from '@common/services/types/sort';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -136,19 +137,17 @@ export type PublicationSortOption = (typeof publicationSortOptions)[number];
 
 export type PublicationSortParam = 'published' | 'title' | 'relevance';
 
-export type PublicationOrderParam = 'asc' | 'desc';
-
 export const publicationFilters = ['releaseType', 'search', 'themeId'] as const;
 
 export type PublicationFilter = (typeof publicationFilters)[number];
 
 export interface PublicationListRequest {
-  order?: PublicationOrderParam;
   page?: number;
   pageSize?: number;
   releaseType?: ReleaseType;
   search?: string;
   sort?: PublicationSortParam;
+  sortDirection?: SortDirection;
   themeId?: string;
 }
 

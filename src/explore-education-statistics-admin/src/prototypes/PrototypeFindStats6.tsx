@@ -87,7 +87,15 @@ const PrototypeFindStats = () => {
 
   return (
     <div className={styles.prototypePublicPage}>
-      <PrototypePage wide={false}>
+      <PrototypePage
+        wide={false}
+        breadcrumbs={[
+          {
+            name: 'Find statistics and data',
+            link: '#',
+          },
+        ]}
+      >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <h1 className="govuk-heading-xl">Find statistics and data</h1>

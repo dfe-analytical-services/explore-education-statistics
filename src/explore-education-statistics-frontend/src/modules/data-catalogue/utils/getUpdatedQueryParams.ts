@@ -1,6 +1,6 @@
 import {
   DataSetFilter,
-  DataSetOrderOption,
+  DataSetSortOption,
 } from '@frontend/services/dataSetService';
 import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import omit from 'lodash/omit';
@@ -10,16 +10,16 @@ import { ReleaseSummary } from '@common/services/publicationService';
 export default async function getUpdatedQueryParams({
   filterType,
   nextValue,
-  orderBy,
   query,
   releaseId,
+  sortBy,
   onFetchReleases,
 }: {
   filterType: DataSetFilter;
   nextValue: string;
-  orderBy?: DataSetOrderOption;
   query: ParsedUrlQuery;
   releaseId?: string;
+  sortBy?: DataSetSortOption;
   onFetchReleases?: () => Promise<ReleaseSummary[]>;
 }): Promise<DataCataloguePageQuery> {
   if (filterType === 'releaseId') {
@@ -34,7 +34,7 @@ export default async function getUpdatedQueryParams({
         latestOnly: nextValue === 'latest' ? 'true' : 'false',
       }),
       ...(filterByReleaseId && { [filterType]: nextValue }),
-      orderBy,
+      sortBy,
     };
   }
 
@@ -46,7 +46,7 @@ export default async function getUpdatedQueryParams({
         'releaseId',
         ...(filterType === 'themeId' ? ['publicationId'] : []),
       ]),
-      orderBy,
+      sortBy,
     };
   }
 
@@ -59,7 +59,7 @@ export default async function getUpdatedQueryParams({
       releaseId: releaseData?.find(release =>
         releaseId ? release.id === releaseId : release.latestRelease,
       )?.id,
-      orderBy,
+      sortBy,
     };
   }
 
@@ -69,6 +69,6 @@ export default async function getUpdatedQueryParams({
       ...(filterType === 'themeId' ? ['publicationId', 'releaseId'] : []),
     ]),
     [filterType]: nextValue,
-    orderBy: filterType === 'searchTerm' ? 'relevance' : orderBy,
+    sortBy: filterType === 'searchTerm' ? 'relevance' : sortBy,
   };
 }

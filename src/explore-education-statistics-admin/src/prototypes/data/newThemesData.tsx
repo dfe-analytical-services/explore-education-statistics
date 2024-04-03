@@ -9,6 +9,8 @@ export const publications = [
     theme: "Children's social care",
     summary:
       "These statistics, derived from the annual Children in Need Census, provide data on children in England referred to children's social care services, assessments carried out relating to those children and whether a child became the subject of a child protection plan.",
+    methodologyTitle2: 'This is another methodology example',
+    data: ['data1', 'data2', 'data3'],
   },
   {
     title: 'Children looked after in England including adoptions',
@@ -18,6 +20,7 @@ export const publications = [
     theme: "Children's social care",
     summary:
       'Information on children looked after (CLA) in England, including numbers of CLA adopted, care leavers and CLA who were missing. Data is taken from the annual SSDA903 data collection which is collected from local authorities in England.',
+    data: ['data5', 'data6', 'data7'],
   },
   {
     title: "Children's social work workforce",
@@ -27,6 +30,7 @@ export const publications = [
     theme: "Children's social care",
     summary:
       'This release provides information about children and family social workers and agency social workers employed in local authorities.  The information is based on data collected in an annual census from local authorities in England. The latest collection covers the year from 1 October 2020 to 30 September 2021.',
+    methodologyTitle2: 'This is another methodology example',
   },
   {
     title:

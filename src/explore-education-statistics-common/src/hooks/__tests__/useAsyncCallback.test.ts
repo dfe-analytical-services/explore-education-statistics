@@ -1,7 +1,7 @@
 import useAsyncCallback, {
   AsyncStateSetterParam,
 } from '@common/hooks/useAsyncCallback';
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 
 describe('useAsyncCallback', () => {
   test('returns correct state when callback not invoked', () => {

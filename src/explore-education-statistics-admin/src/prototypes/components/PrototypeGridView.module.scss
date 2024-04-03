@@ -1,0 +1,16 @@
+@import '~govuk-frontend/dist/govuk/base';
+
+.grid {
+  display: grid;
+  grid-template-columns: (repeat(auto-fit, minmax(350px, 1fr)));
+}
+
+@include govuk-media-query(
+  $from: mobile,
+  $until: tablet,
+  $and: '(orientation: portrait)'
+) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

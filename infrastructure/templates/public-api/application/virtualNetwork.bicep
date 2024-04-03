@@ -1,18 +1,26 @@
-@description('Subscription Name e.g. s101d01. Used as a prefix for created resources')
+@description('Specifies the full name of the existing VNet')
+param vNetName string
+
+@description('Specifies the Subscription name')
 param subscription string
 
 @description('Specifies the Resource Prefix')
 param resourcePrefix string
 
-var vNetName = '${subscription}-vnet-ees'
-var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-data-processor'
-var postgreSqlSubnetName = '${resourcePrefix}-snet-psql'
-var apiContainerAppSubnetName = '${resourcePrefix}-snet-ca-api'
+@description('Specifies the name suffix of the Data Processor Function App')
+param dataProcessorFunctionAppName string
+
+@description('Specifies the name suffix of the PostgreSQL Flexible Server')
+param postgreSqlServerName string
+
+var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
+var postgreSqlSubnetName = '${subscription}-snet-${postgreSqlServerName}'
+var containerAppEnvironmentSubnetName = '${subscription}-snet-cae'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetPrefix = '10.0.6.0/24'
 var postgreSqlSubnetPrefix = '10.0.7.0/24'
-var apiContainerAppSubnetPrefix = '10.0.8.0/24'
+var containerAppEnvironmentSubnetPrefix = '10.0.8.0/24'
 
 // Reference the existing VNet.
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
@@ -25,10 +33,15 @@ var dataProcessorSubnet = {
     addressPrefix: dataProcessorSubnetPrefix
     delegations: [
       {
-        name: '${resourcePrefix}-snet-delegation-fa-data-processor'
+        name: '${resourcePrefix}-snet-delegation-fa-${dataProcessorFunctionAppName}'
         properties: {
           serviceName: 'Microsoft.Web/serverFarms'
         }
+      }
+    ]
+    serviceEndpoints: [
+      {
+         service: 'Microsoft.Storage'
       }
     ]
   }
@@ -40,7 +53,7 @@ var postgreSqlSubnet = {
     addressPrefix: postgreSqlSubnetPrefix
     delegations: [
     {
-      name: '${resourcePrefix}-snet-delegation-psql'
+      name: '${resourcePrefix}-snet-delegation-${postgreSqlServerName}'
       properties: {
         serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
       }
@@ -48,13 +61,13 @@ var postgreSqlSubnet = {
   }
 }
 
-var apiContainerAppSubnet = {
-  name: apiContainerAppSubnetName
+var containerAppEnvironmentSubnet = {
+  name: containerAppEnvironmentSubnetName
   properties: {
-    addressPrefix: apiContainerAppSubnetPrefix
+    addressPrefix: containerAppEnvironmentSubnetPrefix
     delegations: [
       {
-        name: '${resourcePrefix}-snet-delegation-cae-api'
+        name: '${resourcePrefix}-snet-delegation-cae'
         properties: {
           serviceName: 'Microsoft.App/environments'
         }
@@ -66,7 +79,7 @@ var apiContainerAppSubnet = {
 var subnets = [
   dataProcessorSubnet
   postgreSqlSubnet
-  apiContainerAppSubnet
+  containerAppEnvironmentSubnet
 ]
 
 // Create the subnets sequentially rather than in parallel to avoid "AnotherOperationInProgress" errors when multiple
@@ -88,4 +101,4 @@ output dataProcessorSubnetRef string = resourceId('Microsoft.Network/VirtualNetw
 output postgreSqlSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, postgreSqlSubnetName)
 
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
-output apiContainerAppSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, apiContainerAppSubnetName)
+output containerAppEnvironmentSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, containerAppEnvironmentSubnetName)

@@ -82,6 +82,7 @@ function Button(
         'govuk-button',
         {
           [styles.disabled]: isDisabled,
+          'govuk-button--disabled': isDisabled,
           'govuk-button--secondary': variant === 'secondary',
           'govuk-button--warning': variant === 'warning',
         },

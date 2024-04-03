@@ -1,5 +1,4 @@
 import delay from '@common/utils/delay';
-import flushTasks from '@common-test/flushTasks';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
