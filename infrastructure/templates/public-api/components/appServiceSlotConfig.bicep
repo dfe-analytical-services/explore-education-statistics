@@ -26,7 +26,7 @@ param existingProductionAppSettings object
 param tagValues object
 
 @description('Create a staging slot')
-resource stagingSlot 'Microsoft.Web/sites/slots@2021-03-01' = {
+resource stagingSlot 'Microsoft.Web/sites/slots@2023-01-01' = {
   name: '${appName}/staging'
   location: location
   identity: {
@@ -56,7 +56,7 @@ var combinedStagingSettings = union(commonSettings, stagingOnlySettings, existin
 var combinedProductionSettings = union(commonSettings, prodOnlySettings, existingProductionAppSettings)
 
 @description('Set appsettings on the staging slot')
-resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2021-03-01' = {
+resource appStagingSlotSettings 'Microsoft.Web/sites/slots/config@2023-01-01' = {
   name: 'appsettings'
   parent: stagingSlot
   properties: combinedStagingSettings

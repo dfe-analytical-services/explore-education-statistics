@@ -101,6 +101,12 @@ jobs:
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api'
           zipAfterPublish: True
 
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Public frontend API Artifacts'
+        inputs:
+          artifactName: 'public-api'
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Public API - API project'
         inputs:
@@ -111,36 +117,44 @@ jobs:
           zipAfterPublish: False
 
       - task: Docker@2
-        displayName: 'Build and Push Public API - API Docker image'
+        displayName: 'Build Public API - API Docker image'
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: '$(AcrServiceConnection)'
           repository: 'ees-public-api/api'
-          command: 'buildAndPush'
+          command: 'build'
           Dockerfile: 'docker/public-api/api/Dockerfile'
           buildContext: '$(Build.ArtifactStagingDirectory)/public-api/api/GovUk.Education.ExploreEducationStatistics.Public.Data.Api'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
-          addPipelineData: true
         env:
           DOCKER_BUILDKIT: 1
 
+      - task: Docker@2
+        displayName: 'Push Public API - API Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
+        inputs:
+          containerRegistry: '$(AcrServiceConnection)'
+          repository: 'ees-public-api/api'
+          command: 'push'
+          tags: $(Build.BuildNumber)
+      
       - task: 'DotNetCoreCLI@2'
-        displayName: 'Publish Public API Data Processor Function'
+        displayName: 'Publish Public API - Data Processor Function'
         inputs:
           command: 'publish'
           publishWebProjects: false
           includeRootFolder: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.csproj'
-          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api/data-processor'
+          arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-api-data-processor'
           zipAfterPublish: True
 
       - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Public API Data Processor Artifacts'
+        displayName: 'Publish Public API - Data Processor Artifact'
         inputs:
           artifactName: 'public-api-data-processor-$(Build.BuildNumber)'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-api/data-processor'
-
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-api-data-processor'
+       
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Notifier Function'
         inputs:
@@ -322,19 +336,27 @@ jobs:
           script: 'pnpm --filter=explore-education-statistics-frontend run build'
 
       - task: Docker@2
-        displayName: 'Build and Push Public Frontend Docker image'
+        displayName: 'Build Public frontend Docker image'
         condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: '$(AcrServiceConnection)'
           repository: 'ees-public-frontend'
-          command: 'buildAndPush'
+          command: 'build'
           Dockerfile: 'docker/public-frontend/Dockerfile'
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
-          addPipelineData: true
         env:
           DOCKER_BUILDKIT: 1
+
+      - task: Docker@2
+        displayName: 'Push Public frontend Docker image'
+        condition: eq(variables.IsBranchDeployable, true)
+        inputs:
+          containerRegistry: '$(AcrServiceConnection)'
+          repository: 'ees-public-frontend'
+          command: 'push'
+          tags: $(Build.BuildNumber)    
 
   - job: 'MiscellaneousArtifacts'
     pool:
