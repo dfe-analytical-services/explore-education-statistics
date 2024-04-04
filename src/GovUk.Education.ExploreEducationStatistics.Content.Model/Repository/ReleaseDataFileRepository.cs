@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             if (type == Metadata && replacingDataFile != null)
             {
-                throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
+                throw new ArgumentException("replacingDataFile only used with Files of type Data, not Metadata.");
             }
 
             var releaseFile = new ReleaseFile

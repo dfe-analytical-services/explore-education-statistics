@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
@@ -26,10 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
+    private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-    public DataSetFileService(ContentDbContext contentDbContext)
+    public DataSetFileService(
+        ContentDbContext contentDbContext,
+        IReleaseVersionRepository releaseVersionRepository)
     {
         _contentDbContext = contentDbContext;
+        _releaseVersionRepository = releaseVersionRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -134,7 +139,9 @@ public class DataSetFileService : IDataSetFileService
             .OrderByDescending(rf => rf.ReleaseVersion.Version)
             .FirstOrDefaultAsync();
 
-        if (releaseFile == null)
+        if (releaseFile == null
+            || !await _releaseVersionRepository.IsLatestPublishedReleaseVersion(
+                releaseFile.ReleaseVersionId))
         {
             return new NotFoundResult();
         }

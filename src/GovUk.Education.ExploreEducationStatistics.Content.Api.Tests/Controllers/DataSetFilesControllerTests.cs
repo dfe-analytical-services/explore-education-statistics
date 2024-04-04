@@ -1668,7 +1668,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/data-set-file/{releaseFile.File.DataSetFileId}";
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
             var viewModel = response.AssertOk<DataSetFileViewModel>();
@@ -1716,7 +1716,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/data-set-file/{Guid.NewGuid()}";
+            var uri = $"/api/data-set-files/{Guid.NewGuid()}";
 
             var response = await client.GetAsync(uri);
 
@@ -1744,7 +1744,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/data-set-file/{releaseFile.File.DataSetFileId}";
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1782,7 +1782,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/data-set-file/{releaseFile2.File.DataSetFileId}";
+            var uri = $"/api/data-set-files/{releaseFile2.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1790,6 +1790,38 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
             // Fetches latest published version, not amendment
             Assert.Equal(publication.ReleaseVersions[1].Id, viewModel.Release.Id);
+        }
+
+        [Fact]
+        public async Task DataSetFileRemovedOnAmendment_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: false)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            File file = _fixture.DefaultFile();
+
+            ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version
+                .WithFile(file);
+
+            // NOTE: No ReleaseFile for publication.ReleaseVersions[1]
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile0);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile0.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+
+            response.AssertNotFound();
         }
     }
 
@@ -1804,7 +1836,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
                 services.AddTransient<IDataSetFileService>(
                     s => new DataSetFileService(
-                        contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
+                        contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
+                        s.GetRequiredService<IReleaseVersionRepository>()));
             });
     }
 }

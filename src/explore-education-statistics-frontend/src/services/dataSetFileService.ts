@@ -106,7 +106,7 @@ const dataSetFileService = {
     });
   },
   getDataSetFile(dataSetId: string): Promise<DataSetFile> {
-    return contentApi.get(`/data-set-file/${dataSetId}`);
+    return contentApi.get(`/data-set-files/${dataSetId}`);
   },
 };
 export default dataSetFileService;

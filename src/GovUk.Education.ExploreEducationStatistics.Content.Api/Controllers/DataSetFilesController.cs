@@ -48,7 +48,7 @@ public class DataSetFilesController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("data-set-file/{dataSetFileId:guid}")]
+    [HttpGet("data-set-files/{dataSetFileId:guid}")]
     public async Task<ActionResult<DataSetFileViewModel>> GetDataSet(
         Guid dataSetFileId)
     {
