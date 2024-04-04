@@ -104,12 +104,8 @@ const PreReleasePageContainer = ({
     }
 
     if (access === 'Before') {
-      const zonedStartDate = utcToZonedTime(start, 'Europe/Berlin');
-      const dateOfPraStart = format(
-        utcToZonedTime(zonedStartDate, 'Europe/London'),
-        'd MMMM yyyy',
-        { timeZone: 'Europe/London' },
-      );
+      const zonedStartDate = utcToZonedTime(start, 'Europe/London');
+      const dateOfPraStart = format(zonedStartDate, 'd MMMM yyyy');
       const timeOfPraStart = format(zonedStartDate, 'HH:mm');
       const dayScheduledForPublish = format(
         scheduledPublishDate,
