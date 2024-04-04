@@ -17,7 +17,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { format } from 'date-fns';
+import { utcToZonedTime, format } from 'date-fns-tz';
 import React from 'react';
 import { generatePath } from 'react-router';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
@@ -104,6 +104,18 @@ const PreReleasePageContainer = ({
     }
 
     if (access === 'Before') {
+      const zonedStartDate = utcToZonedTime(start, 'Europe/Berlin');
+      const dateOfPraStart = format(
+        utcToZonedTime(zonedStartDate, 'Europe/London'),
+        'd MMMM yyyy',
+        { timeZone: 'Europe/London' },
+      );
+      const timeOfPraStart = format(zonedStartDate, 'HH:mm');
+      const dayScheduledForPublish = format(
+        scheduledPublishDate,
+        'd MMMM yyyy',
+      );
+
       return (
         <>
           <h1>Pre-release access is not yet available</h1>
@@ -114,13 +126,7 @@ const PreReleasePageContainer = ({
           </p>
 
           <p>
-            {`Pre-release access will be available from ${format(
-              start,
-              'd MMMM yyyy',
-            )} at ${format(start, 'HH:mm')} until it is published on ${format(
-              scheduledPublishDate,
-              'd MMMM yyyy',
-            )}.`}
+            {`Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dayScheduledForPublish}.`}
           </p>
 
           <p>

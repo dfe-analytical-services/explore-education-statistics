@@ -76,9 +76,10 @@ describe('PreReleasePageContainer', () => {
       }),
     ).toBeInTheDocument();
 
+    // Need to match both 09:00 and 10:00, because mocking out the "London/Europe" timezone for BST/GMT testing isn't really feasible
     expect(
       screen.getByText(
-        'Pre-release access will be available from 12 December 3000 at 09:00 until it is published on 13 December 3000.',
+        /Pre-release access will be available from 12 December 3000 at (09:00)|(10:00) until it is published on 13 December 3000./,
       ),
     ).toBeInTheDocument();
 
