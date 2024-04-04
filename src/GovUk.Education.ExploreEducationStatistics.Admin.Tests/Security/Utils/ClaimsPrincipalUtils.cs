@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         /// <summary>
         /// Create a Claim representing a SecurityClaimTypes enum value.
         /// </summary>
-        private static Claim SecurityClaim(SecurityClaimTypes type)
+        public static Claim SecurityClaim(SecurityClaimTypes type)
         {
             return new Claim(type.ToString(), "");
         }
