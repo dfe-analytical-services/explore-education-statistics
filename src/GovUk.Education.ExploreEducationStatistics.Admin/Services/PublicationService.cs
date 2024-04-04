@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -462,23 +463,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                         else
                         {
-                            var latestVersion = await _releaseVersionRepository
-                                .GetLatestReleaseVersionForParent(
-                                    seriesItem.ReleaseId!.Value,
-                                    publishedOnly: true);
+                            // prefer getting the latest published version over an unpublished amendment
+                            var latestVersion = await _context.ReleaseVersions
+                                .LatestReleaseVersion(seriesItem.ReleaseId!.Value, publishedOnly: true)
+                                .SingleOrDefaultAsync();
 
                             if (latestVersion == null)
                             {
-                                // if no published version, look for an unpublished version
-                                latestVersion = await _releaseVersionRepository
-                                    .GetLatestReleaseVersionForParent(
-                                        seriesItem.ReleaseId!.Value);
+                                // if the release has no published version, then use its original unpublished version
+                                latestVersion = await _context.ReleaseVersions
+                                    .LatestReleaseVersion(seriesItem.ReleaseId!.Value)
+                                    .SingleOrDefaultAsync();
 
                                 if (latestVersion == null)
                                 {
                                     throw new InvalidDataException(
                                         "ReleaseSeriesItem with ReleaseId set should have an associated " +
-                                        $"LatestReleaseVersion. Release: {seriesItem.ReleaseId} " +
+                                        $"ReleaseVersion. Release: {seriesItem.ReleaseId} " +
                                         $"ReleaseSeriesItem: {seriesItem.Id}");
                                 }
                             }
