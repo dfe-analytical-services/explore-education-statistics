@@ -107,6 +107,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             Version = originalReleaseVersion.Version + 1,
             PreviousVersionId = originalReleaseVersion.Id,
 
+            DataSetFileVersions = CopyDataSetFileVersions(originalReleaseVersion, amendmentReleaseVersionId, createdByUserId, createdDate),
             DataBlockVersions = dataBlockVersionAmendments,
             KeyStatistics = CopyKeyStatistics(originalReleaseVersion, amendmentReleaseVersionId, createdByUserId, originalDataBlockVersionsToAmendments),
             Content = CopyContent(originalReleaseVersion, createdDate, amendmentReleaseVersionId, originalDataBlockVersionsToAmendments),
@@ -118,6 +119,29 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         _context.ReleaseVersions.Add(amendmentReleaseVersion);
         await _context.SaveChangesAsync();
         return amendmentReleaseVersion;
+    }
+
+    private List<DataSetFileVersion> CopyDataSetFileVersions(
+        ReleaseVersion originalReleaseVersion,
+        Guid amendmentReleaseVersionId,
+        Guid createdByUserId,
+        DateTime createdDate)
+    {
+        return originalReleaseVersion.DataSetFileVersions.Select(dsfv =>
+        {
+            return new DataSetFileVersion
+            {
+                Id = Guid.NewGuid(),
+                DataSetFileId = dsfv.DataSetFileId,
+                ReleaseVersionId = amendmentReleaseVersionId,
+                DataFileId = dsfv.DataFileId, // @MarkFix files don't get changed during an amendment, yeah?
+                MetaFileId = dsfv.MetaFileId,
+                Version = dsfv.Version, // Does not increase as data set file hasn't actually changed
+                CreatedById = createdByUserId,
+                Created = createdDate,
+                Updated = null,
+            };
+        }).ToList();
     }
 
     private List<KeyStatistic> CopyKeyStatistics(
@@ -668,6 +692,7 @@ internal static class ReleaseAmendmentQueryableExtensions
             .Include(releaseVersion => releaseVersion.DataBlockVersions)
             .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-            .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null);
+            .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null)
+            .Include(releaseVersion => releaseVersion.DataSetFileVersions);
     }
 }
