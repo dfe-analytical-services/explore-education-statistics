@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 
 public static class ValidationProblemViewModelTestExtensions
 {
