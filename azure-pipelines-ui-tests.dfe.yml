@@ -245,6 +245,25 @@ jobs:
     inputs:
       versionSpec: "16.X"
 
+  - script: |
+            npm ci
+    displayName: "Install dependencies"
+
+  - script: |
+            npx playwright install --with-deps
+    displayName: "Install Playwright Browsers"
+
+        # runs the playwright tests
+  - script: |
+            npx playwright test
+    displayName: "Run Playwright tests"
+    env:
+            URL: $(URL)
+            PUBLIC_URL: $(PUBLIC_URL)
+            ADMIN_URL: $(ADMIN_URL)
+            ADMIN_EMAIL: $(ADMIN_EMAIL)
+            ADMIN_PASSWORD: $(ADMIN_PASSWORD)
+
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
     inputs:
@@ -253,24 +272,8 @@ jobs:
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
-  - - script: |
-        npm ci
-        displayName: "Install dependencies"
 
-    - script: |
-        npx playwright install --with-deps
-        displayName: "Install Playwright Browsers"
 
-        # runs the playwright tests
-    - script: |
-        npx playwright test
-        displayName: "Run Playwright tests"
-      env:
-          PUBLIC_URL: $(PUBLIC_URL)
-          ADMIN_URL: $(ADMIN_URL)
-          ADMIN_EMAIL: $(ADMIN_EMAIL)
-          ADMIN_PASSWORD: $(ADMIN_PASSWORD)
-    
     # this publishes the html report as an artifact that can then be downloaded
   - publish: $(System.DefaultWorkingDirectory)/playwright-report
     artifact: playwright-report
