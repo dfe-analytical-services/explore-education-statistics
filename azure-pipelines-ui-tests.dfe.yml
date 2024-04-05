@@ -224,3 +224,62 @@ jobs:
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public
+
+- job: 'Playwrighttest'
+  displayName: Playwright UI test
+  timeoutInMinutes: 160
+  cancelTimeoutInMinutes: 10
+  condition: succeededOrFailed()
+  pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 5
+    fetchTags: false
+
+  - task: NodeTool@0
+    displayName: Use Node version 16 above
+    timeoutInMinutes: 5
+    inputs:
+      versionSpec: "16.X"
+
+  - task: AzureKeyVault@2
+    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    inputs:
+      azureSubscription: $(SPN_NAME)
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      RunAsPreJob: true
+
+  - - script: |
+        npm ci
+        displayName: "Install dependencies"
+
+    - script: |
+        npx playwright install --with-deps
+        displayName: "Install Playwright Browsers"
+
+        # runs the playwright tests
+    - script: |
+        npx playwright test
+        displayName: "Run Playwright tests"
+      env:
+          PUBLIC_URL: $(PUBLIC_URL)
+          ADMIN_URL: $(ADMIN_URL)
+          ADMIN_EMAIL: $(ADMIN_EMAIL)
+          ADMIN_PASSWORD: $(ADMIN_PASSWORD)
+    
+    # this publishes the html report as an artifact that can then be downloaded
+  - publish: $(System.DefaultWorkingDirectory)/playwright-report
+    artifact: playwright-report
+    condition: always()
+
+    # this publishes the junit formated test results to azure pipelines so they can be displayed and tracked there.
+  - task: PublishTestResults@2
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/playwright-results.xml'
+      testRunTitle: 'Playwright Test Results'
