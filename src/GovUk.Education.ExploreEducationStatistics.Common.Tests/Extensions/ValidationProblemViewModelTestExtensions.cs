@@ -1,11 +1,9 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.AllowedValueValidator;
 
@@ -196,26 +194,22 @@ public static class ValidationProblemViewModelTestExtensions
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EnumValidator
         );
-    public static ErrorViewModel AssertHasAllowedValueError(
+
+    public static ErrorViewModel AssertHasAllowedValueError<TValue>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string? value,
-        IEnumerable<string> allowed)
+        TValue? value,
+        IEnumerable<TValue> allowed)
     {
-        var error = validationProblem.AssertHasFluentValidationError(
+        var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedKey: ValidationMessages.AllowedValue.Code
+            expectedCode: ValidationMessages.AllowedValue.Code
         );
 
-        var errorDetail = GetErrorDetail(error);
+        var errorDetail = error.GetDetail<AllowedErrorDetail<TValue>>();
 
-        Assert.Equal(2, errorDetail.Count);
-        Assert.Equal(value, errorDetail[nameof(AllowedErrorDetail<object>.Value).ToLowerFirst()].GetString());
-        Assert.Equal(
-            allowed,
-            errorDetail[nameof(AllowedErrorDetail<object>.Allowed).ToLowerFirst()]
-                .EnumerateArray()
-                .Select(e => e.GetString()!));
+        Assert.Equal(value, errorDetail.Value);
+        Assert.Equal(allowed, errorDetail.Allowed);
 
         return error;
     }
@@ -240,14 +234,5 @@ public static class ValidationProblemViewModelTestExtensions
         var expectedCode = expectedKey.Replace("Validator", "");
 
         return AssertHasError(validationProblem, expectedPath, expectedCode);
-    }
-
-    private static Dictionary<string, JsonElement> GetErrorDetail(ErrorViewModel error)
-    {
-        var errorDetailJson = Assert.IsType<JsonElement>(error.Detail);
-        var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
-
-        Assert.NotNull(errorDetail);
-        return errorDetail;
     }
 }

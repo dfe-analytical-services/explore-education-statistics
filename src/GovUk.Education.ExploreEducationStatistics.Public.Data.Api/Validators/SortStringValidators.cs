@@ -30,7 +30,7 @@ public static partial class SortStringValidators
                 return;
             }
 
-            var sort = new ParsedSort(value);
+            var sort = ParsedSort.Parse(value);
 
             if (!HasValidFieldLength(sort))
             {
@@ -77,12 +77,15 @@ public static partial class SortStringValidators
 
         public string Direction { get; init; }
 
-        public ParsedSort(string value)
+        public static ParsedSort Parse(string value)
         {
             var directionDelimiter = value.LastIndexOf('|');
 
-            Field = value[..directionDelimiter];
-            Direction = value[(directionDelimiter + 1)..];
+            return new ParsedSort
+            {
+                Field = value[..directionDelimiter],
+                Direction = value[(directionDelimiter + 1)..],
+            };
         }
     }
 }

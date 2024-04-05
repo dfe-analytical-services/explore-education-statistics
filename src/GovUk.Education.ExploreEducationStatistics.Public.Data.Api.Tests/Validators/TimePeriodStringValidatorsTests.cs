@@ -95,6 +95,7 @@ public class TimePeriodStringValidatorsTests
             var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
 
             Assert.Equal(timePeriod, state.Value);
+            Assert.Equal("{period}|{code}", state.ExpectedFormat);
         }
 
         [Theory]

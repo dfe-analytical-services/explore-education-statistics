@@ -87,6 +87,7 @@ public class LocationStringValidatorsTests
             var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
 
             Assert.Equal(location, state.Value);
+            Assert.Equal("{level}|{property}|{value}", state.ExpectedFormat);
         }
 
         [Theory]

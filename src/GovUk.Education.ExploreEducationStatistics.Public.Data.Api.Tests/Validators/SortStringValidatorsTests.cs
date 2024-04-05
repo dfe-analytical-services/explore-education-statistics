@@ -83,6 +83,7 @@ public class SortStringValidatorsTests
             var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
 
             Assert.Equal(sort, state.Value);
+            Assert.Equal("{field}|{order}", state.ExpectedFormat);
         }
 
         [Theory]
