@@ -261,7 +261,6 @@ jobs:
             PUBLIC_URL: $(PUBLIC_URL)
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
-            ADMIN_PASSWORD: $(ADMIN_PASSWORD)
 
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
