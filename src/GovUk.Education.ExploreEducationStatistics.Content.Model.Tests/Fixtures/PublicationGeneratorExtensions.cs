@@ -57,10 +57,10 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => generator.ForInstance(p => p.SetExternalMethodology(externalMethodology));
 
-    public static Generator<Publication> WithLegacyReleases(
+    public static Generator<Publication> WithLegacyLinks(
         this Generator<Publication> generator,
-        IEnumerable<LegacyRelease> legacyReleases)
-        => generator.ForInstance(p => p.SetLegacyReleases(legacyReleases));
+        IEnumerable<ReleaseSeriesItem> releaseSeries)
+        => generator.ForInstance(p => p.SetLegacyLinks(releaseSeries));
 
     public static Generator<Publication> WithSupersededBy(
         this Generator<Publication> generator,
@@ -109,9 +109,18 @@ public static class PublicationGeneratorExtensions
                 p => p.ReleaseVersions,
                 (_, publication, context) =>
                 {
-                    var list = releases.Invoke(context).ToList();
+                    var releaseList = releases.Invoke(context).ToList();
 
-                    var releaseVersions = list.SelectMany(r => r.Versions)
+                    releaseList.ForEach(release =>
+                    {
+                        publication.ReleaseSeries.Insert(0, new ReleaseSeriesItem
+                        {
+                            Id = Guid.NewGuid(),
+                            ReleaseId = release.Id,
+                        });
+                    });
+
+                    var releaseVersions = releaseList.SelectMany(r => r.Versions)
                         .ToList();
 
                     releaseVersions.ForEach(releaseVersion =>
@@ -188,10 +197,26 @@ public static class PublicationGeneratorExtensions
         ExternalMethodology externalMethodology)
         => setters.Set(p => p.ExternalMethodology, externalMethodology);
 
-    private static InstanceSetters<Publication> SetLegacyReleases(
+    private static InstanceSetters<Publication> SetLegacyLinks(
         this InstanceSetters<Publication> setters,
-        IEnumerable<LegacyRelease> legacyReleases)
-        => setters.Set(p => p.LegacyReleases, legacyReleases);
+        IEnumerable<ReleaseSeriesItem> legacyLinks)
+        => setters.Set(
+                p => p.ReleaseSeries,
+                (_, publication, context) =>
+                {
+                    legacyLinks.ForEach(legacyLink =>
+                    {
+                        publication.ReleaseSeries.Add(new()
+                        {
+                            Id = legacyLink.Id,
+                            LegacyLinkDescription = legacyLink.LegacyLinkDescription,
+                            LegacyLinkUrl = legacyLink.LegacyLinkUrl,
+                        });
+                    });
+
+                    return publication.ReleaseSeries;
+                }
+            );
 
     public static InstanceSetters<Publication> SetSupersededBy(
         this InstanceSetters<Publication> setters,

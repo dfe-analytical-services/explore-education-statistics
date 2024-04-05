@@ -1,13 +1,11 @@
-import {
-  LegacyRelease,
-  UpdateLegacyRelease,
-} from '@admin/services/legacyReleaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { OmitStrict } from '@common/types';
-import { PublicationSummary } from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseSeriesItem,
+} from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
 import { isAxiosError } from 'axios';
@@ -43,7 +41,7 @@ export interface PublicationPermissions {
   canAdoptMethodologies: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
-  canManageLegacyReleases: boolean;
+  canManageReleaseSeries: boolean;
   canUpdateContact: boolean;
   canUpdateContributorReleaseRole: boolean;
   canViewReleaseTeamAccess: boolean;
@@ -80,6 +78,18 @@ export interface PublicationCreateRequest {
   topicId: string;
 }
 
+export interface ReleaseSeriesLegacyLinkAddRequest {
+  description: string;
+  url: string;
+}
+
+export interface ReleaseSeriesItemUpdateRequest {
+  id: string;
+  releaseId?: string;
+  legacyLinkDescription?: string;
+  legacyLinkUrl?: string;
+}
+
 export interface ListReleasesParams {
   live?: boolean;
   page?: number;
@@ -87,9 +97,10 @@ export interface ListReleasesParams {
   includePermissions?: boolean;
 }
 
-export type UpdatePublicationLegacyRelease = Partial<
-  OmitStrict<UpdateLegacyRelease, 'publicationId'>
->;
+export interface ReleaseSeriesTableEntry extends ReleaseSeriesItem {
+  isLatest?: boolean;
+  isPublished?: boolean;
+}
 
 const publicationService = {
   listPublications(topicId?: string): Promise<Publication[]> {
@@ -205,13 +216,27 @@ const publicationService = {
     );
   },
 
-  partialUpdateLegacyReleases(
+  getReleaseSeries(publicationId: string): Promise<ReleaseSeriesTableEntry[]> {
+    return client.get(`/publications/${publicationId}/release-series`);
+  },
+
+  addReleaseSeriesLegacyLink(
     publicationId: string,
-    legacyReleases: UpdatePublicationLegacyRelease[],
-  ): Promise<LegacyRelease> {
-    return client.patch(
-      `/publications/${publicationId}/legacy-releases`,
-      legacyReleases,
+    newLegacyLink: ReleaseSeriesLegacyLinkAddRequest,
+  ): Promise<ReleaseSeriesTableEntry[]> {
+    return client.post(
+      `publications/${publicationId}/release-series`,
+      newLegacyLink,
+    );
+  },
+
+  updateReleaseSeries(
+    publicationId: string,
+    updatedReleaseSeries: ReleaseSeriesItemUpdateRequest[],
+  ): Promise<ReleaseSeriesTableEntry[]> {
+    return client.put(
+      `/publications/${publicationId}/release-series`,
+      updatedReleaseSeries,
     );
   },
 

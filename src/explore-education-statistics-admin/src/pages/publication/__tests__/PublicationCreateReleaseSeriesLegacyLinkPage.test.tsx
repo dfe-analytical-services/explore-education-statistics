@@ -1,24 +1,28 @@
-import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
+import PublicationCreateReleaseSeriesLegacyLinkPage from '@admin/pages/publication/PublicationCreateReleaseSeriesLegacyLinkPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import _legacyReleaseService from '@admin/services/legacyReleaseService';
-import { PublicationWithPermissions } from '@admin/services/publicationService';
+import _publicationService, {
+  PublicationWithPermissions,
+} from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/legacyReleaseService');
-const legacyReleaseService = _legacyReleaseService as jest.Mocked<
-  typeof _legacyReleaseService
+jest.mock('@admin/services/publicationService');
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
-describe('PublicationLegacyReleaseCreatePage', () => {
-  test('renders the create legacy release page', async () => {
+describe('PublicationCreateReleaseSeriesLegacyLinkPage', () => {
+  test('renders the create release series page', async () => {
     renderPage(testPublication);
 
-    expect(screen.getByText('Create legacy release')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Create legacy release')).toBeInTheDocument();
+    });
+
     expect(screen.getByLabelText('Description')).toBeInTheDocument();
     expect(screen.getByLabelText('URL')).toBeInTheDocument();
     expect(
@@ -33,22 +37,25 @@ describe('PublicationLegacyReleaseCreatePage', () => {
   test('handles successfully submitting the form', async () => {
     renderPage(testPublication);
 
+    await waitFor(() => {
+      expect(screen.getByText('Create legacy release')).toBeInTheDocument();
+    });
+
+    await userEvent.type(screen.getByLabelText('Description'), 'legacy link 1');
     await userEvent.type(
-      screen.getByLabelText('Description'),
-      'Test description',
+      screen.getByLabelText('URL'),
+      'https://www.test.com/1',
     );
-    await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
     await userEvent.click(
-      screen.getByRole('button', {
-        name: 'Save legacy release',
-      }),
+      screen.getByRole('button', { name: 'Save legacy release' }),
     );
 
     await waitFor(() => {
-      expect(legacyReleaseService.createLegacyRelease).toHaveBeenCalledWith({
-        description: 'Test description',
-        url: 'http://test.com',
-        publicationId: 'publication-1',
+      expect(
+        publicationService.addReleaseSeriesLegacyLink,
+      ).toHaveBeenCalledWith(testPublication.id, {
+        description: 'legacy link 1',
+        url: 'https://www.test.com/1',
       });
     });
   });
@@ -62,7 +69,7 @@ function renderPage(publication: PublicationWithPermissions) {
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationLegacyReleaseCreatePage />
+        <PublicationCreateReleaseSeriesLegacyLinkPage />
       </PublicationContextProvider>
     </MemoryRouter>,
   );
