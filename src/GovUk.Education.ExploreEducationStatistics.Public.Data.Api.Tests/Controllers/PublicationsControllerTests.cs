@@ -211,7 +211,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -231,7 +231,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 40);
         }
 
         [Theory]
@@ -251,7 +251,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasMinimumLengthError("search");
+            validationProblem.AssertHasMinimumLengthError("search", minLength: 3);
         }
 
         private static async Task<HttpResponseMessage> ListPublications(
@@ -720,7 +720,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -741,7 +741,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
         }
 
         [Fact]

@@ -454,7 +454,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -472,7 +472,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
         }
 
         [Theory]
