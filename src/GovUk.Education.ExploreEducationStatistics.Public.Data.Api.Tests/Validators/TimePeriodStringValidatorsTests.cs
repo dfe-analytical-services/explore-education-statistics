@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
@@ -60,6 +61,24 @@ public class TimePeriodStringValidatorsTests
             var testObj = new TestClass { TimePeriod = timePeriod };
 
             _validator.TestValidate(testObj).ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("  ")]
+        [InlineData(null)]
+        public void Failure_Empty(string? timePeriod)
+        {
+            var testObj = new TestClass { TimePeriod = timePeriod! };
+
+            var result = _validator.Validate(testObj);
+
+            Assert.False(result.IsValid);
+
+            var error = Assert.Single(result.Errors);
+
+            Assert.Equal(nameof(TestClass.TimePeriod), error.PropertyName);
+            Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
         }
 
         [Theory]

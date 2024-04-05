@@ -18,8 +18,13 @@ public static partial class SortStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> SortString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.Custom((value, context) =>
+        return rule.NotEmpty().Custom((value, context) =>
         {
+            if (value.IsNullOrWhitespace())
+            {
+                return;
+            }
+
             if (!HasValidFormat(value))
             {
                 context.AddFailure(

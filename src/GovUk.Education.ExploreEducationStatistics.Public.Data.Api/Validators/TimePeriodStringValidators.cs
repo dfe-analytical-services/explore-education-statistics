@@ -14,8 +14,13 @@ public static partial class TimePeriodStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.Custom((value, context) =>
+        return rule.NotEmpty().Custom((value, context) =>
         {
+            if (value.IsNullOrWhitespace())
+            {
+                return;
+            }
+
             if (!HasValidFormat(value))
             {
                 context.AddFailure(
