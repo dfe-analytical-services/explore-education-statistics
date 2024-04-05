@@ -258,7 +258,6 @@ jobs:
             npx playwright test
     displayName: "Run Playwright tests"
     env:
-            URL: $(URL)
             PUBLIC_URL: $(PUBLIC_URL)
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
