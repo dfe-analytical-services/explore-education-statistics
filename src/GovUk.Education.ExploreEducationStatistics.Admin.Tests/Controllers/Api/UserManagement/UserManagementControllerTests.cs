@@ -1,27 +1,16 @@
 #nullable enable
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.UserManagement;
 
-public class UserManagementControllerTests : IntegrationTest<TestStartup>
+public class UserManagementControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public UserManagementControllerTests(TestApplicationFactory<TestStartup> testApp)
-        : base(testApp)
-    {}
-
-    public class DeleteUserTests : UserManagementControllerTests
+    public class DeleteUserTests(TestApplicationFactory testApp) : UserManagementControllerTests(testApp)
     {
-        public DeleteUserTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData("BAU User", true)]
         [InlineData("Analyst", false)]

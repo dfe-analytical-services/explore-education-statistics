@@ -6,26 +6,20 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
-public class ClaimsPrincipalTransformationServiceTests : IntegrationTest<TestStartup>
+public class ClaimsPrincipalTransformationServiceTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public ClaimsPrincipalTransformationServiceTests(TestApplicationFactory<TestStartup> testApp)
-        : base(testApp)
-    {}
-
     [Theory]
     [InlineData("unknown-scope-claim", "access-admin-api", false)]
     [InlineData("scp", "access-admin-api", true)]
