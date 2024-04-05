@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 public abstract class IntegrationTestFixture(TestApplicationFactory testApp)
     : CacheServiceTestFixture, IClassFixture<TestApplicationFactory>, IClassFixture<CacheTestFixture>, IAsyncLifetime
 {
+    protected readonly DataFixture DataFixture = new();
+
     protected readonly TestApplicationFactory TestApp = testApp;
 
     public async Task InitializeAsync()

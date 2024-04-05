@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Hosting;
@@ -21,6 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
+    public async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
+    {
+        await using var context = GetDbContext<TDbContext>();
+
+        supplier.Invoke(context);
+        await context.SaveChangesAsync();
+    }
+
     public async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();

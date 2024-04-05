@@ -1,114 +1,148 @@
 #nullable enable
-
-using System;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static Moq.MockBehavior;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
- 
-public class PublicationControllerTests
-{
-    [Fact]
-    public async Task CreatePublication_Ok()
-    {
-        var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
-            .Returns<PublicationCreateRequest>(p =>
-                Task.FromResult(new Either<ActionResult, PublicationCreateViewModel>(
-                    new PublicationCreateViewModel
-                    {
-                        Topic = new IdTitleViewModel
-                        {
-                            Id = p.TopicId,
-                        }
-                    })
-                )
+public class PublicationControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+{
+    public class CreatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Topic topic = DataFixture.DefaultTopic()
+                .WithTheme(DataFixture.DefaultTheme());
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Topics.Add(topic);
+            });
+
+            var client = TestApp
+                .SetUser(BauUser())
+                .CreateClient();
+
+            var request = new PublicationCreateRequest
+            {
+                Title = "Publication",
+                Summary = "Publication summary",
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                TopicId = topic.Id
+            };
+
+            var response = await CreatePublication(client, request);
+
+            var result = response.AssertOk<PublicationCreateViewModel>();
+
+            Assert.Multiple(
+                () => Assert.Equal(request.Title, result.Title),
+                () => Assert.Equal(request.Summary, result.Summary),
+                () => Assert.Equal("publication", result.Slug),
+                () => Assert.Equal(request.Contact.TeamName, result.Contact.TeamName),
+                () => Assert.Equal(request.Contact.TeamEmail, result.Contact.TeamEmail),
+                () => Assert.Equal(request.Contact.ContactName, result.Contact.ContactName),
+                () => Assert.Equal(request.Contact.ContactTelNo, result.Contact.ContactTelNo),
+                () => Assert.Equal(topic.Id, result.Topic.Id),
+                () => Assert.Equal(topic.Title, result.Topic.Title),
+                () => Assert.Equal(topic.Theme.Id, result.Theme.Id),
+                () => Assert.Equal(topic.Theme.Title, result.Theme.Title),
+                () => Assert.Null(result.SupersededById),
+                () => Assert.False(result.IsSuperseded)
             );
 
-        var controller = BuildController(publicationService: publicationService.Object);
+            await using var context = TestApp.GetDbContext<ContentDbContext>();
 
-        var topicId = Guid.NewGuid();
+            var saved = await context.Publications
+                .Include(p => p.Contact)
+                .Include(p => p.Topic)
+                .ThenInclude(t => t.Theme)
+                .SingleAsync(p => p.Id == result.Id);
 
-        // Method under test
-        var result = await controller.CreatePublication(new PublicationCreateRequest()
+            Assert.Multiple(
+                () => Assert.Equal(request.Title, saved.Title),
+                () => Assert.Equal(request.Summary, saved.Summary),
+                () => Assert.Equal("publication", saved.Slug),
+                () => Assert.Equal(request.Contact.TeamName, saved.Contact.TeamName),
+                () => Assert.Equal(request.Contact.TeamEmail, saved.Contact.TeamEmail),
+                () => Assert.Equal(request.Contact.ContactName, saved.Contact.ContactName),
+                () => Assert.Equal(request.Contact.ContactTelNo, saved.Contact.ContactTelNo),
+                () => Assert.Equal(topic.Id, saved.Topic.Id),
+                () => Assert.Equal(topic.Title, saved.Topic.Title),
+                () => Assert.Equal(topic.Theme.Id, saved.Topic.Theme.Id),
+                () => Assert.Equal(topic.Theme.Title, saved.Topic.Theme.Title)
+            );
+        }
+
+        [Fact]
+        public async Task PublicationSlugNotUnique_ReturnsValidationError()
         {
-            TopicId = topicId
-        });
+            Publication publication = DataFixture.DefaultPublication()
+                .WithTopic(DataFixture.DefaultTopic()
+                    .WithTheme(DataFixture.DefaultTheme()));
 
-        Assert.IsType<PublicationCreateViewModel>(result.Value);
-        Assert.Equal(topicId, result.Value.Topic.Id);
-    }
+            Topic topic = DataFixture.DefaultTopic()
+                .WithTheme(DataFixture.DefaultTheme());
 
-    [Fact]
-    public async Task CreatePublication_ValidationFailure()
-    {
-        var publicationService = new Mock<IPublicationService>();
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.Topics.Add(topic);
+            });
 
-        var validationResponse =
-            new Either<ActionResult, PublicationCreateViewModel>(
-                ValidationUtils.ValidationActionResult(SlugNotUnique));
+            var client = TestApp
+                .SetUser(BauUser())
+                .CreateClient();
 
-        publicationService
-            .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
-            .Returns<PublicationCreateRequest>(p => Task.FromResult(validationResponse));
+            var request = new PublicationCreateRequest
+            {
+                Title = "Publication",
+                Slug = publication.Slug, // Same slug as an existing saved publication
+                Summary = "Publication summary",
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                TopicId = topic.Id
+            };
 
-        var controller = BuildController(publicationService: publicationService.Object);
+            var response = await CreatePublication(client, request);
 
-        var topicId = Guid.NewGuid();
+            var validationProblem = response.AssertValidationProblem();
 
-        // Method under test
-        var result = await controller.CreatePublication(new PublicationCreateRequest()
+            validationProblem.AssertHasGlobalError(ValidationErrorMessages.PublicationSlugNotUnique);
+
+            await using var context = TestApp.GetDbContext<ContentDbContext>();
+
+            // Assert a new publication was not created
+            var saved = Assert.Single(await context.Publications.ToListAsync());
+            Assert.Equal(publication.Id, saved.Id);
+        }
+
+        private static async Task<HttpResponseMessage> CreatePublication(HttpClient client,
+            PublicationCreateRequest request)
         {
-            TopicId = topicId
-        });
-
-        result.Result!.AssertValidationProblem(SlugNotUnique);
-    }
-    
-    [Fact]
-    public async Task GetRoles()
-    {
-        var publicationId = Guid.NewGuid();
-
-        var rolesForPublication = ListOf(new UserPublicationRoleViewModel
-        {
-            Id = Guid.NewGuid()
-        });
-    
-        var roleService = new Mock<IUserRoleService>(Strict);
-
-        roleService
-            .Setup(s => s.GetPublicationRolesForPublication(publicationId))
-            .ReturnsAsync(rolesForPublication);
-    
-        var controller = BuildController(roleService: roleService.Object);
-
-        // Method under test
-        var result = await controller.GetRoles(publicationId);
-        Assert.Equal(rolesForPublication, result.Value);
-    }
-
-    private PublicationController BuildController(
-        IPublicationService? publicationService = null,
-        IUserRoleService? roleService = null)
-    {
-        return new PublicationController(
-            publicationService ?? Mock.Of<IPublicationService>(Strict),
-            roleService ?? Mock.Of<IUserRoleService>(Strict));
+            return await client.PostAsJsonAsync("api/publications", request);
+        }
     }
 }

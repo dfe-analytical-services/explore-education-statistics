@@ -323,7 +323,7 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath,
+        string? expectedPath,
         string expectedCode)
     {
         Predicate<ErrorViewModel> predicate = error => error.Path == expectedPath && error.Code == expectedCode;
@@ -332,6 +332,16 @@ public static class ValidationProblemViewModelTestExtensions
 
         return validationProblem.Errors.First(new Func<ErrorViewModel, bool>(predicate));
     }
+
+    public static ErrorViewModel AssertHasGlobalError(
+        this ValidationProblemViewModel validationProblem,
+        Enum expectedCode) =>
+        validationProblem.AssertHasGlobalError(expectedCode.ToString());
+
+    public static ErrorViewModel AssertHasGlobalError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedCode) =>
+        validationProblem.AssertHasError(expectedPath: null, expectedCode);
 
     private static ErrorViewModel AssertHasFluentValidationError(
         this ValidationProblemViewModel validationProblem,
