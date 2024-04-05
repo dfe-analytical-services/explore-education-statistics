@@ -50,8 +50,9 @@ param backupRetentionDays int = 7
 @description('Geo-Redundant Backup setting')
 param geoRedundantBackup string = 'Disabled'
 
-@description('Specifies the subnet id')
+/*@description('Specifies the subnet id')
 param subnetId string
+*/
 
 @description('An array of database names')
 param databaseNames string[]
@@ -113,10 +114,10 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     highAvailability: {
       mode: 'Disabled'
     }
-    network: {
+    /*network: {
       delegatedSubnetResourceId: subnetId
       privateDnsZoneArmResourceId: privateDnsZoneId
-    }
+    }*/
   }
 
   resource database 'databases' = [for name in databaseNames: {

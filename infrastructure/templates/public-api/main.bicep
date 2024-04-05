@@ -189,8 +189,19 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     postgreSqlVersion: '16'
     tagValues: tagValues
     privateDnsZoneId: postgreSqlPrivateDnsZone.id
-    firewallRules: postgreSqlFirewallRules
-    subnetId: vNetModule.outputs.postgreSqlSubnetRef
+    firewallRules: concat(postgreSqlFirewallRules, [
+      {
+        name: '${resourcePrefix}-ca-${apiContainerAppName}-subnet'
+        startIpAddress: vNetModule.outputs.containerAppEnvironmentSubnetStartIpAddress
+        endIpAddress: vNetModule.outputs.containerAppEnvironmentSubnetEndIpAddress
+      }
+      {
+        name: '${dataProcessorFunctionAppFullName}-subnet'
+        startIpAddress: vNetModule.outputs.dataProcessorSubnetStartIpAddress
+        endIpAddress: vNetModule.outputs.dataProcessorSubnetEndIpAddress
+      }
+    ])
+    // subnetId: vNetModule.outputs.postgreSqlSubnetRef
     databaseNames: ['public_data']
   }
 }

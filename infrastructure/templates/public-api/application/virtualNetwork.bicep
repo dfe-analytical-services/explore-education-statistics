@@ -18,9 +18,9 @@ var postgreSqlSubnetName = '${subscription}-snet-${postgreSqlServerName}'
 var containerAppEnvironmentSubnetName = '${subscription}-snet-cae-01'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
-var dataProcessorSubnetPrefix = '10.0.6.0/24'
-var postgreSqlSubnetPrefix = '10.0.7.0/24'
-var containerAppEnvironmentSubnetPrefix = '10.0.10.0/23'
+var dataProcessorSubnetRange = '10.0.6.0/24'
+var postgreSqlSubnetRange = '10.0.7.0/24'
+var containerAppEnvironmentSubnetRange = '10.0.10.0/23'
 
 // Reference the existing VNet.
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
@@ -30,7 +30,7 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
 var dataProcessorSubnet = {
   name: dataProcessorSubnetName
   properties: {
-    addressPrefix: dataProcessorSubnetPrefix
+    addressPrefix: dataProcessorSubnetRange
     delegations: [
       {
         name: '${resourcePrefix}-snet-delegation-fa-${dataProcessorFunctionAppName}'
@@ -50,7 +50,7 @@ var dataProcessorSubnet = {
 var postgreSqlSubnet = {
   name: postgreSqlSubnetName
   properties: {
-    addressPrefix: postgreSqlSubnetPrefix
+    addressPrefix: postgreSqlSubnetRange
     delegations: [
     {
       name: '${resourcePrefix}-snet-delegation-${postgreSqlServerName}'
@@ -64,7 +64,7 @@ var postgreSqlSubnet = {
 var containerAppEnvironmentSubnet = {
   name: containerAppEnvironmentSubnetName
   properties: {
-    addressPrefix: containerAppEnvironmentSubnetPrefix
+    addressPrefix: containerAppEnvironmentSubnetRange
   }
 }
 
@@ -89,8 +89,20 @@ output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName
 @description('The fully qualified Azure resource ID of the Data Processor Function App Subnet.')
 output dataProcessorSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, dataProcessorSubnetName)
 
+@description('The first usable IP address for the Data Processor Function App Subnet.')
+output dataProcessorSubnetStartIpAddress string = parseCidr(dataProcessorSubnetRange).firstUsable
+
+@description('The last usable IP address for the Data Processor Function App Subnet.')
+output dataProcessorSubnetEndIpAddress string = parseCidr(dataProcessorSubnetRange).lastUsable
+
 @description('The fully qualified Azure resource ID of the PostgreSQL Flexible Server Subnet.')
 output postgreSqlSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, postgreSqlSubnetName)
 
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
 output containerAppEnvironmentSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, containerAppEnvironmentSubnetName)
+
+@description('The first usable IP address for the API Container App Subnet.')
+output containerAppEnvironmentSubnetStartIpAddress string = parseCidr(containerAppEnvironmentSubnetRange).firstUsable
+
+@description('The last usable IP address for the API Container App Subnet.')
+output containerAppEnvironmentSubnetEndIpAddress string = parseCidr(containerAppEnvironmentSubnetRange).lastUsable
