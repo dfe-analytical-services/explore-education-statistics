@@ -54,11 +54,11 @@ public record DataSetGetQueryGeographicLevels
         public Validator()
         {
             RuleFor(q => q.Eq)
-                .AllowedValue(EnumUtil.GetEnumValues<GeographicLevel>())
+                .AllowedValue(GeographicLevelUtils.OrderedCodes)
                 .When(q => q.Eq is not null);
 
             RuleFor(q => q.NotEq)
-                .AllowedValue(EnumUtil.GetEnumValues<GeographicLevel>())
+                .AllowedValue(GeographicLevelUtils.OrderedCodes)
                 .When(q => q.NotEq is not null);
 
             When(q => q.In is not null, () =>
@@ -66,7 +66,7 @@ public record DataSetGetQueryGeographicLevels
                 RuleFor(q => q.In)
                     .NotEmpty();
                 RuleForEach(q => q.In)
-                    .AllowedValue(EnumUtil.GetEnumValues<GeographicLevel>());
+                    .AllowedValue(GeographicLevelUtils.OrderedCodes);
             });
 
             When(q => q.NotIn is not null, () =>
@@ -74,7 +74,7 @@ public record DataSetGetQueryGeographicLevels
                 RuleFor(q => q.NotIn)
                     .NotEmpty();
                 RuleForEach(q => q.NotIn)
-                    .AllowedValue(EnumUtil.GetEnumValues<GeographicLevel>());
+                    .AllowedValue(GeographicLevelUtils.OrderedCodes);
             });
         }
     }

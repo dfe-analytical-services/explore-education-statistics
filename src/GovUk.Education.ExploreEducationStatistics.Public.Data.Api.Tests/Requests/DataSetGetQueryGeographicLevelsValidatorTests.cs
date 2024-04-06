@@ -1,8 +1,6 @@
 using FluentValidation.TestHelper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
@@ -86,7 +84,7 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
             var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
 
             Assert.Equal(geographicLevel, state.Value);
-            Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.Allowed);
+            Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
         }
     }
 
@@ -120,7 +118,7 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
             var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
 
             Assert.Equal(geographicLevel, state.Value);
-            Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.Allowed);
+            Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
         }
     }
 
@@ -162,7 +160,7 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
                 var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
 
                 Assert.Equal(error.AttemptedValue, state.Value);
-                Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.Allowed);
+                Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
             });
         }
     }
@@ -206,7 +204,7 @@ public abstract class DataSetGetQueryGeographicLevelsValidatorTests
                 var state = Assert.IsType<AllowedValueValidator.AllowedErrorDetail<string>>(error.CustomState);
 
                 Assert.Equal(error.AttemptedValue, state.Value);
-                Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.Allowed);
+                Assert.Equal(GeographicLevelUtils.OrderedCodes, state.Allowed);
             });
         }
     }
