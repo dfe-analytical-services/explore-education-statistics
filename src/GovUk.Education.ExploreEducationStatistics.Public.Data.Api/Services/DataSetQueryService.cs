@@ -412,13 +412,13 @@ internal class DataSetQueryService(
             GeographicLevel = EnumUtil.GetFromEnumLabel<GeographicLevel>((string)row[DataTable.Cols.GeographicLevel]!),
             TimePeriod = timePeriodsById.Result[(int)row[DataTable.Cols.TimePeriodId]!],
             Filters = columnsByType.Filters
-                .Where(filter => row[filter] is int)
+                .Where(filter => row[filter] is int and not 0)
                 .ToDictionary(
                     filter => filter,
                     filter => filterOptionsById.Result[(int)row[filter]!]
                 ),
             Locations = locationColumnsByCode
-                .Where(kv => row[kv.Value] is int)
+                .Where(kv => row[kv.Value] is int and not 0)
                 .ToDictionary(
                     kv => kv.Key,
                     kv => locationOptionsById.Result[(int)row[kv.Value]!]

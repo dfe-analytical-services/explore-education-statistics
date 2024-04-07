@@ -728,12 +728,12 @@ public class SeedDataCommand : ICommand
 
             string[] columns =
             [
-                $"{DataTable.Cols.Id} UINTEGER PRIMARY KEY",
-                $"{DataTable.Cols.TimePeriodId} INTEGER",
-                $"{DataTable.Cols.GeographicLevel} VARCHAR",
-                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER"),
-                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER"),
-                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR"),
+                $"{DataTable.Cols.Id} UINTEGER NOT NULL PRIMARY KEY",
+                $"{DataTable.Cols.TimePeriodId} INTEGER NOT NULL",
+                $"{DataTable.Cols.GeographicLevel} VARCHAR NOT NULL",
+                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
+                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
+                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
             ];
 
             await _duckDb.ExecuteAsync($"CREATE TABLE {DataTable.TableName}({columns.JoinToString(",\n")})");
@@ -744,9 +744,9 @@ public class SeedDataCommand : ICommand
                 $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
                 DataSourceTable.Ref.GeographicLevel,
                 ..version.LocationMetas.Select(location =>
-                    $"{LocationsTable.Ref(location).Id} AS {DataTable.Cols.LocationId(location)}"),
+                    $"COALESCE({LocationsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"),
                 ..version.FilterMetas.Select(filter => 
-                    $"{FiltersTable.Ref(filter).Id} AS {DataTable.Cols.Filter(filter)}"),
+                    $"COALESCE({FiltersTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"),
                 ..version.IndicatorMetas.Select(DataTable.Cols.Indicator),
             ];
 
