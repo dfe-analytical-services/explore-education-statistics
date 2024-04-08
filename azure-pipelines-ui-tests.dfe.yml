@@ -246,10 +246,6 @@ jobs:
       versionSpec: "16.X"
 
   - script: |
-      npm install -g npm@latest
-    displayName: 'Upgrade npm'
-
-  - script: |
       npm install
       npm run build # or any other build script you have
     displayName: 'Install dependencies and build'
