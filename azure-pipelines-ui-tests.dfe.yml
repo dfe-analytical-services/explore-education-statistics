@@ -239,41 +239,26 @@ jobs:
     fetchDepth: 5
     fetchTags: false
 
-  - task: NodeTool@1
-    displayName: Use Node version 16 above
+  - task: NodeTool@0
+    displayName: Use Node version 18 above
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "18.X"
+      versionSpec: "18"
 
   - script: |
-      npm install -g pnpm@latest
-    displayName: 'Install pnpm'
+      npm ci
+    displayName: 'npm CI'
 
   - script: |
-      pnpm install
-    displayName: 'Install dependencies and build'
-
-  - task: Cache@2
-    inputs:
-      key: 'pnpm | "$(Agent.OS)" | package-lock.json'
-      restoreKeys: |
-        npm | "$(Agent.OS)"
-      path: $(npm_config_cache)
-    displayName: 'Cache npm packages'
-
-  - script: |
-            npm ci --force
-    displayName: "Install dependencies"
-
-  - script: |
-            npx playwright install --with-deps
-    displayName: "Install Playwright Browsers"
+      npx playwright install --with-deps
+    displayName: 'Install Playwright browsers'
 
         # runs the playwright tests
   - script: |
             npx playwright test
     displayName: "Run Playwright tests"
     env:
+            CI: 'true'
             PUBLIC_URL: $(PUBLIC_URL)
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
