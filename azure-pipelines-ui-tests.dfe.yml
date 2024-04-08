@@ -243,7 +243,7 @@ jobs:
     displayName: Use Node version 18 above
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "18"
+      versionSpec: "18.18.2"
 
   - script: |
         node -v
@@ -256,7 +256,7 @@ jobs:
   - script: |
       pnpm install
     displayName: 'Install dependencies'
-    
+
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
