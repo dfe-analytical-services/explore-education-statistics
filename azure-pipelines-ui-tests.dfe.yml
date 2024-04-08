@@ -246,6 +246,10 @@ jobs:
       versionSpec: "18.X"
 
   - script: |
+      npm install -g pnpm@latest
+    displayName: 'Install pnpm'
+
+  - script: |
       pnpm install
     displayName: 'Install dependencies and build'
 
