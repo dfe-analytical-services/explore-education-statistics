@@ -246,6 +246,10 @@ jobs:
       versionSpec: "16.X"
 
   - script: |
+            rm -rf node_modules
+            rm package-lock.json
+
+  - script: |
             npm install
             npm ci --force
     displayName: "Install dependencies"
