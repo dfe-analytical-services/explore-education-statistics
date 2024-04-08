@@ -61,6 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         expectedImportedRows: result.ImportableRowCount,
                         totalRows: result.TotalRowCount,
                         geographicLevels: result.GeographicLevels);
+                    // @MarkFix Can we get everything we need for DataSetFileMeta here,
+                    // so we can set it?
                 })
                 .OnFailureDo(async errors =>
                 {

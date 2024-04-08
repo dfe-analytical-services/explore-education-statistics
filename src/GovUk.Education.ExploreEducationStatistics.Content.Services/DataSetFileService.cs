@@ -1,8 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -17,23 +17,28 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
+using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
+    private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
 
     public DataSetFileService(
         ContentDbContext contentDbContext,
+        StatisticsDbContext statisticsDbContext,
         IReleaseVersionRepository releaseVersionRepository)
     {
         _contentDbContext = contentDbContext;
+        _statisticsDbContext = statisticsDbContext;
         _releaseVersionRepository = releaseVersionRepository;
     }
 
@@ -59,6 +64,8 @@ public class DataSetFileService : IDataSetFileService
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
@@ -70,48 +77,73 @@ public class DataSetFileService : IDataSetFileService
         var results = await query
             .OrderBy(sort.Value, sortDirection.Value)
             .Paginate(page: page, pageSize: pageSize)
-            .Select(BuildResultViewModel())
             .ToListAsync(cancellationToken: cancellationToken);
+
+        var viewModels = (await results
+            .SelectAsync(BuildDataSetFileSummaryViewModel)).ToList();
 
         return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
             // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
-            await ChangeSummaryHtmlToText(results),
+            await ChangeSummaryHtmlToText(viewModels),
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
             page,
             pageSize);
     }
 
-    private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetFileSummaryViewModel>>
-        BuildResultViewModel()
+    private async Task<DataSetFileSummaryViewModel> BuildDataSetFileSummaryViewModel(
+        FreeTextValueResult<ReleaseFile> result)
     {
-        return result =>
-            new DataSetFileSummaryViewModel
+        var releaseFile = result.Value;
+        var (filters, indicators) = await GetOrderedFiltersAndIndicators(
+            result.Value.ReleaseVersionId, result.Value.File.SubjectId!.Value,
+            releaseFile.File.DataSetFileMeta!.Filters, releaseFile.File.DataSetFileMeta.Indicators);
+
+        return new DataSetFileSummaryViewModel
+        {
+            Id = result.Value.File.DataSetFileId!.Value, // we fetch OfFileType(FileType.Data), so this must be set
+            FileId = result.Value.FileId,
+            Filename = result.Value.File.Filename,
+            FileSize = result.Value.File.DisplaySize(),
+            Title = result.Value.Name ?? "",
+            Content = result.Value.Summary ?? "",
+            Theme = new IdTitleViewModel
             {
-                Id = result.Value.File.DataSetFileId!.Value, // we fetch OfFileType(FileType.Data), so this must be set
-                FileId = result.Value.FileId,
-                Filename = result.Value.File.Filename,
-                FileSize = result.Value.File.DisplaySize(),
-                Title = result.Value.Name ?? "",
-                Content = result.Value.Summary ?? "",
-                Theme = new IdTitleViewModel
+                Id = result.Value.ReleaseVersion.Publication.Topic.ThemeId,
+                Title = result.Value.ReleaseVersion.Publication.Topic.Theme.Title
+            },
+            Publication = new IdTitleViewModel
+            {
+                Id = result.Value.ReleaseVersion.PublicationId,
+                Title = result.Value.ReleaseVersion.Publication.Title
+            },
+            Release = new IdTitleViewModel
+            {
+                Id = result.Value.ReleaseVersionId,
+                Title = result.Value.ReleaseVersion.Title
+            },
+            LatestData = result.Value.ReleaseVersionId ==
+                         result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
+            Published = result.Value.ReleaseVersion.Published!.Value,
+            Meta = (releaseFile.File.DataSetFileMeta == null)
+                ? throw new InvalidDataException(
+                    $"DataSetFileMeta should not be null. FileId: {releaseFile.FileId}")
+                : new DataSetFileMetaViewModel
                 {
-                    Id = result.Value.ReleaseVersion.Publication.Topic.ThemeId,
-                    Title = result.Value.ReleaseVersion.Publication.Topic.Theme.Title
+                    GeographicLevels  = releaseFile.File.DataSetFileMeta.GeographicLevels,
+                    TimePeriod = new DataSetFileTimePeriodViewModel
+                    {
+                        TimeIdentifier = releaseFile.File.DataSetFileMeta.TimeIdentifier.GetEnumLabel(),
+                        From = TimePeriodLabelFormatter.Format(
+                            releaseFile.File.DataSetFileMeta.Years.First(),
+                            releaseFile.File.DataSetFileMeta.TimeIdentifier),
+                        To = TimePeriodLabelFormatter.Format(
+                            releaseFile.File.DataSetFileMeta.Years.Last(),
+                            releaseFile.File.DataSetFileMeta.TimeIdentifier),
+                    },
+                    Filters = filters,
+                    Indicators = indicators,
                 },
-                Publication = new IdTitleViewModel
-                {
-                    Id = result.Value.ReleaseVersion.PublicationId,
-                    Title = result.Value.ReleaseVersion.Publication.Title
-                },
-                Release = new IdTitleViewModel
-                {
-                    Id = result.Value.ReleaseVersionId,
-                    Title = result.Value.ReleaseVersion.Title
-                },
-                LatestData = result.Value.ReleaseVersionId ==
-                             result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
-                Published = result.Value.ReleaseVersion.Published!.Value
-            };
+        };
     }
 
     private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
@@ -126,6 +158,8 @@ public class DataSetFileService : IDataSetFileService
             .ToListAsync();
     }
 
+    // ReSharper disable EntityFramework.NPlusOne.IncompleteDataQuery
+    // ReSharper disable EntityFramework.NPlusOne.IncompleteDataUsage
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetId)
     {
@@ -145,6 +179,10 @@ public class DataSetFileService : IDataSetFileService
         {
             return new NotFoundResult();
         }
+
+        var (filters, indicators) = await GetOrderedFiltersAndIndicators(
+            releaseFile.ReleaseVersionId, releaseFile.File.SubjectId!.Value,
+            releaseFile.File.DataSetFileMeta!.Filters, releaseFile.File.DataSetFileMeta.Indicators);
 
         return new DataSetFileViewModel
         {
@@ -174,8 +212,55 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
-            }
+            },
+            Meta = (releaseFile.File.DataSetFileMeta == null)
+                ? new DataSetFileMetaViewModel()
+                : new DataSetFileMetaViewModel
+                {
+                    GeographicLevels  = releaseFile.File.DataSetFileMeta.GeographicLevels,
+                    TimePeriod = new DataSetFileTimePeriodViewModel
+                    {
+                        TimeIdentifier = releaseFile.File.DataSetFileMeta.TimeIdentifier.GetEnumLabel(),
+                        From = TimePeriodLabelFormatter.Format(
+                            releaseFile.File.DataSetFileMeta.Years.First(),
+                            releaseFile.File.DataSetFileMeta.TimeIdentifier),
+                        To = TimePeriodLabelFormatter.Format(
+                            releaseFile.File.DataSetFileMeta.Years.Last(),
+                            releaseFile.File.DataSetFileMeta.TimeIdentifier),
+                    },
+                    Filters = filters,
+                    Indicators = indicators,
+                },
         };
+    }
+
+    private async Task<Tuple<List<string>, List<string>>> GetOrderedFiltersAndIndicators(
+        Guid releaseVersionId, Guid subjectId,
+        List<FilterMeta> metaFilters, List<IndicatorMeta> metaIndicators)
+    {
+        var releaseSubject = await _statisticsDbContext.ReleaseSubject
+            .SingleAsync(rs => rs.ReleaseVersionId == releaseVersionId
+                          && rs.SubjectId == subjectId);
+
+        var filterSequence = releaseSubject.FilterSequence?
+            .Select(fs => fs.Id)
+            .ToArray();
+        var filters = filterSequence == null
+            ? metaFilters.OrderBy(f => f.Label).ToList()
+            : metaFilters
+                .OrderBy(f => Array.IndexOf(filterSequence, f.Id)).ToList();
+
+        var indicatorSequence = releaseSubject.IndicatorSequence?
+            .SelectMany(seq => seq.ChildSequence)
+            .ToArray();
+        var indicators = indicatorSequence == null
+            ? metaIndicators.OrderBy(i => i.Label).ToList()
+            : metaIndicators
+                .OrderBy(i => Array.IndexOf(indicatorSequence, i.Id)).ToList();
+
+        return new (
+            filters.Select(f => f.Label).ToList(),
+            indicators.Select(i => i.Label).ToList());
     }
 }
 

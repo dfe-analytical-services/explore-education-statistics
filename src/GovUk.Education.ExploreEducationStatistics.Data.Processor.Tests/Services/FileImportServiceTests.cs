@@ -58,6 +58,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     import.Id, COMPLETE, 100))
                 .Returns(Task.CompletedTask);
 
+            dataImportService
+                .Setup(s => s.WriteDataSetFileMeta(
+                    import.SubjectId))
+                .Returns(Task.CompletedTask);
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -206,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     var file = new File
                     {
                         Id = Guid.NewGuid(),
-                        Filename = "my_data_file.csv"
+                        Filename = "my_data_file.csv",
                     };
 
                     var import = new DataImport
@@ -223,7 +228,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     var statisticsDbContextId = Guid.NewGuid().ToString();
 
                     await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
-                    var service = BuildFileImportService();
+
+                    var dataImportService = new Mock<IDataImportService>(Strict);
+                    dataImportService.Setup(mock => mock.WriteDataSetFileMeta(import.SubjectId))
+                        .Returns(Task.CompletedTask);
+
+                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
                     await service.CheckComplete(import, statisticsDbContext);
                 });
         }

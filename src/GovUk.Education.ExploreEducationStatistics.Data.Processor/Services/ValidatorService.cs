@@ -262,6 +262,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     fixedInformationReader.GetTimeIdentifier(rowValues);
                     fixedInformationReader.GetYear(rowValues);
 
+                    // @MarkFix alongside GeogLvl, also get Filters/Indicators/TimePeriods here?
+
                     var level = fixedInformationReader.GetGeographicLevel(rowValues);
                     
                     if (rowCountByGeographicLevel.ContainsKey(level))

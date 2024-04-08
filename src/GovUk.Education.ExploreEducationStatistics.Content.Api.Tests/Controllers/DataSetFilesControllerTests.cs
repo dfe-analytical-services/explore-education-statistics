@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -1826,7 +1827,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
     }
 
     private WebApplicationFactory<TestStartup> BuildApp(
-        ContentDbContext? contentDbContext = null)
+        ContentDbContext? contentDbContext = null,
+        StatisticsDbContext? statisticsDbContext = null)
     {
         return TestApp
             .ResetDbContexts()
@@ -1837,6 +1839,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 services.AddTransient<IDataSetFileService>(
                     s => new DataSetFileService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
+                        statisticsDbContext ?? s.GetRequiredService<StatisticsDbContext>(),
                         s.GetRequiredService<IReleaseVersionRepository>()));
             });
     }
