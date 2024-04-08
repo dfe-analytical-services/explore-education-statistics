@@ -139,6 +139,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
   params: {
     subscription: subscription
     location: location
+    containerAppEnvironmentNameSuffix: '01'
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
@@ -189,6 +190,11 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     postgreSqlVersion: '16'
     tagValues: tagValues
     privateDnsZoneId: postgreSqlPrivateDnsZone.id
+    /*
+    TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+    Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
+    but only on specific subnets.
+    */
     firewallRules: concat(postgreSqlFirewallRules, [
       {
         name: '${resourcePrefix}-ca-${apiContainerAppName}-subnet'

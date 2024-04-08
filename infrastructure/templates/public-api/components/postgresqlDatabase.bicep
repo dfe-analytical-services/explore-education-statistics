@@ -50,7 +50,11 @@ param backupRetentionDays int = 7
 @description('Geo-Redundant Backup setting')
 param geoRedundantBackup string = 'Disabled'
 
-/*@description('Specifies the subnet id')
+/*
+TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
+but only on specific subnets.
+@description('Specifies the subnet id')
 param subnetId string
 */
 
@@ -114,7 +118,12 @@ resource postgreSQLDatabase 'Microsoft.DBforPostgreSQL/flexibleServers@2023-03-0
     highAvailability: {
       mode: 'Disabled'
     }
-    /*network: {
+
+    /*
+    TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+    Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
+    but only on specific subnets.
+    network: {
       delegatedSubnetResourceId: subnetId
       privateDnsZoneArmResourceId: privateDnsZoneId
     }*/
