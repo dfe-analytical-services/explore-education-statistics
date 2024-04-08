@@ -1072,7 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestVersion")
-                        .WithOne("DataSet")
+                        .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestVersionId");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
@@ -1086,7 +1086,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", null)
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "DataSet")
                         .WithMany("Versions")
                         .HasForeignKey("DataSetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1182,6 +1182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                             b1.Navigation("TimePeriodRange")
                                 .IsRequired();
                         });
+
+                    b.Navigation("DataSet");
 
                     b.Navigation("MetaSummary")
                         .IsRequired();
@@ -1287,9 +1289,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.Navigation("DataSet")
-                        .IsRequired();
-
                     b.Navigation("FilterChanges");
 
                     b.Navigation("FilterMetas");

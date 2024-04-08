@@ -37,7 +37,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     locations: 1,
                     timePeriods: 3)
                 .WithStatusPublished()
-                .WithDataSet(dataSet);
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {

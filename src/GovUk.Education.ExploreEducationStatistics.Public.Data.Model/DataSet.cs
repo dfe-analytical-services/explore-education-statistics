@@ -42,8 +42,9 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
             builder
                 .HasOne(ds => ds.LatestVersion)
-                .WithOne(dsv => dsv.DataSet)
-                .HasForeignKey<DataSet>(ds => ds.LatestVersionId);
+                .WithOne()
+                .HasForeignKey<DataSet>(ds => ds.LatestVersionId)
+                .IsRequired(false);
         }
     }
 }
