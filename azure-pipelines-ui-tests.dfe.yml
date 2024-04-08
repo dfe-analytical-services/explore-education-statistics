@@ -250,10 +250,13 @@ jobs:
     displayName: 'node version'
 
   - script: |
-      npm install --package-lock-only
-      npm ci
-    displayName: 'npm CI'
+      npm install -g pnpm
+    displayName: 'Install pnpm'
 
+  - script: |
+      pnpm install
+    displayName: 'Install dependencies'
+    
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
