@@ -245,7 +245,7 @@ jobs:
     inputs:
       versionSpec: "18"
 
-  - - script: |
+  - script: |
         node -v
       displayName: 'node version'
 
