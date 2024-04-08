@@ -10,9 +10,16 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     fileId: 'file-id-1',
     filename: 'file-name-1',
     fileSize: '100 kb',
-    filters: ['Filter 1', 'Filter 2'],
-    geographicLevels: ['National', 'Regional'],
-    indicators: ['Indicator 1', 'Indicator 2'],
+    meta: {
+      timePeriod: {
+        timeIdentifier: 'Calendar year',
+        from: '2010',
+        to: '2020',
+      },
+      filters: ['Filter 1', 'Filter 2'],
+      geographicLevels: ['National', 'Regional'],
+      indicators: ['Indicator 1', 'Indicator 2'],
+    },
     latestData: true,
     publication: {
       id: 'publication-1',
@@ -28,10 +35,6 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       id: 'theme-1',
       title: 'Theme 1',
     },
-    timePeriods: {
-      from: '2010',
-      to: '2020',
-    },
     title: 'Data set 1',
   },
   {
@@ -40,9 +43,16 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     fileId: 'file-id-2',
     filename: 'file-name-2',
     fileSize: '100 kb',
-    filters: ['Filter 1', 'Filter 2'],
-    geographicLevels: ['National', 'Regional'],
-    indicators: ['Indicator 1', 'Indicator 2'],
+    meta: {
+      timePeriod: {
+        timeIdentifier: 'Calendar year',
+        from: '2010',
+        to: '2020',
+      },
+      filters: ['Filter 1', 'Filter 2'],
+      geographicLevels: ['National', 'Regional'],
+      indicators: ['Indicator 1', 'Indicator 2'],
+    },
     latestData: true,
     publication: {
       id: 'publication-1',
@@ -58,10 +68,6 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
       id: 'theme-2',
       title: 'Theme 2',
     },
-    timePeriods: {
-      from: '2010',
-      to: '2020',
-    },
     title: 'Data set 2',
   },
   {
@@ -70,9 +76,16 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     fileId: 'file-id-3',
     filename: 'file-name-3',
     fileSize: '100 kb',
-    filters: ['Filter 1', 'Filter 2'],
-    geographicLevels: ['National', 'Regional'],
-    indicators: ['Indicator 1', 'Indicator 2'],
+    meta: {
+      timePeriod: {
+        timeIdentifier: 'Calendar year',
+        from: '2010',
+        to: '2020',
+      },
+      filters: ['Filter 1', 'Filter 2'],
+      geographicLevels: ['National', 'Regional'],
+      indicators: ['Indicator 1', 'Indicator 2'],
+    },
     latestData: true,
     publication: {
       id: 'publication-2',
@@ -87,10 +100,6 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     theme: {
       id: 'theme-2',
       title: 'Theme 2',
-    },
-    timePeriods: {
-      from: '2010',
-      to: '2020',
     },
     title: 'Data set 3',
   },
@@ -115,12 +124,14 @@ export const testDataSet: DataSetFile = {
   },
   summary: 'Data set 1 summary',
   title: 'Data set 1',
-  // These aren't in the backend yet, so may change.
-  filters: ['Filter 1', 'Filter 2'],
-  geographicLevels: ['Local authority', 'National'],
-  indicators: ['Indicator 1', 'Indicator 2'],
-  timePeriods: {
-    from: '2023',
-    to: '2024',
+  meta: {
+    timePeriod: {
+      timeIdentifier: 'Calendar year',
+      from: '2023',
+      to: '2024',
+    },
+    filters: ['Filter 1', 'Filter 2'],
+    geographicLevels: ['Local authority', 'National'],
+    indicators: ['Indicator 1', 'Indicator 2'],
   },
 };

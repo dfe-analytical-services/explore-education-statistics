@@ -15,6 +15,8 @@ public record DataSetFileViewModel
     public DataSetFileFileViewModel File { get; init; } = null!;
 
     public DataSetFileReleaseViewModel Release { get; init; } = null!;
+
+    public DataSetFileMetaViewModel Meta { get; init; } = null!;
 }
 
 public record DataSetFilePublicationViewModel

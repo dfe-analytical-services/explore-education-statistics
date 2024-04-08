@@ -108,7 +108,7 @@ public class DataSetFilesControllerCachingTests
 
             var controller = BuildController(dataSetFileService.Object);
 
-            var result = await controller.ListDataSets(_query);
+            var result = await controller.ListDataSetFiles(_query);
 
             VerifyAllMocks(MemoryCacheService, dataSetFileService);
 
@@ -126,7 +126,7 @@ public class DataSetFilesControllerCachingTests
 
             var controller = BuildController();
 
-            var result = await controller.ListDataSets(_query);
+            var result = await controller.ListDataSetFiles(_query);
 
             VerifyAllMocks(MemoryCacheService);
 

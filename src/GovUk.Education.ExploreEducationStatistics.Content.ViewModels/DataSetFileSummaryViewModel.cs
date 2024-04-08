@@ -29,4 +29,6 @@ public record DataSetFileSummaryViewModel
     public DateTime Published { get; init; }
 
     public bool HasApiDataSet { get; init; }
+
+    public DataSetFileMetaViewModel Meta { get; init; } = null!;
 }

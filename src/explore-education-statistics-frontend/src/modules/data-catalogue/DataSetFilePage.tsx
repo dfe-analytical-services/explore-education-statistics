@@ -105,12 +105,9 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
 
   const {
     file,
-    filters,
-    geographicLevels,
-    indicators,
     release,
     summary,
-    timePeriods,
+    meta: { timePeriod, filters, geographicLevels, indicators },
     title,
   } = dataSetFile;
 
@@ -255,9 +252,9 @@ export default function DataSetFilePage({ dataSetFileId }: Props) {
                       </CollapsibleList>
                     </SummaryListItem>
                   )}
-                  {timePeriods && (timePeriods.from || timePeriods.to) && (
+                  {timePeriod && (timePeriod.from || timePeriod.to) && (
                     <SummaryListItem term="Time period">
-                      {getTimePeriodString(timePeriods)}
+                      {getTimePeriodString(timePeriod)}
                     </SummaryListItem>
                   )}
                 </SummaryList>

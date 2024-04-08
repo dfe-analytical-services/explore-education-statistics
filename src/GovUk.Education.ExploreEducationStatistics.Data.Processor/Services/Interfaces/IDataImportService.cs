@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
+        Task WriteDataSetFileMeta(Guid subjectId);
+
         Task Update(
             Guid id,
             int? expectedImportedRows = null,

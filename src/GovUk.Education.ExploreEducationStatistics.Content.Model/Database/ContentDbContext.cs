@@ -425,7 +425,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 entity.Property(f => f.Created)
                     .HasConversion(
                         v => v,
-                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+                        v => v.HasValue
+                            ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                            : null);
+                entity.Property(p => p.DataSetFileMeta)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<DataSetFileMeta>(v));
                 entity.HasIndex(f => f.PublicDataSetVersionId);
             });
         }

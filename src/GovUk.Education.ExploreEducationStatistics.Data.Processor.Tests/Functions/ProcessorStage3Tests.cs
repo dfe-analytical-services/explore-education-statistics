@@ -112,6 +112,8 @@ public class ProcessorStage3Tests
             )
             .Generate();
 
+        import.File.SubjectId = _subject.Id;
+
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -287,6 +289,11 @@ public class ProcessorStage3Tests
                 lastObservation.FilterItems[1].FilterItemId);
             Assert.Equal("16", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[0].Id]);
             Assert.Equal("32", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
+
+            var file = contentDbContext.Files
+                .Single(f => f.Type == FileType.Data
+                             && f.SubjectId == import.File.SubjectId);
+            Assert.NotNull(file.DataSetFileMeta);
         }
     }
 
@@ -303,6 +310,8 @@ public class ProcessorStage3Tests
                 expectedImportedRows: 16
             )
             .Generate();
+
+        import.File.SubjectId = _subject.Id;
 
         var unexpectedImportedObservation = _fixture
             .DefaultObservation()
@@ -439,6 +448,8 @@ public class ProcessorStage3Tests
                 lastProcessedRowIndex: 3
             )
             .Generate();
+
+        import.File.SubjectId = _subject.Id;
 
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
@@ -595,6 +606,8 @@ public class ProcessorStage3Tests
             )
             .Generate();
 
+        import.File.SubjectId = _subject.Id;
+
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
             .WithSubject(_subject)
@@ -742,6 +755,8 @@ public class ProcessorStage3Tests
                 expectedImportedRows: 8
             )
             .Generate();
+
+        import.File.SubjectId = _subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -894,6 +909,8 @@ public class ProcessorStage3Tests
                 lastProcessedRowIndex: 6
             )
             .Generate();
+
+        import.File.SubjectId = _subject.Id;
 
         // Generate already-imported Observations with alternating CsvRow numbers
         // e.g. 2, 4, 6, 8
@@ -1341,6 +1358,8 @@ public class ProcessorStage3Tests
             )
             .Generate();
 
+        import.File.SubjectId = _subject.Id;
+
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -1514,6 +1533,8 @@ public class ProcessorStage3Tests
                 expectedImportedRows: 5
             )
             .Generate();
+
+        import.File.SubjectId = subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))

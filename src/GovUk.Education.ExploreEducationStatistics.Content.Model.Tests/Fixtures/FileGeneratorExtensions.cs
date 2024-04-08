@@ -88,6 +88,11 @@ public static class FileGeneratorExtensions
         FileType type)
         => generator.ForInstance(s => s.SetType(type));
 
+    public static Generator<File> WithDataSetFileMeta(
+        this Generator<File> generator,
+        DataSetFileMeta dataSetFileMeta)
+        => generator.ForInstance(s => s.SetDataSetFileMeta(dataSetFileMeta));
+
     public static InstanceSetters<File> SetContentLength(
         this InstanceSetters<File> setters,
         long contentLength)
@@ -155,4 +160,9 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         FileType type)
         => setters.Set(f => f.Type, type);
+
+    public static InstanceSetters<File> SetDataSetFileMeta(
+        this InstanceSetters<File> setters,
+        DataSetFileMeta dataSetFileMeta)
+        => setters.Set(f => f.DataSetFileMeta, dataSetFileMeta);
 }
