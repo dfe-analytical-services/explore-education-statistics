@@ -246,7 +246,7 @@ jobs:
       versionSpec: "16.X"
 
   - script: |
-            npm ci
+            npm ci --force
     displayName: "Install dependencies"
 
   - script: |
