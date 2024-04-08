@@ -245,7 +245,12 @@ jobs:
     inputs:
       versionSpec: "18"
 
+  - - script: |
+        node -v
+      displayName: 'node version'
+
   - script: |
+      npm install --package-lock-only
       npm ci
     displayName: 'npm CI'
 
