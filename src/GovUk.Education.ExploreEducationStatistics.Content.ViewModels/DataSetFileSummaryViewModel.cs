@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
@@ -29,4 +29,6 @@ public record DataSetFileSummaryViewModel
     public DateTime Published { get; init; }
 
     public bool HasApiDataSet { get; init; }
+
+    public DataSetFileMetaViewModel Meta { get; init; } = null!;
 }

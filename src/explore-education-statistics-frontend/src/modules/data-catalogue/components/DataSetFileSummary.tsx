@@ -38,16 +38,22 @@ export default function DataSetFileSummary({
     id: dataSetFileId,
     content,
     fileId,
-    filters = [],
+    meta: {
+      timePeriod = {
+        timeIdentifier: undefined,
+        from: undefined,
+        to: undefined,
+      },
+      filters = [],
+      geographicLevels = [],
+      indicators = [],
+    },
     hasApiDataSet,
-    geographicLevels = [],
-    indicators = [],
     latestData,
     publication,
     published,
     release,
     theme,
-    timePeriods = {},
     title,
   } = dataSetFile;
   const [showMoreContent, toggleMoreContent] = useToggle(false);
@@ -183,14 +189,14 @@ export default function DataSetFileSummary({
             </CollapsibleList>
           </SummaryListItem>
         )}
-        {(timePeriods.from || timePeriods.to) && (
+        {(timePeriod.from || timePeriod.to) && (
           <SummaryListItem
             className={classNames({
               'dfe-js-hidden': !showDetails,
             })}
             term="Time period"
           >
-            {getTimePeriodString(timePeriods)}
+            {getTimePeriodString(timePeriod)}
           </SummaryListItem>
         )}
         <SummaryListItem

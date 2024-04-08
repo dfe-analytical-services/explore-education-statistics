@@ -29,7 +29,7 @@ public class DataSetFilesController : ControllerBase
 
     [HttpGet("data-set-files")]
     [MemoryCache(typeof(ListDataSetFilesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
-    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSets(
+    public async Task<ActionResult<PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         [FromQuery] DataSetFileListRequest request,
         CancellationToken cancellationToken = default)
     {
