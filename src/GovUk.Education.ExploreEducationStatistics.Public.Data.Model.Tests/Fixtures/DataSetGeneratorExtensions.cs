@@ -40,15 +40,15 @@ public static class DataSetGeneratorExtensions
     public static Generator<DataSet> WithSupersedingDataSet(this Generator<DataSet> generator, DataSet? dataSet)
         => generator.ForInstance(s => s.SetSupersedingDataSet(dataSet));
 
-    public static Generator<DataSet> WithLatestVersion(
+    public static Generator<DataSet> WithLatestLiveVersion(
         this Generator<DataSet> generator,
         DataSetVersion? dataSetVersion)
-        => generator.ForInstance(s => s.SetLatestVersion(dataSetVersion));
+        => generator.ForInstance(s => s.SetLatestLiveVersion(dataSetVersion));
 
-    public static Generator<DataSet> WithLatestVersion(
+    public static Generator<DataSet> WithLatestLiveVersion(
         this Generator<DataSet> generator,
         Func<DataSetVersion?> dataSetVersion)
-        => generator.ForInstance(s => s.SetLatestVersion(dataSetVersion));
+        => generator.ForInstance(s => s.SetLatestLiveVersion(dataSetVersion));
 
     public static Generator<DataSet> WithVersions(
         this Generator<DataSet> generator,
@@ -123,12 +123,12 @@ public static class DataSetGeneratorExtensions
             .Set(ds => ds.SupersedingDataSet, dataSet)
             .Set(ds => ds.SupersedingDataSetId, dataSet?.Id);
 
-    public static InstanceSetters<DataSet> SetLatestVersion(
+    public static InstanceSetters<DataSet> SetLatestLiveVersion(
         this InstanceSetters<DataSet> instanceSetter,
         DataSetVersion? dataSetVersion)
-        => instanceSetter.SetLatestVersion(() => dataSetVersion);
+        => instanceSetter.SetLatestLiveVersion(() => dataSetVersion);
 
-    public static InstanceSetters<DataSet> SetLatestVersion(
+    public static InstanceSetters<DataSet> SetLatestLiveVersion(
         this InstanceSetters<DataSet> instanceSetter,
         Func<DataSetVersion?> dataSetVersion)
         => instanceSetter
@@ -148,8 +148,8 @@ public static class DataSetGeneratorExtensions
                         }
                     }
 
-                    ds.LatestVersion = dsv;
-                    ds.LatestVersionId = dsv?.Id;
+                    ds.LatestLiveVersion = dsv;
+                    ds.LatestLiveVersionId = dsv?.Id;
                 }
             );
 
@@ -179,7 +179,7 @@ public static class DataSetGeneratorExtensions
                         )
                         .ToList();
 
-                    ds.LatestVersion = ds.Versions
+                    ds.LatestLiveVersion = ds.Versions
                         .Where(version => version.Status == DataSetVersionStatus.Published)
                         .OrderBy(version => version.VersionMajor)
                         .ThenBy(version => version.VersionMinor)

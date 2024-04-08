@@ -2050,7 +2050,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
             )
             .WithStatus(versionStatus);
 
-        dataSet.LatestVersion = dataSetVersion;
+        dataSet.LatestLiveVersion = dataSetVersion;
 
         await TestApp.AddTestData<PublicDataDbContext>(
             context =>

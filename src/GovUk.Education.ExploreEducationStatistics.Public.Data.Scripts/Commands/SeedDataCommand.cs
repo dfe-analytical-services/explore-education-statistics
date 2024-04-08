@@ -237,7 +237,7 @@ public class SeedDataCommand : ICommand
             var dataSetVersion = await CreateDataSetVersion(metaFileRows, allowedColumns);
             await CreateDataSetMeta(metaFileRows, allowedColumns);
 
-            _seed.DataSet.LatestVersion = dataSetVersion;
+            _seed.DataSet.LatestLiveVersion = dataSetVersion;
 
             await _dbContext.SaveChangesAsync(_cancellationToken);
 

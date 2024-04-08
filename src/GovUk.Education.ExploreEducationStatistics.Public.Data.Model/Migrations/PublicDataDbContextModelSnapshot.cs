@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("LatestVersionId")
+                    b.Property<Guid?>("LatestLiveVersionId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("PublicationId")
@@ -174,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LatestVersionId")
+                    b.HasIndex("LatestLiveVersionId")
                         .IsUnique();
 
                     b.HasIndex("SupersedingDataSetId");
@@ -1071,15 +1071,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestVersion")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestLiveVersion")
                         .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestVersionId");
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestLiveVersionId");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
                         .WithMany()
                         .HasForeignKey("SupersedingDataSetId");
 
-                    b.Navigation("LatestVersion");
+                    b.Navigation("LatestLiveVersion");
 
                     b.Navigation("SupersedingDataSet");
                 });
