@@ -22,11 +22,11 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class DataSetsControllerCachingTests
+public class DataSetFilesControllerCachingTests
 {
     public class ListDataSetsTests : CacheServiceTestFixture
     {
-        private readonly DataSetsListRequest _query = new(
+        private readonly DataSetFileListRequest _query = new(
             ThemeId: Guid.NewGuid(),
             PublicationId: Guid.NewGuid(),
             ReleaseId: Guid.NewGuid(),
@@ -38,8 +38,8 @@ public class DataSetsControllerCachingTests
             PageSize: 10
         );
 
-        private readonly PaginatedListViewModel<DataSetListViewModel> _dataSets = new(
-            new List<DataSetListViewModel>
+        private readonly PaginatedListViewModel<DataSetFileSummaryViewModel> _dataSetFiles = new(
+            new List<DataSetFileSummaryViewModel>
             {
                 new()
                 {
@@ -71,12 +71,12 @@ public class DataSetsControllerCachingTests
         [Fact]
         public async Task NoCachedEntryExists_CreatesCache()
         {
-            var dataSetService = new Mock<IDataSetService>(Strict);
+            var dataSetFileService = new Mock<IDataSetFileService>(Strict);
 
             MemoryCacheService
                 .Setup(s => s.GetItem(
-                    new ListDataSetsCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetListViewModel>)))
+                    new ListDataSetFilesCacheKey(_query),
+                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
                 .Returns((object?) null);
 
             var expectedCacheConfiguration = new MemoryCacheConfiguration(
@@ -84,13 +84,13 @@ public class DataSetsControllerCachingTests
 
             MemoryCacheService
                 .Setup(s => s.SetItem<object>(
-                    new ListDataSetsCacheKey(_query),
-                    _dataSets,
+                    new ListDataSetFilesCacheKey(_query),
+                    _dataSetFiles,
                     ItIs.DeepEqualTo(expectedCacheConfiguration),
                     null));
 
-            dataSetService
-                .Setup(s => s.ListDataSets(
+            dataSetFileService
+                .Setup(s => s.ListDataSetFiles(
                     _query.ThemeId,
                     _query.PublicationId,
                     _query.ReleaseId,
@@ -101,15 +101,15 @@ public class DataSetsControllerCachingTests
                     _query.Page,
                     _query.PageSize,
                     default))
-                .ReturnsAsync(_dataSets);
+                .ReturnsAsync(_dataSetFiles);
 
-            var controller = BuildController(dataSetService.Object);
+            var controller = BuildController(dataSetFileService.Object);
 
             var result = await controller.ListDataSets(_query);
 
-            VerifyAllMocks(MemoryCacheService, dataSetService);
+            VerifyAllMocks(MemoryCacheService, dataSetFileService);
 
-            result.AssertOkResult(_dataSets);
+            result.AssertOkResult(_dataSetFiles);
         }
 
         [Fact]
@@ -117,9 +117,9 @@ public class DataSetsControllerCachingTests
         {
             MemoryCacheService
                 .Setup(s => s.GetItem(
-                    new ListDataSetsCacheKey(_query),
-                    typeof(PaginatedListViewModel<DataSetListViewModel>)))
-                .Returns(_dataSets);
+                    new ListDataSetFilesCacheKey(_query),
+                    typeof(PaginatedListViewModel<DataSetFileSummaryViewModel>)))
+                .Returns(_dataSetFiles);
 
             var controller = BuildController();
 
@@ -127,25 +127,25 @@ public class DataSetsControllerCachingTests
 
             VerifyAllMocks(MemoryCacheService);
 
-            result.AssertOkResult(_dataSets);
+            result.AssertOkResult(_dataSetFiles);
         }
 
         [Fact]
         public void PaginatedDataSetListViewModel_SerializeAndDeserialize_Success()
         {
-            var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<DataSetListViewModel>>(
-                JsonConvert.SerializeObject(_dataSets));
+            var converted = JsonConvert.DeserializeObject<PaginatedListViewModel<DataSetFileSummaryViewModel>>(
+                JsonConvert.SerializeObject(_dataSetFiles));
 
-            converted.AssertDeepEqualTo(_dataSets);
+            converted.AssertDeepEqualTo(_dataSetFiles);
         }
     }
 
-    private static DataSetsController BuildController(
-        IDataSetService? dataSetService = null
+    private static DataSetFilesController BuildController(
+        IDataSetFileService? dataSetFileService = null
     )
     {
-        return new DataSetsController(
-            dataSetService ?? Mock.Of<IDataSetService>(Strict)
+        return new DataSetFilesController(
+            dataSetFileService ?? Mock.Of<IDataSetFileService>(Strict)
         );
     }
 }

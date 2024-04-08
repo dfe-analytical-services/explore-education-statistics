@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
-public interface IDataSetService
+public interface IDataSetFileService
 {
-    Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
+    Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
@@ -24,7 +24,6 @@ public interface IDataSetService
         int pageSize,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseVersionId,
-        Guid fileId);
+    Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
+        Guid dataSetId);
 }

@@ -1037,9 +1037,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataFile.Id
                 );
 
-                Assert.True(result.IsRight);
-
-                var fileInfo = result.Right;
+                var fileInfo = result.AssertRight();
 
                 Assert.Equal(dataFile.Id, fileInfo.Id);
                 Assert.Equal("Test data amended", fileInfo.Name);
@@ -1725,21 +1723,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     metaFormFile: metaFormFile,
                     subjectName: subjectName);
 
-                Assert.True(result.IsRight);
+                var dataFileInfo = result.AssertRight();
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
 
-                Assert.True(result.Right.Id.HasValue);
-                Assert.Equal(subjectName, result.Right.Name);
-                Assert.Equal(dataFileName, result.Right.FileName);
-                Assert.Equal("csv", result.Right.Extension);
-                Assert.True(result.Right.MetaFileId.HasValue);
-                Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal(_user.Email, result.Right.UserName);
-                Assert.Null(result.Right.Rows);
-                Assert.Equal("10 Kb", result.Right.Size);
-                result.Right.Created.AssertUtcNow();
-                Assert.Equal(QUEUED, result.Right.Status);
+                Assert.True(dataFileInfo.Id.HasValue);
+                Assert.Equal(subjectName, dataFileInfo.Name);
+                Assert.Equal(dataFileName, dataFileInfo.FileName);
+                Assert.Equal("csv", dataFileInfo.Extension);
+                Assert.True(dataFileInfo.MetaFileId.HasValue);
+                Assert.Equal(metaFileName, dataFileInfo.MetaFileName);
+                Assert.Equal(_user.Email, dataFileInfo.UserName);
+                Assert.Null(dataFileInfo.Rows);
+                Assert.Equal("10 Kb", dataFileInfo.Size);
+                dataFileInfo.Created.AssertUtcNow();
+                Assert.Equal(QUEUED, dataFileInfo.Status);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1756,10 +1754,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(10240, dataFile.ContentLength);
                 Assert.Equal(ContentTypes.Csv, dataFile.ContentType);
                 Assert.Equal(FileType.Data, dataFile.Type);
+                Assert.NotNull(dataFile.DataSetFileId);
+                Assert.Equal(0, dataFile.DataSetFileVersion);
 
                 Assert.Equal(10240, metaFile.ContentLength);
                 Assert.Equal(ContentTypes.Csv, metaFile.ContentType);
                 Assert.Equal(Metadata, metaFile.Type);
+                Assert.Null(metaFile.DataSetFileId);
+                Assert.Null(metaFile.DataSetFileVersion);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 
@@ -1811,8 +1813,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Filename = "original-data.csv",
                     Type = FileType.Data,
-                    SubjectId = originalSubject.Id
-                }
+                    SubjectId = originalSubject.Id,
+                    DataSetFileId = Guid.NewGuid(),
+                    DataSetFileVersion = 0,
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1944,15 +1948,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(FileType.Data, originalDataFile.Type);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
+                Assert.Equal(originalDataReleaseFile.File.DataSetFileId,
+                    originalDataFile.DataSetFileId);
+                Assert.Equal(originalDataReleaseFile.File.DataSetFileVersion,
+                    originalDataFile.DataSetFileVersion);
 
                 Assert.Equal(10240, dataFile.ContentLength);
                 Assert.Equal("text/csv", dataFile.ContentType);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
+                Assert.Equal(originalDataFile.DataSetFileId, dataFile.DataSetFileId);
+                Assert.Equal(originalDataFile.DataSetFileVersion + 1, dataFile.DataSetFileVersion);
 
                 Assert.Equal(10240, metaFile.ContentLength);
                 Assert.Equal("text/csv", metaFile.ContentType);
                 Assert.Equal(Metadata, metaFile.Type);
+                Assert.Null(metaFile.DataSetFileId);
+                Assert.Null(metaFile.DataSetFileVersion);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
 

@@ -24,12 +24,12 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSet
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
-public class DataSetService : IDataSetService
+public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
 
-    public DataSetService(
+    public DataSetFileService(
         ContentDbContext contentDbContext,
         IReleaseVersionRepository releaseVersionRepository)
     {
@@ -37,7 +37,7 @@ public class DataSetService : IDataSetService
         _releaseVersionRepository = releaseVersionRepository;
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetListViewModel>>> ListDataSets(
+    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
         Guid? themeId,
         Guid? publicationId,
         Guid? releaseVersionId,
@@ -73,7 +73,7 @@ public class DataSetService : IDataSetService
             .Select(BuildResultViewModel())
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return new PaginatedListViewModel<DataSetListViewModel>(
+        return new PaginatedListViewModel<DataSetFileSummaryViewModel>(
             // TODO Remove ChangeSummaryHtmlToText once we do further work to remove all HTML at source
             await ChangeSummaryHtmlToText(results),
             totalResults: await query.CountAsync(cancellationToken: cancellationToken),
@@ -81,12 +81,13 @@ public class DataSetService : IDataSetService
             pageSize);
     }
 
-    private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetListViewModel>>
+    private static Expression<Func<FreeTextValueResult<ReleaseFile>, DataSetFileSummaryViewModel>>
         BuildResultViewModel()
     {
         return result =>
-            new DataSetListViewModel
+            new DataSetFileSummaryViewModel
             {
+                Id = result.Value.File.DataSetFileId!.Value, // we fetch OfFileType(FileType.Data), so this must be set
                 FileId = result.Value.FileId,
                 Filename = result.Value.File.Filename,
                 FileSize = result.Value.File.DisplaySize(),
@@ -113,8 +114,8 @@ public class DataSetService : IDataSetService
             };
     }
 
-    private static async Task<List<DataSetListViewModel>> ChangeSummaryHtmlToText(
-        IList<DataSetListViewModel> results)
+    private static async Task<List<DataSetFileSummaryViewModel>> ChangeSummaryHtmlToText(
+        IList<DataSetFileSummaryViewModel> results)
     {
         return await results
             .ToAsyncEnumerable()
@@ -125,50 +126,56 @@ public class DataSetService : IDataSetService
             .ToListAsync();
     }
 
-    public async Task<Either<ActionResult, DataSetDetailsViewModel>> GetDataSet(
-        Guid releaseVersionId,
-        Guid fileId)
+    public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
+        Guid dataSetId)
     {
-        // WARN: This prevents public uses from seeing data sets they shouldn't!
-        if (!await _releaseVersionRepository.IsLatestPublishedReleaseVersion(releaseVersionId))
+        var releaseFile = await _contentDbContext.ReleaseFiles
+            .Include(rf => rf.ReleaseVersion.Publication.Topic.Theme)
+            .Include(rf => rf.File)
+            .Where(rf =>
+                rf.File.DataSetFileId == dataSetId
+                && rf.ReleaseVersion.Published.HasValue
+                && DateTime.UtcNow >= rf.ReleaseVersion.Published.Value)
+            .OrderByDescending(rf => rf.ReleaseVersion.Version)
+            .FirstOrDefaultAsync();
+
+        if (releaseFile == null
+            || !await _releaseVersionRepository.IsLatestPublishedReleaseVersion(
+                releaseFile.ReleaseVersionId))
         {
             return new NotFoundResult();
         }
 
-        return await _contentDbContext.ReleaseFiles
-            .Where(rf =>
-                rf.FileId == fileId
-                && rf.ReleaseVersionId == releaseVersionId)
-            .Select(releaseFile => new DataSetDetailsViewModel
+        return new DataSetFileViewModel
+        {
+            Id = releaseFile.File.DataSetFileId!.Value, // we ensure this is set when fetching releaseFile
+            Title = releaseFile.Name ?? string.Empty,
+            Summary = releaseFile.Summary ?? string.Empty,
+            Release = new DataSetFileReleaseViewModel
             {
-                Title = releaseFile.Name ?? string.Empty,
-                Summary = releaseFile.Summary ?? string.Empty,
-                Release = new DataSetDetailsReleaseViewModel
+                Id = releaseFile.ReleaseVersionId,
+                Title = releaseFile.ReleaseVersion.Title,
+                Slug = releaseFile.ReleaseVersion.Slug,
+                Type = releaseFile.ReleaseVersion.Type,
+                IsLatestPublishedRelease =
+                    releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
+                    releaseFile.ReleaseVersionId,
+                Published = releaseFile.ReleaseVersion.Published!.Value,
+                Publication = new DataSetFilePublicationViewModel
                 {
-                    Id = releaseFile.ReleaseVersionId,
-                    Title = releaseFile.ReleaseVersion.Title,
-                    Slug = releaseFile.ReleaseVersion.Slug,
-                    Type = releaseFile.ReleaseVersion.Type,
-                    IsLatestPublishedRelease =
-                        releaseFile.ReleaseVersion.Publication.LatestPublishedReleaseVersionId ==
-                        releaseFile.ReleaseVersionId,
-                    Published = releaseFile.ReleaseVersion.Published!.Value,
-                    Publication = new DataSetDetailsPublicationViewModel
-                    {
-                        Id = releaseFile.ReleaseVersion.PublicationId,
-                        Title = releaseFile.ReleaseVersion.Publication.Title,
-                        Slug = releaseFile.ReleaseVersion.Publication.Slug,
-                        ThemeTitle = releaseFile.ReleaseVersion.Publication.Topic.Theme.Title,
-                    },
+                    Id = releaseFile.ReleaseVersion.PublicationId,
+                    Title = releaseFile.ReleaseVersion.Publication.Title,
+                    Slug = releaseFile.ReleaseVersion.Publication.Slug,
+                    ThemeTitle = releaseFile.ReleaseVersion.Publication.Topic.Theme.Title,
                 },
-                File = new DataSetDetailsFileViewModel
-                {
-                    Id = releaseFile.FileId,
-                    Name = releaseFile.File.Filename,
-                    Size = releaseFile.File.DisplaySize(),
-                }
-            })
-            .FirstOrNotFoundAsync();
+            },
+            File = new DataSetFileFileViewModel
+            {
+                Id = releaseFile.FileId,
+                Name = releaseFile.File.Filename,
+                Size = releaseFile.File.DisplaySize(),
+            }
+        };
     }
 }
 

@@ -1,4 +1,4 @@
-import DataSetPageNav from '@frontend/modules/data-catalogue/components/DataSetPageNav';
+import DataSetFilePageNav from '@frontend/modules/data-catalogue/components/DataSetFilePageNav';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
@@ -12,9 +12,9 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
-describe('DataSetPageNav', () => {
+describe('DataSetFilePageNav', () => {
   test('renders the navigation', () => {
-    render(<DataSetPageNav activeSection="details" onClickItem={noop} />);
+    render(<DataSetFilePageNav activeSection="details" onClickItem={noop} />);
 
     expect(
       screen.getByRole('heading', { name: 'On this page' }),
@@ -29,7 +29,7 @@ describe('DataSetPageNav', () => {
   });
 
   test('renders the back to top link on desktop', () => {
-    render(<DataSetPageNav activeSection="details" onClickItem={noop} />);
+    render(<DataSetFilePageNav activeSection="details" onClickItem={noop} />);
 
     expect(screen.getByRole('link', { name: 'Back to top' })).toHaveAttribute(
       'href',
@@ -39,7 +39,7 @@ describe('DataSetPageNav', () => {
 
   test('does not render the back to top link on mobile', () => {
     mockIsMedia = true;
-    render(<DataSetPageNav activeSection="details" onClickItem={noop} />);
+    render(<DataSetFilePageNav activeSection="details" onClickItem={noop} />);
 
     expect(
       screen.queryByRole('link', { name: 'Back to top' }),

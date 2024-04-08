@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
-import DataSetPageSection from '@frontend/modules/data-catalogue/components/DataSetPageSection';
-import styles from '@frontend/modules/data-catalogue/components/DataSetPreview.module.scss';
-import { pageSections } from '@frontend/modules/data-catalogue/DataSetPage';
+import DataSetFilePageSection from '@frontend/modules/data-catalogue/components/DataSetFilePageSection';
+import styles from '@frontend/modules/data-catalogue/components/DataSetFilePreview.module.scss';
+import { pageSections } from '@frontend/modules/data-catalogue/DataSetFilePage';
 import React from 'react';
 
 // TODO EES-4856 replace with real data
@@ -128,7 +128,7 @@ interface Props {
   onToggleShowAll: () => void;
 }
 
-export default function DataSetPreview({
+export default function DataSetFilePreview({
   fullScreen,
   showAll,
   onToggleFullScreen,
@@ -137,7 +137,7 @@ export default function DataSetPreview({
   const displayRows = showAll ? tableRows : tableRows.slice(0, 4);
 
   return (
-    <DataSetPageSection heading={pageSections.preview} id="preview">
+    <DataSetFilePageSection heading={pageSections.preview} id="preview">
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
       <div className={styles.container} tabIndex={0}>
         <table id={tableId}>
@@ -173,6 +173,6 @@ export default function DataSetPreview({
           {fullScreen ? 'Close full screen table' : 'Show full screen table'}
         </ButtonText>
       </div>
-    </DataSetPageSection>
+    </DataSetFilePageSection>
   );
 }

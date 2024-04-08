@@ -3,7 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
-public record DataSetsListRequest(
+public record DataSetFileListRequest(
     Guid? ThemeId = null,
     Guid? PublicationId = null,
     Guid? ReleaseId = null,
@@ -14,7 +14,7 @@ public record DataSetsListRequest(
     int Page = 1,
     int PageSize = 10)
 {
-    public class Validator : AbstractValidator<DataSetsListRequest>
+    public class Validator : AbstractValidator<DataSetFileListRequest>
     {
         public Validator()
         {

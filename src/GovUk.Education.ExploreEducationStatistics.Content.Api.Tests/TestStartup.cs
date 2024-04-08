@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
                 .AddApplicationPart(typeof(Startup).Assembly);
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
+            services.AddValidatorsFromAssemblyContaining<DataSetFileListRequest.Validator>();
 
             services.AddDbContext<StatisticsDbContext>(
                 options =>

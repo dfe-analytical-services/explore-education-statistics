@@ -2,8 +2,10 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-public record DataSetListViewModel
+public record DataSetFileSummaryViewModel
 {
+    public Guid Id { get; init; }
+
     public Guid FileId { get; init; }
 
     public string Filename { get; init; } = string.Empty;

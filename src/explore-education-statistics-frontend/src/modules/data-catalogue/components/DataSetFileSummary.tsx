@@ -11,8 +11,8 @@ import useToggle from '@common/hooks/useToggle';
 import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
 import downloadService from '@common/services/downloadService';
 import Link from '@frontend/components/Link';
-import styles from '@frontend/modules/data-catalogue/components/DataSetSummary.module.scss';
-import { DataSetSummary as DataSetSummaryData } from '@frontend/services/dataSetService';
+import styles from '@frontend/modules/data-catalogue/components/DataSetFileSummary.module.scss';
+import { DataSetFileSummary as DataSetFileSummaryData } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
@@ -21,19 +21,20 @@ import React, { createElement, useEffect } from 'react';
 const maxContentLength = 300;
 
 interface Props {
-  dataSet: DataSetSummaryData;
+  dataSetFile: DataSetFileSummaryData;
   expanded?: boolean;
   headingTag?: 'h3' | 'h4';
   showLatestDataTag?: boolean;
 }
 
-export default function DataSetSummary({
-  dataSet,
+export default function DataSetFileSummary({
+  dataSetFile,
   expanded = false,
   headingTag = 'h3',
   showLatestDataTag = true,
 }: Props) {
   const {
+    id: dataSetFileId,
     content,
     fileId,
     filters = [],
@@ -46,10 +47,10 @@ export default function DataSetSummary({
     theme,
     timePeriods = {},
     title,
-  } = dataSet;
+  } = dataSetFile;
   const [showMoreContent, toggleMoreContent] = useToggle(false);
   const [showDetails, toggleDetails] = useToggle(false);
-  const id = `data-set-${fileId}`;
+  const id = `data-set-file-${dataSetFileId}`;
   const truncateContent = content.length > maxContentLength;
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export default function DataSetSummary({
   return (
     <li
       className="dfe-border-bottom govuk-!-margin-top-4 govuk-!-padding-bottom-2"
-      data-testid={`data-set-summary-${title}`}
+      data-testid={`data-set-file-summary-${title}`}
     >
       {createElement(
         headingTag,
@@ -77,9 +78,7 @@ export default function DataSetSummary({
           className: `govuk-heading-m govuk-!-margin-bottom-2`,
           id: `${id}-heading`,
         },
-        <Link to={`/data-catalogue/release/${release.id}/data-set/${fileId}`}>
-          {title}
-        </Link>,
+        <Link to={`/data-catalogue/data-set/${dataSetFileId}`}>{title}</Link>,
       )}
 
       <ContentHtml

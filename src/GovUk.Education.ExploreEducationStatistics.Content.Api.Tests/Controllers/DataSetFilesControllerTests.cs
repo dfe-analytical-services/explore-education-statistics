@@ -33,21 +33,21 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-public class DataSetsControllerTests : IntegrationTest<TestStartup>
+public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 {
     private readonly DataFixture _fixture = new();
 
-    private DataSetsControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+    private DataSetFilesControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
     }
 
-    public class ListDataSetsTests : DataSetsControllerTests
+    public class ListDataSetFilesTests : DataSetFilesControllerTests
     {
-        private ListDataSetsTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        private ListDataSetFilesTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
         {
         }
 
-        public class FilterTests : ListDataSetsTests
+        public class FilterTests : ListDataSetFilesTests
         {
             public FilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
@@ -66,11 +66,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -80,12 +80,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(ReleaseId: publication1.ReleaseVersions[0].Id);
+                var query = new DataSetFileListRequest(ReleaseId: publication1.ReleaseVersions[0].Id);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: publication1Release1Version1Files.Count);
@@ -105,11 +105,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -119,12 +119,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(PublicationId: publication1.Id);
+                var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: publication1Release1Version1Files.Count);
@@ -147,11 +147,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -161,12 +161,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(ThemeId: publication1.Topic.ThemeId);
+                var query = new DataSetFileListRequest(ThemeId: publication1.Topic.ThemeId);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasExpectedPagingAndResultCount(
                     expectedTotalResults: publication1Release1Version1Files.Count);
@@ -190,11 +190,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
-                var release2Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
+                var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -204,7 +204,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
@@ -213,7 +213,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect data set files of an old release to be returned when LatestOnly is false or null
                 // (LatestOnly should default to false when a releaseId is specified).
@@ -237,11 +237,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
-                var release2Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
+                var release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -251,7 +251,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[1].Id,
                     LatestOnly = true
@@ -260,7 +260,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect no data set files to be returned for an old release when LatestOnly is true
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
@@ -287,12 +287,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication1Release1Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -303,7 +303,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication1.ReleaseVersions[1].Id,
                     LatestOnly = latestOnly
@@ -312,7 +312,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect no data set files to be returned for an unpublished release version regardless of LatestOnly
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
@@ -333,11 +333,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
-                var release1Version2Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[1]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version2Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[1]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -347,7 +347,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
                     LatestOnly = latestOnly
@@ -356,7 +356,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect no data set files to be returned unless they are associated with a latest published release
                 // version regardless of LatestOnly
@@ -381,11 +381,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -395,12 +395,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(PublicationId: publication1.Id);
+                var query = new DataSetFileListRequest(PublicationId: publication1.Id);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
@@ -426,11 +426,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -440,12 +440,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(ThemeId: publication1.Topic.ThemeId);
+                var query = new DataSetFileListRequest(ThemeId: publication1.Topic.ThemeId);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
@@ -460,7 +460,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -469,7 +469,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 };
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
                     publication.ReleaseVersions,
@@ -479,12 +479,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest(SearchTerm: "aaa");
+                var query = new DataSetFileListRequest(SearchTerm: "aaa");
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
@@ -506,10 +506,10 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
                     publication.ReleaseVersions,
@@ -518,12 +518,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest(SearchTerm: "aaa");
+                var query = new DataSetFileListRequest(SearchTerm: "aaa");
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
@@ -551,11 +551,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication1Release2Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
-                var publication1Release2Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[2]);
-                var publication1Release2Version3Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[3]);
-                var publication1Release3Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[4]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication1Release2Version2Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[2]);
+                var publication1Release2Version3Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[3]);
+                var publication1Release3Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[4]);
 
                 var publication1ReleaseFiles = publication1Release1Version1Files
                     .Concat(publication1Release2Version1Files)
@@ -564,11 +564,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication1Release3Version1Files)
                     .ToList();
 
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
-                var publication2Release2Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[1]);
-                var publication2Release2Version2Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[2]);
-                var publication2Release2Version3Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[3]);
-                var publication2Release3Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[4]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication2Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[1]);
+                var publication2Release2Version2Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[2]);
+                var publication2Release2Version3Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[3]);
+                var publication2Release3Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[4]);
 
                 var publication2ReleaseFiles = publication2Release1Version1Files
                     .Concat(publication2Release2Version1Files)
@@ -578,7 +578,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .ToList();
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -588,12 +588,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(LatestOnly: latestOnly);
+                var query = new DataSetFileListRequest(LatestOnly: latestOnly);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect the result to be the data set files of the latest published release versions
                 // of the latest published releases of both publications, in ascending title order
@@ -625,11 +625,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication1Release2Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[1]);
-                var publication1Release2Version2Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[2]);
-                var publication1Release2Version3Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[3]);
-                var publication1Release3Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[4]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication1Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[1]);
+                var publication1Release2Version2Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[2]);
+                var publication1Release2Version3Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[3]);
+                var publication1Release3Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[4]);
 
                 var publication1ReleaseFiles = publication1Release1Version1Files
                     .Concat(publication1Release2Version1Files)
@@ -638,11 +638,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Concat(publication1Release3Version1Files)
                     .ToList();
 
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
-                var publication2Release2Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[1]);
-                var publication2Release2Version2Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[2]);
-                var publication2Release2Version3Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[3]);
-                var publication2Release3Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[4]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication2Release2Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[1]);
+                var publication2Release2Version2Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[2]);
+                var publication2Release2Version3Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[3]);
+                var publication2Release3Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[4]);
 
                 var publication2ReleaseFiles = publication2Release1Version1Files
                     .Concat(publication2Release2Version1Files)
@@ -652,7 +652,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .ToList();
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -662,12 +662,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(LatestOnly: false);
+                var query = new DataSetFileListRequest(LatestOnly: false);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect the result to be the data set files of the latest published release versions
                 // of both publications, in ascending title order
@@ -695,11 +695,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .Generate(2)
                     .ToTuple2();
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1.ReleaseVersions[0]);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2.ReleaseVersions[0]);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1.ReleaseVersions[0]);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -709,12 +709,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest();
+                var query = new DataSetFileListRequest();
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = publication1Release1Version1Files
                     .Concat(publication2Release1Version1Files)
@@ -726,7 +726,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SortByTests : ListDataSetsTests
+        public class SortByTests : ListDataSetFilesTests
         {
             public SortByTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
@@ -745,20 +745,20 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply a descending sequence of titles to the data set files
                 release1Version1Files[0].Name = "b";
                 release1Version1Files[1].Name = "a";
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = sortDirection
@@ -767,7 +767,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
@@ -789,20 +789,20 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply an ascending sequence of titles to the data set files
                 release1Version1Files[0].Name = "a";
                 release1Version1Files[1].Name = "b";
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Title,
                     SortDirection = SortDirection.Desc
@@ -811,7 +811,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
@@ -836,20 +836,20 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply a descending natural order to the data set files
                 release1Version1Files[0].Order = 1;
                 release1Version1Files[1].Order = 0;
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
                     Sort = DataSetsListRequestSortBy.Natural,
@@ -859,7 +859,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect data set files to be returned in ascending natural order
                 var expectedReleaseFiles = new List<ReleaseFile>
@@ -882,20 +882,20 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 // Apply an ascending natural order to the data set files
                 release1Version1Files[0].Order = 0;
                 release1Version1Files[1].Order = 1;
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     ReleaseId = publication.ReleaseVersions[0].Id,
                     Sort = DataSetsListRequestSortBy.Natural,
@@ -905,7 +905,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect data set files to be returned in descending natural order
                 var expectedReleaseFiles = new List<ReleaseFile>
@@ -938,11 +938,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
                 publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1Release1Version1);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2Release1Version1);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1Release1Version1);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2Release1Version1);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -952,7 +952,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = SortDirection.Asc
@@ -961,7 +961,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect data set files belonging to the oldest published release to be returned first
                 var expectedReleaseFiles = new List<ReleaseFile>
@@ -999,11 +999,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 publication1Release1Version1.Published = DateTime.UtcNow.AddDays(-2);
                 publication2Release1Version1.Published = DateTime.UtcNow.AddDays(-1);
 
-                var publication1Release1Version1Files = GenerateDataSetsForReleaseVersion(publication1Release1Version1);
-                var publication2Release1Version1Files = GenerateDataSetsForReleaseVersion(publication2Release1Version1);
+                var publication1Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication1Release1Version1);
+                var publication2Release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication2Release1Version1);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -1013,7 +1013,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     Sort = DataSetsListRequestSortBy.Published,
                     SortDirection = sortDirection
@@ -1022,7 +1022,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect data set files belonging to the newest published release to be returned first
                 var expectedReleaseFiles = new List<ReleaseFile>
@@ -1047,7 +1047,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -1057,7 +1057,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 };
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
                     publication.ReleaseVersions,
@@ -1067,7 +1067,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     SearchTerm = "aaa",
                     Sort = DataSetsListRequestSortBy.Relevance,
@@ -1077,7 +1077,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
@@ -1103,7 +1103,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0], numberOfDataSets: 3);
 
                 var freeTextRanks = new List<FreeTextRank>
                 {
@@ -1113,7 +1113,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 };
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock(
                     publication.ReleaseVersions,
@@ -1123,7 +1123,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest
+                var query = new DataSetFileListRequest
                 {
                     SearchTerm = "aaa",
                     Sort = DataSetsListRequestSortBy.Relevance,
@@ -1133,7 +1133,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var expectedReleaseFiles = new List<ReleaseFile>
                 {
@@ -1147,7 +1147,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class SupersededPublicationTests : ListDataSetsTests
+        public class SupersededPublicationTests : ListDataSetFilesTests
         {
             public SupersededPublicationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
@@ -1171,11 +1171,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -1185,12 +1185,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest();
+                var query = new DataSetFileListRequest();
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Expect all data set files of the superseded publication to be excluded and only the data set files
                 // of the superseding publication to be returned
@@ -1218,11 +1218,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -1232,12 +1232,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest(PublicationId: supersededPublication.Id);
+                var query = new DataSetFileListRequest(PublicationId: supersededPublication.Id);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // Filtering by the superseded publication id should ignore the superseded status and return all data
                 // set files belonging to the publication
@@ -1265,11 +1265,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var supersedingPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
-                var supersededPublicationReleaseFiles = GenerateDataSetsForReleaseVersion(supersededPublication.ReleaseVersions[0]);
+                var supersedingPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersedingPublication.ReleaseVersions[0]);
+                var supersededPublicationReleaseFiles = GenerateDataSetFilesForReleaseVersion(supersededPublication.ReleaseVersions[0]);
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context =>
@@ -1279,12 +1279,12 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     })
                     .CreateClient();
 
-                var query = new DataSetsListRequest();
+                var query = new DataSetFileListRequest();
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 // The superseded status should be ignored as the superseding publication has no published releases
                 // and all data set files belonging to the superseded publication should be returned
@@ -1295,7 +1295,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        public class ValidationTests : ListDataSetsTests
+        public class ValidationTests : ListDataSetFilesTests
         {
             public ValidationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
@@ -1309,7 +1309,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(Page: page);
+                var query = new DataSetFileListRequest(Page: page);
                 var response = await ListDataSets(client, query);
 
                 var validationProblem = response.AssertValidationProblem();
@@ -1325,17 +1325,17 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task PageInAllowedRange_Success(int page)
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .CreateClient();
 
-                var query = new DataSetsListRequest(Page: page);
+                var query = new DataSetFileListRequest(Page: page);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPage: page);
             }
@@ -1348,7 +1348,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(PageSize: pageSize);
+                var query = new DataSetFileListRequest(PageSize: pageSize);
                 var response = await ListDataSets(client, query);
 
                 var validationProblem = response.AssertValidationProblem();
@@ -1364,17 +1364,17 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task PageSizeInAllowedRange_Success(int pageSize)
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .CreateClient();
 
-                var query = new DataSetsListRequest(PageSize: pageSize);
+                var query = new DataSetFileListRequest(PageSize: pageSize);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPageSize: pageSize);
             }
@@ -1386,7 +1386,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(SearchTerm: searchTerm);
+                var query = new DataSetFileListRequest(SearchTerm: searchTerm);
                 var response = await ListDataSets(client, query);
 
                 var validationProblem = response.AssertValidationProblem();
@@ -1402,19 +1402,19 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task SearchTermAboveMinimumLength_Success(string searchTerm)
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest(SearchTerm: searchTerm);
+                var query = new DataSetFileListRequest(SearchTerm: searchTerm);
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
 
             [Fact]
@@ -1422,7 +1422,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(
+                var query = new DataSetFileListRequest(
                     ReleaseId: null,
                     Sort: DataSetsListRequestSortBy.Natural
                 );
@@ -1439,11 +1439,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task SortByNaturalWithReleaseId_Success()
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(
+                var query = new DataSetFileListRequest(
                     ReleaseId: Guid.NewGuid(),
                     Sort: DataSetsListRequestSortBy.Natural
                 );
@@ -1451,7 +1451,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
 
             [Fact]
@@ -1459,7 +1459,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest(
+                var query = new DataSetFileListRequest(
                     SearchTerm: null,
                     Sort: DataSetsListRequestSortBy.Relevance
                 );
@@ -1478,14 +1478,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task SortByRelevanceWithSearchTerm_Success()
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var contentDbContext = ContentDbContextMock();
 
                 var client = BuildApp(contentDbContext.Object)
                     .CreateClient();
 
-                var query = new DataSetsListRequest(
+                var query = new DataSetFileListRequest(
                     SearchTerm: "aaa",
                     Sort: DataSetsListRequestSortBy.Relevance
                 );
@@ -1493,11 +1493,11 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
             }
         }
 
-        public class MiscellaneousTests : ListDataSetsTests
+        public class MiscellaneousTests : ListDataSetFilesTests
         {
             public MiscellaneousTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
             {
@@ -1507,16 +1507,16 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             public async Task NoPublishedDataSets_ReturnsEmpty()
             {
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp().CreateClient();
 
-                var query = new DataSetsListRequest();
+                var query = new DataSetFileListRequest();
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 pagedResult.AssertHasPagingConsistentWithEmptyResults();
             }
@@ -1532,7 +1532,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                     .WithTopic(_fixture.DefaultTopic()
                         .WithTheme(_fixture.DefaultTheme()));
 
-                var release1Version1Files = GenerateDataSetsForReleaseVersion(publication.ReleaseVersions[0]);
+                var release1Version1Files = GenerateDataSetFilesForReleaseVersion(publication.ReleaseVersions[0]);
 
                 release1Version1Files.ForEach(releaseFile =>
                 {
@@ -1540,18 +1540,18 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 });
 
                 MemoryCacheService
-                    .SetupNotFoundForAnyKey<ListDataSetsCacheKey, PaginatedListViewModel<DataSetListViewModel>>();
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 var client = BuildApp()
                     .AddContentDbTestData(context => context.ReleaseFiles.AddRange(release1Version1Files))
                     .CreateClient();
 
-                var query = new DataSetsListRequest();
+                var query = new DataSetFileListRequest();
                 var response = await ListDataSets(client, query);
 
                 MockUtils.VerifyAllMocks(MemoryCacheService);
 
-                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetListViewModel>>();
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
 
                 Assert.All(pagedResult.Results, item =>
                 {
@@ -1563,7 +1563,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         private static async Task<HttpResponseMessage> ListDataSets(HttpClient client,
-            DataSetsListRequest request)
+            DataSetFileListRequest request)
         {
             var queryParams = new Dictionary<string, string?>
             {
@@ -1578,14 +1578,14 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 { "pageSize", request.PageSize.ToString() }
             };
 
-            var uri = QueryHelpers.AddQueryString("/api/data-sets", queryParams);
+            var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
 
             return await client.GetAsync(uri);
         }
 
         private static void AssertResultsForExpectedReleaseFiles(
             List<ReleaseFile> releaseFiles,
-            List<DataSetListViewModel> viewModels)
+            List<DataSetFileSummaryViewModel> viewModels)
         {
             Assert.Equal(releaseFiles.Count, viewModels.Count);
             Assert.All(releaseFiles.Zip(viewModels), tuple =>
@@ -1615,7 +1615,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             });
         }
 
-        private List<ReleaseFile> GenerateDataSetsForReleaseVersion(ReleaseVersion releaseVersion,
+        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(ReleaseVersion releaseVersion,
             int numberOfDataSets = 2)
         {
             return _fixture.DefaultReleaseFile()
@@ -1641,9 +1641,9 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class GetDataSetTests : DataSetsControllerTests
+    public class GetDataSetFileTests : DataSetFilesControllerTests
     {
-        public GetDataSetTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        public GetDataSetFileTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
         {
         }
 
@@ -1668,10 +1668,10 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
-            var viewModel = response.AssertOk<DataSetDetailsViewModel>();
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
 
             Assert.Equal(releaseFile.Name, viewModel.Title);
             Assert.Equal(releaseFile.Summary, viewModel.Summary);
@@ -1696,7 +1696,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
-        public async Task NoRelease_ReturnsNotFound()
+        public async Task NoDataSetFile_ReturnsNotFound()
         {
             Publication publication = _fixture.DefaultPublication()
                 .WithReleases(
@@ -1716,35 +1716,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{Guid.NewGuid()}/data-sets/{releaseFile.FileId}";
-
-            var response = await client.GetAsync(uri);
-
-            response.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task NoFile_ReturnsNotFound()
-        {
-            Publication publication = _fixture.DefaultPublication()
-                .WithReleases(
-                    _fixture.DefaultRelease(publishedVersions: 1)
-                        .Generate(1))
-                .WithTopic(_fixture.DefaultTopic()
-                    .WithTheme(_fixture.DefaultTheme()));
-
-            ReleaseFile releaseFile = _fixture.DefaultReleaseFile()
-                .WithReleaseVersion(publication.ReleaseVersions[0])
-                .WithFile(_fixture.DefaultFile());
-
-            var client = BuildApp()
-                .AddContentDbTestData(context =>
-                {
-                    context.ReleaseFiles.Add(releaseFile);
-                })
-                .CreateClient();
-
-            var uri = $"/api/releases/{publication.ReleaseVersions[0].Id}/data-sets/{Guid.NewGuid()}";
+            var uri = $"/api/data-set-files/{Guid.NewGuid()}";
 
             var response = await client.GetAsync(uri);
 
@@ -1772,7 +1744,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{releaseFile.ReleaseVersionId}/data-sets/{releaseFile.FileId}";
+            var uri = $"/api/data-set-files/{releaseFile.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1780,7 +1752,7 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
         }
 
         [Fact]
-        public async Task AmendmentNotPublished_ReturnsNotFound()
+        public async Task AmendmentNotPublished_ReturnsOk()
         {
             Publication publication = _fixture.DefaultPublication()
                 .WithReleases(
@@ -1810,7 +1782,42 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
                 })
                 .CreateClient();
 
-            var uri = $"/api/releases/{publication.ReleaseVersions[2].Id}/data-sets/{releaseFile2.FileId}";
+            var uri = $"/api/data-set-files/{releaseFile2.File.DataSetFileId}";
+
+            var response = await client.GetAsync(uri);
+
+            var viewModel = response.AssertOk<DataSetFileViewModel>();
+
+            // Fetches latest published version, not amendment
+            Assert.Equal(publication.ReleaseVersions[1].Id, viewModel.Release.Id);
+        }
+
+        [Fact]
+        public async Task DataSetFileRemovedOnAmendment_ReturnsNotFound()
+        {
+            Publication publication = _fixture.DefaultPublication()
+                .WithReleases(
+                    _fixture.DefaultRelease(publishedVersions: 2, draftVersion: false)
+                        .Generate(1))
+                .WithTopic(_fixture.DefaultTopic()
+                    .WithTheme(_fixture.DefaultTheme()));
+
+            File file = _fixture.DefaultFile();
+
+            ReleaseFile releaseFile0 = _fixture.DefaultReleaseFile()
+                .WithReleaseVersion(publication.ReleaseVersions[0]) // the previous published version
+                .WithFile(file);
+
+            // NOTE: No ReleaseFile for publication.ReleaseVersions[1]
+
+            var client = BuildApp()
+                .AddContentDbTestData(context =>
+                {
+                    context.ReleaseFiles.Add(releaseFile0);
+                })
+                .CreateClient();
+
+            var uri = $"/api/data-set-files/{releaseFile0.File.DataSetFileId}";
 
             var response = await client.GetAsync(uri);
 
@@ -1827,8 +1834,8 @@ public class DataSetsControllerTests : IntegrationTest<TestStartup>
             {
                 services.AddTransient<IReleaseVersionRepository>(s => new ReleaseVersionRepository(
                     contentDbContext ?? s.GetRequiredService<ContentDbContext>()));
-                services.AddTransient<IDataSetService>(
-                    s => new DataSetService(
+                services.AddTransient<IDataSetFileService>(
+                    s => new DataSetFileService(
                         contentDbContext ?? s.GetRequiredService<ContentDbContext>(),
                         s.GetRequiredService<IReleaseVersionRepository>()));
             });
