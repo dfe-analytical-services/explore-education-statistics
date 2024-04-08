@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -602,8 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterOptionChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("FilterId")
                                         .IsRequired()
@@ -634,8 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterOptionChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("FilterId")
                                         .IsRequired()
@@ -710,8 +708,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Hint")
                                         .IsRequired()
@@ -739,8 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Hint")
                                         .IsRequired()
@@ -812,8 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<IndicatorChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<byte?>("DecimalPlaces")
                                         .HasColumnType("smallint");
@@ -843,8 +838,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<IndicatorChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<byte?>("DecimalPlaces")
                                         .HasColumnType("smallint");
@@ -918,8 +912,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<LocationChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -951,8 +944,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<LocationChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -1027,8 +1019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<TimePeriodChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -1051,8 +1042,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<TimePeriodChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
