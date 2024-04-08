@@ -246,8 +246,7 @@ jobs:
       versionSpec: "16.X"
 
   - script: |
-      npm install
-      npm run build # or any other build script you have
+      pnpm install
     displayName: 'Install dependencies and build'
 
   - task: Cache@2
