@@ -239,11 +239,11 @@ jobs:
     fetchDepth: 5
     fetchTags: false
 
-  - task: NodeTool@0
+  - task: NodeTool@1
     displayName: Use Node version 16 above
     timeoutInMinutes: 5
     inputs:
-      versionSpec: "16.X"
+      versionSpec: "18.X"
 
   - script: |
       pnpm install
@@ -251,7 +251,7 @@ jobs:
 
   - task: Cache@2
     inputs:
-      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      key: 'pnpm | "$(Agent.OS)" | package-lock.json'
       restoreKeys: |
         npm | "$(Agent.OS)"
       path: $(npm_config_cache)
