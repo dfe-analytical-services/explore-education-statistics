@@ -247,7 +247,7 @@ jobs:
 
   - script: |
         node -v
-      displayName: 'node version'
+    displayName: 'node version'
 
   - script: |
       npm install --package-lock-only
