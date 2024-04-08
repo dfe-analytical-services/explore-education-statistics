@@ -246,11 +246,23 @@ jobs:
       versionSpec: "16.X"
 
   - script: |
-            rm -rf node_modules
-            rm package-lock.json
+      npm install -g npm@latest
+    displayName: 'Upgrade npm'
 
   - script: |
-            npm install
+      npm install
+      npm run build # or any other build script you have
+    displayName: 'Install dependencies and build'
+
+  - task: Cache@2
+    inputs:
+      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: $(npm_config_cache)
+    displayName: 'Cache npm packages'
+
+  - script: |
             npm ci --force
     displayName: "Install dependencies"
 
