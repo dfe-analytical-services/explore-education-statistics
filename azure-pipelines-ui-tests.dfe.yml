@@ -244,6 +244,7 @@ jobs:
     timeoutInMinutes: 5
     inputs:
       versionSpec: "18.18.2"
+      workingDirectory: tests/playwright-tests/
 
   - script: |
         node -v
@@ -262,6 +263,8 @@ jobs:
     displayName: 'Install Playwright browsers'
 
         # runs the playwright tests
+
+
   - script: |
             npx playwright test
     displayName: "Run Playwright tests"
