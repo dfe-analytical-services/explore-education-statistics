@@ -250,13 +250,8 @@ jobs:
     displayName: 'node version'
 
   - script: |
-      npm install -g pnpm
-    displayName: 'Install pnpm'
-    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
-
-  - script: |
-      pnpm install
-    displayName: 'Install dependencies'
+      npm ci
+    displayName: 'Install CI'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
