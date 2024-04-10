@@ -252,17 +252,17 @@ jobs:
   - script: |
       npm install -g pnpm
     displayName: 'Install pnpm'
-    workingDirectory: tests/playwright-tests/
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       pnpm install
     displayName: 'Install dependencies'
-    workingDirectory: tests/playwright-tests/
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
-    workingDirectory: tests/playwright-tests/
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
         # runs the playwright tests
 
   - task: AzureKeyVault@2
@@ -277,7 +277,7 @@ jobs:
   - script: |
       npx playwright test
     displayName: "Run Playwright tests"
-    workingDirectory: tests/playwright-tests/
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
             CI: 'true'
             PUBLIC_URL: $(PUBLIC_URL)
