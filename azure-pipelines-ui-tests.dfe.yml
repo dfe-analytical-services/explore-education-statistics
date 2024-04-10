@@ -176,7 +176,7 @@ jobs:
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
             CI: 'true'
-            PUBLIC_URL: $(PUBLIC_URL)
+            PUBLIC_URL: $(PUBLIC_URL_PLAYWRIGHT)
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
 
