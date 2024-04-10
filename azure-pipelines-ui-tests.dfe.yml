@@ -170,7 +170,7 @@ jobs:
 
   - script: |
       pwd
-     npx playwright test "$(System.DefaultWorkingDirectory)/tests/playwright-tests/tests/**/*.spec.ts"
+      npx playwright test "$(System.DefaultWorkingDirectory)/tests/playwright-tests/tests/**/*.spec.ts"
 
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
