@@ -70,7 +70,7 @@ export interface DataBlock extends BaseBlock {
   highlightName?: string;
   highlightDescription?: string;
   heading: string;
-  source: string;
+  source?: string;
   query: TableDataQuery;
   charts: Chart[];
   table: Table;

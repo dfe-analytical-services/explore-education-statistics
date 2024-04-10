@@ -1,49 +1,72 @@
-import { User, UserReleaseRole } from '@admin/services/userService';
+import userService, {
+  User,
+  UserReleaseRole,
+} from '@admin/services/userService';
+import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import { IdTitlePair } from 'src/services/types/common';
-import { Formik, FormikHelpers } from 'formik';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
-export interface AddReleaseRoleFormValues {
-  selectedReleaseId: string;
-  selectedReleaseRole: string;
+const addReleaseFormErrorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'releaseRole',
+    messages: {
+      UserAlreadyHasResourceRole: 'The user already has this release role',
+    },
+  }),
+];
+
+interface FormValues {
+  releaseId: string;
+  releaseRole: string;
 }
 
 interface Props {
   releases?: IdTitlePair[];
   releaseRoles?: string[];
   user: User;
-  onRemove: (userReleaseRole: UserReleaseRole) => void;
-  onSubmit: (
-    values: AddReleaseRoleFormValues,
-    actions: FormikHelpers<AddReleaseRoleFormValues>,
-  ) => void;
+  onUpdate: () => void;
 }
 
-const ReleaseAccessForm = ({
+export default function ReleaseAccessForm({
   releases,
   releaseRoles,
   user,
-  onRemove,
-  onSubmit,
-}: Props) => {
+  onUpdate,
+}: Props) {
+  const handleAddReleaseRole = async (values: FormValues) => {
+    await userService.addUserReleaseRole(user.id, values);
+    onUpdate();
+  };
+
+  const handleRemoveReleaseAccess = async (
+    userReleaseRole: UserReleaseRole,
+  ) => {
+    await userService.removeUserReleaseRole(userReleaseRole.id);
+    onUpdate();
+  };
+
   return (
-    <Formik<AddReleaseRoleFormValues>
+    <FormProvider
+      errorMappings={addReleaseFormErrorMappings}
       initialValues={{
-        selectedReleaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
-        selectedReleaseRole:
+        releaseId: orderBy(releases, release => release)?.[0]?.id ?? '',
+        releaseRole:
           orderBy(releaseRoles, releaseRole => releaseRole)?.[0] ?? '',
       }}
-      enableReinitialize
-      onSubmit={onSubmit}
     >
-      {form => {
+      {({ formState }) => {
         return (
-          <Form id={`${user.id}-releaseRole`}>
+          <RHFForm
+            id={`${user.id}-releaseRole`}
+            onSubmit={handleAddReleaseRole}
+          >
             <FormFieldset
               id="role"
               legend="Release access"
@@ -52,9 +75,9 @@ const ReleaseAccessForm = ({
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half">
-                  <FormFieldSelect<AddReleaseRoleFormValues>
+                  <RHFFormFieldSelect<FormValues>
                     label="Release"
-                    name="selectedReleaseId"
+                    name="releaseId"
                     options={releases?.map(release => ({
                       label: release.title,
                       value: release.id,
@@ -63,9 +86,9 @@ const ReleaseAccessForm = ({
                 </div>
 
                 <div className="govuk-grid-column-one-quarter">
-                  <FormFieldSelect<AddReleaseRoleFormValues>
+                  <RHFFormFieldSelect<FormValues>
                     label="Release role"
-                    name="selectedReleaseRole"
+                    name="releaseRole"
                     options={releaseRoles?.map(role => ({
                       label: role,
                       value: role,
@@ -76,7 +99,7 @@ const ReleaseAccessForm = ({
                   {user && (
                     <Button
                       type="submit"
-                      disabled={form.isSubmitting}
+                      disabled={formState.isSubmitting}
                       className="govuk-!-margin-top-6"
                     >
                       Add release access
@@ -116,7 +139,11 @@ const ReleaseAccessForm = ({
                       {userReleaseRole.role}
                     </td>
                     <td className="govuk-table__cell">
-                      <ButtonText onClick={() => onRemove(userReleaseRole)}>
+                      <ButtonText
+                        onClick={() =>
+                          handleRemoveReleaseAccess(userReleaseRole)
+                        }
+                      >
                         Remove
                       </ButtonText>
                     </td>
@@ -124,11 +151,9 @@ const ReleaseAccessForm = ({
                 ))}
               </tbody>
             </table>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
-};
-
-export default ReleaseAccessForm;
+}

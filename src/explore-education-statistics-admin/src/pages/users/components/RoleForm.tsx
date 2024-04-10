@@ -1,79 +1,82 @@
-import { Role, User } from '@admin/services/userService';
+import userService, { Role, User } from '@admin/services/userService';
 import Button from '@common/components/Button';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik, FormikHelpers } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
-export interface UpdateRoleFormValues {
-  selectedRoleId: string;
+const updateRoleFormErrorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'roleId',
+    messages: {
+      RoleDoesNotExist: 'Role does not exist',
+    },
+  }),
+];
+
+interface FormValues {
+  roleId: string;
 }
 
 interface Props {
   roles?: Role[];
   user: User;
-  onSubmit: (
-    values: UpdateRoleFormValues,
-    actions: FormikHelpers<UpdateRoleFormValues>,
-  ) => void;
+  onUpdate: () => void;
 }
 
-const RoleForm = ({ roles, user, onSubmit }: Props) => {
+const RoleForm = ({ roles, user, onUpdate }: Props) => {
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      roleId: Yup.string().required('Choose role for the user'),
+    });
+  }, []);
+
+  const handleSubmit = async (values: FormValues) => {
+    await userService.updateUser(user.id, values);
+    onUpdate();
+  };
+
   return (
-    <Formik<UpdateRoleFormValues>
+    <FormProvider
       enableReinitialize
+      errorMappings={updateRoleFormErrorMappings}
       initialValues={{
-        selectedRoleId: user.role ?? '',
+        roleId: user.role ?? '',
       }}
-      validationSchema={Yup.object<UpdateRoleFormValues>({
-        selectedRoleId: Yup.string().required('Choose role for the user'),
-      })}
-      onSubmit={onSubmit}
+      validationSchema={validationSchema}
     >
-      {() => {
-        return (
-          <Form id={user.id}>
-            <FormFieldset id="user" legend="Details" legendSize="m">
-              <SummaryList>
-                <SummaryListItem term="Name">{user.name}</SummaryListItem>
-                <SummaryListItem term="Email">
-                  <a href={`mailto:${user.email}`}>{user.email}</a>
-                </SummaryListItem>
-                <SummaryListItem term="Phone">-</SummaryListItem>
-              </SummaryList>
-            </FormFieldset>
-            <FormFieldset
-              id="role"
-              legend="Role"
-              legendSize="m"
-              hint="The users's role within the service."
-            >
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-quarter">
-                  <FormFieldSelect<UpdateRoleFormValues>
-                    label="Role"
-                    name="selectedRoleId"
-                    options={roles?.map(role => ({
-                      label: role.name,
-                      value: role.id,
-                    }))}
-                    placeholder="Choose role"
-                  />
-                </div>
-                <div className="govuk-grid-column-one-quarter">
-                  <Button type="submit" className="govuk-!-margin-top-6">
-                    Update role
-                  </Button>
-                </div>
-              </div>
-            </FormFieldset>
-          </Form>
-        );
-      }}
-    </Formik>
+      <RHFForm id={user.id} onSubmit={handleSubmit}>
+        <FormFieldset
+          id="role"
+          legend="Role"
+          legendSize="m"
+          hint="The users' role within the service."
+        >
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-quarter">
+              <RHFFormFieldSelect<FormValues>
+                label="Role"
+                name="roleId"
+                options={roles?.map(role => ({
+                  label: role.name,
+                  value: role.id,
+                }))}
+                placeholder="Choose role"
+              />
+            </div>
+            <div className="govuk-grid-column-one-quarter">
+              <Button type="submit" className="govuk-!-margin-top-6">
+                Update role
+              </Button>
+            </div>
+          </div>
+        </FormFieldset>
+      </RHFForm>
+    </FormProvider>
   );
 };
 

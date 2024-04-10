@@ -1,14 +1,13 @@
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
 import PreviewHtml from '@admin/components/PreviewHtml';
 import styles from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import InsetText from '@common/components/InsetText';
 import WarningMessage from '@common/components/WarningMessage';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
-import { Formik } from 'formik';
 import React from 'react';
 
 const defaultAccessListText = `
@@ -33,18 +32,18 @@ interface Props {
   onSubmit: (values: FormValues) => void;
 }
 
-const PublicPreReleaseAccessForm = ({
+export default function PublicPreReleaseAccessForm({
   canUpdateRelease = false,
   isReleaseLive = false,
   preReleaseAccessList,
   onSubmit,
-}: Props) => {
+}: Props) {
   const [showForm, toggleForm] = useToggle(false);
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
+  const handleSubmit = async (values: FormValues) => {
     await onSubmit(values);
     toggleForm.off();
-  });
+  };
 
   return (
     <>
@@ -65,14 +64,13 @@ const PublicPreReleaseAccessForm = ({
       )}
 
       {showForm ? (
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{
             preReleaseAccessList: preReleaseAccessList || defaultAccessListText,
           }}
-          onSubmit={handleSubmit}
         >
-          <Form id={formId}>
-            <FormFieldEditor<FormValues>
+          <RHFForm id={formId} showErrorSummary={false} onSubmit={handleSubmit}>
+            <RHFFormFieldEditor<FormValues>
               name="preReleaseAccessList"
               label="Public access list"
               focusOnInit
@@ -85,8 +83,8 @@ const PublicPreReleaseAccessForm = ({
                 Cancel
               </Button>
             </ButtonGroup>
-          </Form>
-        </Formik>
+          </RHFForm>
+        </FormProvider>
       ) : (
         <>
           {!canUpdateRelease && (
@@ -120,6 +118,4 @@ const PublicPreReleaseAccessForm = ({
       )}
     </>
   );
-};
-
-export default PublicPreReleaseAccessForm;
+}

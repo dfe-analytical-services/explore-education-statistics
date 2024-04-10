@@ -1,5 +1,6 @@
 import FilterGroupDetails from '@admin/pages/release/footnotes/components/FilterGroupDetails';
 import IndicatorDetails from '@admin/pages/release/footnotes/components/IndicatorDetails';
+import styles from '@admin/pages/release/footnotes/components/FootnoteForm.module.scss';
 import {
   BaseFootnote,
   Footnote,
@@ -13,18 +14,19 @@ import {
 } from '@admin/config/ckEditorConfig';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldRadioGroup } from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
-import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import SubmitError from '@common/components/form/util/SubmitError';
+import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import deepmerge from 'deepmerge';
-import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useMemo } from 'react';
-import SubmitError from '@common/components/form/util/SubmitError';
+import { ObjectSchema } from 'yup';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface Props {
   cancelButton?: ReactNode;
@@ -34,13 +36,13 @@ interface Props {
   onSubmit: (values: BaseFootnote) => void | Promise<void>;
 }
 
-const FootnoteForm = ({
+export default function FootnoteForm({
   cancelButton,
   footnote,
   footnoteMeta,
   id = 'footnoteForm',
   onSubmit,
-}: Props) => {
+}: Props) {
   const initialValues = useMemo<BaseFootnote>(() => {
     const subjects = mapValues(footnoteMeta.subjects, subject => {
       const { indicators, filters, subjectId } = subject;
@@ -82,168 +84,154 @@ const FootnoteForm = ({
     };
   }, [footnote, footnoteMeta.subjects]);
 
-  const handleSubmit = useFormSubmit(
-    async (values: BaseFootnote) => {
-      const {
-        subjects,
-        indicatorGroups,
-        indicators,
-        filters,
-        filterGroups,
-        filterItems,
-      } = footnoteToFlatFootnote(values);
-      const hasNoneSelected =
-        [
-          ...subjects,
-          ...indicators,
-          ...indicatorGroups,
-          ...filters,
-          ...filterGroups,
-          ...filterItems,
-        ].length === 0;
+  const handleSubmit = async (values: BaseFootnote) => {
+    const {
+      subjects,
+      indicatorGroups,
+      indicators,
+      filters,
+      filterGroups,
+      filterItems,
+    } = footnoteToFlatFootnote(values);
+    const hasNoneSelected =
+      [
+        ...subjects,
+        ...indicators,
+        ...indicatorGroups,
+        ...filters,
+        ...filterGroups,
+        ...filterItems,
+      ].length === 0;
 
-      if (hasNoneSelected) {
-        throw new SubmitError(
-          'At least one Subject, Indicator or Filter must be selected',
-        );
-      }
+    if (hasNoneSelected) {
+      throw new SubmitError(
+        'At least one Subject, Indicator or Filter must be selected',
+      );
+    }
 
-      const sanitizedValues = {
-        ...values,
-        content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
-      };
+    const sanitizedValues = {
+      ...values,
+      content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
+    };
 
-      await onSubmit(sanitizedValues);
-    },
-    [],
-    {
-      fallbackSubmitError: 'Something went wrong assigning the footnote',
-    },
-  );
+    await onSubmit(sanitizedValues);
+  };
+
+  const validationSchema = useMemo<ObjectSchema<BaseFootnote>>(() => {
+    return Yup.object({
+      content: Yup.string().required('Footnote content must be added'),
+      subjects: Yup.object(),
+    });
+  }, []);
 
   return (
-    <Formik<BaseFootnote>
+    <FormProvider
+      fallbackSubmitError="Something went wrong assigning the footnote"
       initialValues={initialValues}
-      validationSchema={Yup.object<BaseFootnote>({
-        content: Yup.string().required('Footnote content must be added.'),
-        subjects: Yup.object(),
-      })}
-      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
     >
-      {form => (
-        <Form id={id}>
-          <p>
-            Select which subjects, filters and indicators your footnote applies
-            to and these will appear alongside the associated data in your
-            published statistics.
-          </p>
+      <RHFForm id={id} onSubmit={handleSubmit}>
+        <p>
+          Select which subjects, filters and indicators your footnote applies to
+          and these will appear alongside the associated data in your published
+          statistics.
+        </p>
 
-          <p>
-            Footnotes should be used sparingly, and only for information that is
-            critical to understanding the data in the table or chart it refers
-            to.
-          </p>
+        <p>
+          Footnotes should be used sparingly, and only for information that is
+          critical to understanding the data in the table or chart it refers to.
+        </p>
 
-          <FormFieldEditor<BaseFootnote>
-            name="content"
-            label="Footnote"
-            includePlugins={pluginsConfigLinksOnly}
-            toolbarConfig={toolbarConfigLinkOnly}
-          />
+        <RHFFormFieldEditor<BaseFootnote>
+          name="content"
+          label="Footnote"
+          includePlugins={pluginsConfigLinksOnly}
+          toolbarConfig={toolbarConfigLinkOnly}
+        />
 
-          {orderBy(
-            Object.values(footnoteMeta.subjects),
-            subject => subject.subjectName,
-          ).map(subject => {
-            const { subjectId, subjectName } = subject;
+        {orderBy(
+          Object.values(footnoteMeta.subjects),
+          subject => subject.subjectName,
+        ).map(subject => {
+          const { subjectId, subjectName } = subject;
 
-            return (
-              <fieldset
-                key={subjectId}
-                className="govuk-fieldset"
-                data-testid={`footnote-subject ${subjectName}`}
-              >
-                <legend className="govuk-heading-m">
-                  Subject: {subjectName}
-                </legend>
+          return (
+            <RHFFormFieldRadioGroup
+              className={styles.radio}
+              key={subjectId}
+              testId={`footnote-subject ${subjectName}`}
+              legend={
+                <>
+                  {`Subject: ${subjectName}`}
+                  <VisuallyHidden>
+                    {' '}
+                    - select indicators and filters
+                  </VisuallyHidden>
+                </>
+              }
+              small
+              inline
+              showError={false}
+              name={`subjects.${subjectId}.selectionType`}
+              order={[]}
+              options={[
+                { value: 'NA', label: 'Does not apply' },
+                {
+                  value: `All`,
+                  label: 'Applies to all data',
+                },
+                {
+                  value: 'Specific',
+                  label: 'Applies to specific data',
+                  conditional: (
+                    <div className="govuk-grid-row">
+                      <div className="govuk-grid-column-one-half">
+                        <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
+                          Indicators
+                        </h3>
 
-                <FormFieldRadioGroup
-                  legend="Select indicators and filters for this subject"
-                  legendHidden
-                  small
-                  inline
-                  showError={false}
-                  name={`subjects.${subjectId}.selectionType`}
-                  order={[]}
-                  options={[
-                    { value: 'NA', label: 'Does not apply' },
-                    {
-                      value: `All`,
-                      label: 'Applies to all data',
-                    },
-                    {
-                      value: 'Specific',
-                      label: 'Applies to specific data',
-                      conditional: (
-                        <div className="govuk-grid-row govuk-!-margin-top-3">
-                          <div className="govuk-grid-column-one-half">
+                        <IndicatorDetails
+                          summary="Indicators"
+                          valuePath={`subjects.${subjectId}`}
+                          indicatorGroups={subject.indicators}
+                        />
+                      </div>
+
+                      <div className="govuk-grid-column-one-half">
+                        {Object.entries(subject.filters).length > 0 && (
+                          <>
                             <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                              Indicators
+                              Filters
                             </h3>
 
-                            <IndicatorDetails
-                              summary="Indicators"
-                              valuePath={`subjects.${subjectId}`}
-                              indicatorGroups={subject.indicators}
-                              form={form}
-                            />
-                          </div>
-
-                          <div className="govuk-grid-column-one-half">
-                            {Object.entries(subject.filters).length > 0 && (
-                              <>
-                                <h3 className="govuk-heading-s govuk-!-margin-bottom-2 govuk-!-margin-top-0">
-                                  Filters
-                                </h3>
-
-                                {Object.entries(subject.filters).map(
-                                  ([filterId, filter]) => (
-                                    <FilterGroupDetails
-                                      key={filterId}
-                                      summary={filter.legend}
-                                      valuePath={`subjects.${subjectId}`}
-                                      groupId={filterId}
-                                      filter={filter}
-                                      selectAll
-                                      value={get(
-                                        form.values,
-                                        `subjects.${subjectId}.filters.${filterId}.selected`,
-                                      )}
-                                      form={form}
-                                    />
-                                  ),
-                                )}
-                              </>
+                            {Object.entries(subject.filters).map(
+                              ([filterId, filter]) => (
+                                <FilterGroupDetails
+                                  key={filterId}
+                                  summary={filter.legend}
+                                  valuePath={`subjects.${subjectId}`}
+                                  groupId={filterId}
+                                  filter={filter}
+                                  selectAll
+                                />
+                              ),
                             )}
-                          </div>
-                        </div>
-                      ),
-                    },
-                  ]}
-                />
-                <hr className="govuk-!-margin-bottom-2" />
-              </fieldset>
-            );
-          })}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          );
+        })}
 
-          <ButtonGroup>
-            <Button type="submit">Save footnote</Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+        <ButtonGroup>
+          <Button type="submit">Save footnote</Button>
+          {cancelButton}
+        </ButtonGroup>
+      </RHFForm>
+    </FormProvider>
   );
-};
-
-export default FootnoteForm;
+}
