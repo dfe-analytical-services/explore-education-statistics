@@ -167,7 +167,7 @@ jobs:
 
 
   - script: |
-      npx playwright test --testMatch='**/tests/playwright-tests/tests/public/*.spec.ts'
+      npx playwright test --testMatch=`$(System.DefaultWorkingDirectory)/tests/playwright-tests/tests/public/*.spec.ts`
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
