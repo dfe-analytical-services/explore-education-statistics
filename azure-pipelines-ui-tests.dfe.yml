@@ -186,7 +186,7 @@ jobs:
       testResultsFiles: tests/playwright-tests/test-results/xunit.xml
       failTaskOnFailedTests: true
 
--   task: PublishPipelineArtifact@1
+  - task: PublishPipelineArtifact@1
     displayName: Publish Pipeline Artifact
     condition: succeededOrFailed()
     inputs:
