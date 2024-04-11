@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import environment from '@util/env';
+
+const { PUBLIC_USERNAME, PUBLIC_PASSWORD } = environment;
 
 /**
  * Read environment variables from file.
@@ -6,6 +9,11 @@ import { defineConfig, devices } from '@playwright/test';
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
+
+const encodeBasicAuth = (username: string, password: string) => {
+  const unencodedString = `${username}:${password}`;
+  return `Basic ${btoa(unencodedString)}`;
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -25,6 +33,9 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    extraHTTPHeaders: {
+      Authorization: encodeBasicAuth(PUBLIC_USERNAME, PUBLIC_PASSWORD),
+    },
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: ' ',
 
