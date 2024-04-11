@@ -167,7 +167,6 @@ jobs:
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
-
   - script: |
       pwd
       npx playwright test 
@@ -181,14 +180,15 @@ jobs:
             ADMIN_EMAIL: $(ADMIN_EMAIL)
 
     # this publishes the html report as an artifact that can then be downloaded
-  - publish: $(System.DefaultWorkingDirectory)/test/playwright-tests/playwright-report
-    artifact: playwright-report
-    condition: always()
-
-    # this publishes the junit formated test results to azure pipelines so they can be displayed and tracked there.
   - task: PublishTestResults@2
-    condition: always()
+    displayName: Publish Test Results
     inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/playwright-results.xml'
-      testRunTitle: 'Playwright Test Results'
+      testResultsFiles: tests/playwright-tests/test-results/xunit.xml
+      failTaskOnFailedTests: true
+
+-   task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    condition: succeededOrFailed()
+    inputs:
+      path: tests/playwright-tests/test-results/
+      artifactName: test-results-playwright-tests
