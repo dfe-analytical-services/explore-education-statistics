@@ -185,7 +185,7 @@ Validate Related information section and links exist
 Validate data sets list
     user checks list has x items    testid:data-set-file-list    10
 
-    ${dataSet}=    user gets testid element    data-set-summary-${SUBJECT_NAME_3}
+    ${dataSet}=    user gets testid element    data-set-file-summary-${SUBJECT_NAME_3}
 
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
     user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
