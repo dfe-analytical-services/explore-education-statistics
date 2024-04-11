@@ -123,7 +123,7 @@ jobs:
 
 
 - job: 'Playwrighttest'
-  displayName: Playwright UI test
+  displayName: Playwright UI test-Public
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -169,7 +169,7 @@ jobs:
 
   - script: |
       pwd
-      npx playwright test 
+      npx playwright test  tests/public  
 
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
