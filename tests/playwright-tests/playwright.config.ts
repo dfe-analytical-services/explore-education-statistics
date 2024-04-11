@@ -11,12 +11,7 @@ require('dotenv').config();
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  // testDir: './tests',
-  testMatch: [
-    '*tests/playwright-tests/tests/public/*.spec.ts',
-    '*tests/playwright-tests/tests/admin/*.spec.ts',
-    '*tests/playwright-tests/tests/admin-and-public/*.spec.ts',
-  ],
+  testDir: './tests',
 
   timeout: 15 * 60 * 1000,
   /* Run tests in files in parallel */
