@@ -728,12 +728,12 @@ public class SeedDataCommand : ICommand
 
             string[] columns =
             [
-                $"{DataTable.Cols.Id} UINTEGER PRIMARY KEY",
-                $"{DataTable.Cols.TimePeriodId} INTEGER",
-                $"{DataTable.Cols.GeographicLevel} VARCHAR",
-                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER"),
-                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER"),
-                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR"),
+                $"{DataTable.Cols.Id} UINTEGER NOT NULL PRIMARY KEY",
+                $"{DataTable.Cols.TimePeriodId} INTEGER NOT NULL",
+                $"{DataTable.Cols.GeographicLevel} VARCHAR NOT NULL",
+                ..version.LocationMetas.Select(location => $"{DataTable.Cols.LocationId(location)} INTEGER NOT NULL"),
+                ..version.FilterMetas.Select(filter => $"{DataTable.Cols.Filter(filter)} INTEGER NOT NULL"),
+                ..version.IndicatorMetas.Select(indicator => $"{DataTable.Cols.Indicator(indicator)} VARCHAR NOT NULL"),
             ];
 
             await _duckDb.ExecuteAsync($"CREATE TABLE {DataTable.TableName}({columns.JoinToString(",\n")})");
@@ -744,9 +744,9 @@ public class SeedDataCommand : ICommand
                 $"{TimePeriodsTable.Ref().Id} AS {DataTable.Cols.TimePeriodId}",
                 DataSourceTable.Ref.GeographicLevel,
                 ..version.LocationMetas.Select(location =>
-                    $"{LocationsTable.Ref(location).Id} AS {DataTable.Cols.LocationId(location)}"),
+                    $"COALESCE({LocationOptionsTable.Ref(location).Id}, 0) AS {DataTable.Cols.LocationId(location)}"),
                 ..version.FilterMetas.Select(filter => 
-                    $"{FiltersTable.Ref(filter).Id} AS {DataTable.Cols.Filter(filter)}"),
+                    $"COALESCE({FilterOptionsTable.Ref(filter).Id}, 0) AS {DataTable.Cols.Filter(filter)}"),
                 ..version.IndicatorMetas.Select(DataTable.Cols.Indicator),
             ];
 
@@ -760,21 +760,21 @@ public class SeedDataCommand : ICommand
                         string[] conditions =
                         [
                             ..codeColumns.Select(col =>
-                                $"{LocationsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
-                            $"{LocationsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
+                                $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"),
+                            $"{LocationOptionsTable.Ref(location).Label} = {DataSourceTable.Ref.Col(location.Level.CsvNameColumn())}"
                         ];
 
                         return $"""
-                                LEFT JOIN {LocationsTable.TableName} AS {LocationsTable.Alias(location)}
+                                LEFT JOIN {LocationOptionsTable.TableName} AS {LocationOptionsTable.Alias(location)}
                                 ON {conditions.JoinToString(" AND ")}
                                 """;
                     }
                 ),
                 ..version.FilterMetas.Select(
                     filter => $"""
-                               LEFT JOIN {FiltersTable.TableName} AS {FiltersTable.Alias(filter)}
-                               ON {FiltersTable.Ref(filter).ColumnName} = '{filter.PublicId}'
-                               AND {FiltersTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.PublicId)}
+                               LEFT JOIN {FilterOptionsTable.TableName} AS {FilterOptionsTable.Alias(filter)}
+                               ON {FilterOptionsTable.Ref(filter).FilterId} = '{filter.PublicId}'
+                               AND {FilterOptionsTable.Ref(filter).Label} = {DataSourceTable.Ref.Col(filter.PublicId)}
                                """
                 ),
                 $"""
@@ -855,25 +855,53 @@ public class SeedDataCommand : ICommand
 
         private async Task CreateParquetMetaTables(DataSetVersion version)
         {
-            await CreateParquetLocationMetaTables(version);
+            await CreateParquetIndicatorTable(version);
+            await CreateParquetLocationMetaTable(version);
             await CreateParquetFilterMetaTable(version);
             await CreateParquetTimePeriodMetaTable(version);
         }
 
-        private async Task CreateParquetLocationMetaTables(DataSetVersion version)
+        private async Task CreateParquetIndicatorTable(DataSetVersion version)
         {
             await _duckDb.ExecuteAsync(
                 $"""
-                 CREATE TABLE {LocationsTable.TableName}(
-                     {LocationsTable.Cols.Id} INTEGER PRIMARY KEY,
-                     {LocationsTable.Cols.Label} VARCHAR,
-                     {LocationsTable.Cols.Level} VARCHAR,
-                     {LocationsTable.Cols.PublicId} VARCHAR,
-                     {LocationsTable.Cols.Code} VARCHAR,
-                     {LocationsTable.Cols.OldCode} VARCHAR,
-                     {LocationsTable.Cols.Urn} VARCHAR,
-                     {LocationsTable.Cols.LaEstab} VARCHAR,
-                     {LocationsTable.Cols.Ukprn} VARCHAR
+                 CREATE TABLE {IndicatorsTable.TableName}(
+                     {IndicatorsTable.Cols.Id} VARCHAR PRIMARY KEY,
+                     {IndicatorsTable.Cols.Label} VARCHAR,
+                     {IndicatorsTable.Cols.Unit} VARCHAR,
+                     {IndicatorsTable.Cols.DecimalPlaces} TINYINT,
+                 )
+                 """
+            );
+
+            using var appender = _duckDb.CreateAppender(table: IndicatorsTable.TableName);
+
+            foreach (var meta in version.IndicatorMetas)
+            {
+                var insertRow = appender.CreateRow();
+
+                insertRow.AppendValue(meta.PublicId);
+                insertRow.AppendValue(meta.Label);
+                insertRow.AppendValue(meta.Unit?.GetEnumLabel() ?? string.Empty);
+                insertRow.AppendValue(meta.DecimalPlaces);
+                insertRow.EndRow();
+            }
+        }
+
+        private async Task CreateParquetLocationMetaTable(DataSetVersion version)
+        {
+            await _duckDb.ExecuteAsync(
+                $"""
+                 CREATE TABLE {LocationOptionsTable.TableName}(
+                     {LocationOptionsTable.Cols.Id} INTEGER PRIMARY KEY,
+                     {LocationOptionsTable.Cols.Label} VARCHAR,
+                     {LocationOptionsTable.Cols.Level} VARCHAR,
+                     {LocationOptionsTable.Cols.PublicId} VARCHAR,
+                     {LocationOptionsTable.Cols.Code} VARCHAR,
+                     {LocationOptionsTable.Cols.OldCode} VARCHAR,
+                     {LocationOptionsTable.Cols.Urn} VARCHAR,
+                     {LocationOptionsTable.Cols.LaEstab} VARCHAR,
+                     {LocationOptionsTable.Cols.Ukprn} VARCHAR
                  )
                  """
             );
@@ -882,7 +910,7 @@ public class SeedDataCommand : ICommand
 
             foreach (var location in version.LocationMetas)
             {
-                using var appender = _duckDb.CreateAppender(table: LocationsTable.TableName);
+                using var appender = _duckDb.CreateAppender(table: LocationOptionsTable.TableName);
 
                 var insertRow = appender.CreateRow();
 
@@ -936,11 +964,11 @@ public class SeedDataCommand : ICommand
         {
             await _duckDb.ExecuteAsync(
                 $"""
-                 CREATE TABLE {FiltersTable.TableName}(
-                     {FiltersTable.Cols.Id} INTEGER PRIMARY KEY,
-                     {FiltersTable.Cols.Label} VARCHAR,
-                     {FiltersTable.Cols.PublicId} VARCHAR,
-                     {FiltersTable.Cols.ColumnName} VARCHAR
+                 CREATE TABLE {FilterOptionsTable.TableName}(
+                     {FilterOptionsTable.Cols.Id} INTEGER PRIMARY KEY,
+                     {FilterOptionsTable.Cols.Label} VARCHAR,
+                     {FilterOptionsTable.Cols.PublicId} VARCHAR,
+                     {FilterOptionsTable.Cols.FilterId} VARCHAR
                  )
                  """
             );
@@ -949,7 +977,7 @@ public class SeedDataCommand : ICommand
 
             foreach (var filter in version.FilterMetas)
             {
-                using var appender = _duckDb.CreateAppender(table: FiltersTable.TableName);
+                using var appender = _duckDb.CreateAppender(table: FilterOptionsTable.TableName);
 
                 foreach (var link in filter.OptionLinks.OrderBy(l => l.Option.Label))
                 {
@@ -1002,22 +1030,22 @@ public class SeedDataCommand : ICommand
             {
                 GeographicLevel.LocalAuthority =>
                 [
-                    new LocationColumn(Name: LocationsTable.Cols.Code, CsvName: LocalAuthorityCsvColumns.NewCode),
-                    new LocationColumn(Name: LocationsTable.Cols.OldCode, CsvName: LocalAuthorityCsvColumns.OldCode)
+                    new LocationColumn(Name: LocationOptionsTable.Cols.Code, CsvName: LocalAuthorityCsvColumns.NewCode),
+                    new LocationColumn(Name: LocationOptionsTable.Cols.OldCode, CsvName: LocalAuthorityCsvColumns.OldCode)
                 ],
                 GeographicLevel.Provider =>
                 [
-                    new LocationColumn(Name: LocationsTable.Cols.Ukprn, CsvName: ProviderCsvColumns.Ukprn)
+                    new LocationColumn(Name: LocationOptionsTable.Cols.Ukprn, CsvName: ProviderCsvColumns.Ukprn)
                 ],
                 GeographicLevel.RscRegion => [],
                 GeographicLevel.School =>
                 [
-                    new LocationColumn(Name: LocationsTable.Cols.Urn, CsvName: SchoolCsvColumns.Urn),
-                    new LocationColumn(Name: LocationsTable.Cols.LaEstab, CsvName: SchoolCsvColumns.LaEstab)
+                    new LocationColumn(Name: LocationOptionsTable.Cols.Urn, CsvName: SchoolCsvColumns.Urn),
+                    new LocationColumn(Name: LocationOptionsTable.Cols.LaEstab, CsvName: SchoolCsvColumns.LaEstab)
                 ],
                 _ =>
                 [
-                    new LocationColumn(Name: LocationsTable.Cols.Code, CsvName: geographicLevel.CsvCodeColumns().First())
+                    new LocationColumn(Name: LocationOptionsTable.Cols.Code, CsvName: geographicLevel.CsvCodeColumns().First())
                 ],
             };
         }

@@ -12,7 +12,7 @@ export interface ReleaseDataBlockSummary {
   highlightName?: string;
   highlightDescription?: string;
   heading: string;
-  source: string;
+  source?: string;
   chartsCount: number;
   inContent: boolean;
 }

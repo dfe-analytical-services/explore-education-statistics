@@ -15,6 +15,7 @@ export interface Props<TFormValues extends FieldValues>
   id?: string;
   options: CheckboxOption[];
   showError?: boolean;
+  disabled?: boolean;
 }
 
 export default function RHFFormFieldCheckboxGroup<
@@ -24,6 +25,7 @@ export default function RHFFormFieldCheckboxGroup<
   id: customId,
   options,
   showError = true,
+  disabled = false,
   ...props
 }: Props<TFormValues>) {
   const {
@@ -43,6 +45,7 @@ export default function RHFFormFieldCheckboxGroup<
     <FormCheckboxGroup
       {...props}
       {...field}
+      disabled={disabled}
       error={getErrorMessage(errors, name, showError)}
       id={id}
       inputRef={inputRef}

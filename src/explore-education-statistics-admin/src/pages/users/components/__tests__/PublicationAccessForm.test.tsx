@@ -1,82 +1,41 @@
 import PublicationAccessForm from '@admin/pages/users/components/PublicationAccessForm';
-import { User } from '@admin/services/userService';
 import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  within,
-} from '@testing-library/react';
+  testUser,
+  testPublicationSummaries,
+  testResourceRoles,
+} from '@admin/pages/users/__data__/testUserData';
+import _userService from '@admin/services/userService';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
-import { IdTitlePair } from '@admin/services/types/common';
+
+jest.mock('@admin/services/userService');
+const userService = _userService as jest.Mocked<typeof _userService>;
 
 describe('PublicationAccessForm', () => {
-  const testUser: User = {
-    id: 'user-guid-1',
-    name: 'Florian Schneider',
-    email: 'test@test.com',
-    role: 'role-guid-1',
-    userPublicationRoles: [
-      {
-        id: 'pr-id-1',
-        publication: 'pub-1',
-        role: 'Viewer',
-        userName: 'Analyst1 User1',
-        email: 'analyst1@example.com',
-      },
-      {
-        id: 'pr-id-2',
-        publication: 'pub-2',
-        role: 'Owner',
-        userName: 'Analyst2 User2',
-        email: 'analyst2@example.com',
-      },
-    ],
-    userReleaseRoles: [],
-  };
-
-  const testRoles: string[] = ['Contributer', 'Owner', 'Viewer'];
-
-  const testPublications: IdTitlePair[] = [
-    {
-      id: 'publication-guid-1',
-      title: 'title 1',
-    },
-    {
-      id: 'publication-guid-2',
-      title: 'title 2',
-    },
-  ];
-
   test('renders the form', () => {
     render(
       <PublicationAccessForm
-        publications={testPublications}
-        publicationRoles={testRoles}
+        publications={testPublicationSummaries}
+        publicationRoles={testResourceRoles.Publication}
         user={testUser}
-        onRemove={noop}
-        onSubmit={noop}
+        onUpdate={noop}
       />,
     );
 
     const publicationSelect = screen.getByLabelText('Publication');
-    const publications = within(publicationSelect).getAllByRole(
-      'option',
-    ) as HTMLOptionElement[];
-    expect(publications).toHaveLength(2);
-    expect(publications[0]).toHaveTextContent(testPublications[0].title);
-    expect(publications[1]).toHaveTextContent(testPublications[1].title);
+    const publications = within(publicationSelect).getAllByRole('option');
+    expect(publications).toHaveLength(3);
+    expect(publications[0]).toHaveTextContent('Publication 1');
+    expect(publications[1]).toHaveTextContent('Publication 2');
+    expect(publications[2]).toHaveTextContent('Publication 3');
 
     const roleSelect = screen.getByLabelText('Publication role');
-    const roles = within(roleSelect).getAllByRole(
-      'option',
-    ) as HTMLOptionElement[];
-    expect(roles).toHaveLength(3);
-    expect(roles[0]).toHaveTextContent(testRoles[0]);
-    expect(roles[1]).toHaveTextContent(testRoles[1]);
-    expect(roles[2]).toHaveTextContent(testRoles[2]);
+    const roles = within(roleSelect).getAllByRole('option');
+    expect(roles).toHaveLength(2);
+    expect(roles[0]).toHaveTextContent('Approver');
+    expect(roles[1]).toHaveTextContent('Owner');
 
     expect(
       screen.getByRole('button', { name: 'Add publication access' }),
@@ -84,78 +43,94 @@ describe('PublicationAccessForm', () => {
   });
 
   test('can submit the form with the selected publication and role', async () => {
-    const handleSubmit = jest.fn();
+    const user = userEvent.setup();
+    const handleUpdate = jest.fn();
     render(
       <PublicationAccessForm
-        publications={testPublications}
-        publicationRoles={testRoles}
+        publications={testPublicationSummaries}
+        publicationRoles={testResourceRoles.Publication}
         user={testUser}
-        onRemove={noop}
-        onSubmit={handleSubmit}
+        onUpdate={handleUpdate}
       />,
     );
 
-    fireEvent.change(screen.getByLabelText('Publication'), {
-      target: { value: testPublications[1].id },
-    });
-    fireEvent.change(screen.getByLabelText('Publication role'), {
-      target: { value: testRoles[2] },
-    });
+    await user.selectOptions(screen.getByLabelText('Publication'), [
+      'Publication 1',
+    ]);
+    await user.selectOptions(screen.getByLabelText('Publication role'), [
+      'Approver',
+    ]);
 
-    await userEvent.click(
+    expect(userService.addUserPublicationRole).not.toHaveBeenCalled();
+    expect(handleUpdate).not.toHaveBeenCalled();
+
+    await user.click(
       screen.getByRole('button', { name: 'Add publication access' }),
     );
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith(
-        {
-          selectedPublicationId: testPublications[1].id,
-          selectedPublicationRole: testRoles[2],
-        },
-        expect.anything(),
-      );
+      expect(userService.addUserPublicationRole).toHaveBeenCalledTimes(1);
     });
+
+    expect(userService.addUserPublicationRole).toHaveBeenCalledWith(
+      'user-1-id',
+      {
+        publicationId: 'publication-1-id',
+        publicationRole: 'Approver',
+      },
+    );
+    expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 
   test('can remove a role', async () => {
-    const handleRemove = jest.fn();
+    const user = userEvent.setup();
+    const handleUpdate = jest.fn();
     render(
       <PublicationAccessForm
-        publications={testPublications}
-        publicationRoles={testRoles}
+        publications={testPublicationSummaries}
+        publicationRoles={testResourceRoles.Publication}
         user={testUser}
-        onRemove={handleRemove}
-        onSubmit={noop}
+        onUpdate={handleUpdate}
       />,
     );
 
     const removeButtons = screen.getAllByRole('button', { name: 'Remove' });
 
-    await userEvent.click(removeButtons[0]);
+    expect(userService.removeUserPublicationRole).not.toHaveBeenCalled();
+    expect(handleUpdate).not.toHaveBeenCalled();
+
+    await user.click(removeButtons[0]);
 
     await waitFor(() => {
-      expect(handleRemove).toHaveBeenCalledWith(
-        testUser.userPublicationRoles[0],
-      );
+      expect(userService.removeUserPublicationRole).toHaveBeenCalledTimes(1);
     });
+
+    expect(userService.removeUserPublicationRole).toHaveBeenCalledWith(
+      'user-1-id',
+      {
+        id: 'pr-id-1',
+        publication: 'Publication 1',
+        role: 'Viewer',
+        userName: 'Analyst1 User1',
+        email: 'analyst1@example.com',
+      },
+    );
+    expect(handleUpdate).toHaveBeenCalledTimes(1);
   });
 
   test('displays a table of publications', () => {
     render(
       <PublicationAccessForm
-        publications={testPublications}
-        publicationRoles={testRoles}
+        publications={testPublicationSummaries}
+        publicationRoles={testResourceRoles.Publication}
         user={testUser}
-        onRemove={noop}
-        onSubmit={noop}
+        onUpdate={noop}
       />,
     );
 
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
-    expect(rows[1]).toHaveTextContent(
-      testUser.userPublicationRoles[0].publication,
-    );
-    expect(rows[1]).toHaveTextContent(testUser.userPublicationRoles[0].role);
+    expect(within(rows[1]).getByText('Publication 1')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Viewer')).toBeInTheDocument();
   });
 });

@@ -16,16 +16,21 @@ public static class ParquetPaths
 
     public static string FiltersPath(DataSetVersion dataSetVersion) => Path.Combine(
         DirectoryPath(dataSetVersion),
-        $"{FiltersTable.TableName}.parquet"
+        $"{FilterOptionsTable.TableName}.parquet"
     );
 
     public static string LocationsPath(DataSetVersion dataSetVersion) => Path.Combine(
         DirectoryPath(dataSetVersion),
-        $"{LocationsTable.TableName}.parquet"
+        $"{LocationOptionsTable.TableName}.parquet"
     );
 
     public static string TimePeriodsPath(DataSetVersion dataSetVersion) => Path.Combine(
         DirectoryPath(dataSetVersion),
         $"{TimePeriodsTable.TableName}.parquet"
+    );
+
+    public static string IndicatorsPath(DataSetVersion dataSetVersion) => Path.Combine(
+        DirectoryPath(dataSetVersion),
+        $"{IndicatorsTable.TableName}.parquet"
     );
 }

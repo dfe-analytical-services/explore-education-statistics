@@ -21,11 +21,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Asp.Versioning.Mvc" Version="8.0.0" />
-        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.0.0" />
+        <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
         <PackageReference Include="AspectInjector" Version="2.8.2" />
         <PackageReference Include="Azure.Identity" Version="1.10.4" />
-        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.1" />
+        <PackageReference Include="Dapper" Version="2.1.35" />
+        <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.1.2" />
+        <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
         <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="6.0.0" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3" />
@@ -34,6 +36,8 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.3" />
+        <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.3.8" />
+        <PackageReference Include="MiniProfiler.EntityFrameworkCore" Version="4.3.8" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

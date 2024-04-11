@@ -27,7 +27,7 @@ public abstract record DataSetQueryLocation
     [JsonIgnore]
     public GeographicLevel ParsedLevel => EnumUtil.GetFromEnumValue<GeographicLevel>(Level);
 
-    public abstract string Identifier();
+    public abstract string ToLocationString();
 
     public static DataSetQueryLocation Parse(string location)
     {
@@ -51,11 +51,11 @@ public abstract record DataSetQueryLocation
         {
             GeographicLevel.LocalAuthority => property switch
             {
-                nameof(DataSetQueryLocationLocalAuthority.Code) =>
-                    new DataSetQueryLocationLocalAuthority { Code = value },
+                nameof(DataSetQueryLocationLocalAuthorityCode.Code) =>
+                    new DataSetQueryLocationLocalAuthorityCode { Code = value },
 
-                nameof(DataSetQueryLocationLocalAuthority.OldCode) =>
-                    new DataSetQueryLocationLocalAuthority { OldCode = value },
+                nameof(DataSetQueryLocationLocalAuthorityOldCode.OldCode) =>
+                    new DataSetQueryLocationLocalAuthorityOldCode { OldCode = value },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
@@ -63,8 +63,8 @@ public abstract record DataSetQueryLocation
             },
             GeographicLevel.Provider => property switch
             {
-                nameof(DataSetQueryLocationProvider.Ukprn) =>
-                    new DataSetQueryLocationProvider { Ukprn = value },
+                nameof(DataSetQueryLocationProviderUkprn.Ukprn) =>
+                    new DataSetQueryLocationProviderUkprn { Ukprn = value },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
@@ -72,11 +72,11 @@ public abstract record DataSetQueryLocation
             },
             GeographicLevel.School => property switch
             {
-                nameof(DataSetQueryLocationSchool.Urn) =>
-                    new DataSetQueryLocationSchool { Urn = value },
+                nameof(DataSetQueryLocationSchoolUrn.Urn) =>
+                    new DataSetQueryLocationSchoolUrn { Urn = value },
 
-                nameof(DataSetQueryLocationSchool) =>
-                    new DataSetQueryLocationSchool { LaEstab = value },
+                nameof(DataSetQueryLocationSchoolLaEstab.LaEstab) =>
+                    new DataSetQueryLocationSchoolLaEstab { LaEstab = value },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
@@ -85,7 +85,7 @@ public abstract record DataSetQueryLocation
             _ => property switch
             {
                 nameof(DataSetQueryLocationCode.Code) =>
-                    new DataSetQueryLocationCode { Code = value, Level = value },
+                    new DataSetQueryLocationCode { Code = value, Level = level },
 
                 _ => throw new ArgumentOutOfRangeException(
                     paramName: nameof(location),
@@ -108,7 +108,7 @@ public record DataSetQueryLocationId : DataSetQueryLocation
 
     public override required string Level { get; init; }
 
-    public override string Identifier() => Id;
+    public override string ToLocationString() => $"{Level}|id|{Id}";
 }
 
 public record DataSetQueryLocationCode : DataSetQueryLocation
@@ -124,34 +124,38 @@ public record DataSetQueryLocationCode : DataSetQueryLocation
 
     public override required string Level { get; init; }
 
-    public override string Identifier() => Code;
+    public override string ToLocationString() => $"{Level}|code|{Code}";
 }
 
-public record DataSetQueryLocationLocalAuthority : DataSetQueryLocation
+public record DataSetQueryLocationLocalAuthorityCode : DataSetQueryLocation
 {
     /// <summary>
     /// The ONS code of the local authority. This should be 9 characters
     /// in the standard ONS format for local authorities (e.g. `E08000019`).
     /// It can be a combination of two codes (e.g. `E09000021 / E09000027`).
     /// </summary>
-    public string? Code { get; init; }
+    public required string Code { get; init; }
 
+    public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
+
+    public override string ToLocationString() => $"{Level}|code|{Code}";
+}
+
+public record DataSetQueryLocationLocalAuthorityOldCode : DataSetQueryLocation
+{
     /// <summary>
     /// The old code (previously the LEA code) of the local authority.
     /// This should be a 3 digit number (e.g. `318`) or be
     /// a combination of two codes (e.g. `314 / 318`).
     /// </summary>
-    public string? OldCode { get; init; }
+    public required string OldCode { get; init; }
 
     public override string Level => GeographicLevel.LocalAuthority.GetEnumValue();
 
-    public override string Identifier()
-        => Code
-           ?? OldCode
-           ?? throw new NullReferenceException($"{nameof(Code)} or {nameof(OldCode)} must not be null");
+    public override string ToLocationString() => $"{Level}|oldCode|{OldCode}";
 }
 
-public record DataSetQueryLocationProvider : DataSetQueryLocation
+public record DataSetQueryLocationProviderUkprn : DataSetQueryLocation
 {
     /// <summary>
     /// The UKPRN (UK provider reference number) of the provider.
@@ -161,27 +165,31 @@ public record DataSetQueryLocationProvider : DataSetQueryLocation
 
     public override string Level => GeographicLevel.Provider.GetEnumValue();
 
-    public override string Identifier() => Ukprn;
+    public override string ToLocationString() => $"{Level}|ukprn|{Ukprn}";
 }
 
-public record DataSetQueryLocationSchool : DataSetQueryLocation
+public record DataSetQueryLocationSchoolUrn : DataSetQueryLocation
 {
     /// <summary>
     /// The URN (unique reference number) of the school.
     /// This should be a 6 digit number.
     /// </summary>
-    public string? Urn { get; init; }
+    public required string Urn { get; init; }
 
+    public override string Level => GeographicLevel.School.GetEnumValue();
+
+    public override string ToLocationString() => $"{Level}|urn|{Urn}";
+}
+
+public record DataSetQueryLocationSchoolLaEstab : DataSetQueryLocation
+{
     /// <summary>
     /// The LAESTAB (local authority establishment number) of the school.
     /// This should be a 7 digit number.
     /// </summary>
-    public string? LaEstab { get; init; }
+    public required string LaEstab { get; init; }
 
     public override string Level => GeographicLevel.School.GetEnumValue();
 
-    public override string Identifier()
-        => Urn
-           ?? LaEstab
-           ?? throw new NullReferenceException($"{nameof(Urn)} or {nameof(LaEstab)} must not be null");
+    public override string ToLocationString() => $"{Level}|laEstab|{LaEstab}";
 }

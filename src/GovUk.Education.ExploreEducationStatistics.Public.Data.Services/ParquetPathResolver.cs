@@ -42,6 +42,9 @@ public class ParquetPathResolver : IParquetPathResolver
     public string FiltersPath(DataSetVersion dataSetVersion)
         => Path.Combine(_basePath, dataSetVersion.FiltersParquetPath);
 
+    public string IndicatorsPath(DataSetVersion dataSetVersion)
+        => Path.Combine(_basePath, dataSetVersion.IndicatorsParquetPath);
+
     public string LocationsPath(DataSetVersion dataSetVersion)
         => Path.Combine(_basePath, dataSetVersion.LocationsParquetPath);
 

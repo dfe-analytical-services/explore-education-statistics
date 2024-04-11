@@ -1,7 +1,7 @@
 import {
-  DataSetFilter,
-  DataSetSortOption,
-} from '@frontend/services/dataSetService';
+  DataSetFileFilter,
+  DataSetFileSortOption,
+} from '@frontend/services/dataSetFileService';
 import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import omit from 'lodash/omit';
 import { ParsedUrlQuery } from 'querystring';
@@ -15,11 +15,11 @@ export default async function getUpdatedQueryParams({
   sortBy,
   onFetchReleases,
 }: {
-  filterType: DataSetFilter;
+  filterType: DataSetFileFilter;
   nextValue: string;
   query: ParsedUrlQuery;
   releaseId?: string;
-  sortBy?: DataSetSortOption;
+  sortBy?: DataSetFileSortOption;
   onFetchReleases?: () => Promise<ReleaseSummary[]>;
 }): Promise<DataCataloguePageQuery> {
   if (filterType === 'releaseId') {

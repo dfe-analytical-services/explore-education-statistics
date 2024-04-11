@@ -740,9 +740,9 @@ user gives publication access to analyst
     ...    ${ROLE}
     ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
-    user waits until element is enabled    css:[name="selectedPublicationRole"]
-    user chooses select option    css:[name="selectedPublicationRole"]    ${ROLE}
+    user chooses select option    css:[name="publicationId"]    ${PUBLICATION_NAME}
+    user waits until element is enabled    css:[name="publicationRole"]
+    user chooses select option    css:[name="publicationRole"]    ${ROLE}
     user clicks button    Add publication access
     user waits until parent contains element    testid:publicationAccessTable
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
@@ -766,10 +766,10 @@ user gives release access to analyst
     ...    ${ROLE}
     ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
-    user scrolls to element    css:[name="selectedReleaseId"]
-    user chooses select option    css:[name="selectedReleaseId"]    ${PUBLICATION_NAME} - ${RELEASE_NAME}
-    user waits until element is enabled    css:[name="selectedReleaseRole"]
-    user chooses select option    css:[name="selectedReleaseRole"]    ${ROLE}
+    user scrolls to element    css:[name="releaseId"]
+    user chooses select option    css:[name="releaseId"]    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+    user waits until element is enabled    css:[name="releaseRole"]
+    user chooses select option    css:[name="releaseRole"]    ${ROLE}
     user clicks button    Add release access
     user waits until parent contains element    testid:releaseAccessTable
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
@@ -794,8 +794,8 @@ user goes to manage user
     user waits until table is visible
     user clicks link    Manage    xpath://td[text()="${EMAIL_ADDRESS}"]/..
     # stale element exception if you don't wait until it's enabled
-    user waits until element is enabled    css:[name="selectedPublicationId"]
-    user waits until element is enabled    css:[name="selectedReleaseId"]
+    user waits until element is enabled    css:[name="publicationId"]
+    user waits until element is enabled    css:[name="releaseId"]
 
 user waits until modal is visible
     [Arguments]

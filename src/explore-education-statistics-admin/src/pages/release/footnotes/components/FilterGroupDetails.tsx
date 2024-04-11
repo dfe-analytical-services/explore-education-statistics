@@ -1,13 +1,10 @@
-import styles from '@admin/pages/release/footnotes/components/FootnoteForm.module.scss';
-import {
-  BaseFootnote,
-  FootnoteSubjectMeta,
-} from '@admin/services/footnoteService';
+import { FootnoteSubjectMeta } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
-import { FormCheckbox, FormFieldCheckbox } from '@common/components/form';
-import { FormikProps } from 'formik';
-import get from 'lodash/get';
+import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import classNames from 'classnames';
 import React from 'react';
+import { useFormContext } from 'react-hook-form';
 
 interface Props {
   summary: string;
@@ -15,114 +12,74 @@ interface Props {
   valuePath: string;
   groupId?: number | string;
   filter: FootnoteSubjectMeta['filters'][0];
-  value: boolean;
-  form: FormikProps<BaseFootnote>;
 }
 
-const FilterGroupDetails = ({
+export default function FilterGroupDetails({
   summary,
   selectAll = false,
   valuePath,
   groupId,
   filter,
-  value,
-  form,
-}: Props) => {
+}: Props) {
+  const { watch } = useFormContext();
   const groupPath = `${valuePath}.filters.${groupId}`;
-  const groupIsSelected = value;
+  const groupIsSelected = watch(`${groupPath}.selected`);
 
   return (
     <Details
       summary={`${summary}${groupIsSelected ? ' (All)' : ''}`}
       className="govuk-!-margin-bottom-2"
+      testId={`filter-${groupId}`}
     >
-      <div className={styles.filterOverflow}>
-        {selectAll && groupId && (
-          <FormFieldCheckbox
-            name={`${groupPath}.selected`}
-            label="Select all"
-            small
-            checked={groupIsSelected}
-            boldLabel
-            formGroup={false}
-          />
-        )}
+      {selectAll && groupId && (
+        <RHFFormFieldCheckbox
+          name={`${groupPath}.selected`}
+          label="Select all"
+          small
+          checked={groupIsSelected}
+          boldLabel
+          formGroup={false}
+        />
+      )}
 
-        {Object.entries(filter.options).map(([filterGroupId, filterGroup]) => {
-          const groupValue = get(
-            form.values,
-            `${groupPath}.filterGroups[${filterGroupId}].selected`,
-          );
-          const hideGrouping = filterGroup.label === 'Default';
-          const filterItems: string[] =
-            get(
-              form.values,
-              `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
-            ) || [];
-          return (
-            <div key={filterGroupId}>
-              {!hideGrouping && (
-                <FormFieldCheckbox
-                  name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
-                  label={`${filterGroup.label}${groupValue ? ' (All)' : ''}`}
-                  small
-                  boldLabel
-                  formGroup={false}
-                  disabled={groupIsSelected}
-                />
-              )}
+      {Object.entries(filter.options).map(([filterGroupId, filterGroup]) => {
+        const groupValue = watch(
+          `${groupPath}.filterGroups[${filterGroupId}].selected`,
+        );
 
-              <div
-                className={
-                  !hideGrouping
-                    ? 'govuk-!-margin-left-4 govuk-!-margin-bottom-3'
-                    : ''
-                }
-              >
-                {filterGroup.options.map(filterItem => {
-                  const checked =
-                    filterItems.includes(filterItem.value) || false;
-                  return (
-                    <FormCheckbox
-                      {...filterItem}
-                      key={`filterItem-${filterItem.value}`}
-                      className="govuk-checkboxes--small"
-                      name={`${groupPath}.filterGroups[${filterGroupId}].filterItems`}
-                      id={filterItem.value}
-                      disabled={groupIsSelected || groupValue}
-                      checked={checked}
-                      onChange={e => {
-                        form.setFieldValue(
-                          `${groupPath}.filterGroups[${filterGroupId}].selected`,
-                          false,
-                        );
-                        if (!checked) {
-                          form.setFieldValue(
-                            `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
-                            [...filterItems, e.target.value],
-                          );
-                        } else {
-                          form.setFieldValue(
-                            `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
-                            [
-                              ...filterItems.filter(
-                                (selectedItem: string) =>
-                                  selectedItem !== e.target.value,
-                              ),
-                            ],
-                          );
-                        }
-                      }}
-                    />
-                  );
-                })}
-              </div>
+        const hideGrouping = filterGroup.label === 'Default';
+
+        return (
+          <div key={filterGroupId}>
+            {!hideGrouping && (
+              <RHFFormFieldCheckbox
+                name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
+                label={`${filterGroup.label}${groupValue ? ' (All)' : ''}`}
+                small
+                boldLabel
+                formGroup={false}
+                disabled={!!groupIsSelected}
+              />
+            )}
+
+            <div
+              className={classNames({
+                'govuk-!-margin-left-4 govuk-!-margin-bottom-3': !hideGrouping,
+              })}
+            >
+              <RHFFormFieldCheckboxGroup
+                name={`${groupPath}.filterGroups[${filterGroupId}].filterItems`}
+                options={filterGroup.options}
+                legend={filterGroup.label}
+                legendSize="s"
+                legendHidden
+                small
+                disabled={!!(groupIsSelected || groupValue)}
+              />
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </Details>
   );
-};
-
-export default FilterGroupDetails;
+}

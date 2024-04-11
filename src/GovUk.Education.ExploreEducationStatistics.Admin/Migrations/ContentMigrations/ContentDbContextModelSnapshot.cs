@@ -428,6 +428,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("CreatedById")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("DataSetFileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("DataSetFileVersion")
+                        .HasColumnType("int");
+
                     b.Property<string>("Filename")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

@@ -3,14 +3,18 @@ using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using Azure.Core;
 using Azure.Identity;
+using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
@@ -27,6 +31,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 {
     private static readonly string[] ManagedIdentityTokenScopes = new [] { "https://ossrdbms-aad.database.windows.net/.default" };
 
+    private readonly IConfiguration _miniProfilerConfig =
+        configuration.GetRequiredSection(MiniProfilerOptions.Section);
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -37,6 +44,21 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services
             .AddApplicationInsightsTelemetry()
             .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+        // Profiling
+
+        var isMiniProfilerEnabled = _miniProfilerConfig.GetValue<bool>(nameof(MiniProfilerOptions.Enabled));
+
+        if (isMiniProfilerEnabled)
+        {
+            services
+                .AddMiniProfiler(options =>
+                {
+                    options.RouteBasePath = "/profiler";
+                    options.ShouldProfile = request => request.Path.StartsWithSegments("/api");
+                })
+                .AddEntityFramework();
+        }
 
         // MVC
 
@@ -113,6 +135,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             }
         }
 
+        // Configure Dapper to match CSV columns with underscores
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+        services.AddScoped<IDuckDbConnection>(_ => isMiniProfilerEnabled
+            ? new ProfiledDuckDbConnection()
+            : new DuckDbConnection()
+        );
+
         // Caching and compression
 
         services.AddResponseCaching();
@@ -127,6 +157,8 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             .Bind(configuration.GetRequiredSection(ContentApiOptions.Section));
         services.AddOptions<ParquetFilesOptions>()
             .Bind(configuration.GetRequiredSection(ParquetFilesOptions.Section));
+        services.AddOptions<MiniProfilerOptions>()
+            .Bind(_miniProfilerConfig);
 
         // Services
 
@@ -145,12 +177,25 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddSingleton<IParquetPathResolver, ParquetPathResolver>();
         services.AddScoped<IPublicationService, PublicationService>();
         services.AddScoped<IDataSetService, DataSetService>();
+        services.AddScoped<IDataSetQueryService, DataSetQueryService>();
+        services.AddScoped<IDataSetQueryParser, DataSetQueryParser>();
+
+        services.AddScoped<IParquetDataRepository, ParquetDataRepository>();
+        services.AddScoped<IParquetFilterRepository, ParquetFilterRepository>();
+        services.AddScoped<IParquetIndicatorRepository, ParquetIndicatorRepository>();
+        services.AddScoped<IParquetLocationRepository, ParquetLocationRepository>();
+        services.AddScoped<IParquetTimePeriodRepository, ParquetTimePeriodRepository>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         UpdateDatabase(app);
+
+        if (_miniProfilerConfig.GetValue<bool>(nameof(MiniProfilerOptions.Enabled)))
+        {
+            app.UseMiniProfiler();
+        }
 
         if (env.IsDevelopment() || env.IsIntegrationTest())
         {

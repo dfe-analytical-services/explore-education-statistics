@@ -3,14 +3,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 public abstract record PaginatedListViewModel<T>
 {
     /// <summary>
-    /// The list of results for this page.
-    /// </summary>
-    public required List<T> Results { get; init; }
-
-    /// <summary>
     /// Provides metadata for use in pagination.
     /// </summary>
     public required PagingViewModel Paging { get; init; }
+
+    /// <summary>
+    /// The list of results for this page.
+    /// </summary>
+    public required List<T> Results { get; init; }
 }
 
 public record PagingViewModel

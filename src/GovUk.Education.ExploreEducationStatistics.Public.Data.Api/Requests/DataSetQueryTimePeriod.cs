@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
@@ -56,7 +58,15 @@ public record DataSetQueryTimePeriod
     public required string Code { get; init; }
 
     [JsonIgnore]
+    public string ParsedPeriod => GetParsedPeriod(Period, ParsedCode);
+
+    [JsonIgnore]
     public TimeIdentifier ParsedCode => EnumUtil.GetFromEnumValue<TimeIdentifier>(Code);
+
+    public string ToTimePeriodString()
+    {
+        return $"{Period}|{Code}";
+    }
 
     public static DataSetQueryTimePeriod FromString(string timePeriod)
     {
@@ -67,7 +77,26 @@ public record DataSetQueryTimePeriod
         return new DataSetQueryTimePeriod
         {
             Period = period,
-            Code = code
+            Code = code,
         };
+    }
+
+    private static string GetParsedPeriod(string period, TimeIdentifier identifier)
+    {
+        var metaAttribute = identifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();
+
+        if (metaAttribute.YearFormat == TimePeriodYearFormat.Default)
+        {
+            return period;
+        }
+
+        if (period.Contains('/'))
+        {
+            return period;
+        }
+
+        var year = int.Parse(period);
+
+        return $"{year}/{year + 1}";
     }
 }

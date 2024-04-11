@@ -1,6 +1,11 @@
-.filterOverflow {
-  margin-left: -1rem;
-  max-height: 600px;
-  overflow-x: auto;
-  padding-left: 1rem;
+@import '~govuk-frontend/dist/govuk/base';
+
+.radio {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  padding-bottom: govuk-spacing(5);
+
+  :global(.govuk-radios__conditional) {
+    margin-top: govuk-spacing(4);
+    width: 100%;
+  }
 }
