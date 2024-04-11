@@ -441,9 +441,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return Unit.Instance;
         }
 
-        public static async Task<Either<TFailure1, TFailure2>> OnFailureDo<TFailure1, TFailure2>(
-            this Task<Either<TFailure1, TFailure2>> task,
-            Func<TFailure1, Task> failureTask)
+        public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Func<TFailure, Task> failureTask)
         {
             var firstResult = await task;
 
@@ -456,9 +456,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure1, TFailure2>> OnFailureDo<TFailure1, TFailure2>(
-            this Task<Either<TFailure1, TFailure2>> task,
-            Action<TFailure1> failureAction)
+        public static async Task<Either<TFailure, TSuccess>> OnFailureDo<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Action<TFailure> failureAction)
         {
             var firstResult = await task;
 
@@ -471,20 +471,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return firstResult.Left;
         }
 
-        public static async Task<Either<TFailure1, TFailure2>> OnFailureFailWith<TFailure1, TFailure2>(
-            this Task<Either<TFailure1, TFailure2>> task,
-            Func<TFailure1> failure)
+        /// <summary>
+        /// Map a failure result to a new failure result of the same type.
+        /// </summary>
+        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Func<TFailure> func)
         {
-            return await task.OnFailureFailWith(async _ => await Task.FromResult(failure()));
+            return await task.OnFailureFailWith(async _ => await Task.FromResult(func()));
         }
 
-        /**
-         * If the previous Either failed, provide the errors to the given action and then return a new set of errors
-         * provided by the action.
-         */
-        public static async Task<Either<TFailure1, TFailure2>> OnFailureFailWith<TFailure1, TFailure2>(
-            this Task<Either<TFailure1, TFailure2>> task,
-            Func<TFailure1, Task<TFailure1>> func)
+        /// <summary>
+        /// Map a failure result to a new failure result of the same type.
+        /// </summary>
+        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Func<TFailure, TFailure> func)
+        {
+            return await task.OnFailureFailWith(async result => await Task.FromResult(func(result)));
+        }
+
+        /// <summary>
+        /// Map a failure result to a new failure result of the same type.
+        /// </summary>
+        public static async Task<Either<TFailure, TSuccess>> OnFailureFailWith<TFailure, TSuccess>(
+            this Task<Either<TFailure, TSuccess>> task,
+            Func<TFailure, Task<TFailure>> func)
         {
             var firstResult = await task;
 
@@ -496,11 +508,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return await func(firstResult.Left);
         }
 
-        /**
-         * If the previous Either failed, perform the given action and then handle it as a success case anyway.
-         * This allows a prior step to fail but overall be treated as a success (unless a subsequent step happens to
-         * fail after this one).
-        */
+        /// <summary>
+        /// If the previous Either failed, perform the given action and then handle it as a success case anyway.
+        /// This allows a prior step to fail but overall be treated as a success (unless a subsequent step happens to
+        /// fail after this one).
+        /// </summary>
         public static async Task<Either<TFailure, TSuccess>> OnFailureSucceedWith<TFailure, TSuccess>(
             this Task<Either<TFailure, TSuccess>> task,
             Func<TFailure, Task<TSuccess>> func)

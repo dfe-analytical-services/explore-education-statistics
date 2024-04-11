@@ -3,9 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 
-public static class LocationsTable
+public static class LocationOptionsTable
 {
-    public const string TableName = "locations";
+    public const string TableName = "location_options";
 
     public static class Cols
     {

@@ -48,4 +48,23 @@ public record DataSetQueryCriteriaTimePeriods
     /// chronologically less than or equal to the one specified.
     /// </summary>
     public DataSetQueryTimePeriod? Lte { get; init; }
+
+    public HashSet<DataSetQueryTimePeriod> GetOptions()
+    {
+        List<DataSetQueryTimePeriod?> timePeriods =
+        [
+            Eq,
+            NotEq,
+            Gt,
+            Gte,
+            Lt,
+            Lte,
+            ..In ?? [],
+            ..NotIn ?? []
+        ];
+
+        return timePeriods
+            .OfType<DataSetQueryTimePeriod>()
+            .ToHashSet();
+    }
 }
