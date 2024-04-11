@@ -1,9 +1,9 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
@@ -47,6 +47,7 @@ public class LocationCsvUtilsTests
             "sponsor_name",
             "school_urn",
             "school_name",
+            "school_laestab",
             "provider_ukprn",
             "provider_name",
             "planning_area_code",

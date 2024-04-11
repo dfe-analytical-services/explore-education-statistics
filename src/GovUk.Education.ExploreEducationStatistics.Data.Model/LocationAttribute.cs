@@ -1,7 +1,7 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
@@ -85,12 +85,12 @@ public record LocalAuthority(string? Code, string? OldCode, string? Name) : Loca
     }
 
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("new_la_code", Code ?? string.Empty),
             new("old_la_code", OldCode ?? string.Empty),
             new("la_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 3;
 }
@@ -98,11 +98,11 @@ public record LocalAuthority(string? Code, string? OldCode, string? Name) : Loca
 public record LocalAuthorityDistrict(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("lad_code", Code ?? string.Empty),
             new("lad_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 6;
 }
@@ -110,11 +110,11 @@ public record LocalAuthorityDistrict(string? Code, string? Name) : LocationAttri
 public record LocalEnterprisePartnership(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("local_enterprise_partnership_code", Code ?? string.Empty),
             new("local_enterprise_partnership_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 7;
 }
@@ -122,11 +122,11 @@ public record LocalEnterprisePartnership(string? Code, string? Name) : LocationA
 public record LocalSkillsImprovementPlanArea(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("lsip_code", Code ?? string.Empty),
             new("lsip_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 17;
 }
@@ -134,11 +134,11 @@ public record LocalSkillsImprovementPlanArea(string? Code, string? Name) : Locat
 public record MultiAcademyTrust(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("trust_id", Code ?? string.Empty),
             new("trust_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 11;
 }
@@ -146,11 +146,11 @@ public record MultiAcademyTrust(string? Code, string? Name) : LocationAttribute(
 public record MayoralCombinedAuthority(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("mayoral_combined_authority_code", Code ?? string.Empty),
             new("mayoral_combined_authority_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 8;
 }
@@ -158,11 +158,11 @@ public record MayoralCombinedAuthority(string? Code, string? Name) : LocationAtt
 public record OpportunityArea(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("opportunity_area_code", Code ?? string.Empty),
             new("opportunity_area_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 9;
 }
@@ -170,11 +170,11 @@ public record OpportunityArea(string? Code, string? Name) : LocationAttribute(Co
 public record ParliamentaryConstituency(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("pcon_code", Code ?? string.Empty),
             new("pcon_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 5;
 }
@@ -182,11 +182,11 @@ public record ParliamentaryConstituency(string? Code, string? Name) : LocationAt
 public record PlanningArea(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("planning_area_code", Code ?? string.Empty),
             new("planning_area_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 15;
 }
@@ -194,11 +194,11 @@ public record PlanningArea(string? Code, string? Name) : LocationAttribute(Code,
 public record Provider(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("provider_ukprn", Code ?? string.Empty),
             new("provider_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 14;
 }
@@ -206,11 +206,11 @@ public record Provider(string? Code, string? Name) : LocationAttribute(Code, Nam
 public record Region(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("region_code", Code ?? string.Empty),
             new("region_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 2;
 }
@@ -218,22 +218,28 @@ public record Region(string? Code, string? Name) : LocationAttribute(Code, Name)
 public record RscRegion(string? Code) : LocationAttribute(Code, Code)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("rsc_region_lead_name", Code ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 4;
 }
 
-public record School(string? Code, string? Name) : LocationAttribute(Code, Name)
+public record School(string? Code, string? Name, string? LaEstab = null) : LocationAttribute(Code, Name)
 {
+    public override string GetCacheKey()
+    {
+        return $"{GetType().Name}:{Code ?? string.Empty}:{LaEstab ?? string.Empty}:{Name ?? string.Empty}";
+    }
+
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("school_urn", Code ?? string.Empty),
             new("school_name", Name ?? string.Empty),
-        };
+            new("school_laestab", LaEstab ?? string.Empty),
+        ];
 
     public override int CsvPriority => 13;
 }
@@ -241,11 +247,11 @@ public record School(string? Code, string? Name) : LocationAttribute(Code, Name)
 public record Sponsor(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("sponsor_id", Code ?? string.Empty),
             new("sponsor_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 12;
 }
@@ -253,11 +259,11 @@ public record Sponsor(string? Code, string? Name) : LocationAttribute(Code, Name
 public record Ward(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
-        => new KeyValuePair<string, string>[]
-        {
+        =>
+        [
             new("ward_code", Code ?? string.Empty),
             new("ward_name", Name ?? string.Empty),
-        };
+        ];
 
     public override int CsvPriority => 10;
 }

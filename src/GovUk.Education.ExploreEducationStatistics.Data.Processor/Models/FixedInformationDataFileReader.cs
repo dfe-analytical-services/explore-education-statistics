@@ -1,7 +1,4 @@
 # nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -10,6 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
@@ -113,6 +113,9 @@ public class FixedInformationDataFileReader
         [EnumLabelValue("school_name")]
         SchoolName,
 
+        [EnumLabelValue("school_laestab")]
+        SchoolLaEstab,
+
         [EnumLabelValue("sponsor_id")]
         SponsorCode,
 
@@ -156,7 +159,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
+            return (TimeIdentifier)TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -182,7 +185,7 @@ public class FixedInformationDataFileReader
 
         try
         {
-            return (GeographicLevel) GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
+            return (GeographicLevel)GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -320,7 +323,8 @@ public class FixedInformationDataFileReader
     {
         var code = GetLocationAttributeValue(LocationColumn.SchoolCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.SchoolName, rowValues);
-        return GetLocationAttributeOrDefault(() => new School(code, name), code, name);
+        var laEstab = GetLocationAttributeValue(LocationColumn.SchoolLaEstab, rowValues);
+        return GetLocationAttributeOrDefault(() => new School(code, name, laEstab), code, name, laEstab);
     }
 
     private Sponsor? GetSponsor(IReadOnlyList<string> rowValues)

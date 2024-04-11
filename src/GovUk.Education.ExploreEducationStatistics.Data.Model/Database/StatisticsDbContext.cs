@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +7,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
@@ -82,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         /// we created an abstract base class with a type parameter).
         /// </summary>
         protected StatisticsDbContext(
-            DbContextOptions options, 
-            int? timeout, 
+            DbContextOptions options,
+            int? timeout,
             bool updateTimestamps = true) : base(options)
         {
             Configure(timeout, updateTimestamps);
@@ -232,6 +232,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<Location>()
                 .HasIndex(location => location.School_Code);
+
+            modelBuilder.Entity<Location>()
+                .Property(location => location.School_LaEstab)
+                .HasMaxLength(7);
 
             modelBuilder.Entity<Location>()
                 .HasIndex(location => location.Sponsor_Code);

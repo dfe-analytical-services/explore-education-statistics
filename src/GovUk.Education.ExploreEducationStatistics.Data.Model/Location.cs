@@ -1,12 +1,12 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -263,17 +263,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public string? School_Code { get; set; }
         public string? School_Name { get; set; }
+        public string? School_LaEstab { get; set; }
 
         [NotMapped]
         public School? School
         {
-            get => School_Code == null && School_Name == null
+            get => School_Code == null && School_Name == null && School_LaEstab == null
                 ? null
-                : new School(School_Code, School_Name);
+                : new School(School_Code, School_Name, School_LaEstab);
             init
             {
                 School_Code = value?.Code;
                 School_Name = value?.Name;
+                School_LaEstab = value?.LaEstab;
             }
         }
 
@@ -345,6 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                    && RscRegion_Code == other.RscRegion_Code
                    && School_Code == other.School_Code
                    && School_Name == other.School_Name
+                   && School_LaEstab == other.School_LaEstab
                    && Sponsor_Code == other.Sponsor_Code
                    && Sponsor_Name == other.Sponsor_Name
                    && Ward_Code == other.Ward_Code
@@ -356,14 +359,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Location) obj);
+            return Equals((Location)obj);
         }
 
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
             hashCode.Add(Id);
-            hashCode.Add((int) GeographicLevel);
+            hashCode.Add((int)GeographicLevel);
             hashCode.Add(Country_Code);
             hashCode.Add(Country_Name);
             hashCode.Add(EnglishDevolvedArea_Code);
@@ -396,6 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(RscRegion_Code);
             hashCode.Add(School_Code);
             hashCode.Add(School_Name);
+            hashCode.Add(School_LaEstab);
             hashCode.Add(Sponsor_Code);
             hashCode.Add(Sponsor_Name);
             hashCode.Add(Ward_Code);
@@ -484,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 {
                     // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
                     // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
-                    return (Func<Location, LocationAttribute>) (location =>
+                    return (Func<Location, LocationAttribute>)(location =>
                     {
                         var propertyInfo = typeof(Location).GetProperty(propertyName);
 
