@@ -47,10 +47,10 @@
     "actionGroupAlerts": {
       "type": "string"
     },
-    "slackWebhook": {
+    "slackAppToken": {
       "type": "string",
       "metadata": {
-        "description": "Slack webhook URI for alerts"
+        "description": "Slack bot user OAuth token for posting alerts"
       }
     },
     "slackAlertsChannel": {
@@ -92,8 +92,8 @@
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
           },
-          "slackWebhook": {
-            "value": "[parameters('slackWebhook')]"
+          "slackAppToken": {
+            "value": "[parameters('slackAppToken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"

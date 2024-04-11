@@ -621,10 +621,10 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "slackWebhook": {
+    "slackAppToken": {
       "type": "string",
       "metadata": {
-        "description": "Slack webhook URI for alerts"
+        "description": "Slack bot user OAuth token for posting alerts"
       }
     },
     "slackAlertsChannel": {
@@ -3480,8 +3480,8 @@
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
           },
-          "slackWebhook": {
-            "value": "[parameters('slackWebhook')]"
+          "slackAppToken": {
+            "value": "[parameters('slackAppToken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
@@ -4037,13 +4037,15 @@
               "inputs": {
                 "subscribe": {
                   "body": {
-                    "username": "Alertbot",
-                    "icon_emoji": ":face_with_monocle",
                     "channel": "[parameters('slackAlertsChannel')]",
                     "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
                   },
                   "method": "POST",
-                  "uri": "[parameters('slackWebhook')]"
+                  "uri": "https://slack.com/api/chat.postMessage",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                  }
                 },
                 "unsubscribe": {}
               }
