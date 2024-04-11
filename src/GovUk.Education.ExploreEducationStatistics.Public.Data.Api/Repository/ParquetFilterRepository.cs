@@ -45,7 +45,7 @@ public class ParquetFilterRepository(
             $"""
              SELECT *
              FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
-             WHERE {FiltersTable.Cols.PublicId:raw} IN ({publicIdsList})
+             WHERE {FilterOptionsTable.Cols.PublicId:raw} IN ({publicIdsList})
              """
         );
 
@@ -60,7 +60,7 @@ public class ParquetFilterRepository(
         return await ListOptionsById<IdPublicIdPair>(
             dataSetVersion: dataSetVersion,
             ids: ids.ToList(),
-            columns: [FiltersTable.Cols.Id, FiltersTable.Cols.PublicId],
+            columns: [FilterOptionsTable.Cols.Id, FilterOptionsTable.Cols.PublicId],
             cancellationToken: cancellationToken
         );
     }
@@ -87,7 +87,7 @@ public class ParquetFilterRepository(
             $"""
              SELECT {columnsFragments}
              FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
-             WHERE {FiltersTable.Cols.Id:raw} IN ({ids})
+             WHERE {FilterOptionsTable.Cols.Id:raw} IN ({ids})
              """
         );
 
@@ -100,7 +100,7 @@ public class ParquetFilterRepository(
     {
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT DISTINCT {FiltersTable.Cols.ColumnName:raw}
+             SELECT DISTINCT {FilterOptionsTable.Cols.FilterId:raw}
              FROM '{parquetPathResolver.FiltersPath(dataSetVersion):raw}'
              """);
 

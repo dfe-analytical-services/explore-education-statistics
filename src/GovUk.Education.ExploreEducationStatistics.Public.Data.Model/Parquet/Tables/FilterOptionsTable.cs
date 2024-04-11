@@ -1,15 +1,15 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 
-public static class FiltersTable
+public static class FilterOptionsTable
 {
-    public const string TableName = "filters";
+    public const string TableName = "filter_options";
 
     public static class Cols
     {
         public const string Id = "id";
         public const string PublicId = "public_id";
         public const string Label = "label";
-        public const string ColumnName = "column_name";
+        public const string FilterId = "filter_id";
     }
 
     public static string Alias(FilterMeta filter) => $"\"{filter.PublicId}\"";
@@ -24,7 +24,7 @@ public static class FiltersTable
         public readonly string Id = $"{table}.{Cols.Id}";
         public readonly string PublicId = $"{table}.{Cols.PublicId}";
         public readonly string Label = $"{table}.{Cols.Label}";
-        public readonly string ColumnName = $"{table}.{Cols.ColumnName}";
+        public readonly string FilterId = $"{table}.{Cols.FilterId}";
 
         public string Col(string column) => $"{table}.\"{column}\"";
     }

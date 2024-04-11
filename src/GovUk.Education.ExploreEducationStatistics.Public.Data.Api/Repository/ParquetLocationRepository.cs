@@ -86,23 +86,23 @@ public class ParquetLocationRepository(
         return location switch
         {
             DataSetQueryLocationCode locationCode =>
-                (Column: LocationsTable.Cols.Code, Value: locationCode.Code),
+                (Column: LocationOptionsTable.Cols.Code, Value: locationCode.Code),
 
             DataSetQueryLocationId locationId =>
-                (Column: LocationsTable.Cols.PublicId, Value: locationId.Id),
+                (Column: LocationOptionsTable.Cols.PublicId, Value: locationId.Id),
 
             DataSetQueryLocationLocalAuthorityCode localAuthority =>
-                (Column: LocationsTable.Cols.Code, Value: localAuthority.Code),
+                (Column: LocationOptionsTable.Cols.Code, Value: localAuthority.Code),
             DataSetQueryLocationLocalAuthorityOldCode localAuthority =>
-                (Column: LocationsTable.Cols.OldCode, Value: localAuthority.OldCode),
+                (Column: LocationOptionsTable.Cols.OldCode, Value: localAuthority.OldCode),
 
             DataSetQueryLocationProviderUkprn provider =>
-                (Column: LocationsTable.Cols.Ukprn, Value: provider.Ukprn),
+                (Column: LocationOptionsTable.Cols.Ukprn, Value: provider.Ukprn),
 
             DataSetQueryLocationSchoolUrn school =>
-                (Column: LocationsTable.Cols.Urn, Value: school.Urn),
+                (Column: LocationOptionsTable.Cols.Urn, Value: school.Urn),
             DataSetQueryLocationSchoolLaEstab { LaEstab: not null } school =>
-                (Column: LocationsTable.Cols.LaEstab, Value: school.LaEstab),
+                (Column: LocationOptionsTable.Cols.LaEstab, Value: school.LaEstab),
 
             _ => throw new ArgumentOutOfRangeException(nameof(location))
         };
@@ -116,7 +116,7 @@ public class ParquetLocationRepository(
         return await ListOptionsById<IdPublicIdPair>(
             dataSetVersion: dataSetVersion,
             ids: ids.ToList(),
-            columns: [LocationsTable.Cols.Id, LocationsTable.Cols.PublicId],
+            columns: [LocationOptionsTable.Cols.Id, LocationOptionsTable.Cols.PublicId],
             cancellationToken: cancellationToken);
     }
 
@@ -142,7 +142,7 @@ public class ParquetLocationRepository(
             $"""
              SELECT {columnsFragments}
              FROM '{parquetPathResolver.LocationsPath(dataSetVersion):raw}'
-             WHERE {LocationsTable.Cols.Id:raw} IN ({ids})
+             WHERE {LocationOptionsTable.Cols.Id:raw} IN ({ids})
              """
         );
 
@@ -155,7 +155,7 @@ public class ParquetLocationRepository(
     {
         var command = duckDbConnection.SqlBuilder(
             $"""
-             SELECT DISTINCT {LocationsTable.Cols.Level:raw}
+             SELECT DISTINCT {LocationOptionsTable.Cols.Level:raw}
              FROM '{parquetPathResolver.LocationsPath(dataSetVersion):raw}'
              """);
 
