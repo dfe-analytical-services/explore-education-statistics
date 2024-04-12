@@ -394,6 +394,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 entity.HasOne(rf => rf.File)
                     .WithMany()
                     .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(rf => rf.FilterSequence)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<List<FilterSequenceEntry>>(v));
+                entity.Property(rf => rf.IndicatorSequence)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v));
             });
         }
 
