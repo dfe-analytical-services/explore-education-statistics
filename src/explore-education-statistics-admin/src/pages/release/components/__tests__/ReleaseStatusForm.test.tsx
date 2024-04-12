@@ -1113,13 +1113,23 @@ describe('ReleaseStatusForm', () => {
           ).not.toBeChecked();
         });
 
-        await user.click(screen.getByLabelText('Update published date'));
-
         expect(
           screen.getByText(
             "The release's published date in the public view will be updated once the publication is complete.",
           ),
         ).toBeInTheDocument();
+
+        expect(screen.getByLabelText('Update published date')).toHaveAttribute(
+          'aria-expanded',
+          'false',
+        );
+
+        await user.click(screen.getByLabelText('Update published date'));
+
+        expect(screen.getByLabelText('Update published date')).toHaveAttribute(
+          'aria-expanded',
+          'true',
+        );
       });
 
       test('submits successfully with updated values', async () => {

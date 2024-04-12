@@ -13,7 +13,7 @@ describe('RHFFormFieldCheckbox', () => {
         <RHFForm id="testForm" onSubmit={Promise.resolve}>
           <RHFFormFieldCheckbox
             name="test"
-            label="Test values"
+            label="Test checkbox"
             hint="Test hint"
           />
         </RHFForm>
@@ -24,7 +24,7 @@ describe('RHFFormFieldCheckbox', () => {
       'id',
       'testForm-test-item-hint',
     );
-    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
       'id',
       'testForm-test',
     );
@@ -35,7 +35,7 @@ describe('RHFFormFieldCheckbox', () => {
       <FormProvider>
         <RHFFormFieldCheckbox
           name="test"
-          label="Test values"
+          label="Test checkbox"
           hint="Test hint"
         />
       </FormProvider>,
@@ -45,7 +45,10 @@ describe('RHFFormFieldCheckbox', () => {
       'id',
       'test-item-hint',
     );
-    expect(screen.getByLabelText('Test values')).toHaveAttribute('id', 'test');
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
+      'id',
+      'test',
+    );
   });
 
   test('renders with correct custom ids with form', () => {
@@ -55,7 +58,7 @@ describe('RHFFormFieldCheckbox', () => {
           <RHFFormFieldCheckbox
             name="test"
             id="customId"
-            label="Test values"
+            label="Test checkbox"
             hint="Test hint"
           />
         </RHFForm>
@@ -66,7 +69,7 @@ describe('RHFFormFieldCheckbox', () => {
       'id',
       'testForm-customId-item-hint',
     );
-    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
       'id',
       'testForm-customId',
     );
@@ -78,7 +81,7 @@ describe('RHFFormFieldCheckbox', () => {
         <RHFFormFieldCheckbox
           name="test"
           id="customId"
-          label="Test values"
+          label="Test checkbox"
           hint="Test hint"
         />
       </FormProvider>,
@@ -88,7 +91,7 @@ describe('RHFFormFieldCheckbox', () => {
       'id',
       'customId-item-hint',
     );
-    expect(screen.getByLabelText('Test values')).toHaveAttribute(
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
       'id',
       'customId',
     );
@@ -98,11 +101,11 @@ describe('RHFFormFieldCheckbox', () => {
     const user = userEvent.setup();
     render(
       <FormProvider>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test values" />
+        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
-    const checkbox = screen.getByLabelText('Test values');
+    const checkbox = screen.getByLabelText('Test checkbox');
 
     expect(checkbox).not.toBeChecked();
 
@@ -122,20 +125,94 @@ describe('RHFFormFieldCheckbox', () => {
   test('checks the checkbox if initial value is true', async () => {
     render(
       <FormProvider initialValues={{ test: true }}>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test values" />
+        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
-    expect(screen.getByLabelText('Test values')).toBeChecked();
+    expect(screen.getByLabelText('Test checkbox')).toBeChecked();
   });
 
   test('does not check the checkbox if initial value is false', async () => {
     render(
       <FormProvider initialValues={{ test: false }}>
-        <RHFFormFieldCheckbox name="test" id="select" label="Test values" />
+        <RHFFormFieldCheckbox name="test" id="select" label="Test checkbox" />
       </FormProvider>,
     );
 
-    expect(screen.getByLabelText('Test values')).not.toBeChecked();
+    expect(screen.getByLabelText('Test checkbox')).not.toBeChecked();
+  });
+
+  test('hides the conditional element when the checkbox is not checked', async () => {
+    render(
+      <FormProvider>
+        <RHFFormFieldCheckbox
+          name="test"
+          id="select"
+          label="Test checkbox"
+          conditional={<>I am conditional content</>}
+        />
+      </FormProvider>,
+    );
+
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(screen.getByText('I am conditional content')).toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
+  });
+
+  test('shows the conditional element when the checkbox is checked', async () => {
+    const user = userEvent.setup();
+    render(
+      <FormProvider>
+        <RHFFormFieldCheckbox
+          name="test"
+          id="select"
+          label="Test checkbox"
+          conditional={<>I am conditional content</>}
+        />
+      </FormProvider>,
+    );
+
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(screen.getByText('I am conditional content')).toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
+
+    await user.click(screen.getByLabelText('Test checkbox'));
+
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByText('I am conditional content')).not.toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
+  });
+
+  test('hides the conditional element when the checkbox is initially checked', async () => {
+    render(
+      <FormProvider initialValues={{ test: true }}>
+        <RHFFormFieldCheckbox
+          name="test"
+          id="select"
+          label="Test checkbox"
+          conditional={<>I am conditional content</>}
+        />
+      </FormProvider>,
+    );
+
+    expect(screen.getByLabelText('Test checkbox')).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByText('I am conditional content')).not.toHaveClass(
+      'govuk-checkboxes__conditional--hidden',
+    );
   });
 });

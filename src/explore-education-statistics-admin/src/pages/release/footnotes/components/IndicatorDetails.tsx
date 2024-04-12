@@ -1,112 +1,47 @@
-import styles from '@admin/pages/release/footnotes/components/FootnoteForm.module.scss';
-import {
-  BaseFootnote,
-  FootnoteSubjectMeta,
-} from '@admin/services/footnoteService';
+import { FootnoteSubjectMeta } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
-import { FormCheckbox } from '@common/components/form';
-import { FormikProps } from 'formik';
-import get from 'lodash/get';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
 import React from 'react';
 
 interface Props {
   summary: string;
   valuePath: string;
   indicatorGroups: FootnoteSubjectMeta['indicators'];
-  form: FormikProps<BaseFootnote>;
 }
 
-const IndicatorDetails = ({
+export default function IndicatorDetails({
   summary,
   valuePath,
   indicatorGroups,
-  form,
-}: Props) => {
+}: Props) {
   return (
     <Details summary={summary} className="govuk-!-margin-bottom-2">
-      <div className={styles.filterOverflow}>
-        {Object.entries(indicatorGroups).map(
-          ([indicatorGroupId, indicatorGroup]) => {
-            const groupValue = get(
-              form.values,
-              `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
-            );
-            const hideGrouping = indicatorGroup.label === 'Default';
-            const indicators: string[] =
-              get(
-                form.values,
-                `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
-              ) || [];
-            return (
-              <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
-                {!hideGrouping && (
-                  <div className="govuk-!-margin-top-1 govuk-!-margin-bottom-1">
-                    <strong>{indicatorGroup.label}</strong>
-                  </div>
-                  /*
-                 // Disabling indicatorGroup selection for now
-                  <FieldSubjectCheckbox
-                  key={indicatorGroupId}
-                  className="govuk-checkboxes--small"
-                  id={`indicatorGroup-${indicatorGroupId}`}
-                  name={`${valuePath}.indicatorGroups[${indicatorGroupId}].selected`}
-                  label={`${indicatorGroup.label}${groupValue && ' (All)' : ''}`}
-                  boldLabel
-                  disabled={parentSelected}
-                /> */
-                )}
-                <div
-                  className={
-                    !hideGrouping
-                      ? 'govuk-!-margin-left-4 govuk-!-margin-bottom-3'
-                      : ''
-                  }
-                >
-                  {indicatorGroup.options.map(indicatorItem => {
-                    const checked =
-                      indicators.includes(indicatorItem.value) || false;
-                    return (
-                      <FormCheckbox
-                        {...indicatorItem}
-                        key={`indicatorItem-${indicatorItem.value}`}
-                        className="govuk-checkboxes--small"
-                        name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
-                        id={indicatorItem.value}
-                        disabled={groupValue}
-                        checked={checked}
-                        onChange={e => {
-                          form.setFieldValue(
-                            `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
-                            false,
-                          );
-                          if (!checked) {
-                            form.setFieldValue(
-                              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
-                              [...indicators, e.target.value],
-                            );
-                          } else {
-                            form.setFieldValue(
-                              `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
-                              [
-                                ...indicators.filter(
-                                  (selectedItem: string) =>
-                                    selectedItem !== e.target.value,
-                                ),
-                              ],
-                            );
-                          }
-                        }}
-                      />
-                    );
-                  })}
-                </div>
+      {Object.entries(indicatorGroups).map(
+        ([indicatorGroupId, indicatorGroup]) => {
+          const hideGrouping = indicatorGroup.label === 'Default';
+
+          return (
+            <div key={indicatorGroupId} className="govuk-!-margin-bottom-2 ">
+              <div
+                className={
+                  !hideGrouping
+                    ? 'govuk-!-margin-left-4 govuk-!-margin-bottom-3'
+                    : ''
+                }
+              >
+                <RHFFormFieldCheckboxGroup
+                  name={`${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`}
+                  options={indicatorGroup.options}
+                  legend={indicatorGroup.label}
+                  legendSize="s"
+                  legendHidden={hideGrouping}
+                  small
+                />
               </div>
-            );
-          },
-        )}
-      </div>
+            </div>
+          );
+        },
+      )}
     </Details>
   );
-};
-
-export default IndicatorDetails;
+}

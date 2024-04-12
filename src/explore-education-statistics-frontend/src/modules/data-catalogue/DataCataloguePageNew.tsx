@@ -17,17 +17,17 @@ import { SortDirection } from '@common/services/types/sort';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import DataSetSummary from '@frontend/modules/data-catalogue/components/DataSetSummary';
-import dataSetQueries from '@frontend/queries/dataSetQueries';
+import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
+import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
-  DataSetFilter,
-  DataSetSortOption,
-  dataSetFilters,
-} from '@frontend/services/dataSetService';
+  DataSetFileFilter,
+  DataSetFileSortOption,
+  dataSetFileFilters,
+} from '@frontend/services/dataSetFileService';
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
 import SearchForm from '@frontend/components/SearchForm';
-import { getParamsFromQuery } from '@frontend/modules/data-catalogue/utils/createDataSetListRequest';
+import { getParamsFromQuery } from '@frontend/modules/data-catalogue/utils/createDataSetFileListRequest';
 import styles from '@frontend/modules/data-catalogue/DataCataloguePage.module.scss';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import FilterClearButton from '@frontend/components/FilterClearButton';
@@ -47,7 +47,7 @@ export interface DataCataloguePageQuery {
   publicationId?: string;
   releaseId?: string;
   searchTerm?: string;
-  sortBy?: DataSetSortOption;
+  sortBy?: DataSetFileSortOption;
   sortDirection?: SortDirection;
   themeId?: string;
 }
@@ -66,7 +66,7 @@ export default function DataCataloguePageNew() {
     isFetching,
     isLoading,
   } = useQuery({
-    ...dataSetQueries.list(router.query),
+    ...dataSetFileQueries.list(router.query),
     keepPreviousData: true,
     staleTime: 60000,
   });
@@ -169,7 +169,7 @@ export default function DataCataloguePageNew() {
     filterType,
     nextValue,
   }: {
-    filterType: DataSetFilter;
+    filterType: DataSetFileFilter;
     nextValue: string;
   }) => {
     const newParams = await getUpdatedQueryParams({
@@ -200,11 +200,11 @@ export default function DataCataloguePageNew() {
   const handleClearFilter = async ({
     filterType,
   }: {
-    filterType: DataSetFilter | 'all';
+    filterType: DataSetFileFilter | 'all';
   }) => {
     await updateQueryParams({
       ...(filterType === 'all'
-        ? omit(router.query, 'page', ...dataSetFilters)
+        ? omit(router.query, 'page', ...dataSetFileFilters)
         : omit(router.query, getFiltersToRemove(filterType), 'page')),
       sortBy: searchTerm && sortBy === 'relevance' ? 'newest' : sortBy,
     });
@@ -229,7 +229,7 @@ export default function DataCataloguePageNew() {
     });
   };
 
-  const handleSortByChange = async (nextSortBy: DataSetSortOption) => {
+  const handleSortByChange = async (nextSortBy: DataSetFileSortOption) => {
     await updateQueryParams({
       ...omit(router.query, 'page'),
       sortBy: nextSortBy,
@@ -528,12 +528,12 @@ export default function DataCataloguePageNew() {
                     <ul
                       className="govuk-list"
                       id="searchResults"
-                      data-testid="data-sets-list"
+                      data-testid="data-set-file-list"
                     >
                       {dataSets.map(dataSet => (
-                        <DataSetSummary
+                        <DataSetFileSummary
                           key={dataSet.fileId}
-                          dataSet={dataSet}
+                          dataSetFile={dataSet}
                           expanded={showAllDetails}
                           headingTag={selectedPublication ? 'h4' : 'h3'}
                           showLatestDataTag={!selectedRelease}
@@ -569,7 +569,7 @@ export default function DataCataloguePageNew() {
   );
 }
 
-function getFiltersToRemove(filterType: DataSetFilter | 'all') {
+function getFiltersToRemove(filterType: DataSetFileFilter | 'all') {
   if (filterType === 'themeId') {
     return ['themeId', 'publicationId', 'releaseId'];
   }

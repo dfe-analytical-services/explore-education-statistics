@@ -5,18 +5,19 @@ import preReleaseUserService, {
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldTextArea } from '@common/components/form';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ObjectSchema } from 'yup';
 
 interface FormValues {
   emails: string;
@@ -42,11 +43,11 @@ interface Props {
 const formId = 'preReleaseUserAccessForm';
 const inviteLimit = 50;
 
-const PreReleaseUserAccessForm = ({
+export default function PreReleaseUserAccessForm({
   releaseId,
   isReleaseApproved = false,
   isReleaseLive = false,
-}: Props) => {
+}: Props) {
   const [isRemoving, toggleRemoving] = useToggle(false);
 
   const {
@@ -67,33 +68,71 @@ const PreReleaseUserAccessForm = ({
       .map(line => line.trim())
       .filter(line => line);
 
-  const handleSubmit = useFormSubmit<FormValues>(async values => {
+  const handleSubmit = async (values: FormValues) => {
     setInvitePlan(
       await preReleaseUserService.getInvitePlan(
         releaseId,
         splitAndTrimLines(values.emails),
       ),
     );
-  }, errorMappings);
+  };
 
-  const handleModalSubmit = useFormSubmit<FormValues>(
-    async (values, actions) => {
-      const newUsers = await preReleaseUserService.inviteUsers(
-        releaseId,
-        splitAndTrimLines(values.emails),
-      );
+  const handleModalSubmit = async (emails: string) => {
+    const newUsers = await preReleaseUserService.inviteUsers(
+      releaseId,
+      splitAndTrimLines(emails),
+    );
 
-      setUsers({
-        value: [...users, ...newUsers],
-      });
-
-      actions.resetForm();
-    },
-    errorMappings,
-  );
+    setUsers({
+      value: [...users, ...newUsers],
+    });
+  };
 
   const handleModalCancel = useCallback(() => {
     setInvitePlan(undefined);
+  }, []);
+
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      emails: Yup.string()
+        .trim()
+        .required('Enter 1 or more email addresses')
+        .test({
+          name: 'number-of-lines',
+          message: `Enter between 1 and ${inviteLimit} lines of email addresses`,
+          test: (value: string) => {
+            if (value) {
+              const numOfLines = (value.match(/^\s*\S/gm) || '').length;
+              return numOfLines <= inviteLimit;
+            }
+            return true;
+          },
+        })
+        .test({
+          name: 'lines-contain-valid-emails',
+          message: ({ value }) => `'${value}' is not a valid email address`,
+          test(value?: string) {
+            if (value) {
+              const emails = splitAndTrimLines(value);
+              const schema = Yup.string().email();
+              const indexOfFirstInvalid = emails.findIndex(
+                email => !schema.isValidSync(email),
+              );
+              if (indexOfFirstInvalid < 0) {
+                return true;
+              }
+              // eslint-disable-next-line react/no-this-in-sfc
+              return this.createError({
+                path: 'emails',
+                params: {
+                  value: emails[indexOfFirstInvalid],
+                },
+              });
+            }
+            return true;
+          },
+        }),
+    });
   }, []);
 
   if (error) {
@@ -110,90 +149,52 @@ const PreReleaseUserAccessForm = ({
           </WarningMessage>
         }
       >
-        <Formik<FormValues>
-          enableReinitialize
+        <FormProvider
+          errorMappings={errorMappings}
           initialValues={{
             emails: '',
           }}
-          validationSchema={Yup.object<FormValues>({
-            emails: Yup.string()
-              .trim()
-              .required('Enter 1 or more email addresses')
-              .test({
-                name: 'number-of-lines',
-                message: `Enter between 1 and ${inviteLimit} lines of email addresses`,
-                test: (value: string) => {
-                  if (value) {
-                    const numOfLines = (value.match(/^\s*\S/gm) || '').length;
-                    return numOfLines <= inviteLimit;
-                  }
-                  return true;
-                },
-              })
-              .test({
-                name: 'lines-contain-valid-emails',
-                message: ({ value }) =>
-                  `'${value}' is not a valid email address`,
-                test(value?: string) {
-                  if (value) {
-                    const emails = splitAndTrimLines(value);
-                    const schema = Yup.string().email();
-                    const indexOfFirstInvalid = emails.findIndex(
-                      email => !schema.isValidSync(email),
-                    );
-                    if (indexOfFirstInvalid < 0) {
-                      return true;
-                    }
-                    // eslint-disable-next-line react/no-this-in-sfc
-                    return this.createError({
-                      path: 'emails',
-                      params: {
-                        value: emails[indexOfFirstInvalid],
-                      },
-                    });
-                  }
-                  return true;
-                },
-              }),
-          })}
-          onSubmit={handleSubmit}
+          validationSchema={validationSchema}
         >
-          {form => (
-            <Form id={formId}>
-              <FormFieldTextArea<FormValues>
-                label="Invite new users by email"
-                name="emails"
-                className="govuk-!-width-one-third"
-                hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
-                rows={15}
-              />
-
-              <ButtonGroup>
-                <Button
-                  type="submit"
-                  disabled={form.isSubmitting || isRemoving}
-                >
-                  {form.isSubmitting
-                    ? 'Inviting new users'
-                    : 'Invite new users'}
-                </Button>
-              </ButtonGroup>
-
-              {invitePlan && (
-                <PreReleaseInvitePlanModal
-                  isReleaseApproved={isReleaseApproved}
-                  invitePlan={invitePlan}
-                  onConfirm={async () => {
-                    await handleModalSubmit(form.values, form);
-                    setInvitePlan(undefined);
-                  }}
-                  onCancel={handleModalCancel}
-                  onExit={handleModalCancel}
+          {({ formState, getValues, reset }) => {
+            return (
+              <RHFForm id={formId} onSubmit={handleSubmit}>
+                <RHFFormFieldTextArea<FormValues>
+                  label="Invite new users by email"
+                  name="emails"
+                  className="govuk-!-width-one-third"
+                  hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
+                  rows={15}
                 />
-              )}
-            </Form>
-          )}
-        </Formik>
+
+                <ButtonGroup>
+                  <Button
+                    type="submit"
+                    disabled={formState.isSubmitting || isRemoving}
+                  >
+                    {formState.isSubmitting
+                      ? 'Inviting new users'
+                      : 'Invite new users'}
+                  </Button>
+                </ButtonGroup>
+
+                {invitePlan && (
+                  <PreReleaseInvitePlanModal
+                    isReleaseApproved={isReleaseApproved}
+                    invitePlan={invitePlan}
+                    onConfirm={async () => {
+                      await handleModalSubmit(getValues('emails'));
+                      setInvitePlan(undefined);
+                      reset();
+                    }}
+                    onCancel={handleModalCancel}
+                    onExit={handleModalCancel}
+                  />
+                )}
+              </RHFForm>
+            );
+          }}
+        </FormProvider>
       </Gate>
 
       {users.length > 0 ? (
@@ -249,6 +250,4 @@ const PreReleaseUserAccessForm = ({
       )}
     </LoadingSpinner>
   );
-};
-
-export default PreReleaseUserAccessForm;
+}

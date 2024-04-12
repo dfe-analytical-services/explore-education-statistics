@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters.SystemJson;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -19,16 +21,14 @@ public record DataSetQueryPaginatedResultsViewModel : PaginatedListViewModel<Dat
 public record DataSetQueryResultViewModel
 {
     /// <summary>
-    /// The filters associated with this result.
-    ///
-    /// This is a dictionary where the key is the filter ID and
-    /// the value is the specific filter option ID.
+    /// The time period relevant to this result's data.
     /// </summary>
-    public required Dictionary<string, string> Filters { get; init; }
+    public required TimePeriodViewModel TimePeriod { get; init; }
 
     /// <summary>
     /// The geographic level relevant to this result's data.
     /// </summary>
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]
     public required GeographicLevel GeographicLevel { get; init; }
 
     /// <summary>
@@ -40,15 +40,18 @@ public record DataSetQueryResultViewModel
     public required Dictionary<string, string> Locations { get; init; }
 
     /// <summary>
+    /// The filters associated with this result.
+    ///
+    /// This is a dictionary where the key is the filter ID and
+    /// the value is the specific filter option ID.
+    /// </summary>
+    public required Dictionary<string, string> Filters { get; init; }
+
+    /// <summary>
     /// The data values for the result's indicators.
     ///
     /// This is a dictionary where the key is the indicator ID
     /// and the value is the data value.
     /// </summary>
     public required Dictionary<string, string> Values { get; init; }
-
-    /// <summary>
-    /// The time period relevant to this result's data.
-    /// </summary>
-    public required TimePeriodViewModel TimePeriod { get; init; }
 }

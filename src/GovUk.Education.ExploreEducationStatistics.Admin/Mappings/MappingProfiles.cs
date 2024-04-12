@@ -19,7 +19,6 @@ using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.
 using KeyStatisticDataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticDataBlockViewModel;
 using KeyStatisticTextViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticTextViewModel;
 using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticViewModel;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using MarkDownBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MarkDownBlockViewModel;
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
 using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
@@ -143,15 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = otherReleaseVersion.Title,
                             })
                             .ToList(),
-                        LegacyReleases = rv.Publication.LegacyReleases
-                            .OrderByDescending(legacyRelease => legacyRelease.Order)
-                            .Select(legacy => new ManageContentPageViewModel.LegacyReleaseViewModel
-                            {
-                                Id = legacy.Id,
-                                Description = legacy.Description,
-                                Url = legacy.Url,
-                            })
-                            .ToList(),
+                        ReleaseSeries = new List<ReleaseSeriesItemViewModel>(), // Must be hydrated after mapping
                         ExternalMethodology = rv.Publication.ExternalMethodology != null
                             ? new ExternalMethodology
                             {
@@ -175,8 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             : (DateTime?) null));
 
             CreateMap<Update, ReleaseNoteViewModel>();
-
-            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
 
             CreateMap<Comment, CommentViewModel>()
                 .ForMember(dest => dest.CreatedBy,

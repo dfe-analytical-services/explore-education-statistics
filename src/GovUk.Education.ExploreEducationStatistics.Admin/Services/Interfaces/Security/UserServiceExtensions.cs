@@ -335,28 +335,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(file, SecurityPolicies.CanCancelOngoingImports);
         }
 
-        public static Task<Either<ActionResult, Publication>> CheckCanManageLegacyReleases(
+        public static Task<Either<ActionResult, Publication>> CheckCanManageReleaseSeries(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanManageLegacyReleases);
-        }
-
-        public static Task<Either<ActionResult, LegacyRelease>> CheckCanViewLegacyRelease(
-            this IUserService userService, LegacyRelease legacyRelease)
-        {
-            return userService.CheckPolicy(legacyRelease, SecurityPolicies.CanViewLegacyRelease);
-        }
-
-        public static Task<Either<ActionResult, LegacyRelease>> CheckCanUpdateLegacyRelease(
-            this IUserService userService, LegacyRelease legacyRelease)
-        {
-            return userService.CheckPolicy(legacyRelease, SecurityPolicies.CanUpdateLegacyRelease);
-        }
-
-        public static Task<Either<ActionResult, LegacyRelease>> CheckCanDeleteLegacyRelease(
-            this IUserService userService, LegacyRelease legacyRelease)
-        {
-            return userService.CheckPolicy(legacyRelease, SecurityPolicies.CanDeleteLegacyRelease);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanManagePublicationReleaseSeries);
         }
 
         public static async Task<DataFilePermissions> GetDataFilePermissions(this IUserService userService, File file)

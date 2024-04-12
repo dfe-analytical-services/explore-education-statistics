@@ -5,7 +5,7 @@ import {
 } from '@common/services/publicationService';
 import Button from '@common/components/Button';
 import { FormFieldset, FormGroup, FormSelect } from '@common/components/form';
-import { DataSetFilter } from '@frontend/services/dataSetService';
+import { DataSetFileFilter } from '@frontend/services/dataSetFileService';
 import styles from '@frontend/modules/data-catalogue/components/Filters.module.scss';
 import React from 'react';
 
@@ -21,7 +21,7 @@ interface Props {
     filterType,
     nextValue,
   }: {
-    filterType: DataSetFilter;
+    filterType: DataSetFileFilter;
     nextValue: string;
   }) => void;
 }

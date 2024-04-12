@@ -8,8 +8,8 @@ import _publicationService, {
 import { Paging } from '@common/services/types/pagination';
 import render from '@common-test/render';
 import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
-import { testDataSetSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
-import _dataSetService from '@frontend/services/dataSetService';
+import { testDataSetFileSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import _dataSetFileService from '@frontend/services/dataSetFileService';
 import { testReleases } from '@frontend/modules/data-catalogue/__data__/testReleases';
 import { testThemes } from '@frontend/modules/data-catalogue/__data__/testThemes';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -18,7 +18,7 @@ import React from 'react';
 import { produce } from 'immer';
 import mockRouter from 'next-router-mock';
 
-jest.mock('@frontend/services/dataSetService');
+jest.mock('@frontend/services/dataSetFileService');
 jest.mock('@common/services/downloadService');
 jest.mock('@common/services/publicationService');
 jest.mock('@common/services/tableBuilderService');
@@ -32,7 +32,9 @@ jest.mock('@common/hooks/useMedia', () => ({
   },
 }));
 
-const dataSetService = _dataSetService as jest.Mocked<typeof _dataSetService>;
+const dataSetService = _dataSetFileService as jest.Mocked<
+  typeof _dataSetFileService
+>;
 const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
 >;
@@ -454,8 +456,8 @@ describe('DataCataloguePage', () => {
     });
 
     test('renders related information links', async () => {
-      dataSetService.listDataSets.mockResolvedValue({
-        results: testDataSetSummaries,
+      dataSetService.listDataSetFiles.mockResolvedValue({
+        results: testDataSetFileSummaries,
         paging: testPaging,
       });
       publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -478,8 +480,8 @@ describe('DataCataloguePage', () => {
     });
 
     test('renders correctly with data sets', async () => {
-      dataSetService.listDataSets.mockResolvedValue({
-        results: testDataSetSummaries,
+      dataSetService.listDataSetFiles.mockResolvedValue({
+        results: testDataSetFileSummaries,
         paging: testPaging,
       });
       publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -504,7 +506,7 @@ describe('DataCataloguePage', () => {
         screen.getByText('Page 1 of 3, showing all available data sets'),
       ).toBeInTheDocument();
 
-      const dataSets = screen.queryAllByTestId(/data-set-summary/);
+      const dataSets = screen.queryAllByTestId(/data-set-file-summary/);
       expect(dataSets).toHaveLength(3);
 
       expect(
@@ -542,7 +544,7 @@ describe('DataCataloguePage', () => {
     });
 
     test('renders correctly with no data sets', async () => {
-      dataSetService.listDataSets.mockResolvedValue({
+      dataSetService.listDataSetFiles.mockResolvedValue({
         results: [],
         paging: {
           ...testPaging,
@@ -568,8 +570,8 @@ describe('DataCataloguePage', () => {
     });
 
     test('renders the initial filters', async () => {
-      dataSetService.listDataSets.mockResolvedValueOnce({
-        results: testDataSetSummaries,
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
         paging: testPaging,
       });
       publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -618,12 +620,12 @@ describe('DataCataloguePage', () => {
 
     describe('filtering by theme', () => {
       beforeEach(async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -672,7 +674,9 @@ describe('DataCataloguePage', () => {
           screen.getByText('Page 1 of 1, filtered by:'),
         ).toBeInTheDocument();
 
-        expect(screen.queryAllByTestId(/data-set-summary/)).toHaveLength(2);
+        expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(
+          2,
+        );
       });
 
       test('updates the query params', async () => {
@@ -696,16 +700,16 @@ describe('DataCataloguePage', () => {
 
     describe('filtering by publication', () => {
       beforeEach(async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 1 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -769,7 +773,9 @@ describe('DataCataloguePage', () => {
           screen.getByText('Page 1 of 1, filtered by:'),
         ).toBeInTheDocument();
 
-        expect(screen.queryAllByTestId(/data-set-summary/)).toHaveLength(1);
+        expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(
+          1,
+        );
       });
 
       test('updates the query params', async () => {
@@ -834,20 +840,20 @@ describe('DataCataloguePage', () => {
 
     describe('filtering by release', () => {
       test('filtering by another release', async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 1 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[0]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[0]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -941,8 +947,8 @@ describe('DataCataloguePage', () => {
       });
 
       test('switching between showing all and latest releases', async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -985,12 +991,12 @@ describe('DataCataloguePage', () => {
 
     describe('filtering by search term', () => {
       beforeEach(async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValue({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValue({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1017,7 +1023,9 @@ describe('DataCataloguePage', () => {
           screen.getByText('Page 1 of 1, filtered by:'),
         ).toBeInTheDocument();
 
-        expect(screen.queryAllByTestId(/data-set-summary/)).toHaveLength(2);
+        expect(screen.queryAllByTestId(/data-set-file-summary/)).toHaveLength(
+          2,
+        );
       });
 
       test('updates the query params', async () => {
@@ -1043,8 +1051,8 @@ describe('DataCataloguePage', () => {
       test('filters by theme id', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?themeId=theme-2');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1094,8 +1102,8 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1164,8 +1172,8 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1232,8 +1240,8 @@ describe('DataCataloguePage', () => {
       test('filters by publication id', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?publicationId=publication-2');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1305,8 +1313,8 @@ describe('DataCataloguePage', () => {
       test('filters by search term', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?searchTerm=find+me');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1335,8 +1343,8 @@ describe('DataCataloguePage', () => {
       test('does not filter by release id only', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?releaseId=release-1');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1361,12 +1369,12 @@ describe('DataCataloguePage', () => {
       test('removing theme filter', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?themeId=theme-2');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1418,12 +1426,12 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValue({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValue({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1511,12 +1519,12 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValue({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValue({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1577,12 +1585,12 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValue({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValue({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1624,12 +1632,12 @@ describe('DataCataloguePage', () => {
       test('removing search filter', async () => {
         mockRouter.setCurrentUrl('/data-catalogue?searchTerm=find+me');
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1667,12 +1675,12 @@ describe('DataCataloguePage', () => {
           '/data-catalogue?themeId=theme-2&publicationId=publication-2&releaseId=release-1',
         );
 
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1745,8 +1753,8 @@ describe('DataCataloguePage', () => {
 
     describe('sorting', () => {
       test('changing sort order', async () => {
-        dataSetService.listDataSets.mockResolvedValue({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValue({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1768,12 +1776,12 @@ describe('DataCataloguePage', () => {
       });
 
       test('sorts by relevance when have a search filter', async () => {
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1], testDataSetSummaries[2]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1], testDataSetFileSummaries[2]],
           paging: { ...testPaging, totalPages: 1, totalResults: 2 },
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1806,12 +1814,12 @@ describe('DataCataloguePage', () => {
         mockRouter.setCurrentUrl(
           '/data-catalogue?searchTerm=Find+me&orderBy=relevance',
         );
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: [testDataSetSummaries[1]],
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: [testDataSetFileSummaries[1]],
           paging: { ...testPaging, totalPages: 1, totalResults: 1 },
         });
-        dataSetService.listDataSets.mockResolvedValueOnce({
-          results: testDataSetSummaries,
+        dataSetService.listDataSetFiles.mockResolvedValueOnce({
+          results: testDataSetFileSummaries,
           paging: testPaging,
         });
         publicationService.getPublicationTree.mockResolvedValue(testThemes);
@@ -1846,8 +1854,8 @@ describe('DataCataloguePage', () => {
 
     test('renders the mobile filters', async () => {
       mockIsMedia = true;
-      dataSetService.listDataSets.mockResolvedValueOnce({
-        results: testDataSetSummaries,
+      dataSetService.listDataSetFiles.mockResolvedValueOnce({
+        results: testDataSetFileSummaries,
         paging: testPaging,
       });
       publicationService.getPublicationTree.mockResolvedValue(testThemes);

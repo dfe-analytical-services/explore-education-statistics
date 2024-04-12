@@ -14,6 +14,7 @@ export interface FormFieldsetProps {
   legendSize?: 'xl' | 'l' | 'm' | 's';
   legendWeight?: 'strong' | 'regular';
   legendHidden?: boolean;
+  testId?: string;
   /**
    * Set to false to disable default prefixing
    * of `id` with the current form context's form id.
@@ -33,6 +34,7 @@ const FormFieldset = ({
   legendSize = 'l',
   legendWeight = 'strong',
   legendHidden = false,
+  testId,
   useFormId = true,
   onBlur,
   onFocus,
@@ -51,6 +53,7 @@ const FormFieldset = ({
         }
         className={classNames('govuk-fieldset', className)}
         id={fieldId}
+        data-testid={testId}
         onBlur={onBlur}
         onFocus={onFocus}
       >

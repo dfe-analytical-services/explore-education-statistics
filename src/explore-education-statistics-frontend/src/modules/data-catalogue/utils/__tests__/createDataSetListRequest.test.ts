@@ -1,10 +1,10 @@
-import createDataSetListRequest from '@frontend/modules/data-catalogue/utils/createDataSetListRequest';
-import { DataSetListRequest } from '@frontend/services/dataSetService';
+import createDataSetFileListRequest from '@frontend/modules/data-catalogue/utils/createDataSetFileListRequest';
+import { DataSetFileListRequest } from '@frontend/services/dataSetFileService';
 
 describe('createDataSetListRequest', () => {
   test('returns the default request when no query params', () => {
-    const result = createDataSetListRequest({});
-    expect(result).toEqual<DataSetListRequest>({
+    const result = createDataSetFileListRequest({});
+    expect(result).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'published',
       sortDirection: 'Desc',
@@ -12,7 +12,7 @@ describe('createDataSetListRequest', () => {
   });
 
   test('returns the request with query params', () => {
-    const result = createDataSetListRequest({
+    const result = createDataSetFileListRequest({
       latestOnly: 'true',
       page: 4,
       publicationId: 'publication-id',
@@ -21,7 +21,7 @@ describe('createDataSetListRequest', () => {
       searchTerm: 'find me',
       themeId: 'theme-id',
     });
-    expect(result).toEqual<DataSetListRequest>({
+    expect(result).toEqual<DataSetFileListRequest>({
       latestOnly: 'true',
       page: 4,
       publicationId: 'publication-id',
@@ -35,32 +35,32 @@ describe('createDataSetListRequest', () => {
 
   test('returns the correct order and sort params', () => {
     expect(
-      createDataSetListRequest({ sortBy: 'relevance' }),
-    ).toEqual<DataSetListRequest>({
+      createDataSetFileListRequest({ sortBy: 'relevance' }),
+    ).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'relevance',
       sortDirection: 'Desc',
     });
 
     expect(
-      createDataSetListRequest({ sortBy: 'newest' }),
-    ).toEqual<DataSetListRequest>({
+      createDataSetFileListRequest({ sortBy: 'newest' }),
+    ).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'published',
       sortDirection: 'Desc',
     });
 
     expect(
-      createDataSetListRequest({ sortBy: 'oldest' }),
-    ).toEqual<DataSetListRequest>({
+      createDataSetFileListRequest({ sortBy: 'oldest' }),
+    ).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'published',
       sortDirection: 'Asc',
     });
 
     expect(
-      createDataSetListRequest({ sortBy: 'title' }),
-    ).toEqual<DataSetListRequest>({
+      createDataSetFileListRequest({ sortBy: 'title' }),
+    ).toEqual<DataSetFileListRequest>({
       sort: 'title',
       page: 1,
       sortDirection: 'Asc',
@@ -68,8 +68,8 @@ describe('createDataSetListRequest', () => {
   });
 
   test('excludes search terms that are too short', () => {
-    const result = createDataSetListRequest({ searchTerm: 'hi' });
-    expect(result).toEqual<DataSetListRequest>({
+    const result = createDataSetFileListRequest({ searchTerm: 'hi' });
+    expect(result).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'published',
       sortDirection: 'Desc',
@@ -77,11 +77,11 @@ describe('createDataSetListRequest', () => {
   });
 
   test('excludes params that are undefined or empty', () => {
-    const result = createDataSetListRequest({
+    const result = createDataSetFileListRequest({
       publicationId: undefined,
       releaseId: '',
     });
-    expect(result).toEqual<DataSetListRequest>({
+    expect(result).toEqual<DataSetFileListRequest>({
       page: 1,
       sort: 'published',
       sortDirection: 'Desc',

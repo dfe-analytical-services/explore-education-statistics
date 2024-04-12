@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -56,7 +55,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSet.Summary, content.Summary);
             Assert.Equal(dataSet.Status, content.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion!.Version, content.LatestVersion.Number);
+            Assert.Equal(dataSetVersion.Version, content.LatestVersion.Number);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
                 content.LatestVersion.Published.ToUnixTimeSeconds()
@@ -743,6 +742,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithDataSetId(dataSet.Id)
                     .WithFilterMetas(() => filterMetas)
                     .WithLocationMetas(() => locationMetas)
+                    .WithGeographicLevelMeta()
                     .WithIndicatorMetas(() =>
                         DataFixture
                         .DefaultIndicatorMeta()
@@ -1583,7 +1583,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
         {
             var query = new Dictionary<string, string?>
             {
-                { "dataSetVersion", dataSetVersion?.ToString() },
+                { "dataSetVersion", dataSetVersion },
             };
 
             if (types is not null)

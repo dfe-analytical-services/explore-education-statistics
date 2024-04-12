@@ -10,6 +10,8 @@ public interface IParquetPathResolver
 
     string FiltersPath(DataSetVersion dataSetVersion);
 
+    string IndicatorsPath(DataSetVersion dataSetVersion);
+
     string LocationsPath(DataSetVersion dataSetVersion);
 
     string TimePeriodsPath(DataSetVersion dataSetVersion);

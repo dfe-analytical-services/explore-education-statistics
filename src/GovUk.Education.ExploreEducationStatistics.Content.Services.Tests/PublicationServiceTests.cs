@@ -122,11 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Url = "https://external.methodology.com",
             };
 
-            private readonly LegacyRelease _legacyRelease = new()
+            private readonly List<ReleaseSeriesItem> _legacyLinks = new()
             {
-                Description = "Legacy release description",
-                Url = "https://legacy.release.com",
-                Order = 0,
+                new ReleaseSeriesItem
+                {
+                    Id = Guid.NewGuid(),
+                    LegacyLinkDescription = "Legacy release description",
+                    LegacyLinkUrl = "https://legacy.release.com",
+                },
             };
 
             [Fact]
@@ -143,15 +146,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             .DefaultRelease(publishedVersions: 2, draftVersion: true, year: 2022)))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
+                    .WithLegacyLinks(_legacyLinks)
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
                             .DefaultTheme()));
-
-                // Expect the latest published release versions in reverse chronological order
-                var expectedReleaseVersion1 = publication.ReleaseVersions.Single(rv => rv is { Year: 2022, Version: 1 });
-                var expectedReleaseVersion2 = publication.ReleaseVersions.Single(rv => rv is { Year: 2020, Version: 0 });
 
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -162,6 +161,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
                 {
+                    var expectedReleaseVersion1 = publication.ReleaseVersions
+                        .Single(rv => rv is { Year: 2022, Version: 1 });
+                    var expectedReleaseVersion2 = publication.ReleaseVersions
+                        .Single(rv => rv is { Year: 2020, Version: 0 });
+
                     var service = SetupPublicationService(contentDbContext);
 
                     var result = await service.Get(publication.Slug);
@@ -184,10 +188,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Assert.Equal(expectedReleaseVersion2.Slug, publicationViewModel.Releases[1].Slug);
                     Assert.Equal(expectedReleaseVersion2.Title, publicationViewModel.Releases[1].Title);
 
-                    Assert.Single(publicationViewModel.LegacyReleases);
-                    Assert.Equal(_legacyRelease.Id, publicationViewModel.LegacyReleases[0].Id);
-                    Assert.Equal(_legacyRelease.Description, _legacyRelease.Description);
-                    Assert.Equal(_legacyRelease.Url, publicationViewModel.LegacyReleases[0].Url);
+                    Assert.Equal(3, publicationViewModel.ReleaseSeries.Count);
+
+                    var releaseSeriesItem1 = publicationViewModel.ReleaseSeries[0];
+                    Assert.False(releaseSeriesItem1.IsLegacyLink);
+                    Assert.Equal(expectedReleaseVersion1.ReleaseId, releaseSeriesItem1.ReleaseId);
+                    Assert.Equal(expectedReleaseVersion1.Title, releaseSeriesItem1.Description);
+                    Assert.Equal(expectedReleaseVersion1.Slug, releaseSeriesItem1.ReleaseSlug);
+                    Assert.Null(releaseSeriesItem1.LegacyLinkUrl);
+
+                    // NOTE: 2021 release does exist in the database's publication.ReleaseSeries, but is filtered out
+                    // because it's unpublished
+
+                    var releaseSeriesItem2 = publicationViewModel.ReleaseSeries[1];
+                    Assert.False(releaseSeriesItem2.IsLegacyLink);
+                    Assert.Equal(expectedReleaseVersion2.ReleaseId, releaseSeriesItem2.ReleaseId);
+                    Assert.Equal(expectedReleaseVersion2.Title, releaseSeriesItem2.Description);
+                    Assert.Equal(expectedReleaseVersion2.Slug, releaseSeriesItem2.ReleaseSlug);
+                    Assert.Null(releaseSeriesItem2.LegacyLinkUrl);
+
+                    var releaseSeriesItem3 = publicationViewModel.ReleaseSeries[2];
+                    Assert.Equal(_legacyLinks[0].Id, releaseSeriesItem3.Id);
+                    Assert.True(releaseSeriesItem3.IsLegacyLink);
+                    Assert.Null(releaseSeriesItem3.ReleaseId);
+                    Assert.Equal(_legacyLinks[0].LegacyLinkDescription, releaseSeriesItem3.Description);
+                    Assert.Null(releaseSeriesItem3.ReleaseSlug);
+                    Assert.Equal(_legacyLinks[0].LegacyLinkUrl, releaseSeriesItem3.LegacyLinkUrl);
 
                     Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
                     Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
@@ -221,7 +247,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
@@ -268,7 +293,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture
@@ -305,7 +329,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         .Generate(1))
                     .WithContact(_contact)
                     .WithExternalMethodology(_externalMethodology)
-                    .WithLegacyReleases(ListOf(_legacyRelease))
                     .WithTopic(_dataFixture
                         .DefaultTopic()
                         .WithTheme(_dataFixture

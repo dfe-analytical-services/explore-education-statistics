@@ -11,7 +11,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import DataCataloguePageCurrent from '@frontend/modules/data-catalogue/DataCataloguePageCurrent';
 import DataCataloguePageNew from '@frontend/modules/data-catalogue/DataCataloguePageNew';
-import dataSetQueries from '@frontend/queries/dataSetQueries';
+import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
 import publicationQueries from '@frontend/queries/publicationQueries';
 
@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   const queryClient = new QueryClient();
 
   if (newDesign) {
-    await queryClient.prefetchQuery(dataSetQueries.list(context.query));
+    await queryClient.prefetchQuery(dataSetFileQueries.list(context.query));
     await queryClient.prefetchQuery(
       publicationQueries.getPublicationTree({
         publicationFilter: 'DataCatalogue',

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,12 +10,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +28,6 @@ using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IReleaseVersionRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseVersionRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -439,47 +441,159 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases)
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(
-                    publicationId,
-                    publication => publication.Include(p => p.LegacyReleases)
-                )
-                .OnSuccess(_userService.CheckCanManageLegacyReleases)
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
                 .OnSuccess(async publication =>
                 {
-                    publication.LegacyReleases.ForEach(legacyRelease =>
+                    var result = new List<ReleaseSeriesTableEntryViewModel>();
+                    foreach (var seriesItem in publication.ReleaseSeries)
                     {
-                        var updateLegacyRelease = updatedLegacyReleases
-                            .Find(release => release.Id == legacyRelease.Id);
-
-                        if (updateLegacyRelease == null)
+                        if (seriesItem.IsLegacyLink)
                         {
-                            return;
+                            result.Add(new ReleaseSeriesTableEntryViewModel
+                            {
+                                Id = seriesItem.Id,
+                                IsLegacyLink = true,
+                                Description = seriesItem.LegacyLinkDescription!,
+                                LegacyLinkUrl = seriesItem.LegacyLinkUrl,
+                            });
                         }
+                        else
+                        {
+                            // prefer getting the latest published version over an unpublished amendment
+                            var latestVersion = await _context.ReleaseVersions
+                                .LatestReleaseVersion(seriesItem.ReleaseId!.Value, publishedOnly: true)
+                                .SingleOrDefaultAsync();
 
-                        legacyRelease.Description = updateLegacyRelease.Description ?? legacyRelease.Description;
-                        legacyRelease.Url = updateLegacyRelease.Url ?? legacyRelease.Url;
+                            if (latestVersion == null)
+                            {
+                                // if the release has no published version, then use its original unpublished version
+                                latestVersion = await _context.ReleaseVersions
+                                    .LatestReleaseVersion(seriesItem.ReleaseId!.Value)
+                                    .SingleOrDefaultAsync();
 
-                        // Don't shift other orders around as its unreliable when doing
-                        // a bulk update like this. It's easier to let the consumer
-                        // decide what all the orders should be.
-                        legacyRelease.Order = updateLegacyRelease.Order ?? legacyRelease.Order;
+                                if (latestVersion == null)
+                                {
+                                    throw new InvalidDataException(
+                                        "ReleaseSeriesItem with ReleaseId set should have an associated " +
+                                        $"ReleaseVersion. Release: {seriesItem.ReleaseId} " +
+                                        $"ReleaseSeriesItem: {seriesItem.Id}");
+                                }
+                            }
 
-                        _context.Update(legacyRelease);
+                            result.Add(new ReleaseSeriesTableEntryViewModel
+                                {
+                                    Id = seriesItem.Id,
+                                    IsLegacyLink = false,
+                                    Description = latestVersion.Title,
+                                    ReleaseId = latestVersion.ReleaseId,
+                                    ReleaseSlug = latestVersion.Slug,
+                                    IsLatest = latestVersion.Id == publication.LatestPublishedReleaseVersionId,
+                                    IsPublished = latestVersion.Live,
+                                });
+                        }
+                    }
+
+                    return result;
+                });
+        }
+
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
+            Guid publicationId,
+            ReleaseSeriesLegacyLinkAddRequest newLegacyLink)
+        {
+            return await _context.Publications
+                .FirstOrNotFoundAsync(p => p.Id == publicationId)
+                .OnSuccess(_userService.CheckCanManageReleaseSeries)
+                .OnSuccess(async publication =>
+                {
+                    publication.ReleaseSeries.Add(new ReleaseSeriesItem
+                    {
+                        Id = Guid.NewGuid(),
+                        ReleaseId = null,
+                        LegacyLinkDescription = newLegacyLink.Description,
+                        LegacyLinkUrl = newLegacyLink.Url,
                     });
 
-                    _context.Update(publication);
+                    _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
 
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return _mapper.Map<List<LegacyReleaseViewModel>>(
-                        publication.LegacyReleases.OrderByDescending(release => release.Order)
-                    );
+                    return await GetReleaseSeries(publication.Id)
+                        .OnSuccess(releaseSeries => releaseSeries);
+                });
+        }
+
+        public async Task<Either<ActionResult, List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
+            Guid publicationId,
+            List<ReleaseSeriesItemUpdateRequest> updatedReleaseSeriesItems)
+        {
+            return await _context.Publications
+                .Include(p => p.ReleaseVersions)
+                .FirstOrNotFoundAsync(p => p.Id == publicationId)
+                .OnSuccess(_userService.CheckCanManageReleaseSeries)
+                .OnSuccess(async publication =>
+                {
+                    // Check new series items details are correct
+                    foreach (var seriesItem in updatedReleaseSeriesItems)
+                    {
+                        if (seriesItem.ReleaseId != null && (
+                                seriesItem.LegacyLinkDescription != null || seriesItem.LegacyLinkUrl != null))
+                        {
+                            throw new ArgumentException(
+                                $"LegacyLink details shouldn't be set if ReleaseId is set. ReleaseSeriesItem: {seriesItem.Id}");
+                        }
+
+                        if (seriesItem.ReleaseId == null && (
+                                seriesItem.LegacyLinkDescription == null || seriesItem.LegacyLinkUrl == null))
+                        {
+                            throw new ArgumentException(
+                                $"LegacyLink details should be set if ReleaseId is null. ReleaseSeriesItem: {seriesItem.Id}");
+                        }
+                    }
+
+                    // Check all publication releases are included in updatedReleaseSeriesItems
+                    var publicationReleaseIds = publication.ReleaseVersions
+                        .Select(rv => rv.ReleaseId)
+                        .Distinct()
+                        .ToList();
+
+                    var updatedSeriesReleaseIds = updatedReleaseSeriesItems
+                        .Where(rsi => rsi.ReleaseId != null)
+                        .Select(rsi => rsi.ReleaseId!.Value)
+                        .ToList();
+
+                    if (!ComparerUtils.SequencesAreEqualIgnoringOrder(publicationReleaseIds, updatedSeriesReleaseIds))
+                    {
+                        throw new ArgumentException(
+                            "Missing or duplicate release in new release series. Expected ReleaseIds: " +
+                            publicationReleaseIds.Select(id => id.ToString()).JoinToString(","));
+                    }
+
+                    // NOTE: A malicious user could change the release series items' Ids, but we don't care
+
+                    var newReleaseSeries = updatedReleaseSeriesItems
+                        .Select(request => new ReleaseSeriesItem
+                        {
+                            Id = request.Id,
+                            ReleaseId = request.ReleaseId,
+                            LegacyLinkDescription = request.LegacyLinkDescription,
+                            LegacyLinkUrl = request.LegacyLinkUrl,
+                        }).ToList();
+
+                    publication.ReleaseSeries = newReleaseSeries;
+                    _context.Publications.Update(publication);
+
+                    await _context.SaveChangesAsync();
+
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return await GetReleaseSeries(publication.Id)
+                        .OnSuccess(releaseSeries => releaseSeries);
                 });
         }
 

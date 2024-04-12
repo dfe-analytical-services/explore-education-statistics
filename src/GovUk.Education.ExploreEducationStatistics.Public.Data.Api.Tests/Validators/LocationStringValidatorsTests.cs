@@ -111,8 +111,8 @@ public class LocationStringValidatorsTests
 
             var state = Assert.IsType<LocationStringValidators.AllowedLevelErrorDetail>(error.CustomState);
 
-            Assert.Equal(location, state.Value);
-            Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.Allowed);
+            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
+            Assert.Equal(EnumUtil.GetEnumValues<GeographicLevel>().Order(), state.AllowedLevels);
         }
 
         [Theory]
@@ -139,8 +139,8 @@ public class LocationStringValidatorsTests
 
             var state = Assert.IsType<LocationStringValidators.AllowedPropertyErrorDetail>(error.CustomState);
 
-            Assert.Equal(location, state.Value);
-            Assert.Equal(allowedProperties, state.Allowed);
+            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
+            Assert.Equal(allowedProperties, state.AllowedProperties);
         }
 
         [Theory]
@@ -172,8 +172,8 @@ public class LocationStringValidatorsTests
 
             var state = Assert.IsType<LocationStringValidators.MaxValueLengthErrorDetail>(error.CustomState);
 
-            Assert.Equal(location, state.Value);
-            Assert.Equal(expectedMaxLength, state.MaxLength);
+            Assert.Equal(location, $"{state.Value.Level}|{state.Value.Property}|{state.Value.Value}");
+            Assert.Equal(expectedMaxLength, state.MaxValueLength);
         }
     }
 }

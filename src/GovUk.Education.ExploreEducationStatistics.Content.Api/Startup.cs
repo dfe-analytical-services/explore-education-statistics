@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddFluentValidation();
-            services.AddValidatorsFromAssemblyContaining<DataSetsListRequest.Validator>();
+            services.AddValidatorsFromAssemblyContaining<DataSetFileListRequest.Validator>();
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<IDataSetService, DataSetService>();
+            services.AddTransient<IDataSetFileService, DataSetFileService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IPublicationService, PublicationService>();

@@ -24,4 +24,19 @@ public record DataSetQueryCriteriaFilters
     /// Filter the results to not have a filter option matching any of these IDs.
     /// </summary>
     public IReadOnlyList<string>? NotIn { get; init; }
+
+    public HashSet<string> GetOptions()
+    {
+        List<string?> filters =
+        [
+            Eq,
+            NotEq,
+            ..In ?? [],
+            ..NotIn ?? []
+        ];
+
+        return filters
+            .OfType<string>()
+            .ToHashSet();
+    }
 }

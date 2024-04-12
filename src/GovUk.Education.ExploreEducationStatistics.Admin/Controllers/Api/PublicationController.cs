@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ExternalMethodologyViewModel =
     GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -131,17 +130,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        /// Partially update the publication's legacy releases.
-        /// Only legacy releases with matching ids will be updated,
-        /// and only non-null fields will be updated.
-        /// This is useful for bulk updates e.g. re-ordering.
-        [HttpPatch("api/publications/{publicationId:guid}/legacy-releases")]
-        public async Task<ActionResult<List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId,
-            List<LegacyReleasePartialUpdateViewModel> legacyReleases)
+        [HttpGet("api/publications/{publicationId:guid}/release-series")]
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
         {
             return await _publicationService
-                .PartialUpdateLegacyReleases(publicationId, legacyReleases)
+                .GetReleaseSeries(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("api/publications/{publicationId:guid}/release-series")]
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> AddReleaseSeriesLegacyLink(
+            Guid publicationId,
+            ReleaseSeriesLegacyLinkAddRequest request)
+        {
+            return await _publicationService
+                .AddReleaseSeriesLegacyLink(publicationId, request)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("api/publications/{publicationId:guid}/release-series")]
+        public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> UpdateReleaseSeries(
+            Guid publicationId,
+            List<ReleaseSeriesItemUpdateRequest> releaseSeries)
+        {
+            return await _publicationService
+                .UpdateReleaseSeries(publicationId, releaseSeries)
                 .HandleFailuresOrOk();
         }
 

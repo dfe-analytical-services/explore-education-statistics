@@ -1,51 +1,74 @@
-import { User, UserPublicationRole } from '@admin/services/userService';
+import userService, {
+  User,
+  UserPublicationRole,
+} from '@admin/services/userService';
+import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import { IdTitlePair } from 'src/services/types/common';
-import { Formik, FormikHelpers } from 'formik';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import { mapFieldErrors } from '@common/validation/serverValidations';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
-export interface AddPublicationRoleFormValues {
-  selectedPublicationId: string;
-  selectedPublicationRole: string;
+const addPublicationFormErrorMappings = [
+  mapFieldErrors<FormValues>({
+    target: 'publicationRole',
+    messages: {
+      UserAlreadyHasResourceRole: 'The user already has this publication role',
+    },
+  }),
+];
+
+interface FormValues {
+  publicationId: string;
+  publicationRole: string;
 }
 
 interface Props {
   publications?: IdTitlePair[];
   publicationRoles?: string[];
   user: User;
-  onRemove: (userPublicationRole: UserPublicationRole) => void;
-  onSubmit: (
-    values: AddPublicationRoleFormValues,
-    actions: FormikHelpers<AddPublicationRoleFormValues>,
-  ) => void;
+  onUpdate: () => void;
 }
 
-const PublicationAccessForm = ({
+export default function PublicationAccessForm({
   publications,
   publicationRoles,
   user,
-  onRemove,
-  onSubmit,
-}: Props) => {
+  onUpdate,
+}: Props) {
+  const handleAddPublicationRole = async (values: FormValues) => {
+    await userService.addUserPublicationRole(user.id, values);
+    onUpdate();
+  };
+
+  const handleRemovePublicationAccess = async (
+    userPublicationRole: UserPublicationRole,
+  ) => {
+    await userService.removeUserPublicationRole(user.id, userPublicationRole);
+    onUpdate();
+  };
+
   return (
-    <Formik<AddPublicationRoleFormValues>
+    <FormProvider
+      errorMappings={addPublicationFormErrorMappings}
       initialValues={{
-        selectedPublicationId:
+        publicationId:
           orderBy(publications, publication => publication)?.[0]?.id ?? '',
-        selectedPublicationRole:
+        publicationRole:
           orderBy(publicationRoles, publicationRole => publicationRole)?.[0] ??
           '',
       }}
-      enableReinitialize
-      onSubmit={onSubmit}
     >
-      {form => {
+      {({ formState }) => {
         return (
-          <Form id={`${user.id}-publicationRole`}>
+          <RHFForm
+            id={`${user.id}-publicationRole`}
+            onSubmit={handleAddPublicationRole}
+          >
             <FormFieldset
               id="role"
               legend="Publication access"
@@ -54,9 +77,9 @@ const PublicationAccessForm = ({
             >
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-half">
-                  <FormFieldSelect<AddPublicationRoleFormValues>
+                  <RHFFormFieldSelect<FormValues>
                     label="Publication"
-                    name="selectedPublicationId"
+                    name="publicationId"
                     options={publications?.map(publication => ({
                       label: publication.title,
                       value: publication.id,
@@ -65,9 +88,9 @@ const PublicationAccessForm = ({
                 </div>
 
                 <div className="govuk-grid-column-one-quarter">
-                  <FormFieldSelect<AddPublicationRoleFormValues>
+                  <RHFFormFieldSelect<FormValues>
                     label="Publication role"
-                    name="selectedPublicationRole"
+                    name="publicationRole"
                     options={publicationRoles?.map(role => ({
                       label: role,
                       value: role,
@@ -78,7 +101,7 @@ const PublicationAccessForm = ({
                   {user && (
                     <Button
                       type="submit"
-                      disabled={form.isSubmitting}
+                      disabled={formState.isSubmitting}
                       className="govuk-!-margin-top-6"
                     >
                       Add publication access
@@ -117,7 +140,9 @@ const PublicationAccessForm = ({
                       </td>
                       <td className="govuk-table__cell">
                         <ButtonText
-                          onClick={() => onRemove(userPublicationRole)}
+                          onClick={() =>
+                            handleRemovePublicationAccess(userPublicationRole)
+                          }
                         >
                           Remove
                         </ButtonText>
@@ -126,11 +151,9 @@ const PublicationAccessForm = ({
                   ))}
               </tbody>
             </table>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
-};
-
-export default PublicationAccessForm;
+}

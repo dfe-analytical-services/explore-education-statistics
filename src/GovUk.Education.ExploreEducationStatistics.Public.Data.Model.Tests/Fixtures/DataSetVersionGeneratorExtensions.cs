@@ -25,6 +25,7 @@ public static class DataSetVersionGeneratorExtensions
             .WithLocationMetas(faker => fixture
                 .DefaultLocationMeta(options: faker.Random.Int(1, maxLocationOptions))
                 .Generate(locations))
+            .WithGeographicLevelMeta()
             .WithTimePeriodMetas(() => fixture.DefaultTimePeriodMeta().Generate(timePeriods))
             .WithMetaSummary();
 
@@ -98,6 +99,20 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithMetaSummary(
         this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetMetaSummary());
+
+    public static Generator<DataSetVersion> WithGeographicLevelMeta(
+        this Generator<DataSetVersion> generator,
+        GeographicLevelMeta meta)
+        => generator.ForInstance(s => s.SetGeographicLevelMeta(meta));
+
+    public static Generator<DataSetVersion> WithGeographicLevelMeta(
+        this Generator<DataSetVersion> generator,
+        Func<GeographicLevelMeta> meta)
+        => generator.ForInstance(s => s.SetGeographicLevelMeta(meta));
+
+    public static Generator<DataSetVersion> WithGeographicLevelMeta(
+        this Generator<DataSetVersion> generator)
+        => generator.ForInstance(s => s.SetGeographicLevelMeta());
 
     public static Generator<DataSetVersion> WithLocationMetas(
         this Generator<DataSetVersion> generator,
@@ -262,6 +277,27 @@ public static class DataSetVersionGeneratorExtensions
         => instanceSetter.Set(
             dsv => dsv.MetaSummary,
             (_, dsv) => DataSetVersionMetaSummary.Create(dsv));
+
+    public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        GeographicLevelMeta meta)
+        => instanceSetter.SetGeographicLevelMeta(() => meta);
+
+    public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<GeographicLevelMeta> meta)
+        => instanceSetter.Set(dsv => dsv.GeographicLevelMeta, meta);
+
+    public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
+        this InstanceSetters<DataSetVersion> instanceSetter)
+        => instanceSetter.Set(
+            dsv => dsv.GeographicLevelMeta,
+            (_, dsv) => new GeographicLevelMeta
+            {
+                DataSetVersionId = dsv.Id,
+                Levels = dsv.LocationMetas.Select(m => m.Level).ToList()
+            }
+        );
 
     public static InstanceSetters<DataSetVersion> SetLocationMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GovUk.Education.ExploreEducationStatistics.Publisher": {
+      "commandName": "Project",
+      "commandLineArgs": "host start --pause-on-error --port 7072"
+    }
+  }
+}
