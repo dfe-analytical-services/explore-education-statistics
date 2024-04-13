@@ -24,17 +24,22 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             PageSize: pageSize,
             PublicationIds: publicationIds);
 
-        var response = await httpClient.PostAsJsonAsync("api/publications", request, cancellationToken: cancellationToken);
+        var response = await httpClient
+            .PostAsJsonAsync("api/publications", request, cancellationToken: cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
+                    return new BadRequestObjectResult(
+                        await response.Content
+                            .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
+                    );
                 default:
-                    var message = await response.Content.ReadAsStringAsync();
-                    logger.LogError(StringExtensions.TrimIndent(
+                    var message = await response.Content.ReadAsStringAsync(cancellationToken);
+                    logger.LogError(
+                        StringExtensions.TrimIndent(
                         $"""
                          Failed to retrieve publications with status code: {response.StatusCode}. Message:
                          {message}
@@ -45,7 +50,9 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
         }
 
         var publications =
-            await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
+            await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>(
+                cancellationToken: cancellationToken
+            );
 
         return publications
             ?? throw new Exception("Could not deserialize publications from content API.");
@@ -62,11 +69,13 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             switch (response.StatusCode)
             {
                 case HttpStatusCode.BadRequest:
-                    return new BadRequestObjectResult(await response.Content.ReadFromJsonAsync<ValidationProblemViewModel>());
+                    return new BadRequestObjectResult(await response.Content
+                        .ReadFromJsonAsync<ValidationProblemViewModel>(cancellationToken: cancellationToken)
+                    );
                 case HttpStatusCode.NotFound:
                     return new NotFoundResult();
                 default:
-                    var message = await response.Content.ReadAsStringAsync();
+                    var message = await response.Content.ReadAsStringAsync(cancellationToken);
                     logger.LogError(StringExtensions.TrimIndent(
                         $"""
                          Failed to retrieve publication '{publicationId}' with status code: {response.StatusCode}. Message:
@@ -77,7 +86,8 @@ internal class ContentApiClient(ILogger<ContentApiClient> logger, HttpClient htt
             }
         }
 
-        var publications = await response.Content.ReadFromJsonAsync<PublishedPublicationSummaryViewModel>();
+        var publications = await response.Content
+            .ReadFromJsonAsync<PublishedPublicationSummaryViewModel>(cancellationToken: cancellationToken);
 
         return publications
             ?? throw new Exception("Could not deserialize publication from content API.");
