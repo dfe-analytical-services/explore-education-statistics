@@ -428,7 +428,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(ds)
-                    .FinishWith(dsv => ds.LatestVersion = dsv)
+                    .FinishWith(dsv => ds.LatestLiveVersion = dsv)
                     .Generate())
                 .ToList();
 
@@ -439,7 +439,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             });
 
             var expectedDataSetIds = dataSets
-                .OrderByDescending(ds => ds.LatestVersion!.Published)
+                .OrderByDescending(ds => ds.LatestLiveVersion!.Published)
                 .ThenBy(ds => ds.Title)
                 .ThenBy(ds => ds.Id)
                 .Select(ds => ds.Id)
@@ -488,7 +488,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -566,7 +566,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication1DataSet)
-                .FinishWith(dsv => publication1DataSet.LatestVersion = dsv);
+                .FinishWith(dsv => publication1DataSet.LatestLiveVersion = dsv);
 
             DataSetVersion publication2DataSetVersion = DataFixture
                 .DefaultDataSetVersion(
@@ -576,7 +576,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication2DataSet)
-                .FinishWith(dsv => publication2DataSet.LatestVersion = dsv);
+                .FinishWith(dsv => publication2DataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -624,7 +624,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {

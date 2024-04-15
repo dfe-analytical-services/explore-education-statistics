@@ -1,114 +1,693 @@
 #nullable enable
-
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
-using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static Moq.MockBehavior;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api;
- 
-public class PublicationControllerTests
-{
-    [Fact]
-    public async Task CreatePublication_Ok()
-    {
-        var publicationService = new Mock<IPublicationService>(Strict);
 
-        publicationService
-            .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
-            .Returns<PublicationCreateRequest>(p =>
-                Task.FromResult(new Either<ActionResult, PublicationCreateViewModel>(
-                    new PublicationCreateViewModel
-                    {
-                        Topic = new IdTitleViewModel
-                        {
-                            Id = p.TopicId,
-                        }
-                    })
-                )
+public class PublicationControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+{
+    public class CreatePublicationTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Topic topic = DataFixture.DefaultTopic()
+                .WithTheme(DataFixture.DefaultTheme());
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Topics.Add(topic);
+            });
+
+            var request = new PublicationCreateRequest
+            {
+                Title = "Publication",
+                Summary = "Publication summary",
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                TopicId = topic.Id
+            };
+
+            var response = await CreatePublication(request);
+
+            var result = response.AssertOk<PublicationCreateViewModel>();
+
+            Assert.Multiple(
+                () => Assert.Equal(request.Title, result.Title),
+                () => Assert.Equal(request.Summary, result.Summary),
+                () => Assert.Equal("publication", result.Slug),
+                () => Assert.Equal(request.Contact.TeamName, result.Contact.TeamName),
+                () => Assert.Equal(request.Contact.TeamEmail, result.Contact.TeamEmail),
+                () => Assert.Equal(request.Contact.ContactName, result.Contact.ContactName),
+                () => Assert.Equal(request.Contact.ContactTelNo, result.Contact.ContactTelNo),
+                () => Assert.Equal(topic.Id, result.Topic.Id),
+                () => Assert.Equal(topic.Title, result.Topic.Title),
+                () => Assert.Equal(topic.Theme.Id, result.Theme.Id),
+                () => Assert.Equal(topic.Theme.Title, result.Theme.Title),
+                () => Assert.Null(result.SupersededById),
+                () => Assert.False(result.IsSuperseded)
             );
 
-        var controller = BuildController(publicationService: publicationService.Object);
+            await using var context = TestApp.GetDbContext<ContentDbContext>();
 
-        var topicId = Guid.NewGuid();
+            var saved = await context.Publications
+                .Include(p => p.Contact)
+                .Include(p => p.Topic)
+                .ThenInclude(t => t.Theme)
+                .SingleAsync(p => p.Id == result.Id);
 
-        // Method under test
-        var result = await controller.CreatePublication(new PublicationCreateRequest()
+            Assert.Multiple(
+                () => Assert.Equal(request.Title, saved.Title),
+                () => Assert.Equal(request.Summary, saved.Summary),
+                () => Assert.Equal("publication", saved.Slug),
+                () => Assert.Equal(request.Contact.TeamName, saved.Contact.TeamName),
+                () => Assert.Equal(request.Contact.TeamEmail, saved.Contact.TeamEmail),
+                () => Assert.Equal(request.Contact.ContactName, saved.Contact.ContactName),
+                () => Assert.Equal(request.Contact.ContactTelNo, saved.Contact.ContactTelNo),
+                () => Assert.Equal(topic.Id, saved.Topic.Id),
+                () => Assert.Equal(topic.Title, saved.Topic.Title),
+                () => Assert.Equal(topic.Theme.Id, saved.Topic.Theme.Id),
+                () => Assert.Equal(topic.Theme.Title, saved.Topic.Theme.Title)
+            );
+        }
+
+        [Fact]
+        public async Task PublicationSlugNotUnique_ReturnsValidationError()
         {
-            TopicId = topicId
-        });
+            Publication publication = DataFixture.DefaultPublication()
+                .WithTopic(DataFixture.DefaultTopic()
+                    .WithTheme(DataFixture.DefaultTheme()));
 
-        Assert.IsType<PublicationCreateViewModel>(result.Value);
-        Assert.Equal(topicId, result.Value.Topic.Id);
+            Topic topic = DataFixture.DefaultTopic()
+                .WithTheme(DataFixture.DefaultTheme());
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Publications.Add(publication);
+                context.Topics.Add(topic);
+            });
+
+            var request = new PublicationCreateRequest
+            {
+                Title = "Publication",
+                Slug = publication.Slug, // Same slug as an existing saved publication
+                Summary = "Publication summary",
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                TopicId = topic.Id
+            };
+
+            var response = await CreatePublication(request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            validationProblem.AssertHasGlobalError(ValidationErrorMessages.PublicationSlugNotUnique);
+
+            await using var context = TestApp.GetDbContext<ContentDbContext>();
+
+            // Assert a new publication was not created
+            var saved = Assert.Single(await context.Publications.ToListAsync());
+            Assert.Equal(publication.Id, saved.Id);
+        }
+
+        [Fact]
+        public async Task UserHasNoAccessToCreatePublication_ReturnsForbidden()
+        {
+            Topic topic = DataFixture.DefaultTopic()
+                .WithTheme(DataFixture.DefaultTheme());
+
+            await TestApp.AddTestData<ContentDbContext>(context =>
+            {
+                context.Topics.Add(topic);
+            });
+
+            var request = new PublicationCreateRequest
+            {
+                Title = "Publication",
+                Summary = "Publication summary",
+                Contact = new ContactSaveRequest
+                {
+                    TeamName = "Team",
+                    TeamEmail = "team@test.com",
+                    ContactName = "Contact",
+                    ContactTelNo = "01234567890"
+                },
+                TopicId = topic.Id
+            };
+
+            var client = TestApp
+                .SetUser(AuthenticatedUser())
+                .CreateClient();
+
+            var response = await CreatePublication(request, client);
+
+            response.AssertForbidden();
+        }
+
+        private async Task<HttpResponseMessage> CreatePublication(
+            PublicationCreateRequest request,
+            HttpClient? client = null)
+        {
+            client ??= TestApp
+                .SetUser(UserWithCreateAnyPublicationClaim())
+                .CreateClient();
+
+            return await client.PostAsJsonAsync("api/publications", request);
+        }
+
+        private static ClaimsPrincipal UserWithCreateAnyPublicationClaim()
+        {
+            var claimsPrincipal = AuthenticatedUser();
+            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
+            claimsIdentity.AddClaim(SecurityClaim(SecurityClaimTypes.CreateAnyPublication));
+            return claimsPrincipal;
+        }
     }
 
-    [Fact]
-    public async Task CreatePublication_ValidationFailure()
+    public class ListPublicationDataSetsTests(TestApplicationFactory testApp) : PublicationControllerTests(testApp)
     {
-        var publicationService = new Mock<IPublicationService>();
-
-        var validationResponse =
-            new Either<ActionResult, PublicationCreateViewModel>(
-                ValidationUtils.ValidationActionResult(SlugNotUnique));
-
-        publicationService
-            .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
-            .Returns<PublicationCreateRequest>(p => Task.FromResult(validationResponse));
-
-        var controller = BuildController(publicationService: publicationService.Object);
-
-        var topicId = Guid.NewGuid();
-
-        // Method under test
-        var result = await controller.CreatePublication(new PublicationCreateRequest()
+        [Fact]
+        public async Task PublicationHasSingleDataSet_Success_CorrectViewModel()
         {
-            TopicId = topicId
-        });
+            Publication publication = DataFixture
+                .DefaultPublication();
 
-        result.Result!.AssertValidationProblem(SlugNotUnique);
-    }
-    
-    [Fact]
-    public async Task GetRoles()
-    {
-        var publicationId = Guid.NewGuid();
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id);
 
-        var rolesForPublication = ListOf(new UserPublicationRoleViewModel
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion draftDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .WithStatusDraft()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+            DataSetVersion liveDataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .WithStatusPublished()
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(draftDataSetVersion, liveDataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest());
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+
+            var dataSetViewModel = pagedResult.Results.First();
+
+            Assert.NotNull(dataSetViewModel.DraftVersion);
+            Assert.NotNull(dataSetViewModel.LatestLiveVersion);
+
+            Assert.Multiple(
+                () => Assert.Equal(dataSet.Id, dataSetViewModel.Id),
+                () => Assert.Equal(dataSet.Title, dataSetViewModel.Title),
+                () => Assert.Equal(dataSet.Summary, dataSetViewModel.Summary),
+                () => Assert.Equal(dataSet.Status, dataSetViewModel.Status),
+                () => Assert.Null(dataSetViewModel.SupersedingDataSetId),
+                () => Assert.Equal(draftDataSetVersion.Id, dataSetViewModel.DraftVersion.Id),
+                () => Assert.Equal(draftDataSetVersion.Version, dataSetViewModel.DraftVersion.Number),
+                () => Assert.Equal(draftDataSetVersion.Status, dataSetViewModel.DraftVersion.Status),
+                () => Assert.Equal(draftDataSetVersion.VersionType, dataSetViewModel.DraftVersion.Type),
+                () => Assert.Equal(liveDataSetVersion.Id, dataSetViewModel.LatestLiveVersion.Id),
+                () => Assert.Equal(liveDataSetVersion.Version, dataSetViewModel.LatestLiveVersion.Number),
+                () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
+                () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
+                () => Assert.Equal(liveDataSetVersion.Published?.ToUnixTimeSeconds(),
+                    dataSetViewModel.LatestLiveVersion?.Published.ToUnixTimeSeconds())
+            );
+        }
+
+        [Theory]
+        [InlineData(1, 10, 2)]
+        [InlineData(1, 2, 10)]
+        [InlineData(2, 2, 10)]
+        public async Task PublicationHasMultipleDataSets_Success_CorrectPaging(
+            int page,
+            int pageSize,
+            int numberOfAvailableDataSets)
         {
-            Id = Guid.NewGuid()
-        });
-    
-        var roleService = new Mock<IUserRoleService>(Strict);
+            Publication publication = DataFixture
+                .DefaultPublication();
 
-        roleService
-            .Setup(s => s.GetPublicationRolesForPublication(publicationId))
-            .ReturnsAsync(rolesForPublication);
-    
-        var controller = BuildController(roleService: roleService.Object);
+            var dataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id)
+                .GenerateList(numberOfAvailableDataSets);
 
-        // Method under test
-        var result = await controller.GetRoles(publicationId);
-        Assert.Equal(rolesForPublication, result.Value);
-    }
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
 
-    private PublicationController BuildController(
-        IPublicationService? publicationService = null,
-        IUserRoleService? roleService = null)
-    {
-        return new PublicationController(
-            publicationService ?? Mock.Of<IPublicationService>(Strict),
-            roleService ?? Mock.Of<IUserRoleService>(Strict));
+            var dataSetVersions = dataSets
+                .Select(ds =>
+                    DataFixture
+                        .DefaultDataSetVersion(
+                            filters: 1,
+                            indicators: 1,
+                            locations: 1,
+                            timePeriods: 2)
+                        .WithStatusPublished()
+                        .WithDataSet(ds)
+                        .FinishWith(dsv => ds.LatestLiveVersion = dsv)
+                        .Generate())
+                .ToList();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.UpdateRange(dataSets);
+            });
+
+            var expectedDataSetIds = dataSets
+                .OrderByDescending(ds => ds.LatestLiveVersion!.Published)
+                .Select(ds => ds.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var request = new DataSetListRequest
+            {
+                Page = page, PageSize = pageSize
+            };
+
+            var response = await ListPublicationDataSets(publication.Id, request);
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: numberOfAvailableDataSets,
+                expectedPage: page,
+                expectedPageSize: pageSize);
+
+            Assert.Equal(expectedDataSetIds.Count, pagedResult.Results.Count);
+            Assert.Equal(expectedDataSetIds, pagedResult.Results.Select(ds => ds.Id));
+        }
+
+        [Fact]
+        public async Task PublicationHasMultipleDataSets_Success_CorrectOrdering()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            var dataSets = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id)
+                .ForIndex(3, s => s.SetTitle("Dataset B"))
+                .ForIndex(5, s => s.SetTitle("Dataset A"))
+                .GenerateList(6);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.AddRange(dataSets));
+
+            var dataSetVersions = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .ForIndex(0, s =>
+                {
+                    // Associate data set 0 with a live version published 3 days ago
+                    s.SetDataSet(dataSets[0]);
+                    s.SetStatus(DataSetVersionStatus.Deprecated);
+                    s.SetPublished(DateTimeOffset.UtcNow.AddDays(-3));
+                })
+                .ForIndex(1, s =>
+                {
+                    // Associate data set 1 with a live version published 4 days ago
+                    s.SetDataSet(dataSets[1]);
+                    s.SetStatus(DataSetVersionStatus.Published);
+                    s.SetPublished(DateTimeOffset.UtcNow.AddDays(-4));
+                })
+                .ForIndex(2, s =>
+                {
+                    // Also associate data set 1 with a draft version that should have no bearing on the ordering
+                    s.SetDataSet(dataSets[1]);
+                    s.SetStatusDraft();
+                })
+                .ForIndex(3, s =>
+                {
+                    // Associate dataset 2 with a live version published 1 day ago
+                    s.SetDataSet(dataSets[2]);
+                    s.SetStatus(DataSetVersionStatus.Deprecated);
+                    s.SetPublished(DateTimeOffset.UtcNow.AddDays(-1));
+                })
+                .ForIndex(4, s =>
+                {
+                    // Associate dataset 3 with a draft version that should have no bearing on the ordering
+                    s.SetDataSet(dataSets[3]);
+                    s.SetStatusDraft();
+                })
+                .ForIndex(5, s =>
+                {
+                    // Associate dataset 4 with a live version published 2 days ago
+                    s.SetDataSet(dataSets[4]);
+                    s.SetStatus(DataSetVersionStatus.Published);
+                    s.SetPublished(DateTimeOffset.UtcNow.AddDays(-2));
+                })
+                .ForIndex(6, s =>
+                {
+                    // Associate dataset 5 with a draft version that should have no bearing on the ordering
+                    s.SetDataSet(dataSets[5]);
+                    s.SetStatusDraft();
+                })
+                .FinishWith(dsv =>
+                {
+                    switch (dsv.Status)
+                    {
+                        case DataSetVersionStatus.Draft:
+                            dsv.DataSet.LatestDraftVersion = dsv;
+                            break;
+                        case DataSetVersionStatus.Published or DataSetVersionStatus.Deprecated:
+                            dsv.DataSet.LatestLiveVersion = dsv;
+                            break;
+                    }
+                })
+                .GenerateList();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.AddRange(dataSetVersions);
+                context.DataSets.UpdateRange(dataSets);
+            });
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest());
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: dataSets.Count);
+
+            Guid[] expectedDataSetIds =
+            [
+                dataSets[2].Id, // Latest live version published 1 day ago
+                dataSets[4].Id, // Latest live version published 2 days ago
+                dataSets[0].Id, // Latest live version published 3 days ago
+                dataSets[1].Id, // Latest live version published 4 days ago
+                dataSets[5].Id, // Dataset has no live versions and title Dataset A
+                dataSets[3].Id, // Dataset has no live versions and title Dataset B
+            ];
+
+            Assert.Equal(expectedDataSetIds, pagedResult.Results.Select(ds => ds.Id));
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        public async Task PublicationHasSingleDataSetWithoutLiveVersion_LatestLiveVersionIsEmpty(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusDraft()
+                .WithPublicationId(publication.Id);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest());
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+
+            var dataSetViewModel = pagedResult.Results.Single();
+
+            Assert.Null(dataSetViewModel.LatestLiveVersion);
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        [InlineData(DataSetVersionStatus.Published)]
+        public async Task PublicationHasSingleDataSetWithoutDraftVersion_DraftVersionIsEmpty(
+            DataSetVersionStatus dataSetVersionStatus)
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished()
+                .WithPublicationId(publication.Id);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 2)
+                .WithPublished(DateTimeOffset.UtcNow)
+                .WithStatus(dataSetVersionStatus)
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest());
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: 1);
+
+            var dataSetViewModel = pagedResult.Results.Single();
+
+            Assert.Null(dataSetViewModel.DraftVersion);
+        }
+
+        [Fact]
+        public async Task PublicationHasNoDataSets_ReturnsEmpty()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest());
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasPagingConsistentWithEmptyResults();
+        }
+
+        [Fact]
+        public async Task NoPublication_ReturnsNotFound()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var response = await ListPublicationDataSets(publicationId, new DataSetListRequest());
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task UserHasNoAccessToPublication_ReturnsForbidden()
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+            var client = TestApp
+                .SetUser(AuthenticatedUser())
+                .CreateClient();
+
+            var response = await ListPublicationDataSets(publication.Id, new DataSetListRequest(), client);
+
+            response.AssertForbidden();
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task PageBelowMinimumThreshold_ReturnsValidationError(int page)
+        {
+            var publicationId = Guid.NewGuid();
+
+            var request = new DataSetListRequest
+            {
+                Page = page
+            };
+
+            var response = await ListPublicationDataSets(publicationId, request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(9999)]
+        public async Task PageAboveMinimumThreshold_Success(int page)
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+            var request = new DataSetListRequest
+            {
+                Page = page
+            };
+
+            var response = await ListPublicationDataSets(publication.Id, request);
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPage: page);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(101)]
+        public async Task PageSizeOutsideAllowedRange_ReturnsValidationError(int pageSize)
+        {
+            var publicationId = Guid.NewGuid();
+
+            var request = new DataSetListRequest
+            {
+                PageSize = pageSize
+            };
+
+            var response = await ListPublicationDataSets(publicationId, request);
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 100);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(100)]
+        public async Task PageSizeInAllowedRange_Success(int pageSize)
+        {
+            Publication publication = DataFixture
+                .DefaultPublication();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.Publications.Add(publication));
+
+            var request = new DataSetListRequest
+            {
+                PageSize = pageSize
+            };
+
+            var response = await ListPublicationDataSets(publication.Id, request);
+
+            var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetViewModel>>();
+
+            pagedResult.AssertHasPagingConsistentWithEmptyResults(expectedPageSize: pageSize);
+        }
+
+        private async Task<HttpResponseMessage> ListPublicationDataSets(
+            Guid publicationId,
+            DataSetListRequest request,
+            HttpClient? client = null)
+        {
+            client ??= TestApp
+                .SetUser(UserWithAccessAllPublicationsClaim())
+                .CreateClient();
+
+            var queryParams = new Dictionary<string, string?>
+            {
+                {
+                    "page", request.Page.ToString()
+                },
+                {
+                    "pageSize", request.PageSize.ToString()
+                }
+            };
+
+            var uri = QueryHelpers.AddQueryString($"/api/publications/{publicationId}/data-sets", queryParams);
+
+            return await client.GetAsync(uri);
+        }
+
+        private static ClaimsPrincipal UserWithAccessAllPublicationsClaim()
+        {
+            var claimsPrincipal = AuthenticatedUser();
+            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
+            claimsIdentity.AddClaim(SecurityClaim(SecurityClaimTypes.AccessAllPublications));
+            return claimsPrincipal;
+        }
     }
 }

@@ -25,7 +25,7 @@ internal class DataSetService(
     {
         return await publicDataDbContext.DataSets
             .AsNoTracking()
-            .Include(ds => ds.LatestVersion)
+            .Include(ds => ds.LatestLiveVersion)
             .SingleOrNotFoundAsync(ds => ds.Id == dataSetId, cancellationToken: cancellationToken)
             .OnSuccessDo(userService.CheckCanViewDataSet)
             .OnSuccess(MapDataSet);
@@ -39,14 +39,14 @@ internal class DataSetService(
     {
         var queryable = publicDataDbContext.DataSets
             .AsNoTracking()
-            .Include(ds => ds.LatestVersion)
+            .Include(ds => ds.LatestLiveVersion)
             .Where(ds => ds.PublicationId == publicationId)
             .WherePublicStatus();
 
         var totalResults = await queryable.CountAsync(cancellationToken: cancellationToken);
 
         var dataSets = (await queryable
-                .OrderByDescending(ds => ds.LatestVersion!.Published)
+                .OrderByDescending(ds => ds.LatestLiveVersion!.Published)
                 .ThenBy(ds => ds.Title)
                 .ThenBy(ds => ds.Id)
                 .Skip((page - 1) * pageSize)
@@ -146,7 +146,7 @@ internal class DataSetService(
             Title = dataSet.Title,
             Summary = dataSet.Summary,
             Status = dataSet.Status,
-            LatestVersion = MapLatestVersion(dataSet.LatestVersion!),
+            LatestVersion = MapLatestVersion(dataSet.LatestLiveVersion!),
             SupersedingDataSetId = dataSet.SupersedingDataSetId,
         };
     }
@@ -219,9 +219,9 @@ internal class DataSetService(
         {
             return await publicDataDbContext.DataSets
                 .AsNoTracking()
-                .Include(ds => ds.LatestVersion)
+                .Include(ds => ds.LatestLiveVersion)
                 .Where(ds => ds.Id == dataSetId)
-                .Select(ds => ds.LatestVersion!)
+                .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 

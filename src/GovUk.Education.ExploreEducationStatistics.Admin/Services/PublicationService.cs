@@ -600,7 +600,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> ValidatePublicationSlug(
             string newSlug, Guid? publicationId = null)
         {
-            if (await _context.Publications.AsQueryable()
+            if (await _context.Publications
                     .AnyAsync(publication =>
                         publication.Id != publicationId
                         && publication.Slug == newSlug))

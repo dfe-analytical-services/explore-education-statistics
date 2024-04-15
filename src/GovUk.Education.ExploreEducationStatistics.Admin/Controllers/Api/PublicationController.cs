@@ -1,10 +1,15 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -20,24 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Authorize]
     [ApiController]
-    public class PublicationController : ControllerBase
+    public class PublicationController(
+        IDataSetService dataSetService,
+        IPublicationService publicationService,
+        IUserRoleService roleService)
+        : ControllerBase
     {
-        private readonly IPublicationService _publicationService;
-        private readonly IUserRoleService _roleService;
-
-        public PublicationController(
-            IPublicationService publicationService,
-            IUserRoleService roleService)
-        {
-            _publicationService = publicationService;
-            _roleService = roleService;
-        }
-
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
             [FromQuery] Guid? topicId)
         {
-            return await _publicationService
+            return await publicationService
                 .ListPublications(topicId)
                 .HandleFailuresOrOk();
         }
@@ -45,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publication-summaries")]
         public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
-            return await _publicationService
+            return await publicationService
                 .ListPublicationSummaries()
                 .HandleFailuresOrOk();
         }
@@ -54,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
             [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
         {
-            return await _publicationService
+            return await publicationService
                 .GetPublication(publicationId, includePermissions)
                 .HandleFailuresOrOk();
         }
@@ -62,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
         public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
         {
-            return await _publicationService.GetExternalMethodology(publicationId)
+            return await publicationService.GetExternalMethodology(publicationId)
                 .HandleFailuresOrOk();
         }
 
@@ -70,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
             Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
         {
-            return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
+            return await publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
                 .HandleFailuresOrOk();
         }
 
@@ -78,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<Unit>> RemoveExternalMethodology(
             Guid publicationId)
         {
-            return await _publicationService.RemoveExternalMethodology(publicationId)
+            return await publicationService.RemoveExternalMethodology(publicationId)
                 .HandleFailuresOrNoContent();
         }
 
@@ -86,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ContactViewModel>> GetContact(
             Guid publicationId)
         {
-            return await _publicationService.GetContact(publicationId)
+            return await publicationService.GetContact(publicationId)
                 .HandleFailuresOrOk();
         }
 
@@ -94,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<ContactViewModel>> UpdateContact(
             Guid publicationId, ContactSaveRequest updatedContact)
         {
-            return await _publicationService.UpdateContact(publicationId, updatedContact)
+            return await publicationService.UpdateContact(publicationId, updatedContact)
                 .HandleFailuresOrOk();
         }
 
@@ -106,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery] bool? live = null,
             [FromQuery] bool includePermissions = false)
         {
-            return await _publicationService
+            return await publicationService
                 .ListLatestReleaseVersionsPaginated(publicationId, page, pageSize, live, includePermissions)
                 .HandleFailuresOrOk();
         }
@@ -115,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<PublicationCreateViewModel>> CreatePublication(
             PublicationCreateRequest publication)
         {
-            return await _publicationService
+            return await publicationService
                 .CreatePublication(publication)
                 .HandleFailuresOrOk();
         }
@@ -125,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid publicationId,
             PublicationSaveRequest updatedPublication)
         {
-            return await _publicationService
+            return await publicationService
                 .UpdatePublication(publicationId, updatedPublication)
                 .HandleFailuresOrOk();
         }
@@ -133,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publications/{publicationId:guid}/release-series")]
         public async Task<ActionResult<List<ReleaseSeriesTableEntryViewModel>>> GetReleaseSeries(Guid publicationId)
         {
-            return await _publicationService
+            return await publicationService
                 .GetReleaseSeries(publicationId)
                 .HandleFailuresOrOk();
         }
@@ -143,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid publicationId,
             ReleaseSeriesLegacyLinkAddRequest request)
         {
-            return await _publicationService
+            return await publicationService
                 .AddReleaseSeriesLegacyLink(publicationId, request)
                 .HandleFailuresOrOk();
         }
@@ -153,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid publicationId,
             List<ReleaseSeriesItemUpdateRequest> releaseSeries)
         {
-            return await _publicationService
+            return await publicationService
                 .UpdateReleaseSeries(publicationId, releaseSeries)
                 .HandleFailuresOrOk();
         }
@@ -161,8 +159,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publications/{publicationId:guid}/roles")]
         public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
         {
-            return await _roleService
+            return await roleService
                 .GetPublicationRolesForPublication(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("api/publications/{publicationId:guid}/data-sets")]
+        [Produces("application/json")]
+        public async Task<ActionResult<PaginatedListViewModel<DataSetViewModel>>> ListPublicationDataSets(
+            [FromQuery] DataSetListRequest request,
+            Guid publicationId,
+            CancellationToken cancellationToken)
+        {
+            return await dataSetService
+                .ListPublicationDataSets(
+                    page: request.Page,
+                    pageSize: request.PageSize,
+                    publicationId: publicationId,
+                    cancellationToken: cancellationToken)
                 .HandleFailuresOrOk();
         }
     }
