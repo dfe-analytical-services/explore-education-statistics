@@ -122,7 +122,7 @@ jobs:
       artifactName: test-results-admin-and-public-2
 
 
-- job: 'public ui tests playwright'
+- job: 'publicPlaywrightUItest'
   displayName: Public UI tests- Playwright
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -193,7 +193,7 @@ jobs:
       artifactName: test-results-playwright-tests
 
 
-- job: 'admin playwright UI tests'
+- job: 'adminPlaywrightUItest'
   displayName: Admin playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
