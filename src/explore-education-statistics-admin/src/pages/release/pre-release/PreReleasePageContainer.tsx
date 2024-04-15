@@ -17,7 +17,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { utcToZonedTime, format } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 import React from 'react';
 import { generatePath } from 'react-router';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
@@ -26,6 +26,25 @@ interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   preReleaseSummary: PreReleaseSummary;
 }
+
+export const calculatePraPeriodAdvice = (
+  start: Date,
+  scheduledPublishDate: Date,
+): string => {
+  const dateOfPraStart = formatInTimeZone(
+    start,
+    'Europe/London',
+    'd MMMM yyyy',
+  );
+  const timeOfPraStart = formatInTimeZone(start, 'Europe/London', 'HH:mm');
+  const dayScheduledForPublish = formatInTimeZone(
+    scheduledPublishDate,
+    'Europe/London',
+    'd MMMM yyyy',
+  );
+
+  return `Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dayScheduledForPublish}.`;
+};
 
 const PreReleasePageContainer = ({
   match,
@@ -104,13 +123,7 @@ const PreReleasePageContainer = ({
     }
 
     if (access === 'Before') {
-      const zonedStartDate = utcToZonedTime(start, 'Europe/London');
-      const dateOfPraStart = format(zonedStartDate, 'd MMMM yyyy');
-      const timeOfPraStart = format(zonedStartDate, 'HH:mm');
-      const dayScheduledForPublish = format(
-        scheduledPublishDate,
-        'd MMMM yyyy',
-      );
+      // const utcStart = zonedTimeToUtc(start, start.getTimezoneOffset);
 
       return (
         <>
@@ -121,9 +134,7 @@ const PreReleasePageContainer = ({
             of <strong>{publicationTitle}</strong> is not yet available.
           </p>
 
-          <p>
-            {`Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dayScheduledForPublish}.`}
-          </p>
+          <p>{calculatePraPeriodAdvice(start, scheduledPublishDate)}</p>
 
           <p>
             If you believe that this release should be available and you are
