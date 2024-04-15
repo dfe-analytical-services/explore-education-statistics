@@ -465,6 +465,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("PublicDataSetVersionId");
+
                     b.HasIndex("ReplacedById")
                         .IsUnique()
                         .HasFilter("[ReplacedById] IS NOT NULL");

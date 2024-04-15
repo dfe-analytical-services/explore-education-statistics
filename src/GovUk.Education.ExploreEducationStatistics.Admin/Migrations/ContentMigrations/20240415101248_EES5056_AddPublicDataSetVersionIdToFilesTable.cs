@@ -16,11 +16,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "Files",
                 type: "uniqueidentifier",
                 nullable: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_PublicDataSetVersionId",
+                table: "Files",
+                column: "PublicDataSetVersionId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "IX_Files_PublicDataSetVersionId",
+                table: "Files");
+
             migrationBuilder.DropColumn(
                 name: "PublicDataSetVersionId",
                 table: "Files");

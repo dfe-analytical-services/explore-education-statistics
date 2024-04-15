@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20240408155731_EES5056_AddPublicDataSetVersionIdToFilesTable")]
+    [Migration("20240415101248_EES5056_AddPublicDataSetVersionIdToFilesTable")]
     partial class EES5056_AddPublicDataSetVersionIdToFilesTable
     {
         /// <inheritdoc />
@@ -467,6 +467,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("PublicDataSetVersionId");
 
                     b.HasIndex("ReplacedById")
                         .IsUnique()
