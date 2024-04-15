@@ -74,16 +74,16 @@ internal class DataSetQueryService(
             },
             Indicators = request.Indicators,
             Sorts = request.Sorts?.Select(DataSetQuerySort.Parse).ToList(),
+            Debug = request.Debug,
+            Page = request.Page,
+            PageSize = request.PageSize,
         };
 
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
             .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
             .OnSuccess(dsv => RunQuery(
                 dataSetVersion: dsv,
-                request: query,
-                page: request.Page,
-                pageSize: request.PageSize,
-                debug: request.Debug,
+                query: query,
                 cancellationToken: cancellationToken
             ))
             .OnSuccess(results => results with
@@ -130,10 +130,7 @@ internal class DataSetQueryService(
 
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
         DataSetVersion dataSetVersion,
-        DataSetQueryRequest request,
-        int page,
-        int pageSize,
-        bool debug,
+        DataSetQueryRequest query,
         CancellationToken cancellationToken)
     {
         using var _ = MiniProfiler.Current
@@ -143,10 +140,10 @@ internal class DataSetQueryService(
 
         var whereBuilder = new DuckDbSqlBuilder();
 
-        if (request.Criteria is not null)
+        if (query.Criteria is not null)
         {
             whereBuilder += await dataSetQueryParser.ParseCriteria(
-                request.Criteria,
+                query.Criteria,
                 dataSetVersion,
                 queryState,
                 cancellationToken
@@ -158,10 +155,10 @@ internal class DataSetQueryService(
 
         await Task.WhenAll(columnsTask, indicatorsTask);
 
-        var indicators = GetIndicators(request, indicatorsTask.Result, queryState);
+        var indicators = GetIndicators(query, indicatorsTask.Result, queryState);
 
         var sorts = GetSorts(
-            request: request,
+            request: query,
             columns: columnsTask.Result,
             indicators: indicators,
             queryState: queryState);
@@ -192,13 +189,13 @@ internal class DataSetQueryService(
             ],
             where: whereSql,
             sorts: sorts,
-            page: page,
-            pageSize: pageSize,
+            page: query.Page,
+            pageSize: query.PageSize,
             cancellationToken: cancellationToken);
 
         await Task.WhenAll(countTask, rowsTask);
 
-        if (debug)
+        if (query.Debug)
         {
             queryState.Warnings.Add(new WarningViewModel
             {
@@ -218,12 +215,15 @@ internal class DataSetQueryService(
 
         return new DataSetQueryPaginatedResultsViewModel
         {
-            Paging = new PagingViewModel(page, pageSize, (int)countTask.Result),
+            Paging = new PagingViewModel(
+                page: query.Page,
+                pageSize: query.PageSize,
+                totalResults: (int)countTask.Result),
             Results = await MapQueryResults(
                 rows: rowsTask.Result,
                 dataSetVersion: dataSetVersion,
                 columnsByType: columnsByType,
-                debug: debug,
+                debug: query.Debug,
                 cancellationToken: cancellationToken),
             Warnings = queryState.Warnings
         };
