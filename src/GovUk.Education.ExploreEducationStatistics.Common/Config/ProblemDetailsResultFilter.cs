@@ -17,6 +17,21 @@ public class ProblemDetailsResultFilter : IResultFilter
             return;
         }
 
+        if (result.Value is ValidationProblemViewModel validationProblemViewModel)
+        {
+            // If there are no OriginalDetails, this means we did not construct the view
+            // model using a ValidationProblemDetails from the framework. Consequently, we need
+            // to apply the defaults to ensure the view model is filled out properly.
+            // This is mostly applicable to any use of our current ValidationUtils methods
+            // which create custom bad request results with the view model already constructed.
+            if (validationProblemViewModel.OriginalDetails is null)
+            {
+                ApplyValidationProblemDefaults(context, validationProblemViewModel);
+            }
+
+            return;
+        }
+
         if (result.Value is not ProblemDetails problemDetails)
         {
             return;
@@ -28,20 +43,7 @@ public class ProblemDetailsResultFilter : IResultFilter
 
         if (problemDetails is not ValidationProblemDetails validationProblemDetails)
         {
-            return;
-        }
-
-        if (problemDetails is ValidationProblemViewModel validationProblemViewModel)
-        {
-            // If there are no OriginalDetails, this means we did not receive construct the view
-            // model using a ValidationProblemDetails from the framework. Consequently, we need
-            // to apply the defaults to ensure the view model is filled out properly.
-            // This is mostly applicable to any use of our current ValidationUtils methods
-            // which create custom bad request results with the view model already constructed.
-            if (validationProblemViewModel.OriginalDetails is null)
-            {
-                ApplyValidationProblemDefaults(context, validationProblemViewModel);
-            }
+            result.Value = ProblemDetailsViewModel.Create(problemDetails);
 
             return;
         }

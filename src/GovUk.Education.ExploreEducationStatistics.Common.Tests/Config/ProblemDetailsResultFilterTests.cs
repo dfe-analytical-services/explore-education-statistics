@@ -12,12 +12,9 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Config;
 
-public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
+public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup> testApp)
+    : IntegrationTest<TestStartup>(testApp)
 {
-    public ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-    {
-    }
-
     [Fact]
     public async Task BadRequest_Returns400ProblemDetails()
     {

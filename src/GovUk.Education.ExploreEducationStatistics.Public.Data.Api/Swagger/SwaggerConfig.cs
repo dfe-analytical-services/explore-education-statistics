@@ -1,4 +1,5 @@
 using Asp.Versioning.ApiExplorer;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -15,18 +16,19 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
         options.SchemaFilter<SwaggerEnumSchemaFilter>();
         options.SchemaFilter<DataSetStatusSchemaFilter>();
         options.SchemaFilter<DataSetVersionStatusSchemaFilter>();
+        options.SchemaFilter<ErrorViewModelSchemaFilter>();
         options.SchemaFilter<GeographicLevelSchemaFilter>();
         options.SchemaFilter<TimeIdentifierSchemaFilter>();
 
-        var fileName = typeof(Program).Assembly.GetName().Name + ".xml";
-        var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
+        Directory
+            .GetFiles(AppContext.BaseDirectory,"*.xml", SearchOption.TopDirectoryOnly)
+            .ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
         options.DescribeAllParametersInCamelCase();
         options.UseOneOfForPolymorphism();
         options.UseAllOfForInheritance();
         options.UseAllOfToExtendReferenceSchemas();
         options.SupportNonNullableReferenceTypes();
-        options.IncludeXmlComments(filePath);
         options.CustomOperationIds(apiDesc =>
             {
                 var actionDescriptor = apiDesc.ActionDescriptor;

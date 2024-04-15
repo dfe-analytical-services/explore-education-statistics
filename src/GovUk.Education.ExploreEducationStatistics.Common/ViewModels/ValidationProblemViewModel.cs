@@ -13,15 +13,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 /// This type of response will be composed of one or more errors
 /// relating to the request and its properties.
 /// </summary>
-public class ValidationProblemViewModel : ValidationProblemDetails
+public record ValidationProblemViewModel : ProblemDetailsViewModel
 {
-    /// <inheritdoc cref="ValidationProblemDetails.Status" />
+    /// <inheritdoc cref="ProblemDetailsViewModel.Status" />
     public new int Status => StatusCodes.Status400BadRequest;
 
     /// <summary>
-    /// Additional errors that are related to the validation problem.
+    /// The errors relating to the validation problem.
     /// </summary>
-    public new IReadOnlyList<ErrorViewModel> Errors { get; set; } = new List<ErrorViewModel>();
+    public IReadOnlyList<ErrorViewModel> Errors { get; set; } = new List<ErrorViewModel>();
 
     [JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
