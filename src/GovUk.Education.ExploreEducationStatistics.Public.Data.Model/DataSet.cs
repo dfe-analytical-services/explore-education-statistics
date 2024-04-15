@@ -20,6 +20,10 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public DataSet? SupersedingDataSet { get; set; }
 
+    public Guid? LatestDraftVersionId { get; set; }
+
+    public DataSetVersion? LatestDraftVersion { get; set; }
+
     public Guid? LatestLiveVersionId { get; set; }
 
     public DataSetVersion? LatestLiveVersion { get; set; }
@@ -39,6 +43,12 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
         public void Configure(EntityTypeBuilder<DataSet> builder)
         {
             builder.Property(ds => ds.Status).HasConversion<string>();
+
+            builder
+                .HasOne(ds => ds.LatestDraftVersion)
+                .WithOne()
+                .HasForeignKey<DataSet>(ds => ds.LatestDraftVersionId)
+                .IsRequired(false);
 
             builder
                 .HasOne(ds => ds.LatestLiveVersion)

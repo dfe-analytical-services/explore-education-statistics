@@ -131,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     PublicationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     SupersedingDataSetId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LatestDraftVersionId = table.Column<Guid>(type: "uuid", nullable: true),
                     LatestLiveVersionId = table.Column<Guid>(type: "uuid", nullable: true),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -368,6 +369,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DataSets_LatestDraftVersionId",
+                table: "DataSets",
+                column: "LatestDraftVersionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DataSets_LatestLiveVersionId",
                 table: "DataSets",
                 column: "LatestLiveVersionId",
@@ -523,6 +530,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
+                name: "FK_DataSets_DataSetVersions_LatestDraftVersionId",
+                table: "DataSets",
+                column: "LatestDraftVersionId",
+                principalTable: "DataSetVersions",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
                 name: "FK_DataSets_DataSetVersions_LatestLiveVersionId",
                 table: "DataSets",
                 column: "LatestLiveVersionId",
@@ -542,6 +556,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_DataSets_DataSetVersions_LatestDraftVersionId",
+                table: "DataSets");
+
             migrationBuilder.DropForeignKey(
                 name: "FK_DataSets_DataSetVersions_LatestLiveVersionId",
                 table: "DataSets");

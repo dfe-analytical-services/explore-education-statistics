@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240408074415_InitialMigration")]
+    [Migration("20240415084934_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -145,6 +145,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("LatestDraftVersionId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("LatestLiveVersionId")
                         .HasColumnType("uuid");
 
@@ -176,6 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LatestDraftVersionId")
+                        .IsUnique();
 
                     b.HasIndex("LatestLiveVersionId")
                         .IsUnique();
@@ -1074,6 +1080,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestDraftVersion")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestDraftVersionId");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestLiveVersion")
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestLiveVersionId");
@@ -1081,6 +1091,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
                         .WithMany()
                         .HasForeignKey("SupersedingDataSetId");
+
+                    b.Navigation("LatestDraftVersion");
 
                     b.Navigation("LatestLiveVersion");
 
