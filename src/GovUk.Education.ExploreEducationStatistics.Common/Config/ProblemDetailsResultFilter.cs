@@ -1,4 +1,6 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -12,6 +14,26 @@ public class ProblemDetailsResultFilter : IResultFilter
 {
     public void OnResultExecuting(ResultExecutingContext context)
     {
+        if (context.Result is ForbidResult)
+        {
+            // ForbidResults have empty response bodies as .NET leaves it to you to decide
+            // what to do with them. In our case, we should just convert this to a
+            // default ObjectResult with a problem details (like other HTTP error codes).
+            var forbidProblemDetails = GetDefaultProblemDetails(context, StatusCodes.Status403Forbidden);
+
+            if (forbidProblemDetails is null)
+            {
+                return;
+            }
+
+            context.Result = new ObjectResult(ProblemDetailsViewModel.Create(forbidProblemDetails))
+            {
+                StatusCode = StatusCodes.Status403Forbidden
+            };
+
+            return;
+        }
+
         if (context.Result is not ObjectResult result)
         {
             return;
@@ -55,7 +77,7 @@ public class ProblemDetailsResultFilter : IResultFilter
     {
     }
 
-    private void ApplyValidationProblemDefaults(
+    private static void ApplyValidationProblemDefaults(
         ResultExecutingContext context,
         ValidationProblemViewModel validationProblem)
     {
@@ -77,5 +99,12 @@ public class ProblemDetailsResultFilter : IResultFilter
         {
             validationProblem.Extensions["traceId"] = traceId;
         }
+    }
+
+    private static ProblemDetails? GetDefaultProblemDetails(ResultExecutingContext context, int statusCode)
+    {
+        return context.Controller is ControllerBase controllerBase
+            ? controllerBase.ProblemDetailsFactory.CreateProblemDetails(context.HttpContext, statusCode)
+            : null;
     }
 }

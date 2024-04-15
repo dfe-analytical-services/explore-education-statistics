@@ -26,7 +26,7 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
@@ -73,7 +73,7 @@ public class DataSetsController(
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
         [FromQuery] DataSetVersionListRequest request,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
@@ -97,7 +97,7 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/meta")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
         [FromQuery] DataSetMetaRequest request,
@@ -256,7 +256,7 @@ public class DataSetsController(
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
     [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetGet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
