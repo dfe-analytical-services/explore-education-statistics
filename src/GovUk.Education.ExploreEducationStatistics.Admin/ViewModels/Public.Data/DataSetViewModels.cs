@@ -50,8 +50,10 @@ public record DataSetVersionSummaryViewModel
 
     public required string Version { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionStatus Status { get; init; }
 
     public required Guid DataSetFileId { get; init; }

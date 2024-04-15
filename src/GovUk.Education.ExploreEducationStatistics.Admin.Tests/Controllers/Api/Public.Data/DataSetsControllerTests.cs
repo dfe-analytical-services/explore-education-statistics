@@ -532,7 +532,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.Version);
 
-            var content = response.AssertOk<DataSetVersionSummaryViewModel>(useSystemJson: true);
+            var content = response.AssertOk<DataSetVersionSummaryViewModel>();
 
             Assert.NotNull(content);
             Assert.Equal(dataSet.Title, content.Title);
@@ -596,11 +596,11 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.Version);
 
-            response.AssertOk<DataSetVersionSummaryViewModel>(useSystemJson: true);
+            response.AssertOk<DataSetVersionSummaryViewModel>();
         }
 
         [Fact]
-        public async Task NoPermissionsToViewReleaseVersion_Returns401()
+        public async Task NoPermissionsToViewReleaseVersion_Returns403()
         {
             ReleaseVersion releaseVersion = DataFixture
                 .DefaultReleaseVersion();
