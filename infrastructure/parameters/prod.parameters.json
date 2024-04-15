@@ -91,6 +91,9 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 1020054732800
+    },
+    "publicDataDbExists": {
+      "value": false
     }
   }
 }

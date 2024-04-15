@@ -664,6 +664,13 @@
       "metadata": {
         "description": "The password to log in to the Container registry"
       }
+    },
+    "publicDataDbExists": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
+      }
     }
   },
   "variables": {
@@ -1722,7 +1729,8 @@
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
     {

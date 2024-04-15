@@ -107,6 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
+            var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
+
             services.AddHealthChecks();
 
             /*
@@ -222,19 +225,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 }
                 else
                 {
-                    // TODO EES-5049 Admin needs user managed identity to access the public data database
-                    // services.AddDbContext<PublicDataDbContext>(options =>
-                    // {
-                    //     var sqlServerTokenProvider = new DefaultAzureCredential();
-                    //     var accessToken = sqlServerTokenProvider.GetToken(
-                    //             new TokenRequestContext(scopes:
-                    //                 ["https://ossrdbms-aad.database.windows.net/.default"]))
-                    //         .Token;
-                    //     var connectionStringWithAccessToken =
-                    //         publicDataDbConnectionString.Replace("[access_token]", accessToken);
-                    //     var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-                    //     options.UseNpgsql(dbDataSource);
-                    // });
+                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
+                    if (publicDataDbExists)
+                    {
+                        services.AddDbContext<PublicDataDbContext>(options =>
+                        {
+                            var sqlServerTokenProvider = new DefaultAzureCredential();
+                            var accessToken = sqlServerTokenProvider.GetToken(
+                                    new TokenRequestContext(scopes:
+                                        ["https://ossrdbms-aad.database.windows.net/.default"]))
+                                .Token;
+                            var connectionStringWithAccessToken =
+                                publicDataDbConnectionString.Replace("[access_token]", accessToken);
+                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+                            options.UseNpgsql(dbDataSource);
+                        });
+                    }
                 }
             }
 
@@ -444,12 +450,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
-            services.AddTransient<IDataSetService, DataSetService>(provider =>
-                // TODO EES-5049 Remove this in favour of using services.AddTransient<IDataSetService, DataSetService>()
-                // once PublicDataDbContext is configured for non-local environments.
-                new DataSetService(provider.GetRequiredService<ContentDbContext>(),
-                    provider.GetService<PublicDataDbContext>(),
-                    provider.GetRequiredService<IUserService>()));
+
+            if (publicDataDbExists)
+            {
+                services.AddTransient<IDataSetService, DataSetService>();
+            }
+            else
+            {
+                // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
+                // This is allowing for the PublicDataDbContext to be null.
+                services.AddTransient<IDataSetService, DataSetService>(provider =>
+                    new DataSetService(provider.GetRequiredService<ContentDbContext>(),
+                        provider.GetService<PublicDataDbContext>(),
+                        provider.GetRequiredService<IUserService>()));
+            }
 
             services.AddTransient<INotificationClient>(s =>
             {
