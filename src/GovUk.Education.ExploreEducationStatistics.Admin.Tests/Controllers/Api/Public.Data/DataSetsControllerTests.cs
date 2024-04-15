@@ -118,10 +118,10 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var dataSetVersions = dataSets
                 .Select(ds =>
                     DataFixture
-                        .DefaultDataSetVersion(
-                            filters: 1,
-                            indicators: 1,
-                            locations: 1,
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
                             timePeriods: 2)
                         .WithStatusPublished()
                         .WithDataSet(ds)
@@ -233,12 +233,12 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         case DataSetVersionStatus.Published or DataSetVersionStatus.Deprecated:
                             dsv.DataSet.LatestLiveVersion = dsv;
                             break;
-                    }
+        }
                 })
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
-            {
+        {
                 context.DataSetVersions.AddRange(dataSetVersions);
                 context.DataSets.UpdateRange(dataSets);
             });
@@ -443,7 +443,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         [InlineData(1)]
         [InlineData(100)]
         public async Task PageSizeInAllowedRange_Success(int pageSize)
-        {
+            {
             Publication publication = DataFixture
                 .DefaultPublication();
 
@@ -482,6 +482,303 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
+        }
+    }
+
+    public class GetDataSetVersionTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    {
+        [Fact]
+        public async Task Success()
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1);
+
+            File file = DataFixture
+                .DefaultFile();
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(file)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithCsvFileId(file.Id)
+                .WithDataSet(dataSet);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version);
+
+            var content = response.AssertOk<DataSetVersionSummaryViewModel>(useSystemJson: true);
+
+            Assert.NotNull(content);
+            Assert.Equal(dataSet.Title, content.Title);
+            Assert.Equal(release.Id, content.Release.Id);
+            Assert.Equal(releaseVersion.Title, content.Release.Title);
+            Assert.Equal(dataSetVersion.Version, content.Version);
+            Assert.Equal(dataSetVersion.VersionType, content.Type);
+            Assert.Equal(dataSetVersion.Status, content.Status);
+            Assert.Equal(dataSetVersion.CsvFileId, content.DataSetFileId);
+        }
+
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        [InlineData(DataSetVersionStatus.Published)]
+        [InlineData(DataSetVersionStatus.Deprecated)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
+        public async Task HasAccessToAllDataSetVersionStatuses(DataSetVersionStatus dataSetVersionStatus)
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1);
+
+            File file = DataFixture
+                .DefaultFile();
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(file)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatus(dataSetVersionStatus)
+                .WithCsvFileId(file.Id)
+                .WithDataSet(dataSet);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version);
+
+            response.AssertOk<DataSetVersionSummaryViewModel>(useSystemJson: true);
+        }
+
+        [Fact]
+        public async Task NoPermissionsToViewReleaseVersion_Returns401()
+        {
+            ReleaseVersion releaseVersion = DataFixture
+                .DefaultReleaseVersion();
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
+
+            var client = TestApp
+                .SetUser(AuthenticatedUser())
+                .CreateClient();
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: Guid.NewGuid(),
+                dataSetVersion: "1.0",
+                client: client);
+
+            response.AssertForbidden();
+        }
+
+        [Fact]
+        public async Task ReleaseVersionDoesNotExist_Returns404()
+        {
+            var response = await GetDataSetVersion(
+                releaseVersionId: Guid.NewGuid(),
+                dataSetId: Guid.NewGuid(),
+                dataSetVersion: "1.0");
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task NoDataSetVersionExistsForDataSet_Returns404()
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1);
+
+            File file = DataFixture
+                .DefaultFile();
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(file)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: dataSet.Id,
+                dataSetVersion: "1.0");
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task RequestedDataSetVersionDoesNotExist_Returns404()
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1);
+
+            File file = DataFixture
+                .DefaultFile();
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(file)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithCsvFileId(file.Id)
+                .WithDataSet(dataSet);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: dataSet.Id,
+                dataSetVersion: "1.1");
+
+            response.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task DataSetVersionDoesNotBelongToReleaseVersion_Returns404()
+        {
+            Release release = DataFixture
+                .DefaultRelease(publishedVersions: 1);
+
+            File file = DataFixture
+                .DefaultFile();
+
+            var releaseVersion = release.Versions.Single();
+
+            ReleaseFile releaseFile = DataFixture
+                .DefaultReleaseFile()
+                .WithFile(file)
+                .WithReleaseVersion(releaseVersion);
+
+            await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseFile));
+
+            DataSet dataSet = DataFixture
+                .DefaultDataSet()
+                .WithStatusPublished();
+
+            await TestApp.AddTestData<PublicDataDbContext>(context => context.DataSets.Add(dataSet));
+
+            DataSetVersion dataSetVersion = DataFixture
+                .DefaultDataSetVersion(
+                    filters: 1,
+                    indicators: 1,
+                    locations: 1,
+                    timePeriods: 3)
+                .WithStatusPublished()
+                .WithDataSet(dataSet);
+
+            await TestApp.AddTestData<PublicDataDbContext>(context =>
+            {
+                context.DataSetVersions.Add(dataSetVersion);
+                context.DataSets.Update(dataSet);
+            });
+
+            var response = await GetDataSetVersion(
+                releaseVersionId: releaseVersion.Id,
+                dataSetId: dataSet.Id,
+                dataSetVersion: dataSetVersion.Version);
+
+            response.AssertNotFound();
+        }
+
+        private async Task<HttpResponseMessage> GetDataSetVersion(
+            Guid releaseVersionId,
+            Guid dataSetId,
+            string dataSetVersion,
+            HttpClient? client = null)
+        {
+            client ??= TestApp
+                .SetUser(UserWithAccessAllReleasesClaim())
+                .CreateClient();
+
+            var uri = new Uri($"{BaseUrl}/{releaseVersionId}/{dataSetId}/versions/{dataSetVersion}", UriKind.Relative);
+
+            return await client.GetAsync(uri);
+        }
+
+        private static ClaimsPrincipal UserWithAccessAllReleasesClaim()
+        {
+            var claimsPrincipal = AuthenticatedUser();
+            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
+            claimsIdentity.AddClaim(SecurityClaim(SecurityClaimTypes.AccessAllReleases));
+            return claimsPrincipal;
         }
     }
 }
