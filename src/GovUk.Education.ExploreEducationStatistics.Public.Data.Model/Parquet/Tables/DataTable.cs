@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.T
 public static class DataTable
 {
     public const string TableName = "data";
+    public const string ParquetFile = "data.parquet";
 
     public static class Cols
     {

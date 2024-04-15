@@ -18,8 +18,13 @@ public static partial class SortStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> SortString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.Custom((value, context) =>
+        return rule.NotEmpty().Custom((value, context) =>
         {
+            if (value.IsNullOrWhitespace())
+            {
+                return;
+            }
+
             if (!HasValidFormat(value))
             {
                 context.AddFailure(
@@ -30,7 +35,7 @@ public static partial class SortStringValidators
                 return;
             }
 
-            var sort = new ParsedSort(value);
+            var sort = ParsedSort.Parse(value);
 
             if (!HasValidFieldLength(sort))
             {
@@ -77,12 +82,15 @@ public static partial class SortStringValidators
 
         public string Direction { get; init; }
 
-        public ParsedSort(string value)
+        public static ParsedSort Parse(string value)
         {
             var directionDelimiter = value.LastIndexOf('|');
 
-            Field = value[..directionDelimiter];
-            Direction = value[(directionDelimiter + 1)..];
+            return new ParsedSort
+            {
+                Field = value[..directionDelimiter],
+                Direction = value[(directionDelimiter + 1)..],
+            };
         }
     }
 }

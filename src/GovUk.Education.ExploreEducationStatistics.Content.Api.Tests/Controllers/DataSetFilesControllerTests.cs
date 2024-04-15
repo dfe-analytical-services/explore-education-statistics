@@ -1316,7 +1316,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 Assert.Single(validationProblem.Errors);
 
-                validationProblem.AssertHasInclusiveBetweenError("page");
+                validationProblem.AssertHasInclusiveBetweenError("page", from: 1, to: 9999);
             }
 
             [Theory]
@@ -1355,7 +1355,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 Assert.Single(validationProblem.Errors);
 
-                validationProblem.AssertHasInclusiveBetweenError("pageSize");
+                validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 40);
             }
 
             [Theory]
@@ -1393,7 +1393,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 Assert.Single(validationProblem.Errors);
 
-                validationProblem.AssertHasMinimumLengthError("searchTerm");
+                validationProblem.AssertHasMinimumLengthError("searchTerm", minLength: 3);
             }
 
             [Theory]

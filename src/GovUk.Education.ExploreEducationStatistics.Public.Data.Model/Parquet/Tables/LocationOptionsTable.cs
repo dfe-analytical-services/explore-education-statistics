@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.T
 public static class LocationOptionsTable
 {
     public const string TableName = "location_options";
+    public const string ParquetFile = "location_options.parquet";
 
     public static class Cols
     {

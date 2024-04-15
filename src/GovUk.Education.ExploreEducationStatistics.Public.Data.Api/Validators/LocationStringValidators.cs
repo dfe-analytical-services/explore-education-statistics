@@ -14,8 +14,13 @@ public static partial class LocationStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> LocationString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.Custom((value, context) =>
+        return rule.NotEmpty().Custom((value, context) =>
         {
+            if (value.IsNullOrWhitespace())
+            {
+                return;
+            }
+
             if (!HasValidFormat(value))
             {
                 context.AddFailure(
@@ -25,7 +30,7 @@ public static partial class LocationStringValidators
                 return;
             }
 
-            var location = new ParsedLocation(value);
+            var location = ParsedLocation.Parse(value);
 
             if (!HasAllowedLevel(location))
             {
@@ -168,14 +173,16 @@ public static partial class LocationStringValidators
 
         public string Value { get; init; }
 
-
-        public ParsedLocation(string value)
+        public static ParsedLocation Parse(string value)
         {
             var parts = value.Split('|');
 
-            Level = parts[0];
-            Property = parts[1];
-            Value = parts[2];
+            return new ParsedLocation
+            {
+                Level = parts[0],
+                Property = parts[1],
+                Value = parts[2],
+            };
         }
     }
 }

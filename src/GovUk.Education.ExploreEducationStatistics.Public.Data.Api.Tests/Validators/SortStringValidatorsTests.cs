@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
@@ -48,6 +49,23 @@ public class SortStringValidatorsTests
 
         [Theory]
         [InlineData("")]
+        [InlineData("  ")]
+        [InlineData(null)]
+        public void Failure_Empty(string? sort)
+        {
+            var testObj = new TestClass { Sort = sort! };
+
+            var result = _validator.Validate(testObj);
+
+            Assert.False(result.IsValid);
+
+            var error = Assert.Single(result.Errors);
+
+            Assert.Equal(nameof(TestClass.Sort), error.PropertyName);
+            Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
+        }
+
+        [Theory]
         [InlineData("Invalid")]
         [InlineData("Asc")]
         [InlineData("|Asc")]
@@ -83,6 +101,7 @@ public class SortStringValidatorsTests
             var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
 
             Assert.Equal(sort, state.Value);
+            Assert.Equal("{field}|{order}", state.ExpectedFormat);
         }
 
         [Theory]
