@@ -37,13 +37,13 @@ export const calculatePraPeriodAdvice = (
     'd MMMM yyyy',
   );
   const timeOfPraStart = formatInTimeZone(start, 'Europe/London', 'HH:mm');
-  const dayScheduledForPublish = formatInTimeZone(
+  const dateScheduledForPublish = formatInTimeZone(
     scheduledPublishDate,
     'Europe/London',
     'd MMMM yyyy',
   );
 
-  return `Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dayScheduledForPublish}.`;
+  return `Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dateScheduledForPublish}.`;
 };
 
 const PreReleasePageContainer = ({
@@ -123,8 +123,6 @@ const PreReleasePageContainer = ({
     }
 
     if (access === 'Before') {
-      // const utcStart = zonedTimeToUtc(start, start.getTimezoneOffset);
-
       return (
         <>
           <h1>Pre-release access is not yet available</h1>
