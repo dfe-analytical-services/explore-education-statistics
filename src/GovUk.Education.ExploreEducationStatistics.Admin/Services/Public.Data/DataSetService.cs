@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Release = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -57,6 +59,29 @@ public class DataSetService(
                     totalResults: await dataSetsQueryable.CountAsync(cancellationToken: cancellationToken),
                     page: page,
                     pageSize: pageSize);
+            });
+    }
+
+    public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> GetVersion(
+        Guid releaseVersionId,
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
+            .OnSuccessCombineWith(async _ => await CheckVersionExists(dataSetId, dataSetVersion))
+            .OnSuccessDo(async combinedReleaseAndDataSetVersion =>
+            {
+                var (releaseVersion, dataSetVersion) = combinedReleaseAndDataSetVersion;
+
+                return await CheckDataSetVersionBelongsToReleaseVersion(dataSetVersion, releaseVersion);
+            })
+            .OnSuccess(combinedReleaseAndDataSetVersion =>
+            {
+                var (releaseVersion, dataSetVersion) = combinedReleaseAndDataSetVersion;
+
+                return MapDataSetVersion(dataSetVersion, releaseVersion);
             });
     }
 
@@ -107,5 +132,67 @@ public class DataSetService(
         return await contentDbContext.Publications
             .AsNoTracking()
             .FirstOrNotFoundAsync(p => p.Id == publicationId, cancellationToken: cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(
+        Guid releaseVersionId,
+        CancellationToken cancellationToken = default)
+    {
+        return await contentDbContext.ReleaseVersions
+            .AsNoTracking()
+            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
+        Guid dataSetId,
+        string dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        if (!VersionUtils.TryParse(dataSetVersion, out var version))
+        {
+            return new NotFoundResult();
+        }
+
+        return await publicDataDbContext.DataSetVersions
+            .AsNoTracking()
+            .Include(dsv => dsv.DataSet)
+            .Where(dsv => dsv.DataSetId == dataSetId)
+            .Where(dsv => dsv.VersionMajor == version.Major)
+            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .SingleOrNotFoundAsync(cancellationToken);
+    }
+
+    private async Task<Either<ActionResult, Unit>> CheckDataSetVersionBelongsToReleaseVersion(
+        DataSetVersion dataSetVersion,
+        ReleaseVersion releaseVersion)
+    {
+        return await contentDbContext.ReleaseFiles
+            .AsNoTracking()
+            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
+            .Where(rf => rf.FileId == dataSetVersion.CsvFileId)
+            .SingleOrNotFoundAsync()
+            .OnSuccessVoid();
+    }
+
+    private DataSetVersionSummaryViewModel MapDataSetVersion(DataSetVersion dataSetVersion, ReleaseVersion releaseVersion)
+    {
+        return new DataSetVersionSummaryViewModel
+        {
+            Title = dataSetVersion.DataSet.Title,
+            Release = MapReleaseVersion(releaseVersion),
+            Version = dataSetVersion.Version,
+            Type = dataSetVersion.VersionType,
+            Status = dataSetVersion.Status,
+            DataSetFileId = dataSetVersion.CsvFileId,
+        };
+    }
+
+    private Release MapReleaseVersion(ReleaseVersion releaseVersion)
+    {
+        return new Release
+        {
+            Id = releaseVersion.ReleaseId,
+            Title = releaseVersion.Title,
+        };
     }
 }
