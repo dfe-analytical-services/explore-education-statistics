@@ -148,13 +148,11 @@ jobs:
 
   - script: |
       npm ci
-      pwd
     displayName: 'Install CI'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
-      pwd
     displayName: 'Install Playwright browsers'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
         # runs the playwright tests
@@ -168,7 +166,6 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      pwd
       npx playwright test  tests/public  
 
     displayName: "Run Playwright tests"
