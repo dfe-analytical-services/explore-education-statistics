@@ -193,7 +193,7 @@ jobs:
       artifactName: test-results-playwright-tests
 
 
-- job: 'Admin_playwright UI tests'
+- job: 'Admin-playwright-UI tests'
   displayName: Admin playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
