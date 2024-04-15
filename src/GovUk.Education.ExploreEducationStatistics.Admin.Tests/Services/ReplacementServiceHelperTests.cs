@@ -110,7 +110,7 @@ public class ReplacementServiceHelperTests
         };
 
         // Define a sequence for the original subject which is expected to be updated after the replacement
-        var originalReleaseSubject = new ReleaseSubject
+        var originalReleaseFile = new ReleaseFile
         {
             FilterSequence = new List<FilterSequenceEntry>
             {
@@ -341,7 +341,7 @@ public class ReplacementServiceHelperTests
         var updatedSequence = ReplacementServiceHelper.ReplaceFilterSequence(
             originalFilters: originalFilters,
             replacementFilters: replacementFilters,
-            originalReleaseSubject);
+            originalReleaseFile);
 
         // Verify the updated sequence of filters
         Assert.NotNull(updatedSequence);
@@ -527,7 +527,7 @@ public class ReplacementServiceHelperTests
         };
 
         // Define a sequence for the original subject which is expected to be updated after the replacement
-        var originalReleaseSubject = new ReleaseSubject
+        var originalReleaseFile = new ReleaseFile
         {
             IndicatorSequence = new List<IndicatorGroupSequenceEntry>
             {
@@ -673,7 +673,7 @@ public class ReplacementServiceHelperTests
         var updatedSequence = ReplacementServiceHelper.ReplaceIndicatorSequence(
             originalIndicatorGroups: originalGroups,
             replacementIndicatorGroups: replacementGroups,
-            originalReleaseSubject);
+            originalReleaseFile);
 
         // Verify the updated sequence of indicators
         Assert.NotNull(updatedSequence);

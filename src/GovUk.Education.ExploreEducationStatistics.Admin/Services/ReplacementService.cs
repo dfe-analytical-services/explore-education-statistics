@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ForEachAwaitAsync(footnotePlan =>
                             ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
 
-                    await ReplaceReleaseSubject(releaseVersionId: releaseVersionId,
+                    await ReplaceReleaseFileFilterAndIndicatorSequence(releaseVersionId: releaseVersionId,
                         originalSubjectId: originalSubjectId,
                         replacementSubjectId: replacementSubjectId);
 
@@ -1098,65 +1098,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceReleaseSubject(Guid releaseVersionId,
+        private async Task ReplaceReleaseFileFilterAndIndicatorSequence(Guid releaseVersionId,
             Guid originalSubjectId,
             Guid replacementSubjectId)
         {
-            var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .SingleAsync(rs => rs.ReleaseVersionId == releaseVersionId &&
-                                   rs.SubjectId == originalSubjectId);
+            var originalReleaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersionId
+                    && rf.File.SubjectId == originalSubjectId
+                    && rf.File.Type == FileType.Data);
 
-            var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .SingleAsync(rs => rs.ReleaseVersionId == releaseVersionId &&
-                                   rs.SubjectId == replacementSubjectId);
+            var replacementReleaseFile = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .SingleAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersionId
+                    && rf.File.SubjectId == replacementSubjectId
+                    && rf.File.Type == FileType.Data);
 
-            _statisticsDbContext.Update(replacementReleaseSubject);
+            _contentDbContext.Update(replacementReleaseFile);
 
-            replacementReleaseSubject.FilterSequence =
-                await ReplaceFilterSequence(originalReleaseSubject, replacementReleaseSubject);
-            replacementReleaseSubject.IndicatorSequence =
-                await ReplaceIndicatorSequence(originalReleaseSubject, replacementReleaseSubject);
+            replacementReleaseFile.FilterSequence =
+                await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
+            replacementReleaseFile.IndicatorSequence =
+                await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
         }
 
-        private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseSubject originalReleaseSubject,
-            ReleaseSubject replacementReleaseSubject)
+        private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile)
         {
             // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-            if (originalReleaseSubject.FilterSequence == null)
+            if (originalReleaseFile.FilterSequence == null)
             {
                 return null;
             }
 
             var originalFilters =
-                await _filterRepository.GetFiltersIncludingItems(originalReleaseSubject.SubjectId);
+                await _filterRepository.GetFiltersIncludingItems(originalReleaseFile.File.SubjectId!.Value);
             var replacementFilters =
-                await _filterRepository.GetFiltersIncludingItems(replacementReleaseSubject.SubjectId);
+                await _filterRepository.GetFiltersIncludingItems(replacementReleaseFile.File.SubjectId!.Value);
 
             return ReplacementServiceHelper.ReplaceFilterSequence(
                 originalFilters: originalFilters,
                 replacementFilters: replacementFilters,
-                originalReleaseSubject);
+                originalReleaseFile);
         }
 
         private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
-            ReleaseSubject originalReleaseSubject,
-            ReleaseSubject replacementReleaseSubject)
+            ReleaseFile originalReleaseFile,
+            ReleaseFile replacementReleaseFile)
         {
             // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-            if (originalReleaseSubject.IndicatorSequence == null)
+            if (originalReleaseFile.IndicatorSequence == null)
             {
                 return null;
             }
 
             var originalIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseSubject.SubjectId);
+                await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseFile.File.SubjectId!.Value);
             var replacementIndicatorGroups =
-                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseSubject.SubjectId);
+                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseFile.File.SubjectId!.Value);
 
             return ReplacementServiceHelper.ReplaceIndicatorSequence(
                 originalIndicatorGroups: originalIndicatorGroups,
                 replacementIndicatorGroups: replacementIndicatorGroups,
-                originalReleaseSubject);
+                originalReleaseFile);
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
@@ -1206,10 +1212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private class ReplacementSubjectMeta
         {
-            public Dictionary<string, Filter> Filters { get; set; }
-            public Dictionary<string, Indicator> Indicators { get; set; }
-            public IList<Location> Locations { get; set; }
-            public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
+            public Dictionary<string, Filter> Filters { get; set; } = new();
+            public Dictionary<string, Indicator> Indicators { get; set; } = new();
+            public IList<Location> Locations { get; set; } = null!;
+            public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; } = null!;
         }
     }
 }

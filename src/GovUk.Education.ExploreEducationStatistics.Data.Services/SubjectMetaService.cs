@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -22,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -31,76 +33,66 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : ISubjectMetaService
+    public class SubjectMetaService(
+        StatisticsDbContext statisticsDbContext,
+        ContentDbContext contentDbContext,
+        IBlobCacheService cacheService,
+        IReleaseSubjectService releaseSubjectService,
+        IFilterRepository filterRepository,
+        IFilterItemRepository filterItemRepository,
+        IIndicatorGroupRepository indicatorGroupRepository,
+        ILocationRepository locationRepository,
+        ILogger<SubjectMetaService> logger,
+        IObservationService observationService,
+        ITimePeriodService timePeriodService,
+        IUserService userService,
+        IOptions<LocationsOptions> locationOptions)
+        : ISubjectMetaService
     {
+        private readonly LocationsOptions _locationOptions = locationOptions.Value;
+
         private enum SubjectMetaQueryStep
         {
             GetTimePeriods,
             GetFilterItems
         }
 
-        private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IBlobCacheService _cacheService;
-        private readonly IReleaseSubjectService _releaseSubjectService;
-        private readonly IFilterRepository _filterRepository;
-        private readonly IFilterItemRepository _filterItemRepository;
-        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
-        private readonly ILocationRepository _locationRepository;
-        private readonly ILogger _logger;
-        private readonly IObservationService _observationService;
-        private readonly ITimePeriodService _timePeriodService;
-        private readonly IUserService _userService;
-        private readonly LocationsOptions _locationOptions;
-
-        public SubjectMetaService(
-            StatisticsDbContext statisticsDbContext,
-            IBlobCacheService cacheService,
-            IReleaseSubjectService releaseSubjectService,
-            IFilterRepository filterRepository,
-            IFilterItemRepository filterItemRepository,
-            IIndicatorGroupRepository indicatorGroupRepository,
-            ILocationRepository locationRepository,
-            ILogger<SubjectMetaService> logger,
-            IObservationService observationService,
-            ITimePeriodService timePeriodService,
-            IUserService userService,
-            IOptions<LocationsOptions> locationOptions)
-        {
-            _statisticsDbContext = statisticsDbContext;
-            _cacheService = cacheService;
-            _releaseSubjectService = releaseSubjectService;
-            _filterRepository = filterRepository;
-            _filterItemRepository = filterItemRepository;
-            _indicatorGroupRepository = indicatorGroupRepository;
-            _locationRepository = locationRepository;
-            _logger = logger;
-            _observationService = observationService;
-            _timePeriodService = timePeriodService;
-            _userService = userService;
-            _locationOptions = locationOptions.Value;
-        }
-
         public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseVersionId,
             Guid subjectId)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId,
+            return await releaseSubjectService.Find(subjectId: subjectId,
                     releaseVersionId: releaseVersionId)
                 .OnSuccess(GetSubjectMeta);
         }
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject)
         {
-            return await _userService.CheckCanViewSubjectData(releaseSubject)
-                .OnSuccess(GetSubjectMetaViewModel);
+            return await userService.CheckCanViewSubjectData(releaseSubject)
+                .OnSuccess(async rs =>
+                {
+                    var releaseFile = await contentDbContext.ReleaseFiles
+                        .Where(rf => rf.ReleaseVersionId == rs.ReleaseVersionId
+                                     && rf.File.SubjectId == rs.SubjectId
+                                     && rf.File.Type == FileType.Data)
+                        .SingleAsync();
+
+                    return new SubjectMetaViewModel
+                    {
+                        Filters = await GetFilters(releaseSubject.SubjectId, releaseFile.FilterSequence),
+                        Indicators = await GetIndicators(releaseSubject.SubjectId, releaseFile.IndicatorSequence),
+                        Locations = await GetLocations(releaseSubject.SubjectId),
+                        TimePeriod = await GetTimePeriods(releaseSubject.SubjectId)
+                    };
+                });
         }
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseVersionId,
             ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return await _releaseSubjectService.Find(subjectId: query.SubjectId,
+            return await releaseSubjectService.Find(subjectId: query.SubjectId,
                     releaseVersionId: releaseVersionId)
-                .OnSuccess(_userService.CheckCanViewSubjectData)
+                .OnSuccess(userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
                     GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
@@ -110,13 +102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<FilterUpdateViewModel> request)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId, releaseVersionId: releaseVersionId)
+            return await contentDbContext.ReleaseFiles.SingleOrNotFoundAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersionId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data)
                 .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
-                .OnSuccessVoid(async rs =>
+                .OnSuccessVoid(async releaseFile =>
                 {
                     // Set the sequence based on the order of filters, filter groups and indicators observed
                     // in the request
-                    rs.FilterSequence = request.Select(filter =>
+                    releaseFile.FilterSequence = request.Select(filter =>
                             new FilterSequenceEntry(
                                 filter.Id,
                                 filter.FilterGroups.Select(filterGroup =>
@@ -127,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                     .ToList()
                             ))
                         .ToList();
-                    await _statisticsDbContext.SaveChangesAsync();
+                    await contentDbContext.SaveChangesAsync();
                     await InvalidateCachedReleaseSubjectMetadata(releaseVersionId: releaseVersionId,
                         subjectId: subjectId);
                 });
@@ -138,34 +133,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request)
         {
-            return await _releaseSubjectService.Find(subjectId: subjectId,
-                    releaseVersionId: releaseVersionId)
+            return await contentDbContext.ReleaseFiles.SingleOrNotFoundAsync(rf =>
+                    rf.ReleaseVersionId == releaseVersionId
+                    && rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data)
                 .OnSuccessDo(() => ValidateIndicatorGroupsForSubject(subjectId, request))
-                .OnSuccessVoid(async releaseSubject =>
+                .OnSuccessVoid(async releaseFile =>
                 {
                     // Set the sequence based on the order of indicator groups and indicators observed
                     // in the request
-                    releaseSubject.IndicatorSequence = request.Select(indicatorGroup =>
+                    releaseFile.IndicatorSequence = request.Select(indicatorGroup =>
                             new IndicatorGroupSequenceEntry(
                                 indicatorGroup.Id,
                                 indicatorGroup.Indicators
                             ))
                         .ToList();
-                    await _statisticsDbContext.SaveChangesAsync();
-                    await InvalidateCachedReleaseSubjectMetadata(releaseVersionId: releaseVersionId,
+                    await contentDbContext.SaveChangesAsync();
+
+                    await InvalidateCachedReleaseSubjectMetadata(
+                        releaseVersionId: releaseVersionId,
                         subjectId: subjectId);
                 });
-        }
-
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(ReleaseSubject releaseSubject)
-        {
-            return new SubjectMetaViewModel
-            {
-                Filters = await GetFilters(releaseSubject),
-                Indicators = await GetIndicators(releaseSubject),
-                Locations = await GetLocations(releaseSubject.SubjectId),
-                TimePeriod = await GetTimePeriods(releaseSubject.SubjectId)
-            };
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
@@ -191,14 +179,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
 
-                    var observations = _statisticsDbContext
+                    var observations = statisticsDbContext
                         .Observation
                         .AsNoTracking()
                         .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
 
                     var timePeriods = await GetTimePeriods(observations);
 
-                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                     return new SubjectMetaViewModel
                     {
@@ -210,21 +198,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
 
+                    var releaseFile = await contentDbContext.ReleaseFiles
+                        .Where(rf => rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
+                                     && rf.File.SubjectId == releaseSubject.SubjectId
+                                     && rf.File.Type == FileType.Data)
+                        .SingleAsync(cancellationToken: cancellationToken);
+
                     var observations =
-                        await _observationService.GetMatchedObservations(query, cancellationToken);
-                    _logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        await observationService.GetMatchedObservations(query, cancellationToken);
+                    logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterItems = await
-                        _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
+                        filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
                     var filters =
-                        FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
-                            releaseSubject.FilterSequence);
-                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(
+                            filterItems, releaseFile.FilterSequence);
+                    logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicators = await GetIndicators(releaseSubject);
-                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    var indicators = await GetIndicators(
+                        releaseSubject.SubjectId, releaseFile.IndicatorSequence);
+                    logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                     return new SubjectMetaViewModel
                     {
@@ -238,27 +233,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
         }
 
-        private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(ReleaseSubject releaseSubject)
+        private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
         {
-            var filters = await _filterRepository.GetFiltersIncludingItems(releaseSubject.SubjectId);
-            return FiltersMetaViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
+            var filters = await filterRepository.GetFiltersIncludingItems(subjectId);
+            return FiltersMetaViewModelBuilder.BuildFilters(filters, filterSequence);
         }
 
         private async Task<TimePeriodsMetaViewModel> GetTimePeriods(Guid subjectId)
         {
-            var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
+            var timePeriods = await timePeriodService.GetTimePeriods(subjectId);
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
         private async Task<TimePeriodsMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)
         {
-            var timePeriods = await _timePeriodService.GetTimePeriods(observations);
+            var timePeriods = await timePeriodService.GetTimePeriods(observations);
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
         private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
         {
-            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+            var locations = await locationRepository.GetDistinctForSubject(subjectId);
             var locationViewModels = BuildLocationAttributeViewModels(locations,
                 _locationOptions.Hierarchies);
 
@@ -273,11 +268,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 );
         }
 
-        private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(ReleaseSubject releaseSubject)
+        private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(
+            Guid subjectId, List<IndicatorGroupSequenceEntry>? indicatorSequence)
         {
-            var indicators = await _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
+            var indicators = await indicatorGroupRepository.GetIndicatorGroups(subjectId);
             return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators,
-                releaseSubject.IndicatorSequence);
+                indicatorSequence);
         }
 
         private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(
@@ -294,14 +290,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseVersionId, Guid subjectId)
         {
-            return _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersionId, subjectId));
+            return cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseVersionId, subjectId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(
             Guid subjectId,
             List<FilterUpdateViewModel> requestFilters)
         {
-            var filters = await _filterRepository.GetFiltersIncludingItems(subjectId);
+            var filters = await filterRepository.GetFiltersIncludingItems(subjectId);
             return AssertCollectionsAreSameIgnoringOrder(filters,
                 requestFilters,
                 filter => filter.Id,
@@ -343,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> requestIndicatorGroups)
         {
-            var indicatorGroups = await _indicatorGroupRepository.GetIndicatorGroups(subjectId);
+            var indicatorGroups = await indicatorGroupRepository.GetIndicatorGroups(subjectId);
             return AssertCollectionsAreSameIgnoringOrder(indicatorGroups,
                     requestIndicatorGroups,
                     indicatorGroup => indicatorGroup.Id,

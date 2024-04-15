@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Filename = "Filename 1",
-                SubjectId = Guid.NewGuid()
+                SubjectId = Guid.NewGuid(),
             };
 
             var dataFile2 = new File
@@ -298,7 +298,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseVersion = originalReleaseVersion,
                     ReleaseVersionId = originalReleaseVersion.Id,
                     File = dataFile1,
-                    FileId = dataFile1.Id
+                    FileId = dataFile1.Id,
+                    FilterSequence = new List<FilterSequenceEntry>
+                    {
+                        new(
+                            Guid.NewGuid(),
+                            new List<FilterGroupSequenceEntry>
+                            {
+                                new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() })
+                            }
+                        )
+                    },
+                    IndicatorSequence = new List<IndicatorGroupSequenceEntry>
+                    {
+                        new(
+                            Guid.NewGuid(),
+                            new List<Guid> { Guid.NewGuid() }
+                        )
+                    },
                 },
                 new()
                 {
@@ -319,23 +336,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = subject.Id,
                 Created = DateTime.UtcNow.AddDays(-2),
                 Updated = DateTime.UtcNow.AddDays(-1),
-                FilterSequence = new List<FilterSequenceEntry>
-                {
-                    new(
-                        Guid.NewGuid(),
-                        new List<FilterGroupSequenceEntry>
-                        {
-                            new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() })
-                        }
-                    )
-                },
-                IndicatorSequence = new List<IndicatorGroupSequenceEntry>
-                {
-                    new(
-                        Guid.NewGuid(),
-                        new List<Guid> { Guid.NewGuid() }
-                    )
-                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1167,6 +1167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amendmentDataFile.ReleaseVersionId);
             Assert.Equal(originalFile.Name, amendmentDataFile.Name);
             Assert.Equal(originalFile.Order, amendmentDataFile.Order);
+            originalFile.FilterSequence.AssertDeepEqualTo(amendmentDataFile.FilterSequence);
+            originalFile.IndicatorSequence.AssertDeepEqualTo(amendmentDataFile.IndicatorSequence);
 
             // And assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry
