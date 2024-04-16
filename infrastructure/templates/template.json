@@ -621,12 +621,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "slackAppToken": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack bot user OAuth token for posting alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -1073,6 +1067,8 @@
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
+
+    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]",
 
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
@@ -3481,7 +3477,7 @@
             "value": "[variables('actionGroupAlerts')]"
           },
           "slackAppToken": {
-            "value": "[parameters('slackAppToken')]"
+            "value": "[variables('ees-alerts-slackapptoken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
@@ -4044,7 +4040,7 @@
                   "uri": "https://slack.com/api/chat.postMessage",
                   "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                    "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
                   }
                 },
                 "unsubscribe": {}

@@ -129,7 +129,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -179,7 +179,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -301,7 +301,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -351,7 +351,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [parameters('slackAppToken'))]"
+                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",

@@ -47,12 +47,6 @@
     "actionGroupAlerts": {
       "type": "string"
     },
-    "slackAppToken": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack bot user OAuth token for posting alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -61,7 +55,8 @@
     }
   },
   "variables":{
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]"
   },
   "resources":[
     {
@@ -93,7 +88,7 @@
             "value": "[parameters('keyVaultName')]"
           },
           "slackAppToken": {
-            "value": "[parameters('slackAppToken')]"
+            "value": "[variables('ees-alerts-slackapptoken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
