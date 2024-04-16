@@ -10,8 +10,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
         <!-- Disable build warnings for undocumented methods -->
-        <!-- Disable code analysis warnings for not using primary constructors -->
-        <NoWarn>1591, IDE0290</NoWarn>
+        <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
 
