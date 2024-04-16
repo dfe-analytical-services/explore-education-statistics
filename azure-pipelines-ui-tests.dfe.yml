@@ -245,7 +245,7 @@ jobs:
             CI: 'true'
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
-            ADMIN_PASSWORD: $( ees-test-ADMIN-PASSWORD)
+            ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
