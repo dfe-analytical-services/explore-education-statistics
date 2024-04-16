@@ -262,7 +262,7 @@ jobs:
       artifactName: test-results-playwright-tests-admin
 
 - job: 'AdminAndPublicPlaywrightUItest'
-  displayName: Admin playwright UI tests
+  displayName: Admin and public playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -305,7 +305,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      npx playwright test --project "admin-and-public"  
+      npx playwright test --project "adminandpublic"  
 
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
