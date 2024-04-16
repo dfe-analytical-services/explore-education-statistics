@@ -4045,7 +4045,7 @@
                   "uri": "https://slack.com/api/chat.postMessage",
                   "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken'))]"
+                    "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
                   }
                 },
                 "unsubscribe": {}
