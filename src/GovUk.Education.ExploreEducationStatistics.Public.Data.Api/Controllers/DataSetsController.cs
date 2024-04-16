@@ -48,7 +48,7 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
