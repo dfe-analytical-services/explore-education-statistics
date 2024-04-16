@@ -178,6 +178,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
+                name: "DataSetVersionImports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataSetVersionImports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DataSetVersionImports_DataSetVersions_DataSetVersionId",
+                        column: x => x.DataSetVersionId,
+                        principalTable: "DataSetVersions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FilterMetas",
                 columns: table => new
                 {
@@ -386,6 +407,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "SupersedingDataSetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersionImports_DataSetVersionId",
+                table: "DataSetVersionImports",
+                column: "DataSetVersionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DataSetVersions_DataSetId",
                 table: "DataSetVersions",
                 column: "DataSetId");
@@ -578,6 +604,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             migrationBuilder.DropTable(
                 name: "ChangeSetTimePeriods");
+
+            migrationBuilder.DropTable(
+                name: "DataSetVersionImports");
 
             migrationBuilder.DropTable(
                 name: "FilterOptionMetaLinks");
