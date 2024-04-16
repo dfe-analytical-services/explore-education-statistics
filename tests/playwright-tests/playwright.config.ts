@@ -21,7 +21,7 @@ const encodeBasicAuth = (username: string, password: string) => {
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
+  // testDir: './tests',
 
   timeout: 15 * 60 * 1000,
   /* Run tests in files in parallel */
@@ -51,10 +51,21 @@ export default defineConfig({
     trace: 'on',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure different test suites and running against chrome browser */
   projects: [
     {
-      name: 'chromium',
+      name: 'public',
+      testDir: './tests/public',
+    },
+    {
+      name: 'admin',
+      testDir: './tests/admin',
+    },
+    {
+      name: 'adminandpublic',
+      testDir: './tests/admin-and-public',
+    },
+    {
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
