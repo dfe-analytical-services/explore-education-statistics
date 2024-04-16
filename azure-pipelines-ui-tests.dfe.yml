@@ -166,7 +166,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      npx playwright test  tests/public  
+      npx playwright test --project "public"  
 
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
@@ -237,7 +237,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      npx playwright test  tests/admin  
+      npx playwright test --project "admin"  
 
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
