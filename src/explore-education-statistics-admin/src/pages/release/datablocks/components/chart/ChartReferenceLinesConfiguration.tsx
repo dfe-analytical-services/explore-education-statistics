@@ -7,6 +7,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import {
   AxisType,
   ChartDefinitionAxis,
+  ChartType,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -15,9 +16,11 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import React, { useMemo, useState } from 'react';
 import isEqual from 'lodash/isEqual';
 import upperFirst from 'lodash/upperFirst';
+import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
 
 export interface ChartReferenceLinesConfigurationProps {
   axisDefinition?: ChartDefinitionAxis;
+  chartType: ChartType;
   dataSetCategories: DataSetCategory[];
   lines: ReferenceLine[];
   minorAxisDomain?: MinorAxisDomainValues;
@@ -26,6 +29,7 @@ export interface ChartReferenceLinesConfigurationProps {
 
 export default function ChartReferenceLinesConfiguration({
   axisDefinition,
+  chartType,
   dataSetCategories,
   lines,
   minorAxisDomain,
@@ -51,11 +55,23 @@ export default function ChartReferenceLinesConfiguration({
   }, [lines, majorAxisOptions]);
 
   const referenceLines = useMemo(() => {
-    return type === 'major'
-      ? lines?.filter(line =>
-          majorAxisOptions.some(option => option.value === line.position),
-        ) ?? []
-      : lines ?? [];
+    if (type === 'major') {
+      return lines.filter(line => {
+        if (line.position === otherAxisPositionTypes.betweenDataPoints) {
+          return (
+            majorAxisOptions.some(
+              option => option.value === line.otherAxisEnd,
+            ) &&
+            majorAxisOptions.some(
+              option => option.value === line.otherAxisStart,
+            )
+          );
+        }
+        return majorAxisOptions.some(option => option.value === line.position);
+      });
+    }
+
+    return lines;
   }, [type, lines, majorAxisOptions]);
 
   return (
@@ -97,6 +113,7 @@ export default function ChartReferenceLinesConfiguration({
                         referenceLine?.position === option.value ||
                         lines?.every(line => line.position !== option.value),
                     )}
+                    chartType={chartType}
                     majorAxisOptions={majorAxisOptions}
                     minorAxisDomain={minorAxisDomain}
                     referenceLine={referenceLine}
@@ -162,6 +179,7 @@ export default function ChartReferenceLinesConfiguration({
                 allReferenceLines={lines}
                 axisDefinition={axisDefinition}
                 axisPositionOptions={filteredOptions}
+                chartType={chartType}
                 majorAxisOptions={majorAxisOptions}
                 minorAxisDomain={minorAxisDomain}
                 onSubmit={onChange}
@@ -208,6 +226,22 @@ function getAxisPosition({
   referenceLine?: ReferenceLine;
   type?: AxisType;
 }) {
+  if (
+    type === 'major' &&
+    referenceLine?.position === otherAxisPositionTypes.betweenDataPoints
+  ) {
+    const { otherAxisEnd, otherAxisStart } = referenceLine || {};
+    const otherAxisEndLabel = majorAxisOptions.find(
+      option => option.value === otherAxisEnd,
+    )?.label;
+    const otherAxisStartLabel = majorAxisOptions.find(
+      option => option.value === otherAxisStart,
+    )?.label;
+
+    if (otherAxisEndLabel && otherAxisStartLabel) {
+      return `${otherAxisStartLabel} - ${otherAxisEndLabel}`;
+    }
+  }
   return type === 'major'
     ? majorAxisOptions.find(option => option.value === referenceLine?.position)
         ?.label
