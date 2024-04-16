@@ -126,6 +126,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
             }
+            
+            if (await PublicApiDataSetImportsProcessing(releaseVersion.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
+            }
 
             return errors;
         }
@@ -241,6 +247,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
             return await _contentDbContext.FeaturedTables
                 .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
+        }
+
+        private async Task<bool> PublicApiDataSetImportsProcessing(Guid releaseVersionId)
+        {
+            return true;
         }
     }
 

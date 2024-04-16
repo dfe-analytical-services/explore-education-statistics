@@ -125,6 +125,15 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'PublicApiDataSetImportsMustBeCompleted':
+          return {
+            message:
+              'All Public API data set imports must be completed',
+            link: `${generatePath<ReleaseRouteParams>(
+              releaseDataRoute.path,
+              releaseRouteParams,
+            )}#${releaseDataPageTabIds.dataUploads}`,
+          };
         default:
           // Show error code, even if there is no mapping,
           // as this is better than having invisible errors.
