@@ -109,7 +109,10 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     resourcePrefix: resourcePrefix
     subscription: subscription
     dataProcessorFunctionAppName: dataProcessorFunctionAppName
+    /* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+       Security Group guidance on accessing resources behind VNet protection.
     postgreSqlServerName: psqlServerName
+    */
   }
 }
 
@@ -158,6 +161,8 @@ module fileShareModule 'components/fileShares.bicep' = {
   }
 }
 
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 // In order to link PostgreSQL Flexible Server to a VNet, it must have a Private DNS zone available with a name ending
 // with "postgres.database.azure.com".
 resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
@@ -174,6 +179,7 @@ resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01'
     }
   }
 }
+*/
 
 // Deploy PostgreSQL Database.
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
@@ -189,12 +195,13 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     dbAutoGrowStatus: postgreSqlAutoGrowStatus
     postgreSqlVersion: '16'
     tagValues: tagValues
-    privateDnsZoneId: postgreSqlPrivateDnsZone.id
     /*
     TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
     Security Group guidance on accessing resources behind VNet protection. Replacing for now with public access
     but only on specific subnets.
     */
+    // privateDnsZoneId: postgreSqlPrivateDnsZone.id
+    // subnetId: vNetModule.outputs.postgreSqlSubnetRef
     firewallRules: concat(postgreSqlFirewallRules, [
       {
         name: '${resourcePrefix}-ca-${apiContainerAppName}-subnet'
@@ -206,8 +213,12 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
         startIpAddress: vNetModule.outputs.dataProcessorSubnetStartIpAddress
         endIpAddress: vNetModule.outputs.dataProcessorSubnetEndIpAddress
       }
+      {
+        name: '${subscription}-as-ees-admin-subnet'
+        startIpAddress: vNetModule.outputs.adminAppServiceSubnetStartIpAddress
+        endIpAddress: vNetModule.outputs.adminAppServiceSubnetEndIpAddress
+      }
     ])
-    // subnetId: vNetModule.outputs.postgreSqlSubnetRef
     databaseNames: ['public_data']
   }
 }

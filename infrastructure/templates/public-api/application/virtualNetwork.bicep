@@ -10,16 +10,26 @@ param resourcePrefix string
 @description('Specifies the name suffix of the Data Processor Function App')
 param dataProcessorFunctionAppName string
 
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 @description('Specifies the name suffix of the PostgreSQL Flexible Server')
 param postgreSqlServerName string
-
+*/
 var dataProcessorSubnetName = '${resourcePrefix}-snet-fa-${dataProcessorFunctionAppName}'
+
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 var postgreSqlSubnetName = '${subscription}-ees-snet-${postgreSqlServerName}'
+*/
 var containerAppEnvironmentSubnetName = '${subscription}-ees-snet-cae-01'
 
 // Note that the current vNet has subnets with reserved address ranges up to 10.0.5.0/24 currently.
 var dataProcessorSubnetRange = '10.0.6.0/24'
+
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 var postgreSqlSubnetRange = '10.0.7.0/24'
+*/
 var containerAppEnvironmentSubnetRange = '10.0.8.0/24'
 
 // Reference the existing VNet.
@@ -47,6 +57,8 @@ var dataProcessorSubnet = {
   }
 }
 
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 var postgreSqlSubnet = {
   name: postgreSqlSubnetName
   properties: {
@@ -60,6 +72,7 @@ var postgreSqlSubnet = {
     }]
   }
 }
+*/
 
 var containerAppEnvironmentSubnet = {
   name: containerAppEnvironmentSubnetName
@@ -78,7 +91,10 @@ var containerAppEnvironmentSubnet = {
 
 var subnets = [
   dataProcessorSubnet
+  /* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+     Security Group guidance on accessing resources behind VNet protection.
   postgreSqlSubnet
+  */
   containerAppEnvironmentSubnet
 ]
 
@@ -90,6 +106,11 @@ resource subnetResources 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' 
   name: subnet.name
   properties: subnet.properties
 }]
+
+resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' existing = {
+  name: '${subscription}-snet-ees-admin'
+  parent: vNet
+}
 
 @description('The fully qualified Azure resource ID of the Network.')
 output vNetRef string = resourceId('Microsoft.Network/VirtualNetworks', vNetName)
@@ -103,9 +124,11 @@ output dataProcessorSubnetStartIpAddress string = parseCidr(dataProcessorSubnetR
 @description('The last usable IP address for the Data Processor Function App Subnet.')
 output dataProcessorSubnetEndIpAddress string = parseCidr(dataProcessorSubnetRange).lastUsable
 
+/* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
+   Security Group guidance on accessing resources behind VNet protection.
 @description('The fully qualified Azure resource ID of the PostgreSQL Flexible Server Subnet.')
 output postgreSqlSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, postgreSqlSubnetName)
-
+*/
 @description('The fully qualified Azure resource ID of the API Container App Subnet.')
 output containerAppEnvironmentSubnetRef string = resourceId('Microsoft.Network/VirtualNetworks/subnets', vNetName, containerAppEnvironmentSubnetName)
 
@@ -114,3 +137,9 @@ output containerAppEnvironmentSubnetStartIpAddress string = parseCidr(containerA
 
 @description('The last usable IP address for the API Container App Subnet.')
 output containerAppEnvironmentSubnetEndIpAddress string = parseCidr(containerAppEnvironmentSubnetRange).lastUsable
+
+@description('The first usable IP address for the Admin App Service Subnet.')
+output adminAppServiceSubnetStartIpAddress string = parseCidr(adminSubnet.properties.addressPrefix).firstUsable
+
+@description('The last usable IP address for the Admin App Service Subnet.')
+output adminAppServiceSubnetEndIpAddress string = parseCidr(adminSubnet.properties.addressPrefix).lastUsable

@@ -71,8 +71,8 @@ param firewallRules {
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
-@description('Id of the PostgreSQL Private DNS Zone')
-param privateDnsZoneId string
+// @description('Id of the PostgreSQL Private DNS Zone')
+// param privateDnsZoneId string
 
 @description('Create mode for the PostgreSQL Flexible Server resource')
 @allowed([
