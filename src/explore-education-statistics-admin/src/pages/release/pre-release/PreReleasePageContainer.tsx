@@ -17,7 +17,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import React from 'react';
 import { generatePath } from 'react-router';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
@@ -26,6 +26,25 @@ interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
   preReleaseSummary: PreReleaseSummary;
 }
+
+export const calculatePraPeriodAdvice = (
+  start: Date,
+  scheduledPublishDate: Date,
+): string => {
+  const dateOfPraStart = formatInTimeZone(
+    start,
+    'Europe/London',
+    'd MMMM yyyy',
+  );
+  const timeOfPraStart = formatInTimeZone(start, 'Europe/London', 'HH:mm');
+  const dateScheduledForPublish = formatInTimeZone(
+    scheduledPublishDate,
+    'Europe/London',
+    'd MMMM yyyy',
+  );
+
+  return `Pre-release access will be available from ${dateOfPraStart} at ${timeOfPraStart} until it is published on ${dateScheduledForPublish}.`;
+};
 
 const PreReleasePageContainer = ({
   match,
@@ -113,15 +132,7 @@ const PreReleasePageContainer = ({
             of <strong>{publicationTitle}</strong> is not yet available.
           </p>
 
-          <p>
-            {`Pre-release access will be available from ${format(
-              start,
-              'd MMMM yyyy',
-            )} at ${format(start, 'HH:mm')} until it is published on ${format(
-              scheduledPublishDate,
-              'd MMMM yyyy',
-            )}.`}
-          </p>
+          <p>{calculatePraPeriodAdvice(start, scheduledPublishDate)}</p>
 
           <p>
             If you believe that this release should be available and you are

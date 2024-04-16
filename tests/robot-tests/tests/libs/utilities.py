@@ -219,8 +219,8 @@ def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
     return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).astimezone().strftime(strf)
 
 
-def get_current_datetime(strf: str, offset_days: int = 0) -> str:
-    return format_datetime(datetime.datetime.now() + datetime.timedelta(days=offset_days), strf)
+def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:
+    return format_datetime(datetime.datetime.now(pytz.timezone(timezone)) + datetime.timedelta(days=offset_days), strf)
 
 
 def format_datetime(datetime: datetime, strf: str) -> str:

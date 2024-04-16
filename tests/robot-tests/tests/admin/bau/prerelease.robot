@@ -141,8 +141,8 @@ Validate prerelease has not started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1
-    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2
+    ${tomorrow}=    get current datetime    %Y-%m-%dT00:00:00    1    Europe/London
+    ${day_after_tomorrow}=    get current datetime    %Y-%m-%dT%H:%M:%S    2    Europe/London
 
     ${time_start}=    format uk to local datetime    ${tomorrow}    %-d %B %Y at %H:%M
     ${time_end}=    format uk to local datetime    ${day_after_tomorrow}    %-d %B %Y
