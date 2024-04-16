@@ -47,12 +47,6 @@
     "actionGroupAlerts": {
       "type": "string"
     },
-    "slackWebhook": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack webhook URI for alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -61,7 +55,8 @@
     }
   },
   "variables":{
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
+    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]"
   },
   "resources":[
     {
@@ -92,8 +87,8 @@
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
           },
-          "slackWebhook": {
-            "value": "[parameters('slackWebhook')]"
+          "slackAppToken": {
+            "value": "[variables('ees-alerts-slackapptoken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"

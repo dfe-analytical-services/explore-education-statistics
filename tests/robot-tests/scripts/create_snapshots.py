@@ -238,21 +238,14 @@ class SnapshotService:
                 blocks=[
                     {
                         "type": "header",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "Snapshots do not match. See pull request for more details",
-                        },
+                        "text": {"type": "plain_text", "text": ":warning: Snapshots do not match"},
                     },
                     {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "button",
-                                "style": "danger",
-                                "text": {"type": "plain_text", "text": "View pull request"},
-                                "url": "https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt",
-                            }
-                        ],
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "See <https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt|pull request> for more details",
+                        },
                     },
                 ]
             ) if self.slack_webhook_url else print("Snapshot script complete. Snapshots do not match")
