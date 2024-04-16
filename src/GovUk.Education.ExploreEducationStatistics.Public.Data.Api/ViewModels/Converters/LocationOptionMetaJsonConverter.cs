@@ -57,27 +57,22 @@ public class LocationOptionMetaJsonConverter : JsonConverter<LocationOptionMetaV
             return;
         }
 
-        var jsonSerializerOptions = new JsonSerializerOptions(options)
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-
         switch (value)
         {
             case LocationSchoolOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationSchoolOptionMetaViewModel), jsonSerializerOptions);
+                JsonSerializer.Serialize(writer, value, typeof(LocationSchoolOptionMetaViewModel), options);
                 break;
             case LocationRscRegionOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationRscRegionOptionMetaViewModel), jsonSerializerOptions);
+                JsonSerializer.Serialize(writer, value, typeof(LocationRscRegionOptionMetaViewModel), options);
                 break;
             case LocationProviderOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationProviderOptionMetaViewModel), jsonSerializerOptions);
+                JsonSerializer.Serialize(writer, value, typeof(LocationProviderOptionMetaViewModel), options);
                 break;
             case LocationLocalAuthorityOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationLocalAuthorityOptionMetaViewModel), jsonSerializerOptions);
+                JsonSerializer.Serialize(writer, value, typeof(LocationLocalAuthorityOptionMetaViewModel), options);
                 break;
             case LocationCodedOptionMetaViewModel:
-                JsonSerializer.Serialize(writer, value, typeof(LocationCodedOptionMetaViewModel), jsonSerializerOptions);
+                JsonSerializer.Serialize(writer, value, typeof(LocationCodedOptionMetaViewModel), options);
                 break;
             default:
                 throw new JsonException();
