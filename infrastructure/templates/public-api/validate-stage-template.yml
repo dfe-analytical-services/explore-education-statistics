@@ -51,6 +51,7 @@ stages:
                     publicUrls='$(publicUrls)' \
                     postgreSqlAdminName='$(postgreSqlAdminName)' \
                     postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
+                    postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                     dockerImagesTag='$(upstreamPipelineBuildNumber)' \
                     psqlDbUsersAdded=true \
                     apiContainerAppUserCreatedWithAcrPull=true \

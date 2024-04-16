@@ -181,6 +181,12 @@ resource postgreSqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01'
 }
 */
 
+var formattedPostgreSqlFirewallRules = map(postgreSqlFirewallRules, rule => {
+  name: replace(rule.name, ' ', '_')
+  startIpAddress: rule.startIpAddress
+  endIpAddress: rule.endIpAddress
+})
+
 // Deploy PostgreSQL Database.
 module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   name: 'postgreSQLDatabaseDeploy'
@@ -202,7 +208,7 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
     */
     // privateDnsZoneId: postgreSqlPrivateDnsZone.id
     // subnetId: vNetModule.outputs.postgreSqlSubnetRef
-    firewallRules: concat(postgreSqlFirewallRules, [
+    firewallRules: concat(formattedPostgreSqlFirewallRules, [
       {
         name: '${resourcePrefix}-ca-${apiContainerAppName}-subnet'
         startIpAddress: vNetModule.outputs.containerAppEnvironmentSubnetStartIpAddress
