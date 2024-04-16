@@ -55,8 +55,7 @@
     }
   },
   "variables":{
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]",
-    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]"
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
   },
   "resources":[
     {
@@ -86,9 +85,6 @@
           },
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
-          },
-          "slackAppToken": {
-            "value": "[variables('ees-alerts-slackapptoken')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"

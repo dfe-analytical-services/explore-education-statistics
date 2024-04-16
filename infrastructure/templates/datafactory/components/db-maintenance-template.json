@@ -14,12 +14,6 @@
         "description": "The name of the key vault"
       }
     },
-    "slackAppToken": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack bot user OAuth token for posting alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -32,7 +26,8 @@
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "20000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
-    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000"
+    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
+    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]"
   },
   "resources": [
     {
@@ -129,7 +124,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
+                "Authorization": "[concat('Bearer ', [concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')])]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -179,7 +174,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
+                "Authorization": "[concat('Bearer ', [concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')])]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -301,7 +296,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
+                "Authorization": "[concat('Bearer ', [concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')])]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
@@ -351,7 +346,7 @@
               "method": "POST",
               "headers": {
                 "Content-Type": "application/json",
-                "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
+                "Authorization": "[concat('Bearer ', [concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')])]"
               },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",

@@ -3481,9 +3481,6 @@
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
           },
-          "slackAppToken": {
-            "value": "[variables('ees-alerts-slackapptoken')]"
-          },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
           }
@@ -4045,7 +4042,7 @@
                   "uri": "https://slack.com/api/chat.postMessage",
                   "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "[concat('Bearer ', [variables('ees-alerts-slackapptoken')])]"
+                    "Authorization": "[concat('Bearer ', [concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')])]"
                   }
                 },
                 "unsubscribe": {}
