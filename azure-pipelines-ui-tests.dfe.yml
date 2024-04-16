@@ -190,7 +190,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
-      artifactName: test-results-playwright-tests
+      artifactName: test-results-playwright-tests-public
 
 
 - job: 'adminPlaywrightUItest'
@@ -259,4 +259,4 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
-      artifactName: test-results-playwright-tests
+      artifactName: test-results-playwright-tests-admin
