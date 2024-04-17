@@ -180,6 +180,7 @@ jobs:
   - script: |
       npx playwright show-report
     displayName: 'Generate test report'
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -252,6 +253,7 @@ jobs:
   - script: |
       npx playwright show-report
     displayName: 'Generate test report'
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -327,6 +329,7 @@ jobs:
   - script: |
       npx playwright show-report
     displayName: 'Generate test report'
+    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
