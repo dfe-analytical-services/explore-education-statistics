@@ -57,6 +57,7 @@ const CustomReferenceLineLabel = ({
     otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMin : 0,
     otherAxisDomainMax: axisType === 'major' ? otherAxisDomainMax : 100, // otherAxisPosition is set as a percentage on minor axis lines
     otherAxisPosition,
+    perpendicularLine,
     viewBox,
   });
 
