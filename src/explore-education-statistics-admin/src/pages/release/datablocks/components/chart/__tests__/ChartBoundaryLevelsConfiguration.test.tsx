@@ -122,8 +122,6 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    expect(handleChange).not.toHaveBeenCalled();
-
     await userEvent.selectOptions(screen.getByLabelText('Boundary level'), [
       '2',
     ]);

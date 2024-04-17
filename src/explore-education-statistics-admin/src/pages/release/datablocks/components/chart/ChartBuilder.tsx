@@ -8,7 +8,10 @@ import ChartLegendConfiguration from '@admin/pages/release/datablocks/components
 import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
 import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import {
+  ChartOptions,
+  useChartBuilderReducer,
+} from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tabs from '@common/components/Tabs';
@@ -282,16 +285,18 @@ const ChartBuilder = ({
   );
 
   const handleBoundaryLevelChange = useCallback(
-    async (nextBoundaryLevel: string) => {
+    async (values: ChartOptions) => {
+      actions.updateChartOptions(values);
+
       setDataLoading(true);
 
       await onTableQueryUpdate({
-        boundaryLevel: parseNumber(nextBoundaryLevel),
+        boundaryLevel: parseNumber(values.boundaryLevel),
       });
 
       setDataLoading(false);
     },
-    [onTableQueryUpdate],
+    [actions, onTableQueryUpdate],
   );
 
   const deleteButton = useMemo(
@@ -374,8 +379,7 @@ const ChartBuilder = ({
                       buttons={deleteButton}
                       meta={meta}
                       options={options}
-                      onBoundaryLevelChange={handleBoundaryLevelChange}
-                      onChange={handleChartConfigurationChange}
+                      onChange={handleBoundaryLevelChange}
                       onSubmit={actions.updateChartOptions}
                     />
                   </TabsSection>
