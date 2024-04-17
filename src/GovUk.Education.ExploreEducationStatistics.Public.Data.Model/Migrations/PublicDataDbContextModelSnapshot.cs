@@ -236,6 +236,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.ToTable("DataSetVersions");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("DataSetVersionImports");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
                 {
                     b.Property<int>("Id")
@@ -1201,6 +1227,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("Imports")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DataSetVersion");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
@@ -1309,6 +1346,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("GeographicLevelMeta")
                         .IsRequired();
+
+                    b.Navigation("Imports");
 
                     b.Navigation("IndicatorChanges");
 

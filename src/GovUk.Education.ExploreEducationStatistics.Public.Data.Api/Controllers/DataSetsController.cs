@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
@@ -25,8 +26,8 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set summary", type: typeof(DataSetViewModel))]
-    [SwaggerResponse(403)]
-    [SwaggerResponse(404)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetViewModel>> GetDataSet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         CancellationToken cancellationToken)
@@ -47,8 +48,8 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/versions/{dataSetVersion}")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version", type: typeof(DataSetVersionViewModel))]
-    [SwaggerResponse(403)]
-    [SwaggerResponse(404)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionViewModel>> GetDataSetVersion(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         [SwaggerParameter("The data set version e.g. 1.0, 1.1, 2.0, etc.")] string dataSetVersion,
@@ -71,8 +72,8 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/versions")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of data set versions", type: typeof(DataSetVersionPaginatedListViewModel))]
-    [SwaggerResponse(400)]
-    [SwaggerResponse(403)]
+    [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetVersionPaginatedListViewModel>> ListDataSetVersions(
         [FromQuery] DataSetVersionListRequest request,
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
@@ -96,8 +97,8 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/meta")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The requested data set version metadata", type: typeof(DataSetMetaViewModel))]
-    [SwaggerResponse(403)]
-    [SwaggerResponse(404)]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetMetaViewModel>> GetDataSetMeta(
         [FromQuery] DataSetMetaRequest request,
         [FromQuery, SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")] string? dataSetVersion,
@@ -254,9 +255,9 @@ public class DataSetsController(
     [HttpGet("{dataSetId:guid}/query")]
     [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
-    [SwaggerResponse(400)]
-    [SwaggerResponse(403)]
-    [SwaggerResponse(404)]
+    [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
     public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetGet(
         [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
         [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")][FromQuery] string? dataSetVersion,

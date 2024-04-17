@@ -114,6 +114,11 @@ public static class DataSetVersionGeneratorExtensions
         this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetGeographicLevelMeta());
 
+    public static Generator<DataSetVersion> WithImports(
+        this Generator<DataSetVersion> generator,
+        Func<IEnumerable<DataSetVersionImport>> imports)
+        => generator.ForInstance(s => s.SetImports(imports));
+
     public static Generator<DataSetVersion> WithLocationMetas(
         this Generator<DataSetVersion> generator,
         Func<IEnumerable<LocationMeta>> metas)
@@ -299,6 +304,27 @@ public static class DataSetVersionGeneratorExtensions
             }
         );
 
+    public static InstanceSetters<DataSetVersion> SetImports(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<IEnumerable<DataSetVersionImport>> imports)
+        => instanceSetter.SetImports(_ => imports());
+
+    public static InstanceSetters<DataSetVersion> SetImports(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<Faker, IEnumerable<DataSetVersionImport>> imports)
+        => instanceSetter.Set(
+            (faker, dsv) =>
+            {
+                dsv.Imports = imports(faker).ToList();
+
+                foreach (var import in dsv.Imports)
+                {
+                    import.DataSetVersion = dsv;
+                    import.DataSetVersionId = dsv.Id;
+                }
+            }
+        );
+
     public static InstanceSetters<DataSetVersion> SetLocationMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
         Func<IEnumerable<LocationMeta>> metas)
@@ -317,7 +343,6 @@ public static class DataSetVersionGeneratorExtensions
                     meta.DataSetVersion = dsv;
                     meta.DataSetVersionId = dsv.Id;
                 }
-
             }
         );
 
@@ -339,7 +364,6 @@ public static class DataSetVersionGeneratorExtensions
                     meta.DataSetVersion = dsv;
                     meta.DataSetVersionId = dsv.Id;
                 }
-
             }
         );
 
