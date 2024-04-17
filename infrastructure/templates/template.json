@@ -1025,7 +1025,8 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-
+    "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
+    "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -3271,7 +3272,7 @@
     },
     {
       "condition": "[parameters('deploySubnets')]",
-      "apiVersion": "2023-09-01",
+      "apiVersion": "2020-05-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
       "location": "[resourceGroup().location]",
@@ -3290,174 +3291,189 @@
       },
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [
-            "10.0.0.0/16"
-          ]
-        }
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('adminSubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.0.0/24",
-        "serviceEndpoints": [
+          "addressPrefixes": ["10.0.0.0/16"]
+        },
+        "subnets": [
           {
-            "service": "Microsoft.Sql"
-          },
-          {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('adminSubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.0.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('importerSubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.1.0/24",
-        "serviceEndpoints": [
-          {
-            "service": "Microsoft.Sql"
           },
           {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('importerSubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.1.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('publisherSubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.2.0/24",
-        "serviceEndpoints": [
-          {
-            "service": "Microsoft.Sql"
           },
           {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('publisherSubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.2.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('notifySubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.3.0/24",
-        "serviceEndpoints": [
-          {
-            "service": "Microsoft.Sql"
           },
           {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('notifySubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.3.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('contentSubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.4.0/24",
-        "serviceEndpoints": [
-          {
-            "service": "Microsoft.Sql"
           },
           {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('contentSubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.4.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
               ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "name": "[concat(variables('vNetName'), '/', variables('dataSubnetName'))]",
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2020-05-01",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "addressPrefix": "10.0.5.0/24",
-        "serviceEndpoints": [
-          {
-            "service": "Microsoft.Sql"
           },
           {
-            "service": "Microsoft.Storage"
-          }
-        ],
-        "delegations": [
-          {
-            "name": "webapp",
+            "name": "[variables('dataSubnetName')]",
             "properties": {
-              "serviceName": "Microsoft.Web/serverFarms",
-              "actions": [
-                "Microsoft.Network/virtualNetworks/subnets/action"
+              "addressPrefix": "10.0.5.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Sql"
+                },
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms",
+                    "actions": [
+                      "Microsoft.Network/virtualNetworks/subnets/action"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('publicApiDataProcessorSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.6.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('containerAppEnvironmentSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.8.0/24",
+              "delegations": [
+                {
+                  "name": "environment",
+                  "properties": {
+                    "serviceName": "Microsoft.App/environments"
+                  }
+                }
               ]
             }
           }
