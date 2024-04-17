@@ -3271,7 +3271,7 @@
     },
     {
       "condition": "[parameters('deploySubnets')]",
-      "apiVersion": "2020-05-01",
+      "apiVersion": "2023-09-01",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('vNetName')]",
       "location": "[resourceGroup().location]",
