@@ -7,11 +7,14 @@ import generateDataSetLabel from '@admin/pages/release/datablocks/components/cha
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ErrorSummary from '@common/components/ErrorSummary';
-import { Form, FormFieldSelect, FormSelect } from '@common/components/form';
+import { FormSelect } from '@common/components/form';
 import SubmitError from '@common/components/form/util/SubmitError';
 import ModalConfirm from '@common/components/ModalConfirm';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
@@ -22,7 +25,6 @@ import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
 import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
 import reorder from '@common/utils/reorder';
-import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
@@ -79,7 +81,7 @@ const ChartDataSetsConfiguration = ({
     });
   }, [dataSets.length, updateForm]);
 
-  const handleSubmit = useFormSubmit((values: FormValues) => {
+  const handleSubmit = (values: FormValues) => {
     const selectedDataSets = getSelectedDataSets({
       filters: meta.filters,
       indicatorOptions,
@@ -112,7 +114,7 @@ const ChartDataSetsConfiguration = ({
       },
     );
     onChange(updatedDataSets);
-  });
+  };
 
   return (
     <>
@@ -121,7 +123,7 @@ const ChartDataSetsConfiguration = ({
           Selected data sets have different indicator units.
         </WarningMessage>
       )}
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           filters: mapValues(meta.filters, filterGroup =>
             filterGroup.options.length === 1
@@ -136,79 +138,71 @@ const ChartDataSetsConfiguration = ({
               ? meta.timePeriodRange[0].value
               : '',
         }}
-        validateOnBlur={false}
-        validateOnChange={false}
         validationSchema={Yup.object<FormValues>({
           indicator: Yup.string(),
           filters: Yup.object(mapValues(meta.filters, () => Yup.string())),
           location: Yup.string(),
           timePeriod: Yup.string(),
         })}
-        onSubmit={handleSubmit}
       >
-        {() => (
-          <Form id={formId}>
-            <div className={styles.formSelectRow}>
-              {orderBy(
-                Object.entries(meta.filters),
-                ([_, value]) => value.order,
-              )
-                .filter(([, filters]) => filters.options.length > 1)
-                .map(([categoryName, filters]) => (
-                  <FormFieldSelect
-                    key={categoryName}
-                    name={`filters.${categoryName}`}
-                    label={categoryName}
-                    formGroupClass={styles.formSelectGroup}
-                    className="govuk-!-width-full"
-                    placeholder={
-                      filters.options.length > 1 ? 'All options' : undefined
-                    }
-                    options={filters.options}
-                    order={FormSelect.unordered}
-                  />
-                ))}
-
-              {indicatorOptions.length > 1 && (
-                <FormFieldSelect<FormValues>
-                  name="indicator"
-                  label="Indicator"
+        <RHFForm id={formId} onSubmit={handleSubmit}>
+          <div className={styles.formSelectRow}>
+            {orderBy(Object.entries(meta.filters), ([_, value]) => value.order)
+              .filter(([, filters]) => filters.options.length > 1)
+              .map(([categoryName, filters]) => (
+                <RHFFormFieldSelect
+                  key={categoryName}
+                  name={`filters.${categoryName}`}
+                  label={categoryName}
                   formGroupClass={styles.formSelectGroup}
                   className="govuk-!-width-full"
-                  placeholder="All indicators"
-                  options={indicatorOptions}
+                  placeholder={
+                    filters.options.length > 1 ? 'All options' : undefined
+                  }
+                  options={filters.options}
                   order={FormSelect.unordered}
                 />
-              )}
+              ))}
 
-              {locationOptions.length > 1 && (
-                <FormFieldSelect<FormValues>
-                  name="location"
-                  label="Location"
-                  formGroupClass={styles.formSelectGroup}
-                  className="govuk-!-width-full"
-                  placeholder="All locations"
-                  options={locationOptions}
-                />
-              )}
+            {indicatorOptions.length > 1 && (
+              <RHFFormFieldSelect<FormValues>
+                name="indicator"
+                label="Indicator"
+                formGroupClass={styles.formSelectGroup}
+                className="govuk-!-width-full"
+                placeholder="All indicators"
+                options={indicatorOptions}
+                order={FormSelect.unordered}
+              />
+            )}
 
-              {meta.timePeriodRange.length > 1 && (
-                <FormFieldSelect<FormValues>
-                  name="timePeriod"
-                  label="Time period"
-                  formGroupClass={styles.formSelectGroup}
-                  className="govuk-!-width-full"
-                  placeholder="All time periods"
-                  options={meta.timePeriodRange}
-                  order={FormSelect.unordered}
-                />
-              )}
-            </div>
+            {locationOptions.length > 1 && (
+              <RHFFormFieldSelect<FormValues>
+                name="location"
+                label="Location"
+                formGroupClass={styles.formSelectGroup}
+                className="govuk-!-width-full"
+                placeholder="All locations"
+                options={locationOptions}
+              />
+            )}
 
-            <Button type="submit">Add data set</Button>
-          </Form>
-        )}
-      </Formik>
+            {meta.timePeriodRange.length > 1 && (
+              <RHFFormFieldSelect<FormValues>
+                name="timePeriod"
+                label="Time period"
+                formGroupClass={styles.formSelectGroup}
+                className="govuk-!-width-full"
+                placeholder="All time periods"
+                options={meta.timePeriodRange}
+                order={FormSelect.unordered}
+              />
+            )}
+          </div>
+
+          <Button type="submit">Add data set</Button>
+        </RHFForm>
+      </FormProvider>
 
       {forms.dataSets &&
         forms.dataSets.submitCount > 0 &&
