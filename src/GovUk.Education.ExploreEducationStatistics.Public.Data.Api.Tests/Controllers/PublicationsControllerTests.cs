@@ -518,7 +518,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             Assert.Equal(dataSet.Summary, result.Summary);
             Assert.Equal(dataSet.Status, result.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version, result.LatestVersion.Number);
+            Assert.Equal(dataSetVersion.Version, result.LatestVersion.Version);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
                 result.LatestVersion.Published.ToUnixTimeSeconds()
