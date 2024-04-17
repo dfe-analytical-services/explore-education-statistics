@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.P
 
 public interface IDataSetService
 {
-    Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListPublicationDataSets(
+    Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
         int page,
         int pageSize,
         Guid publicationId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }
