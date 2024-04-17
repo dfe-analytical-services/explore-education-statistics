@@ -3297,7 +3297,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('adminSubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('adminSubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
@@ -3325,7 +3325,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('importerSubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('importerSubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
@@ -3353,7 +3353,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('publisherSubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('publisherSubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
@@ -3381,7 +3381,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('notifySubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('notifySubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
@@ -3409,7 +3409,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('contentSubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('contentSubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
@@ -3437,7 +3437,7 @@
       }
     },
     {
-      "name": "[variables('vNetName')]/[variables('dataSubnetName')]",
+      "name": "[concat(variables('vNetName'), '/', variables('dataSubnetName'))]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-05-01",
       "location": "[resourceGroup().location]",
