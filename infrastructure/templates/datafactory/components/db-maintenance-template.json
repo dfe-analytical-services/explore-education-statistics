@@ -27,7 +27,7 @@
     "removeSoftDeletedSubjectsObservationLimit": "20000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
     "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
-    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]"
+    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), 'ees-alerts-slackapptoken')]"
   },
   "resources": [
     {
