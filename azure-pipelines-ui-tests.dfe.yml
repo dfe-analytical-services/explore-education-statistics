@@ -17,7 +17,7 @@ resources:
 
 jobs:
 - job: 'Public'
-  displayName: Public UI tests - robot
+  displayName: Public suite - Robot UI test
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -69,7 +69,7 @@ jobs:
       artifactName: test-results-public
 
 - job: 'PublishAndAmend'
-  displayName: Publish release and amend suites - robot test
+  displayName: Publish release and amend suites - Robot UI test
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -123,7 +123,7 @@ jobs:
 
 
 - job: 'PublicPlaywrightUItest'
-  displayName: Public UI tests- Playwright
+  displayName: Public - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -178,7 +178,7 @@ jobs:
             ADMIN_EMAIL: $(ADMIN_EMAIL)
 
   - script: |
-      npx show-report
+      npx playwright show-report
     displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
@@ -197,7 +197,7 @@ jobs:
 
 
 - job: 'AdminPlaywrightUItest'
-  displayName: Admin UI tests - Playwright
+  displayName: Admin - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -240,7 +240,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      npx playwright test --project "admin"  
+      npx playwright test --project "admin"
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
@@ -250,7 +250,7 @@ jobs:
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
   - script: |
-      npx show-report
+      npx playwright show-report
     displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
@@ -268,7 +268,7 @@ jobs:
       artifactName: test-results-playwright-tests-admin
 
 - job: 'AdminAndPublicPlaywrightUItest'
-  displayName: Admin and public - playwright UI tests
+  displayName: Admin and public - Playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -325,7 +325,7 @@ jobs:
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
   - script: |
-      npx show-report
+      npx playwright show-report
     displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
