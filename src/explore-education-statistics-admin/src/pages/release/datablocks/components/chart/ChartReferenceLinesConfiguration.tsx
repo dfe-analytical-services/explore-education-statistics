@@ -59,6 +59,7 @@ export default function ChartReferenceLinesConfiguration({
       return lines.filter(line => {
         if (line.position === otherAxisPositionTypes.betweenDataPoints) {
           return (
+            chartType === 'verticalbar' &&
             majorAxisOptions.some(
               option => option.value === line.otherAxisEnd,
             ) &&
@@ -72,7 +73,7 @@ export default function ChartReferenceLinesConfiguration({
     }
 
     return lines;
-  }, [type, lines, majorAxisOptions]);
+  }, [chartType, type, lines, majorAxisOptions]);
 
   return (
     <div className="dfe-overflow-x--auto">
