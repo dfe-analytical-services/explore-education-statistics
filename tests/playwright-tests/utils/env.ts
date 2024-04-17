@@ -13,6 +13,7 @@ const publicUrl =
 
 const environment = {
   PUBLIC_URL: publicUrl,
+  PUBLIC_URL_WITHOUT_USERNAME_PASSWORD: process.env.PUBLIC_URL ?? '',
   PUBLIC_USERNAME: process.env.PUBLIC_USERNAME ?? '',
   PUBLIC_PASSWORD: process.env.PUBLIC_PASSWORD ?? '',
   ADMIN_URL: process.env.ADMIN_URL ?? '',

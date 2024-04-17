@@ -7,21 +7,25 @@ import environment from '@util/env';
 // eslint-disable-next-line import/no-relative-packages
 import seoRedirects from '../../../../src/explore-education-statistics-frontend/redirects.js';
 
-const { PUBLIC_URL } = environment;
+const { PUBLIC_URL, PUBLIC_URL_WITHOUT_USERNAME_PASSWORD } = environment;
 
 test.describe('Redirect behaviour', () => {
   test('Absolute paths with trailing slashes are redirected without them', async ({
     page,
   }) => {
     await page.goto(`${PUBLIC_URL}/data-catalogue/`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
+    await expect(page).toHaveURL(
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/data-catalogue`,
+    );
 
     await page.goto(`${PUBLIC_URL}/data-catalogue`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
+    await expect(page).toHaveURL(
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/data-catalogue`,
+    );
 
     await page.goto(`${PUBLIC_URL}/glossary/?someRandomUrlParameter=123`);
     await expect(page).toHaveURL(
-      `${PUBLIC_URL}/glossary?someRandomUrlParameter=123`,
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/glossary?someRandomUrlParameter=123`,
     );
 
     // Would be amazing if we could assert that these redirects
@@ -32,7 +36,9 @@ test.describe('Redirect behaviour', () => {
     await page.goto(`about:blank`);
 
     await page.goto(`${PUBLIC_URL}/data-catalogue/`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
+    await expect(page).toHaveURL(
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/data-catalogue`,
+    );
 
     await page.goBack();
     await expect(page).toHaveURL(`about:blank`);
@@ -42,10 +48,10 @@ test.describe('Redirect behaviour', () => {
     page,
   }) => {
     await page.goto(`${PUBLIC_URL}`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/`);
+    await expect(page).toHaveURL(`${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/`);
 
     await page.goto(`${PUBLIC_URL}/`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/`);
+    await expect(page).toHaveURL(`${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/`);
   });
 
   test('meta-guidance is redirected to data-guidance', async ({ page }) => {
@@ -53,14 +59,14 @@ test.describe('Redirect behaviour', () => {
       `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/meta-guidance`,
     );
     await expect(page).toHaveURL(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/data-guidance`,
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/find-statistics/seed-publication-release-approver/data-guidance`,
     );
 
     await page.goto(
       `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/meta-guidance/`,
     );
     await expect(page).toHaveURL(
-      `${PUBLIC_URL}/find-statistics/seed-publication-release-approver/data-guidance`,
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/find-statistics/seed-publication-release-approver/data-guidance`,
     );
   });
 
@@ -68,10 +74,14 @@ test.describe('Redirect behaviour', () => {
     page,
   }) => {
     await page.goto(`${PUBLIC_URL}/download-latest-data`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
+    await expect(page).toHaveURL(
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/data-catalogue`,
+    );
 
     await page.goto(`${PUBLIC_URL}/download-latest-data/`);
-    await expect(page).toHaveURL(`${PUBLIC_URL}/data-catalogue`);
+    await expect(page).toHaveURL(
+      `${PUBLIC_URL_WITHOUT_USERNAME_PASSWORD}/data-catalogue`,
+    );
   });
 
   // Not ideal, I'd rather it.each like Jest has. But from the docs:

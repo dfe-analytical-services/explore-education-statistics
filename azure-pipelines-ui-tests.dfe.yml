@@ -17,7 +17,7 @@ resources:
 
 jobs:
 - job: 'Public'
-  displayName: Public UI tests
+  displayName: Public UI tests - robot
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -69,7 +69,7 @@ jobs:
       artifactName: test-results-public
 
 - job: 'PublishAndAmend'
-  displayName: Publish release and amend suites
+  displayName: Publish release and amend suites - robot test
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -122,7 +122,7 @@ jobs:
       artifactName: test-results-admin-and-public-2
 
 
-- job: 'publicPlaywrightUItest'
+- job: 'PublicPlaywrightUItest'
   displayName: Public UI tests- Playwright
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
@@ -166,8 +166,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-      npx playwright test --project "public"  
-
+      npx playwright test --project "public"
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
@@ -177,6 +176,10 @@ jobs:
             PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
+
+  - script: |
+      npx show-report
+    displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -193,8 +196,8 @@ jobs:
       artifactName: test-results-playwright-tests-public
 
 
-- job: 'adminPlaywrightUItest'
-  displayName: Admin playwright UI tests
+- job: 'AdminPlaywrightUItest'
+  displayName: Admin UI tests - Playwright
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -233,12 +236,11 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - script: |
       npx playwright test --project "admin"  
-
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
@@ -246,6 +248,10 @@ jobs:
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+
+  - script: |
+      npx show-report
+    displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -262,7 +268,7 @@ jobs:
       artifactName: test-results-playwright-tests-admin
 
 - job: 'AdminAndPublicPlaywrightUItest'
-  displayName: Admin and public playwright UI tests
+  displayName: Admin and public - playwright UI tests
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
@@ -301,7 +307,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
   - script: |
@@ -317,6 +323,10 @@ jobs:
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+
+  - script: |
+      npx show-report
+    displayName: 'Generate test report'
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
