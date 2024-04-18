@@ -94,6 +94,14 @@
     },
     "publicDataDbExists": {
       "value": false
+    },
+    "slackAppToken": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/s101-datahub-production/resourceGroups/s101p01-rg-ees/providers/Microsoft.KeyVault/vaults/s101p01-kv-ees-01"
+        },
+        "secretName": "ees-alerts-slackapptoken"
+      }
     }
   }
 }
