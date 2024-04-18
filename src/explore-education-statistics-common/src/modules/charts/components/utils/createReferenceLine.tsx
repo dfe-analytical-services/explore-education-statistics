@@ -15,14 +15,17 @@ interface Props
   axis: Axis;
   axisDomain?: [AxisDomainItem, AxisDomainItem];
   axisType: AxisType;
+  chartBottomMargin?: number;
   chartData: ChartData[];
+  chartInnerHeight?: number;
   label: string;
   labelWidth?: number;
   otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisEnd?: string;
   otherAxisPosition?: number;
   otherAxisStart?: string;
-  position: string | number;
+  perpendicularLine?: boolean;
+  position?: string | number;
   style?: ReferenceLineStyle;
   x?: string | number;
   y?: string | number;
@@ -31,7 +34,9 @@ interface Props
 export default function createReferenceLine({
   axis,
   axisDomain,
+  chartBottomMargin,
   chartData,
+  chartInnerHeight,
   label,
   labelWidth,
   otherAxisDomain,
@@ -39,13 +44,14 @@ export default function createReferenceLine({
   otherAxisPosition,
   otherAxisStart,
   axisType,
+  perpendicularLine,
   position,
   style = 'dashed',
   x,
   y,
   ...props
 }: Props): ReactElement {
-  const styleProps = () => {
+  const getStyleProps = () => {
     switch (style) {
       case 'dashed':
         return {
@@ -68,9 +74,13 @@ export default function createReferenceLine({
     }
   };
 
+  const styleProps = getStyleProps();
+
   return (
     <ReferenceLine
-      {...styleProps()}
+      // Hide the reference line for perpendicular lines as we draw them
+      // manually with the label.
+      {...(perpendicularLine ? { stroke: 'none' } : styleProps)}
       {...props}
       key={`${position}_${label}`}
       x={otherAxisStart && otherAxisEnd ? undefined : x}
@@ -87,12 +97,16 @@ export default function createReferenceLine({
           viewBox={lineProps.viewBox}
           axis={axis}
           axisType={axisType}
+          chartBottomMargin={chartBottomMargin}
           chartData={chartData}
+          chartInnerHeight={chartInnerHeight}
           label={label}
           labelWidth={labelWidth}
           otherAxisDomain={otherAxisDomain}
           otherAxisPosition={otherAxisPosition}
+          perpendicularLine={perpendicularLine}
           position={position}
+          styleProps={styleProps}
         />
       )}
     />
@@ -112,10 +126,10 @@ function getSegment({
   axis: Axis;
   axisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisEnd?: string;
-  position: string | number;
+  position?: string | number;
   otherAxisStart?: string;
 }) {
-  if (!otherAxisStart || !otherAxisEnd) {
+  if (!otherAxisStart || !otherAxisEnd || !position) {
     return undefined;
   }
   const axisDomainMin = parseNumber(axisDomain?.[0]);
