@@ -35,6 +35,7 @@ interface FormFieldInputProps {
 
 export type FormFieldProps<TFormValues> = {
   children?: ReactNode;
+  errorString?: string;
   id?: string;
   isNumberField?: boolean;
   formGroup?: boolean;
@@ -56,6 +57,7 @@ export default function RHFFormField<
 >({
   as,
   children,
+  errorString,
   formGroup = true,
   formGroupClass,
   id: customId,
@@ -80,7 +82,7 @@ export default function RHFFormField<
 
   const { fieldId } = useFormIdContext();
 
-  const error = getErrorMessage(errors, name, showError);
+  const error = errorString || getErrorMessage(errors, name, showError);
 
   const component = useMemo(() => {
     const Component = as as ComponentType<FormFieldInputProps>;
