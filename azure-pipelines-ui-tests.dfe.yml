@@ -282,11 +282,6 @@ jobs:
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
 
-  - script: |
-      npx playwright show-report
-    displayName: 'Generate test report'
-    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
-
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -354,11 +349,6 @@ jobs:
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
-
-  - script: |
-      npx playwright show-report
-    displayName: 'Generate test report'
-    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -430,11 +420,6 @@ jobs:
             ADMIN_URL: $(ADMIN_URL)
             ADMIN_EMAIL: $(ADMIN_EMAIL)
             ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
-
-  - script: |
-      npx playwright show-report
-    displayName: 'Generate test report'
-    workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
