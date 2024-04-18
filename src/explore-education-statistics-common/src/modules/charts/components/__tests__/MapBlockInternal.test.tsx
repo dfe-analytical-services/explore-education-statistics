@@ -2,8 +2,9 @@ import {
   testMapConfiguration,
   testMapTableData,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
-import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
-import MapBlockInternal from '@common/modules/charts/components/MapBlockInternal';
+import MapBlock, {
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
@@ -31,7 +32,7 @@ describe('MapBlockInternal', () => {
   };
 
   test('renders legends and polygons correctly', async () => {
-    render(<MapBlockInternal {...testBlockProps} />);
+    render(<MapBlock {...testBlockProps} />);
 
     // await waitFor(() => {
     //   const paths = container.querySelectorAll<HTMLElement>(
@@ -78,7 +79,7 @@ describe('MapBlockInternal', () => {
     );
 
     render(
-      <MapBlockInternal
+      <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -108,7 +109,7 @@ describe('MapBlockInternal', () => {
     );
 
     render(
-      <MapBlockInternal
+      <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -128,7 +129,7 @@ describe('MapBlockInternal', () => {
   });
 
   test('changing selected data set changes legends and polygons', async () => {
-    render(<MapBlockInternal {...testBlockProps} />);
+    render(<MapBlock {...testBlockProps} />);
 
     await waitFor(async () => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -170,7 +171,7 @@ describe('MapBlockInternal', () => {
   });
 
   test.skip('changing selected location focuses the correct polygon', async () => {
-    const { container } = render(<MapBlockInternal {...testBlockProps} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -201,7 +202,7 @@ describe('MapBlockInternal', () => {
   });
 
   test('changing selected location renders its indicator tile', async () => {
-    render(<MapBlockInternal {...testBlockProps} />);
+    render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -239,7 +240,7 @@ describe('MapBlockInternal', () => {
     );
 
     render(
-      <MapBlockInternal
+      <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -290,7 +291,7 @@ describe('MapBlockInternal', () => {
   });
 
   test.skip('resetting the map when select None Selected', async () => {
-    const { container } = render(<MapBlockInternal {...testBlockProps} />);
+    const { container } = render(<MapBlock {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -335,7 +336,7 @@ describe('MapBlockInternal', () => {
     );
 
     render(
-      <MapBlockInternal
+      <MapBlock
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}

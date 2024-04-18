@@ -8,8 +8,9 @@ import InfographicBlock, {
 import LineChartBlock, {
   LineChartProps,
 } from '@common/modules/charts/components/LineChartBlock';
-import MapBlock from '@common/modules/charts/components/MapBlock';
-import { MapBlockProps } from '@common/modules/charts/components/MapBlockInternal';
+import MapBlock, {
+  MapBlockProps,
+} from '@common/modules/charts/components/MapBlock';
 import VerticalBarBlock, {
   VerticalBarProps,
 } from '@common/modules/charts/components/VerticalBarBlock';
