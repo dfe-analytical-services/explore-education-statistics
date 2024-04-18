@@ -473,7 +473,7 @@ describe('FootnoteForm', () => {
           },
           filters: {
             'filter-1-id': {
-              selected: 'true',
+              selected: true,
               filterGroups: {
                 'filter-1-group-1-id': { selected: false, filterItems: [] },
               },
@@ -482,7 +482,7 @@ describe('FootnoteForm', () => {
               selected: false,
               filterGroups: {
                 'filter-2-group-1-id': {
-                  selected: 'true',
+                  selected: true,
                   filterItems: [],
                 },
                 'filter-2-group-2-id': {

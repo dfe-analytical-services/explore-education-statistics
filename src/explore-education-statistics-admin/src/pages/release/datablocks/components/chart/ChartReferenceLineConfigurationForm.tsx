@@ -1,275 +1,169 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartReferenceLineConfigurationForm.module.scss';
+import { ChartAxisConfigurationFormValues } from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
 import Button from '@common/components/Button';
-import { FormFieldset } from '@common/components/form';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import ButtonGroup from '@common/components/ButtonGroup';
+import ButtonText from '@common/components/ButtonText';
 import Tooltip from '@common/components/Tooltip';
+import { FormSelect, FormFieldset } from '@common/components/form';
+import { SelectOption } from '@common/components/form/FormSelect';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import {
   ChartDefinitionAxis,
   ChartType,
   ReferenceLine,
-  ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
-import {
-  OtherAxisPositionType,
-  otherAxisPositionTypes,
-} from '@common/modules/charts/types/referenceLinePosition';
-import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
-import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
+import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import { produce } from 'immer';
-import isEqual from 'lodash/isEqual';
-import React, { useMemo } from 'react';
-import { ObjectSchema } from 'yup';
-
-interface FormValues {
-  label: string;
-  labelWidth?: number;
-  position: string | number;
-  otherAxisEnd?: string;
-  otherAxisPosition?: number;
-  otherAxisPositionType?: OtherAxisPositionType;
-  otherAxisStart?: string;
-  style: ReferenceLineStyle;
-}
 
 interface Props {
-  allReferenceLines: ReferenceLine[];
   axisDefinition?: ChartDefinitionAxis;
   axisPositionOptions: SelectOption[];
   chartType: ChartType;
+  index: number;
+  isEditing?: boolean;
   majorAxisOptions: SelectOption[];
-  minorAxisDomain?: MinorAxisDomainValues;
-  referenceLine?: ReferenceLine;
-  onSubmit: (referenceLines: ReferenceLine[]) => void;
+  onSave: (updatedLines: ReferenceLine[]) => void;
 }
 
 export default function ChartReferenceLineConfigurationForm({
-  allReferenceLines,
   axisDefinition,
   axisPositionOptions,
   chartType,
+  index,
+  isEditing,
   majorAxisOptions,
-  minorAxisDomain,
-  referenceLine,
-  onSubmit,
+  onSave,
 }: Props) {
-  const { axis, referenceLineDefaults, type } = axisDefinition || {};
-
-  const validationSchema: ObjectSchema<FormValues> = useMemo(() => {
-    return Yup.object({
-      label: Yup.string().required('Enter label'),
-      labelWidth: Yup.number().optional(),
-      position: Yup.mixed<FormValues['position']>()
-        .required('Enter position')
-        .test({
-          name: 'axisPosition',
-          message: `Enter a position within the ${
-            axis === 'x' ? 'X' : 'Y'
-          } axis min/max range`,
-          test: value => {
-            if (typeof value !== 'number') {
-              return true;
-            }
-
-            return type === 'minor' && minorAxisDomain
-              ? value >= minorAxisDomain?.min && value <= minorAxisDomain.max
-              : true;
-          },
-        }),
-      style: Yup.string()
-        .required('Enter style')
-        .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
-      otherAxisEnd: Yup.string()
-        .optional()
-        .when(['otherAxisPositionType', 'position'], {
-          is: (
-            otherAxisPositionType: OtherAxisPositionType,
-            position: string | number,
-          ) =>
-            otherAxisPositionType ===
-              otherAxisPositionTypes.betweenDataPoints ||
-            position === otherAxisPositionTypes.betweenDataPoints,
-          then: s => s.required('Enter end point').min(1, 'Enter end point'),
-          otherwise: s => s.notRequired(),
-        })
-        .test(
-          'otherAxisEnd',
-          'End point cannot match start point',
-          function checkOtherAxisEnd(value) {
-            /* eslint-disable react/no-this-in-sfc */
-            if (this.parent.otherAxisStart) {
-              return value !== this.parent.otherAxisStart;
-            }
-            return true;
-            /* eslint-enable react/no-this-in-sfc */
-          },
-        ),
-      otherAxisStart: Yup.string()
-        .optional()
-        .when(['otherAxisPositionType', 'position'], {
-          is: (
-            otherAxisPositionType: OtherAxisPositionType,
-            position: string | number,
-          ) =>
-            otherAxisPositionType ===
-              otherAxisPositionTypes.betweenDataPoints ||
-            position === otherAxisPositionTypes.betweenDataPoints,
-          then: s =>
-            s.required('Enter start point').min(1, 'Enter start point'),
-          otherwise: s => s.notRequired(),
-        }),
-
-      otherAxisPosition:
-        type === 'minor'
-          ? Yup.number().when('otherAxisPositionType', {
-              is: otherAxisPositionTypes.custom,
-              then: s =>
-                s.required('Enter a percentage between 0 and 100%').test({
-                  name: 'otherAxisPosition',
-                  message: 'Enter a percentage between 0 and 100%',
-                  test: value => {
-                    if (typeof value !== 'number') {
-                      return true;
-                    }
-                    return value >= 0 && value <= 100;
-                  },
-                }),
-              otherwise: s => s.notRequired(),
-            })
-          : Yup.number()
-              .when('position', {
-                is: otherAxisPositionTypes.betweenDataPoints,
-                then: s =>
-                  s.required(
-                    `Enter a ${axis === 'x' ? 'Y' : 'X'} axis position`,
-                  ),
-              })
-              .test({
-                name: 'otherAxisPosition',
-                message: `Enter a position within the ${
-                  axis === 'x' ? 'Y' : 'X'
-                } axis min/max range`,
-                test: value => {
-                  if (typeof value !== 'number') {
-                    return true;
-                  }
-
-                  return minorAxisDomain
-                    ? value >= minorAxisDomain?.min &&
-                        value <= minorAxisDomain.max
-                    : true;
-                },
-              }),
-      otherAxisPositionType: Yup.string()
-        .optional()
-        .oneOf<OtherAxisPositionType>(Object.values(otherAxisPositionTypes)),
-    });
-  }, [axis, minorAxisDomain, type]);
-
-  const initialValues: FormValues = useMemo(() => {
-    return {
-      label: referenceLine?.label ?? '',
-      labelWidth: referenceLine?.labelWidth ?? undefined,
-      otherAxisEnd: referenceLine?.otherAxisEnd ?? undefined,
-      otherAxisPosition: referenceLine?.otherAxisPosition ?? undefined,
-      otherAxisStart: referenceLine?.otherAxisStart ?? undefined,
-      otherAxisPositionType:
-        type === 'minor' ? getOtherAxisPositionType(referenceLine) : undefined,
-      position: referenceLine?.position ?? '',
-      style: referenceLine?.style ?? referenceLineDefaults?.style ?? 'dashed',
-    };
-  }, [referenceLine, referenceLineDefaults?.style, type]);
+  const { formState, setError, watch } =
+    useFormContext<ChartAxisConfigurationFormValues>();
+  const values = watch();
+  const referenceLine = values.referenceLines?.[index];
+  const { axis, type: axisType } = axisDefinition || {};
 
   return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={async (values, helpers) => {
-        const updated = produce(values, draft => {
-          switch (draft.otherAxisPositionType) {
-            case otherAxisPositionTypes.custom:
-              delete draft.otherAxisStart;
-              delete draft.otherAxisEnd;
-              break;
-
-            case otherAxisPositionTypes.betweenDataPoints:
-              delete draft.otherAxisPosition;
-              break;
-
-            case otherAxisPositionTypes.default:
-              delete draft.otherAxisEnd;
-              delete draft.otherAxisPosition;
-              delete draft.otherAxisStart;
-              break;
-            default:
-              break;
-          }
-
-          delete draft.otherAxisPositionType;
-        });
-
-        if (
-          allReferenceLines
-            .filter(line => !isEqual(line, referenceLine))
-            .some(line => isEqual(line, updated))
-        ) {
-          helpers.setErrors({
-            position: 'A line with these settings has already been added',
-          });
-          return;
-        }
-
-        const updatedReferenceLines = referenceLine
-          ? allReferenceLines?.map(line => {
-              return isEqual(line, referenceLine) ? updated : line;
-            })
-          : [...(allReferenceLines ?? []), updated];
-
-        await onSubmit(updatedReferenceLines);
-        helpers.resetForm();
-      }}
-    >
-      {form => (
-        <>
-          <td className="dfe-vertical-align--bottom">
-            {type === 'major' ? (
-              <>
-                <FormFieldSelect<FormValues>
-                  name="position"
-                  id="referenceLines-position"
-                  label="Position"
+    <>
+      <td className="dfe-vertical-align--bottom">
+        {axisType === 'major' ? (
+          <>
+            <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+              name={`referenceLines.${index}.position`}
+              id="referenceLines-position"
+              label="Position"
+              formGroup={false}
+              hideLabel
+              placeholder="Choose position"
+              order={FormSelect.unordered}
+              options={[
+                ...axisPositionOptions,
+                ...(chartType === 'verticalbar'
+                  ? [
+                      {
+                        label: 'Between data points',
+                        value: otherAxisPositionTypes.betweenDataPoints,
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+            {referenceLine?.position ===
+              otherAxisPositionTypes.betweenDataPoints && (
+              <FormFieldset
+                className="govuk-!-margin-top-2"
+                id="referenceLines-betweenPosition"
+                legend="Select start and end points"
+                legendSize="s"
+                legendWeight="regular"
+              >
+                <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                  className="govuk-!-margin-bottom-2"
+                  name={`referenceLines.${index}.otherAxisStart`}
+                  id="referenceLines-otherAxisStart"
+                  label="Start point"
                   formGroup={false}
                   hideLabel
-                  placeholder="Choose position"
+                  placeholder="Start point"
                   order={FormSelect.unordered}
-                  options={[
-                    ...axisPositionOptions,
-                    ...(chartType === 'verticalbar'
-                      ? [
-                          {
-                            label: 'Between data points',
-                            value: otherAxisPositionTypes.betweenDataPoints,
-                          },
-                        ]
-                      : []),
-                  ]}
+                  options={majorAxisOptions}
                 />
-                {form.values.position ===
-                  otherAxisPositionTypes.betweenDataPoints && (
+                <br />
+                <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                  name={`referenceLines.${index}.otherAxisEnd`}
+                  id="referenceLines-otherAxisEnd"
+                  label="End point"
+                  formGroup={false}
+                  hideLabel
+                  placeholder="End point"
+                  order={FormSelect.unordered}
+                  options={majorAxisOptions}
+                />
+              </FormFieldset>
+            )}
+          </>
+        ) : (
+          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+            name={`referenceLines.${index}.position`}
+            id="referenceLines-position"
+            label="Position"
+            formGroup={false}
+            hideLabel
+          />
+        )}
+      </td>
+      <td className="dfe-vertical-align--bottom">
+        {axisType === 'minor' ? (
+          <>
+            <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+              name={`referenceLines.${index}.otherAxisPositionType`}
+              id="referenceLines-otherAxisPositionType"
+              label={`${axis === 'x' ? 'Y' : 'X'} axis position`}
+              formGroup={false}
+              hideLabel
+              order={FormSelect.unordered}
+              options={[
+                {
+                  label: 'Default',
+                  value: otherAxisPositionTypes.default,
+                },
+                {
+                  label: 'Custom',
+                  value: otherAxisPositionTypes.custom,
+                },
+                {
+                  label: 'Between data points',
+                  value: otherAxisPositionTypes.betweenDataPoints,
+                },
+              ]}
+            />
+
+            {referenceLine?.otherAxisPositionType !==
+              otherAxisPositionTypes.default && (
+              <>
+                {referenceLine?.otherAxisPositionType ===
+                otherAxisPositionTypes.custom ? (
+                  <div className="govuk-!-margin-top-2">
+                    <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                      name={`referenceLines.${index}.otherAxisPosition`}
+                      id="referenceLines-otherAxisPosition"
+                      label={`Percent along ${axis === 'x' ? 'Y' : 'X'} axis`}
+                      formGroup={false}
+                      width={10}
+                    />
+                  </div>
+                ) : (
                   <FormFieldset
                     className="govuk-!-margin-top-2"
                     id="referenceLines-betweenPosition"
-                    legend="Select start and end points"
+                    legend="Select start and end points of line"
                     legendSize="s"
                     legendWeight="regular"
                   >
-                    <FormFieldSelect<FormValues>
+                    <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
                       className="govuk-!-margin-bottom-2"
-                      name="otherAxisStart"
+                      name={`referenceLines.${index}.otherAxisStart`}
                       id="referenceLines-otherAxisStart"
                       label="Start point"
                       formGroup={false}
@@ -279,8 +173,8 @@ export default function ChartReferenceLineConfigurationForm({
                       options={majorAxisOptions}
                     />
                     <br />
-                    <FormFieldSelect<FormValues>
-                      name="otherAxisEnd"
+                    <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                      name={`referenceLines.${index}.otherAxisEnd`}
                       id="referenceLines-otherAxisEnd"
                       label="End point"
                       formGroup={false}
@@ -292,179 +186,141 @@ export default function ChartReferenceLineConfigurationForm({
                   </FormFieldset>
                 )}
               </>
-            ) : (
-              <FormFieldNumberInput<FormValues>
-                name="position"
-                id="referenceLines-position"
-                label="Position"
-                formGroup={false}
-                hideLabel
-              />
             )}
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            {type === 'minor' ? (
-              <>
-                <FormFieldSelect<FormValues>
-                  name="otherAxisPositionType"
-                  id="referenceLines-otherAxisPositionType"
-                  label={`${axis === 'x' ? 'Y' : 'X'} axis position`}
-                  formGroup={false}
-                  hideLabel
-                  order={FormSelect.unordered}
-                  options={[
-                    {
-                      label: 'Default',
-                      value: otherAxisPositionTypes.default,
-                    },
-                    {
-                      label: 'Custom',
-                      value: otherAxisPositionTypes.custom,
-                    },
-                    {
-                      label: 'Between data points',
-                      value: otherAxisPositionTypes.betweenDataPoints,
-                    },
-                  ]}
-                />
+          </>
+        ) : (
+          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+            name={`referenceLines.${index}.otherAxisPosition`}
+            id="referenceLines-otherAxisPosition"
+            label={axis === 'x' ? 'Y axis position' : 'X axis position'}
+            formGroup={false}
+            hideLabel
+            hint={`Value ${
+              values.referenceLines?.[index].position !==
+              otherAxisPositionTypes.betweenDataPoints
+                ? '(optional)'
+                : ''
+            }`}
+            width={10}
+          />
+        )}
+      </td>
+      <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
+        <RHFFormFieldTextInput<ChartAxisConfigurationFormValues>
+          name={`referenceLines.${index}.label`}
+          id="referenceLines-label"
+          label="Label"
+          formGroup={false}
+          hideLabel
+        />
+      </td>
+      <td className="dfe-vertical-align--bottom">
+        <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+          name={`referenceLines.${index}.labelWidth`}
+          id="referenceLines-labelWidth"
+          hint="Pixels (optional)"
+          label="Label width"
+          formGroup={false}
+          hideLabel
+          width={10}
+        />
+      </td>
+      <td className="dfe-vertical-align--bottom">
+        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+          className={styles.styleSelect}
+          name={`referenceLines.${index}.style`}
+          id="referenceLines-style"
+          label="Style"
+          formGroup={false}
+          hideLabel
+          order={FormSelect.unordered}
+          options={[
+            { label: 'Dashed', value: 'dashed' },
+            { label: 'Solid', value: 'solid' },
+            { label: 'None', value: 'none' },
+          ]}
+        />
+      </td>
+      <td className="dfe-vertical-align--bottom">
+        <Tooltip
+          text={!formState.isValid ? 'Cannot add invalid reference line' : ''}
+          enabled={!formState.isValid}
+        >
+          {({ ref }) => (
+            <ButtonGroup className="govuk-!-margin-0">
+              <Button
+                ariaDisabled={!formState.isValid}
+                className="govuk-!-margin-bottom-0 dfe-float--right"
+                ref={ref}
+                type="button"
+                onClick={() => {
+                  if (
+                    !referenceLine ||
+                    !values.referenceLines?.[index].label ||
+                    !values.referenceLines?.[index].position
+                  ) {
+                    return;
+                  }
 
-                {form.values.otherAxisPositionType !==
-                  otherAxisPositionTypes.default && (
-                  <>
-                    {form.values.otherAxisPositionType ===
-                    otherAxisPositionTypes.custom ? (
-                      <div className="govuk-!-margin-top-2">
-                        <FormFieldNumberInput<FormValues>
-                          name="otherAxisPosition"
-                          id="referenceLines-otherAxisPosition"
-                          label={`Percent along ${
-                            axis === 'x' ? 'Y' : 'X'
-                          } axis`}
-                          formGroup={false}
-                          width={10}
-                        />
-                      </div>
-                    ) : (
-                      <FormFieldset
-                        className="govuk-!-margin-top-2"
-                        id="referenceLines-betweenPosition"
-                        legend="Select start and end points of line"
-                        legendSize="s"
-                        legendWeight="regular"
-                      >
-                        <FormFieldSelect<FormValues>
-                          className="govuk-!-margin-bottom-2"
-                          name="otherAxisStart"
-                          id="referenceLines-otherAxisStart"
-                          label="Start point"
-                          formGroup={false}
-                          hideLabel
-                          placeholder="Start point"
-                          order={FormSelect.unordered}
-                          options={majorAxisOptions}
-                        />
-                        <br />
-                        <FormFieldSelect<FormValues>
-                          name="otherAxisEnd"
-                          id="referenceLines-otherAxisEnd"
-                          label="End point"
-                          formGroup={false}
-                          hideLabel
-                          placeholder="End point"
-                          order={FormSelect.unordered}
-                          options={majorAxisOptions}
-                        />
-                      </FormFieldset>
-                    )}
-                  </>
-                )}
-              </>
-            ) : (
-              <FormFieldNumberInput<FormValues>
-                name="otherAxisPosition"
-                id="referenceLines-otherAxisPosition"
-                label={axis === 'x' ? 'Y axis position' : 'X axis position'}
-                formGroup={false}
-                hideLabel
-                hint={`Value ${
-                  form.values.position !==
-                  otherAxisPositionTypes.betweenDataPoints
-                    ? '(optional)'
-                    : ''
-                }`}
-                width={10}
-              />
-            )}
-          </td>
-          <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
-            <FormFieldTextInput<FormValues>
-              name="label"
-              id="referenceLines-label"
-              label="Label"
-              formGroup={false}
-              hideLabel
-            />
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            <FormFieldNumberInput<FormValues>
-              name="labelWidth"
-              id="referenceLines-labelWidth"
-              hint="Pixels (optional)"
-              label="Label width"
-              formGroup={false}
-              hideLabel
-              width={10}
-            />
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            <FormFieldSelect<FormValues>
-              className={styles.styleSelect}
-              name="style"
-              id="referenceLines-style"
-              label="Style"
-              formGroup={false}
-              hideLabel
-              order={FormSelect.unordered}
-              options={[
-                { label: 'Dashed', value: 'dashed' },
-                { label: 'Solid', value: 'solid' },
-                { label: 'None', value: 'none' },
-              ]}
-            />
-          </td>
-          <td className="dfe-vertical-align--bottom">
-            <Tooltip
-              text={!form.isValid ? 'Cannot add invalid reference line' : ''}
-              enabled={!form.isValid}
-            >
-              {({ ref }) => (
-                <Button
-                  ariaDisabled={!form.isValid}
-                  className="govuk-!-margin-bottom-0 dfe-float--right"
-                  ref={ref}
-                  onClick={async () => {
-                    await form.submitForm();
+                  const updatedLine = produce(referenceLine, draft => {
+                    switch (draft.otherAxisPositionType) {
+                      case otherAxisPositionTypes.custom:
+                        delete draft.otherAxisStart;
+                        delete draft.otherAxisEnd;
+                        break;
+
+                      case otherAxisPositionTypes.betweenDataPoints:
+                        delete draft.otherAxisPosition;
+                        break;
+
+                      case otherAxisPositionTypes.default:
+                        delete draft.otherAxisEnd;
+                        delete draft.otherAxisPosition;
+                        delete draft.otherAxisStart;
+                        break;
+                      default:
+                        break;
+                    }
+
+                    delete draft.otherAxisPositionType;
+                  });
+
+                  if (
+                    values.referenceLines.filter(
+                      line =>
+                        line.position.toString() ===
+                          updatedLine.position.toString() &&
+                        line.label === updatedLine.label,
+                    ).length > 1
+                  ) {
+                    setError(`referenceLines.${index}.position`, {
+                      message:
+                        'A line with these settings has already been added',
+                    });
+                    return;
+                  }
+
+                  const updatedLines = values.referenceLines;
+                  updatedLines[index] = updatedLine;
+                  onSave(updatedLines);
+                }}
+              >
+                {isEditing ? 'Save' : 'Add'}
+              </Button>
+              {!isEditing && (
+                <ButtonText
+                  onClick={() => {
+                    (values.referenceLines ?? []).splice(index, 1);
+                    onSave(values.referenceLines ?? []);
                   }}
                 >
-                  {referenceLine ? 'Save' : 'Add line'}
-                </Button>
+                  Remove
+                </ButtonText>
               )}
-            </Tooltip>
-          </td>
-        </>
-      )}
-    </Formik>
+            </ButtonGroup>
+          )}
+        </Tooltip>
+      </td>
+    </>
   );
-}
-
-function getOtherAxisPositionType(
-  referenceLine?: ReferenceLine,
-): OtherAxisPositionType {
-  if (referenceLine?.otherAxisEnd && referenceLine?.otherAxisStart) {
-    return otherAxisPositionTypes.betweenDataPoints;
-  }
-  if (referenceLine?.otherAxisPosition) {
-    return otherAxisPositionTypes.custom;
-  }
-  return otherAxisPositionTypes.default;
 }

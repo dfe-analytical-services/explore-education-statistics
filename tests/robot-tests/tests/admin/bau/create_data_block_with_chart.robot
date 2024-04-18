@@ -482,9 +482,10 @@ Configure line chart data sets
 
 Add reference line
     user clicks link    X Axis (major axis)
+    user clicks button    Add new line
     user chooses select option    id:chartAxisConfiguration-major-referenceLines-position    2005
     user enters text into element    id:chartAxisConfiguration-major-referenceLines-label    Reference line 1
-    user clicks button    Add line
+    user clicks button    Add
 
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview

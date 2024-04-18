@@ -65,7 +65,7 @@ export interface AxisConfiguration {
   sortAsc?: boolean;
   dataSets: DataSet[];
   referenceLines: ReferenceLine[];
-  visible: boolean;
+  visible?: boolean;
   unit?: string;
   showGrid?: boolean;
   label?: Label;

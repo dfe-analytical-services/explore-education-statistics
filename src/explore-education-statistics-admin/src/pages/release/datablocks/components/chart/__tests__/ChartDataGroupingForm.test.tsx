@@ -1,9 +1,9 @@
 import ChartDataGroupingForm from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingForm';
 import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
+import render from '@common-test/render';
 import { MapDataSetConfig } from '@common/modules/charts/types/chart';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -142,10 +142,9 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('changing a data grouping to quantiles', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -180,10 +179,9 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('changing a data grouping to custom groups', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -234,10 +232,9 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('editing existing custom groups', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[2]}
         dataSetConfigs={testDataSetConfigs}
@@ -308,10 +305,9 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('copying custom groups from another data set', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -355,9 +351,7 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('shows a validation error if no number of groups when using equal intervals', async () => {
-    const user = userEvent.setup();
-
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -381,9 +375,7 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('shows a validation error if no number of groups when using quantiles', async () => {
-    const user = userEvent.setup();
-
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[1]}
         dataSetConfigs={testDataSetConfigs}
@@ -409,9 +401,7 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('shows a validation error if no custom groups set when using custom grouping', async () => {
-    const user = userEvent.setup();
-
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -437,9 +427,7 @@ describe('ChartDataGroupingForm', () => {
   });
 
   test('shows a validation error when no data set selected to copy custom groups from', async () => {
-    const user = userEvent.setup();
-
-    render(
+    const { user } = render(
       <ChartDataGroupingForm
         dataSetConfig={testDataSetConfigs[0]}
         dataSetConfigs={testDataSetConfigs}
@@ -466,9 +454,7 @@ describe('ChartDataGroupingForm', () => {
 
   describe('custom groups', () => {
     test('shows validation errors without min and max values', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[0]}
           dataSetConfigs={testDataSetConfigs}
@@ -491,9 +477,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows a validation error when the max is not greater than the min', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[0]}
           dataSetConfigs={testDataSetConfigs}
@@ -516,9 +500,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows a validation error when the minimum value is in an existing group', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[2]}
           dataSetConfigs={testDataSetConfigs}
@@ -540,9 +522,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows a validation error when the maximum value is in an existing group', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[2]}
           dataSetConfigs={testDataSetConfigs}
@@ -565,9 +545,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows validation errors when both values are in an existing group', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[2]}
           dataSetConfigs={testDataSetConfigs}
@@ -596,9 +574,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows validation errors when the new group contains an existing group', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={testDataSetConfigs[2]}
           dataSetConfigs={testDataSetConfigs}
@@ -627,9 +603,7 @@ describe('ChartDataGroupingForm', () => {
     });
 
     test('shows a validation error when groups with negative values overlap', async () => {
-      const user = userEvent.setup();
-
-      render(
+      const { user } = render(
         <ChartDataGroupingForm
           dataSetConfig={{
             ...testDataSetConfigs[2],

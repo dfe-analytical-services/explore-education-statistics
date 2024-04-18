@@ -1,9 +1,9 @@
 import RHFFormField, {
   FormFieldComponentProps,
 } from '@common/components/form/rhf/RHFFormField';
-import FormCheckbox, {
+import RHFFormCheckbox, {
   FormCheckboxProps,
-} from '@common/components/form/FormCheckbox';
+} from '@common/components/form/rhf/RHFFormCheckbox';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import classNames from 'classnames';
 import React from 'react';
@@ -37,13 +37,12 @@ export default function RHFFormFieldCheckbox<TFormValues extends FieldValues>({
           'govuk-checkboxes--small': small,
         })}
       >
-        <FormCheckbox
+        <RHFFormCheckbox
           {...props}
           {...field}
           checked={!!value}
           id={id}
           inputRef={inputRef}
-          value={value}
         />
       </div>
     </RHFFormField>

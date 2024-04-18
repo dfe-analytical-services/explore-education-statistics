@@ -5,8 +5,8 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
-import { render as baseRender, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import baseRender from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 
@@ -528,9 +528,7 @@ describe('ChartDataGroupingsConfiguration', () => {
   });
 
   test('shows a validation error if another form is invalid', async () => {
-    const user = userEvent.setup();
-
-    render(
+    const { user } = render(
       <ChartDataGroupingsConfiguration
         meta={testTable.subjectMeta}
         data={testTable.results}

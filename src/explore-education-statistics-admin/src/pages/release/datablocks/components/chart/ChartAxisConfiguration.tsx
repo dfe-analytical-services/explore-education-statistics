@@ -3,28 +3,31 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import ChartReferenceLinesConfiguration from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import Effect from '@common/components/Effect';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldSelect,
-  FormFieldset,
-  FormFieldTextInput,
-} from '@common/components/form';
-import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import { FormFieldset } from '@common/components/form';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { SelectOption } from '@common/components/form/FormSelect';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import {
   AxesConfiguration,
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
   ChartDefinition,
-  Label,
+  ReferenceLine,
+  ReferenceLineStyle,
   TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
+import {
+  otherAxisPositionTypes,
+  OtherAxisPositionType,
+} from '@common/modules/charts/types/referenceLinePosition';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -35,14 +38,33 @@ import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import mapValues from 'lodash/mapValues';
+import isEqual from 'lodash/isEqual';
 import merge from 'lodash/merge';
+import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { ObjectSchema } from 'yup';
 
-type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
+interface FormReferenceLine extends ReferenceLine {
+  otherAxisPositionType?: OtherAxisPositionType;
+}
+
+export interface ChartAxisConfigurationFormValues
+  extends OmitStrict<
+    AxisConfiguration,
+    'dataSets' | 'type' | 'label' | 'referenceLines'
+  > {
+  labelRotated?: boolean;
+  labelText?: string;
+  labelWidth?: number | null;
+  referenceLines?: FormReferenceLine[];
+}
 
 interface Props {
   axesConfiguration: AxesConfiguration;
@@ -71,12 +93,10 @@ const ChartAxisConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const { capabilities, type: chartType } = definition;
+  const { updateForm, submitForms } = useChartBuilderFormsContext();
 
-  const { hasSubmitted, updateForm, submitForms } =
-    useChartBuilderFormsContext();
-
-  const axisDefinition = definition.axes[type];
+  const { axes, capabilities } = definition;
+  const axisDefinition = axes[type];
   const axisConfiguration = axesConfiguration[type];
 
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
@@ -165,14 +185,14 @@ const ChartAxisConfiguration = ({
       value: 'filters',
       conditional: (
         <>
-          <FormFieldSelect<AxisConfiguration>
+          <RHFFormFieldSelect<AxisConfiguration>
             label="Select a filter"
             name="groupByFilter"
             options={categories}
             order={[]}
           />
           {isGroupedByFilterWithGroups && (
-            <FormFieldCheckbox<FormValues>
+            <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
               name="groupByFilterGroups"
               label="Group by filter groups"
             />
@@ -184,18 +204,8 @@ const ChartAxisConfiguration = ({
     return options;
   }, [isGroupedByFilterWithGroups, meta.filters]);
 
-  // TODO EES-721: Figure out how we should sort data
-  // const sortOptions = useMemo<SelectOption[]>(() => {
-  //   return [
-  //     {
-  //       label: 'Default',
-  //       value: 'name',
-  //     },
-  //   ];
-  // }, []);
-
   const limitOptions = useMemo<SelectOption[]>(() => {
-    if (type !== 'major') {
+    if (type === 'minor') {
       return [];
     }
 
@@ -206,39 +216,44 @@ const ChartAxisConfiguration = ({
   }, [dataSetCategories, type]);
 
   const normalizeValues = useCallback(
-    (values: FormValues): AxisConfiguration => {
+    (values: ChartAxisConfigurationFormValues): AxisConfiguration => {
+      const refLines = (values.referenceLines ?? []).map(line =>
+        omit(line, 'otherAxisPositionType'),
+      );
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
       const result = merge({}, axisConfiguration, values, {
         // `configuration.type` may be incorrectly set by
         // seeded releases, so we want to make sure this is
         // set using the `type` prop (which uses the axis key)
-        type,
-        // Numeric values may be treated as strings by Formik
-        // due to the way they are encoded in the form input value.
+        // type,
+        label: {
+          rotated: values.labelRotated,
+          text: values.labelText,
+          width: values.labelWidth,
+        },
+        // These are strings when set by Selects
         min: parseNumber(values.min),
         max: parseNumber(values.max),
-        size: parseNumber(values.size),
-        tickSpacing: parseNumber(values.tickSpacing),
       });
       // referenceLines are removable, so don't merge - update instead
-      result.referenceLines = [...(values.referenceLines ?? [])];
-      return result;
+      result.referenceLines = [...refLines];
+      return omit(result, ['labelRotated', 'labelText', 'labelWidth']);
     },
-    [axisConfiguration, type],
+    [axisConfiguration],
   );
 
   const handleFormChange = useCallback(
-    ({ isValid, ...values }: FormValues & { isValid: boolean }) => {
-      if (isValid) {
-        onChange(normalizeValues(values));
-      }
+    ({ ...values }: ChartAxisConfigurationFormValues) => {
+      onChange(normalizeValues(values));
     },
     [normalizeValues, onChange],
   );
 
-  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let schema = Yup.object<FormValues>({
+  const validationSchema = useMemo<
+    ObjectSchema<Partial<ChartAxisConfigurationFormValues>>
+  >(() => {
+    let schema = Yup.object<ChartAxisConfigurationFormValues>({
       size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
@@ -256,6 +271,8 @@ const ChartAxisConfiguration = ({
       min: Yup.number(),
       visible: Yup.boolean(),
       unit: Yup.string(),
+      labelText: Yup.string(),
+      labelWidth: Yup.number().positive('Label width must be positive'),
     });
 
     if (type === 'major' && !definition.axes.major?.constants?.groupBy) {
@@ -270,18 +287,7 @@ const ChartAxisConfiguration = ({
 
     if (axisDefinition?.capabilities.canRotateLabel) {
       schema = schema.shape({
-        label: Yup.object<Label>({
-          text: Yup.string(),
-          rotated: Yup.boolean(),
-          width: Yup.number().positive('Label width must be positive'),
-        }),
-      });
-    } else {
-      schema = schema.shape({
-        label: Yup.object<Label>({
-          text: Yup.string(),
-          width: Yup.number().positive('Label width must be positive'),
-        }),
+        labelRotated: Yup.boolean(),
       });
     }
 
@@ -299,37 +305,200 @@ const ChartAxisConfiguration = ({
 
     if (capabilities.hasReferenceLines) {
       schema = schema.shape({
-        referenceLines: Yup.array(),
+        referenceLines: Yup.array()
+          .defined()
+          .of(
+            Yup.object({
+              label: Yup.string().required('Enter label'),
+              labelWidth: Yup.number().optional(),
+              position: Yup.mixed<string | number>()
+                .required()
+                .transform(value => (!value ? undefined : value))
+                .required('Enter position')
+                .test({
+                  name: 'axisPosition',
+                  message: `Enter a position within the ${
+                    axisDefinition?.axis === 'x' ? 'X' : 'Y'
+                  } axis min/max range`,
+                  test: value => {
+                    if (typeof value !== 'number') {
+                      return true;
+                    }
+                    return type === 'minor' && minorAxisDomain
+                      ? value >= minorAxisDomain?.min &&
+                          value <= minorAxisDomain.max
+                      : true;
+                  },
+                }),
+              style: Yup.string()
+                .required('Enter style')
+                .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
+              otherAxisEnd: Yup.string()
+                .optional()
+                .when(['otherAxisPositionType', 'position'], {
+                  is: (
+                    otherAxisPositionType: OtherAxisPositionType,
+                    position: string | number,
+                  ) =>
+                    otherAxisPositionType ===
+                      otherAxisPositionTypes.betweenDataPoints ||
+                    position === otherAxisPositionTypes.betweenDataPoints,
+                  then: s =>
+                    s.required('Enter end point').min(1, 'Enter end point'),
+                  otherwise: s => s.notRequired(),
+                })
+                .test(
+                  'otherAxisEnd',
+                  'End point cannot match start point',
+                  function checkOtherAxisEnd(value) {
+                    /* eslint-disable react/no-this-in-sfc */
+                    if (this.parent.otherAxisStart) {
+                      return value !== this.parent.otherAxisStart;
+                    }
+                    return true;
+                    /* eslint-enable react/no-this-in-sfc */
+                  },
+                ),
+              otherAxisStart: Yup.string()
+                .optional()
+                .when(['otherAxisPositionType', 'position'], {
+                  is: (
+                    otherAxisPositionType: OtherAxisPositionType,
+                    position: string | number,
+                  ) =>
+                    otherAxisPositionType ===
+                      otherAxisPositionTypes.betweenDataPoints ||
+                    position === otherAxisPositionTypes.betweenDataPoints,
+                  then: s =>
+                    s.required('Enter start point').min(1, 'Enter start point'),
+                  otherwise: s => s.notRequired(),
+                }),
+
+              otherAxisPosition:
+                type === 'minor'
+                  ? Yup.number().when('otherAxisPositionType', {
+                      is: otherAxisPositionTypes.custom,
+                      then: s =>
+                        s
+                          .required('Enter a percentage between 0 and 100%')
+                          .test({
+                            name: 'otherAxisPosition',
+                            message: 'Enter a percentage between 0 and 100%',
+                            test: value => {
+                              if (typeof value !== 'number') {
+                                return true;
+                              }
+                              return value >= 0 && value <= 100;
+                            },
+                          }),
+                      otherwise: s => s.notRequired(),
+                    })
+                  : Yup.number()
+                      .when('position', {
+                        is: otherAxisPositionTypes.betweenDataPoints,
+                        then: s =>
+                          s.required(
+                            `Enter a ${
+                              axisDefinition?.axis === 'x' ? 'Y' : 'X'
+                            } axis position`,
+                          ),
+                      })
+                      .test({
+                        name: 'otherAxisPosition',
+                        message: `Enter a position within the ${
+                          axisDefinition?.axis === 'x' ? 'Y' : 'X'
+                        } axis min/max range`,
+                        test: value => {
+                          if (typeof value !== 'number') {
+                            return true;
+                          }
+
+                          return minorAxisDomain
+                            ? value >= minorAxisDomain?.min &&
+                                value <= minorAxisDomain.max
+                            : true;
+                        },
+                      }),
+              otherAxisPositionType: Yup.string()
+                .optional()
+                .oneOf<OtherAxisPositionType>(
+                  Object.values(otherAxisPositionTypes),
+                ),
+            }),
+          ),
       });
     }
 
     return schema;
   }, [
-    axisDefinition,
+    axisDefinition?.axis,
+    axisDefinition?.capabilities.canRotateLabel,
     capabilities.canSort,
     capabilities.hasGridLines,
     capabilities.hasReferenceLines,
-    definition.axes.major,
+    definition.axes.major?.constants?.groupBy,
+    minorAxisDomain,
     type,
   ]);
 
-  const initialValues = useMemo<FormValues>(() => {
-    return type === 'major' && isGroupedByFilterWithGroups && stacked
-      ? {
-          ...pick(axisConfiguration, Object.keys(validationSchema.fields)),
-          groupByFilterGroups: axisConfiguration?.groupByFilterGroups,
-        }
-      : pick(axisConfiguration, Object.keys(validationSchema.fields));
-  }, [
-    axisConfiguration,
-    isGroupedByFilterWithGroups,
-    stacked,
-    type,
-    validationSchema.fields,
-  ]);
+  const getInitialValues = useCallback(
+    (values?: AxisConfiguration): ChartAxisConfigurationFormValues => {
+      const initialValues = {
+        ...pick(values, Object.keys(validationSchema.fields)),
+        groupByFilterGroups:
+          type === 'major' && isGroupedByFilterWithGroups && stacked
+            ? values?.groupByFilterGroups
+            : undefined,
+        max:
+          type === 'major' && !values?.max
+            ? parseNumber(limitOptions[limitOptions.length - 1]?.value)
+            : values?.max,
+        labelRotated: values?.label?.rotated ?? false,
+        labelText: values?.label?.text ?? '',
+        labelWidth: values?.label?.width ?? undefined,
+        referenceLines:
+          values?.referenceLines.map(line => {
+            return {
+              ...line,
+              otherAxisPositionType:
+                type === 'minor' ? getOtherAxisPositionType(line) : undefined,
+              style:
+                line?.style ??
+                axisDefinition?.referenceLineDefaults?.style ??
+                'dashed',
+            };
+          }) ?? [],
+      };
+
+      return initialValues;
+    },
+    [
+      axisDefinition?.referenceLineDefaults?.style,
+      isGroupedByFilterWithGroups,
+      limitOptions,
+      stacked,
+      type,
+      validationSchema.fields,
+    ],
+  );
+
+  const chartType = useRef(definition.type);
+  const initialAxisConfiguration = useRef(getInitialValues(axisConfiguration));
+  const initialDataSets = useRef(axisConfiguration?.dataSets);
+
+  // Update initial options if the chart definition or data sets change
+  useEffect(() => {
+    if (definition.type !== chartType.current) {
+      initialAxisConfiguration.current = getInitialValues(axisConfiguration);
+      chartType.current = definition.type;
+    }
+    if (!isEqual(axisConfiguration?.dataSets, initialDataSets.current)) {
+      initialDataSets.current = axisConfiguration?.dataSets;
+    }
+  }, [dataSetCategories, definition.type, axisConfiguration, getInitialValues]);
 
   const handleSubmit = useCallback(
-    async (values: FormValues) => {
+    async (values: ChartAxisConfigurationFormValues) => {
       const nextConfiguration = normalizeValues(values);
 
       if (nextConfiguration.groupBy) {
@@ -364,234 +533,227 @@ const ChartAxisConfiguration = ({
   );
 
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
-      initialValues={initialValues}
-      initialTouched={
-        hasSubmitted
-          ? mapValues(validationSchema.fields, () => true)
-          : undefined
-      }
-      validateOnMount
+      initialValues={initialAxisConfiguration.current}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
     >
-      {form => (
-        <Form id={id}>
-          <Effect
-            value={{
-              ...form.values,
-              isValid: form.isValid,
-            }}
-            onChange={handleFormChange}
-          />
+      {({ formState, setValue, watch }) => {
+        const values = watch();
 
-          <Effect
-            value={{
-              formKey: type,
-              isValid: form.isValid,
-              submitCount: form.submitCount,
-            }}
-            onMount={updateForm}
-            onChange={updateForm}
-          />
+        return (
+          <RHFForm id={id} onSubmit={handleSubmit}>
+            <Effect
+              value={{
+                ...omit(values, 'referenceLines'),
+              }}
+              onChange={() => handleFormChange(values)}
+            />
 
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-              <FormFieldset id="general" legend="General" legendSize="s">
-                {validationSchema.fields.size && (
-                  <FormFieldNumberInput<AxisConfiguration>
-                    name="size"
-                    min={0}
-                    label="Size of axis (pixels)"
-                    width={3}
-                  />
-                )}
+            <Effect
+              value={{
+                formKey: type,
+                isValid: formState.isValid,
+                submitCount: formState.submitCount,
+              }}
+              onMount={updateForm}
+              onChange={updateForm}
+            />
 
-                {validationSchema.fields.showGrid && (
-                  <FormFieldCheckbox<AxisConfiguration>
-                    name="showGrid"
-                    label="Show grid lines"
-                  />
-                )}
-
-                {validationSchema.fields.visible && (
-                  <FormFieldCheckbox<AxisConfiguration>
-                    name="visible"
-                    label="Show axis"
-                    conditional={
-                      <FormFieldTextInput<AxisConfiguration>
-                        label="Displayed unit"
-                        name="unit"
-                        hint="Leave blank to set default from metadata"
-                        width={10}
-                      />
-                    }
-                  />
-                )}
-
-                {validationSchema.fields.groupBy && (
-                  <FormFieldRadioGroup<AxisConfiguration>
-                    legend="Group data by"
-                    legendSize="s"
-                    name="groupBy"
-                    options={groupByOptions}
-                    onChange={e => {
-                      if (e.target.value !== 'filters') {
-                        form.setFieldValue('groupByFilter', '');
-                      }
-                    }}
-                  />
-                )}
-
-                <FormFieldset id="labels" legend="Labels" legendSize="s">
-                  <FormFieldTextInput label="Label" name="label.text" />
-
-                  <FormFieldNumberInput
-                    label="Width (pixels)"
-                    name="label.width"
-                    width={5}
-                    min={0}
-                  />
-
-                  {(validationSchema.fields.label as ObjectSchema<Label>).fields
-                    .rotated && (
-                    <FormFieldCheckbox
-                      name="label.rotated"
-                      label="Rotate 90 degrees"
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+                <FormFieldset id="general" legend="General" legendSize="s">
+                  {validationSchema.fields.size && (
+                    <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                      name="size"
+                      min={0}
+                      label="Size of axis (pixels)"
+                      width={3}
                     />
                   )}
-                </FormFieldset>
-              </FormFieldset>
-            </div>
 
-            <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-              {validationSchema.fields.sortAsc && (
-                <FormFieldset id="sort" legend="Sorting" legendSize="s">
-                  {/* <FormFieldSelect<AxisConfiguration> */}
-                  {/*  id={`${id}-sortBy`} */}
-                  {/*  name="sortBy" */}
-                  {/*  label="Sort data by" */}
-                  {/*  options={sortOptions} */}
-                  {/* /> */}
-                  <FormFieldCheckbox<AxisConfiguration>
-                    name="sortAsc"
-                    label="Sort ascending"
-                  />
-                </FormFieldset>
-              )}
+                  {validationSchema.fields.showGrid && (
+                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                      name="showGrid"
+                      label="Show grid lines"
+                    />
+                  )}
 
-              {validationSchema.fields.tickConfig && (
-                <FormFieldRadioGroup<AxisConfiguration>
-                  name="tickConfig"
-                  legend="Tick display type"
-                  legendSize="s"
-                  order={[]}
-                  options={[
-                    {
-                      value: 'default',
-                      label: 'Automatic',
-                    },
-                    {
-                      label: 'Start and end only',
-                      value: 'startEnd',
-                    },
-                    {
-                      label: 'Custom',
-                      value: 'custom',
-                      conditional: (
-                        <FormFieldNumberInput<AxisConfiguration>
-                          name="tickSpacing"
+                  {validationSchema.fields.visible && (
+                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                      name="visible"
+                      label="Show axis"
+                      conditional={
+                        <RHFFormFieldTextInput<ChartAxisConfigurationFormValues>
+                          label="Displayed unit"
+                          name="unit"
+                          hint="Leave blank to set default from metadata"
                           width={10}
-                          label="Every nth value"
                         />
-                      ),
-                    },
-                  ]}
-                />
-              )}
+                      }
+                    />
+                  )}
 
-              {type === 'minor' &&
-                (validationSchema.fields.min ||
-                  validationSchema.fields.max) && (
-                  <FormFieldset
-                    id="minorAxisRange"
-                    legend="Axis range"
+                  {validationSchema.fields.groupBy && (
+                    <RHFFormFieldRadioGroup<ChartAxisConfigurationFormValues>
+                      legend="Group data by"
+                      legendSize="s"
+                      name="groupBy"
+                      options={groupByOptions}
+                      onChange={e => {
+                        if (e.target.value !== 'filters') {
+                          setValue('groupByFilter' as const, '');
+                        }
+                      }}
+                    />
+                  )}
+
+                  <FormFieldset id="labels" legend="Labels" legendSize="s">
+                    <RHFFormFieldTextInput label="Label" name="labelText" />
+
+                    <RHFFormFieldNumberInput
+                      label="Width (pixels)"
+                      name="labelWidth"
+                      width={5}
+                      min={0}
+                    />
+
+                    {validationSchema.fields.labelRotated && (
+                      <RHFFormFieldCheckbox
+                        name="labelRotated"
+                        label="Rotate 90 degrees"
+                      />
+                    )}
+                  </FormFieldset>
+                </FormFieldset>
+              </div>
+
+              <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
+                {validationSchema.fields.sortAsc && (
+                  <FormFieldset id="sort" legend="Sorting" legendSize="s">
+                    <RHFFormFieldCheckbox<ChartAxisConfigurationFormValues>
+                      name="sortAsc"
+                      label="Sort ascending"
+                    />
+                  </FormFieldset>
+                )}
+
+                {validationSchema.fields.tickConfig && (
+                  <RHFFormFieldRadioGroup<ChartAxisConfigurationFormValues>
+                    name="tickConfig"
+                    legend="Tick display type"
                     legendSize="s"
-                    hint="Leaving these values blank will set them to 'auto'"
-                  >
-                    <div className={styles.axisRange}>
+                    order={[]}
+                    options={[
+                      {
+                        value: 'default',
+                        label: 'Automatic',
+                      },
+                      {
+                        label: 'Start and end only',
+                        value: 'startEnd',
+                      },
+                      {
+                        label: 'Custom',
+                        value: 'custom',
+                        conditional: (
+                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                            name="tickSpacing"
+                            width={10}
+                            label="Every nth value"
+                          />
+                        ),
+                      },
+                    ]}
+                  />
+                )}
+
+                {type === 'minor' &&
+                  (validationSchema.fields.min ||
+                    validationSchema.fields.max) && (
+                    <FormFieldset
+                      id="minorAxisRange"
+                      legend="Axis range"
+                      legendSize="s"
+                      hint="Leaving these values blank will set them to 'auto'"
+                    >
+                      <div className={styles.axisRange}>
+                        {validationSchema.fields.min && (
+                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                            name="min"
+                            width={10}
+                            label="Minimum value"
+                            formGroupClass="govuk-!-margin-right-2"
+                          />
+                        )}
+                        {validationSchema.fields.max && (
+                          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                            name="max"
+                            width={10}
+                            label="Maximum value"
+                          />
+                        )}
+                      </div>
+                    </FormFieldset>
+                  )}
+
+                {type === 'major' &&
+                  (validationSchema.fields.min ||
+                    validationSchema.fields.max) && (
+                    <FormFieldset
+                      id="majorAxisRange"
+                      legend="Axis range"
+                      legendSize="s"
+                    >
                       {validationSchema.fields.min && (
-                        <FormFieldNumberInput<AxisConfiguration>
+                        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                          isNumberField
+                          label="Minimum"
                           name="min"
-                          width={10}
-                          label="Minimum value"
-                          formGroupClass="govuk-!-margin-right-2"
+                          options={limitOptions}
                         />
                       )}
                       {validationSchema.fields.max && (
-                        <FormFieldNumberInput<AxisConfiguration>
+                        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                          isNumberField
+                          label="Maximum"
                           name="max"
-                          width={10}
-                          label="Maximum value"
+                          options={limitOptions}
                         />
                       )}
-                    </div>
-                  </FormFieldset>
-                )}
-
-              {type === 'major' &&
-                (validationSchema.fields.min ||
-                  validationSchema.fields.max) && (
-                  <FormFieldset
-                    id="majorAxisRange"
-                    legend="Axis range"
-                    legendSize="s"
-                  >
-                    {validationSchema.fields.min && (
-                      <FormFieldSelect<AxisConfiguration>
-                        label="Minimum"
-                        name="min"
-                        placeholder="Default"
-                        options={limitOptions}
-                      />
-                    )}
-                    {validationSchema.fields.max && (
-                      <FormFieldSelect<AxisConfiguration>
-                        label="Maximum"
-                        name="max"
-                        placeholder="Default"
-                        options={limitOptions}
-                      />
-                    )}
-                  </FormFieldset>
-                )}
+                    </FormFieldset>
+                  )}
+              </div>
             </div>
-          </div>
+            {capabilities.hasReferenceLines && (
+              <ChartReferenceLinesConfiguration
+                axisDefinition={axisDefinition}
+                chartType={chartType.current}
+                dataSetCategories={dataSetCategories}
+                referenceLines={
+                  initialAxisConfiguration.current.referenceLines ?? []
+                }
+                onSubmit={updatedReferenceLines => {
+                  setValue('referenceLines' as const, updatedReferenceLines);
+                  handleFormChange({
+                    ...axisConfiguration,
+                    referenceLines: updatedReferenceLines,
+                  });
+                }}
+              />
+            )}
 
-          {validationSchema.fields.referenceLines && (
-            <ChartReferenceLinesConfiguration
-              axisDefinition={axisDefinition}
-              chartType={chartType}
-              dataSetCategories={dataSetCategories}
-              lines={form.values.referenceLines ?? []}
-              minorAxisDomain={minorAxisDomain}
-              onChange={updatedReferenceLines => {
-                form.setFieldValue('referenceLines', updatedReferenceLines);
-              }}
-            />
-          )}
-
-          <ChartBuilderSaveActions
-            formId={id}
-            formKey={type}
-            disabled={form.isSubmitting}
-          >
-            {buttons}
-          </ChartBuilderSaveActions>
-        </Form>
-      )}
-    </Formik>
+            <ChartBuilderSaveActions
+              formId={id}
+              formKey={type}
+              disabled={formState.isSubmitting}
+            >
+              {buttons}
+            </ChartBuilderSaveActions>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 };
 
@@ -615,4 +777,16 @@ function getGroupByFilters(groupBy: AxisGroupBy, meta: FullTableMeta) {
     default:
       return [];
   }
+}
+
+function getOtherAxisPositionType(
+  referenceLine?: ReferenceLine,
+): OtherAxisPositionType {
+  if (referenceLine?.otherAxisEnd && referenceLine?.otherAxisStart) {
+    return otherAxisPositionTypes.betweenDataPoints;
+  }
+  if (referenceLine?.otherAxisPosition) {
+    return otherAxisPositionTypes.custom;
+  }
+  return otherAxisPositionTypes.default;
 }

@@ -288,7 +288,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   },
   options: {
     defaults: {
-      barThickness: undefined,
       height: 300,
       includeNonNumericData: false,
       showDataLabels: false,
@@ -311,10 +310,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       },
       defaults: {
         groupBy: 'timePeriod',
+        groupByFilter: '',
         min: 0,
-        showGrid: true,
         size: 50,
-        sortAsc: true,
         sortBy: 'name',
         tickConfig: 'default',
         tickSpacing: 1,
@@ -333,7 +331,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         canRotateLabel: true,
       },
       defaults: {
-        showGrid: true,
         tickConfig: 'default',
         tickSpacing: 1,
         unit: '',

@@ -1,12 +1,7 @@
 import ChartCustomDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartCustomDataGroupingsConfiguration';
 import FormProvider from '@common/components/form/rhf/FormProvider';
-import {
-  render as baseRender,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import baseRender from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
 
@@ -91,9 +86,8 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
   });
 
   test('calls onAddGroup when add groups', async () => {
-    const user = userEvent.setup();
     const handleAddGroup = jest.fn();
-    render(
+    const { user } = render(
       <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
@@ -124,9 +118,8 @@ describe('ChartCustomDataGroupingsConfiguration', () => {
   });
 
   test('calls onRemoveGroup when remove groups', async () => {
-    const user = userEvent.setup();
     const handleRemoveGroup = jest.fn();
-    render(
+    const { user } = render(
       <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"

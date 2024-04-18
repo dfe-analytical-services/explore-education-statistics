@@ -6,13 +6,8 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import {
-  render as baseRender,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import baseRender from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React, { ReactElement } from 'react';
 
@@ -113,7 +108,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('calls `onChange` handler when form values change', async () => {
     const handleChange = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBoundaryLevelsConfiguration
         meta={testMeta}
         options={testDefaultChartOptions}
@@ -122,9 +117,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    await userEvent.selectOptions(screen.getByLabelText('Boundary level'), [
-      '2',
-    ]);
+    await user.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
 
     expect(handleChange).toHaveBeenCalledWith<[ChartOptions]>({
       ...testDefaultChartOptions,
@@ -133,7 +126,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   });
 
   test('submitting fails with validation errors if no boundary level set', async () => {
-    render(
+    const { user } = render(
       <ChartBoundaryLevelsConfiguration
         meta={testMeta}
         options={testDefaultChartOptions}
@@ -142,7 +135,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -161,7 +154,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('submitting succeeds with form that has been filled out correctly', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBoundaryLevelsConfiguration
         meta={testMeta}
         options={testDefaultChartOptions}
@@ -170,13 +163,11 @@ describe('ChartBoundaryLevelsConfiguration', () => {
       />,
     );
 
-    await userEvent.selectOptions(screen.getByLabelText('Boundary level'), [
-      '2',
-    ]);
+    await user.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 
@@ -191,7 +182,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
   test('submitting succeeds with valid initial values', async () => {
     const handleSubmit = jest.fn();
 
-    render(
+    const { user } = render(
       <ChartBoundaryLevelsConfiguration
         meta={testMeta}
         options={{
@@ -205,7 +196,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole('button', { name: 'Save chart options' }),
     );
 

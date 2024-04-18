@@ -4,12 +4,12 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
+import render from '@common-test/render';
 import {
   ChartCapabilities,
   ChartDefinition,
 } from '@common/modules/charts/types/chart';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -256,9 +256,8 @@ describe('ChartConfiguration', () => {
   });
 
   test('submitting fails with default options', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testDefaultChartOptions}
@@ -285,9 +284,8 @@ describe('ChartConfiguration', () => {
   });
 
   test('submitting succeeds with valid options', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testDefaultChartOptions}
@@ -325,9 +323,8 @@ describe('ChartConfiguration', () => {
   });
 
   test('calls the `onChange` handler when form values change', async () => {
-    const user = userEvent.setup();
     const handleChange = jest.fn();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testDefaultChartOptions}
@@ -384,9 +381,8 @@ describe('ChartConfiguration', () => {
   });
 
   test('setting an alternative title', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testChartOptionsWithAltText}
@@ -421,9 +417,8 @@ describe('ChartConfiguration', () => {
   });
 
   test('setting `showDataLabels`', async () => {
-    const user = userEvent.setup();
     const handleSubmit = jest.fn();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testChartOptionsWithAltText}
@@ -461,8 +456,7 @@ describe('ChartConfiguration', () => {
   });
 
   test('shows a validation error when `showDataLabels` is true and legend position is inline', async () => {
-    const user = userEvent.setup();
-    render(
+    const { user } = render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
           chartOptions={testChartOptionsWithAltText}

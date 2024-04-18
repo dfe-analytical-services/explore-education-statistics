@@ -1,13 +1,14 @@
 import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
+import ChartBuilder from '@admin/pages/release/datablocks/components/chart/ChartBuilder';
 import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import ChartBuilder from '../ChartBuilder';
 
 describe('ChartBuilder', () => {
   const testFormState: ChartBuilderForms = {
@@ -110,8 +111,7 @@ describe('ChartBuilder', () => {
 
   describe('data sets', () => {
     test('adding data sets', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
@@ -266,8 +266,7 @@ describe('ChartBuilder', () => {
     });
 
     test('removing all data sets', async () => {
-      const user = userEvent.setup();
-      render(
+      const { user } = render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
