@@ -665,6 +665,9 @@
       "metadata": {
         "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
       }
+    },
+    "slackAppToken": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -1075,8 +1078,6 @@
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-admin-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-admin-govuknotify-api-key')]",
-
-    "ees-alerts-slackapptoken": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-alerts-slackapptoken')]",
 
     "ees-notifier-govuknotify-api-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-govuknotify-api-key')]",
     "ees-notifier-token-secret-key": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notifier-token-secret-key')]",
@@ -4084,7 +4085,7 @@
                   "uri": "https://slack.com/api/chat.postMessage",
                   "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-alerts-slackapptoken'), '2018-02-14').secretUriWithVersion, ')')]"
+                    "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
                   }
                 },
                 "unsubscribe": {}
