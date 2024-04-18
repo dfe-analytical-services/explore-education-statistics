@@ -95,8 +95,8 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
       return fs.existsSync(
         path.join(projectRoot, this.root, 'appsettings.Idp.json'),
       )
-        ? ['db', 'data-storage']
-        : ['db', 'data-storage', 'idp'];
+        ? ['db', 'data-storage', 'public-api-db']
+        : ['db', 'data-storage', 'public-api-db', 'idp'];
     },
   },
   content: {
