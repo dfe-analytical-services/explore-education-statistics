@@ -1,3 +1,10 @@
+const nextJest = require('next/jest.js');
+
+const createJestConfig = nextJest({
+  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
+  dir: './',
+});
+
 /** @type {import('jest').Config} */
 const config = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
@@ -52,4 +59,4 @@ const config = {
   snapshotSerializers: ['jest-serializer-html'],
 };
 
-module.exports = config;
+module.exports = createJestConfig(config);
