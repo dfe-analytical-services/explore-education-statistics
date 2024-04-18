@@ -12,6 +12,7 @@ export default function getReferenceLineLabelPosition({
   otherAxisDomainMax,
   otherAxisDomainMin,
   otherAxisPosition,
+  perpendicularLine,
   viewBox,
 }: {
   axis: Axis;
@@ -19,6 +20,7 @@ export default function getReferenceLineLabelPosition({
   otherAxisDomainMax?: number;
   otherAxisDomainMin?: number;
   otherAxisPosition?: number;
+  perpendicularLine?: boolean;
   viewBox?: CartesianViewBox;
 }): LabelPosition {
   const { height = 0, width = 0, x = 0, y = 0 } = viewBox ?? {};
@@ -31,7 +33,8 @@ export default function getReferenceLineLabelPosition({
     otherAxisDomainMax === undefined ||
     otherAxisDomainMin === undefined ||
     otherAxisPosition < otherAxisDomainMin ||
-    otherAxisPosition > otherAxisDomainMax
+    otherAxisPosition > otherAxisDomainMax ||
+    perpendicularLine
   ) {
     return {
       x: defaultXPosition,

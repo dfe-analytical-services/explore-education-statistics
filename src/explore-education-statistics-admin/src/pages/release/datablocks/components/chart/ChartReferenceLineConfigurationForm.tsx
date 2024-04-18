@@ -8,9 +8,14 @@ import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import Tooltip from '@common/components/Tooltip';
 import {
   ChartDefinitionAxis,
+  ChartType,
   ReferenceLine,
   ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
+import {
+  OtherAxisPositionType,
+  otherAxisPositionTypes,
+} from '@common/modules/charts/types/referenceLinePosition';
 import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -18,15 +23,6 @@ import { produce } from 'immer';
 import isEqual from 'lodash/isEqual';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
-
-const otherAxisPositionTypes = {
-  default: 'default',
-  betweenDataPoints: 'between-data-points',
-  custom: 'custom',
-} as const;
-type OtherAxisPositionTypeKey = keyof typeof otherAxisPositionTypes;
-type OtherAxisPositionType =
-  (typeof otherAxisPositionTypes)[OtherAxisPositionTypeKey];
 
 interface FormValues {
   label: string;
@@ -43,6 +39,7 @@ interface Props {
   allReferenceLines: ReferenceLine[];
   axisDefinition?: ChartDefinitionAxis;
   axisPositionOptions: SelectOption[];
+  chartType: ChartType;
   majorAxisOptions: SelectOption[];
   minorAxisDomain?: MinorAxisDomainValues;
   referenceLine?: ReferenceLine;
@@ -53,6 +50,7 @@ export default function ChartReferenceLineConfigurationForm({
   allReferenceLines,
   axisDefinition,
   axisPositionOptions,
+  chartType,
   majorAxisOptions,
   minorAxisDomain,
   referenceLine,
@@ -86,8 +84,14 @@ export default function ChartReferenceLineConfigurationForm({
         .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
       otherAxisEnd: Yup.string()
         .optional()
-        .when('otherAxisPositionType', {
-          is: otherAxisPositionTypes.betweenDataPoints,
+        .when(['otherAxisPositionType', 'position'], {
+          is: (
+            otherAxisPositionType: OtherAxisPositionType,
+            position: string | number,
+          ) =>
+            otherAxisPositionType ===
+              otherAxisPositionTypes.betweenDataPoints ||
+            position === otherAxisPositionTypes.betweenDataPoints,
           then: s => s.required('Enter end point').min(1, 'Enter end point'),
           otherwise: s => s.notRequired(),
         })
@@ -105,12 +109,19 @@ export default function ChartReferenceLineConfigurationForm({
         ),
       otherAxisStart: Yup.string()
         .optional()
-        .when('otherAxisPositionType', {
-          is: otherAxisPositionTypes.betweenDataPoints,
+        .when(['otherAxisPositionType', 'position'], {
+          is: (
+            otherAxisPositionType: OtherAxisPositionType,
+            position: string | number,
+          ) =>
+            otherAxisPositionType ===
+              otherAxisPositionTypes.betweenDataPoints ||
+            position === otherAxisPositionTypes.betweenDataPoints,
           then: s =>
             s.required('Enter start point').min(1, 'Enter start point'),
           otherwise: s => s.notRequired(),
         }),
+
       otherAxisPosition:
         type === 'minor'
           ? Yup.number().when('otherAxisPositionType', {
@@ -128,22 +139,30 @@ export default function ChartReferenceLineConfigurationForm({
                 }),
               otherwise: s => s.notRequired(),
             })
-          : Yup.number().test({
-              name: 'otherAxisPosition',
-              message: `Enter a position within the ${
-                axis === 'x' ? 'Y' : 'X'
-              } axis min/max range`,
-              test: value => {
-                if (typeof value !== 'number') {
-                  return true;
-                }
+          : Yup.number()
+              .when('position', {
+                is: otherAxisPositionTypes.betweenDataPoints,
+                then: s =>
+                  s.required(
+                    `Enter a ${axis === 'x' ? 'Y' : 'X'} axis position`,
+                  ),
+              })
+              .test({
+                name: 'otherAxisPosition',
+                message: `Enter a position within the ${
+                  axis === 'x' ? 'Y' : 'X'
+                } axis min/max range`,
+                test: value => {
+                  if (typeof value !== 'number') {
+                    return true;
+                  }
 
-                return minorAxisDomain
-                  ? value >= minorAxisDomain?.min &&
-                      value <= minorAxisDomain.max
-                  : true;
-              },
-            }),
+                  return minorAxisDomain
+                    ? value >= minorAxisDomain?.min &&
+                        value <= minorAxisDomain.max
+                    : true;
+                },
+              }),
       otherAxisPositionType: Yup.string()
         .optional()
         .oneOf<OtherAxisPositionType>(Object.values(otherAxisPositionTypes)),
@@ -218,16 +237,61 @@ export default function ChartReferenceLineConfigurationForm({
         <>
           <td className="dfe-vertical-align--bottom">
             {type === 'major' ? (
-              <FormFieldSelect<FormValues>
-                name="position"
-                id="referenceLines-position"
-                label="Position"
-                formGroup={false}
-                hideLabel
-                placeholder="Choose position"
-                order={FormSelect.unordered}
-                options={axisPositionOptions}
-              />
+              <>
+                <FormFieldSelect<FormValues>
+                  name="position"
+                  id="referenceLines-position"
+                  label="Position"
+                  formGroup={false}
+                  hideLabel
+                  placeholder="Choose position"
+                  order={FormSelect.unordered}
+                  options={[
+                    ...axisPositionOptions,
+                    ...(chartType === 'verticalbar'
+                      ? [
+                          {
+                            label: 'Between data points',
+                            value: otherAxisPositionTypes.betweenDataPoints,
+                          },
+                        ]
+                      : []),
+                  ]}
+                />
+                {form.values.position ===
+                  otherAxisPositionTypes.betweenDataPoints && (
+                  <FormFieldset
+                    className="govuk-!-margin-top-2"
+                    id="referenceLines-betweenPosition"
+                    legend="Select start and end points"
+                    legendSize="s"
+                    legendWeight="regular"
+                  >
+                    <FormFieldSelect<FormValues>
+                      className="govuk-!-margin-bottom-2"
+                      name="otherAxisStart"
+                      id="referenceLines-otherAxisStart"
+                      label="Start point"
+                      formGroup={false}
+                      hideLabel
+                      placeholder="Start point"
+                      order={FormSelect.unordered}
+                      options={majorAxisOptions}
+                    />
+                    <br />
+                    <FormFieldSelect<FormValues>
+                      name="otherAxisEnd"
+                      id="referenceLines-otherAxisEnd"
+                      label="End point"
+                      formGroup={false}
+                      hideLabel
+                      placeholder="End point"
+                      order={FormSelect.unordered}
+                      options={majorAxisOptions}
+                    />
+                  </FormFieldset>
+                )}
+              </>
             ) : (
               <FormFieldNumberInput<FormValues>
                 name="position"
@@ -322,7 +386,12 @@ export default function ChartReferenceLineConfigurationForm({
                 label={axis === 'x' ? 'Y axis position' : 'X axis position'}
                 formGroup={false}
                 hideLabel
-                hint="Value (optional)"
+                hint={`Value ${
+                  form.values.position !==
+                  otherAxisPositionTypes.betweenDataPoints
+                    ? '(optional)'
+                    : ''
+                }`}
                 width={10}
               />
             )}

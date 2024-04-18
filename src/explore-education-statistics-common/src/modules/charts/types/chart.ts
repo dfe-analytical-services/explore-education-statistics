@@ -46,6 +46,7 @@ export interface ReferenceLine {
   otherAxisPosition?: number;
   otherAxisStart?: string;
   position: number | string;
+  perpendicularLine?: boolean;
   style?: ReferenceLineStyle;
 }
 

@@ -24,6 +24,7 @@ import {
   TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -70,7 +71,7 @@ const ChartAxisConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const { capabilities } = definition;
+  const { capabilities, type: chartType } = definition;
 
   const { hasSubmitted, updateForm, submitForms } =
     useChartBuilderFormsContext();
@@ -342,13 +343,15 @@ const ChartAxisConfiguration = ({
         // they don't lose reference lines when toggling the `groupBy`.
         onSubmit({
           ...nextConfiguration,
-          referenceLines: nextConfiguration.referenceLines.filter(line =>
-            groupByFilters.some(filter => {
-              if (filter instanceof LocationFilter) {
-                return LocationFilter.createId(filter) === line.position;
-              }
-              return filter.value === line.position;
-            }),
+          referenceLines: nextConfiguration.referenceLines.filter(
+            line =>
+              line.position === otherAxisPositionTypes.betweenDataPoints ||
+              groupByFilters.some(filter => {
+                if (filter instanceof LocationFilter) {
+                  return LocationFilter.createId(filter) === line.position;
+                }
+                return filter.value === line.position;
+              }),
           ),
         });
       } else {
@@ -569,6 +572,7 @@ const ChartAxisConfiguration = ({
           {validationSchema.fields.referenceLines && (
             <ChartReferenceLinesConfiguration
               axisDefinition={axisDefinition}
+              chartType={chartType}
               dataSetCategories={dataSetCategories}
               lines={form.values.referenceLines ?? []}
               minorAxisDomain={minorAxisDomain}

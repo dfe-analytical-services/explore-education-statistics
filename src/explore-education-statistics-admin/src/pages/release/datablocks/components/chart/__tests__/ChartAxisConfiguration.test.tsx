@@ -4,6 +4,7 @@ import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
+import { horizontalBarBlockDefinition } from '@common/modules/charts/components/HorizontalBarBlock';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
 import {
   AxesConfiguration,
@@ -667,7 +668,7 @@ describe('ChartAxisConfiguration', () => {
             id="chartBuilder-major"
             type="major"
             axesConfiguration={testAxesConfiguration}
-            definition={verticalBarBlockDefinition}
+            definition={horizontalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
             onChange={noop}
