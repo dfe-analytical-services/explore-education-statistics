@@ -19,13 +19,11 @@ const ButtonLink = ({
   variant,
   ...props
 }: Props) => {
-  const isAbsolute = typeof to === 'string' && to.startsWith('http');
-
-  const link = (
-    <a
-      // eslint-disable-next-line react/jsx-props-no-spreading
+  return (
+    <Link
+      href={to}
+      prefetch={prefetch}
       {...props}
-      href={isAbsolute ? (to as string) : undefined}
       className={classNames(
         'govuk-button',
         {
@@ -36,16 +34,6 @@ const ButtonLink = ({
       )}
     >
       {children}
-    </a>
-  );
-
-  if (isAbsolute) {
-    return link;
-  }
-
-  return (
-    <Link {...props} prefetch={prefetch} href={to} passHref>
-      {link}
     </Link>
   );
 };
