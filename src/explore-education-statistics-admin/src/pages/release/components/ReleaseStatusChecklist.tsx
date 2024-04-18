@@ -127,8 +127,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
           };
         case 'PublicApiDataSetImportsMustBeCompleted':
           return {
-            message:
-              'All Public API data set imports must be completed',
+            message: 'All Public API data set imports must be completed',
             link: `${generatePath<ReleaseRouteParams>(
               releaseDataRoute.path,
               releaseRouteParams,

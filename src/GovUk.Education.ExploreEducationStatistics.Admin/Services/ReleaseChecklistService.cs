@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -31,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
+        private readonly IDataSetVersionImportService _dataSetVersionImportService;
 
         public ReleaseChecklistService(
             ContentDbContext contentDbContext,
@@ -40,7 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseDataFileRepository fileRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IFootnoteRepository footnoteRepository,
-            IDataBlockService dataBlockService)
+            IDataBlockService dataBlockService,
+            IDataSetVersionImportService dataSetVersionImportService)
         {
             _contentDbContext = contentDbContext;
             _dataImportService = dataImportService;
@@ -50,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyVersionRepository = methodologyVersionRepository;
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
+            _dataSetVersionImportService = dataSetVersionImportService;
         }
 
         public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
@@ -249,9 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
         }
 
-        private async Task<bool> PublicApiDataSetImportsProcessing(Guid releaseVersionId)
+        private Task<bool> PublicApiDataSetImportsProcessing(Guid releaseVersionId)
         {
-            return true;
+            return _dataSetVersionImportService.IsPublicApiDataSetImportsInProgress(releaseVersionId);
         }
     }
 

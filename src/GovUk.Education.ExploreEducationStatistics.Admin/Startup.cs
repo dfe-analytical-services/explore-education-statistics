@@ -16,8 +16,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -455,6 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (publicDataDbExists)
             {
                 services.AddTransient<IDataSetService, DataSetService>();
+                services.AddTransient<IDataSetVersionImportService, DataSetVersionImportService>();
             }
             else
             {
@@ -464,6 +467,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new DataSetService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IUserService>()));
+                
+                services.AddTransient<IDataSetVersionImportService, DataSetVersionImportService>(provider =>
+                    new DataSetVersionImportService(provider.GetRequiredService<ContentDbContext>(),
+                        provider.GetService<PublicDataDbContext>()));
             }
 
             services.AddTransient<INotificationClient>(s =>
