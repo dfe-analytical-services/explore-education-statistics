@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Head from 'next/head';
+import { Helmet } from 'react-helmet';
 
 class ErrorPrefixPageTitle extends Component {
   public componentWillUnmount() {
@@ -9,9 +9,9 @@ class ErrorPrefixPageTitle extends Component {
   public render() {
     document.title = `ERROR: ${document.title.replace(/ERROR: /g, '')}`;
     return (
-      <Head>
+      <Helmet>
         <title>ERROR: {document.title.replace(/ERROR: /g, '')}</title>
-      </Head>
+      </Helmet>
     );
   }
 }
