@@ -173,7 +173,7 @@ internal class DataSetService(
     {
         return new DataSetLatestVersionViewModel
         {
-            Number = latestVersion.Version,
+            Version = latestVersion.Version,
             Published = latestVersion.Published!.Value,
             TotalResults = latestVersion.TotalResults,
             TimePeriods = MapTimePeriods(latestVersion.MetaSummary.TimePeriodRange),
@@ -196,7 +196,7 @@ internal class DataSetService(
     {
         return new DataSetVersionViewModel
         {
-            Number = dataSetVersion.Version,
+            Version = dataSetVersion.Version,
             Type = dataSetVersion.VersionType,
             Status = dataSetVersion.Status,
             Published = dataSetVersion.Published!.Value,

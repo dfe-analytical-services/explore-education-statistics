@@ -25,11 +25,11 @@ public class DataSetService(
     IUserService userService)
     : IDataSetService
 {
-    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListPublicationDataSets(
+    public async Task<Either<ActionResult, PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
         int page,
         int pageSize,
         Guid publicationId,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         return await CheckPublicationExists(publicationId, cancellationToken)
             .OnSuccess(userService.CheckCanViewPublication)
@@ -80,7 +80,7 @@ public class DataSetService(
             ? new DataSetVersionViewModel
             {
                 Id = dataSetVersion.Id,
-                Number = dataSetVersion.Version,
+                Version = dataSetVersion.Version,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
             }
@@ -93,7 +93,7 @@ public class DataSetService(
             ? new DataSetLiveVersionViewModel
             {
                 Id = dataSetVersion.Id,
-                Number = dataSetVersion.Version,
+                Version = dataSetVersion.Version,
                 Published = dataSetVersion.Published!.Value,
                 Status = dataSetVersion.Status,
                 Type = dataSetVersion.VersionType,
@@ -102,7 +102,7 @@ public class DataSetService(
     }
 
     private async Task<Either<ActionResult, Publication>> CheckPublicationExists(Guid publicationId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return await contentDbContext.Publications
             .AsNoTracking()

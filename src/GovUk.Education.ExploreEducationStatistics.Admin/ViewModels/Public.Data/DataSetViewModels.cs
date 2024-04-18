@@ -1,6 +1,8 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
@@ -12,6 +14,7 @@ public record DataSetViewModel
 
     public required string Summary { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetStatus Status { get; init; }
 
     public required DataSetVersionViewModel? DraftVersion { get; init; }
@@ -25,10 +28,12 @@ public record DataSetVersionViewModel
 {
     public required Guid Id { get; init; }
 
-    public required string Number { get; init; }
+    public required string Version { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionStatus Status { get; init; }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public required DataSetVersionType Type { get; init; }
 }
 
