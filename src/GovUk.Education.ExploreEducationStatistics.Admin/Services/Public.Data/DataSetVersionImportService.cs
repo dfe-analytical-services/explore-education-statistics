@@ -28,6 +28,6 @@ public class DataSetVersionImportService(
             .AsNoTracking()
             .AnyAsync(import => 
                 dataFileIds.Contains(import.DataSetVersion.CsvFileId) 
-                && !DataSetVersionImportStatusConstants.TerminalStates.Contains(import.Status));
+                && !DataSetVersionImportStatusConstants.TerminalStates.ToList().Contains(import.Status));
     }
 }
