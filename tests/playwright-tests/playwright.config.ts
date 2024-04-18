@@ -1,21 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
-import environment from '@util/env';
 
-const { PUBLIC_USERNAME, PUBLIC_PASSWORD } = environment;
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
-
-/*
-const encodeBasicAuth = (username: string, password: string) => {
-  const unencodedString = `${username}:${password}`;
-  return `Basic ${btoa(unencodedString)}`;
-};
-*/
 
 /**
  * See https://playwright.dev/docs/test-configuration.
