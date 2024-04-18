@@ -89,6 +89,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return result.Left;
         }
 
+        public static async Task<ActionResult> HandleFailuresOrNoOp(
+            this Task<Either<ActionResult, Unit>> task)
+        {
+            var result = await task;
+
+            return result.IsRight ? new NoOpResult() : result.Left;
+        }
+
         public static async Task<HubResult<T>> HandleFailuresOrHubResult<T>(
             this Task<Either<ActionResult, T>> task) where T : class
         {

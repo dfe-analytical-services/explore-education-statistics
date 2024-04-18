@@ -50,11 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [ResponseCache(Duration = 300)]
         [HttpGet("releases/{releaseVersionId:guid}/files")]
         [Produces(MediaTypeNames.Application.Octet)]
-        public async Task StreamFilesToZip(
+        public async Task<ActionResult> StreamFilesToZip(
             Guid releaseVersionId,
             [FromQuery] IList<Guid>? fileIds = null)
         {
-            await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
+            return await _persistenceHelper.CheckEntityExists<ReleaseVersion>(
                     releaseVersionId,
                     q => q.Include(rv => rv.Publication)
                 )
@@ -62,9 +62,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .OnSuccess(
                     async releaseVersion =>
                     {
-                        var filename = $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip";
-                        Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
-                        Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
+                        Response.ContentDispositionAttachment(
+                            contentType: MediaTypeNames.Application.Octet,
+                            filename: $"{releaseVersion.Publication.Slug}_{releaseVersion.Slug}.zip");
 
                         // We start the response immediately, before all of the files have
                         // even downloaded from blob storage. As we download them, they are
@@ -79,20 +79,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         );
                     }
                 )
-                .OnFailureVoid(
+                .OnFailureDo(
                     result =>
                     {
-                        if (result is StatusCodeResult statusCodeResult)
-                        {
-                            Response.StatusCode = statusCodeResult.StatusCode;
-                        }
-                        else
-                        {
-                            Response.StatusCode = 500;
-                        }
+                        Response.StatusCode = result is StatusCodeResult statusCodeResult
+                            ? statusCodeResult.StatusCode
+                            : 500;
                     }
-                );
-
+                )
+                .HandleFailuresOrNoOp();
         }
     }
 }
