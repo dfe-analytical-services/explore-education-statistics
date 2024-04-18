@@ -428,6 +428,12 @@ jobs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
       failTaskOnFailedTests: true
 
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testResultsFiles: tests/playwright-tests/test-results/playwright-testreport/index.html
+      failTaskOnFailedTests: true
+
   - task: PublishPipelineArtifact@1
     displayName: Publish Pipeline Artifact
     condition: succeededOrFailed()
