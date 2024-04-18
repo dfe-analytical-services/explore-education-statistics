@@ -1,6 +1,9 @@
 using System.Text.Json;
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -18,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -27,6 +31,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Npgsql;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
@@ -49,6 +54,9 @@ var host = new HostBuilder()
     })
     .ConfigureServices((hostContext, services) =>
     {
+        var configuration = hostContext.Configuration;
+        var hostEnvironment = hostContext.HostingEnvironment;
+        
         services
             .AddApplicationInsightsTelemetryWorkerService()
             .ConfigureFunctionsApplicationInsights()
@@ -69,7 +77,7 @@ var host = new HostBuilder()
                     ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
                     providerOptions => providerOptions.EnableCustomRetryOnFailure()))
             .AddSingleton<IFileStorageService, FileStorageService>(provider =>
-                new FileStorageService(hostContext.Configuration.GetValue<string>("PublisherStorage")))
+                new FileStorageService(configuration.GetValue<string>("PublisherStorage")))
             .AddScoped<IPublishingService, PublishingService>()
             .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>()
             .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
@@ -95,12 +103,12 @@ var host = new HostBuilder()
                 new NotificationsService(
                     context: provider.GetRequiredService<ContentDbContext>(),
                     storageQueueService: new StorageQueueService(
-                        hostContext.Configuration.GetValue<string>("NotificationStorage"),
+                        configuration.GetValue<string>("NotificationStorage"),
                         new StorageInstanceCreationUtil())))
             .AddScoped<IQueueService, QueueService>(provider =>
                 new QueueService(
                     storageQueueService: new StorageQueueService(
-                        hostContext.Configuration.GetValue<string>("PublisherStorage"),
+                        configuration.GetValue<string>("PublisherStorage"),
                         new StorageInstanceCreationUtil()
                     ),
                     releasePublishingStatusService: provider.GetRequiredService<IReleasePublishingStatusService>(),
@@ -115,7 +123,7 @@ var host = new HostBuilder()
             .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
             .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
             .AddScoped<IRedirectsService, RedirectsService>()
-            .Configure<AppSettingOptions>(hostContext.Configuration.GetSection(AppSettingOptions.AppSettings));
+            .Configure<AppSettingOptions>(configuration.GetSection(AppSettingOptions.AppSettings));
 
         // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
         // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
@@ -132,6 +140,47 @@ var host = new HostBuilder()
             .AddScoped<IContentReleaseService, ContentReleaseService>()
             .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
             .AddScoped<IReleaseCacheService, ReleaseCacheService>();
+        
+        // Only set up the `PublicDataDbContext` in non-integration test
+        // environments. Otherwise, the connection string will be null and
+        // cause the data source builder to throw a host exception.
+        if (!hostEnvironment.IsIntegrationTest())
+        {
+            var connectionString = configuration.GetConnectionString("PublicDataDb")!;
+
+            if (hostEnvironment.IsDevelopment())
+            {
+                var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+
+                // Set up the data source outside the `AddDbContext` action as this
+                // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                // creating over 20 `IServiceProvider` instances.
+                var dbDataSource = dataSourceBuilder.Build();
+
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    options
+                        .UseNpgsql(dbDataSource)
+                        .EnableSensitiveDataLogging();
+                });
+            }
+            else
+            {
+                services.AddDbContext<PublicDataDbContext>(options =>
+                {
+                    var sqlServerTokenProvider = new DefaultAzureCredential();
+                    var accessToken = sqlServerTokenProvider.GetToken(
+                        new TokenRequestContext(scopes: new[] { "https://ossrdbms-aad.database.windows.net/.default" } )).Token;
+
+                    var connectionStringWithAccessToken =
+                        connectionString.Replace("[access_token]", accessToken);
+
+                    var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+
+                    options.UseNpgsql(dbDataSource);
+                });
+            }
+        }
 
         StartupUtils.AddPersistenceHelper<ContentDbContext>(services);
         StartupUtils.AddPersistenceHelper<StatisticsDbContext>(services);
