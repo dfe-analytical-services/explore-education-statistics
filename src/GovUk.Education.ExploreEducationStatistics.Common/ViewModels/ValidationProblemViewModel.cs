@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 /// </summary>
 public record ValidationProblemViewModel : ProblemDetailsViewModel
 {
-    /// <inheritdoc cref="ProblemDetailsViewModel.Status" />
-    public new int Status => StatusCodes.Status400BadRequest;
+    public override int Status { get; set; } = StatusCodes.Status400BadRequest;
 
     /// <summary>
     /// The errors relating to the validation problem.

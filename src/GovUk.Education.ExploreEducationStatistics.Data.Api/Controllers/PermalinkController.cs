@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json", "text/csv")]
-        public async Task GetPermalink(Guid permalinkId,
+        public async Task<ActionResult> GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
             if (Request.AcceptsCsv(exact: true))
@@ -36,26 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     contentType: ContentTypes.Csv,
                     filename: $"permalink-{permalinkId}.csv");
 
-                var csvResult = await _permalinkService.DownloadCsvToStream(
+                return await _permalinkService.DownloadCsvToStream(
                         permalinkId: permalinkId,
                         stream: Response.BodyWriter.AsStream(),
                         cancellationToken: cancellationToken
                     )
-                    .HandleFailuresOr(Ok);
-
-                if (csvResult is not OkObjectResult)
-                {
-                    await csvResult.ExecuteResultAsync(ControllerContext);
-                }
-
-                return;
+                    .HandleFailuresOrNoOp();
             }
 
-            var result = await _permalinkService
+            return await _permalinkService
                 .GetPermalink(permalinkId, cancellationToken)
                 .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [HttpPost("permalink")]

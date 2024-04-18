@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpPost("data/tablebuilder/release/{releaseVersionId:guid}")]
         [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
-        public async Task Query(
+        public async Task<ActionResult> Query(
             Guid releaseVersionId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
@@ -52,21 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     contentType: ContentTypes.Csv,
                     filename: $"{releaseVersionId}.csv");
 
-                await _tableBuilderService.QueryToCsvStream(
-                    releaseVersionId,
-                    query,
-                    Response.BodyWriter.AsStream(),
-                    cancellationToken
-                );
-
-                return;
+                return await _tableBuilderService.QueryToCsvStream(
+                    releaseVersionId: releaseVersionId,
+                    queryContext: query,
+                    stream: Response.BodyWriter.AsStream(),
+                    cancellationToken: cancellationToken
+                )
+                .HandleFailuresOrNoOp();
             }
 
-            var result = await _tableBuilderService
+            return await _tableBuilderService
                 .Query(releaseVersionId, query, cancellationToken)
                 .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [HttpGet("data/tablebuilder/release/{releaseVersionId:guid}/data-block/{dataBlockParentId:guid}")]
