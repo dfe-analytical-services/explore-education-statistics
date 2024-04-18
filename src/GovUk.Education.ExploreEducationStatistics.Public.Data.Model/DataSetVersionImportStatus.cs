@@ -12,3 +12,13 @@ public enum DataSetVersionImportStatus
     Cancelled,
     Failed,
 }
+
+public static class DataSetVersionImportStatusConstants
+{
+    public static readonly List<DataSetVersionImportStatus> TerminalStates =
+    [
+        DataSetVersionImportStatus.Cancelled,
+        DataSetVersionImportStatus.Complete,
+        DataSetVersionImportStatus.Failed
+    ];
+} 

@@ -22,6 +22,7 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'GenericSectionsContainEmptyHtmlBlock' },
               { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
               { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
+              { code: 'PublicApiDataSetImportsMustBeCompleted' },
             ],
           }}
           release={testRelease}
@@ -37,7 +38,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('9 issues')).toBeInTheDocument();
+    expect(screen.getByText('10 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -118,6 +119,15 @@ describe('ReleaseStatusChecklist', () => {
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'All Public API data set imports must be completed',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data#data-uploads',
     );
   });
 

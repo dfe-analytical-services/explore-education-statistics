@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -60,7 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseDataFileRepository releaseDataFileRepository = null,
             IMethodologyVersionRepository methodologyVersionRepository = null,
             IFootnoteRepository footnoteRepository = null,
-            IDataBlockService dataBlockService = null)
+            IDataBlockService dataBlockService = null,
+            IDataSetVersionImportService? dataSetVersionImportService = null)
         {
             return new(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
@@ -70,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileRepository ?? new Mock<IReleaseDataFileRepository>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object
+                dataBlockService ?? new Mock<IDataBlockService>().Object,
+                dataSetVersionImportService ?? new Mock<IDataSetVersionImportService>().Object
             );
         }
     }
