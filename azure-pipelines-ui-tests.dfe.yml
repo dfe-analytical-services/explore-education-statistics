@@ -431,7 +431,7 @@ jobs:
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
-      testResultsFiles: tests/playwright-tests/test-results/playwright-testreport/index.html
+      testResultsFiles: tests/playwright-tests/test-results/playwright-testreport/
       failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
