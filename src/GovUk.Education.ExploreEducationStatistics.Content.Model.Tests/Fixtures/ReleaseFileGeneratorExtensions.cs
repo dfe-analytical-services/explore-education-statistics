@@ -76,7 +76,8 @@ public static class ReleaseFileGeneratorExtensions
     public static InstanceSetters<ReleaseFile> SetFile(
         this InstanceSetters<ReleaseFile> setters,
         File file)
-        => setters.Set(rf => rf.File, file)
+        => setters
+            .Set(rf => rf.File, file)
             .SetFileId(file.Id);
 
     public static InstanceSetters<ReleaseFile> SetFileId(
