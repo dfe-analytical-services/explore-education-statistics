@@ -81,6 +81,7 @@ var coreStorageAccountName = '${subscription}saeescore'
 var keyVaultName = '${subscription}-kv-ees-01'
 var acrName = 'eesacr'
 var vNetName = '${subscription}-vnet-ees'
+var containerAppEnvironmentNameSuffix = '01'
 
 var tagValues = union(resourceTags ?? {}, {
   Environment: environmentName
@@ -108,7 +109,8 @@ module vNetModule 'application/virtualNetwork.bicep' = {
     vNetName: vNetName
     resourcePrefix: resourcePrefix
     subscription: subscription
-    dataProcessorFunctionAppName: dataProcessorFunctionAppName
+    dataProcessorFunctionAppNameSuffix: dataProcessorFunctionAppName
+    containerAppEnvironmentName: containerAppEnvironmentNameSuffix
     /* TODO EES-5052 - temporarily disconnecting PostgreSQL Flexible Server from VNet integration whilst awaiting
        Security Group guidance on accessing resources behind VNet protection.
     postgreSqlServerName: psqlServerName
@@ -142,7 +144,7 @@ module containerAppEnvironmentModule 'components/containerAppEnvironment.bicep' 
   params: {
     subscription: subscription
     location: location
-    containerAppEnvironmentNameSuffix: '01'
+    containerAppEnvironmentNameSuffix: containerAppEnvironmentNameSuffix
     subnetId: vNetModule.outputs.containerAppEnvironmentSubnetRef
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceName
     applicationInsightsKey: applicationInsightsModule.outputs.applicationInsightsKey
