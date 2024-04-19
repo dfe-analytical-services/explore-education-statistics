@@ -90,8 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 content: releaseFile.Summary ?? string.Empty,
                                 timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                                 geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
-                                filters: await GetFilters(rs.SubjectId, rs.FilterSequence),
-                                indicators: await GetIndicators(rs.SubjectId, rs.IndicatorSequence),
+                                filters: await GetFilters(rs.SubjectId, releaseFile.FilterSequence),
+                                indicators: await GetIndicators(rs.SubjectId, releaseFile.IndicatorSequence),
                                 file: releaseFile.ToFileInfo()
                             );
                         }
