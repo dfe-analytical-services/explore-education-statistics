@@ -3987,7 +3987,7 @@
       }
     },
     {
-      "name": "logicApp",
+      "name": "logicAppTemplate",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "properties": {
@@ -4014,8 +4014,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[variables('logicAppSlackAlerts')]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
       ]
     },
     {
