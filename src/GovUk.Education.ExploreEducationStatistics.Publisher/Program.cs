@@ -123,6 +123,7 @@ var host = new HostBuilder()
             .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
             .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
             .AddScoped<IRedirectsService, RedirectsService>()
+            .AddScoped<IDataSetVersionPublishingService, DataSetVersionPublishingService>()
             .Configure<AppSettingOptions>(configuration.GetSection(AppSettingOptions.AppSettings));
 
         // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
@@ -151,12 +152,12 @@ var host = new HostBuilder()
             if (hostEnvironment.IsDevelopment())
             {
                 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-
+            
                 // Set up the data source outside the `AddDbContext` action as this
                 // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
                 // creating over 20 `IServiceProvider` instances.
                 var dbDataSource = dataSourceBuilder.Build();
-
+            
                 services.AddDbContext<PublicDataDbContext>(options =>
                 {
                     options
@@ -171,12 +172,12 @@ var host = new HostBuilder()
                     var sqlServerTokenProvider = new DefaultAzureCredential();
                     var accessToken = sqlServerTokenProvider.GetToken(
                         new TokenRequestContext(scopes: new[] { "https://ossrdbms-aad.database.windows.net/.default" } )).Token;
-
+            
                     var connectionStringWithAccessToken =
                         connectionString.Replace("[access_token]", accessToken);
-
+            
                     var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
-
+            
                     options.UseNpgsql(dbDataSource);
                 });
             }
