@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 
@@ -201,6 +202,23 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
+    public static ErrorViewModel AssertHasTimePeriodInvalidYearError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
+        string period)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.TimePeriodInvalidYear.Code
+        );
+
+        var errorDetail = error.GetDetail<InvalidErrorDetail<string>>();
+
+        Assert.Equal(period, errorDetail.Value);
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasTimePeriodYearRangeError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
@@ -208,12 +226,12 @@ public static class ValidationProblemViewModelTestExtensions
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.TimePeriodYearRange.Code
+            expectedCode: ValidationMessages.TimePeriodInvalidYearRange.Code
         );
 
-        var errorDetail = error.GetDetail<TimePeriodStringValidators.RangeErrorDetail>();
+        var errorDetail = error.GetDetail<InvalidErrorDetail<string>>();
 
-        Assert.Equal(period, errorDetail.Value.Period);
+        Assert.Equal(period, errorDetail.Value);
 
         return error;
     }
@@ -228,9 +246,9 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.TimePeriodAllowedCode.Code
         );
 
-        var errorDetail = error.GetDetail<TimePeriodStringValidators.AllowedCodeErrorDetail>();
+        var errorDetail = error.GetDetail<TimePeriodAllowedCodeErrorDetail>();
 
-        Assert.Equal(code, errorDetail.Value.Code);
+        Assert.Equal(code, errorDetail.Value);
 
         return error;
     }

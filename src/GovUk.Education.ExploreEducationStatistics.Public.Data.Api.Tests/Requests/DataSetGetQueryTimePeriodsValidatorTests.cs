@@ -44,7 +44,6 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
             ["2022"],
             ["2022/2023"],
             ["20222"],
-            ["20222|AY"],
             ["2022|ay"],
             ["2022/2020|AY"],
             ["2000/1999|AY"],
@@ -60,7 +59,7 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
             [],
             ["", ""],
             ["Invalid", "2022", "2022/2023"],
-            ["20222", "20222|AY", "2022|ay"],
+            ["20222", "2022|ay"],
             ["2022/2020|AY", "2000/1999|AY"],
             ["2022|YY", "2022|WEEK12", "2022/2023|ZZ"]
         ];

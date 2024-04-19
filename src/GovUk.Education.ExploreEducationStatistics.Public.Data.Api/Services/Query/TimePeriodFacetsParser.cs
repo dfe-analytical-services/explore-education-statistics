@@ -216,8 +216,8 @@ internal class TimePeriodFacetsParser : IFacetsParser
 
         public TimePeriodKey(DataSetQueryTimePeriod timePeriod)
         {
-            Period = TimePeriodFormatter.FormatToCsv(timePeriod.ParsedPeriod);
-            Identifier = timePeriod.ParsedCode;
+            Period = TimePeriodFormatter.FormatToCsv(timePeriod.ParsedPeriod());
+            Identifier = timePeriod.ParsedCode();
         }
     }
 }
