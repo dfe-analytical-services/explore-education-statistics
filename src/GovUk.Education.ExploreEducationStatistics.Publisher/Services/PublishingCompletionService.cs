@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +24,10 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
     private readonly IRedirectsCacheService _redirectsCacheService;
+    private readonly IDataSetVersionPublishingService _dataSetVersionVersionPublishingService;
 
-    public PublishingCompletionService(ContentDbContext contentDbContext,
+    public PublishingCompletionService(
+        ContentDbContext contentDbContext,
         IContentService contentService,
         IMethodologyService methodologyService,
         INotificationsService notificationsService,
@@ -32,7 +35,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         IPublicationCacheService publicationCacheService,
         IReleaseVersionRepository releaseVersionRepository,
         IReleaseService releaseService,
-        IRedirectsCacheService redirectsCacheService)
+        IRedirectsCacheService redirectsCacheService,
+        IDataSetVersionPublishingService dataSetVersionVersionPublishingService)
     {
         _contentDbContext = contentDbContext;
         _contentService = contentService;
@@ -43,6 +47,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _releaseVersionRepository = releaseVersionRepository;
         _releaseService = releaseService;
         _redirectsCacheService = redirectsCacheService;
+        _dataSetVersionVersionPublishingService = dataSetVersionVersionPublishingService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -143,6 +148,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         await _contentService.UpdateCachedTaxonomyBlobs();
 
         await _redirectsCacheService.UpdateRedirects();
+
+        await _dataSetVersionVersionPublishingService.PublishDataSetVersions(releaseVersionIdsToUpdate);
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()
