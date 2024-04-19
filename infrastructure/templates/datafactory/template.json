@@ -88,6 +88,14 @@
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
+          },
+          "slackAppToken": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-slackapptoken"
+            }
           }
         }
       },
