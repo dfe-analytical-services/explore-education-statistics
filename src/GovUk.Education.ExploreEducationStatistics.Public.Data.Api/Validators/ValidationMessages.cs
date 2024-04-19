@@ -54,8 +54,13 @@ public static class ValidationMessages
         Message: "Must be a time period in the correct format."
     );
 
-    public static readonly LocalizableMessage TimePeriodYearRange = new(
-        Code: "TimePeriodYearRange",
+    public static readonly LocalizableMessage TimePeriodInvalidYear = new(
+        Code: "TimePeriodInvalidYear",
+        Message: "Must be a time period for a valid year."
+    );
+
+    public static readonly LocalizableMessage TimePeriodInvalidYearRange = new(
+        Code: "TimePeriodInvalidYearRange",
         Message: "Must be a valid time period range where the start year is one year before the end year."
     );
 

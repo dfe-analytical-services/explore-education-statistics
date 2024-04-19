@@ -1839,7 +1839,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             validationProblem.AssertHasNotEmptyError($"{path}[0]");
             validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[2]", value: "|");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[2]", code: "");
 
             validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[3]", period: "2020/2019");
             validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[4]", period: "2020/2022");
@@ -1892,7 +1892,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
             validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.notEq", code: "W10");
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
             validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[2]", value: "|");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
             validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn");
         }
 
