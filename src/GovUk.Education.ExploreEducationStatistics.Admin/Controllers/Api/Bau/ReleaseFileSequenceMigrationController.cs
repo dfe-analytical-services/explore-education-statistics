@@ -40,11 +40,11 @@ public class ReleaseFileSequenceMigrationController(
         foreach (var releaseSubject in releaseSubjects)
         {
             var releaseFile = await contentDbContext.ReleaseFiles
-                .Where(rf =>
-                    rf.File.Type == FileType.Data
-                    && rf.File.SubjectId == releaseSubject.SubjectId
-                    && rf.ReleaseVersionId == releaseSubject.ReleaseVersionId)
-                .SingleAsync(cancellationToken: cancellationToken);
+                .SingleAsync(rf =>
+                        rf.File.Type == FileType.Data
+                        && rf.File.SubjectId == releaseSubject.SubjectId
+                        && rf.ReleaseVersionId == releaseSubject.ReleaseVersionId,
+                    cancellationToken: cancellationToken);
 
             releaseFile.FilterSequence = releaseSubject.FilterSequence;
             releaseFile.IndicatorSequence = releaseSubject.IndicatorSequence;

@@ -88,10 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
 
-                    var releaseFile =
-                        await _releaseDataFileRepository.GetBySubject(releaseVersionId: releaseVersionId,
-                            subjectId: releaseSubject.SubjectId);
-
                     var locations = observations
                         .Select(o => o.Location)
                         .Distinct()
@@ -100,14 +96,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
+                    var releaseFile =
+                        await _releaseDataFileRepository.GetBySubject(releaseVersionId: releaseVersionId,
+                            subjectId: releaseSubject.SubjectId);
+
                     var filterItems =
                         await _filterItemRepository.GetFilterItemsFromObservations(observations);
-                    var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
-                        releaseFile.FilterSequence);
+                    var filterViewModels = FiltersMetaViewModelBuilder
+                        .BuildFiltersFromFilterItems(filterItems, releaseFile.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicatorViewModels = GetIndicatorViewModels(query, releaseFile);
+                    var indicatorViewModels = GetIndicatorViewModels(
+                        query, releaseFile.IndicatorSequence);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -169,13 +170,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query,
-            ReleaseFile releaseFile)
+            List<IndicatorGroupSequenceEntry>? indicatorSequence)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
 
             // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
             // been fetched without groups
-            var indicatorsOrdering = releaseFile.IndicatorSequence?
+            var indicatorsOrdering = indicatorSequence?
                 .SelectMany(groupOrdering => groupOrdering.ChildSequence)
                 .ToList();
 

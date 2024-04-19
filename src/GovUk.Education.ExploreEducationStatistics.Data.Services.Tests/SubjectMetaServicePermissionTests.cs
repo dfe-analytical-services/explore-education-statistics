@@ -20,7 +20,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.Permi
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
-using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 

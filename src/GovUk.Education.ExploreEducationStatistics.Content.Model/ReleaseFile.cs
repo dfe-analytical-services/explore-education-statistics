@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<FilterSequenceEntry>? FilterSequence { get; set; }
 
         public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
-
     }
 
     public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);

@@ -3179,16 +3179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedReleaseFile = await contentDbContext.ReleaseFiles
                     .FirstAsync(rf => rf.ReleaseVersionId == releaseVersion.Id
                                       && rf.FileId == replacementFile.Id);
-
                 Assert.Equal("Original data set guidance", updatedReleaseFile.Summary);
 
-                // Check the sequence of filters and indicators remains untouched
-                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseVersionId == statsReleaseVersion.Id
-                                      && rs.SubjectId == replacementReleaseSubject.SubjectId);
-
-                Assert.Null(replacedReleaseSubject.FilterSequence);
-                Assert.Null(replacedReleaseSubject.IndicatorSequence);
+                Assert.Null(updatedReleaseFile.FilterSequence);
+                Assert.Null(updatedReleaseFile.IndicatorSequence);
             }
         }
 

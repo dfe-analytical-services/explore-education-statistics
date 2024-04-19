@@ -372,8 +372,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
-                Subject = new Subject { Id = Guid.NewGuid(), }
+                ReleaseVersion = new ReleaseVersion(),
+                Subject = new Subject(),
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();

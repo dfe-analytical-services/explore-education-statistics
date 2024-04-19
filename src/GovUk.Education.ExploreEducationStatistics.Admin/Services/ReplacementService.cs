@@ -157,9 +157,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ForEachAwaitAsync(footnotePlan =>
                             ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
 
-                    await ReplaceReleaseFileFilterAndIndicatorSequence(releaseVersionId: releaseVersionId,
-                        originalSubjectId: originalSubjectId,
-                        replacementSubjectId: replacementSubjectId);
+                    replacementReleaseFile.FilterSequence =
+                        await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
+                    replacementReleaseFile.IndicatorSequence =
+                        await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
 
                     // Replace data guidance
                     replacementReleaseFile.Summary = originalReleaseFile.Summary;
@@ -1096,32 +1097,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FootnoteId = footnoteId,
                 IndicatorId = plan.TargetValue
             });
-        }
-
-        private async Task ReplaceReleaseFileFilterAndIndicatorSequence(Guid releaseVersionId,
-            Guid originalSubjectId,
-            Guid replacementSubjectId)
-        {
-            var originalReleaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.SubjectId == originalSubjectId
-                    && rf.File.Type == FileType.Data);
-
-            var replacementReleaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseVersionId == releaseVersionId
-                    && rf.File.SubjectId == replacementSubjectId
-                    && rf.File.Type == FileType.Data);
-
-            _contentDbContext.Update(replacementReleaseFile);
-
-            replacementReleaseFile.FilterSequence =
-                await ReplaceFilterSequence(originalReleaseFile, replacementReleaseFile);
-            replacementReleaseFile.IndicatorSequence =
-                await ReplaceIndicatorSequence(originalReleaseFile, replacementReleaseFile);
         }
 
         private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseFile originalReleaseFile,

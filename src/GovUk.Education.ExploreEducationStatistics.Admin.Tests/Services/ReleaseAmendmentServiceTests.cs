@@ -299,23 +299,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ReleaseVersionId = originalReleaseVersion.Id,
                     File = dataFile1,
                     FileId = dataFile1.Id,
-                    FilterSequence = new List<FilterSequenceEntry>
-                    {
-                        new(
+                    FilterSequence =
+                    [
+                        new FilterSequenceEntry(
                             Guid.NewGuid(),
-                            new List<FilterGroupSequenceEntry>
-                            {
-                                new(Guid.NewGuid(), new List<Guid> { Guid.NewGuid() })
-                            }
+                            [new(Guid.NewGuid(), [Guid.NewGuid()])]
                         )
-                    },
-                    IndicatorSequence = new List<IndicatorGroupSequenceEntry>
-                    {
-                        new(
+                    ],
+                    IndicatorSequence =
+                    [
+                        new IndicatorGroupSequenceEntry(
                             Guid.NewGuid(),
-                            new List<Guid> { Guid.NewGuid() }
+                            [Guid.NewGuid()]
                         )
-                    },
+                    ],
                 },
                 new()
                 {

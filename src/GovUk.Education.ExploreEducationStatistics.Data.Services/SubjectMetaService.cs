@@ -23,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
@@ -233,7 +232,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
         }
 
-        private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
+        private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(
+            Guid subjectId, List<FilterSequenceEntry>? filterSequence)
         {
             var filters = await filterRepository.GetFiltersIncludingItems(subjectId);
             return FiltersMetaViewModelBuilder.BuildFilters(filters, filterSequence);
