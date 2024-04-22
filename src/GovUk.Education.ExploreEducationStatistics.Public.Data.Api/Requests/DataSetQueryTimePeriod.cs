@@ -73,7 +73,7 @@ public record DataSetQueryTimePeriod
         return $"{Period}|{Code}";
     }
 
-    public static DataSetQueryTimePeriod FromString(string timePeriod)
+    public static DataSetQueryTimePeriod Parse(string timePeriod)
     {
         var parts = timePeriod.Split('|');
         var period = parts[0];
