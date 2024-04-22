@@ -24,6 +24,6 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
     {
         return await releaseService
             .GetApiDataSetCandidates(releaseVersionId, cancellationToken)
-            .HandleFailuresOrNoContent();
+            .HandleFailuresOrOk();
     }
 }
