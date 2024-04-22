@@ -145,7 +145,7 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.yellow,
     port: 7072,
     type: 'func',
-    dockerServices: ['db', 'data-storage'],
+    dockerServices: ['db', 'data-storage', 'public-api-db'],
   },
   notifier: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Notifier',
