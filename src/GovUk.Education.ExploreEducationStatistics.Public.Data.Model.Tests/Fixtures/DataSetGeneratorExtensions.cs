@@ -39,6 +39,16 @@ public static class DataSetGeneratorExtensions
 
     public static Generator<DataSet> WithSupersedingDataSet(this Generator<DataSet> generator, DataSet? dataSet)
         => generator.ForInstance(s => s.SetSupersedingDataSet(dataSet));
+    
+    public static Generator<DataSet> WithLatestDraftVersion(
+        this Generator<DataSet> generator,
+        DataSetVersion? dataSetVersion)
+        => generator.ForInstance(s => s.SetLatestDraftVersion(dataSetVersion));
+
+    public static Generator<DataSet> WithLatestDraftVersion(
+        this Generator<DataSet> generator,
+        Func<DataSetVersion?> dataSetVersion)
+        => generator.ForInstance(s => s.SetLatestDraftVersion(dataSetVersion));
 
     public static Generator<DataSet> WithLatestLiveVersion(
         this Generator<DataSet> generator,
@@ -150,6 +160,36 @@ public static class DataSetGeneratorExtensions
 
                     ds.LatestLiveVersion = dsv;
                     ds.LatestLiveVersionId = dsv?.Id;
+                }
+            );
+    
+    public static InstanceSetters<DataSet> SetLatestDraftVersion(
+        this InstanceSetters<DataSet> instanceSetter,
+        DataSetVersion? dataSetVersion)
+        => instanceSetter.SetLatestDraftVersion(() => dataSetVersion);
+
+    public static InstanceSetters<DataSet> SetLatestDraftVersion(
+        this InstanceSetters<DataSet> instanceSetter,
+        Func<DataSetVersion?> dataSetVersion)
+        => instanceSetter
+            .Set(
+                (_, ds) =>
+                {
+                    var dsv = dataSetVersion();
+
+                    if (dsv is not null)
+                    {
+                        dsv.DataSet = ds;
+                        dsv.DataSetId = ds.Id;
+
+                        if (!ds.Versions.Contains(dsv))
+                        {
+                            ds.Versions.Add(dsv);
+                        }
+                    }
+
+                    ds.LatestDraftVersion = dsv;
+                    ds.LatestDraftVersionId = dsv?.Id;
                 }
             );
 

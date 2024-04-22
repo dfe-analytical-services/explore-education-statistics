@@ -15,6 +15,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
         <PackageReference Include="Snapshooter.Xunit" Version="0.14.1" />
+        <PackageReference Include="Testcontainers" Version="3.8.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="3.8.0" />
         <PackageReference Include="xunit" Version="2.7.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
           <PrivateAssets>all</PrivateAssets>
@@ -29,6 +31,11 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher\GovUk.Education.ExploreEducationStatistics.Publisher.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Functions\" />
     </ItemGroup>
 
 </Project>

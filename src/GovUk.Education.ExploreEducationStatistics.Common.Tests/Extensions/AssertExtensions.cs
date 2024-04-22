@@ -85,7 +85,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = TimeWithinMillis)
         {
             Assert.NotNull(dateTime);
-            AssertUtcNow(dateTime!.Value, withinMillis);
+            AssertUtcNow(dateTime.Value, withinMillis);
+        }
+        
+        /// <summary>
+        /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
+        /// </summary>
+        public static void AssertUtcNow(this DateTimeOffset dateTime, int withinMillis = TimeWithinMillis)
+        {
+            Assert.InRange(DateTimeOffset.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
+        }
+
+        /// <summary>
+        /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
+        /// </summary>
+        public static void AssertUtcNow(this DateTimeOffset? dateTime, int withinMillis = TimeWithinMillis)
+        {
+            Assert.NotNull(dateTime);
+            AssertUtcNow(dateTime.Value, withinMillis);
         }
     }
 }
