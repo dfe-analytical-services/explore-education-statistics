@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Release = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 
@@ -62,26 +61,25 @@ public class DataSetService(
             });
     }
 
-    public async Task<Either<ActionResult, DataSetVersionSummaryViewModel>> GetVersion(
-        Guid releaseVersionId,
+    public async Task<Either<ActionResult, DataSetSummaryViewModel>> GetDataSet(
         Guid dataSetId,
-        string dataSetVersion,
         CancellationToken cancellationToken = default)
     {
-        return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
-            .OnSuccess(userService.CheckCanViewReleaseVersion)
-            .OnSuccessCombineWith(async _ => await CheckVersionExists(dataSetId, dataSetVersion))
-            .OnSuccessDo(async combinedReleaseAndDataSetVersion =>
+        return await CheckDataSetExists(dataSetId, cancellationToken)
+            .OnSuccessCombineWith(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken))
+            .OnSuccess(async combinedDataSetAndPublication =>
             {
-                var (releaseVersion, dataSetVersion) = combinedReleaseAndDataSetVersion;
+                (var dataSet, var publication) = combinedDataSetAndPublication;
 
-                return await CheckDataSetVersionBelongsToReleaseVersion(dataSetVersion, releaseVersion);
+                return await userService.CheckCanViewPublication(publication)
+                    .OnSuccess(_ => dataSet);
             })
-            .OnSuccess(combinedReleaseAndDataSetVersion =>
+            .OnSuccessCombineWith(async dataSet => await GetLatestDataSetVersionFilesByFileId(dataSet, cancellationToken))
+            .OnSuccess(combinedDataSetAndReleaseFiles =>
             {
-                var (releaseVersion, dataSetVersion) = combinedReleaseAndDataSetVersion;
+                (var dataSet, var releaseFilesByFileId) = combinedDataSetAndReleaseFiles;
 
-                return MapDataSetVersion(dataSetVersion, releaseVersion);
+                return MapDataSet(dataSet, releaseFilesByFileId);
             });
     }
 
@@ -126,6 +124,49 @@ public class DataSetService(
             : null;
     }
 
+    private static DataSetSummaryViewModel MapDataSet(DataSet dataSet, IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByFileId)
+    {
+        var draftVersion = dataSet.LatestDraftVersion is null
+            ? null
+            : MapDataSetVersion(dataSet.LatestDraftVersion, releaseFilesByFileId[dataSet.LatestDraftVersion.CsvFileId]);
+
+        var latestLiveVersion = dataSet.LatestLiveVersion is null
+            ? null
+            : MapDataSetVersion(dataSet.LatestLiveVersion, releaseFilesByFileId[dataSet.LatestLiveVersion.CsvFileId]);
+
+        return new DataSetSummaryViewModel
+        {
+            Id = dataSet.Id,
+            Title = dataSet.Title,
+            Summary = dataSet.Summary,
+            Status = dataSet.Status,
+            DraftVersion = draftVersion,
+            LatestLiveVersion = latestLiveVersion,
+        };
+    }
+
+    private static DataSetVersionSummaryViewModel MapDataSetVersion(DataSetVersion dataSetVersion, ReleaseFile releaseFile)
+    {
+        return new DataSetVersionSummaryViewModel
+        {
+            Id = dataSetVersion.Id,
+            Version = dataSetVersion.Version,
+            Status = dataSetVersion.Status,
+            Type = dataSetVersion.VersionType,
+            DataSetFileId = (Guid)releaseFile.File.DataSetFileId!,
+            ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
+        };
+    }
+
+    private static IdTitleViewModel MapReleaseVersion(ReleaseVersion releaseVersion)
+    {
+        return new IdTitleViewModel
+        {
+            Id = releaseVersion.Id,
+            Title = releaseVersion.Title,
+        };
+    }
+
     private async Task<Either<ActionResult, Publication>> CheckPublicationExists(Guid publicationId,
         CancellationToken cancellationToken)
     {
@@ -134,65 +175,38 @@ public class DataSetService(
             .FirstOrNotFoundAsync(p => p.Id == publicationId, cancellationToken: cancellationToken);
     }
 
-    private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(
-        Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
-    {
-        return await contentDbContext.ReleaseVersions
-            .AsNoTracking()
-            .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken: cancellationToken);
-    }
-
-    private async Task<Either<ActionResult, DataSetVersion>> CheckVersionExists(
+    private async Task<Either<ActionResult, DataSet>> CheckDataSetExists(
         Guid dataSetId,
-        string dataSetVersion,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
-        if (!VersionUtils.TryParse(dataSetVersion, out var version))
-        {
-            return new NotFoundResult();
-        }
-
-        return await publicDataDbContext.DataSetVersions
+        return await publicDataDbContext.DataSets
             .AsNoTracking()
-            .Include(dsv => dsv.DataSet)
-            .Where(dsv => dsv.DataSetId == dataSetId)
-            .Where(dsv => dsv.VersionMajor == version.Major)
-            .Where(dsv => dsv.VersionMinor == version.Minor)
+            .Include(ds => ds.LatestDraftVersion)
+            .Include(ds => ds.LatestLiveVersion)
+            .Where(ds => ds.Id == dataSetId)
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private async Task<Either<ActionResult, Unit>> CheckDataSetVersionBelongsToReleaseVersion(
-        DataSetVersion dataSetVersion,
-        ReleaseVersion releaseVersion)
+    private async Task<Either<ActionResult, IReadOnlyDictionary<Guid, ReleaseFile>>> GetLatestDataSetVersionFilesByFileId(
+        DataSet dataSet,
+        CancellationToken cancellationToken)
     {
+        if (dataSet.LatestDraftVersion is null && dataSet.LatestLiveVersion is null)
+        {
+            return new Dictionary<Guid, ReleaseFile>();
+        }
+
         return await contentDbContext.ReleaseFiles
-            .AsNoTracking()
-            .Where(rf => rf.ReleaseVersionId == releaseVersion.Id)
-            .Where(rf => rf.FileId == dataSetVersion.CsvFileId)
-            .SingleOrNotFoundAsync()
-            .OnSuccessVoid();
-    }
-
-    private DataSetVersionSummaryViewModel MapDataSetVersion(DataSetVersion dataSetVersion, ReleaseVersion releaseVersion)
-    {
-        return new DataSetVersionSummaryViewModel
-        {
-            Title = dataSetVersion.DataSet.Title,
-            Release = MapReleaseVersion(releaseVersion),
-            Version = dataSetVersion.Version,
-            Type = dataSetVersion.VersionType,
-            Status = dataSetVersion.Status,
-            DataSetFileId = dataSetVersion.CsvFileId,
-        };
-    }
-
-    private Release MapReleaseVersion(ReleaseVersion releaseVersion)
-    {
-        return new Release
-        {
-            Id = releaseVersion.ReleaseId,
-            Title = releaseVersion.Title,
-        };
+            .Where(rf => 
+                dataSet.LatestDraftVersion == null 
+                ? false 
+                : rf.FileId == dataSet.LatestDraftVersion.CsvFileId
+                || 
+                dataSet.LatestLiveVersion == null 
+                ? false 
+                : rf.FileId == dataSet.LatestLiveVersion.CsvFileId)
+            .Include(rf => rf.ReleaseVersion)
+            .Include(rf => rf.File)
+            .ToDictionaryAsync(rf => rf.FileId, cancellationToken);
     }
 }

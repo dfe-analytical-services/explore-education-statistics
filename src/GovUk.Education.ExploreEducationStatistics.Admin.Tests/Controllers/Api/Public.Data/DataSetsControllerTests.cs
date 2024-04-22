@@ -233,15 +233,15 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                         case DataSetVersionStatus.Published or DataSetVersionStatus.Deprecated:
                             dsv.DataSet.LatestLiveVersion = dsv;
                             break;
-        }
+                    }
                 })
                 .GenerateList();
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
         {
-                context.DataSetVersions.AddRange(dataSetVersions);
-                context.DataSets.UpdateRange(dataSets);
-            });
+            context.DataSetVersions.AddRange(dataSetVersions);
+            context.DataSets.UpdateRange(dataSets);
+        });
 
             var response = await ListPublicationDataSets(publication.Id);
 
@@ -443,7 +443,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
         [InlineData(1)]
         [InlineData(100)]
         public async Task PageSizeInAllowedRange_Success(int pageSize)
-            {
+        {
             Publication publication = DataFixture
                 .DefaultPublication();
 
@@ -516,7 +516,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     filters: 1,
                     indicators: 1,
                     locations: 1,
-                    timePeriods: 3)
+                    timePeriods: 2)
                 .WithStatusPublished()
                 .WithCsvFileId(file.Id)
                 .WithDataSet(dataSet);
@@ -532,7 +532,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.Version);
 
-            var content = response.AssertOk<DataSetVersionSummaryViewModel>();
+            var content = response.AssertOk<DataSetSummaryViewModel>();
 
             Assert.NotNull(content);
             Assert.Equal(dataSet.Title, content.Title);
@@ -580,7 +580,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     filters: 1,
                     indicators: 1,
                     locations: 1,
-                    timePeriods: 3)
+                    timePeriods: 2)
                 .WithStatus(dataSetVersionStatus)
                 .WithCsvFileId(file.Id)
                 .WithDataSet(dataSet);
@@ -596,7 +596,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 dataSetId: dataSet.Id,
                 dataSetVersion: dataSetVersion.Version);
 
-            response.AssertOk<DataSetVersionSummaryViewModel>();
+            response.AssertOk<DataSetSummaryViewModel>();
         }
 
         [Fact]
@@ -692,7 +692,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     filters: 1,
                     indicators: 1,
                     locations: 1,
-                    timePeriods: 3)
+                    timePeriods: 2)
                 .WithStatusPublished()
                 .WithCsvFileId(file.Id)
                 .WithDataSet(dataSet);
@@ -740,7 +740,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     filters: 1,
                     indicators: 1,
                     locations: 1,
-                    timePeriods: 3)
+                    timePeriods: 2)
                 .WithStatusPublished()
                 .WithDataSet(dataSet);
 

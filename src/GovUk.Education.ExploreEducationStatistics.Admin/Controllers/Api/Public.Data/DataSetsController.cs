@@ -9,8 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 
@@ -34,19 +32,15 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpGet("{releaseVersionId:guid}/{dataSetId:guid}/versions/{dataSetVersion}")]
+    [HttpGet("{dataSetId:guid}")]
     [Produces("application/json")]
-    public async Task<ActionResult<DataSetVersionSummaryViewModel>> GetDataSetVersion(
-    Guid releaseVersionId,
-    Guid dataSetId,
-    string dataSetVersion,
-    CancellationToken cancellationToken)
+    public async Task<ActionResult<DataSetSummaryViewModel>> GetDataSet(
+        Guid dataSetId,
+        CancellationToken cancellationToken)
     {
         return await dataSetService
-            .GetVersion(
-                releaseVersionId: releaseVersionId,
+            .GetDataSet(
                 dataSetId: dataSetId,
-                dataSetVersion: dataSetVersion,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }

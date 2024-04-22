@@ -17,9 +17,7 @@ public interface IDataSetService
         Guid publicationId,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, DataSetVersionSummaryViewModel>> GetVersion(
-        Guid releaseVersionId,
+    Task<Either<ActionResult, DataSetSummaryViewModel>> GetDataSet(
         Guid dataSetId,
-        string dataSetVersion,
         CancellationToken cancellationToken = default);
 }
