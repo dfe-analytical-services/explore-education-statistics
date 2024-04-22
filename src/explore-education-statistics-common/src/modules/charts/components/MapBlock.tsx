@@ -104,7 +104,7 @@ export const mapBlockDefinition: ChartDefinition = {
   },
 };
 
-export default function MapBlockInternal({
+export default function MapBlock({
   id,
   dataGroups: deprecatedDataGroups,
   dataClassification: deprecatedDataClassification,

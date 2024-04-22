@@ -3,6 +3,13 @@ const flowRight = require('lodash/fp/flowRight');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
+const checkBuildNumber = buildNumber => {
+  if (buildNumber === undefined || buildNumber === '') {
+    throw new Error('No build number was provided.');
+  }
+  return buildNumber;
+};
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -13,7 +20,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {
-    BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
+    BUILD_NUMBER: checkBuildNumber(process.env.BUILD_BUILDNUMBER),
   },
   publicRuntimeConfig: {
     APP_ENV: process.env.APP_ENV,
