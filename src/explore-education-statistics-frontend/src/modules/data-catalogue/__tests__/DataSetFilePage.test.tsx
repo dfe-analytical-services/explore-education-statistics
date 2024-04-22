@@ -48,6 +48,26 @@ describe('DataSetFilePage', () => {
         name: /National statistics/,
       }),
     ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Geographic levels-value')).getByText(
+        'Local authority, National',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Indicators-value')).getByText('Indicator 1'),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Indicators-value')).getByText('Indicator 2'),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Filters-value')).getByText('Filter 1'),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Filters-value')).getByText('Filter 2'),
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('Time period-value')).getByText('2023 to 2024'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', { name: 'Download data set (ZIP)' }),

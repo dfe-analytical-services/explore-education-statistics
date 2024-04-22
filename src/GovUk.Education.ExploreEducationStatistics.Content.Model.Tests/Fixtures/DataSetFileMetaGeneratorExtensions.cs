@@ -40,6 +40,11 @@ public static class DataSetFileMetaGeneratorExtensions
         List<FilterMeta> filters)
         => generator.ForInstance(s => s.SetFilters(filters));
 
+    public static Generator<DataSetFileMeta> WithIndicators(
+        this Generator<DataSetFileMeta> generator,
+        List<IndicatorMeta> indicators)
+        => generator.ForInstance(s => s.SetIndicators(indicators));
+
     public static InstanceSetters<DataSetFileMeta> SetGeographicLevels(
         this InstanceSetters<DataSetFileMeta> setters,
         List<string> geographicLevels)

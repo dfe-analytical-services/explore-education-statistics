@@ -261,7 +261,7 @@ public class ProcessorStage3Tests
                 Assert.Equal(i + 2, observations[i].CsvRow));
 
             // Thoroughly check the first Observation row for correct details.
-            var firstObservation = observations[0];
+            var firstObservation = observations.First();
             var expectedLocation = _locations.Single(l => l.LocalAuthority!.Name == "Birmingham");
             Assert.Equal(expectedLocation.Id, firstObservation.LocationId);
             Assert.Equal(2018, firstObservation.Year);
@@ -276,7 +276,7 @@ public class ProcessorStage3Tests
             Assert.Equal("2", firstObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
 
             // Thoroughly check the last Observation row for correct details.
-            var lastObservation = observations[15];
+            var lastObservation = observations.Last();
             var expectedLocation2 = _locations.Single(l => l.LocalAuthority!.Name == "Camden");
             Assert.Equal(expectedLocation2.Id, lastObservation.LocationId);
             Assert.Equal(2025, lastObservation.Year);
@@ -293,7 +293,26 @@ public class ProcessorStage3Tests
             var file = contentDbContext.Files
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
-            Assert.NotNull(file.DataSetFileMeta);
+
+            Assert.NotNull(file.DataSetFileMeta!);
+
+            // Checking against contents of small-csv.csv in Resources directory
+            var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
+            Assert.Equal("Local authority", geographicLevel);
+            Assert.Equal(TimeIdentifier.CalendarYear, file.DataSetFileMeta.TimeIdentifier);
+            new List<int> { 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025 }
+                .AssertDeepEqualTo(file.DataSetFileMeta.Years);
+
+            // Checking against contents of small-csv.meta.csv
+            new List<string> { "Filter one", "Filter two", }
+                .AssertDeepEqualTo(
+                    file.DataSetFileMeta.Filters
+                        .Select(f => f.Label).ToList());
+
+            new List<string> { "Indicator one", "Indicator two", }
+                .AssertDeepEqualTo(
+                    file.DataSetFileMeta.Indicators
+                        .Select(i => i.Label).ToList());
         }
     }
 
