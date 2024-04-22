@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -58,6 +58,11 @@ public static class FileGeneratorExtensions
         Guid replacedById)
         => generator.ForInstance(s => s.SetReplacedById(replacedById));
 
+    public static Generator<File> WithPublicDataSetVersionId(
+        this Generator<File> generator,
+        Guid publicDataSetVersionId)
+        => generator.ForInstance(s => s.SetPublicDataSetVersionId(publicDataSetVersionId));
+
     public static Generator<File> WithRootPath(
         this Generator<File> generator,
         Guid rootPath)
@@ -108,6 +113,11 @@ public static class FileGeneratorExtensions
         this InstanceSetters<File> setters,
         Guid replacedById)
         => setters.Set(f => f.ReplacedById, replacedById);
+
+    public static InstanceSetters<File> SetPublicDataSetVersionId(
+        this InstanceSetters<File> setters,
+        Guid publicDataSetVersionId)
+        => setters.Set(f => f.PublicDataSetVersionId, publicDataSetVersionId);
 
     public static InstanceSetters<File> SetReplacing(
         this InstanceSetters<File> setters,
