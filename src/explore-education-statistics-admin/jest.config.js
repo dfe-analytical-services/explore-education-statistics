@@ -39,6 +39,7 @@ const config = {
     '@azure/msal-react': '<rootDir>/test/stub.js',
     'react-markdown':
       '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
+    'react-leaflet': '<rootDir>/__mocks__/reactLeafletMock.ts',
   },
   moduleFileExtensions: [
     'web.js',
