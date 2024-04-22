@@ -57,14 +57,14 @@ public record DataSetGetQueryTimePeriods
     {
         return new DataSetQueryCriteriaTimePeriods
         {
-            Eq = Eq is not null ? DataSetQueryTimePeriod.FromString(Eq) : null,
-            NotEq = NotEq is not null ? DataSetQueryTimePeriod.FromString(NotEq) : null,
-            In = In?.Select(DataSetQueryTimePeriod.FromString).ToList(),
-            NotIn = NotIn?.Select(DataSetQueryTimePeriod.FromString).ToList(),
-            Gt = Gt is not null ? DataSetQueryTimePeriod.FromString(Gt) : null,
-            Gte = Gte is not null ? DataSetQueryTimePeriod.FromString(Gte) : null,
-            Lt = Lt is not null ? DataSetQueryTimePeriod.FromString(Lt) : null,
-            Lte = Lte is not null ? DataSetQueryTimePeriod.FromString(Lte) : null
+            Eq = Eq is not null ? DataSetQueryTimePeriod.Parse(Eq) : null,
+            NotEq = NotEq is not null ? DataSetQueryTimePeriod.Parse(NotEq) : null,
+            In = In?.Select(DataSetQueryTimePeriod.Parse).ToList(),
+            NotIn = NotIn?.Select(DataSetQueryTimePeriod.Parse).ToList(),
+            Gt = Gt is not null ? DataSetQueryTimePeriod.Parse(Gt) : null,
+            Gte = Gte is not null ? DataSetQueryTimePeriod.Parse(Gte) : null,
+            Lt = Lt is not null ? DataSetQueryTimePeriod.Parse(Lt) : null,
+            Lte = Lte is not null ? DataSetQueryTimePeriod.Parse(Lte) : null
         };
     }
 

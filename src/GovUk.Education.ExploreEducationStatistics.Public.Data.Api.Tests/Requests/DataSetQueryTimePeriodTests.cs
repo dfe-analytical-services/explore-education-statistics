@@ -4,7 +4,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Reque
 
 public abstract class DataSetQueryTimePeriodTests
 {
-    public class FromStringTests
+    public class ParseTests
     {
         [Theory]
         [InlineData("2020", "AY")]
@@ -12,7 +12,7 @@ public abstract class DataSetQueryTimePeriodTests
         [InlineData("2020", "CY")]
         public void Success(string period, string code)
         {
-            var timePeriod = DataSetQueryTimePeriod.FromString($"{period}|{code}");
+            var timePeriod = DataSetQueryTimePeriod.Parse($"{period}|{code}");
 
             Assert.Equal(period, timePeriod.Period);
             Assert.Equal(code, timePeriod.Code);

@@ -30,7 +30,7 @@ public static partial class TimePeriodStringValidators
             }
 
             var validator = new DataSetQueryTimePeriod.Validator();
-            var result = validator.Validate(DataSetQueryTimePeriod.FromString(value));
+            var result = validator.Validate(DataSetQueryTimePeriod.Parse(value));
 
             if (result.IsValid)
             {
