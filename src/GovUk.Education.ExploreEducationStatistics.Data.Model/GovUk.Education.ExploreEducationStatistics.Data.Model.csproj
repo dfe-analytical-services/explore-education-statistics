@@ -24,8 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
-    <!-- Remove below row after removing Filter/IndicatorSequence from ReleaseSubject -->
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
   </ItemGroup>
 
 </Project>
