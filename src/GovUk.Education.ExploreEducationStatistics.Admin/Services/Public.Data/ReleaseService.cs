@@ -27,7 +27,7 @@ public class ReleaseService(
         CancellationToken cancellationToken = default)
     {
         return await CheckReleaseVersionExists(releaseVersionId, cancellationToken)
-            .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccess(userService.CheckCanViewReleaseVersion)
             .OnSuccess(async () => await GetApiDataSetCandidates(releaseVersionId));
     }
 
