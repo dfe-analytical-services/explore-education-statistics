@@ -14,12 +14,12 @@ PATH = f"{os.getcwd()}{os.sep}test-results"
 
 class SlackService:
     def __init__(self):
-        self.slack_bot_token = os.getenv("SLACK_BOT_TOKEN")
+        self.slack_app_token = os.getenv("SLACK_APP_TOKEN")
 
-        if self.slack_bot_token is None:
-            raise AssertionError(f"SLACK_BOT_TOKEN is not set")
+        if self.slack_app_token is None:
+            raise AssertionError(f"SLACK_APP_TOKEN is not set")
 
-        self.client = WebClient(token=self.slack_bot_token)
+        self.client = WebClient(token=self.slack_app_token)
 
     def _build_test_results_attachments(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
