@@ -41,7 +41,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-alerts-slackapptoken
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -51,8 +51,7 @@ jobs:
       arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --noinvite-pass "test" --pendinginvite-pass "test" --env "dev" --file "tests/general_public/" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
-      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+      SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -93,7 +92,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -105,8 +104,7 @@ jobs:
     #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
-      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+      SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -146,7 +144,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -157,8 +155,7 @@ jobs:
       arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/admin" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
-      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+      SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -199,7 +196,7 @@ jobs:
     inputs:
       azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-NOINVITE-PASSWORD,ees-test-PENDINGINVITE-PASSWORD,ees-alerts-slackapptoken
       RunAsPreJob: true
 
   - task: PythonScript@0
@@ -209,8 +206,7 @@ jobs:
       arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --noinvite-pass '"$(ees-test-NOINVITE-PASSWORD)"' --pendinginvite-pass '"$(ees-test-PENDINGINVITE-PASSWORD)"' --env "dev" --file "tests/admin_and_public" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
-      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+      SLACK_APP_TOKEN: $(ees-alerts-slackapptoken)
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
