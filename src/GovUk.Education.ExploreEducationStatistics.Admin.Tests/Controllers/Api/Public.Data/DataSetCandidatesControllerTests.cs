@@ -11,15 +11,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.WebUtilities;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Public.Data;
 
-public class ReleasesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public class DataSetCandidatesControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    private const string BaseUrl = "api/public-data/releases";
+    private const string BaseUrl = "api/public-data/data-set-candidates";
 
     public class ListApiDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
@@ -196,7 +197,12 @@ public class ReleasesControllerTests(TestApplicationFactory testApp) : Integrati
                 .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllReleases)))
                 .CreateClient();
 
-            var uri = new Uri($"{BaseUrl}/{releaseVersionId}/data-set-candidates", UriKind.Relative);
+            var query = new Dictionary<string, string?>
+            {
+                { "releaseVersionId", releaseVersionId.ToString() },
+            };
+
+            var uri = QueryHelpers.AddQueryString(BaseUrl, query);
 
             return await client.GetAsync(uri);
         }

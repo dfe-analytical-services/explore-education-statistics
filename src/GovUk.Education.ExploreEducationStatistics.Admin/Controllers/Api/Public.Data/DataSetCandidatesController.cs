@@ -13,13 +13,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Publi
 
 [Authorize]
 [ApiController]
-[Route("api/public-data/releases")]
-public class ReleasesController(IReleaseService releaseService) : ControllerBase
+[Route("api/public-data/data-set-candidates")]
+public class DataSetCandidatesController(IReleaseService releaseService) : ControllerBase
 {
-    [HttpGet("{releaseVersionId:guid}/data-set-candidates")]
+    [HttpGet]
     [Produces("application/json")]
     public async Task<ActionResult<IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
-        Guid releaseVersionId,
+        [FromQuery] Guid releaseVersionId,
         CancellationToken cancellationToken)
     {
         return await releaseService
