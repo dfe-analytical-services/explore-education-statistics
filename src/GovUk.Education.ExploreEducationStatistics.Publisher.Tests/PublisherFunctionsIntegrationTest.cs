@@ -46,7 +46,7 @@ public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTest
     {
         return base
             .ConfigureTestHostBuilder()
-            .ConfigureHostBuilder()
+            .ConfigurePublisherHostBuilder()
             .ConfigureServices(services =>
             {
                 services.UseInMemoryDbContext<ContentDbContext>();

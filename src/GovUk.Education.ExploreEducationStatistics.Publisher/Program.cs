@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
-    .ConfigureHostBuilder()
+    .ConfigurePublisherHostBuilder()
     .Build();
 
 EnableCaching();
