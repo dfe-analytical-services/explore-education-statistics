@@ -24,7 +24,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
     private readonly IRedirectsCacheService _redirectsCacheService;
-    private readonly IDataSetVersionPublishingService _dataSetVersionVersionPublishingService;
+    private readonly IDataSetPublishingService _dataSetPublishingService;
 
     public PublishingCompletionService(
         ContentDbContext contentDbContext,
@@ -36,7 +36,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         IReleaseVersionRepository releaseVersionRepository,
         IReleaseService releaseService,
         IRedirectsCacheService redirectsCacheService,
-        IDataSetVersionPublishingService dataSetVersionVersionPublishingService)
+        IDataSetPublishingService dataSetPublishingService)
     {
         _contentDbContext = contentDbContext;
         _contentService = contentService;
@@ -47,7 +47,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _releaseVersionRepository = releaseVersionRepository;
         _releaseService = releaseService;
         _redirectsCacheService = redirectsCacheService;
-        _dataSetVersionVersionPublishingService = dataSetVersionVersionPublishingService;
+        _dataSetPublishingService = dataSetPublishingService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -149,7 +149,7 @@ public class PublishingCompletionService : IPublishingCompletionService
 
         await _redirectsCacheService.UpdateRedirects();
 
-        await _dataSetVersionVersionPublishingService.PublishDataSetVersions(releaseVersionIdsToUpdate);
+        await _dataSetPublishingService.PublishDataSets(releaseVersionIdsToUpdate);
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()

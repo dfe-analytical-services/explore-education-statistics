@@ -11,19 +11,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
-public class DataSetVersionPublishingService(
+public class DataSetPublishingService(
     ContentDbContext contentDbContext,
     PublicDataDbContext publicDataDbContext
-    ) : IDataSetVersionPublishingService
+    ) : IDataSetPublishingService
 {
-    public async Task PublishDataSetVersions(IEnumerable<Guid> releaseVersionIds)
+    public async Task PublishDataSets(IEnumerable<Guid> releaseVersionIds)
     {
+        // Find all Data Files associated with the given ReleaseVersions.
         var dataFileIds = await contentDbContext
             .ReleaseFiles
             .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
             .Select(rf => rf.FileId)
             .ToListAsync();
 
+        // Find all DataSets whose current Draft DataSetVersions reference any of the Release Versions' Data Files. 
         var releaseVersionDataSets = await publicDataDbContext
             .DataSets
             .AsNoTracking()
@@ -33,6 +35,8 @@ public class DataSetVersionPublishingService(
                               && dataFileIds.Contains(dataSet.LatestDraftVersion.CsvFileId))
             .ToListAsync();
 
+        // For each DataSet due to have a Draft DataSetVersion go live with the given Release Versions, publish the
+        // Draft version, and ensure that the overarching DataSet is also published.
         releaseVersionDataSets
             .ForEach(dataSet => 
             {
@@ -40,12 +44,8 @@ public class DataSetVersionPublishingService(
                 currentDraftVersion!.Status = DataSetVersionStatus.Published;
                 currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
-                var currentLiveVersion = dataSet.LatestLiveVersion;
-                if (currentLiveVersion != null)
-                {
-                    currentLiveVersion.Status = DataSetVersionStatus.Deprecated;
-                }
-                
+                // Mark the overarching DataSet as Published, and set a Published date if one has not previously been
+                // set.
                 dataSet.Status = DataSetStatus.Published;
                 dataSet.Published ??= currentDraftVersion.Published;
                 
@@ -58,11 +58,6 @@ public class DataSetVersionPublishingService(
                 
                 publicDataDbContext.DataSets.Update(dataSet);
                 publicDataDbContext.DataSetVersions.Update(currentDraftVersion);
-
-                if (currentLiveVersion != null)
-                {
-                    publicDataDbContext.DataSetVersions.Update(currentLiveVersion);
-                }
             });
         
         publicDataDbContext.DataSets.UpdateRange(releaseVersionDataSets);

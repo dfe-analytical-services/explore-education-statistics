@@ -38,12 +38,11 @@ using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Serv
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher;
 
-public static class HostBuilderExtensions
+public static class PublisherHostBuilderExtensions
 {
-    public static IHostBuilder ConfigureHostBuilder(this IHostBuilder hostBuilder)
+    public static IHostBuilder ConfigurePublisherHostBuilder(this IHostBuilder hostBuilder)
     {
         return hostBuilder
-            // .ConfigureFunctionsWebApplication()
             .ConfigureAppConfiguration((hostBuilderContext, configBuilder) =>
             {
                 configBuilder
@@ -124,7 +123,7 @@ public static class HostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    .AddScoped<IDataSetVersionPublishingService, DataSetVersionPublishingService>()
+                    .AddScoped<IDataSetPublishingService, DataSetPublishingService>()
                     .Configure<AppSettingOptions>(configuration.GetSection(AppSettingOptions.AppSettings));
 
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
