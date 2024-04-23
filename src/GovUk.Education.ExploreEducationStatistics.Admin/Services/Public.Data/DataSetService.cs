@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -196,15 +197,15 @@ public class DataSetService(
             return new Dictionary<Guid, ReleaseFile>();
         }
 
+        Expression<Func<ReleaseFile, bool>> predicate =
+            dataSet.LatestDraftVersion is not null && dataSet.LatestLiveVersion is not null
+            ? rf => rf.FileId == dataSet.LatestDraftVersion.CsvFileId || rf.FileId == dataSet.LatestLiveVersion.CsvFileId
+            : dataSet.LatestDraftVersion is not null
+            ? rf => rf.FileId == dataSet.LatestDraftVersion.CsvFileId
+            : rf => rf.FileId == dataSet.LatestLiveVersion!.CsvFileId;
+
         return await contentDbContext.ReleaseFiles
-            .Where(rf => 
-                dataSet.LatestDraftVersion == null 
-                ? false 
-                : rf.FileId == dataSet.LatestDraftVersion.CsvFileId
-                || 
-                dataSet.LatestLiveVersion == null 
-                ? false 
-                : rf.FileId == dataSet.LatestLiveVersion.CsvFileId)
+            .Where(predicate)
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
             .ToDictionaryAsync(rf => rf.FileId, cancellationToken);
