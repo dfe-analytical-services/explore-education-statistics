@@ -154,7 +154,8 @@
       },
       "extends": ["plugin:@next/next/recommended"],
       "rules": {
-        "@next/next/no-img-element": "off"
+        "@next/next/no-img-element": "off",
+        "@next/next/no-html-link-for-pages": ["error", ["src/pages", "src/explore-education-statistics-frontend/src/pages"]]
       }
     }
   ]
