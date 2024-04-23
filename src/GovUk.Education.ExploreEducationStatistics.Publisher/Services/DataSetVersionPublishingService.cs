@@ -24,40 +24,48 @@ public class DataSetVersionPublishingService(
             .Select(rf => rf.FileId)
             .ToListAsync();
 
-        var dataSetVersionsToPublish = await publicDataDbContext
-            .DataSetVersions
+        var releaseVersionDataSets = await publicDataDbContext
+            .DataSets
             .AsNoTracking()
-            .Where(dataSetVersion => dataFileIds.Contains(dataSetVersion.CsvFileId))
-            .Include(dataSetVersion => dataSetVersion.DataSet)
-            .ThenInclude(dataSet => dataSet.LatestLiveVersion)
+            .Include(dataSet => dataSet.LatestLiveVersion)
+            .Include(dataSet => dataSet.LatestDraftVersion)
+            .Where(dataSet => dataSet.LatestDraftVersion != null
+                              && dataFileIds.Contains(dataSet.LatestDraftVersion.CsvFileId))
             .ToListAsync();
 
-        dataSetVersionsToPublish.ForEach(dataSetVersion =>
-        {
-            var dataSet = dataSetVersion.DataSet;
-            var currentLiveVersion = dataSet.LatestLiveVersion;
+        releaseVersionDataSets
+            .ForEach(dataSet => 
+            {
+                var currentDraftVersion = dataSet.LatestDraftVersion;
+                currentDraftVersion!.Status = DataSetVersionStatus.Published;
+                currentDraftVersion.Published = DateTimeOffset.UtcNow;
 
-            dataSet.Status = DataSetStatus.Published;
-            dataSetVersion.Status = DataSetVersionStatus.Published;
-            if (currentLiveVersion != null)
-            {
-                currentLiveVersion.Status = DataSetVersionStatus.Deprecated;
-            }
-            
-            dataSetVersion.Published = DateTimeOffset.UtcNow;
-            if (currentLiveVersion == null)
-            {
-                dataSet.Published = dataSetVersion.Published;
-            }
-            
-            // Set the newly published DataSetVersion as the overarching DataSet's LatestLiveVersion,
-            // and unset it from being the latest Draft version.
-            dataSet.LatestLiveVersionId = dataSetVersion.Id;
-            dataSet.LatestDraftVersionId = null;
-        });
+                var currentLiveVersion = dataSet.LatestLiveVersion;
+                if (currentLiveVersion != null)
+                {
+                    currentLiveVersion.Status = DataSetVersionStatus.Deprecated;
+                }
+                
+                dataSet.Status = DataSetStatus.Published;
+                dataSet.Published ??= currentDraftVersion.Published;
+                
+                // Set the newly published DataSetVersion as the overarching DataSet's LatestLiveVersion,
+                // and unset it from being the latest Draft version.
+                dataSet.LatestLiveVersion = currentDraftVersion;
+                dataSet.LatestLiveVersionId = currentDraftVersion.Id;
+                dataSet.LatestDraftVersion = null;
+                dataSet.LatestDraftVersionId = null;
+                
+                publicDataDbContext.DataSets.Update(dataSet);
+                publicDataDbContext.DataSetVersions.Update(currentDraftVersion);
+
+                if (currentLiveVersion != null)
+                {
+                    publicDataDbContext.DataSetVersions.Update(currentLiveVersion);
+                }
+            });
         
-        publicDataDbContext.DataSetVersions.UpdateRange(dataSetVersionsToPublish);
-        publicDataDbContext.DataSets.UpdateRange(dataSetVersionsToPublish.Select(dsv => dsv.DataSet));
+        publicDataDbContext.DataSets.UpdateRange(releaseVersionDataSets);
 
         await publicDataDbContext.SaveChangesAsync();
     }
