@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -22,7 +21,7 @@ public class ReleasesControllerTests(TestApplicationFactory testApp) : Integrati
 {
     private const string BaseUrl = "api/public-data/releases";
 
-    public class GetDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
+    public class ListApiDataSetCandidatesTests(TestApplicationFactory testApp) : DataSetsControllerTests(testApp)
     {
         [Fact]
         public async Task Success()
@@ -53,8 +52,8 @@ public class ReleasesControllerTests(TestApplicationFactory testApp) : Integrati
             Assert.NotNull(content);
             Assert.NotEmpty(content);
             Assert.Equal(3, content.Count);
-            Assert.All(content, apiDataSetCandidate =>
-                releaseFiles.Any(rf => rf.FileId == apiDataSetCandidate.FileId && rf.Name == apiDataSetCandidate.Title));
+            Assert.All(releaseFiles, releaseFile =>
+                content.Any(apiDataSetCandidate => apiDataSetCandidate.FileId == releaseFile.FileId && apiDataSetCandidate.Title == releaseFile.Name));
         }
 
         [Theory]
@@ -68,8 +67,13 @@ public class ReleasesControllerTests(TestApplicationFactory testApp) : Integrati
 
             await TestApp.AddTestData<ContentDbContext>(context => context.ReleaseVersions.Add(releaseVersion));
 
+            var authenticatedUser =
+                claimType.HasValue
+                ? AuthenticatedUser(SecurityClaim(claimType.Value))
+                : AuthenticatedUser();
+
             var client = TestApp
-                .SetUser(UserWithClaim(claimType))
+                .SetUser(authenticatedUser)
                 .CreateClient();
 
             var response = await GetDataSetCandidates(releaseVersion.Id, client);
@@ -189,25 +193,12 @@ public class ReleasesControllerTests(TestApplicationFactory testApp) : Integrati
             HttpClient? client = null)
         {
             client ??= TestApp
-                .SetUser(UserWithClaim(SecurityClaimTypes.AccessAllReleases))
+                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllReleases)))
                 .CreateClient();
 
             var uri = new Uri($"{BaseUrl}/{releaseVersionId}/data-set-candidates", UriKind.Relative);
 
             return await client.GetAsync(uri);
-        }
-
-        private static ClaimsPrincipal UserWithClaim(SecurityClaimTypes? claimType = null)
-        {
-            var claimsPrincipal = AuthenticatedUser();
-            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
-
-            if (claimType.HasValue)
-            {
-                claimsIdentity.AddClaim(SecurityClaim(claimType.Value));
-            }
-
-            return claimsPrincipal;
         }
     }
 }

@@ -1,6 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +18,12 @@ public class ReleasesController(IReleaseService releaseService) : ControllerBase
 {
     [HttpGet("{releaseVersionId:guid}/data-set-candidates")]
     [Produces("application/json")]
-    public async Task<ActionResult<IReadOnlyList<ApiDataSetCandidateViewModel>>> GetDataSetCandidates(
+    public async Task<ActionResult<IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
         Guid releaseVersionId,
         CancellationToken cancellationToken)
     {
         return await releaseService
-            .GetApiDataSetCandidates(releaseVersionId, cancellationToken)
+            .ListApiDataSetCandidates(releaseVersionId, cancellationToken)
             .HandleFailuresOrOk();
     }
 }

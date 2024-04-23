@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -22,7 +22,7 @@ public class ReleaseService(
     IUserService userService)
     : IReleaseService
 {
-    public async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> GetApiDataSetCandidates(
+    public async Task<Either<ActionResult, IReadOnlyList<ApiDataSetCandidateViewModel>>> ListApiDataSetCandidates(
         Guid releaseVersionId,
         CancellationToken cancellationToken = default)
     {
@@ -33,7 +33,7 @@ public class ReleaseService(
 
     private async Task<Either<ActionResult, ReleaseVersion>> CheckReleaseVersionExists(
         Guid releaseVersionId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken)
     {
         return await contentDbContext.ReleaseVersions
             .AsNoTracking()
@@ -44,7 +44,6 @@ public class ReleaseService(
     {
         return await contentDbContext.ReleaseFiles
             .AsNoTracking()
-            .Include(rf => rf.File)
             .Where(rf => rf.ReleaseVersionId == releaseVersionId)
             .Where(rf => rf.File.Type == FileType.Data)
             .Where(rf => rf.File.PublicDataSetVersionId == null)
@@ -53,7 +52,7 @@ public class ReleaseService(
             .Select(rf => new ApiDataSetCandidateViewModel
             {
                 FileId = rf.FileId,
-                Title = rf.Name,
+                Title = rf.Name!,
             })
             .OrderBy(rf => rf.Title)
             .ToListAsync();

@@ -1,6 +1,7 @@
+#nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Public.Data;
 
 public record ApiDataSetCandidateViewModel
 {
