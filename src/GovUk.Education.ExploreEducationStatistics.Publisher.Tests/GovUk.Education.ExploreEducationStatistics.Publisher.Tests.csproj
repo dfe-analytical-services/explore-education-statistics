@@ -34,8 +34,4 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests\GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Functions\" />
-    </ItemGroup>
-
 </Project>
