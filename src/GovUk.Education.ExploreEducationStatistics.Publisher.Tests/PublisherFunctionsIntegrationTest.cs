@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,54 +16,22 @@ using Xunit;
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests;
 
 [Collection(CacheTestFixture.CollectionName)]
-public class FunctionsIntegrationTest : 
-    CacheServiceTestFixture,
-    IClassFixture<FunctionsIntegrationTestFixture>,
-    IClassFixture<CacheTestFixture>
+public class PublisherFunctionsIntegrationTest : FunctionsIntegrationTest<PublisherFunctionsIntegrationTestFixture>
 {
-    protected readonly DataFixture DataFixture = new();
-    private readonly IHost _host;
-    
-    protected FunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture)
+    protected PublisherFunctionsIntegrationTest(FunctionsIntegrationTestFixture fixture) : base(fixture)
     {
-        _host = fixture.Host;
-    }
-
-    protected async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
-    {
-        await using var context = GetDbContext<TDbContext>();
-
-        supplier.Invoke(context);
-        await context.SaveChangesAsync();
-    }
-
-    protected async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext
-    {
-        await using var context = GetDbContext<TDbContext>();
-        await context.Database.EnsureDeletedAsync();
-    }
-
-    protected TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
-    {
-        var scope = _host.Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<TDbContext>();
-    }
-
-    protected TService GetRequiredService<TService>()
-    {
-        return _host.Services.GetRequiredService<TService>();
+        ResetDbContext<ContentDbContext>();
+        ClearTestData<PublicDataDbContext>();
     }
 }
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class FunctionsIntegrationTestFixture : IAsyncLifetime
+public class PublisherFunctionsIntegrationTestFixture : FunctionsIntegrationTestFixture, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
 
-    internal IHost Host;
-    
     public async Task DisposeAsync()
     {
         await _postgreSqlContainer.DisposeAsync();
@@ -70,15 +40,12 @@ public class FunctionsIntegrationTestFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _postgreSqlContainer.StartAsync();
-        Host = ConfigureHost();
     }
     
-    private IHost ConfigureHost()
+    public override IHostBuilder ConfigureTestHostBuilder()
     {
-        return new HostBuilder()
-            .ConfigureAppConfiguration((hostContext, _) => 
-                hostContext.HostingEnvironment.EnvironmentName = HostEnvironmentExtensions.IntegrationTestEnvironment
-            )
+        return base
+            .ConfigureTestHostBuilder()
             .ConfigureHostBuilder()
             .ConfigureServices(services =>
             {
@@ -93,7 +60,21 @@ public class FunctionsIntegrationTestFixture : IAsyncLifetime
 
                 using var context = serviceScope.ServiceProvider.GetRequiredService<PublicDataDbContext>();
                 context.Database.Migrate();
-            })
-            .Build();
+            });
+    }
+
+    protected override IEnumerable<Type> GetFunctionTypes()
+    {
+        return [
+            typeof(NotifyChangeFunction),
+            typeof(PublishImmediateReleaseContentFunction),
+            typeof(PublishMethodologyFilesFunction),
+            typeof(PublishReleaseFilesFunction),
+            typeof(PublishScheduledReleasesFunction),
+            typeof(PublishTaxonomyFunction),
+            typeof(RetryReleasePublishingFunction),
+            typeof(StageReleaseContentFunction),
+            typeof(StageScheduledReleasesFunction)
+        ];
     }
 }
