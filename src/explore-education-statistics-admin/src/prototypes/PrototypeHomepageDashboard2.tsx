@@ -198,7 +198,7 @@ const PrototypeHomepage = () => {
               </p>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
                 <a href="https://www.gov.uk/school-performance-tables">
-                  Find and compare schools in England
+                  Compare school and college performance
                 </a>
               </h3>
               <p className="govuk-caption-m govuk-!-margin-top-1">
