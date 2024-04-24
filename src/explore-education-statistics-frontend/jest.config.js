@@ -17,16 +17,11 @@ const config = {
     url: 'http://localhost/',
   },
   transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest',
     '^.+\\.css$':
       '<rootDir>/../explore-education-statistics-common/test/cssTransform.js',
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)':
       '<rootDir>/../explore-education-statistics-common/test/fileTransform.js',
   },
-  transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
-    '^.+\\.module\\.(css|sass|scss)$',
-  ],
   moduleNameMapper: {
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     '^@frontend/(.*)$': '<rootDir>/src/$1',
