@@ -27,6 +27,7 @@ const Link = ({
 }: LinkProps) => {
   return (
     <RouterLink
+      {...props}
       href={to}
       prefetch={prefetch}
       scroll={scroll}
@@ -39,7 +40,6 @@ const Link = ({
         className,
       )}
       data-testid={testId}
-      {...props}
     >
       {children}
     </RouterLink>

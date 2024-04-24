@@ -21,9 +21,9 @@ const ButtonLink = ({
 }: Props) => {
   return (
     <Link
+      {...props}
       href={to}
       prefetch={prefetch}
-      {...props}
       className={classNames(
         'govuk-button',
         {
