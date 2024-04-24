@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
@@ -464,7 +463,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             HttpClient? client = null)
         {
             client ??= TestApp
-                .SetUser(UserWithAccessAllPublicationsClaim())
+                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.AccessAllPublications)))
                 .CreateClient();
 
             var queryParams = new Dictionary<string, string?>
@@ -483,14 +482,6 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
             var uri = QueryHelpers.AddQueryString(BaseUrl, queryParams);
 
             return await client.GetAsync(uri);
-        }
-
-        private static ClaimsPrincipal UserWithAccessAllPublicationsClaim()
-        {
-            var claimsPrincipal = AuthenticatedUser();
-            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
-            claimsIdentity.AddClaim(SecurityClaim(SecurityClaimTypes.AccessAllPublications));
-            return claimsPrincipal;
         }
     }
 }

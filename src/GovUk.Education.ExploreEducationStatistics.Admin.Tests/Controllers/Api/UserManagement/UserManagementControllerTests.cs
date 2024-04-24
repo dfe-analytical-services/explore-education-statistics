@@ -19,10 +19,9 @@ public class UserManagementControllerTests(TestApplicationFactory testApp) : Int
             string globalRoleName,
             bool successExpected)
         {
-            var claimsPrincipal = ClaimsPrincipalUtils.AuthenticatedUser();
-            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
-            claimsIdentity.AddClaim(ClaimsPrincipalUtils.RoleClaim(globalRoleName));
-            claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, "user@education.gov.uk"));
+            var claimsPrincipal = ClaimsPrincipalUtils.AuthenticatedUser(
+                ClaimsPrincipalUtils.RoleClaim(globalRoleName),
+                new Claim(ClaimTypes.Email, "user@education.gov.uk"));
 
             var client = TestApp
                 .SetUser(claimsPrincipal)

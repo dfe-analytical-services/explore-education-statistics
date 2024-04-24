@@ -1,7 +1,6 @@
 #nullable enable
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -172,18 +171,10 @@ public class PublicationControllerTests(TestApplicationFactory testApp) : Integr
             HttpClient? client = null)
         {
             client ??= TestApp
-                .SetUser(UserWithCreateAnyPublicationClaim())
+                .SetUser(AuthenticatedUser(SecurityClaim(SecurityClaimTypes.CreateAnyPublication)))
                 .CreateClient();
 
             return await client.PostAsJsonAsync("api/publications", request);
-        }
-
-        private static ClaimsPrincipal UserWithCreateAnyPublicationClaim()
-        {
-            var claimsPrincipal = AuthenticatedUser();
-            var claimsIdentity = (claimsPrincipal.Identity as ClaimsIdentity)!;
-            claimsIdentity.AddClaim(SecurityClaim(SecurityClaimTypes.CreateAnyPublication));
-            return claimsPrincipal;
         }
     }
 }
