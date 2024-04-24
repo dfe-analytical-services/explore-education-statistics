@@ -22,7 +22,6 @@ import getDataSetCategoryConfigs, {
   DataSetCategoryConfig,
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import { GeoJsonFeatureProperties } from '@common/services/tableBuilderService';
-
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
