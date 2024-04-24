@@ -2,7 +2,7 @@ import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import DynamicDataBlockTabs from '@frontend/modules/find-statistics/components/DynamicDataBlockTabs';
+import DynamicDataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
