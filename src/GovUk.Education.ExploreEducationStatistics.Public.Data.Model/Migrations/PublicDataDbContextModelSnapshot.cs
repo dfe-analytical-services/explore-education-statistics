@@ -197,9 +197,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CsvFileId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("DataSetId")
                         .HasColumnType("uuid");
 
@@ -209,6 +206,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Property<DateTimeOffset?>("Published")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReleaseFileId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -232,6 +232,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetId");
+
+                    b.HasIndex("ReleaseFileId");
 
                     b.ToTable("DataSetVersions");
                 });
