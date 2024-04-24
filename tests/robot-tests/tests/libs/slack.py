@@ -15,6 +15,7 @@ PATH = f"{os.getcwd()}{os.sep}test-results"
 class SlackService:
     def __init__(self):
         self.slack_app_token = os.getenv("SLACK_APP_TOKEN")
+        self.slack_channel = "C070FUXS3GC" # ui-test-reports
 
         if self.slack_app_token is None:
             raise AssertionError(f"SLACK_APP_TOKEN is not set")
@@ -95,7 +96,7 @@ class SlackService:
     def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         attachments = self._build_test_results_attachments(env, suites_ran, suites_failed, run_index)
 
-        response = self.client.chat_postMessage(channel="CGNHH80CV", text="All results", blocks=attachments)
+        response = self.client.chat_postMessage(channel=self.slack_channel, text="All results", blocks=attachments)
 
         if suites_failed:
             date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
@@ -105,7 +106,7 @@ class SlackService:
             shutil.make_archive(report_name.replace(".zip", ""), "zip", PATH)
             try:
                 self.client.files_upload_v2(
-                    channel="CGNHH80CV", file=report_name, title=report_name, thread_ts=response.data["ts"]
+                    channel=self.slack_channel, file=report_name, title=report_name, thread_ts=response.data["ts"]
                 )
             except SlackApiError as e:
                 logger.error(f"Error uploading test report: {e}")
@@ -120,7 +121,7 @@ class SlackService:
         attachments = self._build_exception_details_attachments(env, suites_ran, run_index, ex)
 
         response = self.client.chat_postMessage(
-            text=":x: UI test pipeline failure", channel="CGNHH80CV", blocks=attachments
+            text=":x: UI test pipeline failure", channel=self.slack_channel, blocks=attachments
         )
 
         assert response.status_code == 200, logger.warn(f"Response wasn't 200, it was {response}")
