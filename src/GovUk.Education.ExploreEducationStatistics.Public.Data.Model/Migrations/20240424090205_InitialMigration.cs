@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -568,7 +568,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "LatestLiveVersionId",
                 principalTable: "DataSetVersions",
                 principalColumn: "Id");
-
 
             // Grant permissions on database tables created by this resource's database user to the
             // Admin App Service and Data Processor Function App users.
