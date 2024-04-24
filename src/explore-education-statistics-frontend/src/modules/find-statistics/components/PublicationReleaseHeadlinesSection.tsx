@@ -1,7 +1,7 @@
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import DynamicDataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
+import DataBlockTabs from '@frontend/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
@@ -79,7 +79,7 @@ const PublicationReleaseHeadlinesSection = ({
   }
 
   return (
-    <DynamicDataBlockTabs
+    <DataBlockTabs
       id="releaseHeadlines"
       releaseId={releaseId}
       getInfographic={getReleaseFile}
