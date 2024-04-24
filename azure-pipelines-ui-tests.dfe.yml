@@ -1,7 +1,7 @@
 variables:
   SPN_NAME: s101d-datahub-spn-ees-dfe-gov-uk
 schedules:
-- cron: 0 5,7,19 * * 1,2,3,4,5
+- cron: 0 6 * * 1,2,3,4,5
   branches:
     include:
     - dev
