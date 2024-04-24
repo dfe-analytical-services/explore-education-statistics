@@ -17,7 +17,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required DataSetVersionStatus Status { get; set; }
 
-    public required Guid CsvFileId { get; set; }
+    public required Guid ReleaseFileId { get; set; }
 
     public required int VersionMajor { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    CsvFileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReleaseFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -569,6 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 principalTable: "DataSetVersions",
                 principalColumn: "Id");
 
+
             // Grant permissions on database tables created by this resource's database user to the
             // Admin App Service and Data Processor Function App users.
             var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
@@ -577,7 +578,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
             }
-
             var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
             if (dataProcessorFunctionAppIdentityName != null)
             {
