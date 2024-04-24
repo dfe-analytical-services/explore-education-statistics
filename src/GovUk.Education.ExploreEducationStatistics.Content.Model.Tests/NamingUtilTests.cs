@@ -1,37 +1,36 @@
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests;
+
+public abstract class NamingUtilTests
 {
-    public class NamingUtilTests
+    public class SlugFromTitleTests
     {
-        
         [Fact]
-        public void ReleaseSlugFromTitle_CalendarYear()
+        public void CalendarYearTitle()
         {
-            var slug = SlugFromTitle("calendar year 2019");
-            Assert.Equal("calendar-year-2019", slug);
+            Assert.Equal("calendar-year-2019", SlugFromTitle("calendar year 2019"));
         }
-        
+
         [Fact]
-        public void ReleaseSlugFromTitle_NonCalendarYear()
+        public void NonCalendarYearTitle()
         {
-            var slug = SlugFromTitle("tax year 2019/20");
-            Assert.Equal("tax-year-2019-20", slug);
+            Assert.Equal("tax-year-2019-20", SlugFromTitle("tax year 2019/20"));
         }
-        
-        
-        [Fact]
-        public void GenerateSlugFromTitle()
+
+        [Theory]
+        [InlineData("title", "title")]
+        [InlineData("TITLE", "title")]
+        [InlineData("A sentence with spaces", "a-sentence-with-spaces")]
+        [InlineData("A - sentence -  with - - dashes  -  and -- spaces", "a-sentence-with-dashes-and-spaces")]
+        [InlineData("A sentence with !@£('\\) non alpha numeric characters", "a-sentence-with-non-alpha-numeric-characters")]
+        [InlineData("A sentence with non alpha numeric characters at the end !@£('\\)", "a-sentence-with-non-alpha-numeric-characters-at-the-end")]
+        [InlineData("a sentence with      big     spaces   ", "a-sentence-with-big-spaces")]
+        [InlineData("a sentence with numbers 1 2 3 and 4", "a-sentence-with-numbers-1-2-3-and-4")]
+        public void EdgeCaseTitles(string title, string expectedSlug)
         {
-            Assert.Equal("title", SlugFromTitle("title"));
-            Assert.Equal("title", SlugFromTitle("TITLE"));
-            Assert.Equal("a-sentence-with-spaces",SlugFromTitle("A sentence with spaces"));
-            Assert.Equal("a-sentence-with-non-alpha-numeric-characters",SlugFromTitle("A sentence with !@£('\\) non alpha numeric characters"));
-            Assert.Equal("a-sentence-with-non-alpha-numeric-characters-at-the-end", SlugFromTitle("A sentence with non alpha numeric characters at the end !@£('\\)"));
-            Assert.Equal("a-sentence-with-big-spaces", SlugFromTitle("a sentence with      big     spaces   "));
-            Assert.Equal("a-sentence-with-numbers-1-2-3-and-4", SlugFromTitle("a sentence with numbers 1 2 3 and 4"));
+            Assert.Equal(expectedSlug, SlugFromTitle(title));
         }
-        
     }
 }
