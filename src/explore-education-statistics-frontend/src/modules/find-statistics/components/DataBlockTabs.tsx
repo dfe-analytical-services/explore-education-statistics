@@ -2,7 +2,7 @@ import { DataBlockTabsProps } from '@common/modules/find-statistics/components/D
 import dynamic from 'next/dynamic';
 import React, { memo } from 'react';
 
-const DataBlockTabInternal = dynamic(
+const DataBlockTabsInternal = dynamic(
   () => import('@common/modules/find-statistics/components/DataBlockTabs'),
   {
     ssr: false,
@@ -15,7 +15,7 @@ const DataBlockTabInternal = dynamic(
  * trying to initialise server-side (causing undefined `window` errors).
  */
 const DataBlockTabs = (props: DataBlockTabsProps) => {
-  return <DataBlockTabInternal {...props} />;
+  return <DataBlockTabsInternal {...props} />;
 };
 
 export default memo(DataBlockTabs);
