@@ -2,11 +2,6 @@ import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { Link as RouterLink, LinkProps } from 'react-router-dom';
 
-import {
-  SetCommonButtonLink,
-  ButtonLinkType,
-} from '@common/components/ButtonLink';
-
 type Props = {
   children: ReactNode;
   className?: string;
@@ -32,6 +27,5 @@ const ButtonLink = ({ children, className, to, variant, ...props }: Props) => {
   );
 };
 
-SetCommonButtonLink(ButtonLink as ButtonLinkType);
 
 export default ButtonLink;
