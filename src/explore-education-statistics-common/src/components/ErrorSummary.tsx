@@ -1,4 +1,3 @@
-import ErrorPrefixPageTitle from '@common/components/ErrorPrefixPageTitle';
 import classNames from 'classnames';
 import React, {
   forwardRef,
@@ -26,6 +25,14 @@ export const BaseErrorSummary = forwardRef<
 >((props, ref) => {
   const { children, testId = 'errorSummary', title, visuallyHidden } = props;
 
+  useEffect(() => {
+    document.title = `ERROR: ${document.title.replace(/ERROR: /g, '')}`;
+
+    return () => {
+      document.title = document.title.replace(/ERROR: /g, '');
+    };
+  }, []);
+
   return (
     <div
       className={classNames('govuk-error-summary', {
@@ -37,9 +44,6 @@ export const BaseErrorSummary = forwardRef<
     >
       <div role="alert">
         <h2 className="govuk-error-summary__title">{title}</h2>
-
-        <ErrorPrefixPageTitle />
-
         <div className="govuk-error-summary__body">{children}</div>
       </div>
     </div>
