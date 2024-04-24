@@ -577,6 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 migrationBuilder.Sql(
                     $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
             }
+
             var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
             if (dataProcessorFunctionAppIdentityName != null)
             {
