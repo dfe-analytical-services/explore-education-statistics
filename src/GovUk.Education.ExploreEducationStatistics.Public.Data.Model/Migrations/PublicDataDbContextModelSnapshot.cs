@@ -233,6 +233,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasIndex("DataSetId");
 
+                    b.HasIndex("ReleaseFileId");
+
                     b.ToTable("DataSetVersions");
                 });
 

@@ -417,6 +417,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersions_ReleaseFileId",
+                table: "DataSetVersions",
+                column: "ReleaseFileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FilterMetas_DataSetVersionId_PublicId",
                 table: "FilterMetas",
                 columns: new[] { "DataSetVersionId", "PublicId" },

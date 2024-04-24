@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240424090205_InitialMigration")]
+    [Migration("20240424123603_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -235,6 +235,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetId");
+
+                    b.HasIndex("ReleaseFileId");
 
                     b.ToTable("DataSetVersions");
                 });

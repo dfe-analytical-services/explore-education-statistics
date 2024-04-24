@@ -102,6 +102,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
             });
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();
+
+            builder.HasIndex(dsv => dsv.ReleaseFileId);
         }
     }
 }
