@@ -17,7 +17,7 @@ import React from 'react';
 // It's stubbed out in the mocks folder.
 // Tests are skipped or partially commented out when they
 // are testing the maps directly.
-describe('MapBlockInternal', () => {
+describe('MapBlock', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
