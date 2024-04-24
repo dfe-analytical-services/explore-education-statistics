@@ -513,6 +513,7 @@ Add text block with link to a featured table to accordion section
     user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert featured table link
     user clicks button    Save & close    ${block}
+    sleep    0.5
     user waits until element contains link    ${block}    Test highlight name 2
 
 Add public prerelease access list again

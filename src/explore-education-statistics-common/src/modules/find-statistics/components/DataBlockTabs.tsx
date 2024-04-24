@@ -169,5 +169,7 @@ const DataBlockTabs = ({
 
 export default withLazyLoad(DataBlockTabs, {
   offset: 100,
-  placeholder: ({ dataBlock }) => <span data-testid={testId(dataBlock)} />,
+  placeholder: ({ dataBlock, id }) => (
+    <span id={id} data-testid={testId(dataBlock)} />
+  ),
 });

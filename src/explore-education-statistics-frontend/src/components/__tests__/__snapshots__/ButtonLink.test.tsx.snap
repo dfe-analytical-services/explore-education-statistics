@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ButtonLink renders correctly with required props 1`] = `
-<a href="/"
-   class="govuk-button"
+<a class="govuk-button"
+   href="/"
 >
   Test button
 </a>

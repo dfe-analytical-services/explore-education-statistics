@@ -11,9 +11,6 @@ module.exports = {
   sourceMaps: true,
   env: {
     test: {
-      plugins: [
-        'explore-education-statistics-common/babel-url-import-meta-plugin.js',
-      ],
       presets: [
         [
           '@babel/preset-react',

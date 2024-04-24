@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
-describe('MapBlockInternal', () => {
+describe('MapControls', () => {
   const testIndicator1 = new Indicator({
     label: 'Indicator 1',
     name: 'indicator-1-name',

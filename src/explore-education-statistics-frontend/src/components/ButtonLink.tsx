@@ -1,10 +1,6 @@
 import classNames from 'classnames';
 import Link from 'next/link';
 import React from 'react';
-import {
-  SetCommonButtonLink,
-  ButtonLinkType,
-} from '@common/components/ButtonLink';
 import { LinkProps } from './Link';
 
 type Props = {
@@ -19,13 +15,11 @@ const ButtonLink = ({
   variant,
   ...props
 }: Props) => {
-  const isAbsolute = typeof to === 'string' && to.startsWith('http');
-
-  const link = (
-    <a
-      // eslint-disable-next-line react/jsx-props-no-spreading
+  return (
+    <Link
       {...props}
-      href={isAbsolute ? (to as string) : undefined}
+      href={to}
+      prefetch={prefetch}
       className={classNames(
         'govuk-button',
         {
@@ -36,20 +30,8 @@ const ButtonLink = ({
       )}
     >
       {children}
-    </a>
-  );
-
-  if (isAbsolute) {
-    return link;
-  }
-
-  return (
-    <Link {...props} prefetch={prefetch} href={to} passHref>
-      {link}
     </Link>
   );
 };
-
-SetCommonButtonLink(ButtonLink as ButtonLinkType);
 
 export default ButtonLink;

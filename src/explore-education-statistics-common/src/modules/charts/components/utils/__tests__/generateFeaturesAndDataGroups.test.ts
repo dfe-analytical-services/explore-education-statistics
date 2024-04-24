@@ -3,7 +3,7 @@ import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { MapDataSetCategory } from '@common/modules/charts/components/utils/createMapDataSetCategories';
 import { DataSetCategoryConfig } from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
-import { MapFeatureCollection } from '@common/modules/charts/components/MapBlockInternal';
+import { MapFeatureCollection } from '@common/modules/charts/components/MapBlock';
 import { LegendDataGroup } from '@common/modules/charts/components/utils/generateLegendDataGroups';
 import {
   testLocation1,

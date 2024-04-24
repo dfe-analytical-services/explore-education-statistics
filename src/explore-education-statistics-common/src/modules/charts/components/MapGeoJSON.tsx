@@ -6,7 +6,7 @@ import {
   MapFeature,
   MapFeatureCollection,
   MapFeatureProperties,
-} from '@common/modules/charts/components/MapBlockInternal';
+} from '@common/modules/charts/components/MapBlock';
 
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
