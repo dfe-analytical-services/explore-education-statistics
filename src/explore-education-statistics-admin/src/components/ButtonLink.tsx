@@ -27,5 +27,4 @@ const ButtonLink = ({ children, className, to, variant, ...props }: Props) => {
   );
 };
 
-
 export default ButtonLink;
