@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
@@ -67,20 +66,15 @@ public class DataSetService(
         CancellationToken cancellationToken = default)
     {
         return await CheckDataSetExists(dataSetId, cancellationToken)
-            .OnSuccessCombineWith(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken))
-            .OnSuccess(async combinedDataSetAndPublication =>
-            {
-                (var dataSet, var publication) = combinedDataSetAndPublication;
-
-                return await userService.CheckCanViewPublication(publication)
-                    .OnSuccess(_ => dataSet);
-            })
-            .OnSuccessCombineWith(async dataSet => await GetLatestDataSetVersionFilesByFileId(dataSet, cancellationToken))
+            .OnSuccessDo(dataSet => CheckPublicationExists(dataSet.PublicationId, cancellationToken)
+                    .OnSuccess(userService.CheckCanViewPublication)
+            )
+            .OnSuccessCombineWith(async dataSet => await GetReleaseFilesByDataSetVersionId(dataSet, cancellationToken))
             .OnSuccess(combinedDataSetAndReleaseFiles =>
             {
-                (var dataSet, var releaseFilesByFileId) = combinedDataSetAndReleaseFiles;
+                var (dataSet, releaseFilesByDataSetVersionId) = combinedDataSetAndReleaseFiles;
 
-                return MapDataSet(dataSet, releaseFilesByFileId);
+                return MapDataSet(dataSet, releaseFilesByDataSetVersionId);
             });
     }
 
@@ -125,15 +119,15 @@ public class DataSetService(
             : null;
     }
 
-    private static DataSetSummaryViewModel MapDataSet(DataSet dataSet, IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByFileId)
+    private static DataSetSummaryViewModel MapDataSet(DataSet dataSet, IReadOnlyDictionary<Guid, ReleaseFile> releaseFilesByDataSetVersionId)
     {
         var draftVersion = dataSet.LatestDraftVersion is null
             ? null
-            : MapDataSetVersion(dataSet.LatestDraftVersion, releaseFilesByFileId[dataSet.LatestDraftVersion.CsvFileId]);
+            : MapDataSetVersion(dataSet.LatestDraftVersion, releaseFilesByDataSetVersionId[dataSet.LatestDraftVersionId!.Value]);
 
         var latestLiveVersion = dataSet.LatestLiveVersion is null
             ? null
-            : MapDataSetVersion(dataSet.LatestLiveVersion, releaseFilesByFileId[dataSet.LatestLiveVersion.CsvFileId]);
+            : MapDataSetVersion(dataSet.LatestLiveVersion, releaseFilesByDataSetVersionId[dataSet.LatestLiveVersionId!.Value]);
 
         return new DataSetSummaryViewModel
         {
@@ -154,7 +148,7 @@ public class DataSetService(
             Version = dataSetVersion.Version,
             Status = dataSetVersion.Status,
             Type = dataSetVersion.VersionType,
-            DataSetFileId = (Guid)releaseFile.File.DataSetFileId!,
+            DataSetFileId = releaseFile.File.DataSetFileId!.Value,
             ReleaseVersion = MapReleaseVersion(releaseFile.ReleaseVersion),
         };
     }
@@ -188,7 +182,7 @@ public class DataSetService(
             .SingleOrNotFoundAsync(cancellationToken);
     }
 
-    private async Task<Either<ActionResult, IReadOnlyDictionary<Guid, ReleaseFile>>> GetLatestDataSetVersionFilesByFileId(
+    private async Task<Either<ActionResult, IReadOnlyDictionary<Guid, ReleaseFile>>> GetReleaseFilesByDataSetVersionId(
         DataSet dataSet,
         CancellationToken cancellationToken)
     {
@@ -197,17 +191,22 @@ public class DataSetService(
             return new Dictionary<Guid, ReleaseFile>();
         }
 
-        Expression<Func<ReleaseFile, bool>> predicate =
-            dataSet.LatestDraftVersion is not null && dataSet.LatestLiveVersion is not null
-            ? rf => rf.FileId == dataSet.LatestDraftVersion.CsvFileId || rf.FileId == dataSet.LatestLiveVersion.CsvFileId
-            : dataSet.LatestDraftVersion is not null
-            ? rf => rf.FileId == dataSet.LatestDraftVersion.CsvFileId
-            : rf => rf.FileId == dataSet.LatestLiveVersion!.CsvFileId;
+        var dataSetVersionIdsByReleaseFileId = new Dictionary<Guid, Guid>();
+
+        if (dataSet.LatestDraftVersion is not null)
+        {
+            dataSetVersionIdsByReleaseFileId.Add(dataSet.LatestDraftVersion.ReleaseFileId, dataSet.LatestDraftVersionId!.Value);
+        }
+
+        if (dataSet.LatestLiveVersion is not null)
+        {
+            dataSetVersionIdsByReleaseFileId.Add(dataSet.LatestLiveVersion.ReleaseFileId, dataSet.LatestLiveVersionId!.Value);
+        }
 
         return await contentDbContext.ReleaseFiles
-            .Where(predicate)
+            .Where(rf => dataSetVersionIdsByReleaseFileId.Keys.Contains(rf.Id))
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
-            .ToDictionaryAsync(rf => rf.FileId, cancellationToken);
+            .ToDictionaryAsync(rf => dataSetVersionIdsByReleaseFileId[rf.Id], cancellationToken);
     }
 }
