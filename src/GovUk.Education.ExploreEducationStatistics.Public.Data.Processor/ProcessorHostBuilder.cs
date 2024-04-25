@@ -2,6 +2,7 @@ using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,6 +77,10 @@ public static class ProcessorHostBuilder
                         });
                     }
                 }
+
+                services
+                    .AddApplicationInsightsTelemetryWorkerService()
+                    .ConfigureFunctionsApplicationInsights();
             });
     }
 }

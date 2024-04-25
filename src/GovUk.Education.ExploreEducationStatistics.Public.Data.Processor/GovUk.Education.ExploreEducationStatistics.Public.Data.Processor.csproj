@@ -16,9 +16,8 @@
     <ItemGroup>
         <PackageReference Include="Azure.Identity" Version="1.10.4" />
         <PackageReference Include="DuckDB.NET.Data.Full" Version="0.10.1.2" />
-        <PackageReference Include="FluentValidation" Version="11.9.0" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
+        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="1.2.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.21.0" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.DurableTask" Version="1.1.2" />
         <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
