@@ -59,9 +59,6 @@ public class DataSetFileService : IDataSetFileService
         var latestPublishedReleaseVersions =
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
-        var x = await _contentDbContext.Files
-            .ToListAsync();
-
         var query = _contentDbContext.ReleaseFiles
             .AsNoTracking()
             .Include(rf => rf.File)
