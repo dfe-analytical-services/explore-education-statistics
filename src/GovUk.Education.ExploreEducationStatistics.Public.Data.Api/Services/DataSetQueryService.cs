@@ -73,7 +73,7 @@ internal class DataSetQueryService(
                 TimePeriods = request.TimePeriods?.ToCriteria(),
             },
             Indicators = request.Indicators,
-            Sorts = request.Sorts?.Select(DataSetQuerySort.FromString).ToList()
+            Sorts = request.Sorts?.Select(DataSetQuerySort.Parse).ToList(),
         };
 
         return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
