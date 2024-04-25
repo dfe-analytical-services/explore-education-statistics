@@ -146,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
                     options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.Filters.Add(new ProblemDetailsResultFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
