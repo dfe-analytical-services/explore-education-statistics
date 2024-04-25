@@ -1,6 +1,7 @@
-using System.Text.Json.Serialization;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -30,8 +31,7 @@ public record DataSetQuerySort
     /// </summary>
     public required string Direction { get; init; }
 
-    [JsonIgnore]
-    public SortDirection ParsedDirection => EnumUtil.GetFromEnumValue<SortDirection>(Direction);
+    public SortDirection ParsedDirection() => EnumUtil.GetFromEnumValue<SortDirection>(Direction);
 
     public string ToSortString() => $"{Field}|{Direction}";
 
@@ -44,5 +44,23 @@ public record DataSetQuerySort
             Field = sort[..directionDelimiter],
             Direction = sort[(directionDelimiter + 1)..]
         };
+    }
+
+    public class Validator : AbstractValidator<DataSetQuerySort>
+    {
+        private static readonly HashSet<string> AllowedDirections = [
+            SortDirection.Asc.ToString(),
+            SortDirection.Desc.ToString()
+        ];
+
+        public Validator()
+        {
+            RuleFor(t => t.Field)
+                .NotEmpty()
+                .MaximumLength(40);
+
+            RuleFor(t => t.Direction)
+                .AllowedValue(AllowedDirections);
+        }
     }
 }

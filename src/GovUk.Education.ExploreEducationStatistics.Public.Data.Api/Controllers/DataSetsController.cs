@@ -248,8 +248,8 @@ public class DataSetsController(
     ///
     /// ### Examples
     ///
-    /// - `time_period|Desc` sorts by time period in descending order
-    /// - `geographic_level|Asc` sorts by geographic level in ascending order
+    /// - `timePeriod|Desc` sorts by time period in descending order
+    /// - `geographicLevel|Asc` sorts by geographic level in ascending order
     /// - `location|REG|Asc` sorts by regions in ascending order
     /// </remarks>
     [HttpGet("{dataSetId:guid}/query")]

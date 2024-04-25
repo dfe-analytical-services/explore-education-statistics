@@ -294,7 +294,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
 
             result
                 .ShouldHaveValidationErrorFor("Sorts[3]")
-                .WithErrorCode(ValidationMessages.SortMaxFieldLength.Code);
+                .WithErrorCode(ValidationMessages.SortFieldMaxLength.Code);
         }
     }
 

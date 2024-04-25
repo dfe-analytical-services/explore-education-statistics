@@ -1,20 +1,15 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 
 public static partial class SortStringValidators
 {
-    private const string ExpectedFormat = "{field}|{order}";
-    private const int MaxFieldLength = 40;
-
-    private static readonly HashSet<string> AllowedDirections = [
-        SortDirection.Asc.ToString(),
-        SortDirection.Desc.ToString()
-    ];
+    private const string ExpectedFormat = "{field}|{direction}";
 
     public static IRuleBuilderOptionsConditions<T, string> SortString<T>(this IRuleBuilder<T, string> rule)
     {
@@ -35,62 +30,62 @@ public static partial class SortStringValidators
                 return;
             }
 
-            var sort = ParsedSort.Parse(value);
+            var sort = DataSetQuerySort.Parse(value);
 
-            if (!HasValidFieldLength(sort))
+
+            var validator = new DataSetQuerySort.Validator();
+            var result = validator.Validate(sort);
+
+            if (result.IsValid)
             {
-                context.AddFailure(
-                    message: ValidationMessages.SortMaxFieldLength,
-                    detail: new MaxFieldLengthErrorDetail(sort, MaxFieldLength),
-                    new Dictionary<string, object>
-                    {
-                        { "MaxFieldLength", MaxFieldLength }
-                    }
-                );
+                return;
             }
 
-            if (!HasValidDirection(sort))
+            foreach (var error in result.Errors)
             {
-                context.AddFailure(
-                    message: ValidationMessages.SortDirection,
-                    detail: new DirectionErrorDetail(sort, AllowedDirections)
-                );
+                switch (error.PropertyName.ToUpperFirst())
+                {
+                    case nameof(DataSetQuerySort.Field)
+                        when error.ErrorCode == FluentValidationKeys.NotEmptyValidator:
+
+                        error.ErrorCode = ValidationMessages.SortFieldNotEmpty.Code;
+                        error.ErrorMessage = ValidationMessages.SortFieldNotEmpty.Message;
+
+                        break;
+
+                    case nameof(DataSetQuerySort.Field)
+                        when error.ErrorCode == FluentValidationKeys.MaximumLengthValidator:
+
+                        error.ErrorCode = ValidationMessages.SortFieldMaxLength.Code;
+                        error.ErrorMessage = context.MessageFormatter
+                            .AppendArgument("MaxLength", error.FormattedMessagePlaceholderValues["MaxLength"])
+                            .BuildMessage(ValidationMessages.SortFieldMaxLength.Message);
+
+                        break;
+
+                    case nameof(DataSetQuerySort.Direction)
+                        when error.ErrorCode == Common.Validators.ValidationMessages.AllowedValue.Code:
+
+                        error.ErrorCode = ValidationMessages.SortDirection.Code;
+                        error.ErrorMessage = ValidationMessages.SortDirection.Message;
+
+                        break;
+                }
+
+                error.FormattedMessagePlaceholderValues["Property"] = error.PropertyName.ToLowerFirst();
+                error.PropertyName = context.PropertyPath;
+
+                context.AddFailure(error);
             }
         });
     }
 
-    [GeneratedRegex(@"^[\w_]+(\|\w+)?\|[A-Za-z]+$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
+    // Note this regex only does basic checks on delimiters to allow other
+    // validations to provide more specific error messages on what is invalid.
+    [GeneratedRegex(@"^[^\|]*(\|[^\|]+)?\|[^\|]*$", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
     private static partial Regex FormatRegexGenerated();
 
     private static readonly Regex FormatRegex = FormatRegexGenerated();
 
     private static bool HasValidFormat(string value) => FormatRegex.IsMatch(value);
-
-    private static bool HasValidFieldLength(ParsedSort sort) => sort.Field.Length < MaxFieldLength;
-
-    private static bool HasValidDirection(ParsedSort sort) => AllowedDirections.Contains(sort.Direction);
-
-    public record DirectionErrorDetail(ParsedSort Value, IEnumerable<string> AllowedDirections)
-        : InvalidErrorDetail<ParsedSort>(Value);
-
-    public record MaxFieldLengthErrorDetail(ParsedSort Value, int MaxFieldLength)
-        : InvalidErrorDetail<ParsedSort>(Value);
-
-    public record ParsedSort
-    {
-        public string Field { get; init; }
-
-        public string Direction { get; init; }
-
-        public static ParsedSort Parse(string value)
-        {
-            var directionDelimiter = value.LastIndexOf('|');
-
-            return new ParsedSort
-            {
-                Field = value[..directionDelimiter],
-                Direction = value[(directionDelimiter + 1)..],
-            };
-        }
-    }
 }

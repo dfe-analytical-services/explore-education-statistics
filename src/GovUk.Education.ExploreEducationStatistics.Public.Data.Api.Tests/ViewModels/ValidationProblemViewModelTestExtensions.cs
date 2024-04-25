@@ -1,10 +1,12 @@
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ErrorDetails;
+using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.ViewModels;
 
@@ -133,21 +135,38 @@ public static class ValidationProblemViewModelTestExtensions
         return error;
     }
 
-    public static ErrorViewModel AssertHasSortMaxFieldLengthError(
+    public static ErrorViewModel AssertHasSortFieldNotEmptyError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath,
-        string field,
-        int maxFieldLength = 40)
+        string expectedPath)
     {
         var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedCode: ValidationMessages.SortMaxFieldLength.Code
+            expectedCode: ValidationMessages.SortFieldNotEmpty.Code
         );
 
-        var errorDetail = error.GetDetail<SortStringValidators.MaxFieldLengthErrorDetail>();
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
 
-        Assert.Equal(field, errorDetail.Value.Field);
-        Assert.Equal(maxFieldLength, errorDetail.MaxFieldLength);
+        Assert.Equal("field", errorDetail["property"].GetString());
+
+        return error;
+    }
+    
+    public static ErrorViewModel AssertHasSortFieldMaxLengthError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedPath,
+        string field,
+        int maxLength = 40)
+    {
+        var error = validationProblem.AssertHasError(
+            expectedPath: expectedPath,
+            expectedCode: ValidationMessages.SortFieldMaxLength.Code
+        );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal("field", errorDetail["property"].GetString());
+        Assert.Equal(field, errorDetail["value"].GetString());
+        Assert.Equal(maxLength, errorDetail["maxLength"].GetInt32());
 
         return error;
     }
@@ -162,9 +181,9 @@ public static class ValidationProblemViewModelTestExtensions
             expectedCode: ValidationMessages.SortDirection.Code
         );
 
-        var errorDetail = error.GetDetail<SortStringValidators.DirectionErrorDetail>();
+        var errorDetail = error.GetDetail<AllowedValueValidator.AllowedErrorDetail<string>>();
 
-        Assert.Equal(direction, errorDetail.Value.Direction);
+        Assert.Equal(direction, errorDetail.Value);
 
         return error;
     }
