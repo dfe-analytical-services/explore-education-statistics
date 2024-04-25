@@ -138,8 +138,6 @@ public class DataSetFileService : IDataSetFileService
             .ToListAsync();
     }
 
-    // ReSharper disable EntityFramework.NPlusOne.IncompleteDataQuery
-    // ReSharper disable EntityFramework.NPlusOne.IncompleteDataUsage
     public async Task<Either<ActionResult, DataSetFileViewModel>> GetDataSetFile(
         Guid dataSetId)
     {

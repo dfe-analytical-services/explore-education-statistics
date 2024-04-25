@@ -157,21 +157,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             await using var statisticsDbContext = _dbContextSupplier.CreateDbContext<StatisticsDbContext>();
 
-            var observations = await statisticsDbContext.Observation
+            var observations = statisticsDbContext.Observation
                 .AsNoTracking()
-                .Where(o => o.SubjectId == subjectId)
-                .Select(o => new { o.Location.GeographicLevel, o.Year, o.TimeIdentifier })
-                .Distinct()
-                .ToListAsync();
+                .Where(o => o.SubjectId == subjectId);
 
             var geographicLevels = observations
-                .Select(o => o.GeographicLevel.GetEnumLabel())
+                .Select(o => o.Location.GeographicLevel)
                 .Distinct()
                 .OrderBy(gl => gl)
                 .ToList();
 
             var timePeriods = observations
-                .Select(o => (o.Year, o.TimeIdentifier))
+                .Select(o => new TimePeriodMeta { Year = o.Year, TimeIdentifier = o.TimeIdentifier })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
                 .ToList();
@@ -196,7 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var dataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels,
+                GeographicLevels = geographicLevels
+                    .Select(gl => gl.GetEnumLabel()).ToList(),
                 TimeIdentifier = timePeriods[0].TimeIdentifier,
                 Years = timePeriods.Select(tp => tp.Year).ToList(),
                 Filters = filters,

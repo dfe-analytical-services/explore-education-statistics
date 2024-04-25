@@ -31,3 +31,10 @@ public class IndicatorMeta
     public Guid Id { get; set; }
     public string Label { get; set; }
 }
+
+public class TimePeriodMeta
+{
+    public int Year;
+    public TimeIdentifier TimeIdentifier;
+}
+

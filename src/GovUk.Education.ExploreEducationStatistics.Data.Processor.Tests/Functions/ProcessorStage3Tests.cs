@@ -104,15 +104,13 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithFiles("small-csv", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -294,25 +292,23 @@ public class ProcessorStage3Tests
                 .Single(f => f.Type == FileType.Data
                              && f.SubjectId == import.File.SubjectId);
 
-            Assert.NotNull(file.DataSetFileMeta!);
+            Assert.NotNull(file.DataSetFileMeta);
 
             // Checking against contents of small-csv.csv in Resources directory
             var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
             Assert.Equal("Local authority", geographicLevel);
             Assert.Equal(TimeIdentifier.CalendarYear, file.DataSetFileMeta.TimeIdentifier);
-            new List<int> { 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025 }
-                .AssertDeepEqualTo(file.DataSetFileMeta.Years);
+            file.DataSetFileMeta.Years
+                .AssertDeepEqualTo([2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
 
             // Checking against contents of small-csv.meta.csv
-            new List<string> { "Filter one", "Filter two", }
-                .AssertDeepEqualTo(
-                    file.DataSetFileMeta.Filters
-                        .Select(f => f.Label).ToList());
+            file.DataSetFileMeta.Filters
+                .Select(f => f.Label).ToList()
+                .AssertDeepEqualTo(new List<string> { "Filter one", "Filter two", });
 
-            new List<string> { "Indicator one", "Indicator two", }
-                .AssertDeepEqualTo(
-                    file.DataSetFileMeta.Indicators
-                        .Select(i => i.Label).ToList());
+            file.DataSetFileMeta.Indicators
+                .Select(i => i.Label).ToList()
+                .AssertDeepEqualTo(new List<string> { "Indicator one", "Indicator two", });
         }
     }
 
@@ -322,15 +318,13 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithFiles("small-csv", subjectId: _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         var unexpectedImportedObservation = _fixture
             .DefaultObservation()
@@ -458,7 +452,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithFiles("small-csv", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -467,8 +461,6 @@ public class ProcessorStage3Tests
                 lastProcessedRowIndex: 3
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
@@ -615,7 +607,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv")
+            .WithFiles("small-csv", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -624,8 +616,6 @@ public class ProcessorStage3Tests
                 lastProcessedRowIndex: 9
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         var alreadyImportedObservations = _fixture
             .DefaultObservation()
@@ -767,15 +757,13 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithFiles("ignored-school-rows", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 8
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -919,7 +907,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows")
+            .WithFiles("ignored-school-rows", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -928,8 +916,6 @@ public class ProcessorStage3Tests
                 lastProcessedRowIndex: 6
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         // Generate already-imported Observations with alternating CsvRow numbers
         // e.g. 2, 4, 6, 8
@@ -1369,15 +1355,13 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("additional-filters-and-indicators")
+            .WithFiles("additional-filters-and-indicators", _subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
                 expectedImportedRows: 16
             )
             .Generate();
-
-        import.File.SubjectId = _subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1545,15 +1529,13 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithFiles("small-csv-with-special-data")
+            .WithFiles("small-csv-with-special-data", subject.Id)
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 5,
                 expectedImportedRows: 5
             )
             .Generate();
-
-        import.File.SubjectId = subject.Id;
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))

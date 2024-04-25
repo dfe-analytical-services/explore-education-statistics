@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
 
             var completedImport = await _dataImportService.GetImport(import.Id);
-            await CheckComplete(completedImport, context);
+            await CompleteImport(completedImport, context);
         }
 
         public async Task ImportFiltersAndLocations(
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context);
         }
 
-        public async Task CheckComplete(DataImport import, StatisticsDbContext context)
+        public async Task CompleteImport(DataImport import, StatisticsDbContext context)
         {
             if (import.Status.IsFinished())
             {

@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -38,9 +37,8 @@ public class DataSetFileMetaMigrationController : ControllerBase
         public int LeftToProcess;
     }
 
-    public class Observation
+    private class TimePeriod
     {
-        public GeographicLevel GeographicLevel;
         public int Year;
         public TimeIdentifier TimeIdentifier;
     }
@@ -67,28 +65,21 @@ public class DataSetFileMetaMigrationController : ControllerBase
 
         foreach (var file in files)
         {
-            var observations = await _statisticsDbContext.Observation
+            var observations = _statisticsDbContext.Observation
                 .AsNoTracking()
-                .Where(o => o.SubjectId == file.SubjectId)
-                .Select(o => new Observation
-                {
-                    GeographicLevel = o.Location.GeographicLevel,
-                    Year = o.Year,
-                    TimeIdentifier = o.TimeIdentifier,
-                })
-                .ToListAsync(cancellationToken: cancellationToken);
+                .Where(o => o.SubjectId == file.SubjectId);
 
-            var geographicLevels = observations
-                .Select(o => o.GeographicLevel.GetEnumLabel())
+            var geographicLevels = await observations
+                .Select(o => o.Location.GeographicLevel)
                 .Distinct()
                 .OrderBy(gl => gl)
-                .ToList();
+                .ToListAsync(cancellationToken: cancellationToken);
 
-            var timePeriods = observations
-                .Select(o => (o.Year, o.TimeIdentifier))
+            var timePeriods = await observations
+                .Select(o => new TimePeriod{ Year = o.Year, TimeIdentifier = o.TimeIdentifier })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
-                .ToList();
+                .ToListAsync(cancellationToken: cancellationToken);
 
             var filters = await _statisticsDbContext.Filter
                 .Where(f => f.SubjectId == file.SubjectId)
@@ -108,7 +99,8 @@ public class DataSetFileMetaMigrationController : ControllerBase
 
             file.DataSetFileMeta = new DataSetFileMeta
             {
-                GeographicLevels = geographicLevels,
+                GeographicLevels = geographicLevels
+                    .Select(gl => gl.GetEnumLabel()).ToList(),
                 TimeIdentifier = timePeriods[0].TimeIdentifier,
                 Years = timePeriods.Select(tp => tp.Year).ToList(),
                 Filters = filters,
