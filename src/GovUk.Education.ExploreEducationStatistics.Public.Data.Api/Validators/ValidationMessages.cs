@@ -38,10 +38,15 @@ public static class ValidationMessages
         Code: "LocationAllowedProperty",
         Message: "Must be a location with an allowed identifying property."
     );
+    
+    public static readonly LocalizableMessage LocationValueNotEmpty = new(
+        Code: "LocationValueNotEmpty",
+        Message: "Must be a location with '{Property}' that is not empty."
+    );
 
-    public static readonly LocalizableMessage LocationMaxValueLength = new(
-        Code: "LocationMaxLengthValue",
-        Message: "Must be a location with an identifying value that is {MaxValueLength} characters or fewer."
+    public static readonly LocalizableMessage LocationValueMaxLength = new(
+        Code: "LocationValueMaxLength",
+        Message: "Must be a location with '{Property}' that is {MaxLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage LocationsNotFound = new(
