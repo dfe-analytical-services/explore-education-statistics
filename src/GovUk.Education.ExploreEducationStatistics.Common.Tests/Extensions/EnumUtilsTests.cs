@@ -21,10 +21,10 @@ public static class EnumUtilsTests
         [Fact]
         public void WithLabelValue_UsingLabel_Invalid()
         {
-            var exception = Assert.Throws<ArgumentException>(
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
                 () => EnumUtil.GetFromEnumValue<TestEnum>("With label value"));
 
-            Assert.Equal(
+            Assert.StartsWith(
                 $"The value 'With label value' is not a valid {nameof(TestEnum)}",
                 exception.Message);
         }
@@ -32,10 +32,10 @@ public static class EnumUtilsTests
         [Fact]
         public void NoMatch_Invalid()
         {
-            var exception = Assert.Throws<ArgumentException>(
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
                 () => EnumUtil.GetFromEnumValue<TestEnum>("Invalid label"));
 
-            Assert.Equal(
+            Assert.StartsWith(
                 $"The value 'Invalid label' is not a valid {nameof(TestEnum)}",
                 exception.Message);
         }
@@ -74,10 +74,10 @@ public static class EnumUtilsTests
         [Fact]
         public void WithLabelValue_UsingValue_Invalid()
         {
-            var exception = Assert.Throws<ArgumentException>(
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
                 () => EnumUtil.GetFromEnumLabel<TestEnum>("with-label-value"));
 
-            Assert.Equal(
+            Assert.StartsWith(
                 $"The label 'with-label-value' is not a valid {nameof(TestEnum)}",
                 exception.Message);
         }
@@ -85,10 +85,10 @@ public static class EnumUtilsTests
         [Fact]
         public void NoMatch_Invalid()
         {
-            var exception = Assert.Throws<ArgumentException>(
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
                 () => EnumUtil.GetFromEnumLabel<TestEnum>("Invalid label"));
 
-            Assert.Equal(
+            Assert.StartsWith(
                 $"The label 'Invalid label' is not a valid {nameof(TestEnum)}",
                 exception.Message);
         }
