@@ -42,6 +42,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? publicationId,
         Guid? releaseVersionId,
         bool? latestOnly,
+        bool? apiDataSetsOnly,
         string? searchTerm,
         DataSetsListRequestSortBy? sort,
         SortDirection? sortDirection,
@@ -58,12 +59,18 @@ public class DataSetFileService : IDataSetFileService
         var latestPublishedReleaseVersions =
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
+        var x = await _contentDbContext.Files
+            .ToListAsync();
+
         var query = _contentDbContext.ReleaseFiles
+            .AsNoTracking()
+            .Include(rf => rf.File)
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            .HavingApiDataSet(apiDataSetsOnly ?? false)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
@@ -110,7 +117,8 @@ public class DataSetFileService : IDataSetFileService
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
-                Published = result.Value.ReleaseVersion.Published!.Value
+                Published = result.Value.ReleaseVersion.Published!.Value,
+                HasApiDataSet = result.Value.File.PublicDataSetVersionId.HasValue
             };
     }
 
@@ -266,6 +274,13 @@ internal static class ReleaseFileQueryableExtensions
         Guid? releaseVersionId)
     {
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
+    }
+
+    internal static IQueryable<ReleaseFile> HavingApiDataSet(
+        this IQueryable<ReleaseFile> query,
+        bool apiDataSetsOnly)
+    {
+        return apiDataSetsOnly ? query.Where(rf => rf.File.PublicDataSetVersionId.HasValue) : query;
     }
 
     internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(
