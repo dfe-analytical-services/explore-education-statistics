@@ -37,7 +37,9 @@ public static class EnumUtil
             return enumValue;
         }
 
-        throw new ArgumentException($"The value '{value}' is not a valid {typeof(TEnum).Name}");
+        throw new ArgumentOutOfRangeException(
+            paramName: nameof(value),
+            message: $"The value '{value}' is not a valid {typeof(TEnum).Name}");
     }
 
     public static bool TryGetFromEnumValue<TEnum>(
@@ -62,7 +64,9 @@ public static class EnumUtil
             return enumValue;
         }
 
-        throw new ArgumentException($"The label '{label}' is not a valid {typeof(TEnum).Name}");
+        throw new ArgumentOutOfRangeException(
+            paramName: nameof(label),
+            message: $"The label '{label}' is not a valid {typeof(TEnum).Name}");
     }
 
     public static bool TryGetFromEnumLabel<TEnum>(
