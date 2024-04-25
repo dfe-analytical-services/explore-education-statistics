@@ -72,7 +72,7 @@ const LineChartBlock = ({
   showDataLabels,
   dataLabelPosition,
 }: LineChartProps) => {
-  const [legendProps, renderLegend] = useLegend({});
+  const [legendProps, renderLegend] = useLegend();
 
   if (
     axes === undefined ||

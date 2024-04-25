@@ -62,7 +62,7 @@ const VerticalBarBlock = ({
   stacked,
   width,
 }: VerticalBarProps) => {
-  const [legendProps, renderLegend] = useLegend({ reverseOrder: stacked });
+  const [legendProps, renderLegend] = useLegend();
   if (
     axes === undefined ||
     axes.major === undefined ||
@@ -127,7 +127,11 @@ const VerticalBarBlock = ({
   return (
     <ChartContainer
       height={height || 300}
-      legend={legendProps}
+      legend={
+        stacked && legendProps?.payload
+          ? { ...legendProps, payload: [...legendProps.payload].reverse() }
+          : legendProps
+      }
       legendPosition={legend.position}
       yAxisWidth={yAxisWidth}
       yAxisLabel={axes.minor.label}
