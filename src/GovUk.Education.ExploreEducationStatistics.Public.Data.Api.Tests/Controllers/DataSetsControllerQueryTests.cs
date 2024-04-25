@@ -1507,6 +1507,7 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
                     "",
                     "invalid",
                     "|",
+                    "test|",
                     "test|invalid",
                     "test|asc",
                     "test|desc",
@@ -1519,22 +1520,25 @@ public abstract class DataSetsControllerQueryTests(TestApplicationFactory testAp
 
             var validationProblem = response.AssertValidationProblem();
 
-            Assert.Equal(8, validationProblem.Errors.Count);
+            Assert.Equal(10, validationProblem.Errors.Count);
 
             validationProblem.AssertHasNotEmptyError(expectedPath: "sorts[0]");
             validationProblem.AssertHasSortFormatError(expectedPath: "sorts[1]", value: "invalid");
-            validationProblem.AssertHasSortFormatError(expectedPath: "sorts[2]", value: "|");
 
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "invalid");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "asc");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "desc");
+            validationProblem.AssertHasSortFieldNotEmptyError(expectedPath: "sorts[2]");
 
-            validationProblem.AssertHasSortMaxFieldLengthError(
-                expectedPath: "sorts[6]",
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[2]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "invalid");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "asc");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[6]", direction: "desc");
+
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[7]",
                 field: new string('a', 41)
             );
-            validationProblem.AssertHasSortMaxFieldLengthError(
-                expectedPath: "sorts[7]",
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[8]",
                 field: new string('b', 41)
             );
         }

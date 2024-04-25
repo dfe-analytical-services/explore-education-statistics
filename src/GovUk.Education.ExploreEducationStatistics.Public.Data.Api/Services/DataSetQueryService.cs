@@ -301,13 +301,13 @@ internal class DataSetQueryService(
         {
             if (fieldColumnMap.TryGetValue(sort.Field, out var field))
             {
-                sorts.Add(new Sort(Field: field, Direction: sort.ParsedDirection));
+                sorts.Add(new Sort(Field: field, Direction: sort.ParsedDirection()));
                 continue;
             }
 
             if (otherFields.Contains(sort.Field))
             {
-                sorts.Add(new Sort(Field: sort.Field, Direction: sort.ParsedDirection));
+                sorts.Add(new Sort(Field: sort.Field, Direction: sort.ParsedDirection()));
                 continue;
             }
 

@@ -89,9 +89,14 @@ public static class ValidationMessages
         Message: "Must be a sort in the correct format."
     );
 
-    public static readonly LocalizableMessage SortMaxFieldLength = new(
-        Code: "SortMaxFieldLength",
-        Message: "Must be a sort with a field that is {MaxFieldLength} characters or fewer."
+    public static readonly LocalizableMessage SortFieldNotEmpty = new(
+        Code: "SortFieldNotEmpty",
+        Message: "Must be a sort with a field that is not empty."
+    );
+
+    public static readonly LocalizableMessage SortFieldMaxLength = new(
+        Code: "SortFieldMaxLength",
+        Message: "Must be a sort with a field that is {MaxLength} characters or fewer."
     );
 
     public static readonly LocalizableMessage SortDirection = new(
