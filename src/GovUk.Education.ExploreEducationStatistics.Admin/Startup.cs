@@ -457,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             if (publicDataDbExists)
             {
                 services.AddTransient<IDataSetService, DataSetService>();
-                services.AddTransient<IDataSetVersionImportService, DataSetVersionImportService>();
+                services.AddTransient<IDataSetVersionService, DataSetVersionService>();
             }
             else
             {
@@ -468,8 +468,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         provider.GetService<PublicDataDbContext>(),
                         provider.GetRequiredService<IUserService>()));
                 
-                services.AddTransient<IDataSetVersionImportService, DataSetVersionImportService>(provider =>
-                    new DataSetVersionImportService(provider.GetRequiredService<ContentDbContext>(),
+                services.AddTransient<IDataSetVersionService, DataSetVersionService>(provider =>
+                    new DataSetVersionService(provider.GetRequiredService<ContentDbContext>(),
                         provider.GetService<PublicDataDbContext>()));
             }
 

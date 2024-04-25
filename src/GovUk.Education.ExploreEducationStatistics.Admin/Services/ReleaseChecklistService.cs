@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseDataFileRepository _fileRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
-        private readonly IDataSetVersionImportService _dataSetVersionImportService;
+        private readonly IDataSetVersionService _dataSetVersionService;
 
         public ReleaseChecklistService(
             ContentDbContext contentDbContext,
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMethodologyVersionRepository methodologyVersionRepository,
             IFootnoteRepository footnoteRepository,
             IDataBlockService dataBlockService,
-            IDataSetVersionImportService dataSetVersionImportService)
+            IDataSetVersionService dataSetVersionService)
         {
             _contentDbContext = contentDbContext;
             _dataImportService = dataImportService;
@@ -53,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyVersionRepository = methodologyVersionRepository;
             _footnoteRepository = footnoteRepository;
             _dataBlockService = dataBlockService;
-            _dataSetVersionImportService = dataSetVersionImportService;
+            _dataSetVersionService = dataSetVersionService;
         }
 
         public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseVersionId)
@@ -131,10 +132,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
             }
             
-            if (await PublicApiDataSetImportsProcessing(releaseVersion.Id))
+            var dataSetVersionStatuses = 
+                await _dataSetVersionService.GetStatusesForReleaseVersion(releaseVersion.Id);
+            
+            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Processing))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.PublicApiDataSetImportsMustBeCompleted));
+            }
+            
+            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Cancelled))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetCancellationsMustBeResolved));
+            }
+            
+            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Failed))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetFailuresMustBeResolved));
+            }
+            
+            if (dataSetVersionStatuses.Any(status => status.Status == DataSetVersionStatus.Mapping))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.PublicApiDataSetMappingsMustBeCompleted));
             }
 
             return errors;
@@ -251,11 +273,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
             return await _contentDbContext.FeaturedTables
                 .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
-        }
-
-        private Task<bool> PublicApiDataSetImportsProcessing(Guid releaseVersionId)
-        {
-            return _dataSetVersionImportService.IsPublicApiDataSetImportsInProgress(releaseVersionId);
         }
     }
 

@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
@@ -54,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private ReleaseChecklistService BuildReleaseChecklistService(
             ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IDataImportService dataImportService = null,
             IUserService userService = null,
             IDataGuidanceService dataGuidanceService = null,
@@ -62,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyVersionRepository methodologyVersionRepository = null,
             IFootnoteRepository footnoteRepository = null,
             IDataBlockService dataBlockService = null,
-            IDataSetVersionImportService? dataSetVersionImportService = null)
+            IDataSetVersionService dataSetVersionService = null)
         {
             return new(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
@@ -73,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
-                dataSetVersionImportService ?? new Mock<IDataSetVersionImportService>().Object
+                dataSetVersionService ?? new Mock<IDataSetVersionService>().Object
             );
         }
     }
