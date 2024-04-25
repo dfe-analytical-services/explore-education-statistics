@@ -348,7 +348,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
-      artifactName: Admin Suite - Publish Playwright Test Artifacts
+      artifactName: test-results-playwright-admin
 
 - job: 'AdminAndPublicPlaywrightUItest'
   displayName: Admin and public suite - Playwright UI tests
