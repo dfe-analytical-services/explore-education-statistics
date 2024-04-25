@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
@@ -55,6 +58,9 @@ public static class PublisherHostBuilderExtensions
             {
                 var configuration = hostContext.Configuration;
                 var hostEnvironment = hostContext.HostingEnvironment;
+
+                // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
+                var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
 
                 services
                     .AddApplicationInsightsTelemetryWorkerService()
@@ -123,9 +129,18 @@ public static class PublisherHostBuilderExtensions
                     .AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>()
                     .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
                     .AddScoped<IRedirectsService, RedirectsService>()
-                    .AddScoped<IDataSetPublishingService, DataSetPublishingService>()
+                    
                     .Configure<AppSettingOptions>(configuration.GetSection(AppSettingOptions.AppSettings));
 
+                if (publicDataDbExists)
+                {
+                    services.AddScoped<IDataSetPublishingService, DataSetPublishingService>();
+                }
+                else
+                {
+                    services.AddScoped<IDataSetPublishingService, NoOpDataSetPublishingService>();
+                }
+                
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
                 // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.
@@ -167,27 +182,39 @@ public static class PublisherHostBuilderExtensions
                     }
                     else
                     {
-                        services.AddDbContext<PublicDataDbContext>(options =>
+                        if (publicDataDbExists)
                         {
-                            var sqlServerTokenProvider = new DefaultAzureCredential();
-                            var accessToken = sqlServerTokenProvider.GetToken(
-                                new TokenRequestContext(scopes: new[]
-                                {
-                                    "https://ossrdbms-aad.database.windows.net/.default"
-                                })).Token;
+                            services.AddDbContext<PublicDataDbContext>(options =>
+                            {
+                                var sqlServerTokenProvider = new DefaultAzureCredential();
+                                var accessToken = sqlServerTokenProvider.GetToken(
+                                    new TokenRequestContext(scopes: new[]
+                                    {
+                                        "https://ossrdbms-aad.database.windows.net/.default"
+                                    })).Token;
 
-                            var connectionStringWithAccessToken =
-                                connectionString.Replace("[access_token]", accessToken);
+                                var connectionStringWithAccessToken =
+                                    connectionString.Replace("[access_token]", accessToken);
 
-                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+                                var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
 
-                            options.UseNpgsql(dbDataSource);
-                        });
+                                options.UseNpgsql(dbDataSource);
+                            });
+                        }
                     }
                 }
 
                 StartupUtils.AddPersistenceHelper<ContentDbContext>(services);
                 StartupUtils.AddPersistenceHelper<StatisticsDbContext>(services);
             });
+    }
+
+    // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
+    public class NoOpDataSetPublishingService : IDataSetPublishingService
+    {
+        public Task PublishDataSets(IEnumerable<Guid> releaseVersionIds)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

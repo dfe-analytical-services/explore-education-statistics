@@ -14,12 +14,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Functions;
 
-// This test has been added for EES-4909 as a simple example of using the Functions integration testing setup to test
-// a Function directly.
 public class PublishTaxonomyFunctionTests(PublisherFunctionsIntegrationTestFixture fixture)
     : PublisherFunctionsIntegrationTest(fixture)
 {
-    public class PublishTaxonomy(PublisherFunctionsIntegrationTestFixture fixture)
+    public class PublishTaxonomyTests(PublisherFunctionsIntegrationTestFixture fixture)
         : PublishTaxonomyFunctionTests(fixture)
     {
         [Fact]

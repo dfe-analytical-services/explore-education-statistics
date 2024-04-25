@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         /// </summary>
         public static void AssertUtcNow(this DateTime dateTime, int withinMillis = TimeWithinMillis)
         {
-            Assert.InRange(DateTime.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
+            Assert.Equal(DateTime.UtcNow, dateTime, TimeSpan.FromMilliseconds(withinMillis));
         }
 
         /// <summary>
@@ -85,24 +85,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = TimeWithinMillis)
         {
             Assert.NotNull(dateTime);
-            AssertUtcNow(dateTime.Value, withinMillis);
+            dateTime.Value.AssertUtcNow(withinMillis: withinMillis);
         }
         
         /// <summary>
         /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
         /// </summary>
-        public static void AssertUtcNow(this DateTimeOffset dateTime, int withinMillis = TimeWithinMillis)
+        public static void AssertUtcNow(this DateTimeOffset dateTimeOffset, int withinMillis = TimeWithinMillis)
         {
-            Assert.InRange(DateTimeOffset.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
+            Assert.Equal(DateTimeOffset.UtcNow, dateTimeOffset, TimeSpan.FromMilliseconds(withinMillis));
         }
 
         /// <summary>
         /// Assert that the given DateTimeOffset is effectively "now", within a given tolerance of milliseconds.
         /// </summary>
-        public static void AssertUtcNow(this DateTimeOffset? dateTime, int withinMillis = TimeWithinMillis)
+        public static void AssertUtcNow(this DateTimeOffset? dateTimeOffset, int withinMillis = TimeWithinMillis)
         {
-            Assert.NotNull(dateTime);
-            AssertUtcNow(dateTime.Value, withinMillis);
+            Assert.NotNull(dateTimeOffset);
+            dateTimeOffset.Value.AssertUtcNow(withinMillis: withinMillis);
         }
     }
 }
