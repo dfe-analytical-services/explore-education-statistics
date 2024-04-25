@@ -109,9 +109,9 @@ internal class DataSetQueryService(
         {
             return await publicDataDbContext.DataSets
                 .AsNoTracking()
-                .Include(ds => ds.LatestVersion)
+                .Include(ds => ds.LatestLiveVersion)
                 .Where(ds => ds.Id == dataSetId)
-                .Select(ds => ds.LatestVersion!)
+                .Select(ds => ds.LatestLiveVersion!)
                 .SingleOrNotFoundAsync(cancellationToken);
         }
 

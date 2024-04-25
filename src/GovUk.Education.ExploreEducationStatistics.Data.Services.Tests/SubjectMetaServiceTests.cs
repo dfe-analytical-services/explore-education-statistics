@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -58,18 +60,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_EmptyModelReturned()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -94,16 +113,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new List<Location>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.GetSubjectMeta(releaseVersionId: releaseSubject.ReleaseVersionId,
+                var result = (await service.GetSubjectMeta(
+                        releaseVersionId: releaseSubject.ReleaseVersionId,
                         subjectId: releaseSubject.SubjectId))
                     .AssertRight();
 
@@ -125,10 +147,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationsForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File { SubjectId = releaseSubject.SubjectId, Type = FileType.Data, },
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
@@ -193,11 +222,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                statisticsDbContext.ReleaseSubject.Add(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -221,10 +256,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
                 .ReturnsAsync(locations);
 
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -336,11 +373,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject = new ReleaseSubject
             {
                 ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                Subject = new Subject(),
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
@@ -608,20 +644,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task FilterSubjectMeta_FiltersAndIndicators()
         {
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = subject
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion
+                {
+                    Id = releaseSubject.ReleaseVersion.Id,
+                    Published = DateTime.UtcNow,
+                },
+                File =  new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var query = new ObservationQueryContext
             {
-                SubjectId = subject.Id,
+                SubjectId = releaseSubject.SubjectId,
                 LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery
                 {
@@ -632,8 +678,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
 
+            var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
@@ -644,6 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var cancellationToken = new CancellationTokenSource().Token;
@@ -659,7 +712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var filter1 = new Filter
                 {
                     Id = Guid.NewGuid(),
-                    SubjectId = subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Label = "Filter 1"
                 };
                 filter1.FilterGroups = CreateFilterGroups(filter1, 2, 1);
@@ -667,7 +720,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var filter2 = new Filter
                 {
                     Id = Guid.NewGuid(),
-                    SubjectId = subject.Id,
+                    SubjectId = releaseSubject.SubjectId,
                     Label = "Filter 2"
                 };
                 filter2.FilterGroups = CreateFilterGroups(filter2, 2);
@@ -687,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 filterItemRepository
                     .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
                         // ReSharper disable once AccessToDisposedClosure
-                        subject.Id, statisticsDbContext.MatchedObservations))
+                        releaseSubject.SubjectId, statisticsDbContext.MatchedObservations))
                     .ReturnsAsync(allFilterItems);
 
                 var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -719,11 +772,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     });
 
                 indicatorGroupRepository
-                    .Setup(s => s.GetIndicatorGroups(subject.Id))
+                    .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
                     .ReturnsAsync(indicatorGroups);
 
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    contentDbContext: contentDbContext,
                     observationService: observationService.Object,
                     filterItemRepository: filterItemRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
@@ -863,7 +917,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
@@ -885,10 +938,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task UpdateSubjectFilters()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -963,11 +1027,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }).ToList();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
@@ -983,8 +1053,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(filters);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     cacheService: cacheService.Object,
                     filterRepository: filterRepository.Object);
 
@@ -999,13 +1072,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertRight();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                var savedSequence = savedReleaseSubject.FilterSequence;
+                var savedSequence = savedReleaseFile.FilterSequence;
 
                 Assert.NotNull(savedSequence);
                 Assert.Equal(2, savedSequence!.Count);
@@ -1046,10 +1119,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task UpdateSubjectFilters_FilterMissing()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1113,11 +1197,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                contentDbContext.ReleaseFiles.Add(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1125,9 +1215,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .ReturnsAsync(filters);
 
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1141,24 +1234,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FiltersDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseSubject.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
                 // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectFilters_FilterGroupMissing()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion{ Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1215,11 +1319,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1227,9 +1337,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .ReturnsAsync(filters);
 
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1243,24 +1356,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FilterGroupsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectFilters_FilterItemMissing()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1310,11 +1434,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1323,8 +1453,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(filters);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1338,24 +1471,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FilterItemsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectFilters_FilterNotForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1416,11 +1560,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1429,8 +1579,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(filters);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1444,24 +1597,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FiltersDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectFilters_FilterGroupNotForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1515,11 +1679,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1528,8 +1698,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(filters);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1543,24 +1716,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FilterGroupsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectFilters_FilterItemNotForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var filters = new List<Filter>
@@ -1607,11 +1791,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
@@ -1620,8 +1810,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(filters);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -1635,14 +1828,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(FilterItemsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
@@ -1650,18 +1843,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task UpdateSubjectFilters_ReleaseNotFound()
         {
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1683,14 +1893,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertNotFound();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
@@ -1698,18 +1908,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task UpdateSubjectFilters_SubjectNotFound()
         {
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1731,24 +1958,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertNotFound();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.FilterSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.FilterSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectIndicators()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var indicatorGroups = new List<IndicatorGroup>
@@ -1790,11 +2028,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }).ToList();
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
@@ -1810,13 +2054,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(indicatorGroups);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     cacheService: cacheService.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
-                    releaseVersionId: releaseSubject.ReleaseVersionId,
+                    releaseVersionId: releaseSubject.ReleaseVersion.Id,
                     subjectId: releaseSubject.SubjectId,
                     request
                 );
@@ -1826,13 +2073,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertRight();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersion.Id
+                    && rf.File.SubjectId == releaseSubject.SubjectId
+                    && rf.File.Type == FileType.Data);
 
-                var savedSequence = savedReleaseSubject.IndicatorSequence;
+                var savedSequence = savedReleaseFile.IndicatorSequence;
 
                 Assert.NotNull(savedSequence);
                 Assert.Equal(2, savedSequence!.Count);
@@ -1857,10 +2105,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task UpdateSubjectIndicators_IndicatorGroupMissing()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var indicatorGroups = new List<IndicatorGroup>
@@ -1903,11 +2162,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -1916,8 +2181,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(indicatorGroups);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
@@ -1931,24 +2199,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectIndicators_IndicatorMissing()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var indicatorGroups = new List<IndicatorGroup>
@@ -1984,11 +2263,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -1997,8 +2282,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(indicatorGroups);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
@@ -2012,24 +2300,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(IndicatorsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectIndicators_IndicatorGroupNotForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var indicatorGroups = new List<IndicatorGroup>
@@ -2069,11 +2368,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -2082,8 +2387,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(indicatorGroups);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
@@ -2097,24 +2405,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
         [Fact]
         public async Task UpdateSubjectIndicators_IndicatorNotForSubject()
         {
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var indicatorGroups = new List<IndicatorGroup>
@@ -2147,11 +2466,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
@@ -2160,8 +2485,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(indicatorGroups);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    contentDbContext,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
@@ -2175,14 +2503,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertBadRequest(IndicatorsDifferFromSubject);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
@@ -2190,18 +2518,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task UpdateSubjectIndicators_ReleaseNotFound()
         {
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2223,14 +2568,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertNotFound();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
@@ -2238,18 +2583,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task UpdateSubjectIndicators_SubjectNotFound()
         {
             // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var subject = new Subject { Id = Guid.NewGuid(), };
             var releaseSubject = new ReleaseSubject
             {
-                ReleaseVersion = new ReleaseVersion(),
-                Subject = new Subject()
+                ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid(), },
+                SubjectId = subject.Id,
             };
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var releaseFile = new ReleaseFile
+            {
+                ReleaseVersion = new Content.Model.ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id, },
+                File = new File
+                {
+                    SubjectId = releaseSubject.SubjectId,
+                    Type = FileType.Data,
+                },
+            };
 
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2271,14 +2634,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 result.AssertNotFound();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
-                    rs.ReleaseVersionId == releaseSubject.ReleaseVersionId
-                    && rs.SubjectId == releaseSubject.SubjectId);
+                var savedReleaseFile = contentDbContext.ReleaseFiles.Single(rf =>
+                    rf.ReleaseVersionId == releaseFile.ReleaseVersionId
+                    && rf.File.SubjectId == releaseSubject.SubjectId);
 
-                // Verify that the ReleaseSubject remains untouched
-                Assert.Null(savedReleaseSubject.IndicatorSequence);
+                // Verify that the ReleaseFile remains untouched
+                Assert.Null(savedReleaseFile.IndicatorSequence);
             }
         }
 
@@ -2334,6 +2697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             return new(
                 statisticsDbContext,
+                contentDbContextInstance,
                 cacheService ?? Mock.Of<IBlobCacheService>(MockBehavior.Strict),
                 releaseSubjectService ?? new ReleaseSubjectService(statisticsDbContext, contentDbContextInstance),
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),

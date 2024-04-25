@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int? DataSetFileVersion { get; set; }
 
+        public Guid? PublicDataSetVersionId { get; set; }
+
         public Guid? ReplacedById { get; set; }
 
         public File? ReplacedBy { get; set; }

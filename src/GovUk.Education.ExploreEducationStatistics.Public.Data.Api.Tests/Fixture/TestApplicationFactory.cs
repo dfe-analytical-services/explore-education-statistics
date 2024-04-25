@@ -23,20 +23,6 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         await _postgreSqlContainer.DisposeAsync();
     }
 
-    public TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
-    {
-        var scope = Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<TDbContext>();
-    }
-
-    public async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
-    {
-        await using var context = GetDbContext<TDbContext>();
-
-        supplier.Invoke(context);
-        await context.SaveChangesAsync();
-    }
-
     public async Task ClearTestData<TDbContext>() where TDbContext : DbContext
     {
         await using var context = GetDbContext<TDbContext>();

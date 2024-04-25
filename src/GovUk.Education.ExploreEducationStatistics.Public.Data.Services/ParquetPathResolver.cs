@@ -34,22 +34,7 @@ public class ParquetPathResolver : IParquetPathResolver
     }
 
     public string DirectoryPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.ParquetDirectoryPath);
-
-    public string DataPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.DataParquetPath);
-
-    public string FiltersPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.FiltersParquetPath);
-
-    public string IndicatorsPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.IndicatorsParquetPath);
-
-    public string LocationsPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.LocationsParquetPath);
-
-    public string TimePeriodsPath(DataSetVersion dataSetVersion)
-        => Path.Combine(_basePath, dataSetVersion.TimePeriodsParquetPath);
+        => Path.Combine(_basePath, dataSetVersion.DataSetId.ToString(), $"v{dataSetVersion.Version}");
 
     private string GetBasePath()
     {

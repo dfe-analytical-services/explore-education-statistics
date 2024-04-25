@@ -211,7 +211,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -231,7 +231,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 40);
         }
 
         [Theory]
@@ -251,7 +251,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasMinimumLengthError("search");
+            validationProblem.AssertHasMinimumLengthError("search", minLength: 3);
         }
 
         private static async Task<HttpResponseMessage> ListPublications(
@@ -428,7 +428,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                         timePeriods: 3)
                     .WithStatusPublished()
                     .WithDataSet(ds)
-                    .FinishWith(dsv => ds.LatestVersion = dsv)
+                    .FinishWith(dsv => ds.LatestLiveVersion = dsv)
                     .Generate())
                 .ToList();
 
@@ -439,7 +439,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             });
 
             var expectedDataSetIds = dataSets
-                .OrderByDescending(ds => ds.LatestVersion!.Published)
+                .OrderByDescending(ds => ds.LatestLiveVersion!.Published)
                 .ThenBy(ds => ds.Title)
                 .ThenBy(ds => ds.Id)
                 .Select(ds => ds.Id)
@@ -488,7 +488,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -518,7 +518,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             Assert.Equal(dataSet.Summary, result.Summary);
             Assert.Equal(dataSet.Status, result.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version, result.LatestVersion.Number);
+            Assert.Equal(dataSetVersion.Version, result.LatestVersion.Version);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
                 result.LatestVersion.Published.ToUnixTimeSeconds()
@@ -566,7 +566,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication1DataSet)
-                .FinishWith(dsv => publication1DataSet.LatestVersion = dsv);
+                .FinishWith(dsv => publication1DataSet.LatestLiveVersion = dsv);
 
             DataSetVersion publication2DataSetVersion = DataFixture
                 .DefaultDataSetVersion(
@@ -576,7 +576,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(publication2DataSet)
-                .FinishWith(dsv => publication2DataSet.LatestVersion = dsv);
+                .FinishWith(dsv => publication2DataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -624,7 +624,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
                     timePeriods: 3)
                 .WithStatusPublished()
                 .WithDataSet(dataSet)
-                .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -720,7 +720,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -741,7 +741,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
         }
 
         [Fact]

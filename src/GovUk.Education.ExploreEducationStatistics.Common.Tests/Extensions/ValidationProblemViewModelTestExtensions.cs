@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using System;
@@ -23,19 +22,37 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasGreaterThanOrEqualError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.GreaterThanOrEqualValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasGreaterThanError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.GreaterThanValidator
         );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].GetInt32());
+
+        return error;
+    }
 
     public static ErrorViewModel AssertHasLengthError(
         this ValidationProblemViewModel validationProblem,
@@ -47,43 +64,88 @@ public static class ValidationProblemViewModelTestExtensions
 
     public static ErrorViewModel AssertHasMinimumLengthError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int minLength)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.MinimumLengthValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(minLength, errorDetail["minLength"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasMaximumLengthError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int maxLength)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.MaximumLengthValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(maxLength, errorDetail["maxLength"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasLessThanOrEqualError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.LessThanOrEqualValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasLessThanError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.LessThanValidator
         );
 
-    public static ErrorViewModel AssertHasNotEqualError(
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].GetInt32());
+
+        return error;
+    }
+
+    public static ErrorViewModel AssertHasNotEqualError<T>(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        T comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.NotEqualValidator
         );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].Deserialize<T>());
+
+        return error;
+    }
 
     public static ErrorViewModel AssertHasNotEmptyError(
         this ValidationProblemViewModel validationProblem,
@@ -125,37 +187,80 @@ public static class ValidationProblemViewModelTestExtensions
             expectedKey: FluentValidationKeys.RegularExpressionValidator
         );
 
-    public static ErrorViewModel AssertHasEqualError(
+    public static ErrorViewModel AssertHasEqualError<T>(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        T comparisonValue)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EqualValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(comparisonValue, errorDetail["comparisonValue"].Deserialize<T>());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasExactLengthError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int minLength,
+        int maxLength)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.ExactLengthValidator
         );
 
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(minLength, errorDetail["minLength"].GetInt32());
+        Assert.Equal(maxLength, errorDetail["maxLength"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasInclusiveBetweenError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int from,
+        int to)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.InclusiveBetweenValidator
         );
 
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(from, errorDetail["from"].GetInt32());
+        Assert.Equal(to, errorDetail["to"].GetInt32());
+
+        return error;
+    }
+
     public static ErrorViewModel AssertHasExclusiveBetweenError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath)
-        => validationProblem.AssertHasFluentValidationError(
+        string expectedPath,
+        int from,
+        int to)
+    {
+        var error = validationProblem.AssertHasFluentValidationError(
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.ExclusiveBetweenValidator
         );
+
+        var errorDetail = error.GetDetail<Dictionary<string, JsonElement>>();
+
+        Assert.Equal(from, errorDetail["from"].GetInt32());
+        Assert.Equal(to, errorDetail["to"].GetInt32());
+
+        return error;
+    }
 
     public static ErrorViewModel AssertHasCreditCardError(
         this ValidationProblemViewModel validationProblem,
@@ -196,33 +301,29 @@ public static class ValidationProblemViewModelTestExtensions
             expectedPath: expectedPath,
             expectedKey: FluentValidationKeys.EnumValidator
         );
-    public static ErrorViewModel AssertHasAllowedValueError(
+
+    public static ErrorViewModel AssertHasAllowedValueError<TValue>(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
-        string? value,
-        IEnumerable<string> allowed)
+        TValue? value,
+        IEnumerable<TValue> allowed)
     {
-        var error = validationProblem.AssertHasFluentValidationError(
+        var error = validationProblem.AssertHasError(
             expectedPath: expectedPath,
-            expectedKey: ValidationMessages.AllowedValue.Code
+            expectedCode: ValidationMessages.AllowedValue.Code
         );
 
-        var errorDetail = GetErrorDetail(error);
+        var errorDetail = error.GetDetail<AllowedErrorDetail<TValue>>();
 
-        Assert.Equal(2, errorDetail.Count);
-        Assert.Equal(value, errorDetail[nameof(AllowedErrorDetail<object>.Value).ToLowerFirst()].GetString());
-        Assert.Equal(
-            allowed,
-            errorDetail[nameof(AllowedErrorDetail<object>.Allowed).ToLowerFirst()]
-                .EnumerateArray()
-                .Select(e => e.GetString()!));
+        Assert.Equal(value, errorDetail.Value);
+        Assert.Equal(allowed, errorDetail.Allowed);
 
         return error;
     }
 
     public static ErrorViewModel AssertHasError(
         this ValidationProblemViewModel validationProblem,
-        string expectedPath,
+        string? expectedPath,
         string expectedCode)
     {
         Predicate<ErrorViewModel> predicate = error => error.Path == expectedPath && error.Code == expectedCode;
@@ -232,6 +333,16 @@ public static class ValidationProblemViewModelTestExtensions
         return validationProblem.Errors.First(new Func<ErrorViewModel, bool>(predicate));
     }
 
+    public static ErrorViewModel AssertHasGlobalError(
+        this ValidationProblemViewModel validationProblem,
+        Enum expectedCode) =>
+        validationProblem.AssertHasGlobalError(expectedCode.ToString());
+
+    public static ErrorViewModel AssertHasGlobalError(
+        this ValidationProblemViewModel validationProblem,
+        string expectedCode) =>
+        validationProblem.AssertHasError(expectedPath: null, expectedCode);
+
     private static ErrorViewModel AssertHasFluentValidationError(
         this ValidationProblemViewModel validationProblem,
         string expectedPath,
@@ -240,14 +351,5 @@ public static class ValidationProblemViewModelTestExtensions
         var expectedCode = expectedKey.Replace("Validator", "");
 
         return AssertHasError(validationProblem, expectedPath, expectedCode);
-    }
-
-    private static Dictionary<string, JsonElement> GetErrorDetail(ErrorViewModel error)
-    {
-        var errorDetailJson = Assert.IsType<JsonElement>(error.Detail);
-        var errorDetail = errorDetailJson.Deserialize<Dictionary<string, JsonElement>>();
-
-        Assert.NotNull(errorDetail);
-        return errorDetail;
     }
 }

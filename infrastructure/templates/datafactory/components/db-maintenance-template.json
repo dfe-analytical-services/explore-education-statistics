@@ -14,17 +14,14 @@
         "description": "The name of the key vault"
       }
     },
-    "slackWebhook": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack webhook URI for alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
         "description": "Slack channel to post Azure alerts to"
       }
+    },
+    "slackAppToken": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -125,13 +122,15 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "url": "[parameters('slackWebhook')]",
+              "url": "https://slack.com/api/chat.postMessage",
               "method": "POST",
+              "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+              },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "icon_emoji": ":smile",
                 "text": "Data Factory Success!",
-                "username": "Alertbot",
                 "attachments": [{
                   "color": "good",
                   "fields": [{
@@ -173,13 +172,15 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "url": "[parameters('slackWebhook')]",
+              "url": "https://slack.com/api/chat.postMessage",
               "method": "POST",
+              "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+              },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "icon_emoji": ":face_vomiting",
                 "text": "Data Factory Failure!",
-                "username": "Alertbot",
                 "attachments": [
                   {
                     "color": "warning",
@@ -293,13 +294,15 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "url": "[parameters('slackWebhook')]",
+              "url": "https://slack.com/api/chat.postMessage",
               "method": "POST",
+              "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+              },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "icon_emoji": ":smile",
                 "text": "Data Factory Success!",
-                "username": "Alertbot",
                 "attachments": [{
                   "color": "good",
                   "fields": [{
@@ -341,13 +344,15 @@
             },
             "userProperties": [],
             "typeProperties": {
-              "url": "[parameters('slackWebhook')]",
+              "url": "https://slack.com/api/chat.postMessage",
               "method": "POST",
+              "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+              },
               "body": {
                 "channel": "[parameters('slackAlertsChannel')]",
-                "icon_emoji": ":face_vomiting",
                 "text": "Data Factory Failure!",
-                "username": "Alertbot",
                 "attachments": [
                   {
                     "color": "warning",

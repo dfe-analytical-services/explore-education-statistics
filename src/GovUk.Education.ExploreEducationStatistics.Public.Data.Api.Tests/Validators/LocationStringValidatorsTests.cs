@@ -2,6 +2,7 @@ using FluentValidation;
 using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators;
 using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
@@ -51,6 +52,23 @@ public class LocationStringValidatorsTests
 
         [Theory]
         [InlineData("")]
+        [InlineData("  ")]
+        [InlineData(null)]
+        public void Failure_Empty(string? location)
+        {
+            var testObj = new TestClass { Location = location! };
+
+            var result = _validator.Validate(testObj);
+
+            Assert.False(result.IsValid);
+
+            var error = Assert.Single(result.Errors);
+
+            Assert.Equal(nameof(TestClass.Location), error.PropertyName);
+            Assert.Equal(FluentValidationKeys.NotEmptyValidator, error.ErrorCode);
+        }
+
+        [Theory]
         [InlineData("Invalid")]
         [InlineData("NAT")]
         [InlineData("id")]
@@ -87,6 +105,7 @@ public class LocationStringValidatorsTests
             var state = Assert.IsType<FormatErrorDetail>(error.CustomState);
 
             Assert.Equal(location, state.Value);
+            Assert.Equal("{level}|{property}|{value}", state.ExpectedFormat);
         }
 
         [Theory]

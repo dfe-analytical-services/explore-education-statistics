@@ -13,15 +13,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migrations
 {
     [DbContext(typeof(PublicDataDbContext))]
-    [Migration("20240322153331_EES4807_AddPermissionsToDataProcessorUser")]
-    partial class EES4807_AddPermissionsToDataProcessorUser
+    [Migration("20240424123603_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.0")
+                .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -145,7 +145,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("LatestVersionId")
+                    b.Property<Guid?>("LatestDraftVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LatestLiveVersionId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("PublicationId")
@@ -177,7 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LatestVersionId")
+                    b.HasIndex("LatestDraftVersionId")
+                        .IsUnique();
+
+                    b.HasIndex("LatestLiveVersionId")
                         .IsUnique();
 
                     b.HasIndex("SupersedingDataSetId");
@@ -194,9 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CsvFileId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("DataSetId")
                         .HasColumnType("uuid");
 
@@ -206,6 +209,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Property<DateTimeOffset?>("Published")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ReleaseFileId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -230,7 +236,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasIndex("DataSetId");
 
+                    b.HasIndex("ReleaseFileId");
+
                     b.ToTable("DataSetVersions");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DataSetVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("Updated")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataSetVersionId");
+
+                    b.ToTable("DataSetVersionImports");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
@@ -605,8 +639,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterOptionChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("FilterId")
                                         .IsRequired()
@@ -637,8 +670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterOptionChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("FilterId")
                                         .IsRequired()
@@ -713,8 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Hint")
                                         .IsRequired()
@@ -742,8 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<FilterChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Hint")
                                         .IsRequired()
@@ -815,8 +845,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<IndicatorChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<byte?>("DecimalPlaces")
                                         .HasColumnType("smallint");
@@ -846,8 +875,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<IndicatorChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<byte?>("DecimalPlaces")
                                         .HasColumnType("smallint");
@@ -921,8 +949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<LocationChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -954,8 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<LocationChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -1030,8 +1056,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<TimePeriodChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -1054,8 +1079,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .HasColumnType("uuid");
 
                                     b2.Property<int>("ChangeId")
-                                        .HasColumnType("integer")
-                                        .HasColumnName("Change<TimePeriodChangeState>Id");
+                                        .HasColumnType("integer");
 
                                     b2.Property<string>("Code")
                                         .IsRequired()
@@ -1084,22 +1108,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestVersion")
-                        .WithOne("DataSet")
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestVersionId");
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestDraftVersion")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestDraftVersionId");
+
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestLiveVersion")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestLiveVersionId");
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
                         .WithMany()
                         .HasForeignKey("SupersedingDataSetId");
 
-                    b.Navigation("LatestVersion");
+                    b.Navigation("LatestDraftVersion");
+
+                    b.Navigation("LatestLiveVersion");
 
                     b.Navigation("SupersedingDataSet");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", null)
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "DataSet")
                         .WithMany("Versions")
                         .HasForeignKey("DataSetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1196,8 +1226,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                 .IsRequired();
                         });
 
+                    b.Navigation("DataSet");
+
                     b.Navigation("MetaSummary")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "DataSetVersion")
+                        .WithMany("Imports")
+                        .HasForeignKey("DataSetVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DataSetVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.FilterMeta", b =>
@@ -1300,9 +1343,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.Navigation("DataSet")
-                        .IsRequired();
-
                     b.Navigation("FilterChanges");
 
                     b.Navigation("FilterMetas");
@@ -1311,6 +1351,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("GeographicLevelMeta")
                         .IsRequired();
+
+                    b.Navigation("Imports");
 
                     b.Navigation("IndicatorChanges");
 

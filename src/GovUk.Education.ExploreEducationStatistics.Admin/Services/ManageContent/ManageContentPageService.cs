@@ -183,8 +183,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.ReleaseVersions)
                 .Include(rv => rv.Publication)
-                .ThenInclude(publication => publication.LegacyReleases)
-                .Include(rv => rv.Publication)
                 .ThenInclude(publication => publication.Topic.Theme)
                 .Include(rv => rv.Content)
                 .ThenInclude(section => section.Content)

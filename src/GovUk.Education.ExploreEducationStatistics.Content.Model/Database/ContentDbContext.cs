@@ -56,7 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseVersion> ReleaseVersions { get; set; }
         public virtual DbSet<Release> Releases { get; set; }
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
-        public virtual DbSet<LegacyRelease> LegacyReleases { get; set; }
         public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
@@ -394,6 +393,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 entity.HasOne(rf => rf.File)
                     .WithMany()
                     .OnDelete(DeleteBehavior.NoAction);
+                entity.Property(rf => rf.FilterSequence)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<List<FilterSequenceEntry>>(v));
+                entity.Property(rf => rf.IndicatorSequence)
+                    .HasConversion(
+                        v => JsonConvert.SerializeObject(v),
+                        v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v));
             });
         }
 
@@ -401,24 +408,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<File>(entity =>
             {
-                entity.Property(e => e.ContentType)
+                entity.Property(f => f.ContentType)
                     .HasMaxLength(255);
-                entity.Property(e => e.Type)
+                entity.Property(f => f.Type)
                     .HasConversion(new EnumToStringConverter<FileType>())
                     .HasMaxLength(25);
-                entity.HasIndex(e => e.Type);
-                entity.HasOne(b => b.Replacing)
+                entity.HasIndex(f => f.Type);
+                entity.HasOne(f => f.Replacing)
                     .WithOne()
-                    .HasForeignKey<File>(b => b.ReplacingId)
+                    .HasForeignKey<File>(f => f.ReplacingId)
                     .IsRequired(false);
-                entity.HasOne(b => b.ReplacedBy)
+                entity.HasOne(f => f.ReplacedBy)
                     .WithOne()
-                    .HasForeignKey<File>(b => b.ReplacedById)
+                    .HasForeignKey<File>(f => f.ReplacedById)
                     .IsRequired(false);
-                entity.Property(e => e.Created)
+                entity.Property(f => f.Created)
                     .HasConversion(
                         v => v,
                         v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+                entity.HasIndex(f => f.PublicDataSetVersionId);
             });
         }
 

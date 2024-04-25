@@ -12,10 +12,22 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Config;
 
-public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
+public class ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup> testApp)
+    : IntegrationTest<TestStartup>(testApp)
 {
-    public ProblemDetailsResultFilterTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+    [Fact]
+    public async Task Forbid_Returns403ProblemDetails()
     {
+        var client = BuildApp().CreateClient();
+        var response = await client.GetAsync(nameof(TestController.TestForbid));
+
+        response.AssertForbidden();
+
+        var problemDetails = response.AssertBodyIsProblemDetails();
+
+        Assert.Equal(403, problemDetails.Status);
+        Assert.Equal("Forbidden", problemDetails.Title);
+        Assert.Equal("https://tools.ietf.org/html/rfc9110#section-15.5.4", problemDetails.Type);
     }
 
     [Fact]
@@ -111,6 +123,12 @@ public class ProblemDetailsResultFilterTests : IntegrationTest<TestStartup>
     [ApiController]
     private class TestController : ControllerBase
     {
+        [HttpGet(nameof(TestForbid))]
+        public ActionResult TestForbid()
+        {
+            return Forbid();
+        }
+
         [HttpGet(nameof(TestBadRequest))]
         public ActionResult TestBadRequest()
         {

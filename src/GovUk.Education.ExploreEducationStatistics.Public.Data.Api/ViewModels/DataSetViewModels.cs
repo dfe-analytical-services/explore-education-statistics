@@ -53,7 +53,7 @@ public record DataSetLatestVersionViewModel
     /// <summary>
     /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).
     /// </summary>
-    public required string Number { get; init; }
+    public required string Version { get; init; }
 
     /// <summary>
     /// When the version was published.
@@ -97,7 +97,7 @@ public class DataSetVersionViewModel
     /// <summary>
     /// The version number. Follows semantic versioning e.g. 2.0 (major), 1.1 (minor).
     /// </summary>
-    public required string Number { get; init; }
+    public required string Version { get; init; }
 
     /// <summary>
     /// The version type. Can be one of the following:

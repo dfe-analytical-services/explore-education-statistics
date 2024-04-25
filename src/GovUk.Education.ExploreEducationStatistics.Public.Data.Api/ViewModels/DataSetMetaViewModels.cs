@@ -195,7 +195,7 @@ public record LocationSchoolOptionMetaViewModel : LocationOptionMetaViewModel
 public record TimePeriodMetaViewModel
 {
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<TimeIdentifier>))]
-    public TimeIdentifier? Code { get; init; }
+    public required TimeIdentifier Code { get; init; }
 
     /// <summary>
     /// The period that the time period relates to.

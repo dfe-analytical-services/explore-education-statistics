@@ -520,10 +520,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
                     // Copy certain fields from the original.
                     SubjectId = originalReleaseSubject.SubjectId,
-                    FilterSequence = originalReleaseSubject.FilterSequence,
-                    IndicatorSequence = originalReleaseSubject.IndicatorSequence
                 });
-
             _statisticsDbContext.ReleaseVersion.Add(statsAmendmentVersion);
             _statisticsDbContext.ReleaseSubject.AddRange(statsAmendmentSubjectLinks);
 
@@ -623,7 +620,9 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                 FileId = originalFile.FileId,
                 Order = originalFile.Order,
                 Name = originalFile.Name,
-                Summary = originalFile.Summary
+                Summary = originalFile.Summary,
+                FilterSequence = originalFile.FilterSequence,
+                IndicatorSequence = originalFile.IndicatorSequence,
             })
             .ToList();
 

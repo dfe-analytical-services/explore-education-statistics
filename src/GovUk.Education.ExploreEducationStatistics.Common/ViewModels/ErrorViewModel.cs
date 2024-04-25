@@ -2,6 +2,10 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
+/// <summary>
+/// Describes an error that occurred with the request. This will typically
+/// need to be rectified before the request can be fully processed.
+/// </summary>
 public record ErrorViewModel
 {
     /// <summary>
@@ -11,7 +15,7 @@ public record ErrorViewModel
 
     /// <summary>
     /// The path to the property on the request that the error relates to.
-    /// May be omitted or be empty if no specific property of the
+    /// May be omitted or empty if no specific property of the
     /// request relates to the error (it is a 'global' error).
     /// </summary>
     public string? Path { get; init; }

@@ -27,7 +27,7 @@
       "value": "S1 Standard"
     },
     "slackAlertsChannel": {
-      "value": "#alerts-preprod"
+      "value": "C0681S50SP5"
     },
     "useSubnets": {
       "value": true
@@ -88,6 +88,9 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "publicDataDbExists": {
+      "value": false
     }
   }
 }

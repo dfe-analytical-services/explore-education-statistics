@@ -24,7 +24,7 @@
       "value": "B1 Basic"
     },
     "slackAlertsChannel": {
-      "value": "#alerts-dev"
+      "value": "C067Z1K68UD"
     },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"
@@ -112,6 +112,9 @@
     },
     "immediatePublicationOfScheduledReleaseVersionsEnabled": {
       "value": true
+    },
+    "publicDataDbExists": {
+      "value": false
     }
   }
 }

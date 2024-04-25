@@ -1,0 +1,126 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters":{
+    "logicAppName": {
+      "type": "string"
+    },
+    "slackAlertsChannel": {
+      "type": "string"
+    },
+    "slackAppToken": {
+      "type": "securestring"
+    }
+  },
+  "resources":[
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('logicAppName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "properties": {
+                        "alertContext": {
+                          "properties": {},
+                          "type": "object"
+                        },
+                        "essentials": {
+                          "properties": {
+                            "alertContextVersion": {
+                              "type": "string"
+                            },
+                            "alertId": {
+                              "type": "string"
+                            },
+                            "alertRule": {
+                              "type": "string"
+                            },
+                            "alertTargetIDs": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "essentialsVersion": {
+                              "type": "string"
+                            },
+                            "firedDateTime": {
+                              "type": "string"
+                            },
+                            "monitorCondition": {
+                              "type": "string"
+                            },
+                            "monitoringService": {
+                              "type": "string"
+                            },
+                            "originAlertId": {
+                              "type": "string"
+                            },
+                            "resolvedDateTime": {
+                              "type": "string"
+                            },
+                            "severity": {
+                              "type": "string"
+                            },
+                            "signalType": {
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "schemaId": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "actions": {
+            "HTTP_Webhook": {
+              "runAfter": {},
+              "type": "HttpWebhook",
+              "inputs": {
+                "subscribe": {
+                  "body": {
+                    "channel": "[parameters('slackAlertsChannel')]",
+                    "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
+                  },
+                  "method": "POST",
+                  "uri": "https://slack.com/api/chat.postMessage",
+                  "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": "[concat('Bearer ', parameters('slackAppToken'))]"
+                  }
+                },
+                "unsubscribe": {}
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {}
+      }
+    }
+  ]
+}

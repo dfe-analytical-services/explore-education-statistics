@@ -1,6 +1,7 @@
 #nullable enable
 using System;
-using AutoMapper;
+using Azure.Core;
+using Azure.Identity;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Database;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -42,6 +43,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -64,6 +66,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Npgsql;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
@@ -74,9 +77,11 @@ using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Con
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
+using DataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data.DataSetService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
+using IDataSetService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data.IDataSetService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
@@ -97,22 +102,14 @@ using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.T
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
-    public class Startup
+    public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
     {
-        private IConfiguration Configuration { get; }
-        private IHostEnvironment HostEnvironment { get; }
-
-        public Startup(
-            IConfiguration configuration,
-            IHostEnvironment hostEnvironment)
-        {
-            Configuration = configuration;
-            HostEnvironment = hostEnvironment;
-        }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public virtual void ConfigureServices(IServiceCollection services)
         {
+            // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
+            var publicDataDbExists = configuration.GetValue<bool>("PublicDataDbExists");
+
             services.AddHealthChecks();
 
             /*
@@ -143,6 +140,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddHttpContextAccessor();
 
+            services.AddFluentValidation();
+
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.RegisteredUser.ToString()));
@@ -169,37 +168,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // TODO EES-4869 - review if we need to retain these tables.
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                    .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
-                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                    .UseSqlServer(configuration.GetConnectionString("StatisticsDb"),
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
                                 .EnableCustomRetryOnFailure()
                     )
-                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+                    .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment())
             );
+
+            // Only set up the `PublicDataDbContext` in non-integration test
+            // environments. Otherwise, the connection string will be null and
+            // cause the data source builder to throw a host exception.
+            if (!hostEnvironment.IsIntegrationTest())
+            {
+                var publicDataDbConnectionString = configuration.GetConnectionString("PublicDataDb")!;
+
+                if (hostEnvironment.IsDevelopment())
+                {
+                    var dataSourceBuilder = new NpgsqlDataSourceBuilder(publicDataDbConnectionString);
+
+                    // Set up the data source outside the `AddDbContext` action as this
+                    // prevents `ManyServiceProvidersCreatedWarning` warnings due to EF
+                    // creating over 20 `IServiceProvider` instances.
+                    var dbDataSource = dataSourceBuilder.Build();
+
+                    services.AddDbContext<PublicDataDbContext>(options =>
+                    {
+                        options
+                            .UseNpgsql(dbDataSource)
+                            .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment());
+                    });
+                }
+                else
+                {
+                    // TODO EES-5073 Remove this check when the Public Data db is available in all Azure environments.
+                    if (publicDataDbExists)
+                    {
+                        services.AddDbContext<PublicDataDbContext>(options =>
+                        {
+                            var sqlServerTokenProvider = new DefaultAzureCredential();
+                            var accessToken = sqlServerTokenProvider.GetToken(
+                                    new TokenRequestContext(scopes:
+                                        ["https://ossrdbms-aad.database.windows.net/.default"]))
+                                .Token;
+                            var connectionStringWithAccessToken =
+                                publicDataDbConnectionString.Replace("[access_token]", accessToken);
+                            var dbDataSource = new NpgsqlDataSourceBuilder(connectionStringWithAccessToken).Build();
+                            options.UseNpgsql(dbDataSource);
+                        });
+                    }
+                }
+            }
 
             /*
              * Authentication and Authorization
@@ -232,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // ClaimsPrincipal already from information in the JWT).
             services.AddTransient<IClaimsTransformation, ClaimsPrincipalTransformationService>();
 
-            if (!HostEnvironment.IsIntegrationTest())
+            if (!hostEnvironment.IsIntegrationTest())
             {
                 services
                         // This tells Identity Framework to look for Bearer tokens in incoming requests' Authorization
@@ -248,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     })
                     // This adds verification of the incoming JWTs after they have been located in the
                     // Authorization headers above.
-                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("OpenIdConnectIdentityFramework"));
+                    .AddMicrosoftIdentityWebApi(configuration.GetRequiredSection("OpenIdConnectIdentityFramework"));
 
                 // This helps Identity Framework with incoming websocket requests from SignalR, or any request where
                 // adding the Bearer token in the Authorization HTTP header is not possible, and is instead added as an
@@ -291,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 )
                 .AddNewtonsoftJsonProtocol();
 
-            var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
+            var azureSignalRConnectionString = configuration.GetValue<string>("Azure:SignalR:ConnectionString");
 
             if (!azureSignalRConnectionString.IsNullOrEmpty())
             {
@@ -302,23 +345,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Configuration options
              */
 
-            services.Configure<PreReleaseOptions>(Configuration);
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+            services.Configure<PreReleaseOptions>(configuration);
+            services.Configure<LocationsOptions>(configuration.GetRequiredSection(LocationsOptions.Locations));
             services.Configure<ReleaseApprovalOptions>(
-                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
-            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
+                configuration.GetRequiredSection(ReleaseApprovalOptions.ReleaseApproval));
+            services.Configure<TableBuilderOptions>(configuration.GetRequiredSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<OpenIdConnectSpaClientOptions>(Configuration.GetSection(
+            services.Configure<OpenIdConnectSpaClientOptions>(configuration.GetSection(
                 OpenIdConnectSpaClientOptions.OpenIdConnectSpaClient));
 
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, Configuration);
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services, configuration);
 
             /*
              * Services
              */
 
-            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
+            var coreStorageConnectionString = configuration.GetValue<string>("CoreStorage");
+            var publisherStorageConnectionString = configuration.GetValue<string>("PublisherStorage");
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -407,12 +450,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
             services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
             services.AddTransient<IRedirectsService, RedirectsService>();
+            services.AddTransient<Services.Interfaces.Public.Data.IReleaseService, Services.Public.Data.ReleaseService>();
+
+            if (publicDataDbExists)
+            {
+                services.AddTransient<IDataSetService, DataSetService>();
+            }
+            else
+            {
+                // TODO EES-5073 Remove this once PublicDataDbContext is configured in ALL Azure environments.
+                // This is allowing for the PublicDataDbContext to be null.
+                services.AddTransient<IDataSetService, DataSetService>(provider =>
+                    new DataSetService(provider.GetRequiredService<ContentDbContext>(),
+                        provider.GetService<PublicDataDbContext>(),
+                        provider.GetRequiredService<IUserService>()));
+            }
 
             services.AddTransient<INotificationClient>(s =>
             {
-                var notifyApiKey = Configuration.GetValue<string>("NotifyApiKey");
+                var notifyApiKey = configuration.GetValue<string>("NotifyApiKey");
 
-                if (!HostEnvironment.IsDevelopment() && !HostEnvironment.IsIntegrationTest())
+                if (!hostEnvironment.IsDevelopment() && !hostEnvironment.IsIntegrationTest())
                 {
                     return new NotificationClient(notifyApiKey);
                 }
@@ -481,7 +539,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddScoped<DateTimeProvider>();
 
             // This service allows a set of users to be pre-invited to the service on startup.
-            if (HostEnvironment.IsDevelopment())
+            if (hostEnvironment.IsDevelopment())
             {
                 services.AddTransient<BootstrapUsersService>();
             }
@@ -502,7 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Swagger
              */
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("enableSwagger"))
                 services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1",
@@ -569,7 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             app.UseResponseCompression();
 
-            if (Configuration.GetValue<bool>("enableSwagger"))
+            if (configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
@@ -593,7 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .FontSources(s => s.Self())
                 .FormActions(s =>
                 {
-                    var loginAuthorityUrl = Configuration.GetSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
+                    var loginAuthorityUrl = configuration.GetRequiredSection("OpenIdConnectIdentityFramework").GetValue<string>("Authority");
                     var loginAuthorityUri = new Uri(loginAuthorityUrl);
                     s
                         .CustomSources(loginAuthorityUri.GetLeftPart(UriPartial.Authority))

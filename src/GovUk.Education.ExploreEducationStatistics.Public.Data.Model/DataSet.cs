@@ -20,9 +20,13 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public DataSet? SupersedingDataSet { get; set; }
 
-    public Guid? LatestVersionId { get; set; }
+    public Guid? LatestDraftVersionId { get; set; }
 
-    public DataSetVersion? LatestVersion { get; set; }
+    public DataSetVersion? LatestDraftVersion { get; set; }
+
+    public Guid? LatestLiveVersionId { get; set; }
+
+    public DataSetVersion? LatestLiveVersion { get; set; }
 
     public List<DataSetVersion> Versions { get; set; } = [];
 
@@ -41,9 +45,16 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
             builder.Property(ds => ds.Status).HasConversion<string>();
 
             builder
-                .HasOne(ds => ds.LatestVersion)
-                .WithOne(dsv => dsv.DataSet)
-                .HasForeignKey<DataSet>(ds => ds.LatestVersionId);
+                .HasOne(ds => ds.LatestDraftVersion)
+                .WithOne()
+                .HasForeignKey<DataSet>(ds => ds.LatestDraftVersionId)
+                .IsRequired(false);
+
+            builder
+                .HasOne(ds => ds.LatestLiveVersion)
+                .WithOne()
+                .HasForeignKey<DataSet>(ds => ds.LatestLiveVersionId)
+                .IsRequired(false);
         }
     }
 }

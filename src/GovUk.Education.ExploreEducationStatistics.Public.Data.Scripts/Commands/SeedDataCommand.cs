@@ -237,7 +237,7 @@ public class SeedDataCommand : ICommand
             var dataSetVersion = await CreateDataSetVersion(metaFileRows, allowedColumns);
             await CreateDataSetMeta(metaFileRows, allowedColumns);
 
-            _seed.DataSet.LatestVersion = dataSetVersion;
+            _seed.DataSet.LatestLiveVersion = dataSetVersion;
 
             await _dbContext.SaveChangesAsync(_cancellationToken);
 
@@ -307,7 +307,7 @@ public class SeedDataCommand : ICommand
                 VersionMinor = 0,
                 Status = DataSetVersionStatus.Published,
                 Notes = string.Empty,
-                CsvFileId = Guid.NewGuid(),
+                ReleaseFileId = Guid.NewGuid(),
                 DataSetId = _seed.DataSet.Id,
                 TotalResults = totalResults,
                 MetaSummary = new DataSetVersionMetaSummary
