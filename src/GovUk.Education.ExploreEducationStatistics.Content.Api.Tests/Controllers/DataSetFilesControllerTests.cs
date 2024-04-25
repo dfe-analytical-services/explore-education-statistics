@@ -683,6 +683,95 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
+            public async Task FilterByApiDataSetsOnly_ReturnsOnlyDataSetsWithAssociatedApiDataSets()
+            {
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var releaseVersionFiles = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile()
+                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .GenerateList(5))
+                    .GenerateList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
+                    .CreateClient();
+
+                var query = new DataSetFileListRequest
+                {
+                    ApiDataSetsOnly = true
+                };
+
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var expectedReleaseFiles = releaseVersionFiles
+                    .Where(rf => rf.File.PublicDataSetVersionId.HasValue)
+                    .OrderBy(rf => rf.Name)
+                    .ToList();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: expectedReleaseFiles.Count);
+                AssertResultsForExpectedReleaseFiles(expectedReleaseFiles, pagedResult.Results);
+            }
+
+            [Theory]
+            [InlineData(false)]
+            [InlineData(null)]
+            public async Task FilterByApiDataSetsOnly_FalseOrUnset_ReturnsAllDataSets(bool? apiDataSetsOnly)
+            {
+                Publication publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_fixture
+                        .DefaultRelease(publishedVersions: 1)
+                        .Generate(1))
+                    .WithTopic(_fixture.DefaultTopic()
+                        .WithTheme(_fixture.DefaultTheme()));
+
+                var releaseVersionFiles = _fixture.DefaultReleaseFile()
+                    .WithReleaseVersion(publication.ReleaseVersions[0])
+                    .WithFiles(_fixture.DefaultFile()
+                        .ForIndex(0, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .ForIndex(1, s => s.SetPublicDataSetVersionId(Guid.NewGuid()))
+                        .GenerateList(5))
+                    .GenerateList();
+
+                MemoryCacheService
+                    .SetupNotFoundForAnyKey<ListDataSetFilesCacheKey, PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                var client = BuildApp()
+                    .AddContentDbTestData(context => context.ReleaseFiles.AddRange(releaseVersionFiles))
+                    .CreateClient();
+
+                var query = new DataSetFileListRequest
+                {
+                    ApiDataSetsOnly = apiDataSetsOnly
+                };
+
+                var response = await ListDataSets(client, query);
+
+                MockUtils.VerifyAllMocks(MemoryCacheService);
+
+                var pagedResult = response.AssertOk<PaginatedListViewModel<DataSetFileSummaryViewModel>>();
+
+                pagedResult.AssertHasExpectedPagingAndResultCount(expectedTotalResults: releaseVersionFiles.Count);
+                AssertResultsForExpectedReleaseFiles(releaseVersionFiles, pagedResult.Results);
+            }
+
+            [Fact]
             public async Task NoFilter_ReturnsAllResultsOrderedByTitleAscending()
             {
                 var (publication1, publication2) = _fixture
@@ -1562,7 +1651,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
         }
 
-        private static async Task<HttpResponseMessage> ListDataSets(HttpClient client,
+        private static async Task<HttpResponseMessage> ListDataSets(
+            HttpClient client,
             DataSetFileListRequest request)
         {
             var queryParams = new Dictionary<string, string?>
@@ -1575,7 +1665,8 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 { "sort", request.Sort?.ToString() },
                 { "sortDirection", request.SortDirection?.ToString() },
                 { "page", request.Page.ToString() },
-                { "pageSize", request.PageSize.ToString() }
+                { "pageSize", request.PageSize.ToString() },
+                { "apiDataSetsOnly", request.ApiDataSetsOnly?.ToString() }
             };
 
             var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
@@ -1610,12 +1701,14 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                     () => Assert.Equal(theme.Id, viewModel.Theme.Id),
                     () => Assert.Equal(theme.Title, viewModel.Theme.Title),
                     () => Assert.Equal(releaseVersion.Id == publication.LatestPublishedReleaseVersionId, viewModel.LatestData),
-                    () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published)
+                    () => Assert.Equal(releaseFile.ReleaseVersion.Published!.Value, viewModel.Published),
+                    () => Assert.Equal(releaseFile.File.PublicDataSetVersionId.HasValue, viewModel.HasApiDataSet)
                 );
             });
         }
 
-        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(ReleaseVersion releaseVersion,
+        private List<ReleaseFile> GenerateDataSetFilesForReleaseVersion(
+            ReleaseVersion releaseVersion,
             int numberOfDataSets = 2)
         {
             return _fixture.DefaultReleaseFile()

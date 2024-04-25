@@ -31,6 +31,7 @@ public class DataSetFilesControllerCachingTests
             PublicationId: Guid.NewGuid(),
             ReleaseId: Guid.NewGuid(),
             LatestOnly: true,
+            ApiDataSetsOnly: true,
             SearchTerm: "term",
             DataSetsListRequestSortBy.Published,
             SortDirection.Asc,
@@ -64,7 +65,8 @@ public class DataSetFilesControllerCachingTests
                         Title = "Academic year 2001/02"
                     },
                     LatestData = true,
-                    Published = DateTime.UtcNow
+                    Published = DateTime.UtcNow,
+                    HasApiDataSet = true
                 }
             }, 1, 1, 10);
 
@@ -95,6 +97,7 @@ public class DataSetFilesControllerCachingTests
                     _query.PublicationId,
                     _query.ReleaseId,
                     _query.LatestOnly,
+                    _query.ApiDataSetsOnly,
                     _query.SearchTerm,
                     _query.Sort,
                     _query.SortDirection,
