@@ -396,6 +396,7 @@ Verify help and support section is correct
 Verify Dates data block accordion section
     user opens accordion section    Dates data block    id:content
     user scrolls to accordion section    Dates data block    id:content
+    user waits until page finishes loading
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
     user checks chart title contains    ${section}    Updated dates table title
