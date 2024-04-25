@@ -13,6 +13,7 @@
     },
     "subscription": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "Data Hub Subscription Name e.g. s101d01. Used as a prefix for created resources"
       }
@@ -621,12 +622,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "slackWebhook": {
-      "type": "string",
-      "metadata": {
-        "description": "Slack webhook URI for alerts"
-      }
-    },
     "slackAlertsChannel": {
       "type": "string",
       "metadata": {
@@ -663,6 +658,13 @@
       "defaultValue": "",
       "metadata": {
         "description": "The password to log in to the Container registry"
+      }
+    },
+    "publicDataDbExists": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Flag to determine if the public data database exists. TODO EES-5073 remove this when the public data database is available in every environment"
       }
     }
   },
@@ -1031,7 +1033,8 @@
     "contentSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('contentSubnetName'))]",
     "dataSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-data')]",
     "dataSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('dataSubnetName'))]",
-
+    "publicApiDataProcessorSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-papi-snet-fa-processor')]",
+    "containerAppEnvironmentSubnetName": "[concat(parameters('subscription'), '-', parameters('environment'), '-snet-cae-01')]",
     "sqlAllowedSubnets": [
       {
         "name": "admin",
@@ -1655,6 +1658,11 @@
               "name": "ContentDb",
               "type": "SQLAzure",
               "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+            },
+            {
+              "name": "PublicDataDb",
+              "type": "PostgreSQL",
+              "connectionString": "[concat('@Microsoft.KeyVault(VaultName=', variables('keyVaultName'), ';SecretName=ees-admin-connectionstring-publicdatadb)')]"
             }
           ]
         }
@@ -1717,7 +1725,8 @@
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
+        "PublicDataDbExists": "[parameters('publicDataDbExists')]"
       }
     },
     {
@@ -3441,6 +3450,39 @@
                 }
               ]
             }
+          },
+          {
+            "name": "[variables('publicApiDataProcessorSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.6.0/24",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage"
+                }
+              ],
+              "delegations": [
+                {
+                  "name": "webapp",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "[variables('containerAppEnvironmentSubnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.8.0/24",
+              "delegations": [
+                {
+                  "name": "environment",
+                  "properties": {
+                    "serviceName": "Microsoft.App/environments"
+                  }
+                }
+              ]
+            }
           }
         ]
       }
@@ -3479,9 +3521,6 @@
           },
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
-          },
-          "slackWebhook": {
-            "value": "[parameters('slackWebhook')]"
           },
           "slackAlertsChannel": {
             "value": "[parameters('slackAlertsChannel')]"
@@ -3948,111 +3987,35 @@
       }
     },
     {
-      "type": "Microsoft.Logic/workflows",
-      "apiVersion": "2017-07-01",
-      "name": "[variables('logicAppSlackAlerts')]",
-      "location": "[resourceGroup().location]",
+      "name": "logicAppTemplate",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
       "properties": {
-        "state": "Enabled",
-        "definition": {
-          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "triggers": {
-            "manual": {
-              "type": "Request",
-              "kind": "Http",
-              "inputs": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "properties": {
-                        "alertContext": {
-                          "properties": {},
-                          "type": "object"
-                        },
-                        "essentials": {
-                          "properties": {
-                            "alertContextVersion": {
-                              "type": "string"
-                            },
-                            "alertId": {
-                              "type": "string"
-                            },
-                            "alertRule": {
-                              "type": "string"
-                            },
-                            "alertTargetIDs": {
-                              "items": {
-                                "type": "string"
-                              },
-                              "type": "array"
-                            },
-                            "description": {
-                              "type": "string"
-                            },
-                            "essentialsVersion": {
-                              "type": "string"
-                            },
-                            "firedDateTime": {
-                              "type": "string"
-                            },
-                            "monitorCondition": {
-                              "type": "string"
-                            },
-                            "monitoringService": {
-                              "type": "string"
-                            },
-                            "originAlertId": {
-                              "type": "string"
-                            },
-                            "resolvedDateTime": {
-                              "type": "string"
-                            },
-                            "severity": {
-                              "type": "string"
-                            },
-                            "signalType": {
-                              "type": "string"
-                            }
-                          },
-                          "type": "object"
-                        }
-                      },
-                      "type": "object"
-                    },
-                    "schemaId": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "actions": {
-            "HTTP_Webhook": {
-              "runAfter": {},
-              "type": "HttpWebhook",
-              "inputs": {
-                "subscribe": {
-                  "body": {
-                    "username": "Alertbot",
-                    "icon_emoji": ":face_with_monocle",
-                    "channel": "[parameters('slackAlertsChannel')]",
-                    "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
-                  },
-                  "method": "POST",
-                  "uri": "[parameters('slackWebhook')]"
-                },
-                "unsubscribe": {}
-              }
-            }
-          },
-          "outputs": {}
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'logic-app-template.json')]",
+          "contentVersion": "1.0.0.0"
         },
-        "parameters": {}
-      }
+        "parameters": {
+          "logicAppName": {
+            "value": "[variables('logicAppSlackAlerts')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
+          },
+          "slackAppToken": {
+            "reference": {
+              "keyVault": {
+                "id": "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+              },
+              "secretName": "ees-alerts-slackapptoken"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ]
     },
     {
       "type": "microsoft.insights/actionGroups",

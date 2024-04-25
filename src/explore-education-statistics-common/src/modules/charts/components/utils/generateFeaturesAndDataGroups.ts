@@ -7,7 +7,7 @@ import generateHslColour from '@common/utils/colour/generateHslColour';
 import {
   MapFeature,
   MapFeatureCollection,
-} from '@common/modules/charts/components/MapBlockInternal';
+} from '@common/modules/charts/components/MapBlock';
 
 export default function generateFeaturesAndDataGroups({
   dataSetCategories,

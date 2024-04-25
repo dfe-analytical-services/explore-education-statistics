@@ -23,7 +23,7 @@
 }
 
 .filterType {
-  @include govuk-font($size: 14);
+  @include govuk-font($size: 16);
   display: block;
   text-transform: uppercase;
 }

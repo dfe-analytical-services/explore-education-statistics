@@ -8,5 +8,5 @@ public record ParquetFilterOption
 
     public required string PublicId { get; set; }
 
-    public required string ColumnName { get; set; }
+    public required string FilterId { get; set; }
 }

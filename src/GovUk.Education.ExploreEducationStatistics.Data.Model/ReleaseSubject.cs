@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -23,15 +24,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public DateTime? Updated { get; set; }
     }
-
-    public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);
-
-    public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> ChildSequence) :
-        SequenceEntry<Guid, FilterGroupSequenceEntry>(Id, ChildSequence);
-
-    public record FilterGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
-        SequenceEntry<Guid, Guid>(Id, ChildSequence);
-
-    public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
-        SequenceEntry<Guid, Guid>(Id, ChildSequence);
 }

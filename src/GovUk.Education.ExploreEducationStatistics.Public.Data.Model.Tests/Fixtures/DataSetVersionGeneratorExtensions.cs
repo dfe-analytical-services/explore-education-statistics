@@ -42,10 +42,10 @@ public static class DataSetVersionGeneratorExtensions
         Guid dataSetId)
         => generator.ForInstance(s => s.SetDataSetId(dataSetId));
 
-    public static Generator<DataSetVersion> WithCsvFileId(
+    public static Generator<DataSetVersion> WithReleaseFileId(
         this Generator<DataSetVersion> generator,
-        Guid csvFileId)
-        => generator.ForInstance(s => s.SetCsvFileId(csvFileId));
+        Guid releaseFileId)
+        => generator.ForInstance(s => s.SetReleaseFileId(releaseFileId));
 
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
@@ -114,6 +114,11 @@ public static class DataSetVersionGeneratorExtensions
         this Generator<DataSetVersion> generator)
         => generator.ForInstance(s => s.SetGeographicLevelMeta());
 
+    public static Generator<DataSetVersion> WithImports(
+        this Generator<DataSetVersion> generator,
+        Func<IEnumerable<DataSetVersionImport>> imports)
+        => generator.ForInstance(s => s.SetImports(imports));
+
     public static Generator<DataSetVersion> WithLocationMetas(
         this Generator<DataSetVersion> generator,
         Func<IEnumerable<LocationMeta>> metas)
@@ -173,7 +178,7 @@ public static class DataSetVersionGeneratorExtensions
         => setters
             .SetDefault(dsv => dsv.Id)
             .SetDefault(dsv => dsv.DataSetId)
-            .SetDefault(dsv => dsv.CsvFileId)
+            .SetDefault(dsv => dsv.ReleaseFileId)
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
@@ -192,10 +197,10 @@ public static class DataSetVersionGeneratorExtensions
         Guid dataSetId)
         => instanceSetter.Set(dsv => dsv.DataSetId, dataSetId);
 
-    public static InstanceSetters<DataSetVersion> SetCsvFileId(
+    public static InstanceSetters<DataSetVersion> SetReleaseFileId(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        Guid csvFileId)
-        => instanceSetter.Set(dsv => dsv.CsvFileId, csvFileId);
+        Guid releaseFileId)
+        => instanceSetter.Set(dsv => dsv.ReleaseFileId, releaseFileId);
 
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -299,6 +304,27 @@ public static class DataSetVersionGeneratorExtensions
             }
         );
 
+    public static InstanceSetters<DataSetVersion> SetImports(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<IEnumerable<DataSetVersionImport>> imports)
+        => instanceSetter.SetImports(_ => imports());
+
+    public static InstanceSetters<DataSetVersion> SetImports(
+        this InstanceSetters<DataSetVersion> instanceSetter,
+        Func<Faker, IEnumerable<DataSetVersionImport>> imports)
+        => instanceSetter.Set(
+            (faker, dsv) =>
+            {
+                dsv.Imports = imports(faker).ToList();
+
+                foreach (var import in dsv.Imports)
+                {
+                    import.DataSetVersion = dsv;
+                    import.DataSetVersionId = dsv.Id;
+                }
+            }
+        );
+
     public static InstanceSetters<DataSetVersion> SetLocationMetas(
         this InstanceSetters<DataSetVersion> instanceSetter,
         Func<IEnumerable<LocationMeta>> metas)
@@ -317,7 +343,6 @@ public static class DataSetVersionGeneratorExtensions
                     meta.DataSetVersion = dsv;
                     meta.DataSetVersionId = dsv.Id;
                 }
-
             }
         );
 
@@ -339,7 +364,6 @@ public static class DataSetVersionGeneratorExtensions
                     meta.DataSetVersion = dsv;
                     meta.DataSetVersionId = dsv.Id;
                 }
-
             }
         );
 

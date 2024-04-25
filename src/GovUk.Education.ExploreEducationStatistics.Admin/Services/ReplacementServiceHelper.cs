@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -15,10 +16,10 @@ public class ReplacementServiceHelper
     public static List<FilterSequenceEntry>? ReplaceFilterSequence(
         List<Filter> originalFilters,
         List<Filter> replacementFilters,
-        ReleaseSubject originalReleaseSubject)
+        ReleaseFile originalReleaseFile)
     {
         // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-        if (originalReleaseSubject.FilterSequence == null)
+        if (originalReleaseFile.FilterSequence == null)
         {
             return null;
         }
@@ -94,7 +95,7 @@ public class ReplacementServiceHelper
         // - Swap the remaining id's with their replacements
         // - Append new entries that were added in the replacement
 
-        var filterSequence = originalReleaseSubject.FilterSequence
+        var filterSequence = originalReleaseFile.FilterSequence
             .Where(filter => filtersMap.ContainsKey(filter.Id))
             .Select(filter =>
             {
@@ -157,10 +158,10 @@ public class ReplacementServiceHelper
     public static List<IndicatorGroupSequenceEntry>? ReplaceIndicatorSequence(
         List<IndicatorGroup> originalIndicatorGroups,
         List<IndicatorGroup> replacementIndicatorGroups,
-        ReleaseSubject originalReleaseSubject)
+        ReleaseFile originalReleaseFile)
     {
         // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
-        if (originalReleaseSubject.IndicatorSequence == null)
+        if (originalReleaseFile.IndicatorSequence == null)
         {
             return null;
         }
@@ -213,7 +214,7 @@ public class ReplacementServiceHelper
         // - Swap the remaining id's with their replacements
         // - Append new entries that were added in the replacement
 
-        var indicatorSequence = originalReleaseSubject.IndicatorSequence
+        var indicatorSequence = originalReleaseFile.IndicatorSequence
             .Where(indicatorGroup => indicatorGroupsMap.ContainsKey(indicatorGroup.Id))
             .Select(indicatorGroup =>
             {

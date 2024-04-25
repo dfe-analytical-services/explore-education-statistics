@@ -2,7 +2,6 @@ using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
@@ -269,21 +268,21 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
             var result = _validator.TestValidate(query);
 
             result.ShouldHaveValidationErrorFor(q => q.Eq)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Gt)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Gte)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Lt)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Lte)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Fact]
@@ -309,13 +308,13 @@ public abstract class DataSetGetQueryTimePeriodsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.Lte);
 
             result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Gte)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.Lt)
-                .WithErrorCode(ValidationMessages.TimePeriodFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
     }
 }

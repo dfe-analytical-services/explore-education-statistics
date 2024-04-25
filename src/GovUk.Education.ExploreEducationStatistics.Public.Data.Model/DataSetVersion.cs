@@ -1,7 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -18,7 +17,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required DataSetVersionStatus Status { get; set; }
 
-    public required Guid CsvFileId { get; set; }
+    public required Guid ReleaseFileId { get; set; }
 
     public required int VersionMajor { get; set; }
 
@@ -31,6 +30,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public required DataSetVersionMetaSummary MetaSummary { get; set; }
 
     public required GeographicLevelMeta GeographicLevelMeta { get; set; }
+
+    public List<DataSetVersionImport> Imports { get; set; } = [];
 
     public List<LocationMeta> LocationMetas { get; set; } = [];
 
@@ -60,20 +61,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Version => $"{VersionMajor}.{VersionMinor}";
 
-    public DataSetVersionType VersionType 
+    public DataSetVersionType VersionType
         => VersionMinor == 0 ? DataSetVersionType.Major : DataSetVersionType.Minor;
-
-    public string ParquetDirectoryPath => ParquetPaths.DirectoryPath(this);
-
-    public string DataParquetPath => ParquetPaths.DataPath(this);
-
-    public string FiltersParquetPath => ParquetPaths.FiltersPath(this);
-
-    public string IndicatorsParquetPath  => ParquetPaths.IndicatorsPath(this);
-
-    public string LocationsParquetPath => ParquetPaths.LocationsPath(this);
-
-    public string TimePeriodsParquetPath => ParquetPaths.TimePeriodsPath(this);
 
     internal class Config : IEntityTypeConfiguration<DataSetVersion>
     {
@@ -113,6 +102,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
             });
 
             builder.Property(dsv => dsv.Status).HasConversion<string>();
+
+            builder.HasIndex(dsv => dsv.ReleaseFileId);
         }
     }
 }

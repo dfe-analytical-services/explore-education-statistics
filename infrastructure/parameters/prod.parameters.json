@@ -27,7 +27,7 @@
       "value": "S1 Standard"
     },
     "slackAlertsChannel": {
-      "value": "#alerts"
+      "value": "C01MCTX47E3"
     },
     "publicAppBasicAuth": {
       "value": "false"
@@ -91,6 +91,9 @@
     },
     "maxStatsDbSizeBytes": {
       "value": 1020054732800
+    },
+    "publicDataDbExists": {
+      "value": false
     }
   }
 }

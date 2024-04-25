@@ -3,6 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.T
 public static class IndicatorsTable
 {
     public const string TableName = "indicators";
+    public const string ParquetFile = "indicators.parquet";
 
     public static class Cols
     {

@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpPost("tablebuilder")]
         [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
-        public async Task Query(
+        public async Task<ActionResult> Query(
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
@@ -57,22 +57,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             {
                 Response.ContentDispositionAttachment(ContentTypes.Csv);
 
-                await _tableBuilderService.QueryToCsvStream(query, Response.BodyWriter.AsStream(), cancellationToken);
-
-                return;
+                return await _tableBuilderService.QueryToCsvStream(
+                    queryContext: query,
+                    stream: Response.BodyWriter.AsStream(),
+                    cancellationToken: cancellationToken
+                )
+                .HandleFailuresOrNoOp();
             }
 
-            var result = await _tableBuilderService
+            return await _tableBuilderService
                 .Query(query, cancellationToken)
                 .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [HttpPost("tablebuilder/release/{releaseVersionId:guid}")]
         [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
-        public async Task Query(
+        public async Task<ActionResult> Query(
             Guid releaseVersionId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
@@ -83,21 +84,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     contentType: ContentTypes.Csv,
                     filename: $"{releaseVersionId}.csv");
 
-                await _tableBuilderService.QueryToCsvStream(
-                    releaseVersionId,
-                    query,
-                    Response.BodyWriter.AsStream(),
-                    cancellationToken
-                );
-
-                return;
+                return await _tableBuilderService.QueryToCsvStream(
+                        releaseVersionId: releaseVersionId,
+                        queryContext: query,
+                        stream: Response.BodyWriter.AsStream(),
+                        cancellationToken: cancellationToken
+                    )
+                    .HandleFailuresOrNoOp();
             }
 
-            var result = await _tableBuilderService
+            return await _tableBuilderService
                 .Query(releaseVersionId, query, cancellationToken)
                 .HandleFailuresOr(Ok);
-
-            await result.ExecuteResultAsync(ControllerContext);
         }
 
         // Note that releaseVersionId is not necessary for this method to function any more in the Data API, but remains in place

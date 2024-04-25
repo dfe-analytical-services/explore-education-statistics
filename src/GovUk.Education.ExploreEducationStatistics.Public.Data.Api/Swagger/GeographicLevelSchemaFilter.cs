@@ -42,8 +42,7 @@ public class GeographicLevelSchemaFilter : ISchemaFilter
                 - `WARD` - Ward
                 """.TrimIndent();
 
-            schema.Enum = GeographicLevelUtils.LevelCodes
-                .Order()
+            schema.Enum = GeographicLevelUtils.OrderedCodes
                 .Select(code => new OpenApiString(code))
                 .ToList<IOpenApiAny>();
         }

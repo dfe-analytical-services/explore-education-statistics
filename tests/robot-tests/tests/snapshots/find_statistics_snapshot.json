@@ -9,7 +9,7 @@
   {
     "publication_summary": "Attainment and retention data for A level and other qualifications by age 16-18 in England. Includes region, institution type, characteristics, and subject.",
     "publication_title": "A level and other 16 to 18 results",
-    "published": "1 Feb 2024",
+    "published": "18 Apr 2024",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -217,6 +217,13 @@
     "theme": "UK education and training statistics"
   },
   {
+    "publication_summary": "Management information on eligibility codes for the extended childcare entitlement for working parents.",
+    "publication_title": "Expansion to early childcare entitlements: eligibility codes issued and validated",
+    "published": "22 Apr 2024",
+    "release_type": "Management information",
+    "theme": "Early years"
+  },
+  {
     "publication_summary": "The number of further education learners going into employment and learning destinations by local authority district in the 2017/18 academic year.",
     "publication_title": "FE learners going into employment and learning destinations by local authority district",
     "published": "28 Jan 2021",
@@ -263,6 +270,13 @@
     "publication_title": "Graduate labour market statistics",
     "published": "29 Jun 2023",
     "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "English-dom first degree entrants at UK HE from 2016/17-21/22 by level 2 & 3 attainment, proportion of entrants in 2016/17-17/18 completing degree in 5 years",
+    "publication_title": "Higher Education Entrants and Qualifiers by their Level 2 and 3 Attainment",
+    "published": "25 Apr 2024",
+    "release_type": "Ad hoc statistics",
     "theme": "Higher education"
   },
   {
@@ -352,7 +366,7 @@
   {
     "publication_summary": "Annual level 2 and 3 attainment figures age 16 to 25 in England. Includes qualification type, institution type, characteristics and geographical breakdowns.",
     "publication_title": "Level 2 and 3 attainment age 16 to 25",
-    "published": "27 Apr 2023",
+    "published": "25 Apr 2024",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -422,7 +436,7 @@
   {
     "publication_summary": "Children in need, including children looked after by local authorities in England, national and local authority level outcomes including key stage 4 and absence",
     "publication_title": "Outcomes for children in need, including children looked after by local authorities in England",
-    "published": "30 Mar 2023",
+    "published": "18 Apr 2024",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
@@ -499,7 +513,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "4 Apr 2024",
+    "published": "18 Apr 2024",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -611,7 +625,7 @@
   {
     "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
     "publication_title": "Suspensions and permanent exclusions in England",
-    "published": "23 Nov 2023",
+    "published": "18 Apr 2024",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },

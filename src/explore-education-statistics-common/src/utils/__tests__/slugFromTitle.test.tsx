@@ -23,6 +23,12 @@ describe('slugFromTitle', () => {
     );
   });
 
+  test('converts a sentence with dashes and spaces', () => {
+    expect(
+      slugFromTitle('A - sentence -  with - - dashes  -  and -- spaces'),
+    ).toEqual('a-sentence-with-dashes-and-spaces');
+  });
+
   test('converts a sentence with non alphanumeric characters', () => {
     expect(
       slugFromTitle("A sentence with !@£('\\) non alpha numeric characters"),

@@ -148,11 +148,16 @@ public static class GeographicLevelUtils
         )
     );
 
-    public static IReadOnlyList<GeographicLevel> Levels => EnumUtil.GetEnums<GeographicLevel>();
+    public static readonly IReadOnlyList<GeographicLevel> Levels = EnumUtil.GetEnums<GeographicLevel>();
 
-    public static IReadOnlyList<string> LevelCodes => EnumUtil.GetEnumValues<GeographicLevel>();
+    public static readonly IReadOnlyList<string> OrderedCodes =
+        EnumUtil.GetEnumValues<GeographicLevel>()
+            .Order()
+            .ToList();
 
-    public static IReadOnlyList<string> LevelLabels => EnumUtil.GetEnumLabels<GeographicLevel>();
+    public static readonly IReadOnlyList<string> OrderedLabels = EnumUtil.GetEnumLabels<GeographicLevel>()
+            .Order()
+            .ToList();
 
     public static GeographicCsvColumns CsvColumns(this GeographicLevel level) => GeographicLevelCsvColumns.Value[level];
 

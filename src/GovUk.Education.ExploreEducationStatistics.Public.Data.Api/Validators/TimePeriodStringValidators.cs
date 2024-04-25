@@ -14,8 +14,13 @@ public static partial class TimePeriodStringValidators
 
     public static IRuleBuilderOptionsConditions<T, string> TimePeriodString<T>(this IRuleBuilder<T, string> rule)
     {
-        return rule.Custom((value, context) =>
+        return rule.NotEmpty().Custom((value, context) =>
         {
+            if (value.IsNullOrWhitespace())
+            {
+                return;
+            }
+
             if (!HasValidFormat(value))
             {
                 context.AddFailure(
@@ -25,7 +30,7 @@ public static partial class TimePeriodStringValidators
                 return;
             }
 
-            var timePeriod = new ParsedTimePeriod(value);
+            var timePeriod = ParsedTimePeriod.Parse(value);
 
             if (!HasValidYearRange(timePeriod))
             {
@@ -117,12 +122,15 @@ public static partial class TimePeriodStringValidators
         
         public string Code { get; init; }
 
-        public ParsedTimePeriod(string value)
+        public static ParsedTimePeriod Parse(string value)
         {
             var parts = value.Split('|');
 
-            Period = parts[0];
-            Code = parts[1];
+            return new ParsedTimePeriod
+            {
+                Period = parts[0],
+                Code = parts[1]
+            };
         }
 
         public bool HasRangePeriod() => Period.Contains('/');

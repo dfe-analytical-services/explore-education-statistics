@@ -70,6 +70,7 @@ param dataProcessorFunctionAppExists bool = false
 var resourcePrefix = '${subscription}-ees-papi'
 var apiContainerAppName = 'api'
 var apiContainerAppManagedIdentityName = '${resourcePrefix}-id-${apiContainerAppName}'
+var adminAppServiceFullName = '${subscription}-as-ees-admin'
 var dataProcessorFunctionAppName = 'processor'
 var dataProcessorFunctionAppFullName = '${resourcePrefix}-fa-${dataProcessorFunctionAppName}'
 var psqlServerName = 'psql-flexibleserver'
@@ -238,9 +239,16 @@ module apiContainerAppModule 'components/containerApp.bicep' = if (psqlDbUsersAd
         value: publicUrls!.contentApi
       }
       {
+        // This property informs the Container App of the name of the Admin's system-assigned identity.
+        // It uses this to grant permissions to the Admin user in order for it to be able to access
+        // tables in the "public_data" database successfully.
+        name: 'AdminAppServiceIdentityName'
+        value: adminAppServiceFullName
+      }
+      {
         // This property informs the Container App of the name of the Data Processor's system-assigned identity.
         // It uses this to grant permissions to the Data Processor user in order for it to be able to access
-        // tables in the "public_data" datbase successfully.
+        // tables in the "public_data" database successfully.
         name: 'DataProcessorFunctionAppIdentityName'
         value: dataProcessorFunctionAppFullName
       }

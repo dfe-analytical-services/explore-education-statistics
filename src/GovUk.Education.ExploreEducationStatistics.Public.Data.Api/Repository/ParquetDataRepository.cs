@@ -35,7 +35,7 @@ public class ParquetDataRepository(
              """
         );
 
-        command.AppendIf(!where.IsEmpty(), $"WHERE {where}");
+        command.AppendIf(!where.IsEmpty(), $"\nWHERE {where}");
 
         return await command.QuerySingleAsync<long>(cancellationToken: cancellationToken);
     }

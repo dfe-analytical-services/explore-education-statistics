@@ -1,23 +1,17 @@
 #nullable enable
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
-using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
-public class PermissionsControllerTests : IntegrationTest<TestStartup>
+public class PermissionsControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp)
-        : base(testApp)
-    {}
-
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {

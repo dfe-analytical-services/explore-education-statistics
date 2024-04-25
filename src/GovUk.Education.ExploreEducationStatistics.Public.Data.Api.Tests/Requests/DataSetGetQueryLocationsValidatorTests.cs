@@ -2,7 +2,6 @@ using FluentValidation.TestHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
-using ValidationMessages = GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Validators.ValidationMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
@@ -178,9 +177,9 @@ public abstract class DataSetGetQueryLocationsValidatorTests
             var result = _validator.TestValidate(query);
 
             result.ShouldHaveValidationErrorFor(q => q.Eq)
-                .WithErrorCode(ValidationMessages.LocationFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(ValidationMessages.LocationFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.In)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotIn)
@@ -204,7 +203,7 @@ public abstract class DataSetGetQueryLocationsValidatorTests
             result.ShouldNotHaveValidationErrorFor(q => q.In);
 
             result.ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(ValidationMessages.LocationFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
             result.ShouldHaveValidationErrorFor(q => q.NotIn)
                 .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }

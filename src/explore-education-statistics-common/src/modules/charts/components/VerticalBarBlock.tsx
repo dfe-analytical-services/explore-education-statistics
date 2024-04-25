@@ -24,6 +24,7 @@ import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
+import { otherAxisPositionTypes } from '@common/modules/charts/types/referenceLinePosition';
 import React, { memo } from 'react';
 import {
   Bar,
@@ -37,6 +38,8 @@ import {
   YAxis,
 } from 'recharts';
 import groupBy from 'lodash/groupBy';
+
+const chartBottomMargin = 20;
 
 export interface VerticalBarProps extends StackedBarProps {
   legend: LegendConfiguration;
@@ -107,6 +110,20 @@ const VerticalBarBlock = ({
   const chartHasNegativeValues =
     (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
+  // Major axis reference lines positioned between data points need to be rendered on
+  // the minor axis. Filter them out, add a `perpendicularLine` flag to make them
+  // identifiable and append them to the minor axis reference lines.
+  const majorAxisReferenceLines = axes.major.referenceLines.filter(
+    line => line.position !== otherAxisPositionTypes.betweenDataPoints,
+  );
+  const perpendicularMajorAxisReferenceLines = axes.major.referenceLines
+    .filter(line => line.position === otherAxisPositionTypes.betweenDataPoints)
+    .map(line => ({ ...line, perpendicularLine: true }));
+  const minorAxisReferenceLines = [
+    ...axes.minor.referenceLines,
+    ...perpendicularMajorAxisReferenceLines,
+  ];
+
   return (
     <ChartContainer
       height={height || 300}
@@ -125,7 +142,7 @@ const VerticalBarBlock = ({
           data={chartData}
           margin={{
             left: 30,
-            top: 20,
+            top: chartBottomMargin,
           }}
         >
           <CartesianGrid
@@ -204,7 +221,7 @@ const VerticalBarBlock = ({
 
           {chartHasNegativeValues && <ReferenceLine y={0} stroke="#666" />}
 
-          {axes.major.referenceLines?.map(referenceLine =>
+          {majorAxisReferenceLines.map(referenceLine =>
             createReferenceLine({
               axis: 'x',
               axisType: 'major',
@@ -219,21 +236,28 @@ const VerticalBarBlock = ({
             }),
           )}
 
-          {axes.minor.referenceLines?.map(referenceLine =>
+          {minorAxisReferenceLines.map(referenceLine =>
             createReferenceLine({
               axis: 'y',
               axisDomain: minorDomainTicks.domain,
               axisType: 'minor',
+              chartBottomMargin,
               chartData,
+              chartInnerHeight: height - (xAxisHeight ?? 0),
               label: referenceLine.label,
               labelWidth: referenceLine.labelWidth,
               otherAxisDomain: majorDomainTicks.domain,
               otherAxisEnd: referenceLine.otherAxisEnd,
               otherAxisPosition: referenceLine.otherAxisPosition,
               otherAxisStart: referenceLine.otherAxisStart,
-              position: referenceLine.position,
+              perpendicularLine: referenceLine.perpendicularLine,
+              position: referenceLine.perpendicularLine
+                ? referenceLine.otherAxisPosition
+                : referenceLine.position,
               style: referenceLine.style,
-              y: referenceLine.position,
+              y: referenceLine.perpendicularLine
+                ? referenceLine.otherAxisPosition
+                : referenceLine.position,
             }),
           )}
         </BarChart>

@@ -37,7 +37,8 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     locations: 1,
                     timePeriods: 3)
                 .WithStatusPublished()
-                .WithDataSet(dataSet);
+                .WithDataSet(dataSet)
+                .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
             await TestApp.AddTestData<PublicDataDbContext>(context =>
             {
@@ -55,7 +56,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSet.Summary, content.Summary);
             Assert.Equal(dataSet.Status, content.Status);
             Assert.Equal(dataSet.SupersedingDataSetId, content.SupersedingDataSetId);
-            Assert.Equal(dataSetVersion.Version, content.LatestVersion.Number);
+            Assert.Equal(dataSetVersion.Version, content.LatestVersion.Version);
             Assert.Equal(
                 dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
                 content.LatestVersion.Published.ToUnixTimeSeconds()
@@ -201,9 +202,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             var page1Content = page1Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
 
             Assert.Equal(3, page1Content.Results.Count);
-            Assert.Equal("3.1", page1Content.Results[0].Number);
-            Assert.Equal("3.0", page1Content.Results[1].Number);
-            Assert.Equal("2.1", page1Content.Results[2].Number);
+            Assert.Equal("3.1", page1Content.Results[0].Version);
+            Assert.Equal("3.0", page1Content.Results[1].Version);
+            Assert.Equal("2.1", page1Content.Results[2].Version);
 
             var page2Response = await ListDataSetVersions(
                 dataSetId: dataSet.Id,
@@ -213,9 +214,9 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             var page2Content = page2Response.AssertOk<DataSetVersionPaginatedListViewModel>(useSystemJson: true);
 
             Assert.Equal(3, page2Content.Results.Count);
-            Assert.Equal("2.0", page2Content.Results[0].Number);
-            Assert.Equal("1.1", page2Content.Results[1].Number);
-            Assert.Equal("1.0", page2Content.Results[2].Number);
+            Assert.Equal("2.0", page2Content.Results[0].Version);
+            Assert.Equal("1.1", page2Content.Results[1].Version);
+            Assert.Equal("1.0", page2Content.Results[2].Version);
         }
 
         [Theory]
@@ -260,7 +261,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             var result = Assert.Single(content.Results);
 
-            Assert.Equal(dataSetVersion.Version, result.Number);
+            Assert.Equal(dataSetVersion.Version, result.Version);
             Assert.Equal(dataSetVersion.VersionType, result.Type);
             Assert.Equal(dataSetVersion.Status, result.Status);
             Assert.Equal(
@@ -337,7 +338,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(1, content.Paging.PageSize);
             Assert.Equal(1, content.Paging.TotalResults);
             var result = Assert.Single(content.Results);
-            Assert.Equal(dataSet1Version.Version, result.Number);
+            Assert.Equal(dataSet1Version.Version, result.Version);
         }
 
         [Theory]
@@ -454,7 +455,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasGreaterThanOrEqualError("page");
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
         }
 
         [Theory]
@@ -472,7 +473,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
 
             Assert.Single(validationProblem.Errors);
 
-            validationProblem.AssertHasInclusiveBetweenError("pageSize");
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 20);
         }
 
         [Theory]
@@ -559,7 +560,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             var content = response.AssertOk<DataSetVersionViewModel>(useSystemJson: true);
 
             Assert.NotNull(content);
-            Assert.Equal(dataSetVersion.Version, content.Number);
+            Assert.Equal(dataSetVersion.Version, content.Version);
             Assert.Equal(dataSetVersion.VersionType, content.Type);
             Assert.Equal(dataSetVersion.Status, content.Status);
             Assert.Equal(
@@ -754,7 +755,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         .GenerateList(3)
                     )
                     .WithMetaSummary()
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -897,7 +898,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                     .WithStatus(dataSetVersionStatus)
                     .WithPublished(DateTimeOffset.UtcNow)
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -933,7 +934,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 3)
                     .WithStatus(dataSetVersionStatus)
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -1084,7 +1085,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                             ]
                         )
                     )
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv)
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv)
                     .GenerateList();
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
@@ -1164,7 +1165,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -1205,7 +1206,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -1270,7 +1271,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -1355,7 +1356,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {
@@ -1438,7 +1439,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         timePeriods: 2)
                     .WithStatusPublished()
                     .WithDataSetId(dataSet.Id)
-                    .FinishWith(dsv => dataSet.LatestVersion = dsv);
+                    .FinishWith(dsv => dataSet.LatestLiveVersion = dsv);
 
                 await TestApp.AddTestData<PublicDataDbContext>(context =>
                 {

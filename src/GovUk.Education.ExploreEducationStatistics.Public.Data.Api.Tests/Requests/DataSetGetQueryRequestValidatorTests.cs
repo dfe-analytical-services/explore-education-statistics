@@ -282,7 +282,7 @@ public abstract class DataSetGetQueryRequestValidatorTests
 
             result
                 .ShouldHaveValidationErrorFor("Sorts[0]")
-                .WithErrorCode(ValidationMessages.SortFormat.Code);
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
 
             result
                 .ShouldHaveValidationErrorFor("Sorts[1]")

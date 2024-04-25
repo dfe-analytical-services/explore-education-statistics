@@ -1,5 +1,7 @@
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
-import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
+import PreReleasePageContainer, {
+  calculatePraPeriodAdvice,
+} from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import { preReleaseRoute } from '@admin/routes/routes';
 import _permissionService from '@admin/services/permissionService';
@@ -31,6 +33,28 @@ describe('PreReleasePageContainer', () => {
     contactEmail: 'test@test.com',
     contactTeam: 'Test team',
   };
+
+  test('calculates PRA period advice during winter', () => {
+    const result = calculatePraPeriodAdvice(
+      new Date('2020-12-09T00:00:00Z'),
+      new Date('2020-12-10T09:30:00Z'),
+    );
+
+    expect(result).toBe(
+      'Pre-release access will be available from 9 December 2020 at 00:00 until it is published on 10 December 2020.',
+    );
+  });
+
+  test('calculates PRA period advice during summer', () => {
+    const result = calculatePraPeriodAdvice(
+      new Date('2020-06-08T23:00:00Z'),
+      new Date('2020-06-10T08:30:00Z'),
+    );
+
+    expect(result).toBe(
+      'Pre-release access will be available from 9 June 2020 at 00:00 until it is published on 10 June 2020.',
+    );
+  });
 
   test('renders correctly when pre-release has ended', async () => {
     permissionService.getPreReleaseWindowStatus.mockResolvedValue({

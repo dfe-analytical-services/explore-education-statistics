@@ -1,9 +1,13 @@
 #nullable enable
+using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
@@ -18,6 +22,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 // ReSharper disable once ClassNeverInstantiated.Global
 public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
+    public async Task AddTestData<TDbContext>(Action<TDbContext> supplier) where TDbContext : DbContext
+    {
+        await using var context = GetDbContext<TDbContext>();
+
+        supplier.Invoke(context);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task EnsureDatabaseDeleted<TDbContext>() where TDbContext : DbContext
+    {
+        await using var context = GetDbContext<TDbContext>();
+        await context.Database.EnsureDeletedAsync();
+    }
+
+    public TDbContext GetDbContext<TDbContext>() where TDbContext : DbContext
+    {
+        var scope = Services.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<TDbContext>();
+    }
+
     protected override IHostBuilder CreateHostBuilder()
     {
         return Host

@@ -7,27 +7,41 @@ import parseNumber from '@common/utils/number/parseNumber';
 import { AxisDomainItem, CartesianViewBox } from 'recharts/types/util/types';
 import { Text } from 'recharts';
 
+interface StyleProps {
+  stroke?: string;
+  strokeDasharray?: string;
+  strokeWidth?: number;
+}
+
 interface Props {
   axis: Axis;
   axisType: AxisType;
+  chartBottomMargin?: number;
   chartData: ChartData[];
+  chartInnerHeight?: number;
   label: string;
   labelWidth?: number;
   otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisPosition?: number;
-  position: string | number;
+  perpendicularLine?: boolean;
+  position?: string | number;
+  styleProps?: StyleProps;
   viewBox?: CartesianViewBox;
 }
 
 const CustomReferenceLineLabel = ({
   axis,
   axisType,
+  chartBottomMargin = 0,
   chartData,
+  chartInnerHeight,
   label,
   labelWidth,
   otherAxisDomain,
   otherAxisPosition,
+  perpendicularLine = false,
   position,
+  styleProps,
   viewBox,
 }: Props) => {
   const otherAxisDomainMin = otherAxisDomain
@@ -43,6 +57,7 @@ const CustomReferenceLineLabel = ({
     otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMin : 0,
     otherAxisDomainMax: axisType === 'major' ? otherAxisDomainMax : 100, // otherAxisPosition is set as a percentage on minor axis lines
     otherAxisPosition,
+    perpendicularLine,
     viewBox,
   });
 
@@ -70,17 +85,58 @@ const CustomReferenceLineLabel = ({
   };
 
   return (
-    <Text
-      className={styles.text}
-      dy={axis === 'y' ? -4 : 0}
-      x={labelPosition.x}
-      y={labelPosition.y}
-      textAnchor={getTextAnchor()}
-      width={labelWidth}
-    >
-      {label}
-    </Text>
+    <>
+      {/* Manually draw a line when it's perpendicular to the axis
+      (added between data points on the major axis) */}
+      {perpendicularLine && (
+        <PerpendicularLine
+          chartBottomMargin={chartBottomMargin}
+          chartInnerHeight={chartInnerHeight}
+          styleProps={styleProps}
+          viewBox={viewBox}
+        />
+      )}
+      <Text
+        className={styles.text}
+        dy={axis === 'y' ? -4 : 0}
+        x={labelPosition.x}
+        y={labelPosition.y}
+        textAnchor={getTextAnchor()}
+        width={labelWidth}
+      >
+        {label}
+      </Text>
+    </>
   );
 };
 
 export default memo(CustomReferenceLineLabel);
+
+function PerpendicularLine({
+  chartBottomMargin,
+  chartInnerHeight,
+  styleProps,
+  viewBox,
+}: {
+  chartBottomMargin?: number;
+  chartInnerHeight?: number;
+  styleProps?: StyleProps;
+  viewBox?: CartesianViewBox;
+}) {
+  if (!viewBox || !viewBox.x || !viewBox.width) {
+    return null;
+  }
+  const x = viewBox.x + viewBox.width / 2;
+
+  return (
+    <line
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...styleProps}
+      x1={x}
+      y1={chartInnerHeight}
+      x2={x}
+      y2={chartBottomMargin}
+      className="recharts-reference-line-line"
+    />
+  );
+}
