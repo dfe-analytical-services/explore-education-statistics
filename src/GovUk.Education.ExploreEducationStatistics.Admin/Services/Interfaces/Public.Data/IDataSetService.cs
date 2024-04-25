@@ -16,4 +16,8 @@ public interface IDataSetService
         int pageSize,
         Guid publicationId,
         CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, DataSetSummaryViewModel>> GetDataSet(
+        Guid dataSetId,
+        CancellationToken cancellationToken = default);
 }

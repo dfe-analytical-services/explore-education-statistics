@@ -8,14 +8,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Public.Data;
 
 [Authorize]
 [ApiController]
+[Route("api/public-data/data-sets")]
 public class DataSetsController(IDataSetService dataSetService) : ControllerBase
 {
-    [HttpGet("api/public-data/data-sets")]
+    [HttpGet]
     [Produces("application/json")]
     public async Task<ActionResult<PaginatedListViewModel<DataSetViewModel>>> ListDataSets(
         [FromQuery] DataSetListRequest request,
@@ -26,6 +28,19 @@ public class DataSetsController(IDataSetService dataSetService) : ControllerBase
                 page: request.Page,
                 pageSize: request.PageSize,
                 publicationId: request.PublicationId,
+                cancellationToken: cancellationToken)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpGet("{dataSetId:guid}")]
+    [Produces("application/json")]
+    public async Task<ActionResult<DataSetSummaryViewModel>> GetDataSet(
+        Guid dataSetId,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetService
+            .GetDataSet(
+                dataSetId: dataSetId,
                 cancellationToken: cancellationToken)
             .HandleFailuresOrOk();
     }
