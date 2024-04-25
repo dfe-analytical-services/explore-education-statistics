@@ -1,12 +1,14 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,8 +19,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortDirection;
 using static GovUk.Education.ExploreEducationStatistics.Content.Requests.DataSetsListRequestSortBy;
 
@@ -28,13 +32,19 @@ public class DataSetFileService : IDataSetFileService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IReleaseVersionRepository _releaseVersionRepository;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
+    private readonly IFootnoteRepository _footnoteRepository;
 
     public DataSetFileService(
         ContentDbContext contentDbContext,
-        IReleaseVersionRepository releaseVersionRepository)
+        IReleaseVersionRepository releaseVersionRepository,
+        IPublicBlobStorageService publicBlobStorageService,
+        IFootnoteRepository footnoteRepository)
     {
         _contentDbContext = contentDbContext;
         _releaseVersionRepository = releaseVersionRepository;
+        _publicBlobStorageService = publicBlobStorageService;
+        _footnoteRepository = footnoteRepository;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<DataSetFileSummaryViewModel>>> ListDataSetFiles(
@@ -146,6 +156,22 @@ public class DataSetFileService : IDataSetFileService
             return new NotFoundResult();
         }
 
+        // Fetch Data CSV preview lines
+        List<string> dataCsvPreviewLines = new();
+        var datafileStreamProvider = () => _publicBlobStorageService.StreamBlob(
+            containerName: PublicReleaseFiles,
+            path: releaseFile.PublicPath());
+        using var dataFileReader = new StreamReader(await datafileStreamProvider.Invoke());
+
+        // Fetch footnotes
+
+        for (var i = 0; i < 6; i++)
+        {
+            var line = await dataFileReader.ReadLineAsync();
+            if (line == null) { break; }
+            dataCsvPreviewLines.Add(line);
+        }
+
         return new DataSetFileViewModel
         {
             Id = releaseFile.File.DataSetFileId!.Value, // we ensure this is set when fetching releaseFile
@@ -174,6 +200,7 @@ public class DataSetFileService : IDataSetFileService
                 Id = releaseFile.FileId,
                 Name = releaseFile.File.Filename,
                 Size = releaseFile.File.DisplaySize(),
+                DataCsvPreviewLines = dataCsvPreviewLines,
             }
         };
     }
