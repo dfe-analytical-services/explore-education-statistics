@@ -35,7 +35,7 @@ public record DataSetQuerySort
 
     public string ToSortString() => $"{Field}|{Direction}";
 
-    public static DataSetQuerySort FromString(string sort)
+    public static DataSetQuerySort Parse(string sort)
     {
         var directionDelimiter = sort.LastIndexOf('|');
 
