@@ -8,6 +8,7 @@ export interface FormFieldsetProps {
   children?: ReactNode;
   className?: string;
   error?: string;
+  formGroupClass?: string;
   hint?: string | ReactNode;
   id: string;
   legend: ReactNode | string;
@@ -28,6 +29,7 @@ const FormFieldset = ({
   children,
   className,
   error,
+  formGroupClass,
   hint,
   id,
   legend,
@@ -43,7 +45,7 @@ const FormFieldset = ({
   const fieldId = useFormId ? prefixFormId(id) : id;
 
   return (
-    <FormGroup hasError={!!error}>
+    <FormGroup className={formGroupClass} hasError={!!error}>
       <fieldset
         aria-describedby={
           classNames({

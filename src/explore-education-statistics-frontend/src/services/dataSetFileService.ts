@@ -6,6 +6,7 @@ import { SortDirection } from '@common/services/types/sort';
 export interface DataSetFile {
   id: string;
   file: { id: string; name: string; size: string };
+  hasApiDataSet?: boolean;
   release: {
     id: string;
     isLatestPublishedRelease: boolean;
@@ -39,6 +40,7 @@ export interface DataSetFileSummary {
   filename: string;
   fileSize: string;
   fileExtension: string;
+  hasApiDataSet?: boolean;
   title: string;
   theme: {
     id: string;
@@ -76,6 +78,7 @@ export type DataSetFileSortOption = (typeof dataSetFileSortOptions)[number];
 export type DataSetFileSortParam = 'published' | 'title' | 'relevance';
 
 export const dataSetFileFilters = [
+  'dataSetType',
   'latest',
   'publicationId',
   'releaseId',
@@ -85,7 +88,10 @@ export const dataSetFileFilters = [
 
 export type DataSetFileFilter = (typeof dataSetFileFilters)[number];
 
+export type DataSetType = 'all' | 'api';
+
 export interface DataSetFileListRequest {
+  dataSetType?: DataSetType;
   latestOnly?: 'true' | 'false';
   page?: number;
   pageSize?: number;
