@@ -1,5 +1,7 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -21,6 +23,14 @@ public static class FileGeneratorExtensions
             .SetContentType("text/csv")
             .SetType(FileType.Data)
             .SetDefault(f => f.Filename)
+            .SetDataSetFileMeta(new DataSetFileMeta
+            {
+                GeographicLevels = [GeographicLevel.Country.GetEnumLabel()],
+                TimeIdentifier = TimeIdentifier.CalendarYear,
+                Years = [ 2000, 2001, ],
+                Filters = [new() { Id = Guid.NewGuid(), Label = "Filter 1", }],
+                Indicators = [new() { Id = Guid.NewGuid(), }],
+            })
             .Set(f => f.Filename, (_, f) => $"{f.Filename}.csv");
 
     public static Generator<File> WithContentLength(

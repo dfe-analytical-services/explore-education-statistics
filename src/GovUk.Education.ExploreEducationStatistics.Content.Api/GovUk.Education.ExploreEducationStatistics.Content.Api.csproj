@@ -21,6 +21,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.3" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="Testcontainers.Azurite" Version="3.8.0" />
     </ItemGroup>
 
     <ItemGroup>
