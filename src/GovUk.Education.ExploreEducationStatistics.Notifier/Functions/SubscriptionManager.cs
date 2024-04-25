@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Logging;
-using Notify.Exceptions;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Notify.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using static GovUk.Education.ExploreEducationStatistics.Common.TableStorageTableNames;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
@@ -254,7 +254,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 }
             }
 
-            return new BadRequestObjectResult("Unable to verify subscription");
+            return new RedirectResult(
+                $"{_appSettingOptions.PublicAppUrl}/subscriptions/verification-error",
+                true);
         }
 
         [Function("RemoveNonVerifiedSubscriptions")]
