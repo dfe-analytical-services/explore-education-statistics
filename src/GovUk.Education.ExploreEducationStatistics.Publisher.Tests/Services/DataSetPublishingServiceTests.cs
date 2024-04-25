@@ -44,7 +44,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                     locations: 1,
                     timePeriods: 2)
                 .WithDataSetId(dataSet.Id)
-                .WithCsvFileId(releaseDataFile.FileId);
+                .WithReleaseFileId(releaseDataFile.Id);
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>
@@ -104,10 +104,10 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                     timePeriods: 2)
                 .WithDataSetId(dataSet.Id)
                 .ForIndex(0, s => s
-                    .SetCsvFileId(Guid.NewGuid())
+                    .SetReleaseFileId(Guid.NewGuid())
                     .SetStatusPublished())
                 .ForIndex(1, s => s
-                    .SetCsvFileId(releaseDataFile.FileId)
+                    .SetReleaseFileId(releaseDataFile.Id)
                     .SetStatusDraft())
                 .GenerateList(2);
 
@@ -179,7 +179,7 @@ public class DataSetPublishingServiceTests(PublisherFunctionsIntegrationTestFixt
                     timePeriods: 2)
                 .WithDataSetId(dataSet.Id)
                 .WithStatusPublished()
-                .WithCsvFileId(releaseDataFile.FileId);
+                .WithReleaseFileId(releaseDataFile.Id);
 
             await AddTestData<ContentDbContext>(context => context.ReleaseFiles.Add(releaseDataFile));
             await AddTestData<PublicDataDbContext>(context =>

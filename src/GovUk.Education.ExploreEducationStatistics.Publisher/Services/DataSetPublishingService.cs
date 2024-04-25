@@ -19,10 +19,10 @@ public class DataSetPublishingService(
     public async Task PublishDataSets(IEnumerable<Guid> releaseVersionIds)
     {
         // Find all Data Files associated with the given ReleaseVersions.
-        var dataFileIds = await contentDbContext
+        var releaseFileIds = await contentDbContext
             .ReleaseFiles
             .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
-            .Select(rf => rf.FileId)
+            .Select(rf => rf.Id)
             .ToListAsync();
 
         // Find all DataSets whose current Draft DataSetVersions reference any of the Release Versions' Data Files. 
@@ -32,7 +32,7 @@ public class DataSetPublishingService(
             .Include(dataSet => dataSet.LatestLiveVersion)
             .Include(dataSet => dataSet.LatestDraftVersion)
             .Where(dataSet => dataSet.LatestDraftVersion != null
-                              && dataFileIds.Contains(dataSet.LatestDraftVersion.CsvFileId))
+                              && releaseFileIds.Contains(dataSet.LatestDraftVersion.ReleaseFileId))
             .ToListAsync();
 
         // For each DataSet due to have a Draft DataSetVersion go live with the given Release Versions, publish the
