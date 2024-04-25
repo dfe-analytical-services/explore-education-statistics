@@ -242,59 +242,50 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: Use Node version 18 above
+    displayName: 'Use Node version 18 or above'
     timeoutInMinutes: 5
     inputs:
       versionSpec: "18.18.2"
 
   - script: |
         node -v
-    displayName: 'node version'
+    displayName: 'Display node version'
 
   - script: |
       npm ci
-    displayName: 'Install CI'
+    displayName: 'Clean and install NPM dependencies'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
-        # runs the playwright tests
-
-  - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
-    inputs:
-      azureSubscription: $(SPN_NAME)
-      KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
-      RunAsPreJob: true
 
   - script: |
       npx playwright test --project "public"
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-            CI: 'true'
-            PUBLIC_URL: $(PUBLIC_URL)
-            PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
-            PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
-            ADMIN_URL: $(ADMIN_URL)
-            ADMIN_EMAIL: $(ADMIN_EMAIL)
+        CI: 'true'
+        PUBLIC_URL: $(PUBLIC_URL)
+        PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
+        PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
+        ADMIN_URL: $(ADMIN_URL)
+        ADMIN_EMAIL: $(ADMIN_EMAIL)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
-    displayName: Publish Test Results
+    displayName: Public suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
       failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Publish Pipeline Artifact
+    displayName: Public suite - Publish Playwright Test Artifacts
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
-      artifactName: test-results-playwright-tests-public
+      artifactName: test-results-playwright-public
 
 
 - job: 'AdminPlaywrightUItest'
@@ -312,47 +303,38 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: Use Node version 18 above
+    displayName: 'Use Node version 18 or above'
     timeoutInMinutes: 5
     inputs:
       versionSpec: "18.18.2"
 
   - script: |
         node -v
-    displayName: 'node version'
+    displayName: 'Display node version'
 
   - script: |
       npm ci
-    displayName: 'Install CI'
+    displayName: 'Clean and install npm dependencies'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
-        # runs the playwright tests
-
-  - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
-    inputs:
-      azureSubscription: $(SPN_NAME)
-      KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
-      RunAsPreJob: true
 
   - script: |
       npx playwright test --project "admin"
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-            CI: 'true'
-            ADMIN_URL: $(ADMIN_URL)
-            ADMIN_EMAIL: $(ADMIN_EMAIL)
-            ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+        CI: 'true'
+        ADMIN_URL: $(ADMIN_URL)
+        ADMIN_EMAIL: $(ADMIN_EMAIL)
+        ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
-    displayName: Publish Test Results
+    displayName: Admin Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
       failTaskOnFailedTests: true
@@ -362,7 +344,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
-      artifactName: test-results-playwright-tests-admin
+      artifactName: Admin Suite - Publish Playwright Test Artifacts
 
 - job: 'AdminAndPublicPlaywrightUItest'
   displayName: Admin and public suite - Playwright UI tests
@@ -379,33 +361,24 @@ jobs:
     fetchTags: false
 
   - task: NodeTool@0
-    displayName: Use Node version 18 above
+    displayName: 'Use Node version 18 or above'
     timeoutInMinutes: 5
     inputs:
       versionSpec: "18.18.2"
 
   - script: |
         node -v
-    displayName: 'node version'
+    displayName: 'Display node version'
 
   - script: |
       npm ci
-    displayName: 'Install CI'
+    displayName: 'Clean and install npm dependencies'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
 
   - script: |
       npx playwright install --with-deps
     displayName: 'Install Playwright browsers'
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
-        # runs the playwright tests
-
-  - task: AzureKeyVault@2
-    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
-    inputs:
-      azureSubscription: $(SPN_NAME)
-      KeyVaultName: s101d01-kv-ees-01
-      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
-      RunAsPreJob: true
 
   - script: |
       npx playwright test --project "adminandpublic"  
@@ -413,23 +386,23 @@ jobs:
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-            CI: 'true'
-            PUBLIC_URL: $(PUBLIC_URL)
-            PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
-            PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
-            ADMIN_URL: $(ADMIN_URL)
-            ADMIN_EMAIL: $(ADMIN_EMAIL)
-            ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+        CI: 'true'
+        PUBLIC_URL: $(PUBLIC_URL)
+        PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
+        PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
+        ADMIN_URL: $(ADMIN_URL)
+        ADMIN_EMAIL: $(ADMIN_EMAIL)
+        ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
-    displayName: Publish Test Results
+    displayName: Admin And Public Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
       failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Publish Pipeline Artifact
+    displayName: Admin And Public Suite - Publish Playwright Test Artifacts
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
