@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Public.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Public.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -16,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -123,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var dataSetVersionImportService = new Mock<IDataSetVersionImportService>(MockBehavior.Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -152,9 +154,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
-                dataSetVersionImportService
-                    .Setup(s => s.IsPublicApiDataSetImportsInProgress(releaseVersion.Id))
-                    .ReturnsAsync(true);
+                dataSetVersionService
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .ReturnsAsync([
+                        new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "Data set 1",
+                            Status: DataSetVersionStatus.Cancelled),
+                        new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "Data set 2",
+                            Status: DataSetVersionStatus.Mapping),
+                        new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "Data set 3",
+                            Status: DataSetVersionStatus.Processing),
+                        new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "Data set 4",
+                            Status: DataSetVersionStatus.Failed),
+                    ]);
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -162,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataImportService: dataImportService.Object,
                     dataGuidanceService: dataGuidanceService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataSetVersionImportService: dataSetVersionImportService.Object
+                    dataSetVersionService: dataSetVersionService.Object
                 );
 
                 var result = await service.GetChecklist(releaseVersion.Id);
@@ -171,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataGuidanceService,
                     methodologyVersionRepository,
                     releaseDataFileRepository,
-                    dataSetVersionImportService);
+                    dataSetVersionService);
 
                 var checklist = result.AssertRight();
 
@@ -181,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Select(error => error.Code)
                     .ToList();
 
-                Assert.Equal(10, errors.Count);
+                Assert.Equal(13, errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
@@ -193,6 +212,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
                 Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
                 Assert.Equal(PublicApiDataSetImportsMustBeCompleted, errors[9]);
+                Assert.Equal(PublicApiDataSetCancellationsMustBeResolved, errors[10]);
+                Assert.Equal(PublicApiDataSetFailuresMustBeResolved, errors[11]);
+                Assert.Equal(PublicApiDataSetMappingsMustBeCompleted, errors[12]);
             }
         }
 
@@ -215,7 +237,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-
+            var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
+            
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
@@ -233,19 +256,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataGuidanceService
                     .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
+                
+                dataSetVersionService
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataGuidanceService: dataGuidanceService.Object
+                    dataGuidanceService: dataGuidanceService.Object,
+                    dataSetVersionService: dataSetVersionService.Object
                 );
 
                 var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataGuidanceService,
                     methodologyVersionRepository,
-                    releaseDataFileRepository);
+                    releaseDataFileRepository,
+                    dataSetVersionService);
 
                 var checklist = result.AssertRight();
 
@@ -280,6 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -344,6 +374,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             new(),
                         }
                     );
+                
+                dataSetVersionService
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -351,7 +385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     dataGuidanceService: dataGuidanceService.Object,
                     footnoteRepository: footnoteRepository.Object,
-                    dataBlockService: dataBlockService.Object
+                    dataBlockService: dataBlockService.Object,
+                    dataSetVersionService: dataSetVersionService.Object
                 );
 
                 var result = await service.GetChecklist(releaseVersion.Id);
@@ -360,7 +395,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteRepository,
                     dataGuidanceService,
                     methodologyVersionRepository,
-                    releaseDataFileRepository);
+                    releaseDataFileRepository,
+                    dataSetVersionService);
 
                 var checklist = result.AssertRight();
 
@@ -403,6 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -421,19 +458,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataGuidanceService
                     .Setup(s => s.ValidateForReleaseChecklist(releaseVersion.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
+                
+                dataSetVersionService
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .ReturnsAsync([]);
 
                 var service = BuildReleaseChecklistService(
                     context,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
-                    dataGuidanceService: dataGuidanceService.Object
+                    dataGuidanceService: dataGuidanceService.Object,
+                    dataSetVersionService: dataSetVersionService.Object
                 );
 
                 var result = await service.GetChecklist(releaseVersion.Id);
 
                 MockUtils.VerifyAllMocks(dataGuidanceService,
                     methodologyVersionRepository,
-                    releaseDataFileRepository);
+                    releaseDataFileRepository,
+                    dataGuidanceService,
+                    dataSetVersionService);
 
                 var checklist = result.AssertRight();
 
@@ -573,7 +617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataGuidanceService = new Mock<IDataGuidanceService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var dataSetVersionImportService = new Mock<IDataSetVersionImportService>(MockBehavior.Strict);
+            var dataSetVersionService = new Mock<IDataSetVersionService>(MockBehavior.Strict);
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -625,9 +669,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                dataSetVersionImportService
-                    .Setup(s => s.IsPublicApiDataSetImportsInProgress(releaseVersion.Id))
-                    .ReturnsAsync(false);
+                dataSetVersionService
+                    .Setup(s => s.GetStatusesForReleaseVersion(releaseVersion.Id))
+                    .ReturnsAsync(new[]
+                        {
+                            DataSetVersionStatus.Draft, 
+                            DataSetVersionStatus.Withdrawn,
+                            DataSetVersionStatus.Published, 
+                            DataSetVersionStatus.Deprecated
+                        }
+                        .Select(status => new DataSetVersionStatusSummary(
+                            Id: Guid.NewGuid(),
+                            Title: "",
+                            Status: status))
+                        .ToList());
 
                 var service = BuildReleaseChecklistService(
                     context,
@@ -636,7 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object,
-                    dataSetVersionImportService: dataSetVersionImportService.Object
+                    dataSetVersionService: dataSetVersionService.Object
                 );
                 var result = await service.GetChecklist(releaseVersion.Id);
 
@@ -652,7 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 dataGuidanceService,
                 methodologyVersionRepository,
                 releaseDataFileRepository,
-                dataSetVersionImportService);
+                dataSetVersionService);
         }
 
         [Fact]
@@ -685,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
-            IDataSetVersionImportService? dataSetVersionImportService = null)
+            IDataSetVersionService? dataSetVersionService = null)
         {
             return new(
                 contentDbContext,
@@ -696,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
-                dataSetVersionImportService ?? new Mock<IDataSetVersionImportService>().Object
+                dataSetVersionService ?? new Mock<IDataSetVersionService>().Object
             );
         }
     }
