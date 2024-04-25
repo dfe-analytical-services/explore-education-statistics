@@ -6,6 +6,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Validators;
 
 public static class ValidatorTestExtensions
 {
+    public static ITestValidationWith WithAttemptedValue<T>(
+        this ITestValidationContinuation failures,
+        T value)
+    {
+        return failures.When(
+            failure => failure.AttemptedValue is T attemptedValue && attemptedValue.Equals(value),
+            $"Expected attempted value of '{value}'. Actual attempted value was '{{MessageArgument:PropertyValue}}'."
+        );
+    }
+
     public static ITestValidationWith WithCustomState<T>(
         this ITestValidationContinuation failures,
         Func<T, bool> predicate)

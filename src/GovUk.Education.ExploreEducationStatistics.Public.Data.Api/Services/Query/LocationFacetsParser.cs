@@ -99,7 +99,7 @@ internal class LocationFacetsParser : IFacetsParser
                 .Build();
         }
 
-        builder += $"{DataTable.Ref().LocationId(location.ParsedLevel):raw} {(negate ? "!=" : "="):raw} {option.Id}";
+        builder += $"{DataTable.Ref().LocationId(location.ParsedLevel()):raw} {(negate ? "!=" : "="):raw} {option.Id}";
 
         return builder.Build();
     }
@@ -168,7 +168,7 @@ internal class LocationFacetsParser : IFacetsParser
     {
         locationOption = null;
 
-        if (!_allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel, out var options))
+        if (!_allowedLocationOptionsByLevel.TryGetValue(queryLocation.ParsedLevel(), out var options))
         {
             return false;
         }
