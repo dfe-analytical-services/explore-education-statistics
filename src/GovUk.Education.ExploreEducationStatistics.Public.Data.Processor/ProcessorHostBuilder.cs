@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor;
@@ -15,6 +16,18 @@ public static class ProcessorHostBuilder
     public static IHostBuilder ConfigureProcessorHostBuilder(this IHostBuilder hostBuilder)
     {
         return hostBuilder
+            .ConfigureAppConfiguration(builder =>
+            {
+                builder
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: false)
+                    .AddEnvironmentVariables();
+            })
+            .ConfigureLogging(logging =>
+            {
+                // TODO EES-5013 Why can't Command logging be suppressed via the logging config in application settings?
+                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            })
             .ConfigureServices((hostBuilderContext, services) =>
             {
                 var configuration = hostBuilderContext.Configuration;
