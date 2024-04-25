@@ -1,6 +1,4 @@
 /* eslint-disable no-param-reassign */
-const flowRight = require('lodash/fp/flowRight');
-const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
 /**
@@ -13,7 +11,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {
-    BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
+    BUILD_NUMBER: process.env.BUILD_BUILDNUMBER ?? '',
   },
   publicRuntimeConfig: {
     APP_ENV: process.env.APP_ENV,
@@ -91,18 +89,10 @@ const nextConfig = {
 
     return config;
   },
-};
-
-// Plugins are applied to the
-// Next config from left to right
-module.exports = flowRight(
-  withTranspileModules(
-    // Need to modify the following as next-transpile-modules
-    // throws when running server in a production environment
-    // because we remove the target modules as part
-    // of the build to reduce total artifact size.
+  transpilePackages:
     process.env.NEXT_CONFIG_MODE !== 'server'
       ? ['explore-education-statistics-common']
       : [],
-  ),
-)(nextConfig);
+};
+
+module.exports = nextConfig;

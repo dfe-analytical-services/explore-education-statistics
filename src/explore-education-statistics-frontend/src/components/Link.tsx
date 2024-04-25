@@ -25,13 +25,13 @@ const Link = ({
   testId,
   ...props
 }: LinkProps) => {
-  const isAbsolute = typeof to === 'string' && to.startsWith('http');
-
-  const link = (
-    <a
-      // eslint-disable-next-line react/jsx-props-no-spreading
+  return (
+    <RouterLink
       {...props}
-      href={isAbsolute ? (to as string) : undefined}
+      href={to}
+      prefetch={prefetch}
+      scroll={scroll}
+      shallow={shallow}
       className={classNames(
         'govuk-link',
         {
@@ -42,22 +42,6 @@ const Link = ({
       data-testid={testId}
     >
       {children}
-    </a>
-  );
-
-  if (isAbsolute) {
-    return link;
-  }
-
-  return (
-    <RouterLink
-      href={to}
-      prefetch={prefetch}
-      scroll={scroll}
-      shallow={shallow}
-      passHref
-    >
-      {link}
     </RouterLink>
   );
 };

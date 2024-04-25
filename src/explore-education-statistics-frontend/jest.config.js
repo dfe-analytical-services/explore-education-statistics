@@ -1,3 +1,9 @@
+const nextJest = require('next/jest.js');
+
+const createJestConfig = nextJest({
+  dir: './',
+});
+
 /** @type {import('jest').Config} */
 const config = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
@@ -11,16 +17,11 @@ const config = {
     url: 'http://localhost/',
   },
   transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest',
     '^.+\\.css$':
       '<rootDir>/../explore-education-statistics-common/test/cssTransform.js',
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)':
       '<rootDir>/../explore-education-statistics-common/test/fileTransform.js',
   },
-  transformIgnorePatterns: [
-    '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',
-    '^.+\\.module\\.(css|sass|scss)$',
-  ],
   moduleNameMapper: {
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
     '^@frontend/(.*)$': '<rootDir>/src/$1',
@@ -31,6 +32,7 @@ const config = {
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
     'react-markdown':
       '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
+    'react-leaflet': '<rootDir>/__mocks__/reactLeafletMock.ts',
   },
   moduleFileExtensions: [
     'web.js',
@@ -52,4 +54,4 @@ const config = {
   snapshotSerializers: ['jest-serializer-html'],
 };
 
-module.exports = config;
+module.exports = createJestConfig(config);
