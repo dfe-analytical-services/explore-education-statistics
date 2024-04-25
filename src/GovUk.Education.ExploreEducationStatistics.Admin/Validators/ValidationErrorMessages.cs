@@ -113,6 +113,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
         SummarySectionContainsEmptyHtmlBlock,
         PublicApiDataSetImportsMustBeCompleted,
+        PublicApiDataSetCancellationsMustBeResolved,
+        PublicApiDataSetFailuresMustBeResolved,
+        PublicApiDataSetMappingsMustBeCompleted,
 
         // Data guidance
         DataGuidanceDataSetNotAttachedToRelease,
