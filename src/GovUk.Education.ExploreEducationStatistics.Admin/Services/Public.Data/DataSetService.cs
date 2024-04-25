@@ -204,6 +204,7 @@ public class DataSetService(
         }
 
         return await contentDbContext.ReleaseFiles
+            .AsNoTracking()
             .Where(rf => dataSetVersionIdsByReleaseFileId.Keys.Contains(rf.Id))
             .Include(rf => rf.ReleaseVersion)
             .Include(rf => rf.File)
