@@ -244,7 +244,7 @@ jobs:
       versionSpec: "18.18.2"
 
   - script: |
-        node -v
+      node -v
     displayName: 'Display node version'
 
   - script: |
@@ -262,22 +262,22 @@ jobs:
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-        CI: 'true'
-        PUBLIC_URL: $(PUBLIC_URL)
-        PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
-        PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
-        ADMIN_URL: $(ADMIN_URL)
-        ADMIN_EMAIL: $(ADMIN_EMAIL)
+      CI: 'true'
+      PUBLIC_URL: $(PUBLIC_URL)
+      PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
+      PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
+      ADMIN_URL: $(ADMIN_URL)
+      ADMIN_EMAIL: $(ADMIN_EMAIL)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
-    displayName: Public suite - Publish Playwright Test Results
+    displayName: Public Suite - Publish Playwright Test Results
     inputs:
       testResultsFiles: tests/playwright-tests/test-results/playwright-results.xml
       failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Public suite - Publish Playwright Test Artifacts
+    displayName: Public Suite - Publish Playwright Test Artifacts
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
@@ -313,7 +313,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-        node -v
+      node -v
     displayName: 'Display node version'
 
   - script: |
@@ -331,10 +331,10 @@ jobs:
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-        CI: 'true'
-        ADMIN_URL: $(ADMIN_URL)
-        ADMIN_EMAIL: $(ADMIN_EMAIL)
-        ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+      CI: 'true'
+      ADMIN_URL: $(ADMIN_URL)
+      ADMIN_EMAIL: $(ADMIN_EMAIL)
+      ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
@@ -344,7 +344,7 @@ jobs:
       failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
-    displayName: Publish Pipeline Artifact
+    displayName: Admin Suite - Publish Pipeline Artifact
     condition: succeededOrFailed()
     inputs:
       path: tests/playwright-tests/test-results/
@@ -379,7 +379,7 @@ jobs:
       RunAsPreJob: true
 
   - script: |
-        node -v
+      node -v
     displayName: 'Display node version'
 
   - script: |
@@ -398,13 +398,13 @@ jobs:
     displayName: "Run Playwright tests"
     workingDirectory: $(System.DefaultWorkingDirectory)/tests/playwright-tests/
     env:
-        CI: 'true'
-        PUBLIC_URL: $(PUBLIC_URL)
-        PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
-        PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
-        ADMIN_URL: $(ADMIN_URL)
-        ADMIN_EMAIL: $(ADMIN_EMAIL)
-        ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
+      CI: 'true'
+      PUBLIC_URL: $(PUBLIC_URL)
+      PUBLIC_USERNAME: $(PUBLIC_AUTH_USER)
+      PUBLIC_PASSWORD: $(PUBLIC_AUTH_PASSWORD)
+      ADMIN_URL: $(ADMIN_URL)
+      ADMIN_EMAIL: $(ADMIN_EMAIL)
+      ADMIN_PASSWORD: $(ees-test-ADMIN-PASSWORD)
 
     # this publishes the html report as an artifact that can then be downloaded
   - task: PublishTestResults@2
