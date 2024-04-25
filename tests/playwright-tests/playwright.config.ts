@@ -1,7 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
+import environment from '@util/env';
+
+const { PUBLIC_USERNAME, PUBLIC_PASSWORD, PUBLIC_URL } = environment;
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
+
+const encodeBasicAuth = (username: string, password: string) => {
+  if (PUBLIC_URL) {
+    const unencodedString = `${username}:${password}`;
+    return `Basic ${btoa(unencodedString)}`;
+  }
+  return {};
+};
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -32,6 +43,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: ' ',
     ignoreHTTPSErrors: true,
+    extraHTTPHeaders: encodeBasicAuth(PUBLIC_USERNAME, PUBLIC_PASSWORD),
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
