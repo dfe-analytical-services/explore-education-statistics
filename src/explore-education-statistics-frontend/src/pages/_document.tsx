@@ -1,6 +1,10 @@
 import BaseDocument, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 
+// As part of making the incremental transition from the Pages Router to the App Router,
+// the contents of this file are being temporary duplicated in ~src/app/layout.tsx
+// https://nextjs.org/docs/app/building-your-application/upgrading/app-router-migration#migrating-_documentjs-and-_appjs
+
 class Document extends BaseDocument {
   render() {
     return (
