@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@hello-pangea/dnd": "^16.5.0",
-    "@next/env": "^12.3.4",
+    "@next/env": "^14.2.3",
     "@tanstack/react-query": "4.32.0",
     "applicationinsights": "^2.7.0",
     "axios": "^1.4.0",
@@ -24,7 +24,7 @@
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "memoizee": "^0.4.14",
-    "next": "^14.2.2",
+    "next": "^14.2.3",
     "nookies": "^2.5.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",

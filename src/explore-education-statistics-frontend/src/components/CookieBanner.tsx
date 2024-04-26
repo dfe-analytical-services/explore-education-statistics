@@ -1,3 +1,5 @@
+'use client';
+
 import Link from '@frontend/components/Link';
 import React, { useEffect, useState } from 'react';
 import useMounted from '@common/hooks/useMounted';

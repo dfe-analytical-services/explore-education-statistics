@@ -1,3 +1,5 @@
+'use client';
+
 import PhaseBanner from '@common/components/PhaseBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
