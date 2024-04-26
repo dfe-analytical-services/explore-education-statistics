@@ -93,7 +93,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithMetaSummary(
         this Generator<DataSetVersion> generator,
-        DataSetVersionMetaSummary metaSummary)
+        DataSetVersionMetaSummary? metaSummary)
         => generator.ForInstance(s => s.SetMetaSummary(metaSummary));
 
     public static Generator<DataSetVersion> WithMetaSummary(
@@ -102,7 +102,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithGeographicLevelMeta(
         this Generator<DataSetVersion> generator,
-        GeographicLevelMeta meta)
+        GeographicLevelMeta? meta)
         => generator.ForInstance(s => s.SetGeographicLevelMeta(meta));
 
     public static Generator<DataSetVersion> WithGeographicLevelMeta(
@@ -274,7 +274,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetMetaSummary(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        DataSetVersionMetaSummary metaSummary)
+        DataSetVersionMetaSummary? metaSummary)
         => instanceSetter.Set(dsv => dsv.MetaSummary, metaSummary);
 
     public static InstanceSetters<DataSetVersion> SetMetaSummary(
@@ -285,12 +285,12 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        GeographicLevelMeta meta)
+        GeographicLevelMeta? meta)
         => instanceSetter.SetGeographicLevelMeta(() => meta);
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        Func<GeographicLevelMeta> meta)
+        Func<GeographicLevelMeta?> meta)
         => instanceSetter.Set(dsv => dsv.GeographicLevelMeta, meta);
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(

@@ -27,9 +27,9 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public long TotalResults { get; set; }
 
-    public required DataSetVersionMetaSummary MetaSummary { get; set; }
+    public DataSetVersionMetaSummary? MetaSummary { get; set; }
 
-    public required GeographicLevelMeta GeographicLevelMeta { get; set; }
+    public GeographicLevelMeta? GeographicLevelMeta { get; set; }
 
     public List<DataSetVersionImport> Imports { get; set; } = [];
 
