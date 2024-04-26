@@ -249,13 +249,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTimeOffset?>("Completed")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("DataSetVersionId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
+                    b.Property<Guid>("InstanceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Stage")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -265,6 +271,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasKey("Id");
 
                     b.HasIndex("DataSetVersionId");
+
+                    b.HasIndex("InstanceId")
+                        .IsUnique();
 
                     b.ToTable("DataSetVersionImports");
                 });

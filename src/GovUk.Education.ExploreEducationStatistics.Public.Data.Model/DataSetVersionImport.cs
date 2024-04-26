@@ -12,7 +12,11 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public required DataSetVersionImportStatus Status { get; set; }
+    public required Guid InstanceId { get; set; }
+
+    public required DataSetVersionImportStage Stage { get; set; }
+
+    public DateTimeOffset? Completed { get; set; }
 
     public DateTimeOffset Created { get; set; }
 
@@ -22,7 +26,11 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
     {
         public void Configure(EntityTypeBuilder<DataSetVersionImport> builder)
         {
-            builder.Property(i => i.Status).HasConversion<string>();
+            builder.Property(i => i.Stage)
+                .HasConversion<string>();
+
+            builder.HasIndex(i => i.InstanceId)
+                .IsUnique();
         }
     }
 }
