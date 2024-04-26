@@ -800,19 +800,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         dataSetVersion.LocationMetas,
                         fm => fm.Level == locationMetaViewModel.Level);
 
-                    var allLocationMetaLinks = locationMeta.Options
-                        .SelectMany(o => o.MetaLinks)
-                        .ToList();
-
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
-                        var locationOptionMetaLink = Assert.Single(
-                            allLocationMetaLinks,
-                            link => link.PublicId == locationOptionMetaViewModel.Id);
-
                         var locationOptionMeta = Assert.Single(
                             locationMeta.Options,
-                            o => o.Id == locationOptionMetaLink.OptionId);
+                            o => o.PublicId == locationOptionMetaViewModel.Id);
 
                         switch (locationOptionMeta)
                         {

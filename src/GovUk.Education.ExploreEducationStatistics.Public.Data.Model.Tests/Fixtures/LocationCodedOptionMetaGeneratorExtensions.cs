@@ -18,6 +18,7 @@ public static class LocationCodedOptionMetaGeneratorExtensions
     public static InstanceSetters<LocationCodedOptionMeta> SetDefaults(
         this InstanceSetters<LocationCodedOptionMeta> setters)
         => setters
+            .SetDefault(m => m.PublicId)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Code);
 

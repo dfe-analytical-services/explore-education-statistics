@@ -20,6 +20,7 @@ public static class LocationProviderOptionMetaGeneratorExtensions
     public static InstanceSetters<LocationProviderOptionMeta> SetDefaults(
         this InstanceSetters<LocationProviderOptionMeta> setters)
         => setters
+            .SetDefault(m => m.PublicId)
             .SetDefault(m => m.Label)
             .SetDefault(m => m.Ukprn);
 
