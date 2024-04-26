@@ -17,7 +17,13 @@
         "./test/*"
       ]
     },
-    "incremental": true
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
   },
   "exclude": [
     "node_modules"
@@ -27,5 +33,5 @@
     "test",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-  ],
+  ]
 }

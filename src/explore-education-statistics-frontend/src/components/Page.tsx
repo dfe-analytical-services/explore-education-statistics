@@ -2,14 +2,12 @@ import PhaseBanner from '@common/components/PhaseBanner';
 import CookieBanner from '@frontend/components/CookieBanner';
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
 import Breadcrumbs, { BreadcrumbsProps } from './Breadcrumbs';
 import PageFooter from './PageFooter';
 import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
-import TemporaryNotice from './TemporaryNotice';
 
 type Props = {
   title: string;
@@ -37,8 +35,6 @@ const Page = ({
   isHomepage = false,
   breadcrumbs = [],
 }: Props) => {
-  const router = useRouter();
-
   return (
     <>
       <CookieBanner wide={wide} />
@@ -50,30 +46,6 @@ const Page = ({
       <PageHeader />
 
       <UserTestingBanner />
-
-      {router.asPath.includes(
-        'find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',
-      ) && (
-        <TemporaryNotice
-          start={new Date('2020-12-01T09:30:00Z')}
-          end={new Date('2020-12-15T09:30:00Z')}
-          wide={wide}
-        >
-          <p>
-            1 December 2020: Further breakdowns to be provided within the
-            publication “Attendance in education and early years settings during
-            the coronavirus (COVID-19) outbreak” scheduled for 15 December and
-            subsequent releases
-          </p>
-
-          <p>
-            From 15 December we will include local authority breakdowns
-            including by pupil attendance and an update will be provided
-            half-termly. Additionally school workforce data will be published in
-            the new year.
-          </p>
-        </TemporaryNotice>
-      )}
 
       <div
         className={classNames('govuk-width-container', className, {

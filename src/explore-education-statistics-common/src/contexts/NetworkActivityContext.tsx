@@ -1,3 +1,5 @@
+'use client';
+
 import useMountedRef from '@common/hooks/useMountedRef';
 import {
   RequestInterceptor,
