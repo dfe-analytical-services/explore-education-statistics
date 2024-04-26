@@ -13,9 +13,9 @@ import { Metadata } from 'next';
 import { Dictionary } from '@common/types';
 import ApplicationInsightsContextProvider, {
   ApplicationInsightsTracking,
-} from './application-insights-context-provider';
-import QueryClientProvider from './query-client-provider';
-import NavigationEvents from './navigation-events';
+} from '../components/application-insights-context-provider';
+import QueryClientProvider from '../components/query-client-provider';
+import NavigationEvents from '../components/navigation-events';
 
 type Props = AppProps<{ dehydratedState: unknown }> & {
   children: React.ReactNode;
