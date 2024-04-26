@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -95,14 +96,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
+                    var releaseFile =
+                        await _releaseDataFileRepository.GetBySubject(releaseVersionId: releaseVersionId,
+                            subjectId: releaseSubject.SubjectId);
+
                     var filterItems =
                         await _filterItemRepository.GetFilterItemsFromObservations(observations);
-                    var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
-                        releaseSubject.FilterSequence);
+                    var filterViewModels = FiltersMetaViewModelBuilder
+                        .BuildFiltersFromFilterItems(filterItems, releaseFile.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicatorViewModels = GetIndicatorViewModels(query, releaseSubject);
+                    var indicatorViewModels = GetIndicatorViewModels(
+                        query, releaseFile.IndicatorSequence);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -121,11 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationId = await _subjectRepository.FindPublicationIdForSubject(releaseSubject.SubjectId);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
-                    var releaseFile =
-                        await _releaseDataFileRepository.GetBySubject(releaseVersionId: releaseVersionId,
-                            subjectId: releaseSubject.SubjectId);
-                    var subjectName = releaseFile.Name!;
-
                     var locationViewModels =
                         await GetLocationViewModels(locations, query.BoundaryLevel, _locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -143,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Locations = locationViewModels,
                         BoundaryLevels = boundaryLevelViewModels,
                         PublicationName = publicationTitle,
-                        SubjectName = subjectName,
+                        SubjectName = releaseFile.Name!,
                         TimePeriodRange = timePeriodViewModels
                     };
                 });
@@ -169,13 +170,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query,
-            ReleaseSubject subject)
+            List<IndicatorGroupSequenceEntry>? indicatorSequence)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
 
             // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
             // been fetched without groups
-            var indicatorsOrdering = subject.IndicatorSequence?
+            var indicatorsOrdering = indicatorSequence?
                 .SelectMany(groupOrdering => groupOrdering.ChildSequence)
                 .ToList();
 

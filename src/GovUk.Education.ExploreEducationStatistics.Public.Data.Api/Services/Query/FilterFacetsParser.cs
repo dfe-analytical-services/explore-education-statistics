@@ -89,7 +89,7 @@ internal class FilterFacetsParser : IFacetsParser
                 .Build();
         }
 
-        builder += $"{DataTable.Ref().Col(option.ColumnName):raw} {(negate ? "!=" : "="):raw} {option.Id}";
+        builder += $"{DataTable.Ref().Col(option.FilterId):raw} {(negate ? "!=" : "="):raw} {option.Id}";
 
         return builder.Build();
     }
@@ -119,7 +119,7 @@ internal class FilterFacetsParser : IFacetsParser
         }
 
         var fragments = options
-            .GroupBy(o => o.ColumnName)
+            .GroupBy(o => o.FilterId)
             .Select(group =>
             {
                 var ids = group.Select(o => o.Id);

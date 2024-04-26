@@ -3,7 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Parquet.Tables;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Services.Options;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -50,34 +52,33 @@ public abstract class ParquetPathResolverTests
                 BasePath = Path.Combine("data", "parquet-files")
             });
 
-            var expectedBasePath = Path.Combine(
+            var expectedDirectoryPath = Path.Combine(
                 PathUtils.ProjectRootPath,
                 "data",
-                "parquet-files"
+                "parquet-files",
+                version.DataSetId.ToString(),
+                "v1.0"
             );
 
+            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.ParquetDirectoryPath),
-                resolver.DirectoryPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedBasePath, version.DataParquetPath),
+                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.FiltersParquetPath),
+                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
                 resolver.IndicatorsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.LocationsParquetPath),
+                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
                 resolver.LocationsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.TimePeriodsParquetPath),
+                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
                 resolver.TimePeriodsPath(version)
             );
         }
@@ -96,34 +97,33 @@ public abstract class ParquetPathResolverTests
                 BasePath = Path.Combine("data", "parquet-files")
             });
 
-            var expectedBasePath = Path.Combine(
+            var expectedDirectoryPath = Path.Combine(
                 Assembly.GetExecutingAssembly().GetDirectoryPath(),
                 "data",
-                "parquet-files"
+                "parquet-files",
+                version.DataSetId.ToString(),
+                "v1.0"
             );
 
+            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.ParquetDirectoryPath),
-                resolver.DirectoryPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedBasePath, version.DataParquetPath),
+                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.FiltersParquetPath),
+                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
                 resolver.IndicatorsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.LocationsParquetPath),
+                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
                 resolver.LocationsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.TimePeriodsParquetPath),
+                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
                 resolver.TimePeriodsPath(version)
             );
         }
@@ -142,39 +142,38 @@ public abstract class ParquetPathResolverTests
                 BasePath = Path.Combine("data", "parquet-files")
             });
 
-            var expectedBasePath = Path.Combine(
+            var expectedDirectoryPath = Path.Combine(
                 "data",
-                "parquet-files"
+                "parquet-files",
+                version.DataSetId.ToString(),
+                "v1.0"
             );
 
+            Assert.Equal(expectedDirectoryPath, resolver.DirectoryPath(version));
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.ParquetDirectoryPath),
-                resolver.DirectoryPath(version)
-            );
-            Assert.Equal(
-                Path.Combine(expectedBasePath, version.DataParquetPath),
+                Path.Combine(expectedDirectoryPath, DataTable.ParquetFile),
                 resolver.DataPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.FiltersParquetPath),
+                Path.Combine(expectedDirectoryPath, FilterOptionsTable.ParquetFile),
                 resolver.FiltersPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.IndicatorsParquetPath),
+                Path.Combine(expectedDirectoryPath, IndicatorsTable.ParquetFile),
                 resolver.IndicatorsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.LocationsParquetPath),
+                Path.Combine(expectedDirectoryPath, LocationOptionsTable.ParquetFile),
                 resolver.LocationsPath(version)
             );
             Assert.Equal(
-                Path.Combine(expectedBasePath, version.TimePeriodsParquetPath),
+                Path.Combine(expectedDirectoryPath, TimePeriodsTable.ParquetFile),
                 resolver.TimePeriodsPath(version)
             );
         }
     }
 
-    private ParquetPathResolver BuildService(
+    private IParquetPathResolver BuildService(
         ParquetFilesOptions options,
         IWebHostEnvironment? webHostEnvironment = null)
     {

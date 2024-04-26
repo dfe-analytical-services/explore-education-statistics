@@ -17,7 +17,7 @@
     "@types/split2": "^4.2.0",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "caniuse-lite": "^1.0.30001314",
+    "caniuse-lite": "^1.0.30001610",
     "chalk": "^5.3.0",
     "check-node-version": "^4.2.1",
     "commander": "^11.0.0",

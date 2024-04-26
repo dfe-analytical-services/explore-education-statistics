@@ -31,6 +31,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
@@ -3178,16 +3179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedReleaseFile = await contentDbContext.ReleaseFiles
                     .FirstAsync(rf => rf.ReleaseVersionId == releaseVersion.Id
                                       && rf.FileId == replacementFile.Id);
-
                 Assert.Equal("Original data set guidance", updatedReleaseFile.Summary);
 
-                // Check the sequence of filters and indicators remains untouched
-                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseVersionId == statsReleaseVersion.Id
-                                      && rs.SubjectId == replacementReleaseSubject.SubjectId);
-
-                Assert.Null(replacedReleaseSubject.FilterSequence);
-                Assert.Null(replacedReleaseSubject.IndicatorSequence);
+                Assert.Null(updatedReleaseFile.FilterSequence);
+                Assert.Null(updatedReleaseFile.IndicatorSequence);
             }
         }
 
@@ -3916,7 +3911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             // Define a sequence for the original subject which is expected to be updated after the replacement
-            originalReleaseSubject.FilterSequence = new List<FilterSequenceEntry>
+            originalReleaseFile.FilterSequence = new List<FilterSequenceEntry>
             {
                 // Filter a
                 new(originalFilters[0].Id,
@@ -4025,14 +4020,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .SingleAsync(rs => rs.ReleaseVersionId == statsReleaseVersion.Id
-                                       && rs.SubjectId == replacementReleaseSubject.SubjectId);
+                var replacedReleaseFile = await contentDbContext.ReleaseFiles
+                    .SingleAsync(rf => rf.ReleaseVersionId == statsReleaseVersion.Id
+                                       && rf.File.SubjectId == replacementReleaseSubject.SubjectId);
 
                 // Verify the updated sequence of filters on the replacement subject
-                var updatedSequence = replacedReleaseSubject.FilterSequence;
+                var updatedSequence = replacedReleaseFile.FilterSequence;
                 Assert.NotNull(updatedSequence);
 
                 // 'Filter a' should be the only filter in the sequence
@@ -4123,7 +4118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             // Define a sequence for the original subject which is expected to be updated after the replacement
-            originalReleaseSubject.IndicatorSequence = new List<IndicatorGroupSequenceEntry>
+            originalReleaseFile.IndicatorSequence = new List<IndicatorGroupSequenceEntry>
             {
                 // Group a
                 new(
@@ -4220,14 +4215,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .SingleAsync(rs => rs.ReleaseVersionId == statsRelease.Id
-                                       && rs.SubjectId == replacementReleaseSubject.SubjectId);
+                var replacedReleaseFile = await contentDbContext.ReleaseFiles
+                    .SingleAsync(rf => rf.ReleaseVersionId == statsRelease.Id
+                                       && rf.File.SubjectId == replacementReleaseSubject.SubjectId);
 
                 // Verify the updated sequence of indicators on the replacement subject
-                var updatedSequence = replacedReleaseSubject.IndicatorSequence;
+                var updatedSequence = replacedReleaseFile.IndicatorSequence;
                 Assert.NotNull(updatedSequence);
 
                 // 'Group a' should be the only group in the sequence

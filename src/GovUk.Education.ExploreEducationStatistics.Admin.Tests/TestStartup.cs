@@ -81,8 +81,10 @@ public static class TestStartupExtensions
         this WebApplicationFactory<TestStartup> testApp,
         ClaimsPrincipal user)
     {
-        return testApp.WithWebHostBuilder(builder => builder
-            .ConfigureServices(services => services.AddScoped(_ => user)));
+        return testApp.ConfigureServices(services =>
+        {
+            services.AddScoped(_ => user);
+        });
     }
 }
 

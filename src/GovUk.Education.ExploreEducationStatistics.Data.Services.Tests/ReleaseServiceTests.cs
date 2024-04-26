@@ -603,12 +603,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
-                FilterSequence = new List<FilterSequenceEntry>
-                {
-                    new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
-                    new (subject1Filter1Id, new List<FilterGroupSequenceEntry>()),
-                    new (subject1Filter3Id, new List<FilterGroupSequenceEntry>()),
-                },
             };
 
             var subject1Filter1 = new Filter
@@ -667,6 +661,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
+                },
+                FilterSequence = new List<FilterSequenceEntry>
+                {
+                    new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
+                    new (subject1Filter1Id, new List<FilterGroupSequenceEntry>()),
+                    new (subject1Filter3Id, new List<FilterGroupSequenceEntry>()),
                 },
             };
 
@@ -741,11 +741,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 ReleaseVersion = statisticsReleaseVersion,
                 Subject = new Subject(),
-                IndicatorSequence = new List<IndicatorGroupSequenceEntry>
-                {
-                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),
-                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator3.Id, }),
-                },
             };
 
             var subject1Filter1 = new Filter
@@ -797,6 +792,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
+                },
+                IndicatorSequence = new List<IndicatorGroupSequenceEntry>
+                {
+                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),
+                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator3.Id, }),
                 },
             };
 

@@ -23,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public ExternalMethodology? ExternalMethodology { get; set; }
 
-        public List<LegacyRelease> LegacyReleases { get; set; } = new();
-
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; } = null!;

@@ -102,15 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
         {
             public ThemeViewModel Theme;
         }
-
-        public class LegacyReleaseViewModel
-        {
-            public Guid Id { get; set; }
-
-            public string Description { get; set; }
-
-            public string Url { get; set; }
-        }
     }
 
     public class ReleaseNoteViewModel

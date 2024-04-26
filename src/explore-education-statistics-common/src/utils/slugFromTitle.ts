@@ -4,9 +4,5 @@
  * Duplicates NamingUtils#SlugFromTitle in the backend
  */
 export default function slugFromTitle(title: string) {
-  return title
-    .replace(/[^\w-]+/g, ' ')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-');
+  return title.replace(/\W+/g, ' ').trim().toLowerCase().replace(/\s+/g, '-');
 }

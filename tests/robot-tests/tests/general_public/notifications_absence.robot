@@ -27,8 +27,7 @@ Go to Notify me page for Absence publication
     user checks nth breadcrumb contains    4    Notify me
 
 Sign up for email alerts
-    [Documentation]    EES-716    EES-1265
-    [Tags]    NotAgainstPreProd    NotAgainstLocal
+    [Tags]    NotAgainstLocal
     user clicks element    id:subscriptionForm-email
     press keys    id:subscriptionForm-email    mark@hiveit.co.uk
     user clicks button    Subscribe

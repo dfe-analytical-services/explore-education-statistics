@@ -78,13 +78,35 @@ jobs:
       - test
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GH_TOKEN }}
+
       - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "Workflow ${{ needs.test.result }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":x: Workflow ${{ needs.test.result }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Workflow*: <https://github.com/dfe-analytical-services/explore-education-statistics/actions/workflows/validate-snapshots.yml|${{ github.workflow }}>\n*Details*: Notification from action run `${{ github.run_number }}`, which ran against commit `${{ github.sha }}` from branch `${{ github.ref_name }}` of the `${{ github.repository }}` repository."
+                  }
+                }
+              ]
+            }
         env:
-          SLACK_USERNAME: Alertbot
-          SLACK_ICON_EMOJI: ':x:'
-          SLACK_COLOR: '#a30200'
-          SLACK_TITLE: Workflow ${{ needs.test.result }}
-          MSG_MINIMAL: actions url
-          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

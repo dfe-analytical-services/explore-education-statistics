@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -82,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Changes = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                 },
@@ -130,7 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     PublicationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     SupersedingDataSetId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LatestVersionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LatestDraftVersionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LatestLiveVersionId = table.Column<Guid>(type: "uuid", nullable: true),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Withdrawn = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -153,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    CsvFileId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReleaseFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
@@ -171,6 +173,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         name: "FK_DataSetVersions_DataSets_DataSetId",
                         column: x => x.DataSetId,
                         principalTable: "DataSets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DataSetVersionImports",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataSetVersionImports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DataSetVersionImports_DataSetVersions_DataSetVersionId",
+                        column: x => x.DataSetVersionId,
+                        principalTable: "DataSetVersions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -367,9 +390,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSets_LatestVersionId",
+                name: "IX_DataSets_LatestDraftVersionId",
                 table: "DataSets",
-                column: "LatestVersionId",
+                column: "LatestDraftVersionId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSets_LatestLiveVersionId",
+                table: "DataSets",
+                column: "LatestLiveVersionId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -378,9 +407,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 column: "SupersedingDataSetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersionImports_DataSetVersionId",
+                table: "DataSetVersionImports",
+                column: "DataSetVersionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DataSetVersions_DataSetId",
                 table: "DataSetVersions",
                 column: "DataSetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DataSetVersions_ReleaseFileId",
+                table: "DataSetVersions",
+                column: "ReleaseFileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FilterMetas_DataSetVersionId_PublicId",
@@ -522,18 +561,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_DataSets_DataSetVersions_LatestVersionId",
+                name: "FK_DataSets_DataSetVersions_LatestDraftVersionId",
                 table: "DataSets",
-                column: "LatestVersionId",
+                column: "LatestDraftVersionId",
                 principalTable: "DataSetVersions",
                 principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DataSets_DataSetVersions_LatestLiveVersionId",
+                table: "DataSets",
+                column: "LatestLiveVersionId",
+                principalTable: "DataSetVersions",
+                principalColumn: "Id");
+
+            // Grant permissions on database tables created by this resource's database user to the
+            // Admin App Service and Data Processor Function App users.
+            var adminAppServiceIdentityName = Environment.GetEnvironmentVariable("AdminAppServiceIdentityName");
+            if (adminAppServiceIdentityName != null)
+            {
+                migrationBuilder.Sql(
+                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{adminAppServiceIdentityName}\"");
+            }
+
+            var dataProcessorFunctionAppIdentityName = Environment.GetEnvironmentVariable("DataProcessorFunctionAppIdentityName");
+            if (dataProcessorFunctionAppIdentityName != null)
+            {
+                migrationBuilder.Sql(
+                    $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{dataProcessorFunctionAppIdentityName}\"");
+            }
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_DataSets_DataSetVersions_LatestVersionId",
+                name: "FK_DataSets_DataSetVersions_LatestDraftVersionId",
+                table: "DataSets");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_DataSets_DataSetVersions_LatestLiveVersionId",
                 table: "DataSets");
 
             migrationBuilder.DropTable(
@@ -550,6 +616,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             migrationBuilder.DropTable(
                 name: "ChangeSetTimePeriods");
+
+            migrationBuilder.DropTable(
+                name: "DataSetVersionImports");
 
             migrationBuilder.DropTable(
                 name: "FilterOptionMetaLinks");

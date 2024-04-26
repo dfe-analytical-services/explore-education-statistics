@@ -29,12 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
                 ScopeClaim(SecurityScopes.AccessAdminApiScope));
         }
 
-        public static ClaimsPrincipal AuthenticatedUser()
+        public static ClaimsPrincipal AuthenticatedUser(params Claim[] additionalClaims)
         {
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
-                SecurityClaim(ApplicationAccessGranted),
-                ScopeClaim(SecurityScopes.AccessAdminApiScope));
+                [
+                    SecurityClaim(ApplicationAccessGranted),
+                    ScopeClaim(SecurityScopes.AccessAdminApiScope),
+                    ..additionalClaims
+                ]);
         }
 
         public static ClaimsPrincipal BauUser()
@@ -100,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         /// <summary>
         /// Create a Claim representing a SecurityClaimTypes enum value.
         /// </summary>
-        private static Claim SecurityClaim(SecurityClaimTypes type)
+        public static Claim SecurityClaim(SecurityClaimTypes type)
         {
             return new Claim(type.ToString(), "");
         }

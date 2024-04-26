@@ -219,8 +219,8 @@ def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
     return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).astimezone().strftime(strf)
 
 
-def get_current_datetime(strf: str, offset_days: int = 0) -> str:
-    return format_datetime(datetime.datetime.now() + datetime.timedelta(days=offset_days), strf)
+def get_current_datetime(strf: str, offset_days: int = 0, timezone: str = "UTC") -> str:
+    return format_datetime(datetime.datetime.now(pytz.timezone(timezone)) + datetime.timedelta(days=offset_days), strf)
 
 
 def format_datetime(datetime: datetime, strf: str) -> str:
@@ -343,10 +343,10 @@ def is_webelement(variable: object) -> bool:
 def _normalise_child_locator(child_locator: str) -> str:
     if isinstance(child_locator, str):
         # the below substitution is necessary in order to correctly find the parent's descendants.  Without the
-        # preceding dot, the double forward sl()ash breaks out of the parent container and returns the xpath query
+        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query
         # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below
         # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward
-        # sl()ashes without the "xpath:" prefix are inferred as being xpath expressions.
+        # slashes without the "xpath:" prefix are inferred as being xpath expressions.
         return re.sub(r"^(xpath:)?//", "xpath:.//", child_locator)
 
     raise_assertion_error(f"Child locator was not a str - {child_locator}")

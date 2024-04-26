@@ -78,7 +78,7 @@ const PrototypeHomepage = () => {
                 className="govuk-link"
                 href="https://www.gov.uk/school-performance-tables"
               >
-                Find and compare schools in England
+                Compare school and college performance
               </a>
             </h4>
             <p className="govuk-caption-m govuk-!-margin-top-1">

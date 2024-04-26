@@ -6,31 +6,21 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using Microsoft.AspNetCore.Identity;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
-public class SignInControllerTests : IntegrationTest<TestStartup>
+public class SignInControllerTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public SignInControllerTests(TestApplicationFactory<TestStartup> testApp)
-        : base(testApp)
-    {}
-
-    public class RegistrationTests : SignInControllerTests
+    public class RegistrationTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
-        public RegistrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Theory]
         [InlineData("VALID-USER@education.gov.uk", null, "FirstName", "LastName", null, "Role 2", null, null)]
         [InlineData(null, "VALID-USER@education.gov.uk", "FirstName", "LastName", null, "Role 1", null, null)]
@@ -441,12 +431,8 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class SignInTests : SignInControllerTests
+    public class SignInTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
-        public SignInTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task Success()
         {
@@ -503,12 +489,8 @@ public class SignInControllerTests : IntegrationTest<TestStartup>
         }
     }
 
-    public class PermissionsTests : SignInControllerTests
+    public class PermissionsTests(TestApplicationFactory testApp) : SignInControllerTests(testApp)
     {
-        public PermissionsTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
-        {
-        }
-
         [Fact]
         public async Task NoAccessAdminApiScope()
         {
