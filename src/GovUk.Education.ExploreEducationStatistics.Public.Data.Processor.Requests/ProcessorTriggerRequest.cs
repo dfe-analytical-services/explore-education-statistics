@@ -1,0 +1,6 @@
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
+
+public record ProcessorTriggerRequest
+{
+    public required Guid ReleaseFileId { get; init; }
+}

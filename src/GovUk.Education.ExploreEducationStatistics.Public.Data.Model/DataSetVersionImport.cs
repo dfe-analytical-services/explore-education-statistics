@@ -8,7 +8,7 @@ public class DataSetVersionImport : ICreatedUpdatedTimestamps<DateTimeOffset, Da
 {
     public Guid Id { get; init; }
 
-    public required Guid DataSetVersionId { get; set; }
+    public Guid DataSetVersionId { get; set; }
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 

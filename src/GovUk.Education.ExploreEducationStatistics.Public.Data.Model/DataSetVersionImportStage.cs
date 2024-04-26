@@ -6,4 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 public enum DataSetVersionImportStage
 {
     Created,
+    Completing
 }
