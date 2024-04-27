@@ -45,6 +45,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     indicators: 1,
                     locations: 1,
                     timePeriods: 2)
+                .WithVersionNumber(1, 1)
                 .WithStatusDraft()
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dataSet.LatestDraftVersion = dsv);
@@ -549,6 +550,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     locations: 1,
                     timePeriods: 2)
                 .WithStatusDraft()
+                .WithVersionNumber(1, 1)
                 .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);
@@ -643,6 +645,7 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                     locations: 1,
                     timePeriods: 2)
                 .WithStatusDraft()
+                .WithVersionNumber(1, 1)
                 .WithReleaseFileId(draftReleaseFile.Id)
                 .WithDataSet(dataSet)
                 .FinishWith(dsv => dsv.DataSet.LatestDraftVersion = dsv);

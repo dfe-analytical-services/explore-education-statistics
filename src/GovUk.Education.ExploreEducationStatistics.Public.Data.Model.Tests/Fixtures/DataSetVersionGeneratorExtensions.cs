@@ -50,8 +50,9 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
         int major,
-        int minor)
-        => generator.ForInstance(s => s.SetVersionNumber(major, minor));
+        int minor,
+        int patch = 0)
+        => generator.ForInstance(s => s.SetVersionNumber(major, minor, patch));
 
     public static Generator<DataSetVersion> WithPublished(
         this Generator<DataSetVersion> generator,
@@ -182,6 +183,7 @@ public static class DataSetVersionGeneratorExtensions
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
+            .Set(dsv => dsv.VersionPatch, 0)
             .Set(dsv => dsv.TotalResults, f => f.Random.Long(min: 10000, max: 10_000_000))
             .Set(dsv => dsv.Status, DataSetVersionStatus.Draft);
 
@@ -205,10 +207,12 @@ public static class DataSetVersionGeneratorExtensions
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
         int major,
-        int minor)
+        int minor,
+        int patch = 0)
         => instanceSetter
             .Set(dsv => dsv.VersionMajor, major)
-            .Set(dsv => dsv.VersionMinor, minor);
+            .Set(dsv => dsv.VersionMinor, minor)
+            .Set(dsv => dsv.VersionPatch, patch);
 
     public static InstanceSetters<DataSetVersion> SetStatus(
         this InstanceSetters<DataSetVersion> instanceSetter,
