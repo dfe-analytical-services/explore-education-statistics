@@ -152,11 +152,11 @@ public static class ObjectExtensionsTests
 
         private class TestClassWithComplexTypes
         {
-            public object Anonymous { get; init; }
+            public object? Anonymous { get; init; }
 
-            public TestClassWithPrimitives Class { get; init; }
+            public TestClassWithPrimitives? Class { get; init; }
 
-            public List<object> List { get; init; }
+            public List<object>? List { get; init; }
         }
     }
 }
