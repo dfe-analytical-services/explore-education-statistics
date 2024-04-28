@@ -1,3 +1,6 @@
+using FluentValidation;
+using FluentValidation.Validators;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 /// <summary>
@@ -48,5 +51,47 @@ public record DataSetQueryCriteriaLocations
         return locations
             .OfType<DataSetQueryLocation>()
             .ToHashSet();
+    }
+
+    public class Validator : AbstractValidator<DataSetQueryCriteriaLocations>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Eq)
+                .SetInheritanceValidator(InheritanceValidator!)
+                .When(request => request.Eq is not null);
+
+            RuleFor(request => request.NotEq)
+                .SetInheritanceValidator(InheritanceValidator!)
+                .When(request => request.NotEq is not null);
+
+            When(q => q.In is not null, () =>
+            {
+                RuleFor(request => request.In)
+                    .NotEmpty();
+                RuleForEach(request => request.In)
+                    .SetInheritanceValidator(InheritanceValidator);
+            });
+
+            When(q => q.NotIn is not null, () =>
+            {
+                RuleFor(request => request.NotIn)
+                    .NotEmpty();
+                RuleForEach(request => request.NotIn)
+                    .SetInheritanceValidator(InheritanceValidator);
+            });
+        }
+
+        private static void InheritanceValidator(
+            PolymorphicValidator<DataSetQueryCriteriaLocations, DataSetQueryLocation> validator)
+        {
+            validator.Add(new DataSetQueryLocationId.Validator());
+            validator.Add(new DataSetQueryLocationCode.Validator());
+            validator.Add(new DataSetQueryLocationLocalAuthorityCode.Validator());
+            validator.Add(new DataSetQueryLocationLocalAuthorityOldCode.Validator());
+            validator.Add(new DataSetQueryLocationProviderUkprn.Validator());
+            validator.Add(new DataSetQueryLocationSchoolLaEstab.Validator());
+            validator.Add(new DataSetQueryLocationSchoolUrn.Validator());
+        }
     }
 }

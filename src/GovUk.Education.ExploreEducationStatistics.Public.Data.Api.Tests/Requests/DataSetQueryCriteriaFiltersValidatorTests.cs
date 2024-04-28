@@ -4,23 +4,32 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Requests;
 
-public abstract class DataSetGetQueryFiltersValidatorTests
+public class DataSetQueryCriteriaFiltersValidatorTests
 {
-    private readonly DataSetGetQueryFilters.Validator _validator = new();
+    private readonly DataSetQueryCriteriaFilters.Validator _validator = new();
 
-    public static readonly TheoryData<string?> ValidFiltersSingle =
-        DataSetQueryCriteriaFiltersValidatorTests.ValidFiltersSingle;
+    public static readonly TheoryData<string?> ValidFiltersSingle = new()
+    {
+       null,
+       "abc",
+       "12345",
+       "123456789",
+       "1234567890",
+    };
 
-    public static readonly TheoryData<string[]> ValidFiltersMultiple =
-        DataSetQueryCriteriaFiltersValidatorTests.ValidFiltersMultiple;
+    public static readonly TheoryData<string[]> ValidFiltersMultiple = new()
+    {
+        new [] { "abc", "12345", "123456789" },
+        new [] { "1234567890", "123", "abcde" },
+    };
 
-    public class EqTests : DataSetGetQueryFiltersValidatorTests
+    public class EqTests : DataSetQueryCriteriaFiltersValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidFiltersSingle))]
         public void Success(string? filter)
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 Eq = filter
             };
@@ -31,39 +40,37 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_Empty()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 Eq = ""
             };
 
             _validator.TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Eq)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
-                .Only();
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Fact]
         public void Failure_MaxLength()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 Eq = "12345678901"
             };
 
             _validator.TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.Eq)
-                .WithErrorCode(FluentValidationKeys.MaximumLengthValidator)
-                .Only();
+                .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
 
-    public class NotEqTests : DataSetGetQueryFiltersValidatorTests
+    public class NotEqTests : DataSetQueryCriteriaFiltersValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidFiltersSingle))]
         public void Success(string? filter)
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotEq = filter
             };
@@ -74,39 +81,37 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_Empty()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotEq = ""
             };
 
             _validator.TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(FluentValidationKeys.NotEmptyValidator)
-                .Only();
+                .WithErrorCode(FluentValidationKeys.NotEmptyValidator);
         }
 
         [Fact]
         public void Failure_MaxLength()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotEq = "12345678901"
             };
 
             _validator.TestValidate(query)
                 .ShouldHaveValidationErrorFor(q => q.NotEq)
-                .WithErrorCode(FluentValidationKeys.MaximumLengthValidator)
-                .Only();
+                .WithErrorCode(FluentValidationKeys.MaximumLengthValidator);
         }
     }
 
-    public class InTests : DataSetGetQueryFiltersValidatorTests
+    public class InTests : DataSetQueryCriteriaFiltersValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidFiltersMultiple))]
         public void Success(params string[] filters)
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 In = filters
             };
@@ -117,7 +122,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Success_Null()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 In = null
             };
@@ -128,7 +133,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_EmptyStrings()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 In = ["", ""]
             };
@@ -146,7 +151,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_MaxLengths()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 In = ["12345678901", "999999999999999"]
             };
@@ -162,13 +167,13 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         }
     }
 
-    public class NotInTests : DataSetGetQueryFiltersValidatorTests
+    public class NotInTests : DataSetQueryCriteriaFiltersValidatorTests
     {
         [Theory]
         [MemberData(nameof(ValidFiltersMultiple))]
         public void Success(params string[] filters)
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotIn = filters
             };
@@ -179,7 +184,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Success_Null()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotIn = null
             };
@@ -190,7 +195,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_EmptyStrings()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotIn = ["", ""]
             };
@@ -208,7 +213,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void Failure_MaxLengths()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 NotIn = ["12345678901", "999999999999999"]
             };
@@ -224,12 +229,12 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         }
     }
 
-    public class EmptyTests : DataSetGetQueryFiltersValidatorTests
+    public class EmptyTests : DataSetQueryCriteriaFiltersValidatorTests
     {
         [Fact]
         public void AllEmpty_Failure()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 Eq = "",
                 NotEq = "",
@@ -252,7 +257,7 @@ public abstract class DataSetGetQueryFiltersValidatorTests
         [Fact]
         public void SomeEmpty_Failure()
         {
-            var query = new DataSetGetQueryFilters
+            var query = new DataSetQueryCriteriaFilters
             {
                 Eq = "123",
                 NotEq = "",

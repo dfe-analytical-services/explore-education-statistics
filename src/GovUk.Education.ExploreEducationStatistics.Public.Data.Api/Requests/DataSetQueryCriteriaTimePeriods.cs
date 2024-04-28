@@ -1,3 +1,5 @@
+using FluentValidation;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
 /// <summary>
@@ -66,5 +68,51 @@ public record DataSetQueryCriteriaTimePeriods
         return timePeriods
             .OfType<DataSetQueryTimePeriod>()
             .ToHashSet();
+    }
+
+    public class Validator : AbstractValidator<DataSetQueryCriteriaTimePeriods>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.Eq)
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.Eq is not null);
+
+            RuleFor(request => request.NotEq)!
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.NotEq is not null);
+
+            When(q => q.In is not null, () =>
+            {
+                RuleFor(request => request.In)
+                    .NotEmpty();
+                RuleForEach(request => request.In)
+                    .SetValidator(new DataSetQueryTimePeriod.Validator());
+            });
+
+            When(q => q.NotIn is not null, () =>
+            {
+                RuleFor(request => request.NotIn)
+                    .NotEmpty();
+                RuleForEach(request => request.NotIn)
+                    .SetValidator(new DataSetQueryTimePeriod.Validator());
+            });
+
+            RuleFor(request => request.Gt)
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.Gt is not null);
+
+            RuleFor(request => request.Gte)
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.Gte is not null);
+
+            RuleFor(request => request.Lt)
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.Lt is not null);
+
+            RuleFor(request => request.Lte)
+                .SetValidator(new DataSetQueryTimePeriod.Validator()!)
+                .When(request => request.Lte is not null);
+        }
     }
 }
