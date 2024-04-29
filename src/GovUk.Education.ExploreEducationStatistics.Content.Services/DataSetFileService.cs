@@ -61,7 +61,6 @@ public class DataSetFileService : IDataSetFileService
 
         var query = _contentDbContext.ReleaseFiles
             .AsNoTracking()
-            .Include(rf => rf.File)
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
