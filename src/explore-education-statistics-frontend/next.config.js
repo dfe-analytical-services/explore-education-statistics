@@ -34,9 +34,7 @@ const nextConfig = {
       },
     ];
   },
-  webpack(config, options) {
-    const { dev, isServer } = options;
-
+  webpack(config, { dev, isServer }) {
     if (isServer) {
       const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 
@@ -47,8 +45,6 @@ const nextConfig = {
           },
         }),
       );
-
-      config.externals = [...config.externals, 'react', 'react-dom'];
     }
 
     if (dev) {
@@ -82,7 +78,6 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       './dist/cpexcel.js': false,
-      react: path.resolve(__dirname, 'node_modules/react'),
       formik: path.resolve(__dirname, 'node_modules/formik'),
     };
 
