@@ -5,7 +5,7 @@ import {
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
 import React, { ReactNode, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function ApplicationInsightsContextProvider({
   children,
@@ -22,8 +22,9 @@ export default function ApplicationInsightsContextProvider({
 }
 
 export const ApplicationInsightsTracking = () => {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const appInsights = useApplicationInsights();
-  const router = useRouter();
 
   useEffect(() => {
     if (!appInsights) {
@@ -31,13 +32,12 @@ export const ApplicationInsightsTracking = () => {
     }
 
     appInsights.trackPageView({
-      uri: router.pathname,
+      uri: pathname ?? undefined,
     });
 
-    router.events.on('routeChangeComplete', uri => {
-      appInsights.trackPageView({ uri });
-    });
-  }, [appInsights, router.events, router.pathname]);
+    const uri = `${pathname}?${searchParams}`;
+    appInsights.trackPageView({ uri });
+  }, [appInsights, pathname, searchParams]);
 
   return null;
 };
