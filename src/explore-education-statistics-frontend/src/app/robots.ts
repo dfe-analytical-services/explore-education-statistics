@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/data-tables/fast-track/', '/data-tables/permalink/'],
       },
     ],
-    sitemap: `${process.env.PUBLIC_URL}/sitemap.xml`,
+    sitemap: `${process.env.PUBLIC_URL}sitemap.xml`,
   };
 }
