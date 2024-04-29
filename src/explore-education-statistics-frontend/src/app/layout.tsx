@@ -85,6 +85,7 @@ export default function RootLayout({ children }: Props) {
 }
 
 export const metadata: Metadata = {
-  title: 'A test title', // Explore our statistics and data
-  description: 'A test description',
+  title: 'Explore our statistics and data',
+  description:
+    'Find, download and explore official Department for Education (DfE) statistics and data in England.',
 };
