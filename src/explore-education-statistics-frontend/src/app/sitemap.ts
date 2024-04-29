@@ -12,31 +12,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${process.env.PUBLIC_URL}/not-found`,
+      url: `${process.env.PUBLIC_URL}not-found`,
       lastModified: new Date(),
       changeFrequency: 'never',
       priority: 0.0,
     },
     {
-      url: `${process.env.PUBLIC_URL}/contact-us`,
+      url: `${process.env.PUBLIC_URL}contact-us`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.4,
     },
     {
-      url: `${process.env.PUBLIC_URL}/cookies`,
+      url: `${process.env.PUBLIC_URL}cookies`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.0,
     },
     {
-      url: `${process.env.PUBLIC_URL}/cookies/details`,
+      url: `${process.env.PUBLIC_URL}cookies/details`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.0,
     },
     {
-      url: `${process.env.PUBLIC_URL}/data-catalogue`,
+      url: `${process.env.PUBLIC_URL}data-catalogue`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
@@ -45,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // data-catalogue/[publicationSlug]/[releaseSlug]
     // data-catalogue/data-set/[dataSetFieldId]
     {
-      url: `${process.env.PUBLIC_URL}/data-tables`,
+      url: `${process.env.PUBLIC_URL}data-tables`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.8,
@@ -55,7 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // data-tables/fast-track/[dataBlockParentId]
     // data-tables/permalink/[publicationSlug]
     {
-      url: `${process.env.PUBLIC_URL}/find-statistics`,
+      url: `${process.env.PUBLIC_URL}find-statistics`,
       lastModified: new Date(),
       changeFrequency: 'always',
       priority: 0.9,
@@ -67,33 +67,33 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // find-statistics/[publication]/data-guidance
     // find-statistics/[publication]/prerelease-access-list
     {
-      url: `${process.env.PUBLIC_URL}/glossary`,
+      url: `${process.env.PUBLIC_URL}glossary`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
-      url: `${process.env.PUBLIC_URL}/help-support`,
+      url: `${process.env.PUBLIC_URL}help-support`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
-      url: `${process.env.PUBLIC_URL}/methodology`,
+      url: `${process.env.PUBLIC_URL}methodology`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     // methodology/[methodology]
     {
-      url: `${process.env.PUBLIC_URL}/privacy-notice`,
+      url: `${process.env.PUBLIC_URL}privacy-notice`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.0,
     },
     // subscriptions - TODO: Check if this should even be accessible? Current yields a 404
     {
-      url: `${process.env.PUBLIC_URL}/subscriptions/verification-error`,
+      url: `${process.env.PUBLIC_URL}subscriptions/verification-error`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.0,
