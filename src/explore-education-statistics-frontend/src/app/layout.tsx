@@ -4,11 +4,9 @@ import '@frontend/loadEnv';
 import '../styles/_all.scss';
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import composeProviders from '@common/hocs/composeProviders';
-import { AppProps } from 'next/app';
 import { cookies } from 'next/headers';
 import Head from 'next/head';
 import React, { Suspense } from 'react';
-import { Hydrate } from '@tanstack/react-query';
 import { Metadata } from 'next';
 import { Dictionary } from '@common/types';
 import ApplicationInsightsContextProvider, {
@@ -17,7 +15,7 @@ import ApplicationInsightsContextProvider, {
 import QueryClientProvider from '../components/query-client-provider';
 import NavigationEvents from '../components/navigation-events';
 
-type Props = AppProps<{ dehydratedState: unknown }> & {
+type Props = {
   children: React.ReactNode;
 };
 
@@ -27,7 +25,7 @@ const Providers = composeProviders(
   QueryClientProvider,
 );
 
-export default function RootLayout({ Component, pageProps, children }: Props) {
+export default function RootLayout({ children }: Props) {
   const allCookies: Dictionary<string> = Object.assign(
     {},
     ...cookies()
@@ -79,10 +77,7 @@ export default function RootLayout({ Component, pageProps, children }: Props) {
           <Suspense fallback={null}>
             <NavigationEvents cookies={allCookies} />
           </Suspense>
-          <Hydrate state={pageProps.dehydratedState}>
-            <Component {...pageProps} />
-            {children}
-          </Hydrate>
+          {children}
         </Providers>
       </body>
     </html>
