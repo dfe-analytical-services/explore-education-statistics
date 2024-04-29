@@ -1,9 +1,12 @@
+import getPublicationSlugs from '@frontend/services/sitemapService';
 import { MetadataRoute } from 'next';
 
 // Priority is a decimal bounded [0.0, 1.0] which indicates to Google which pages we most want users to find in search results.
 // The default priority is 0.5.
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const publicationPages = await getPublicationSlugs();
+
   return [
     {
       url: process.env.PUBLIC_URL,
@@ -41,7 +44,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 0.9,
     },
-    // data-catalogue/[publicationSlug]
+    ...publicationPages, // all routes matching: data-catalogue/[publicationSlug]
     // data-catalogue/[publicationSlug]/[releaseSlug]
     // data-catalogue/data-set/[dataSetFieldId]
     {
