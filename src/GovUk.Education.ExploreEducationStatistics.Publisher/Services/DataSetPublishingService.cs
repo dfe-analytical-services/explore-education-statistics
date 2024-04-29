@@ -20,9 +20,14 @@ public class DataSetPublishingService(
     public async Task PublishDataSets(Guid[] releaseVersionIds)
     {
         await PromoteDraftDataSetVersions(releaseVersionIds);
-        await UpdatePreviousReleaseFileIds(releaseVersionIds);
+        await UpdateReleaseFileIdsForReleaseAmendment(releaseVersionIds);
     }
 
+    /// <summary>
+    /// This method moves any Draft DataSetVersions that are connected to any of the provided releaseVersionIds
+    /// into Published, making them the latest live versions of their overarching DataSets. It also marks the
+    /// DataSets themselves as published if they haven't previously been published. 
+    /// </summary>
     private async Task PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
     {
         // Find all Data Files associated with the given ReleaseVersions.
@@ -69,7 +74,12 @@ public class DataSetPublishingService(
         await publicDataDbContext.SaveChangesAsync();
     }
 
-    private async Task UpdatePreviousReleaseFileIds(IEnumerable<Guid> releaseVersionIds)
+    /// <summary>
+    /// This method updates any ReleaseFileId values on DataSetVersions that referenced any Ids of ReleaseFiles on
+    /// previous ReleaseVersions, in the case that any of the given releaseVersionIds that are being published are
+    /// amendments of ReleaseVersions that contain Public API Data sets.
+    /// </summary>
+    private async Task UpdateReleaseFileIdsForReleaseAmendment(IEnumerable<Guid> releaseVersionIds)
     {
         var previousReleaseVersionIds = await contentDbContext
             .ReleaseVersions
