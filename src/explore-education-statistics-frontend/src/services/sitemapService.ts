@@ -23,13 +23,27 @@ export default async function getPublicationSlugs() {
     ).json<PaginatedList<PublicationListSummary>>()
   ).results;
 
-  const routes: MetadataRoute.Sitemap = publications.map(publication => {
-    return {
-      url: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
-      lastModified: publication.published ?? new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    };
+  const routes: MetadataRoute.Sitemap = publications.flatMap(publication => {
+    return [
+      {
+        url: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
+        lastModified: publication.published ?? new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      },
+      {
+        url: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
+        lastModified: publication.published ?? new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      },
+      {
+        url: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
+        lastModified: publication.published ?? new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      },
+    ];
   });
   return routes;
 }

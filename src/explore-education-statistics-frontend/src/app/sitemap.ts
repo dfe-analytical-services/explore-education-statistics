@@ -44,31 +44,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
-    ...publicationPages, // all routes matching: data-catalogue/[publicationSlug]
-    // data-catalogue/[publicationSlug]/[releaseSlug]
-    // data-catalogue/data-set/[dataSetFieldId]
+    // all routes matching:
+    // data-catalogue/[publicationSlug]
+    // data-tables/[publicationSlug]
+    // find-statistics/[publication]
+    ...publicationPages,
     {
       url: `${process.env.PUBLIC_URL}data-tables`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.8,
     },
-    // data-tables/[publicationSlug]
-    // data-tables/[publicationSlug]/[releaseSlug]
-    // data-tables/fast-track/[dataBlockParentId]
-    // data-tables/permalink/[publicationSlug]
+
     {
       url: `${process.env.PUBLIC_URL}find-statistics`,
       lastModified: new Date(),
       changeFrequency: 'always',
       priority: 0.9,
     },
-    // find-statistics/[publication]
-    // find-statistics/[publication]/[release]
-    // find-statistics/[publication]/[release]/data-guidance
-    // find-statistics/[publication]/[release]/prerelease-access-list
-    // find-statistics/[publication]/data-guidance
-    // find-statistics/[publication]/prerelease-access-list
+
     {
       url: `${process.env.PUBLIC_URL}glossary`,
       lastModified: new Date(),
@@ -87,7 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
-    // methodology/[methodology]
     {
       url: `${process.env.PUBLIC_URL}privacy-notice`,
       lastModified: new Date(),
@@ -101,5 +94,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.0,
     },
+    // Omitting the following dynamic routes from the sitemap:
+    // methodology/[methodology]
+    // find-statistics/[publication]/[release]/data-guidance
+    // find-statistics/[publication]/[release]/prerelease-access-list
+    // find-statistics/[publication]/data-guidance
+    // find-statistics/[publication]/prerelease-access-list
+    // data-tables/fast-track/[dataBlockParentId]
+    // data-tables/permalink/[publicationSlug]
+    // data-catalogue/data-set/[dataSetFieldId]
+
+    // Feels like we should add these, but that might require writing a new endpoint.
+    // Currently would need to make a GET request PER publication
+    // data-catalogue/[publicationSlug]/[releaseSlug]
+    // data-tables/[publicationSlug]/[releaseSlug]
+    // find-statistics/[publication]/[release]
   ];
 }
