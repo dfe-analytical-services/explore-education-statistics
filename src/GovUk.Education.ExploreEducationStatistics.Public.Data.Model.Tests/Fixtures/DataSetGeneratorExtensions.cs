@@ -101,7 +101,7 @@ public static class DataSetGeneratorExtensions
     public static InstanceSetters<DataSet> SetStatusPublished(this InstanceSetters<DataSet> instanceSetter)
         => instanceSetter
             .SetStatus(DataSetStatus.Published)
-            .SetPublished(DateTimeOffset.UtcNow)
+            .SetPublished(DateTimeOffset.UtcNow.AddDays(-1))
             .SetWithdrawn(null);
 
     public static InstanceSetters<DataSet> SetStatusDraft(this InstanceSetters<DataSet> instanceSetter)
@@ -113,8 +113,8 @@ public static class DataSetGeneratorExtensions
     public static InstanceSetters<DataSet> SetStatusWithdrawn(this InstanceSetters<DataSet> instanceSetter)
         => instanceSetter
             .SetStatus(DataSetStatus.Withdrawn)
-            .SetWithdrawn(DateTimeOffset.UtcNow)
-            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-1));
+            .SetWithdrawn(DateTimeOffset.UtcNow.AddDays(-1))
+            .Set((_, dsv) => dsv.Published ??= DateTimeOffset.UtcNow.AddDays(-2));
 
     public static InstanceSetters<DataSet> SetPublished(
         this InstanceSetters<DataSet> instanceSetter,

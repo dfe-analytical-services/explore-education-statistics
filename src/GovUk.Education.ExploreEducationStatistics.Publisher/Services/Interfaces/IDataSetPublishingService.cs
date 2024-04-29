@@ -6,5 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IDataSetPublishingService
 {
-    Task PublishDataSets(IEnumerable<Guid> releaseVersionIds);
+    Task PublishDataSets(Guid[] releaseVersionIds);
 }

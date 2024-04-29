@@ -102,8 +102,8 @@ public class AssertExtensionsTests
         [Fact]
         public void DateTimesOutsideTolerance()
         {
-            Assert.Throws<InRangeException>(() => DateTime.UtcNow.AddMilliseconds(-1 - TimeWithinMillis).AssertUtcNow());
-            Assert.Throws<InRangeException>(() => DateTime.UtcNow.AddMilliseconds(-101).AssertUtcNow(withinMillis: 100));
+            Assert.Throws<EqualException>(() => DateTime.UtcNow.AddMilliseconds(-1 - TimeWithinMillis).AssertUtcNow());
+            Assert.Throws<EqualException>(() => DateTime.UtcNow.AddMilliseconds(-101).AssertUtcNow(withinMillis: 100));
         }
 
         [Fact]
