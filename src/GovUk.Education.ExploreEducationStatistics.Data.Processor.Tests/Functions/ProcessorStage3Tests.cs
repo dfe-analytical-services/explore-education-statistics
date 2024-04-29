@@ -68,6 +68,7 @@ public class ProcessorStage3Tests
                 .DefaultFilter()
                 .ForIndex(0, s => s
                     .SetLabel("Filter one")
+                    .SetHint("Hint 1")
                     .SetFilterGroups(_fixture
                         .DefaultFilterGroup()
                         .WithFilterItems(_fixture
@@ -77,6 +78,7 @@ public class ProcessorStage3Tests
                         .Generate(1)))
                 .ForIndex(1, s => s
                     .SetLabel("Filter two")
+                    .SetHint(null)
                     .SetFilterGroups(_fixture
                         .DefaultFilterGroup()
                         .WithFilterItems(_fixture
@@ -294,21 +296,25 @@ public class ProcessorStage3Tests
 
             Assert.NotNull(file.DataSetFileMeta);
 
-            // Checking against contents of small-csv.csv in Resources directory
+            // Checking against contents of small-csv.csv in Resources directory / _subject
             var geographicLevel = Assert.Single(file.DataSetFileMeta.GeographicLevels);
             Assert.Equal("Local authority", geographicLevel);
             Assert.Equal(TimeIdentifier.CalendarYear, file.DataSetFileMeta.TimeIdentifier);
             file.DataSetFileMeta.Years
                 .AssertDeepEqualTo([2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]);
 
-            // Checking against contents of small-csv.meta.csv
+            // Checking against contents of small-csv.meta.csv / _subject
             file.DataSetFileMeta.Filters
-                .Select(f => f.Label).ToList()
-                .AssertDeepEqualTo(new List<string> { "Filter one", "Filter two", });
+                .Select(f => (f.Label, f.Hint, f.ColumnName)).ToList()
+                .AssertDeepEqualTo([
+                    ("Filter one", "Hint 1", "filter_one"),
+                    ("Filter two", null, "filter_two")]);
 
             file.DataSetFileMeta.Indicators
-                .Select(i => i.Label).ToList()
-                .AssertDeepEqualTo(new List<string> { "Indicator one", "Indicator two", });
+                .Select(i => (i.Label, i.ColumnName)).ToList()
+                .AssertDeepEqualTo([
+                    ("Indicator one", "indicator_one"),
+                    ("Indicator two", "indicator_two")]);
         }
     }
 

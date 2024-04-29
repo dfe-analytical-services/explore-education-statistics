@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -83,8 +84,14 @@ public class DataSetFileMetaMigrationController : ControllerBase
 
             var filters = await _statisticsDbContext.Filter
                 .Where(f => f.SubjectId == file.SubjectId)
-                .Select(f => new FilterMeta { Id = f.Id, Label = f.Label, })
                 .OrderBy(f => f.Label)
+                .Select(f => new FilterMeta
+                {
+                    Id = f.Id,
+                    Label = f.Label,
+                    Hint = f.Hint,
+                    ColumnName = f.Name,
+                })
                 .ToListAsync(cancellationToken: cancellationToken);
 
             var indicators = await _statisticsDbContext.Indicator
@@ -93,6 +100,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 {
                     Id = i.Id,
                     Label = i.Label,
+                    ColumnName = i.Name,
                 })
                 .OrderBy(i => i.Label)
                 .ToListAsync(cancellationToken: cancellationToken);

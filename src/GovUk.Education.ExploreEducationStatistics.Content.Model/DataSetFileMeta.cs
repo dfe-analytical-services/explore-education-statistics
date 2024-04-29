@@ -24,12 +24,18 @@ public class FilterMeta
 {
     public Guid Id { get; set; }
     public string Label { get; set; }
+
+    public string? Hint { get; set; }
+
+    public string ColumnName { get; set; }
 }
 
 public class IndicatorMeta
 {
     public Guid Id { get; set; }
     public string Label { get; set; }
+
+    public string ColumnName { get; set; }
 }
 
 public class TimePeriodMeta

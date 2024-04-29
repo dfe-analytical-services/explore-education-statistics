@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -173,6 +174,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .OrderBy(tp => tp.Year)
                 .ToList();
 
+            var filters = await statisticsDbContext.Filter
+                .AsNoTracking()
+                .Where(f => f.SubjectId == subjectId)
+                .OrderBy(f => f.Label)
+                .Select(f => new FilterMeta
+                {
+                    Id = f.Id,
+                    Label = f.Label,
+                    Hint = f.Hint,
+                    ColumnName = f.Name,
+                })
+                .ToListAsync();
+
             var indicators = await statisticsDbContext.Indicator
                 .AsNoTracking()
                 .Where(i => i.IndicatorGroup.SubjectId == subjectId)
@@ -180,15 +194,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     Id = i.Id,
                     Label = i.Label,
+                    ColumnName = i.Name,
                 })
                 .OrderBy(i => i.Label)
-                .ToListAsync();
-
-            var filters = await statisticsDbContext.Filter
-                .AsNoTracking()
-                .Where(f => f.SubjectId == subjectId)
-                .Select(f => new FilterMeta { Id = f.Id, Label = f.Label, })
-                .OrderBy(f => f.Label)
                 .ToListAsync();
 
             var dataSetFileMeta = new DataSetFileMeta
