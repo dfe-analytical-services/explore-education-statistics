@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -16,14 +17,17 @@ public class DataSetPublishingService(
     PublicDataDbContext publicDataDbContext
     ) : IDataSetPublishingService
 {
-    public async Task PublishDataSets(IEnumerable<Guid> releaseVersionIds)
+    public async Task PublishDataSets(Guid[] releaseVersionIds)
+    {
+        await PromoteDraftDataSetVersions(releaseVersionIds);
+        await UpdatePreviousReleaseFileIds(releaseVersionIds);
+    }
+
+    private async Task PromoteDraftDataSetVersions(IEnumerable<Guid> releaseVersionIds)
     {
         // Find all Data Files associated with the given ReleaseVersions.
-        var releaseFileIds = await contentDbContext
-            .ReleaseFiles
-            .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
-            .Select(rf => rf.Id)
-            .ToListAsync();
+        var releaseFileIds = (await GetReleaseFilesForReleaseVersions(releaseVersionIds))
+            .Select(releaseFile => releaseFile.Id);
 
         // Find all DataSets whose current Draft DataSetVersions reference any of the Release Versions' Data Files. 
         var releaseVersionDataSets = await publicDataDbContext
@@ -64,4 +68,43 @@ public class DataSetPublishingService(
 
         await publicDataDbContext.SaveChangesAsync();
     }
+
+    private async Task UpdatePreviousReleaseFileIds(IEnumerable<Guid> releaseVersionIds)
+    {
+        var previousReleaseVersionIds = await contentDbContext
+            .ReleaseVersions
+            .Where(releaseVersion =>
+                releaseVersionIds.Contains(releaseVersion.Id)
+                && releaseVersion.PreviousVersionId != null)
+            .Select(releaseVersion => releaseVersion.PreviousVersionId)
+            .Cast<Guid>()
+            .ToListAsync();
+
+        var currentReleaseFiles = await GetReleaseFilesForReleaseVersions(releaseVersionIds);
+        var previousReleaseFiles = await GetReleaseFilesForReleaseVersions(previousReleaseVersionIds);
+        var previousToCurrentReleaseFileIds = previousReleaseFiles.ToDictionary(
+            previousReleaseFile => previousReleaseFile.Id,
+            previousReleaseFile => currentReleaseFiles.SingleOrDefault(currentReleaseFile => currentReleaseFile.FileId == previousReleaseFile.FileId)?.Id);
+        
+        var previousReleaseFileIdsToUpdate = previousToCurrentReleaseFileIds
+            .Where(mapping => mapping.Value != null)
+            .Select(mapping => mapping.Key);
+
+        var previousDataSetVersions = await publicDataDbContext
+            .DataSetVersions
+            .Where(dataSetVersion => previousReleaseFileIdsToUpdate.Contains(dataSetVersion.ReleaseFileId))
+            .ToListAsync();
+        
+        previousDataSetVersions.ForEach(previousDataSetVersion => 
+            previousDataSetVersion.ReleaseFileId =
+                previousToCurrentReleaseFileIds[previousDataSetVersion.ReleaseFileId]!.Value);
+
+        await publicDataDbContext.SaveChangesAsync();
+    }
+
+    private async Task<List<ReleaseFile>> GetReleaseFilesForReleaseVersions(IEnumerable<Guid> releaseVersionIds) =>
+        await contentDbContext
+            .ReleaseFiles
+            .Where(rf => releaseVersionIds.Contains(rf.ReleaseVersionId) && rf.File.Type == FileType.Data)
+            .ToListAsync();
 }

@@ -212,7 +212,7 @@ public static class PublisherHostBuilderExtensions
     // TODO EES-5073 Remove this when the Public Data db exists in ALL Azure environments.
     public class NoOpDataSetPublishingService : IDataSetPublishingService
     {
-        public Task PublishDataSets(IEnumerable<Guid> releaseVersionIds)
+        public Task PublishDataSets(Guid[] releaseVersionIds)
         {
             return Task.CompletedTask;
         }
