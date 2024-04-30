@@ -17,7 +17,7 @@ public interface IDataSetFileService
         Guid? publicationId,
         Guid? releaseVersionId,
         bool? latestOnly,
-        bool? apiDataSetsOnly,
+        DataSetType? dataSetType,
         string? searchTerm,
         DataSetsListRequestSortBy? sort,
         SortDirection? sortDirection,

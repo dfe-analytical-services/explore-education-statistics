@@ -42,7 +42,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? publicationId,
         Guid? releaseVersionId,
         bool? latestOnly,
-        bool? apiDataSetsOnly,
+        DataSetType? dataSetType,
         string? searchTerm,
         DataSetsListRequestSortBy? sort,
         SortDirection? sortDirection,
@@ -52,6 +52,8 @@ public class DataSetFileService : IDataSetFileService
     {
         // If latestOnly is null default it to true except when a releaseVersionId is provided
         latestOnly ??= !releaseVersionId.HasValue;
+
+        dataSetType ??= DataSetType.All;
 
         sort ??= searchTerm == null ? Title : Relevance;
         sortDirection ??= sort is Title or Natural ? Asc : Desc;
@@ -66,7 +68,7 @@ public class DataSetFileService : IDataSetFileService
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
-            .HavingApiDataSet(apiDataSetsOnly ?? false)
+            .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
@@ -272,11 +274,16 @@ internal static class ReleaseFileQueryableExtensions
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
     }
 
-    internal static IQueryable<ReleaseFile> HavingApiDataSet(
+    internal static IQueryable<ReleaseFile> OfDataSetType(
         this IQueryable<ReleaseFile> query,
-        bool apiDataSetsOnly)
+        DataSetType dataSetType)
     {
-        return apiDataSetsOnly ? query.Where(rf => rf.File.PublicDataSetVersionId.HasValue) : query;
+        return dataSetType switch
+        {
+            DataSetType.All => query,
+            DataSetType.Api => query.Where(rf => rf.File.PublicDataSetVersionId.HasValue),
+            _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
+        };
     }
 
     internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(

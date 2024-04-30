@@ -39,7 +39,7 @@ public class DataSetFilesController : ControllerBase
                 publicationId: request.PublicationId,
                 releaseVersionId: request.ReleaseId,
                 latestOnly: request.LatestOnly,
-                apiDataSetsOnly: request.ApiDataSetsOnly,
+                dataSetType: request.DataSetType,
                 searchTerm: request.SearchTerm,
                 sort: request.Sort,
                 sortDirection: request.SortDirection,

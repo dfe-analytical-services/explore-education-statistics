@@ -8,7 +8,7 @@ public record DataSetFileListRequest(
     Guid? PublicationId = null,
     Guid? ReleaseId = null,
     bool? LatestOnly = null,
-    bool? ApiDataSetsOnly = null,
+    DataSetType? DataSetType = null,
     string? SearchTerm = null,
     DataSetsListRequestSortBy? Sort = null,
     SortDirection? SortDirection = null,

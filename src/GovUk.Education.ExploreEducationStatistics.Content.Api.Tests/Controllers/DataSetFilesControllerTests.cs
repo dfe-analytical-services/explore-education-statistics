@@ -683,7 +683,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
 
             [Fact]
-            public async Task FilterByApiDataSetsOnly_ReturnsOnlyDataSetsWithAssociatedApiDataSets()
+            public async Task FilterByDataSetType_Api_ReturnsOnlyDataSetsWithAssociatedApiDataSets()
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -710,7 +710,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetFileListRequest
                 {
-                    ApiDataSetsOnly = true
+                    DataSetType = DataSetType.Api
                 };
 
                 var response = await ListDataSets(client, query);
@@ -729,9 +729,9 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
             }
 
             [Theory]
-            [InlineData(false)]
+            [InlineData(DataSetType.All)]
             [InlineData(null)]
-            public async Task FilterByApiDataSetsOnly_FalseOrUnset_ReturnsAllDataSets(bool? apiDataSetsOnly)
+            public async Task FilterByDataSetType_AllOrUnset_ReturnsAllDataSets(DataSetType? dataSetType)
             {
                 Publication publication = _fixture
                     .DefaultPublication()
@@ -758,7 +758,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
 
                 var query = new DataSetFileListRequest
                 {
-                    ApiDataSetsOnly = apiDataSetsOnly
+                    DataSetType = dataSetType
                 };
 
                 var response = await ListDataSets(client, query);
@@ -1666,7 +1666,7 @@ public class DataSetFilesControllerTests : IntegrationTest<TestStartup>
                 { "sortDirection", request.SortDirection?.ToString() },
                 { "page", request.Page.ToString() },
                 { "pageSize", request.PageSize.ToString() },
-                { "apiDataSetsOnly", request.ApiDataSetsOnly?.ToString() }
+                { "dataSetType", request.DataSetType?.ToString() }
             };
 
             var uri = QueryHelpers.AddQueryString("/api/data-set-files", queryParams);
