@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using FluentValidation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -44,4 +45,39 @@ public record DataSetQueryRequest
     /// </summary>
     [DefaultValue(1000)]
     public int PageSize { get; init; } = 1000;
+
+    public class Validator : AbstractValidator<DataSetQueryRequest>
+    {
+        public Validator()
+        {
+            RuleFor(q => q.Indicators)
+                .NotEmpty();
+            RuleForEach(q => q.Indicators)
+                .NotEmpty()
+                .MaximumLength(40);
+
+            RuleFor(q => q.Criteria)
+                .SetInheritanceValidator(v =>
+                {
+                    v.Add(new DataSetQueryCriteriaAnd.Validator());
+                    v.Add(new DataSetQueryCriteriaOr.Validator());
+                    v.Add(new DataSetQueryCriteriaNot.Validator());
+                    v.Add(new DataSetQueryCriteriaFacets.Validator());
+                });
+
+            When(q => q.Sorts is not null, () =>
+            {
+                RuleFor(q => q.Sorts)
+                    .NotEmpty();
+                RuleForEach(q => q.Sorts)
+                    .NotNull()
+                    .SetValidator(new DataSetQuerySort.Validator());
+            });
+
+            RuleFor(request => request.Page)
+                .GreaterThanOrEqualTo(1);
+            RuleFor(request => request.PageSize)
+                .InclusiveBetween(1, 10000);
+        }
+    }
 }
