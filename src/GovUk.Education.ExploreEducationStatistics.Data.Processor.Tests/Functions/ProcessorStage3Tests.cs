@@ -106,7 +106,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv", _subject.Id)
+            .WithFiles("small-csv")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -324,7 +324,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv", subjectId: _subject.Id)
+            .WithFiles("small-csv")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -458,7 +458,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv", _subject.Id)
+            .WithFiles("small-csv")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -613,7 +613,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("small-csv", _subject.Id)
+            .WithFiles("small-csv")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -763,7 +763,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows", _subject.Id)
+            .WithFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -913,7 +913,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("ignored-school-rows", _subject.Id)
+            .WithFiles("ignored-school-rows")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -1361,7 +1361,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(_subject.Id)
-            .WithFiles("additional-filters-and-indicators", _subject.Id)
+            .WithFiles("additional-filters-and-indicators")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 16,
@@ -1535,7 +1535,7 @@ public class ProcessorStage3Tests
         var import = _fixture
             .DefaultDataImport()
             .WithSubjectId(subject.Id)
-            .WithFiles("small-csv-with-special-data", subject.Id)
+            .WithFiles("small-csv-with-special-data")
             .WithStatus(STAGE_3)
             .WithRowCounts(
                 totalRows: 5,

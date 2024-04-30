@@ -24,9 +24,8 @@ public static class DataImportGeneratorExtensions
     
     public static Generator<DataImport> WithFiles(
         this Generator<DataImport> generator,
-        string dataFileName,
-        Guid? subjectId = null)
-        => generator.ForInstance(s => s.SetFiles(dataFileName, subjectId));
+        string dataFileName)
+        => generator.ForInstance(s => s.SetFiles(dataFileName));
 
     public static Generator<DataImport> WithStatus(
         this Generator<DataImport> generator,
@@ -47,22 +46,21 @@ public static class DataImportGeneratorExtensions
     
     public static InstanceSetters<DataImport> SetFiles(
         this InstanceSetters<DataImport> setters,
-        string dataFileName,
-        Guid? subjectId = null)
+        string dataFileName)
         => setters
-            .Set(d => d.File, new File
+            .Set(d => d.File, (_, dataImport) => new File
             {
                 Id = Guid.NewGuid(),
                 Filename = $"{dataFileName}.csv",
                 Type = FileType.Data,
-                SubjectId = subjectId,
+                SubjectId = dataImport.SubjectId,
             })
-            .Set(d => d.MetaFile, new File
+            .Set(d => d.MetaFile, (_, dataImport) => new File
             {
                 Id = Guid.NewGuid(),
                 Filename = $"{dataFileName}.meta.csv",
                 Type = FileType.Metadata,
-                SubjectId = subjectId,
+                SubjectId = dataImport.SubjectId,
             });
 
 }
