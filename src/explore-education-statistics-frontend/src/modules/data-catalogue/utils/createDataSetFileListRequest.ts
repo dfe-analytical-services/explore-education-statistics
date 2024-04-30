@@ -15,6 +15,7 @@ export default function createDataSetFileListRequest(
   query: DataCataloguePageQuery,
 ): DataSetFileListRequest {
   const {
+    dataSetType,
     latestOnly,
     sortBy,
     publicationId,
@@ -31,6 +32,7 @@ export default function createDataSetFileListRequest(
 
   return omitBy(
     {
+      dataSetType,
       latestOnly,
       page: parseNumber(query.page) ?? 1,
       publicationId,
@@ -74,6 +76,7 @@ function getSortParams(orderBy: DataSetFileSortOption): {
 
 export function getParamsFromQuery(query: DataCataloguePageQuery) {
   return {
+    dataSetType: getFirst(query.dataSetType),
     latestOnly: getFirst(query.latestOnly),
     sortBy:
       query.sortBy && isOneOf(query.sortBy, dataSetFileSortOptions)

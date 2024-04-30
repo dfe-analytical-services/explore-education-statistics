@@ -3,7 +3,6 @@ import { testReleases } from '@frontend/modules/data-catalogue/__data__/testRele
 import { testThemes } from '@frontend/modules/data-catalogue/__data__/testThemes';
 import { screen, within } from '@testing-library/react';
 import render from '@common-test/render';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
 
@@ -52,6 +51,14 @@ describe('Filters', () => {
     expect(releases[1]).toHaveTextContent('All releases');
     expect(releases[1]).toHaveValue('all');
     expect(releases[1].selected).toBe(false);
+
+    const apiFilter = within(
+      screen.getByRole('group', {
+        name: 'Type of data',
+      }),
+    );
+    expect(apiFilter.getByLabelText('All data')).toBeChecked();
+    expect(apiFilter.getByLabelText('API data sets only')).not.toBeChecked();
   });
 
   test('populates the release filter with all & releases when there is a publicationId', () => {
@@ -98,11 +105,13 @@ describe('Filters', () => {
 
   test('calls the onChange handler when the theme filter is changed', async () => {
     const handleChange = jest.fn();
-    render(<Filters themes={testThemes} onChange={handleChange} />);
+    const { user } = render(
+      <Filters themes={testThemes} onChange={handleChange} />,
+    );
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await userEvent.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
+    await user.selectOptions(screen.getByLabelText('Theme'), ['theme-1']);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'themeId',
@@ -112,7 +121,7 @@ describe('Filters', () => {
 
   test('calls the onChange handler when the publication filter is changed', async () => {
     const handleChange = jest.fn();
-    render(
+    const { user } = render(
       <Filters
         publications={testThemes[1].topics[0].publications}
         themeId="theme-2"
@@ -123,7 +132,7 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await userEvent.selectOptions(screen.getByLabelText('Publication'), [
+    await user.selectOptions(screen.getByLabelText('Publication'), [
       'publication-2',
     ]);
 
@@ -135,7 +144,7 @@ describe('Filters', () => {
 
   test('calls the onChange handler when the release filter is changed', async () => {
     const handleChange = jest.fn();
-    render(
+    const { user } = render(
       <Filters
         publicationId="publication-2"
         releases={testReleases}
@@ -147,13 +156,33 @@ describe('Filters', () => {
 
     expect(handleChange).not.toHaveBeenCalled();
 
-    await userEvent.selectOptions(screen.getByLabelText('Releases'), [
-      'release-1',
-    ]);
+    await user.selectOptions(screen.getByLabelText('Releases'), ['release-1']);
 
     expect(handleChange).toHaveBeenCalledWith({
       filterType: 'releaseId',
       nextValue: 'release-1',
+    });
+  });
+
+  test('calls the onChange handler when the type of data filter is changed', async () => {
+    const handleChange = jest.fn();
+    const { user } = render(
+      <Filters
+        publicationId="publication-2"
+        releases={testReleases}
+        themes={testThemes}
+        themeId="theme-2"
+        onChange={handleChange}
+      />,
+    );
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    await user.click(screen.getByLabelText('API data sets only'));
+
+    expect(handleChange).toHaveBeenCalledWith({
+      filterType: 'dataSetType',
+      nextValue: 'api',
     });
   });
 

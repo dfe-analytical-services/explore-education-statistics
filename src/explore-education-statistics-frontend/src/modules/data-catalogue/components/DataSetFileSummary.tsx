@@ -6,6 +6,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
+import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
@@ -38,6 +39,7 @@ export default function DataSetFileSummary({
     content,
     fileId,
     filters = [],
+    hasApiDataSet,
     geographicLevels = [],
     indicators = [],
     latestData,
@@ -95,15 +97,6 @@ export default function DataSetFileSummary({
           <VisuallyHidden> about {title}</VisuallyHidden>
         </ButtonText>
       )}
-      {showLatestDataTag && (
-        <p className="govuk-!-margin-top-4">
-          <Tag colour={latestData ? undefined : 'orange'}>
-            {latestData
-              ? 'This is the latest data'
-              : 'This is not the latest data'}
-          </Tag>
-        </p>
-      )}
 
       <SummaryList
         ariaLabel={`Details list for ${title}`}
@@ -112,6 +105,20 @@ export default function DataSetFileSummary({
         compact
         noBorder
       >
+        {(showLatestDataTag || hasApiDataSet) && (
+          <SummaryListItem term="Status">
+            <TagGroup>
+              {showLatestDataTag && (
+                <Tag colour={latestData ? undefined : 'orange'}>
+                  {latestData
+                    ? 'This is the latest data'
+                    : 'This is not the latest data'}
+                </Tag>
+              )}
+              {hasApiDataSet && <Tag colour="grey">Available by API</Tag>}
+            </TagGroup>
+          </SummaryListItem>
+        )}
         <SummaryListItem term="Theme">{theme.title}</SummaryListItem>
         <SummaryListItem term="Published">
           <FormattedDate format="d MMM yyyy">{published}</FormattedDate>

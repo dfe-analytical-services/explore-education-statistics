@@ -5,6 +5,7 @@ import {
 
 export const testDataSetFileSummaries: DataSetFileSummary[] = [
   {
+    hasApiDataSet: true,
     id: 'datasetfile-id-1',
     fileExtension: 'csv',
     fileId: 'file-id-1',
@@ -35,6 +36,7 @@ export const testDataSetFileSummaries: DataSetFileSummary[] = [
     title: 'Data set 1',
   },
   {
+    hasApiDataSet: false,
     id: 'datasetfile-id-2',
     fileExtension: 'csv',
     fileId: 'file-id-2',

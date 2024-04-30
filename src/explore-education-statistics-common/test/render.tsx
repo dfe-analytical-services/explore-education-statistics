@@ -4,8 +4,13 @@ import {
   RenderOptions,
   RenderResult,
 } from '@testing-library/react';
+import userEvent, { UserEvent } from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { FC, ReactElement, ReactNode } from 'react';
+
+interface CustomRenderResult extends RenderResult {
+  user: UserEvent;
+}
 
 const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
   const queryClient = new QueryClient({
@@ -36,9 +41,12 @@ const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
 export default function render(
   ui: ReactElement,
   options?: Omit<RenderOptions, 'queries'>,
-): RenderResult {
-  return baseRender(ui, {
-    wrapper: DefaultWrapper,
-    ...options,
-  });
+): CustomRenderResult {
+  return {
+    ...(baseRender(ui, {
+      wrapper: DefaultWrapper,
+      ...options,
+    }) as RenderResult),
+    user: userEvent.setup(),
+  };
 }

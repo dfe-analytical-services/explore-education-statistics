@@ -23,6 +23,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
   DataSetFileFilter,
   DataSetFileSortOption,
+  DataSetType,
   dataSetFileFilters,
 } from '@frontend/services/dataSetFileService';
 import Filters from '@frontend/modules/data-catalogue/components/Filters';
@@ -42,6 +43,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 
 export interface DataCataloguePageQuery {
+  dataSetType?: DataSetType;
   latestOnly?: string;
   page?: number;
   publicationId?: string;
@@ -57,8 +59,15 @@ export default function DataCataloguePageNew() {
   const queryClient = useQueryClient();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
-  const { latestOnly, sortBy, publicationId, releaseId, searchTerm, themeId } =
-    getParamsFromQuery(router.query);
+  const {
+    dataSetType,
+    latestOnly,
+    sortBy,
+    publicationId,
+    releaseId,
+    searchTerm,
+    themeId,
+  } = getParamsFromQuery(router.query);
 
   const {
     data: dataSetsData,
@@ -288,24 +297,19 @@ export default function DataCataloguePageNew() {
           {!isMobileMedia && (
             <LoadingSpinner loading={isLoadingThemes}>
               <Filters
+                dataSetType={dataSetType}
                 latestOnly={latestOnly}
                 publicationId={publicationId}
                 publications={publications}
                 releaseId={releaseId}
                 releases={releases}
+                showClearFiltersButton={!isMobileMedia && isFiltered}
                 themeId={themeId}
                 themes={themes}
                 onChange={handleChangeFilter}
+                onClearFilters={() => handleClearFilter({ filterType: 'all' })}
               />
             </LoadingSpinner>
-          )}
-
-          {!isMobileMedia && isFiltered && (
-            <ButtonText
-              onClick={() => handleClearFilter({ filterType: 'all' })}
-            >
-              Clear filters
-            </ButtonText>
           )}
         </div>
         <div className="govuk-grid-column-two-thirds">
@@ -396,6 +400,7 @@ export default function DataCataloguePageNew() {
                 totalResults={totalResults}
               >
                 <Filters
+                  dataSetType={dataSetType}
                   latestOnly={latestOnly}
                   publicationId={publicationId}
                   publications={publications}
