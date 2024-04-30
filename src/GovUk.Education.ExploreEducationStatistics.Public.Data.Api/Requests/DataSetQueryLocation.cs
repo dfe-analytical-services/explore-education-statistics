@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 
@@ -17,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 /// When using codes, you may get more results than expected so it's recommended
 /// to use IDs where possible to ensure only a single location is matched.
 /// </summary>
+[JsonConverter(typeof(DataSetQueryLocationJsonConverter))]
 public abstract record DataSetQueryLocation
 {
     /// <summary>
