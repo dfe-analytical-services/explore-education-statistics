@@ -42,6 +42,7 @@ public class DataSetFileService : IDataSetFileService
         Guid? publicationId,
         Guid? releaseVersionId,
         bool? latestOnly,
+        DataSetType? dataSetType,
         string? searchTerm,
         DataSetsListRequestSortBy? sort,
         SortDirection? sortDirection,
@@ -52,6 +53,8 @@ public class DataSetFileService : IDataSetFileService
         // If latestOnly is null default it to true except when a releaseVersionId is provided
         latestOnly ??= !releaseVersionId.HasValue;
 
+        dataSetType ??= DataSetType.All;
+
         sort ??= searchTerm == null ? Title : Relevance;
         sortDirection ??= sort is Title or Natural ? Asc : Desc;
 
@@ -59,11 +62,13 @@ public class DataSetFileService : IDataSetFileService
             _contentDbContext.ReleaseVersions.LatestReleaseVersions(publicationId, publishedOnly: true);
 
         var query = _contentDbContext.ReleaseFiles
+            .AsNoTracking()
             .OfFileType(FileType.Data)
             .HavingNoDataReplacementInProgress()
             .HavingThemeId(themeId)
             .HavingPublicationIdOrNoSupersededPublication(publicationId)
             .HavingReleaseVersionId(releaseVersionId)
+            .OfDataSetType(dataSetType.Value)
             .HavingLatestPublishedReleaseVersions(latestPublishedReleaseVersions, latestOnly.Value)
             .JoinFreeText(_contentDbContext.ReleaseFilesFreeTextTable, rf => rf.Id, searchTerm);
 
@@ -110,7 +115,8 @@ public class DataSetFileService : IDataSetFileService
                 },
                 LatestData = result.Value.ReleaseVersionId ==
                              result.Value.ReleaseVersion.Publication.LatestPublishedReleaseVersionId,
-                Published = result.Value.ReleaseVersion.Published!.Value
+                Published = result.Value.ReleaseVersion.Published!.Value,
+                HasApiDataSet = result.Value.File.PublicDataSetVersionId.HasValue
             };
     }
 
@@ -266,6 +272,18 @@ internal static class ReleaseFileQueryableExtensions
         Guid? releaseVersionId)
     {
         return releaseVersionId.HasValue ? query.Where(rf => rf.ReleaseVersionId == releaseVersionId.Value) : query;
+    }
+
+    internal static IQueryable<ReleaseFile> OfDataSetType(
+        this IQueryable<ReleaseFile> query,
+        DataSetType dataSetType)
+    {
+        return dataSetType switch
+        {
+            DataSetType.All => query,
+            DataSetType.Api => query.Where(rf => rf.File.PublicDataSetVersionId.HasValue),
+            _ => throw new ArgumentOutOfRangeException(nameof(dataSetType)),
+        };
     }
 
     internal static IQueryable<ReleaseFile> HavingLatestPublishedReleaseVersions(
