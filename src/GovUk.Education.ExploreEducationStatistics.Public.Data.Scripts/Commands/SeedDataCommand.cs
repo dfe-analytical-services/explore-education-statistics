@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 using CliFx;
 using CliFx.Attributes;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Models;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.Seeds;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using LinqToDB;
+using LinqToDB.Data;
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -545,25 +547,12 @@ public class SeedDataCommand : ICommand
                     .GetTable<LocationOptionMetaRow>()
                     .TableName(nameof(PublicDataDbContext.LocationOptionMetas));
 
-                await optionTable
-                    .Merge()
-                    .Using(options)
-                    .On(
-                        o => new { o.Type, o.Label, o.Code, o.OldCode, o.Urn, o.LaEstab, o.Ukprn },
-                        o => new { o.Type, o.Label, o.Code, o.OldCode, o.Urn, o.LaEstab, o.Ukprn }
-                    )
-                    .InsertWhenNotMatched()
-                    .MergeAsync(_cancellationToken);
-
-                var startIndex = await _dbContext.LocationOptionMetaLinks.CountAsync(token: _cancellationToken);
-
                 var current = 0;
 
                 const int batchSize = 1000;
 
                 while (current < options.Count)
                 {
-                    var batchStartIndex = startIndex + current;
                     var batch = options
                         .Skip(current)
                         .Take(batchSize)
@@ -575,34 +564,48 @@ public class SeedDataCommand : ICommand
                     // against every other row. Out of several such attempts, the 'row key'
                     // technique was the fastest and simplest way to create the links.
                     var batchRowKeys = batch
-                        .Select(
-                            o =>
-                                o.Type + ',' +
-                                o.Label + ',' +
-                                (o.Code ?? "null") + ',' +
-                                (o.OldCode ?? "null") + ',' +
-                                (o.Urn ?? "null") + ',' +
-                                (o.LaEstab ?? "null") + ',' +
-                                (o.Ukprn ?? "null")
-                        )
+                        .Select(o => o.GetRowKey())
                         .ToHashSet();
 
+                    Expression<Func<LocationOptionMetaRow,bool>> hasBatchRowKey =
+                        o => o.Type == batch[0].Type &&
+                             batchRowKeys.Contains(
+                                 o.Type + ',' +
+                                 o.Label + ',' +
+                                 (o.Code ?? "null") + ',' +
+                                 (o.OldCode ?? "null") + ',' +
+                                 (o.Urn ?? "null") + ',' +
+                                 (o.LaEstab ?? "null") + ',' +
+                                 (o.Ukprn ?? "null")
+                             );
+
+                    var existingRowKeys = (await optionTable
+                        .Where(hasBatchRowKey)
+                        .ToListAsync(token: _cancellationToken))
+                        .Select(o => o.GetRowKey())
+                        .ToHashSet();
+
+                    if (existingRowKeys.Count != batch.Count)
+                    {
+                        var newOptions = batch
+                            .Where(o => !existingRowKeys.Contains(o.GetRowKey()))
+                            .ToList();
+
+                        var startIndex = await _dbContext.LocationOptionMetas.CountAsync(token: _cancellationToken);
+
+                        foreach (var option in newOptions)
+                        {
+                            option.Id = startIndex++;
+                            option.PublicId = SqidEncoder.Encode(option.Id);
+                        }
+
+                        await optionTable.BulkCopyAsync(newOptions, cancellationToken: _cancellationToken);
+                    }
+
                     var links = await optionTable
-                        .Where(
-                            o => o.Type == batch[0].Type &&
-                                 batchRowKeys.Contains(
-                                     o.Type + ',' +
-                                     o.Label + ',' +
-                                     (o.Code ?? "null") + ',' +
-                                     (o.OldCode ?? "null") + ',' +
-                                     (o.Urn ?? "null") + ',' +
-                                     (o.LaEstab ?? "null") + ',' +
-                                     (o.Ukprn ?? "null")
-                                )
-                        )
+                        .Where(hasBatchRowKey)
                         .Select((option, index) => new LocationOptionMetaLink
                         {
-                            PublicId = SqidEncoder.Encode(batchStartIndex + index),
                             MetaId = meta.Id,
                             OptionId = option.Id
                         })
@@ -629,7 +632,7 @@ public class SeedDataCommand : ICommand
             }
         }
 
-        private LocationOptionMeta MapLocationOptionMeta(
+        private static LocationOptionMeta MapLocationOptionMeta(
             IDictionary<string, string> row,
             GeographicLevel level)
         {
@@ -640,36 +643,42 @@ public class SeedDataCommand : ICommand
             {
                 GeographicLevel.LocalAuthority => new LocationLocalAuthorityOptionMeta
                 {
+                    PublicId = string.Empty,
                     Label = label,
                     Code = row[LocalAuthorityCsvColumns.NewCode],
                     OldCode = row[LocalAuthorityCsvColumns.OldCode]
                 },
                 GeographicLevel.School => new LocationSchoolOptionMeta
                 {
-                    Label = label, Urn = row[SchoolCsvColumns.Urn],
+                    PublicId = string.Empty,
+                    Label = label,
+                    Urn = row[SchoolCsvColumns.Urn],
                     LaEstab = row[SchoolCsvColumns.LaEstab]
                 },
                 GeographicLevel.Provider => new LocationProviderOptionMeta
                 {
+                    PublicId = string.Empty,
                     Label = label,
                     Ukprn = row[ProviderCsvColumns.Ukprn]
                 },
                 GeographicLevel.RscRegion => new LocationRscRegionOptionMeta
                 {
+                    PublicId = string.Empty,
                     Label = label
                 },
                 _ => new LocationCodedOptionMeta
                 {
+                    PublicId = string.Empty,
                     Label = label,
                     Code = row[cols.Codes.First()]
                 }
             };
         }
 
-        private List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
+        private static List<GeographicLevel> ListLocationLevels(IReadOnlySet<string> allowedColumns)
         {
             return allowedColumns
-                .Where(col => CsvColumnsToGeographicLevel.ContainsKey(col))
+                .Where(CsvColumnsToGeographicLevel.ContainsKey)
                 .Select(col => CsvColumnsToGeographicLevel[col])
                 .Distinct()
                 .OrderBy(EnumToEnumLabelConverter<GeographicLevel>.ToProvider)
@@ -921,7 +930,7 @@ public class SeedDataCommand : ICommand
                     insertRow.AppendValue(id++);
                     insertRow.AppendValue(option.Label);
                     insertRow.AppendValue(location.Level.GetEnumValue());
-                    insertRow.AppendValue(link.PublicId);
+                    insertRow.AppendValue(option.PublicId);
 
                     switch (option)
                     {

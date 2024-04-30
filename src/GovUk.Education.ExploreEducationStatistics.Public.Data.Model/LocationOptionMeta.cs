@@ -8,9 +8,11 @@ public abstract class LocationOptionMeta
 {
     public int Id { get; set; }
 
+    public required string PublicId { get; set; }
+
     public required string Label { get; set; }
 
-    private string Type { get; set; }
+    protected abstract string Type { get; set; }
 
     protected string? Code { get; set; }
 
@@ -26,7 +28,18 @@ public abstract class LocationOptionMeta
 
     public List<LocationOptionMetaLink> MetaLinks { get; set; } = [];
 
-    public abstract LocationOptionMetaRow ToRow();
+    public LocationOptionMetaRow ToRow() => new()
+    {
+        Id = Id,
+        Type = Type,
+        PublicId = PublicId,
+        Label = Label,
+        Code = Code,
+        OldCode = OldCode,
+        Urn = Urn,
+        LaEstab = LaEstab,
+        Ukprn = Ukprn
+    };
 
     internal class Config : IEntityTypeConfiguration<LocationOptionMeta>
     {
@@ -39,6 +52,10 @@ public abstract class LocationOptionMeta
                 .HasValue<LocationProviderOptionMeta>(LocationProviderOptionMeta.TypeValue)
                 .HasValue<LocationRscRegionOptionMeta>(LocationRscRegionOptionMeta.TypeValue)
                 .HasValue<LocationSchoolOptionMeta>(LocationSchoolOptionMeta.TypeValue);
+
+            builder
+                .HasIndex(o => o.PublicId)
+                .IsUnique();
 
             builder
                 .Property(o => o.Type)
@@ -89,23 +106,20 @@ public class LocationCodedOptionMeta : LocationOptionMeta
 {
      public const string TypeValue = "CODE";
 
+     protected override string Type { get; set; } = TypeValue;
+
      public new required string Code
      {
          get => base.Code ?? string.Empty;
          set => base.Code = value;
      }
-
-     public override LocationOptionMetaRow ToRow() => new()
-     {
-         Type = TypeValue,
-         Label = Label,
-         Code = Code
-     };
 }
 
 public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
 {
      public const string TypeValue = "LA";
+
+     protected override string Type { get; set; } = TypeValue;
 
      public new required string Code
      {
@@ -118,48 +132,33 @@ public class LocationLocalAuthorityOptionMeta : LocationOptionMeta
          get => base.OldCode ?? string.Empty;
          set => base.OldCode = value;
      }
-
-     public override LocationOptionMetaRow ToRow() => new()
-     {
-         Type = TypeValue,
-         Label = Label,
-         Code = Code,
-         OldCode = OldCode
-     };
 }
 
 public class LocationProviderOptionMeta : LocationOptionMeta
 {
      public const string TypeValue = "PROV";
 
+     protected override string Type { get; set; } = TypeValue;
+
      public new required string Ukprn
      {
          get => base.Ukprn ?? string.Empty;
          set => base.Ukprn = value;
      }
-
-     public override LocationOptionMetaRow ToRow() => new()
-     {
-         Type = TypeValue,
-         Label = Label,
-         Ukprn = Ukprn,
-     };
 }
 
 public class LocationRscRegionOptionMeta : LocationOptionMeta
 {
     public const string TypeValue = "RSC";
 
-    public override LocationOptionMetaRow ToRow() => new()
-    {
-        Type = TypeValue,
-        Label = Label
-    };
+    protected override string Type { get; set; } = TypeValue;
 }
 
 public class LocationSchoolOptionMeta : LocationOptionMeta
 {
      public const string TypeValue = "SCH";
+
+     protected override string Type { get; set; } = TypeValue;
 
      public new required string Urn
      {
@@ -172,12 +171,4 @@ public class LocationSchoolOptionMeta : LocationOptionMeta
          get => base.LaEstab ?? string.Empty;
          set => base.LaEstab = value;
      }
-
-     public override LocationOptionMetaRow ToRow() => new()
-     {
-         Type = TypeValue,
-         Label = Label,
-         Urn = Urn,
-         LaEstab = LaEstab
-     };
 }

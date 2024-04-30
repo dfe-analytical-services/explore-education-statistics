@@ -28,7 +28,7 @@ public class DataSetVersionMetaSummary
         {
             Filters = dataSetVersion.FilterMetas.Select(f => f.Label).ToList(),
             Indicators = dataSetVersion.IndicatorMetas.Select(i => i.Label).ToList(),
-            GeographicLevels = dataSetVersion.GeographicLevelMeta.Levels,
+            GeographicLevels = dataSetVersion.GeographicLevelMeta!.Levels,
             TimePeriodRange = new TimePeriodRange
             {
                 Start = TimePeriodRangeBound.Create(timePeriods[0]),

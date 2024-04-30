@@ -50,8 +50,9 @@ public static class DataSetVersionGeneratorExtensions
     public static Generator<DataSetVersion> WithVersionNumber(
         this Generator<DataSetVersion> generator,
         int major,
-        int minor)
-        => generator.ForInstance(s => s.SetVersionNumber(major, minor));
+        int minor,
+        int patch = 0)
+        => generator.ForInstance(s => s.SetVersionNumber(major, minor, patch));
 
     public static Generator<DataSetVersion> WithPublished(
         this Generator<DataSetVersion> generator,
@@ -93,7 +94,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithMetaSummary(
         this Generator<DataSetVersion> generator,
-        DataSetVersionMetaSummary metaSummary)
+        DataSetVersionMetaSummary? metaSummary)
         => generator.ForInstance(s => s.SetMetaSummary(metaSummary));
 
     public static Generator<DataSetVersion> WithMetaSummary(
@@ -102,7 +103,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static Generator<DataSetVersion> WithGeographicLevelMeta(
         this Generator<DataSetVersion> generator,
-        GeographicLevelMeta meta)
+        GeographicLevelMeta? meta)
         => generator.ForInstance(s => s.SetGeographicLevelMeta(meta));
 
     public static Generator<DataSetVersion> WithGeographicLevelMeta(
@@ -182,6 +183,7 @@ public static class DataSetVersionGeneratorExtensions
             .SetDefault(dsv => dsv.Notes)
             .Set(dsv => dsv.VersionMajor, 1)
             .Set(dsv => dsv.VersionMinor, (_, _, context) => context.Index)
+            .Set(dsv => dsv.VersionPatch, 0)
             .Set(dsv => dsv.TotalResults, f => f.Random.Long(min: 10000, max: 10_000_000))
             .Set(dsv => dsv.Status, DataSetVersionStatus.Draft);
 
@@ -205,10 +207,12 @@ public static class DataSetVersionGeneratorExtensions
     public static InstanceSetters<DataSetVersion> SetVersionNumber(
         this InstanceSetters<DataSetVersion> instanceSetter,
         int major,
-        int minor)
+        int minor,
+        int patch = 0)
         => instanceSetter
             .Set(dsv => dsv.VersionMajor, major)
-            .Set(dsv => dsv.VersionMinor, minor);
+            .Set(dsv => dsv.VersionMinor, minor)
+            .Set(dsv => dsv.VersionPatch, patch);
 
     public static InstanceSetters<DataSetVersion> SetStatus(
         this InstanceSetters<DataSetVersion> instanceSetter,
@@ -274,7 +278,7 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetMetaSummary(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        DataSetVersionMetaSummary metaSummary)
+        DataSetVersionMetaSummary? metaSummary)
         => instanceSetter.Set(dsv => dsv.MetaSummary, metaSummary);
 
     public static InstanceSetters<DataSetVersion> SetMetaSummary(
@@ -285,12 +289,12 @@ public static class DataSetVersionGeneratorExtensions
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        GeographicLevelMeta meta)
+        GeographicLevelMeta? meta)
         => instanceSetter.SetGeographicLevelMeta(() => meta);
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(
         this InstanceSetters<DataSetVersion> instanceSetter,
-        Func<GeographicLevelMeta> meta)
+        Func<GeographicLevelMeta?> meta)
         => instanceSetter.Set(dsv => dsv.GeographicLevelMeta, meta);
 
     public static InstanceSetters<DataSetVersion> SetGeographicLevelMeta(

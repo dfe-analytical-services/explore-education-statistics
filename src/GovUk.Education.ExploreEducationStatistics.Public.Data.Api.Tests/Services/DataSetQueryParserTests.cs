@@ -389,7 +389,7 @@ public abstract class DataSetQueryParserTests
         {
             List<GeographicLevel> geographicLevels = [GeographicLevel.LocalAuthority];
 
-            _dataSetVersion.MetaSummary.GeographicLevels = geographicLevels;
+            _dataSetVersion.MetaSummary!.GeographicLevels = geographicLevels;
 
             var service = BuildService();
 
@@ -454,7 +454,7 @@ public abstract class DataSetQueryParserTests
                 GeographicLevel.School,
             ];
 
-            _dataSetVersion.MetaSummary.GeographicLevels = geographicLevels;
+            _dataSetVersion.MetaSummary!.GeographicLevels = geographicLevels;
 
             var service = BuildService();
 
@@ -489,7 +489,7 @@ public abstract class DataSetQueryParserTests
                 GeographicLevel.School,
             ];
 
-            _dataSetVersion.MetaSummary.GeographicLevels = [geographicLevels[1], geographicLevels[3]];
+            _dataSetVersion.MetaSummary!.GeographicLevels = [geographicLevels[1], geographicLevels[3]];
 
             var service = BuildService();
 
@@ -1288,7 +1288,7 @@ public abstract class DataSetQueryParserTests
 
             List<GeographicLevel> geographicLevels = [GeographicLevel.LocalAuthority];
 
-            _dataSetVersion.MetaSummary.GeographicLevels = geographicLevels;
+            _dataSetVersion.MetaSummary!.GeographicLevels = geographicLevels;
 
             // Location options
 
@@ -1378,7 +1378,7 @@ public abstract class DataSetQueryParserTests
 
             List<GeographicLevel> geographicLevels = [GeographicLevel.Country, GeographicLevel.Region];
 
-            _dataSetVersion.MetaSummary.GeographicLevels = geographicLevels;
+            _dataSetVersion.MetaSummary!.GeographicLevels = geographicLevels;
 
             // Location options
 

@@ -526,7 +526,7 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.LatestVersion.TimePeriods.Start);
             Assert.Equal(

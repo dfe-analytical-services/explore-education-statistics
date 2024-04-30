@@ -64,7 +64,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSetVersion.TotalResults, content.LatestVersion.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.LatestVersion.TimePeriods.Start);
             Assert.Equal(
@@ -276,7 +276,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSetVersion.TotalResults, result.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 result.TimePeriods.Start);
             Assert.Equal(
@@ -575,7 +575,7 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
             Assert.Equal(dataSetVersion.TotalResults, content.TotalResults);
             Assert.Equal(
                 TimePeriodFormatter.FormatLabel(
-                    dataSetVersion.MetaSummary.TimePeriodRange.Start.Period,
+                    dataSetVersion.MetaSummary!.TimePeriodRange.Start.Period,
                     dataSetVersion.MetaSummary.TimePeriodRange.Start.Code),
                 content.TimePeriods.Start);
             Assert.Equal(
@@ -800,19 +800,11 @@ public abstract class DataSetsControllerTests(TestApplicationFactory testApp) : 
                         dataSetVersion.LocationMetas,
                         fm => fm.Level == locationMetaViewModel.Level);
 
-                    var allLocationMetaLinks = locationMeta.Options
-                        .SelectMany(o => o.MetaLinks)
-                        .ToList();
-
                     foreach (var locationOptionMetaViewModel in locationMetaViewModel.Options)
                     {
-                        var locationOptionMetaLink = Assert.Single(
-                            allLocationMetaLinks,
-                            link => link.PublicId == locationOptionMetaViewModel.Id);
-
                         var locationOptionMeta = Assert.Single(
                             locationMeta.Options,
-                            o => o.Id == locationOptionMetaLink.OptionId);
+                            o => o.PublicId == locationOptionMetaViewModel.Id);
 
                         switch (locationOptionMeta)
                         {

@@ -1,6 +1,5 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests.Fixtures;
-using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Tests;
 

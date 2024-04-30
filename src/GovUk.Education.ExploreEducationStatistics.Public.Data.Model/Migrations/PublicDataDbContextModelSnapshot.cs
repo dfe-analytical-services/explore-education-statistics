@@ -226,14 +226,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("VersionMinor")
                         .HasColumnType("integer");
 
+                    b.Property<int>("VersionPatch")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset?>("Withdrawn")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DataSetId");
-
                     b.HasIndex("ReleaseFileId");
+
+                    b.HasIndex("DataSetId", "VersionMajor", "VersionMinor", "VersionPatch")
+                        .IsUnique()
+                        .HasDatabaseName("IX_DataSetVersions_DataSetId_VersionNumber");
 
                     b.ToTable("DataSetVersions");
                 });
@@ -466,6 +471,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<string>("OldCode")
                         .HasColumnType("text");
 
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -484,6 +493,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.HasIndex("LaEstab");
 
                     b.HasIndex("OldCode");
+
+                    b.HasIndex("PublicId")
+                        .IsUnique();
 
                     b.HasIndex("Type");
 
@@ -511,18 +523,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<int>("OptionId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("MetaId", "OptionId");
 
                     b.HasIndex("OptionId");
-
-                    b.HasIndex("PublicId");
-
-                    b.HasIndex("MetaId", "PublicId")
-                        .IsUnique();
 
                     b.ToTable("LocationOptionMetaLinks");
                 });
@@ -1225,8 +1228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("DataSet");
 
-                    b.Navigation("MetaSummary")
-                        .IsRequired();
+                    b.Navigation("MetaSummary");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersionImport", b =>
@@ -1346,8 +1348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.Navigation("FilterOptionChanges");
 
-                    b.Navigation("GeographicLevelMeta")
-                        .IsRequired();
+                    b.Navigation("GeographicLevelMeta");
 
                     b.Navigation("Imports");
 
