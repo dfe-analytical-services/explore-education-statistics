@@ -29,6 +29,12 @@ public static class LocationOptionMetaGeneratorExtensions
         Func<IEnumerable<LocationOptionMetaLink>> links) where TOptionMeta : LocationOptionMeta
         => generator.ForInstance(s => s.SetMetaLinks(links));
 
+    public static InstanceSetters<TOptionMeta> SetBaseDefaults<TOptionMeta>(
+        this InstanceSetters<TOptionMeta> setters) where TOptionMeta : LocationOptionMeta
+        => setters
+            .SetDefault(m => m.PublicId)
+            .SetDefault(m => m.Label);
+
     public static InstanceSetters<TOptionMeta> SetId<TOptionMeta>(
         this InstanceSetters<TOptionMeta> setters,
         int id) where TOptionMeta : LocationOptionMeta
