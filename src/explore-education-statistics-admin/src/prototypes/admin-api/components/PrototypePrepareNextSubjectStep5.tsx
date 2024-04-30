@@ -5,13 +5,11 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import {
-  Form,
-  FormFieldRadioGroup,
-  FormFieldTextArea,
-  FormFieldset,
-} from '@common/components/form';
-import { Formik } from 'formik';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import React, { useEffect, useState } from 'react';
 import ChangelogExample from './PrototypeChangelogExamples';
 import {
@@ -68,22 +66,24 @@ const PrototypePrepareNextSubjectStep5 = ({
     return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <Formik<FormValues>
+          <FormProvider
             initialValues={{
               versionNotes,
               versionType: initialVersionType,
             }}
-            onSubmit={values => {
-              setVersionNotes(values.versionNotes);
-              setVersionType(values.versionType);
-              goToNextStep();
-            }}
           >
             {() => (
-              <Form id="form">
+              <RHFForm
+                id="form"
+                onSubmit={values => {
+                  setVersionNotes(values.versionNotes);
+                  setVersionType(values.versionType);
+                  goToNextStep();
+                }}
+              >
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
-                    <FormFieldTextArea<FormValues>
+                    <RHFFormFieldTextArea<FormValues>
                       hint="Use the public guidance notes to highlight any extra information to your end users that may not
                       be apparent in the automated changelog below"
                       label="Public guidance notes"
@@ -92,7 +92,7 @@ const PrototypePrepareNextSubjectStep5 = ({
                     />
 
                     <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-                      <FormFieldRadioGroup<FormValues>
+                      <RHFFormFieldRadioGroup<FormValues>
                         legend="Changes on current live version (version 1.0)"
                         name="versionType"
                         onChange={event =>
@@ -138,9 +138,9 @@ const PrototypePrepareNextSubjectStep5 = ({
                   submitText="Next step - complete this API data set version"
                   {...stepProps}
                 />
-              </Form>
+              </RHFForm>
             )}
-          </Formik>
+          </FormProvider>
         </div>
       </div>
     );

@@ -28,7 +28,6 @@ export interface FormCheckboxProps {
   name: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
-  // value?: string;
   disabled?: boolean;
   inputRef?: Ref<HTMLInputElement>;
 }
@@ -46,7 +45,6 @@ const FormCheckbox = ({
   name,
   onBlur,
   onChange,
-  // value,
   disabled = false,
   inputRef,
 }: FormCheckboxProps) => {
@@ -76,7 +74,6 @@ const FormCheckbox = ({
             }
           }}
           type="checkbox"
-          // value={value}
           disabled={disabled}
           ref={inputRef}
         />

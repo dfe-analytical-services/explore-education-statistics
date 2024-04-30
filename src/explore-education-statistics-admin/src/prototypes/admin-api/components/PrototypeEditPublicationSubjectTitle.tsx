@@ -1,9 +1,10 @@
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldTextInput } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import Button from '@common/components/Button';
 import Yup from '@common/validation/yup';
 import React from 'react';
-import { Formik } from 'formik';
 import { PublicationSubject } from '../PrototypePublicationSubjects';
 
 interface FormValues {
@@ -34,28 +35,30 @@ const PrototypeEditPublicationSubjectTitle = ({
         <span className="govuk-caption-l">{publicationSubject.title}</span>
         <h2>Edit data set title</h2>
 
-        <Formik<FormValues>
+        <FormProvider
           initialValues={{ title: publicationSubject.title }}
           validationSchema={Yup.object<FormValues>({
             title: Yup.string().required('Enter a title'),
           })}
-          onSubmit={values => {
-            onSubmit({
-              ...publicationSubject,
-              title: values.title,
-            });
-          }}
         >
-          <Form id="dataFileForm">
-            <FormFieldTextInput<FormValues>
+          <RHFForm
+            id="dataFileForm"
+            onSubmit={values => {
+              onSubmit({
+                ...publicationSubject,
+                title: values.title,
+              });
+            }}
+          >
+            <RHFFormFieldTextInput<FormValues>
               className="govuk-!-width-two-thirds"
               label="Title"
               name="title"
             />
 
             <Button type="submit">Save</Button>
-          </Form>
-        </Formik>
+          </RHFForm>
+        </FormProvider>
       </section>
     </>
   );
