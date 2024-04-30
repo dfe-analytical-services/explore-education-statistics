@@ -1,10 +1,11 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
 using Xunit.Sdk;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
-public class DateTimeOffsetTestExtensionsTests
+public class DateTimeOffsetExtensionsTests
 {
     public class TruncateNanosecondsTests
     {
@@ -40,7 +41,7 @@ public class DateTimeOffsetTestExtensionsTests
         [Fact]
         public void NullDate()
         {
-            Assert.Throws<NotNullException>(() => ((DateTimeOffset?) null).TruncateNanoseconds());
+            Assert.Throws<ArgumentException>(() => ((DateTimeOffset?) null).TruncateNanoseconds());
         }
     }
 }
