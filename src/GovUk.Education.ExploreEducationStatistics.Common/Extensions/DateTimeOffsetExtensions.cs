@@ -1,9 +1,8 @@
 using System;
-using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
-public static class DateTimeOffsetTestExtensions
+public static class DateTimeOffsetExtensions
 {
     /// <summary>
     /// Strip the nanosecond component from a DateTimeOffset. Helpful for testing in scenarios where precision can
@@ -41,7 +40,10 @@ public static class DateTimeOffsetTestExtensions
     /// <returns></returns>
     public static DateTimeOffset TruncateNanoseconds(this DateTimeOffset? offset)
     {
-        Assert.NotNull(offset);
+        if (offset == null)
+        {
+            throw new ArgumentException("offset cannot be null when truncating nanoseconds");
+        }
         return TruncateNanoseconds((DateTimeOffset)offset);
     }
 }
