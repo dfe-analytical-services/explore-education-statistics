@@ -5,45 +5,56 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { MetadataRoute } from 'next';
 
 export default async function getPublicationSlugs() {
-  // TODO: Replace this with use of the publicationService, once the app router is more widely adopted
-  // (using it currently requires more changes)
-  const publications = (
-    await (
-      await fetch(
-        // TODO: Create a more graceful way of opting out of pagination,
-        // Or make multiple paginated calls, whatever best
-        `${process.env.CONTENT_API_BASE_URL}/publications?pageSize=10000`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
+  try {
+    // TODO: Replace this with use of the publicationService, once the app router is more widely adopted
+    // (using it currently requires more changes)
+    const publications = (
+      await (
+        await fetch(
+          // TODO: Create a more graceful way of opting out of pagination,
+          // Or make multiple paginated calls, whatever best
+          `${process.env.CONTENT_API_BASE_URL}/publications?pageSize=10000`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
           },
-        },
-      )
-    ).json<PaginatedList<PublicationListSummary>>()
-  ).results;
+        )
+      ).json<PaginatedList<PublicationListSummary>>()
+    ).results;
 
-  const routes: MetadataRoute.Sitemap = publications.flatMap(publication => {
-    return [
-      {
-        url: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
-        lastModified: publication.published ?? new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.6,
-      },
-      {
-        url: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
-        lastModified: publication.published ?? new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.6,
-      },
-      {
-        url: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
-        lastModified: publication.published ?? new Date(),
-        changeFrequency: 'monthly',
-        priority: 0.6,
-      },
-    ];
-  });
-  return routes;
+    const routes: MetadataRoute.Sitemap = publications.flatMap(publication => {
+      return [
+        {
+          url: `${process.env.PUBLIC_URL}data-catalogue/${publication.slug}`,
+          lastModified: publication.published ?? new Date(),
+          changeFrequency: 'monthly',
+          priority: 0.6,
+        },
+        {
+          url: `${process.env.PUBLIC_URL}data-tables/${publication.slug}`,
+          lastModified: publication.published ?? new Date(),
+          changeFrequency: 'monthly',
+          priority: 0.6,
+        },
+        {
+          url: `${process.env.PUBLIC_URL}find-statistics/${publication.slug}`,
+          lastModified: publication.published ?? new Date(),
+          changeFrequency: 'monthly',
+          priority: 0.6,
+        },
+      ];
+    });
+    return routes;
+  } catch (err) {
+    if (process.env.APP_ENV === 'Local') {
+      // eslint-disable-next-line no-console
+      console.error(
+        'Encountered an error whilst trying to fetch publications to build the sitemap. This step requires that the Content API be running.',
+      );
+      return [];
+    }
+    throw err;
+  }
 }
