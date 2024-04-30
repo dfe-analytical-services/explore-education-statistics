@@ -89,8 +89,8 @@ public class DataSetsControllerTests(TestApplicationFactory testApp) : Integrati
                 () => Assert.Equal(liveDataSetVersion.Version, dataSetViewModel.LatestLiveVersion.Version),
                 () => Assert.Equal(liveDataSetVersion.Status, dataSetViewModel.LatestLiveVersion.Status),
                 () => Assert.Equal(liveDataSetVersion.VersionType, dataSetViewModel.LatestLiveVersion.Type),
-                () => Assert.Equal(liveDataSetVersion.Published?.ToUnixTimeSeconds(),
-                    dataSetViewModel.LatestLiveVersion?.Published.ToUnixTimeSeconds())
+                () => Assert.Equal(liveDataSetVersion.Published.TruncateNanoseconds(),
+                    dataSetViewModel.LatestLiveVersion?.Published)
             );
         }
 
