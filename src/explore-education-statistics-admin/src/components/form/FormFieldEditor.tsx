@@ -1,184 +1,122 @@
-import { Element, Node } from '@admin/types/ckeditor';
+import { Element } from '@admin/types/ckeditor';
 import FormEditor, {
   EditorElementsHandler,
   FormEditorProps,
 } from '@admin/components/form/FormEditor';
+import { InvalidUrl } from '@admin/components/editable/EditableContentForm';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormGroup from '@common/components/form/FormGroup';
 import { OmitStrict } from '@common/types';
-import createErrorHelper from '@common/validation/createErrorHelper';
 import WarningMessage from '@common/components/WarningMessage';
-import useToggle from '@common/hooks/useToggle';
-import Yup from '@common/validation/yup';
-import { Field, FieldProps } from 'formik';
-import React, { useRef, useState } from 'react';
-
-interface InvalidUrl {
-  text: string;
-  url: string;
-}
+import useRegister from '@common/components/form/hooks/useRegister';
+import getErrorMessage from '@common/components/form/util/getErrorMessage';
+import React, { useRef } from 'react';
+import {
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 
 export const elementsFieldName = (name: string) => `__${name}`;
 
-type Props<FormValues> = {
+export interface Props<TFormValues extends FieldValues>
+  extends OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'> {
+  altTextError?: string;
+  name: Path<TFormValues>;
   formGroupClass?: string;
   id?: string;
-  name: keyof FormValues | string;
-  shouldValidateAltText?: boolean;
+  invalidLinkErrors?: InvalidUrl[];
   shouldValidateLinks?: boolean;
   showError?: boolean;
   testId?: string;
   onBlur?: (isDirty: boolean) => void;
-} & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'>;
+  onChange?: (elements?: Element[]) => void;
+}
 
-function FormFieldEditor<T>({
+export default function FormFieldEditor<TFormValues extends FieldValues>({
+  altTextError,
   error,
   formGroupClass,
   id,
+  invalidLinkErrors = [],
   name,
-  shouldValidateAltText = true,
-  shouldValidateLinks = true,
   showError = true,
   testId,
   onBlur,
+  onChange,
   ...props
-}: Props<T>) {
+}: Props<TFormValues>) {
+  const {
+    formState: { errors },
+    register,
+    getValues,
+    setValue,
+    getFieldState,
+  } = useFormContext<TFormValues>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { ref, ...field } = useRegister(name, register);
+  const value = useWatch({ name }) || '';
   const { fieldId } = useFormIdContext();
   const elements = useRef<Element[]>([]);
 
-  const [altTextError, toggleAltTextError] = useToggle(false);
-  const [invalidLinkErrors, setInvalidLinkErrors] = useState<InvalidUrl[]>([]);
-
-  function validateAltText(els: Element[]): string {
-    const hasInvalidImage = els.some(
-      element =>
-        isInvalidImage(element) ||
-        Array.from(element.getChildren()).some(child => isInvalidImage(child)),
-    );
-    toggleAltTextError(hasInvalidImage);
-    return hasInvalidImage ? 'All images must have alternative text. ' : '';
-  }
-
-  function validateLinks(els: Element[]): string {
-    const invalidLinks = getInvalidLinks(els);
-    setInvalidLinkErrors(invalidLinks);
-    return invalidLinks.length
-      ? `${
-          invalidLinks.length === 1
-            ? '1 link has an invalid URL.'
-            : `${invalidLinks.length} links have invalid URLs.`
-        }`
-      : '';
-  }
+  const handleElements: EditorElementsHandler = nextElements => {
+    elements.current = nextElements;
+  };
+  const errorMessage = error || getErrorMessage(errors, name, showError);
 
   return (
-    <Field
-      name={name}
-      validate={() => {
-        const invalidLinksError = shouldValidateLinks
-          ? validateLinks(elements.current)
-          : '';
-        const invalidAltTextError = shouldValidateAltText
-          ? validateAltText(elements.current)
-          : '';
-        return `${invalidAltTextError}${invalidLinksError}`;
-      }}
-    >
-      {({ field, form }: FieldProps) => {
-        const { getError } = createErrorHelper(form);
+    <FormGroup hasError={!!errorMessage} className={formGroupClass}>
+      {altTextError && <AltTextWarningMessage />}
 
-        let errorMessage = error || getError(name);
+      {invalidLinkErrors.length > 0 && (
+        <WarningMessage className="govuk-!-margin-bottom-1">
+          The following links have invalid URLs:
+          <ul className="govuk-!-font-weight-regular govuk-!-margin-bottom-1 govuk-!-margin-top-1">
+            {invalidLinkErrors.map(link => (
+              <li key={link?.text}>
+                {link?.text} ({link?.url})
+              </li>
+            ))}
+          </ul>
+        </WarningMessage>
+      )}
 
-        if (!showError) {
-          errorMessage = '';
-        }
+      <FormEditor
+        testId={testId}
+        {...props}
+        {...field}
+        id={fieldId(name as string, id)}
+        value={value}
+        onBlur={() => {
+          const currentValue = getValues(name);
+          setValue(name, currentValue, {
+            shouldDirty: true,
+            shouldTouch: true,
+            shouldValidate: true,
+          });
 
-        const handleElements: EditorElementsHandler = nextElements => {
-          elements.current = nextElements;
-        };
+          if (onBlur) {
+            const fieldState = getFieldState(name);
+            onBlur(fieldState.isDirty);
+          }
+        }}
+        onElementsChange={handleElements}
+        onElementsReady={handleElements}
+        onChange={nextValue => {
+          setValue(
+            name,
+            nextValue as PathValue<TFormValues, Path<TFormValues>>,
+            { shouldDirty: true, shouldTouch: true, shouldValidate: true },
+          );
 
-        return (
-          <FormGroup hasError={!!errorMessage} className={formGroupClass}>
-            {altTextError && <AltTextWarningMessage />}
-
-            {invalidLinkErrors.length > 0 && (
-              <WarningMessage className="govuk-!-margin-bottom-1">
-                The following links have invalid URLs:
-                <ul className="govuk-!-font-weight-regular govuk-!-margin-bottom-1 govuk-!-margin-top-1">
-                  {invalidLinkErrors.map(link => (
-                    <li key={link?.text}>
-                      {link?.text} ({link?.url})
-                    </li>
-                  ))}
-                </ul>
-              </WarningMessage>
-            )}
-
-            <FormEditor
-              testId={testId}
-              {...props}
-              {...field}
-              id={fieldId(name as string, id)}
-              onBlur={() => {
-                form.setFieldTouched(name as string, true);
-                if (onBlur) {
-                  onBlur(form.dirty);
-                }
-              }}
-              onElementsChange={handleElements}
-              onElementsReady={handleElements}
-              onChange={value => {
-                form.setFieldValue(name as string, value);
-              }}
-              error={errorMessage}
-            />
-          </FormGroup>
-        );
-      }}
-    </Field>
+          onChange?.(elements.current);
+        }}
+        error={errorMessage}
+      />
+    </FormGroup>
   );
-}
-
-export default FormFieldEditor;
-
-function isInvalidImage(element: Element | Node) {
-  return (
-    (element.name === 'imageBlock' || element.name === 'imageInline') &&
-    !element.getAttribute('alt')
-  );
-}
-
-function getInvalidLinks(elements: Element[]) {
-  return elements
-    .flatMap(element =>
-      Array.from(element.getChildren()).flatMap(child => child),
-    )
-    .reduce<InvalidUrl[]>((acc, el) => {
-      if (!el.getAttribute('linkHref')) {
-        return acc;
-      }
-      const jsonEl = el.toJSON();
-      const attributes = jsonEl.attributes as Record<string, unknown>;
-      const url = attributes.linkHref as string;
-
-      try {
-        // exclude anchor links, localhost and emails as they fail Yup url validation.
-        if (
-          url &&
-          !url.startsWith('#') &&
-          !url.startsWith('http://localhost') &&
-          !url.startsWith('mailto:')
-        ) {
-          Yup.string().url().validateSync(url.trim());
-        }
-      } catch {
-        acc.push({
-          text: jsonEl.data as string,
-          url,
-        });
-      }
-      return acc;
-    }, []);
 }
 
 export function AltTextWarningMessage() {

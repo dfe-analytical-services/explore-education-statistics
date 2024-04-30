@@ -309,7 +309,6 @@ module.exports = webpackEnv => {
         './dist/cpexcel.js': false,
         '@admin': paths.appSrc,
         '@common': 'explore-education-statistics-common/src',
-        formik: require.resolve('formik'),
         react: require.resolve('react'),
       },
       fallback: {
@@ -334,7 +333,6 @@ module.exports = webpackEnv => {
           babelRuntimeRegenerator,
           // EES - Add extra allowed files for compatibility
           // with our custom import aliases
-          require.resolve('formik'),
           require.resolve('react'),
         ]),
       ],

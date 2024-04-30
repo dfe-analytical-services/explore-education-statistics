@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import React from 'react';
@@ -61,7 +61,7 @@ export default function EditableKeyStatTextForm({
       >
         {({ formState }) => {
           return (
-            <RHFForm
+            <Form
               id={
                 keyStat
                   ? `editableKeyStatTextForm-${keyStat.id}`
@@ -70,21 +70,21 @@ export default function EditableKeyStatTextForm({
               onSubmit={handleSubmit}
             >
               <div className={styles.textTile}>
-                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                <FormFieldTextInput<KeyStatTextFormValues>
                   name="title"
                   className={classNames({
                     'govuk-!-width-one-third': isReordering,
                   })}
                   label={<span>Title</span>}
                 />
-                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                <FormFieldTextInput<KeyStatTextFormValues>
                   name="statistic"
                   className={classNames({
                     'govuk-!-width-one-third': isReordering,
                   })}
                   label={<span>Statistic</span>}
                 />
-                <RHFFormFieldTextInput<KeyStatTextFormValues>
+                <FormFieldTextInput<KeyStatTextFormValues>
                   name="trend"
                   className={classNames({
                     'govuk-!-width-one-third': isReordering,
@@ -93,7 +93,7 @@ export default function EditableKeyStatTextForm({
                 />
               </div>
 
-              <RHFFormFieldTextInput<KeyStatTextFormValues>
+              <FormFieldTextInput<KeyStatTextFormValues>
                 formGroupClass="govuk-!-margin-top-2"
                 name="guidanceTitle"
                 className={classNames({
@@ -102,7 +102,7 @@ export default function EditableKeyStatTextForm({
                 label="Guidance title"
               />
 
-              <RHFFormFieldTextArea<KeyStatTextFormValues>
+              <FormFieldTextArea<KeyStatTextFormValues>
                 label="Guidance text"
                 name="guidanceText"
                 rows={3}
@@ -116,7 +116,7 @@ export default function EditableKeyStatTextForm({
                   Cancel
                 </Button>
               </ButtonGroup>
-            </RHFForm>
+            </Form>
           );
         }}
       </FormProvider>

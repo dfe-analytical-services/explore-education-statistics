@@ -9,12 +9,12 @@ import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { FormSelect } from '@common/components/form';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -80,10 +80,10 @@ const MethodologyStatusForm = ({
       {({ watch }) => {
         const status = watch('status');
         return (
-          <RHFForm id="methodologyStatusForm" onSubmit={onSubmit}>
+          <Form id="methodologyStatusForm" onSubmit={onSubmit}>
             <h2>Edit methodology status</h2>
 
-            <RHFFormFieldRadioGroup<MethodologyStatusFormValues>
+            <FormFieldRadioGroup<MethodologyStatusFormValues>
               legend="Status"
               hint={
                 isPublished &&
@@ -109,7 +109,7 @@ const MethodologyStatusForm = ({
               ]}
               order={[]}
             />
-            <RHFFormFieldTextArea<MethodologyStatusFormValues>
+            <FormFieldTextArea<MethodologyStatusFormValues>
               name="latestInternalReleaseNote"
               className="govuk-!-width-one-half"
               label="Internal note"
@@ -117,7 +117,7 @@ const MethodologyStatusForm = ({
               rows={2}
             />
             {status === 'Approved' && (
-              <RHFFormFieldRadioGroup<MethodologyStatusFormValues>
+              <FormFieldRadioGroup<MethodologyStatusFormValues>
                 name="publishingStrategy"
                 legend="When to publish"
                 legendSize="m"
@@ -128,7 +128,7 @@ const MethodologyStatusForm = ({
                     label: 'With a specific release',
                     value: 'WithRelease',
                     conditional: (
-                      <RHFFormFieldSelect<MethodologyStatusFormValues>
+                      <FormFieldSelect<MethodologyStatusFormValues>
                         label="Select release"
                         name="withReleaseId"
                         order={FormSelect.unordered}
@@ -154,7 +154,7 @@ const MethodologyStatusForm = ({
               <Button type="submit">Update status</Button>
               <ButtonText onClick={onCancel}>Cancel</ButtonText>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

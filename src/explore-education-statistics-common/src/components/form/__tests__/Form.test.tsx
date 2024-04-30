@@ -1,34 +1,16 @@
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
-import { FormFieldTextInput } from '@common/components/form';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import SubmitError from '@common/components/form/util/SubmitError';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import Yup from '@common/validation/yup';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  Field,
-  Formik as BaseFormik,
-  FormikConfig,
-  FormikValues,
-} from 'formik';
-import noop from 'lodash/noop';
 import React from 'react';
-import Form from '../Form';
 
 describe('Form', () => {
-  // Wrapper around Formik so we can enable `useFormSubmit` hook.
-  function Formik<FormValues extends FormikValues>({
-    onSubmit,
-    ...props
-  }: FormikConfig<FormValues>) {
-    const handleSubmit = useFormSubmit(onSubmit);
-
-    return <BaseFormik {...props} onSubmit={handleSubmit} />;
-  }
-
   test('renders error summary from form errors when form is submitted', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
           lastName: '',
@@ -37,13 +19,12 @@ describe('Form', () => {
           firstName: Yup.string().required('First name is required'),
           lastName: Yup.string().required('Last name is required'),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -64,7 +45,7 @@ describe('Form', () => {
 
   test('does not render errors for fields that do not have errors', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
           lastName: 'Lastname',
@@ -73,13 +54,12 @@ describe('Form', () => {
           firstName: Yup.string().required('First name is required'),
           lastName: Yup.string().required('Last name is required'),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -96,7 +76,7 @@ describe('Form', () => {
 
   test('renders nested error messages', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           address: {
             line1: '',
@@ -107,13 +87,12 @@ describe('Form', () => {
             line1: Yup.string().required('Line 1 of address is required'),
           }),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -128,7 +107,7 @@ describe('Form', () => {
 
   test('does not render nested error messages for fields that do not have errors', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           address: {
             line1: 'Line 1',
@@ -141,13 +120,12 @@ describe('Form', () => {
             line2: Yup.string().required('Line 2 of address is required'),
           }),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -166,20 +144,19 @@ describe('Form', () => {
     const handleSubmit = jest.fn();
 
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={handleSubmit}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={handleSubmit}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -191,22 +168,24 @@ describe('Form', () => {
 
   test('renders submit error with default message when error thrown', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw new Error();
-        }}
       >
-        <Form id="test-form">
+        <Form
+          id="test-form"
+          onSubmit={() => {
+            throw new Error();
+          }}
+        >
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -222,22 +201,24 @@ describe('Form', () => {
 
   test('renders submit error with custom message when `SubmitError` thrown', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw new SubmitError('Custom submit error message');
-        }}
       >
-        <Form id="test-form">
+        <Form
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message');
+          }}
+        >
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -254,24 +235,26 @@ describe('Form', () => {
 
   test('renders submit error with custom field when `SubmitError` thrown', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw new SubmitError('Custom submit error message', {
-            field: 'firstName',
-          });
-        }}
       >
-        <Form id="test-form">
+        <Form
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message', {
+              field: 'firstName',
+            });
+          }}
+        >
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -288,24 +271,26 @@ describe('Form', () => {
 
   test('renders submit error with default href when `SubmitError` thrown with invalid field', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw new SubmitError('Custom submit error message', {
-            field: 'invalidField',
-          });
-        }}
       >
-        <Form id="test-form">
+        <Form
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message', {
+              field: 'invalidField',
+            });
+          }}
+        >
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -326,27 +311,26 @@ describe('Form', () => {
     });
 
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={onSubmit}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={onSubmit}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong whilst submitting the form'),
+        screen.getByText('Something went wrong whilst submitting the form'),
       ).toBeInTheDocument();
     });
 
@@ -364,38 +348,45 @@ describe('Form', () => {
 
   test('removes submit error when form is reset', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={() => {
-          throw new Error();
-        }}
       >
-        {formik => (
-          <Form id="test-form">
+        {({ reset }) => (
+          <Form
+            id="test-form"
+            onSubmit={() => {
+              throw new Error();
+            }}
+          >
             The form
             <button type="submit">Submit</button>
-            <button type="button" onClick={formik.handleReset}>
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+              }}
+            >
               Reset form
             </button>
           </Form>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong whilst submitting the form'),
+        screen.getByText('Something went wrong whilst submitting the form'),
       ).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Reset form'));
+    await userEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
@@ -404,35 +395,34 @@ describe('Form', () => {
     });
   });
 
-  test('renders mapped server validation submit errors', async () => {
+  test('renders mapped server validation errors when form submitted', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw createServerValidationErrorMock([
-            { path: 'firstName', message: 'Invalid first name' },
-          ]);
-        }}
       >
-        <Form id="test-form">
+        <Form
+          id="test-form"
+          onSubmit={() => {
+            throw createServerValidationErrorMock([
+              { path: 'firstName', message: 'Invalid first name' },
+            ]);
+          }}
+        >
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Invalid first name')).toHaveAttribute(
-        'href',
-        '#test-form-firstName',
-      );
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
     });
   });
 
@@ -444,20 +434,19 @@ describe('Form', () => {
     });
 
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().defined(),
         })}
-        onSubmit={onSubmit}
       >
-        <Form id="test-form">
+        <Form id="test-form" onSubmit={onSubmit}>
           The form
           <button type="submit">Submit</button>
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -478,29 +467,36 @@ describe('Form', () => {
 
   test('removes mapped server validation errors when form is reset', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw createServerValidationErrorMock([
-            { path: 'firstName', message: 'Invalid first name' },
-          ]);
-        }}
       >
-        {formik => (
-          <Form id="test-form">
+        {({ reset }) => (
+          <Form
+            id="test-form"
+            onSubmit={() => {
+              throw createServerValidationErrorMock([
+                { path: 'firstName', message: 'Invalid first name' },
+              ]);
+            }}
+          >
             The form
             <button type="submit">Submit</button>
-            <button type="button" onClick={formik.handleReset}>
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+              }}
+            >
               Reset form
             </button>
           </Form>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -518,26 +514,35 @@ describe('Form', () => {
 
   test('removes mapped server validation errors when field values are changed', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw createServerValidationErrorMock([
-            { path: 'firstName', message: 'Invalid first name' },
-          ]);
-        }}
       >
-        <Form id="test-form">
-          <label htmlFor="firstName">Firstname</label>
-          <Field name="firstName" type="text" id="firstName" />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <Form
+            id="test-form"
+            onSubmit={() => {
+              throw createServerValidationErrorMock([
+                { path: 'firstName', message: 'Invalid first name' },
+              ]);
+            }}
+          >
+            The form
+            <label htmlFor="firstName">Firstname</label>
+            <input
+              type="text"
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </Form>
+        )}
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -558,29 +563,31 @@ describe('Form', () => {
 
   test('does not render unmapped server validation errors when form submitted', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().defined(),
         })}
-        onSubmit={() => {
-          throw createServerValidationErrorMock([
-            { message: 'Global error' },
-            { code: 'UnmappedCode', message: '' },
-            { path: 'field1', message: 'Invalid field 1' },
-            { path: 'nested.field2', message: 'Invalid field 2' },
-          ]);
-        }}
       >
-        {({ submitCount }) => (
-          <Form id="test-form">
-            {submitCount > 0 ? 'The form is submitted' : 'The form'}
+        {({ formState }) => (
+          <Form
+            id="test-form"
+            onSubmit={() => {
+              throw createServerValidationErrorMock([
+                { message: 'Global error' },
+                { code: 'UnmappedCode', message: '' },
+                { path: 'field1', message: 'Invalid field 1' },
+                { path: 'nested.field2', message: 'Invalid field 2' },
+              ]);
+            }}
+          >
+            {formState.isSubmitted ? 'The form is submitted' : 'The form'}
             <button type="submit">Submit</button>
           </Form>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -602,62 +609,67 @@ describe('Form', () => {
 
   test('focuses error summary on submit', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
-        onSubmit={noop}
       >
-        <Form id="test-form">
-          <FormFieldTextInput
-            id="test-form-firstName"
-            label="First name"
-            name="firstName"
-          />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <Form id="test-form" onSubmit={jest.fn()}>
+            <input
+              id="test-form-firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </Form>
+        )}
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('errorSummary')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
-        onSubmit={noop}
       >
-        <Form id="test-form">
-          <FormFieldTextInput
-            id="test-form-firstName"
-            label="First name"
-            name="firstName"
-          />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <Form id="test-form" onSubmit={jest.fn()}>
+            <label htmlFor="firstName">First name</label>
+            <input
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </Form>
+        )}
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('errorSummary')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     const input = screen.getByLabelText('First name');
 
@@ -678,34 +690,35 @@ describe('Form', () => {
 
   test('re-focuses error summary on re-submit', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
-        onSubmit={noop}
       >
-        {() => (
-          <Form id="test-form">
-            <FormFieldTextInput
-              id="test-form-firstName"
-              label="First name"
-              name="firstName"
+        {({ register }) => (
+          <Form id="test-form" onSubmit={jest.fn()}>
+            <label htmlFor="firstName">First name</label>
+            <input
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
             />
-
             <button type="submit">Submit</button>
           </Form>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('errorSummary')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     screen.getByLabelText('First name').focus();
     expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
@@ -713,6 +726,7 @@ describe('Form', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
       expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
   });

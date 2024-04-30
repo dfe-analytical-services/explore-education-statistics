@@ -6,7 +6,7 @@ interface Props {
   name: string;
 }
 
-const RHFFormCheckboxSelectedCount = ({ name }: Props) => {
+const FormCheckboxSelectedCount = ({ name }: Props) => {
   const value = useWatch({ name });
   let count = 0;
 
@@ -22,4 +22,4 @@ const RHFFormCheckboxSelectedCount = ({ name }: Props) => {
   ) : null;
 };
 
-export default memo(RHFFormCheckboxSelectedCount);
+export default memo(FormCheckboxSelectedCount);

@@ -1,4 +1,4 @@
-import FormProvider from '@common/components/form/rhf/FormProvider';
+import FormProvider from '@common/components/form/FormProvider';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableHeadersReadOnlyList from '@common/modules/table-tool/components/TableHeadersReadOnlyList';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';

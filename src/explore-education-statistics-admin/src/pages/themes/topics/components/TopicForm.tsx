@@ -1,8 +1,8 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { ReactNode, useMemo } from 'react';
@@ -53,8 +53,8 @@ const TopicForm = ({
     >
       {({ formState }) => {
         return (
-          <RHFForm id={id} onSubmit={onSubmit}>
-            <RHFFormFieldTextInput<TopicFormValues>
+          <Form id={id} onSubmit={onSubmit}>
+            <FormFieldTextInput<TopicFormValues>
               label="Title"
               name="title"
               className="govuk-!-width-two-thirds"
@@ -66,7 +66,7 @@ const TopicForm = ({
               </Button>
               {cancelButton}
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

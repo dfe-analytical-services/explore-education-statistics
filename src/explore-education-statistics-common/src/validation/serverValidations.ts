@@ -4,7 +4,6 @@ import {
 } from '@common/services/types/problemDetails';
 import { Dictionary, Path } from '@common/types';
 import { AxiosError, isAxiosError } from 'axios';
-import { FormikErrors } from 'formik';
 import camelCase from 'lodash/camelCase';
 import has from 'lodash/has';
 import set from 'lodash/set';
@@ -127,31 +126,14 @@ function normalizeField<FormValues = unknown>(
 }
 
 /**
- * Convert server validation errors to Formik error messages.
+ * Convert server validation errors to RHF error messages.
  *
  * @param response The server validation error response.
  * @param formValues The form values that were submitted.
  * @param messageMappers Mappings between server validation errors and field error messages.
  * @param fallbackMapper Optional fallback mapper if no mapping is found.
  */
-export function convertServerFieldErrors<FormValues>(
-  response: ValidationProblemDetails,
-  formValues: FormValues,
-  messageMappers: FieldMessageMapper<FormValues>[] = [],
-  fallbackMapper?: FieldMessageMapper<FormValues>,
-): FormikErrors<FormValues> {
-  return mapServerFieldErrors(response, messageMappers, fallbackMapper).reduce<
-    FormikErrors<FormValues>
-  >((errors, { field, message }) => {
-    if (has(formValues, field)) {
-      set(errors, field, message);
-    }
-
-    return errors;
-  }, {});
-}
-
-export function rhfConvertServerFieldErrors<FormValues extends FieldValues>(
+export function convertServerFieldErrors<FormValues extends FieldValues>(
   response: ValidationProblemDetails,
   formValues: FormValues,
   messageMappers: FieldMessageMapper<FormValues>[] = [],

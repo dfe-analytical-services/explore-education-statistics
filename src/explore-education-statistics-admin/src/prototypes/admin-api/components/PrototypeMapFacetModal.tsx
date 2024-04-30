@@ -1,10 +1,10 @@
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import { FormTextSearchInput } from '@common/components/form';
 import Yup from '@common/validation/yup';
 import Modal from '@common/components/Modal';
@@ -61,7 +61,7 @@ const PrototypeMapFacetModal = ({
           selectedItem: Yup.string().required(`Choose a ${name}`),
         })}
       >
-        <RHFForm
+        <Form
           id="form"
           onSubmit={({ selectedItem }) => {
             onSubmit(selectedItem);
@@ -121,7 +121,7 @@ const PrototypeMapFacetModal = ({
             />
             {Object.entries(groupedNewItems).map(([key, items]) => {
               return (
-                <RHFFormFieldRadioGroup
+                <FormFieldRadioGroup
                   showError={false}
                   id="items"
                   key={key}
@@ -141,7 +141,7 @@ const PrototypeMapFacetModal = ({
           </div>
           <hr className="govuk-!-margin-0" />
           <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-            <RHFFormFieldCheckbox
+            <FormFieldCheckbox
               small
               name="no-mapping"
               label={`No ${name} mapping available`}
@@ -171,7 +171,7 @@ const PrototypeMapFacetModal = ({
             </Button>
             */}
           </div>
-        </RHFForm>
+        </Form>
       </FormProvider>
     </Modal>
   );

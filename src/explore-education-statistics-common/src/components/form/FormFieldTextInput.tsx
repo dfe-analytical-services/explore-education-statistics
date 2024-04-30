@@ -1,16 +1,19 @@
 import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';
-import React from 'react';
-import FormTextInput, { FormTextInputProps } from './FormTextInput';
-
-type Props<FormValues> = FormFieldComponentProps<
+import FormTextInput, {
   FormTextInputProps,
-  FormValues
+} from '@common/components/form/FormTextInput';
+import React from 'react';
+import { FieldValues } from 'react-hook-form';
+
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
+  FormTextInputProps,
+  TFormValues
 >;
 
-function FormFieldTextInput<FormValues>(props: Props<FormValues>) {
+export default function FormFieldTextInput<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
   return <FormField {...props} as={FormTextInput} />;
 }
-
-export default FormFieldTextInput;

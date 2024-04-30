@@ -1,8 +1,8 @@
 import { FormFieldset } from '@common/components/form';
 import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
@@ -137,10 +137,10 @@ const DownloadStep = ({
         // isMounted check required as Form context can be undefined
         // if the step is active on page load.
         return isActive && isMounted ? (
-          <RHFForm id="downloadForm" onSubmit={onSubmit}>
+          <Form id="downloadForm" onSubmit={onSubmit}>
             <FormFieldset id="downloadFiles" legend={stepHeading}>
               {checkboxOptions.length > 0 && (
-                <RHFFormFieldCheckboxGroup<DownloadFormValues>
+                <FormFieldCheckboxGroup<DownloadFormValues>
                   name="files"
                   order={[]}
                   legend="Choose files from the list below"
@@ -162,7 +162,7 @@ const DownloadStep = ({
             ) : (
               <p>No downloads available.</p>
             )}
-          </RHFForm>
+          </Form>
         ) : (
           <ResetFormOnPreviousStep
             currentStep={currentStep}

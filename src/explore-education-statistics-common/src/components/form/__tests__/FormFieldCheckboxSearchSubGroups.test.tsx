@@ -1,27 +1,21 @@
-import { Form } from '@common/components/form';
+import FormFieldCheckboxSearchSubGroups from '@common/components/form/FormFieldCheckboxSearchSubGroups';
+import Form from '@common/components/form/Form';
+import FormProvider from '@common/components/form/FormProvider';
 import Yup from '@common/validation/yup';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Formik } from 'formik';
-import noop from 'lodash/noop';
 import React from 'react';
-import FormFieldCheckboxSearchSubGroups from '../FormFieldCheckboxSearchSubGroups';
 
 describe('FormFieldCheckboxSearchSubGroups', () => {
-  interface FormValues {
-    test: string[];
-  }
-
   test('renders with correct default ids without form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        <FormFieldCheckboxSearchSubGroups<FormValues>
+        <FormFieldCheckboxSearchSubGroups
           name="test"
           legend="Test checkboxes"
           options={[
@@ -41,7 +35,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             },
           ]}
         />
-      </Formik>,
+      </FormProvider>,
     );
 
     const fieldset = screen.getByRole('group', { name: 'Test checkboxes' });
@@ -77,14 +71,13 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('renders with correct default ids with form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        <Form id="testForm">
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
             legend="Test checkboxes"
             options={[
@@ -105,7 +98,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             ]}
           />
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
 
     const fieldset = screen.getByRole('group', { name: 'Test checkboxes' });
@@ -141,14 +134,13 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('renders with correct custom ids with form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        <Form id="testForm">
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             id="customId"
             name="test"
             legend="Test checkboxes"
@@ -171,9 +163,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             ]}
           />
         </Form>
-      </Formik>,
+      </FormProvider>,
     );
-
     const fieldset = screen.getByRole('group', { name: 'Test checkboxes' });
     const groupA = screen.getByRole('group', { name: 'Group A' });
     const groupB = screen.getByRole('group', { name: 'Group B' });
@@ -207,13 +198,12 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('renders with correct custom ids without form', () => {
     render(
-      <Formik<FormValues>
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        <FormFieldCheckboxSearchSubGroups<FormValues>
+        <FormFieldCheckboxSearchSubGroups
           id="customId"
           name="test"
           legend="Test checkboxes"
@@ -235,7 +225,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             },
           ]}
         />
-      </Formik>,
+      </FormProvider>,
     );
 
     const fieldset = screen.getByRole('group', { name: 'Test checkboxes' });
@@ -271,16 +261,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('checking option checks it', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -299,8 +287,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -314,14 +302,13 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('un-checking option un-checks it', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: ['1'],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
             id="checkboxes"
             legend="Test checkboxes"
@@ -342,8 +329,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -357,16 +344,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('clicking `Select all options` button checks all values for all groups', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -382,8 +367,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const checkbox1 = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -413,16 +398,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('clicking `Unselect all options` button un-checks all options for all groups', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: ['1', '2', '3'],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -438,8 +421,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const checkbox1 = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -463,16 +446,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('checking all checkboxes for all groups renders `Unselect all options` button', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -488,8 +469,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     expect(
@@ -511,16 +492,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('clicking `Select all subgroup options` button for a group checks all values for that group', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -536,8 +515,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const group1 = within(screen.getByRole('group', { name: 'Group A' }));
@@ -564,16 +543,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('clicking `Unselect all` button for a group un-checks all values for that group', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: ['2', '3'],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -589,8 +566,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const group1 = within(screen.getByRole('group', { name: 'Group A' }));
@@ -615,16 +592,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('checking all options for a group renders corresponding `Unselect all subgroup options` button', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: [],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -640,8 +615,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const group2 = within(screen.getByRole('group', { name: 'Group B' }));
@@ -675,16 +650,14 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('un-checking any options renders the corresponding `Unselect all options` button', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: ['2', '3'],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
             options={[
               {
@@ -700,8 +673,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const group2 = within(screen.getByRole('group', { name: 'Group B' }));
@@ -735,19 +708,17 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
   describe('error messages', () => {
     test('does not display validation message when checkboxes are untouched', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: [],
           }}
-          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
-          {() => (
-            <FormFieldCheckboxSearchSubGroups<FormValues>
+          <Form id="testForm" onSubmit={Promise.resolve}>
+            <FormFieldCheckboxSearchSubGroups
               name="test"
-              id="checkboxes"
               legend="Test checkboxes"
               options={[
                 {
@@ -766,8 +737,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
                 },
               ]}
             />
-          )}
-        </Formik>,
+          </Form>
+        </FormProvider>,
       );
 
       expect(
@@ -777,22 +748,17 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     test('displays validation message when no checkboxes are checked', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: ['1'],
           }}
-          initialTouched={{
-            test: true,
-          }}
-          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
-          {() => (
-            <FormFieldCheckboxSearchSubGroups<FormValues>
+          <Form id="testForm" onSubmit={Promise.resolve}>
+            <FormFieldCheckboxSearchSubGroups
               name="test"
-              id="checkboxes"
               legend="Test checkboxes"
               options={[
                 {
@@ -811,8 +777,9 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
                 },
               ]}
             />
-          )}
-        </Formik>,
+            <button type="submit">Submit</button>
+          </Form>
+        </FormProvider>,
       );
 
       const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -821,36 +788,31 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       expect(screen.queryByText('Select at least one option')).toBeNull();
 
       await userEvent.click(checkbox);
+      expect(checkbox.checked).toBe(false);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
       await waitFor(() => {
-        expect(checkbox.checked).toBe(false);
-
         expect(
-          screen.getByText('Select at least one option'),
-        ).toBeInTheDocument();
+          screen.queryAllByText('Select at least one option')[0],
+        ).toHaveAttribute('href', '#testForm-test');
       });
     });
 
     test('does not display validation message when `showError` is false', async () => {
       render(
-        <Formik
+        <FormProvider
           initialValues={{
             test: ['1'],
           }}
-          initialTouched={{
-            test: true,
-          }}
-          onSubmit={noop}
           validationSchema={Yup.object({
             test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
-          {() => (
-            <FormFieldCheckboxSearchSubGroups<FormValues>
+          <Form id="testForm" onSubmit={Promise.resolve}>
+            <FormFieldCheckboxSearchSubGroups
               name="test"
-              id="checkboxes"
               legend="Test checkboxes"
-              showError={false}
               options={[
                 {
                   legend: 'Group A',
@@ -867,9 +829,10 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
                   ],
                 },
               ]}
+              showError={false}
             />
-          )}
-        </Formik>,
+          </Form>
+        </FormProvider>,
       );
 
       const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
@@ -890,18 +853,15 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
   test('providing a search term does not remove checkboxes that have already been checked', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           test: ['1'],
         }}
-        onSubmit={noop}
       >
-        {() => (
-          <FormFieldCheckboxSearchSubGroups<FormValues>
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxSearchSubGroups
             name="test"
-            id="checkboxes"
             legend="Test checkboxes"
-            searchLabel="Search options"
             options={[
               {
                 legend: 'Group A',
@@ -919,8 +879,8 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
               },
             ]}
           />
-        )}
-      </Formik>,
+        </Form>
+      </FormProvider>,
     );
 
     const searchInput = screen.getByLabelText(
@@ -931,9 +891,9 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     await userEvent.type(searchInput, '2');
 
-    await waitFor(() => {
-      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument();
-    });
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Checkbox 3')).not.toBeInTheDocument(),
+    );
 
     expect(screen.getAllByLabelText(/Checkbox/)).toHaveLength(2);
     expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');

@@ -11,9 +11,9 @@ import { FormSelect } from '@common/components/form';
 import SubmitError from '@common/components/form/util/SubmitError';
 import ModalConfirm from '@common/components/ModalConfirm';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import Form from '@common/components/form/Form';
 
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
@@ -145,12 +145,12 @@ const ChartDataSetsConfiguration = ({
           timePeriod: Yup.string(),
         })}
       >
-        <RHFForm id={formId} onSubmit={handleSubmit}>
+        <Form id={formId} onSubmit={handleSubmit}>
           <div className={styles.formSelectRow}>
             {orderBy(Object.entries(meta.filters), ([_, value]) => value.order)
               .filter(([, filters]) => filters.options.length > 1)
               .map(([categoryName, filters]) => (
-                <RHFFormFieldSelect
+                <FormFieldSelect
                   key={categoryName}
                   name={`filters.${categoryName}`}
                   label={categoryName}
@@ -165,7 +165,7 @@ const ChartDataSetsConfiguration = ({
               ))}
 
             {indicatorOptions.length > 1 && (
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 name="indicator"
                 label="Indicator"
                 formGroupClass={styles.formSelectGroup}
@@ -177,7 +177,7 @@ const ChartDataSetsConfiguration = ({
             )}
 
             {locationOptions.length > 1 && (
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 name="location"
                 label="Location"
                 formGroupClass={styles.formSelectGroup}
@@ -188,7 +188,7 @@ const ChartDataSetsConfiguration = ({
             )}
 
             {meta.timePeriodRange.length > 1 && (
-              <RHFFormFieldSelect<FormValues>
+              <FormFieldSelect<FormValues>
                 name="timePeriod"
                 label="Time period"
                 formGroupClass={styles.formSelectGroup}
@@ -201,7 +201,7 @@ const ChartDataSetsConfiguration = ({
           </div>
 
           <Button type="submit">Add data set</Button>
-        </RHFForm>
+        </Form>
       </FormProvider>
 
       {forms.dataSets &&

@@ -1,13 +1,13 @@
 import Button from '@common/components/Button';
 import { FormFieldset, FormGroup } from '@common/components/form';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import { OmitStrict } from '@common/types';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { ObjectSchema } from 'yup';
 
 interface FormValues {
@@ -80,18 +80,18 @@ const DataBlockDetailsForm = ({
     >
       {({ formState, getValues }) => {
         return (
-          <RHFForm id={formId} onSubmit={handleSubmit}>
+          <Form id={formId} onSubmit={handleSubmit}>
             <h2>Data block details</h2>
 
             <FormGroup>
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="name"
                 label="Name"
                 hint="Name of the data block. This will not be visible to users."
                 className="govuk-!-width-one-half"
               />
 
-              <RHFFormFieldTextArea<FormValues>
+              <FormFieldTextArea<FormValues>
                 name="heading"
                 className="govuk-!-width-two-thirds"
                 label="Table title"
@@ -102,7 +102,7 @@ const DataBlockDetailsForm = ({
                 }}
               />
 
-              <RHFFormFieldTextInput<FormValues>
+              <FormFieldTextInput<FormValues>
                 name="source"
                 label="Source"
                 hint="The data source used to create this data."
@@ -115,18 +115,18 @@ const DataBlockDetailsForm = ({
                 legendSize="s"
                 hint="Checking this option will make this table available as a featured table when the publication is selected via the table builder"
               >
-                <RHFFormFieldCheckbox<FormValues>
+                <FormFieldCheckbox<FormValues>
                   name="isHighlight"
                   label="Set as a featured table for this publication"
                   conditional={
                     <>
-                      <RHFFormFieldTextInput<FormValues>
+                      <FormFieldTextInput<FormValues>
                         name="highlightName"
                         label="Featured table name"
                         hint="We will show this name to table builder users as a featured table"
                         className="govuk-!-width-two-thirds"
                       />
-                      <RHFFormFieldTextArea<FormValues>
+                      <FormFieldTextArea<FormValues>
                         name="highlightDescription"
                         label="Featured table description"
                         hint="Describe the contents of this featured table to table builder users"
@@ -145,7 +145,7 @@ const DataBlockDetailsForm = ({
                 Save data block
               </Button>
             </FormGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

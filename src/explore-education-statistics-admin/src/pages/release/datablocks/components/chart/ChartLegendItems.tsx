@@ -10,12 +10,12 @@ import {
   LegendConfiguration,
   LegendPosition,
 } from '@common/modules/charts/types/legend';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFFormFieldColourInput from '@common/components/form/rhf/RHFFormFieldColourInput';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
 import Effect from '@common/components/Effect';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import FormFieldset from '@common/components/form/FormFieldset';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import { ChartCapabilities } from '@common/modules/charts/types/chart';
 import { Dictionary } from '@common/types';
@@ -96,7 +96,7 @@ export default function ChartLegendItems({
                 >
                   <div className="dfe-flex dfe-justify-content--space-between">
                     <div className={styles.labelInput}>
-                      <RHFFormFieldTextInput
+                      <FormFieldTextInput
                         name={`items.${index}.label`}
                         label="Label"
                         formGroup={false}
@@ -104,7 +104,7 @@ export default function ChartLegendItems({
                       />
                     </div>
                     <div className={styles.colourInput}>
-                      <RHFFormFieldColourInput
+                      <FormFieldColourInput
                         name={`items.${index}.colour`}
                         label="Colour"
                         colours={colours}
@@ -115,7 +115,7 @@ export default function ChartLegendItems({
 
                     {capabilities.hasSymbols && (
                       <div className={styles.configurationInput}>
-                        <RHFFormFieldSelect
+                        <FormFieldSelect
                           name={`items.${index}.symbol`}
                           label="Symbol"
                           formGroup={false}
@@ -127,7 +127,7 @@ export default function ChartLegendItems({
 
                     {capabilities.hasLineStyle && (
                       <div className={styles.configurationInput}>
-                        <RHFFormFieldSelect
+                        <FormFieldSelect
                           name={`items.${index}.lineStyle`}
                           label="Style"
                           order={FormSelect.unordered}
@@ -140,7 +140,7 @@ export default function ChartLegendItems({
 
                     {position === 'inline' && (
                       <div className={styles.configurationInput}>
-                        <RHFFormFieldSelect
+                        <FormFieldSelect
                           name={`items.${index}.inlinePosition`}
                           label="Position"
                           order={FormSelect.unordered}

@@ -1,6 +1,6 @@
-import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import FormProvider from '@common/components/form/rhf/FormProvider';
+import FormFieldCheckboxGroupsMenu from '@common/components/form/FormFieldCheckboxGroupsMenu';
+import Form from '@common/components/form/Form';
+import FormProvider from '@common/components/form/FormProvider';
 import Yup from '@common/validation/yup';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,7 +14,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: '',
         }}
       >
-        <RHFFormFieldCheckboxGroupsMenu
+        <FormFieldCheckboxGroupsMenu
           id="test"
           name="test"
           legend="Choose options"
@@ -57,7 +57,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: '',
         }}
       >
-        <RHFFormFieldCheckboxGroupsMenu
+        <FormFieldCheckboxGroupsMenu
           id="test"
           name="test"
           legend="Choose options"
@@ -91,7 +91,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: '',
         }}
       >
-        <RHFFormFieldCheckboxGroupsMenu
+        <FormFieldCheckboxGroupsMenu
           id="test"
           name="test"
           legend="Choose options"
@@ -120,8 +120,8 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: Yup.array().min(1, 'Select at least one option'),
         })}
       >
-        <RHFForm id="testForm" onSubmit={Promise.resolve}>
-          <RHFFormFieldCheckboxGroupsMenu
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxGroupsMenu
             id="test"
             name="test"
             legend="Choose options"
@@ -136,7 +136,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
             ]}
           />
           <button type="submit">Submit</button>
-        </RHFForm>
+        </Form>
       </FormProvider>,
     );
 
@@ -167,8 +167,8 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: Yup.array().min(1, 'Select at least one option'),
         })}
       >
-        <RHFForm id="testForm" onSubmit={Promise.resolve}>
-          <RHFFormFieldCheckboxGroupsMenu
+        <Form id="testForm" onSubmit={Promise.resolve}>
+          <FormFieldCheckboxGroupsMenu
             id="test"
             name="test"
             legend="Choose options"
@@ -183,7 +183,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
             ]}
           />
           <button type="submit">Submit</button>
-        </RHFForm>
+        </Form>
       </FormProvider>,
     );
 

@@ -6,9 +6,9 @@ import ButtonText from '@common/components/ButtonText';
 import Tooltip from '@common/components/Tooltip';
 import { FormSelect, FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import {
   ChartDefinitionAxis,
   ChartType,
@@ -49,7 +49,7 @@ export default function ChartReferenceLineConfigurationForm({
       <td className="dfe-vertical-align--bottom">
         {axisType === 'major' ? (
           <>
-            <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+            <FormFieldSelect<ChartAxisConfigurationFormValues>
               name={`referenceLines.${index}.position`}
               id="referenceLines-position"
               label="Position"
@@ -78,7 +78,7 @@ export default function ChartReferenceLineConfigurationForm({
                 legendSize="s"
                 legendWeight="regular"
               >
-                <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                <FormFieldSelect<ChartAxisConfigurationFormValues>
                   className="govuk-!-margin-bottom-2"
                   name={`referenceLines.${index}.otherAxisStart`}
                   id="referenceLines-otherAxisStart"
@@ -90,7 +90,7 @@ export default function ChartReferenceLineConfigurationForm({
                   options={majorAxisOptions}
                 />
                 <br />
-                <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                <FormFieldSelect<ChartAxisConfigurationFormValues>
                   name={`referenceLines.${index}.otherAxisEnd`}
                   id="referenceLines-otherAxisEnd"
                   label="End point"
@@ -104,7 +104,7 @@ export default function ChartReferenceLineConfigurationForm({
             )}
           </>
         ) : (
-          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
             name={`referenceLines.${index}.position`}
             id="referenceLines-position"
             label="Position"
@@ -116,7 +116,7 @@ export default function ChartReferenceLineConfigurationForm({
       <td className="dfe-vertical-align--bottom">
         {axisType === 'minor' ? (
           <>
-            <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+            <FormFieldSelect<ChartAxisConfigurationFormValues>
               name={`referenceLines.${index}.otherAxisPositionType`}
               id="referenceLines-otherAxisPositionType"
               label={`${axis === 'x' ? 'Y' : 'X'} axis position`}
@@ -145,7 +145,7 @@ export default function ChartReferenceLineConfigurationForm({
                 {referenceLine?.otherAxisPositionType ===
                 otherAxisPositionTypes.custom ? (
                   <div className="govuk-!-margin-top-2">
-                    <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+                    <FormFieldNumberInput<ChartAxisConfigurationFormValues>
                       name={`referenceLines.${index}.otherAxisPosition`}
                       id="referenceLines-otherAxisPosition"
                       label={`Percent along ${axis === 'x' ? 'Y' : 'X'} axis`}
@@ -161,7 +161,7 @@ export default function ChartReferenceLineConfigurationForm({
                     legendSize="s"
                     legendWeight="regular"
                   >
-                    <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                    <FormFieldSelect<ChartAxisConfigurationFormValues>
                       className="govuk-!-margin-bottom-2"
                       name={`referenceLines.${index}.otherAxisStart`}
                       id="referenceLines-otherAxisStart"
@@ -173,7 +173,7 @@ export default function ChartReferenceLineConfigurationForm({
                       options={majorAxisOptions}
                     />
                     <br />
-                    <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+                    <FormFieldSelect<ChartAxisConfigurationFormValues>
                       name={`referenceLines.${index}.otherAxisEnd`}
                       id="referenceLines-otherAxisEnd"
                       label="End point"
@@ -189,7 +189,7 @@ export default function ChartReferenceLineConfigurationForm({
             )}
           </>
         ) : (
-          <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+          <FormFieldNumberInput<ChartAxisConfigurationFormValues>
             name={`referenceLines.${index}.otherAxisPosition`}
             id="referenceLines-otherAxisPosition"
             label={axis === 'x' ? 'Y axis position' : 'X axis position'}
@@ -206,7 +206,7 @@ export default function ChartReferenceLineConfigurationForm({
         )}
       </td>
       <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
-        <RHFFormFieldTextInput<ChartAxisConfigurationFormValues>
+        <FormFieldTextInput<ChartAxisConfigurationFormValues>
           name={`referenceLines.${index}.label`}
           id="referenceLines-label"
           label="Label"
@@ -215,7 +215,7 @@ export default function ChartReferenceLineConfigurationForm({
         />
       </td>
       <td className="dfe-vertical-align--bottom">
-        <RHFFormFieldNumberInput<ChartAxisConfigurationFormValues>
+        <FormFieldNumberInput<ChartAxisConfigurationFormValues>
           name={`referenceLines.${index}.labelWidth`}
           id="referenceLines-labelWidth"
           hint="Pixels (optional)"
@@ -226,7 +226,7 @@ export default function ChartReferenceLineConfigurationForm({
         />
       </td>
       <td className="dfe-vertical-align--bottom">
-        <RHFFormFieldSelect<ChartAxisConfigurationFormValues>
+        <FormFieldSelect<ChartAxisConfigurationFormValues>
           className={styles.styleSelect}
           name={`referenceLines.${index}.style`}
           id="referenceLines-style"

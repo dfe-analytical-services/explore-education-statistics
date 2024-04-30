@@ -2,9 +2,9 @@ import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import Effect from '@common/components/Effect';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import {
   AxisConfiguration,
   ChartDefinition,
@@ -240,7 +240,7 @@ const ChartLegendConfiguration = ({
       {({ formState, watch }) => {
         const values = watch();
         return (
-          <RHFForm
+          <Form
             id={formId}
             onSubmit={async () => {
               onSubmit(values);
@@ -263,7 +263,7 @@ const ChartLegendConfiguration = ({
             />
 
             {validationSchema.fields.position && (
-              <RHFFormFieldSelect<ChartLegendFormValues>
+              <FormFieldSelect<ChartLegendFormValues>
                 name="position"
                 hint={
                   capabilities.canPositionLegendInline && showDataLabels
@@ -297,7 +297,7 @@ const ChartLegendConfiguration = ({
             >
               {buttons}
             </ChartBuilderSaveActions>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

@@ -2,10 +2,10 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -58,7 +58,7 @@ export default function EditableKeyStatDataBlockForm({
     >
       {({ formState }) => {
         return (
-          <RHFForm
+          <Form
             id={`editableKeyStatDataBlockForm-${keyStat.id}`}
             onSubmit={handleSubmit}
           >
@@ -69,19 +69,19 @@ export default function EditableKeyStatDataBlockForm({
               value={statistic}
               isReordering={isReordering}
             >
-              <RHFFormFieldTextInput<KeyStatDataBlockFormValues>
+              <FormFieldTextInput<KeyStatDataBlockFormValues>
                 name="trend"
                 label={<span className={styles.trendText}>Trend</span>}
               />
             </KeyStatTile>
 
-            <RHFFormFieldTextInput<KeyStatDataBlockFormValues>
+            <FormFieldTextInput<KeyStatDataBlockFormValues>
               formGroupClass="govuk-!-margin-top-2"
               name="guidanceTitle"
               label="Guidance title"
             />
 
-            <RHFFormFieldTextArea<KeyStatDataBlockFormValues>
+            <FormFieldTextArea<KeyStatDataBlockFormValues>
               label="Guidance text"
               name="guidanceText"
               rows={3}
@@ -95,7 +95,7 @@ export default function EditableKeyStatDataBlockForm({
                 Cancel
               </Button>
             </ButtonGroup>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

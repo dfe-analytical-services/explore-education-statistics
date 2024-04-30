@@ -1,8 +1,8 @@
 import { FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
@@ -171,25 +171,25 @@ const TimePeriodForm = ({
       {({ formState, getValues, reset }) => {
         if (isActive) {
           return (
-            <RHFForm id="timePeriodForm" onSubmit={handleSubmit}>
+            <Form id="timePeriodForm" onSubmit={handleSubmit}>
               <FormFieldset
                 id="timePeriod"
                 hint={options.length === 1 && 'Only one time period available.'}
                 legend={stepHeading}
               >
-                <RHFFormFieldSelect<FormValues>
+                <FormFieldSelect<FormValues>
                   name="start"
                   label="Start date"
                   disabled={formState.isSubmitting}
                   options={timePeriodOptions}
-                  order={RHFFormFieldSelect.unordered}
+                  order={FormFieldSelect.unordered}
                 />
-                <RHFFormFieldSelect<FormValues>
+                <FormFieldSelect<FormValues>
                   name="end"
                   label="End date"
                   disabled={formState.isSubmitting}
                   options={timePeriodOptions}
-                  order={RHFFormFieldSelect.unordered}
+                  order={FormFieldSelect.unordered}
                 />
               </FormFieldset>
 
@@ -197,7 +197,7 @@ const TimePeriodForm = ({
                 {...stepProps}
                 isSubmitting={formState.isSubmitting}
               />
-            </RHFForm>
+            </Form>
           );
         }
 

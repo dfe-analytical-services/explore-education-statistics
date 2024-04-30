@@ -1,7 +1,7 @@
 import Button from '@common/components/Button';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import useMounted from '@common/hooks/useMounted';
 import publicationService, {
   PublicationTitle,
@@ -113,8 +113,8 @@ const SubscriptionPage: NextPage<Props> = ({
             >
               {({ formState }) => {
                 return (
-                  <RHFForm id="subscriptionForm" onSubmit={handleFormSubmit}>
-                    <RHFFormFieldTextInput<FormValues>
+                  <Form id="subscriptionForm" onSubmit={handleFormSubmit}>
+                    <FormFieldTextInput<FormValues>
                       label="Enter your email address"
                       hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
                       name="email"
@@ -126,7 +126,7 @@ const SubscriptionPage: NextPage<Props> = ({
                         ? 'Submitting'
                         : 'Subscribe'}
                     </Button>
-                  </RHFForm>
+                  </Form>
                 );
               }}
             </FormProvider>

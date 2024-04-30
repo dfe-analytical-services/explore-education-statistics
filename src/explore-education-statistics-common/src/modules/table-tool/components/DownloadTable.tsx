@@ -1,6 +1,6 @@
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -70,7 +70,7 @@ const DownloadTable = ({
     >
       {({ formState }) => {
         return (
-          <RHFForm
+          <Form
             id="downloadTableForm"
             onSubmit={async ({ fileFormat }) => {
               await onSubmit?.(fileFormat);
@@ -90,7 +90,7 @@ const DownloadTable = ({
                 },
                 'Download Table',
               )}
-              <RHFFormFieldRadioGroup<FormValues>
+              <FormFieldRadioGroup<FormValues>
                 legend="Select file format:"
                 legendSize="s"
                 legendWeight="regular"
@@ -125,7 +125,7 @@ const DownloadTable = ({
                 />
               </ButtonGroup>
             </>
-          </RHFForm>
+          </Form>
         );
       }}
     </FormProvider>

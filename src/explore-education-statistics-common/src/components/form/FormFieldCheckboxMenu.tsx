@@ -1,11 +1,18 @@
 import DetailsMenu from '@common/components/DetailsMenu';
-import { FormFieldCheckboxSearchGroupProps } from '@common/components/form/FormFieldCheckboxSearchGroup';
-import RHFFormCheckboxSelectedCount from '@common/components/form/rhf/RHFFormCheckboxSelectedCount';
-import RHFFormFieldCheckboxSearchGroup from '@common/components/form/rhf/RHFFormFieldCheckboxSearchGroup';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import FormCheckboxSelectedCount from '@common/components/form/FormCheckboxSelectedCount';
+import FormFieldCheckboxSearchGroup from '@common/components/form/FormFieldCheckboxSearchGroup';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
+import { FormFieldComponentProps } from '@common/components/form/FormField';
+import { FormCheckboxSearchGroupProps } from '@common/components/form/FormCheckboxSearchGroup';
+import { OmitStrict } from '@common/types';
 import get from 'lodash/get';
 import React, { useEffect, useState } from 'react';
 import { FieldValues, useFormContext } from 'react-hook-form';
+
+export type FormFieldCheckboxSearchGroupProps<FormValues> = OmitStrict<
+  FormFieldComponentProps<FormCheckboxSearchGroupProps, FormValues>,
+  'formGroup'
+>;
 
 interface Props<TFormValues extends FieldValues>
   extends FormFieldCheckboxSearchGroupProps<TFormValues> {
@@ -13,9 +20,9 @@ interface Props<TFormValues extends FieldValues>
   open?: boolean;
 }
 
-export default function RHFFormFieldCheckboxMenu<
-  TFormValues extends FieldValues,
->(props: Props<TFormValues>) {
+export default function FormFieldCheckboxMenu<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
   const { name, open: defaultOpen = false, options, legend, id } = props;
   const [open, setOpen] = useState(defaultOpen);
   const {
@@ -34,10 +41,10 @@ export default function RHFFormFieldCheckboxMenu<
       open={open}
       jsRequired
       summary={legend}
-      summaryAfter={<RHFFormCheckboxSelectedCount name={name} />}
+      summaryAfter={<FormCheckboxSelectedCount name={name} />}
     >
       {options.length > 1 ? (
-        <RHFFormFieldCheckboxSearchGroup
+        <FormFieldCheckboxSearchGroup
           selectAll
           legendHidden
           {...props}
@@ -45,7 +52,7 @@ export default function RHFFormFieldCheckboxMenu<
           options={options}
         />
       ) : (
-        <RHFFormFieldCheckboxGroup {...props} name={name} options={options} />
+        <FormFieldCheckboxGroup {...props} name={name} options={options} />
       )}
     </DetailsMenu>
   );

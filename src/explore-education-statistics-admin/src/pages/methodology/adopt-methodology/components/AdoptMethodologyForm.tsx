@@ -1,4 +1,4 @@
-import RHFFormFieldRadioSearchGroup from '@common/components/form/rhf/RHFFormFieldRadioSearchGroup';
+import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
@@ -12,8 +12,8 @@ import { MethodologyVersion } from '@admin/services/methodologyService';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
 import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
@@ -89,8 +89,8 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
       initialValues={{ methodologyId: '' }}
       validationSchema={validationSchema}
     >
-      <RHFForm id="adoptMethodologyForm" onSubmit={onSubmit}>
-        <RHFFormFieldRadioSearchGroup
+      <Form id="adoptMethodologyForm" onSubmit={onSubmit}>
+        <FormFieldRadioSearchGroup
           id="selectMethodology"
           legend="Select a published methodology"
           name="methodologyId"
@@ -101,7 +101,7 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
           <Button type="submit">Save</Button>
           <ButtonText onClick={onCancel}>Cancel</ButtonText>
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 };

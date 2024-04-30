@@ -1,24 +1,37 @@
-import { FieldHelperProps, FieldMetaProps } from 'formik';
+import { CheckboxOption } from '@common/components/form/FormCheckboxGroup';
 import difference from 'lodash/difference';
-import { CheckboxOption } from '../FormCheckboxGroup';
+import {
+  FieldValues,
+  Path,
+  PathValue,
+  UseFormSetValue,
+  UseFormTrigger,
+} from 'react-hook-form';
 
-export default function handleAllChange({
-  checked,
-  meta,
-  helpers,
-  options,
-}: {
+interface Props<TFormValues extends FieldValues> {
+  name: Path<TFormValues>;
   checked: boolean;
-  meta: FieldMetaProps<string[]>;
-  helpers: FieldHelperProps<string[]>;
   options: CheckboxOption[];
-}): void {
-  const allOptionValues = options.map(option => option.value);
-  const restValues = difference(meta.value, allOptionValues);
+  selectedValues: string[];
+  setValue: UseFormSetValue<TFormValues>;
+  trigger: UseFormTrigger<TFormValues>;
+}
 
-  if (!checked) {
-    helpers.setValue([...restValues, ...allOptionValues]);
-  } else {
-    helpers.setValue(restValues);
-  }
+export default function handleAllCheckboxChange<
+  TFormValues extends FieldValues,
+>({
+  checked,
+  name,
+  options,
+  selectedValues,
+  setValue,
+  trigger,
+}: Props<TFormValues>): void {
+  const allOptionValues = options.map(option => option.value);
+  const restValues = difference(selectedValues, allOptionValues);
+  const nextValues = checked ? restValues : [...restValues, ...allOptionValues];
+
+  setValue(name, nextValues as PathValue<TFormValues, Path<TFormValues>>);
+
+  trigger(name);
 }

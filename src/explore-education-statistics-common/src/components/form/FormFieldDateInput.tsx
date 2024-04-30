@@ -3,25 +3,31 @@ import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
 import { PartialDate } from '@common/utils/date/partialDate';
-import delay from '@common/utils/delay';
 import parseNumber from '@common/utils/number/parseNumber';
 import { isValid, parse } from 'date-fns';
-import { FormikErrors, useField } from 'formik';
 import last from 'lodash/last';
-import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
+import {
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
+import getErrorMessage from './util/getErrorMessage';
 
-interface Props<FormValues> {
+interface Props<TFormValues> {
   hint?: string;
   id?: string;
   legend: string;
   legendSize?: 'xl' | 'l' | 'm' | 's';
-  name: keyof FormValues | string;
+  name: Path<TFormValues>;
   partialDateType?: 'dayMonthYear' | 'monthYear';
   showError?: boolean;
   type?: 'date' | 'partialDate';
 }
 
-function FormFieldDateInput<FormValues>({
+export default function FormFieldDateInput<TFormValues extends FieldValues>({
   id: customId,
   name,
   showError = true,
@@ -30,42 +36,39 @@ function FormFieldDateInput<FormValues>({
   legendSize = 'l',
   partialDateType = 'dayMonthYear',
   type = 'date',
-}: Props<FormValues>) {
+}: Props<TFormValues>) {
   const { fieldId } = useFormIdContext();
   const id = fieldId(name as string, customId);
 
-  const isFocused = useRef(false);
+  const {
+    formState: { errors },
+    setValue,
+    trigger,
+  } = useFormContext<TFormValues>();
 
-  const [field, meta, helpers] = useField<
-    Date | Partial<PartialDate> | undefined
-  >(name as string);
+  const value = useWatch({ name });
 
   const [values, setValues] = useState<Partial<PartialDate>>(() => {
-    if (field.value instanceof Date) {
+    const dateValue = value as Date;
+    if (value && typeof dateValue.getDate === 'function') {
       return {
-        day: field.value?.getDate(),
+        day: dateValue.getDate(),
         month:
-          typeof field.value?.getMonth() === 'number'
-            ? field.value.getMonth() + 1
+          typeof dateValue.getMonth() === 'number'
+            ? dateValue.getMonth() + 1
             : undefined,
-        year: field.value?.getFullYear(),
+        year: dateValue.getFullYear(),
       };
     }
 
+    const partialDateValue = value as PartialDate;
+
     return {
-      day: field.value?.day,
-      month: field.value?.month,
-      year: field.value?.year,
+      day: partialDateValue?.day,
+      month: partialDateValue?.month,
+      year: partialDateValue?.year,
     };
   });
-
-  const error =
-    showError && meta.error && meta.touched
-      ? (meta.error as FormikErrors<PartialDate> | string)
-      : {};
-
-  const errorMessage =
-    typeof error === 'string' ? error : Object.values(error)[0] ?? '';
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -84,17 +87,29 @@ function FormFieldDateInput<FormValues>({
       if (type === 'date') {
         const date = parse(`${year}-${month}-${day}Z`, 'yyyy-M-dX', new Date());
 
-        helpers.setValue(isValid(date) ? date : undefined);
+        const newDateValue = isValid(date) ? date : undefined;
+        setValue(
+          name,
+          newDateValue as PathValue<TFormValues, Path<TFormValues>>,
+          { shouldTouch: true },
+        );
       } else {
-        helpers.setValue({ day, month, year });
+        const nextValue =
+          !day && !month && !year ? undefined : { day, month, year };
+
+        setValue(name, nextValue as PathValue<TFormValues, Path<TFormValues>>, {
+          shouldTouch: true,
+        });
       }
 
       setValues({
         ...values,
         [key]: inputValue,
       });
+
+      trigger(name);
     },
-    [helpers, type, values],
+    [name, setValue, trigger, type, values],
   );
 
   return (
@@ -103,24 +118,8 @@ function FormFieldDateInput<FormValues>({
       legend={legend}
       legendSize={legendSize}
       hint={hint}
-      error={errorMessage}
+      error={getErrorMessage(errors, name, showError)}
       useFormId={false}
-      onBlur={async event => {
-        event.persist();
-
-        if (isFocused.current) {
-          isFocused.current = false;
-        }
-
-        await delay();
-
-        if (!isFocused.current) {
-          field.onBlur(event);
-        }
-      }}
-      onFocus={() => {
-        isFocused.current = true;
-      }}
     >
       {(partialDateType === 'dayMonthYear' || type === 'date') && (
         <FormGroup className="govuk-date-input__item">
@@ -159,5 +158,3 @@ function FormFieldDateInput<FormValues>({
     </FormFieldset>
   );
 }
-
-export default FormFieldDateInput;

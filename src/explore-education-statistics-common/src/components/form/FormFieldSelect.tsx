@@ -1,13 +1,21 @@
 import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';
+import FormSelect, {
+  FormSelectProps,
+} from '@common/components/form/FormSelect';
 import React from 'react';
-import FormSelect, { FormSelectProps } from './FormSelect';
+import { FieldValues } from 'react-hook-form';
 
-type Props<FormValues> = FormFieldComponentProps<FormSelectProps, FormValues>;
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
+  FormSelectProps,
+  TFormValues
+>;
 
-function FormFieldSelect<FormValues>(props: Props<FormValues>) {
+export default function FormFieldSelect<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
   return <FormField {...props} as={FormSelect} />;
 }
 
-export default FormFieldSelect;
+FormFieldSelect.unordered = [] as [];

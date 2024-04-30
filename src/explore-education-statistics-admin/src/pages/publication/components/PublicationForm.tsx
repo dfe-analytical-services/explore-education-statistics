@@ -2,10 +2,10 @@ import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormFieldset } from '@common/components/form';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFForm from '@common/components/form/rhf/RHFForm';
-import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/FormProvider';
+import Form from '@common/components/form/Form';
+import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React, { ReactNode, useMemo } from 'react';
@@ -120,14 +120,14 @@ export default function PublicationForm({
       }}
       validationSchema={validationSchema}
     >
-      <RHFForm id={id} onSubmit={handleSubmit}>
-        <RHFFormFieldTextInput<FormValues>
+      <Form id={id} onSubmit={handleSubmit}>
+        <FormFieldTextInput<FormValues>
           label="Publication title"
           name="title"
           className="govuk-!-width-two-thirds"
         />
 
-        <RHFFormFieldTextArea<FormValues>
+        <FormFieldTextArea<FormValues>
           label="Publication summary"
           name="summary"
           className="govuk-!-width-one-half"
@@ -140,25 +140,25 @@ export default function PublicationForm({
           legendSize="m"
           hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
         >
-          <RHFFormFieldTextInput<FormValues>
+          <FormFieldTextInput<FormValues>
             name="teamName"
             label="Team name"
             className="govuk-!-width-one-half"
           />
 
-          <RHFFormFieldTextInput<FormValues>
+          <FormFieldTextInput<FormValues>
             name="teamEmail"
             label="Team email address"
             className="govuk-!-width-one-half"
           />
 
-          <RHFFormFieldTextInput<FormValues>
+          <FormFieldTextInput<FormValues>
             name="contactName"
             label="Contact name"
             className="govuk-!-width-one-half"
           />
 
-          <RHFFormFieldTextInput<FormValues>
+          <FormFieldTextInput<FormValues>
             name="contactTelNo"
             label="Contact telephone (optional)"
             width={10}
@@ -170,7 +170,7 @@ export default function PublicationForm({
 
           {cancelButton}
         </ButtonGroup>
-      </RHFForm>
+      </Form>
     </FormProvider>
   );
 }

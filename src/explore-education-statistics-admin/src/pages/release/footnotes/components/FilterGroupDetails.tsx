@@ -1,7 +1,7 @@
 import { FootnoteSubjectMeta } from '@admin/services/footnoteService';
 import Details from '@common/components/Details';
-import RHFFormFieldCheckbox from '@common/components/form/rhf/RHFFormFieldCheckbox';
-import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
+import FormFieldCheckboxGroup from '@common/components/form/FormFieldCheckboxGroup';
 import classNames from 'classnames';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -32,7 +32,7 @@ export default function FilterGroupDetails({
       testId={`filter-${groupId}`}
     >
       {selectAll && groupId && (
-        <RHFFormFieldCheckbox
+        <FormFieldCheckbox
           name={`${groupPath}.selected`}
           label="Select all"
           small
@@ -52,7 +52,7 @@ export default function FilterGroupDetails({
         return (
           <div key={filterGroupId}>
             {!hideGrouping && (
-              <RHFFormFieldCheckbox
+              <FormFieldCheckbox
                 name={`${groupPath}.filterGroups[${filterGroupId}].selected`}
                 label={`${filterGroup.label}${groupValue ? ' (All)' : ''}`}
                 small
@@ -67,7 +67,7 @@ export default function FilterGroupDetails({
                 'govuk-!-margin-left-4 govuk-!-margin-bottom-3': !hideGrouping,
               })}
             >
-              <RHFFormFieldCheckboxGroup
+              <FormFieldCheckboxGroup
                 name={`${groupPath}.filterGroups[${filterGroupId}].filterItems`}
                 options={filterGroup.options}
                 legend={filterGroup.label}

@@ -1,6 +1,6 @@
 import { ChartDataGroupingFormValues } from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingForm';
 import Button from '@common/components/Button';
-import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import Tooltip from '@common/components/Tooltip';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { CustomDataGroup } from '@common/modules/charts/types/chart';
@@ -68,7 +68,7 @@ export default function ChartCustomDataGroupingsConfiguration({
 
         <tr>
           <td className="dfe-vertical-align--bottom">
-            <RHFFormFieldNumberInput
+            <FormFieldNumberInput
               errorString={
                 touchedFields.min && !hasMinValue ? 'Enter a minimum value' : ''
               }
@@ -80,7 +80,7 @@ export default function ChartCustomDataGroupingsConfiguration({
             />
           </td>
           <td className="dfe-vertical-align--bottom">
-            <RHFFormFieldNumberInput
+            <FormFieldNumberInput
               errorString={
                 touchedFields.max && !hasMaxValue ? 'Enter a maximum value' : ''
               }

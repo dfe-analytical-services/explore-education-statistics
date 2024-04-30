@@ -1,7 +1,7 @@
 import ButtonText from '@common/components/ButtonText';
-import FormProvider from '@common/components/form/rhf/FormProvider';
-import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
-import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/FormProvider';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import Form from '@common/components/form/Form';
 import Button from '@common/components/Button';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -41,7 +41,7 @@ const PrototypeEditPublicationSubjectTitle = ({
             title: Yup.string().required('Enter a title'),
           })}
         >
-          <RHFForm
+          <Form
             id="dataFileForm"
             onSubmit={values => {
               onSubmit({
@@ -50,14 +50,14 @@ const PrototypeEditPublicationSubjectTitle = ({
               });
             }}
           >
-            <RHFFormFieldTextInput<FormValues>
+            <FormFieldTextInput<FormValues>
               className="govuk-!-width-two-thirds"
               label="Title"
               name="title"
             />
 
             <Button type="submit">Save</Button>
-          </RHFForm>
+          </Form>
         </FormProvider>
       </section>
     </>
