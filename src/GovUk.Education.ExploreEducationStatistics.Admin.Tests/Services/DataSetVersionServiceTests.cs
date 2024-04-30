@@ -18,14 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class DataSetVersionServiceTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
-    public class GetDataSetImportsInProgressTests(TestApplicationFactory testApp) : DataSetVersionServiceTests(testApp)
+    public class GetStatusesForReleaseVersionTests(TestApplicationFactory testApp) : DataSetVersionServiceTests(testApp)
     {
         /// <summary>
-        /// Test that each "terminal" import status (i.e. statuses whereby the importing process has finished
-        /// processing for some reason) reports that no imports are in progress. 
+        /// Test that each DataSetVersion status is reported correctly.
         /// </summary>
         [Fact]
-        public async Task GetStatusesForReleaseVersion()
+        public async Task AllStatuses()
         {
             await GetEnums<DataSetVersionStatus>()
                 .ToAsyncEnumerable()
@@ -33,7 +32,7 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
         }
         
         /// <summary>
-        /// Test the scenario when data set imports are in progress, but for an unrelated ReleaseVersion.
+        /// Test the scenario when data set versions exist, but for an unrelated ReleaseVersion.
         /// </summary>
         [Fact]
         public async Task DataSetVersionForDifferentReleaseVersion()
@@ -104,6 +103,8 @@ public class DataSetVersionServiceTests(TestApplicationFactory testApp) : Integr
             var service = testApp.Services.GetRequiredService<IDataSetVersionService>();
 
             var statusSummary = Assert.Single(await service.GetStatusesForReleaseVersion(dataFile.ReleaseVersionId));
+            Assert.Equal(dataSetVersion.Id, statusSummary.Id);
+            Assert.Equal(dataSetVersion.DataSet.Title, statusSummary.Title);
             Assert.Equal(status, statusSummary.Status);
         }
     }

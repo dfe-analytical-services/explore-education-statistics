@@ -20,23 +20,20 @@ public class DataSetVersionService(
     {
         var releaseFileIds = await contentDbContext
             .ReleaseFiles
-            .AsNoTracking()
             .Where(rf => rf.ReleaseVersionId == releaseVersionId && rf.File.Type == FileType.Data)
             .Select(rf => rf.Id)
             .ToListAsync();
 
-        return (await publicDataDbContext
+        return await publicDataDbContext
             .DataSetVersions
-            .AsNoTracking()
             .Where(dataSetVersion => releaseFileIds.Contains(dataSetVersion.ReleaseFileId))
             .Include(dataSetVersion => dataSetVersion.DataSet)
-            .ToListAsync())
             .Select(dataSetVersion => new DataSetVersionStatusSummary(
-                Id: dataSetVersion.Id,
-                Title: dataSetVersion.DataSet.Title,
-                Status: dataSetVersion.Status)
+                dataSetVersion.Id,
+                dataSetVersion.DataSet.Title,
+                dataSetVersion.Status)
             )
-            .ToList();
+            .ToListAsync();
     }
 }
 
