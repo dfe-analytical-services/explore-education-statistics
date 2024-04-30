@@ -520,8 +520,8 @@ public abstract class PublicationsControllerTests(TestApplicationFactory testApp
             Assert.Equal(dataSet.SupersedingDataSetId, result.SupersedingDataSetId);
             Assert.Equal(dataSetVersion.Version, result.LatestVersion.Version);
             Assert.Equal(
-                dataSetVersion.Published!.Value.ToUnixTimeSeconds(),
-                result.LatestVersion.Published.ToUnixTimeSeconds()
+                dataSetVersion.Published.TruncateNanoseconds(),
+                result.LatestVersion.Published
             );
             Assert.Equal(dataSetVersion.TotalResults, result.LatestVersion.TotalResults);
             Assert.Equal(

@@ -1,4 +1,5 @@
 using System;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
@@ -40,8 +41,7 @@ public static class DateTimeOffsetTestExtensions
     /// <returns></returns>
     public static DateTimeOffset TruncateNanoseconds(this DateTimeOffset? offset)
     {
-        return offset == null
-            ? throw new ArgumentException("offset cannot be null")
-            : TruncateNanoseconds((DateTimeOffset)offset);
+        Assert.NotNull(offset);
+        return TruncateNanoseconds((DateTimeOffset)offset);
     }
 }
