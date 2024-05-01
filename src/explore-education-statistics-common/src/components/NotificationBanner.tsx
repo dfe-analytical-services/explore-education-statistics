@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
-  heading: string;
+  heading?: string;
   title: string;
 }
 
@@ -23,7 +23,9 @@ const NotificationBanner = ({ children, heading, title }: Props) => {
         </h2>
       </div>
       <div className="govuk-notification-banner__content">
-        <p className="govuk-notification-banner__heading">{heading}</p>
+        {heading && (
+          <p className="govuk-notification-banner__heading">{heading}</p>
+        )}
         {children}
       </div>
     </div>
