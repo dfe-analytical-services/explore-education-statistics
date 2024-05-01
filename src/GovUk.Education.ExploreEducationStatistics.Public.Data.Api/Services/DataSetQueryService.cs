@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class DataSetQueryService(
     PublicDataDbContext publicDataDbContext,
+    IDuckDbConnection duckDbConnection,
     IUserService userService,
     IDataSetQueryParser dataSetQueryParser,
     IParquetDataRepository dataRepository,
@@ -148,6 +149,8 @@ internal class DataSetQueryService(
         DataSetQueryRequest query,
         CancellationToken cancellationToken)
     {
+        duckDbConnection.Open();
+
         using var _ = MiniProfiler.Current
             .Step($"{nameof(DataSetQueryService)}.{nameof(RunQuery)}");
 
@@ -228,18 +231,22 @@ internal class DataSetQueryService(
             });
         }
 
+        var results = await MapQueryResults(
+            rows: rowsTask.Result,
+            dataSetVersion: dataSetVersion,
+            columnsByType: columnsByType,
+            debug: query.Debug,
+            cancellationToken: cancellationToken);
+
+        duckDbConnection.Close();
+
         return new DataSetQueryPaginatedResultsViewModel
         {
             Paging = new PagingViewModel(
                 page: query.Page,
                 pageSize: query.PageSize,
                 totalResults: (int)countTask.Result),
-            Results = await MapQueryResults(
-                rows: rowsTask.Result,
-                dataSetVersion: dataSetVersion,
-                columnsByType: columnsByType,
-                debug: query.Debug,
-                cancellationToken: cancellationToken),
+            Results = results,
             Warnings = queryState.Warnings
         };
     }
