@@ -97,6 +97,21 @@ internal class DataSetQueryService(
             );
     }
 
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> Query(
+        Guid dataSetId,
+        DataSetQueryRequest request,
+        string? dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
+            .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
+            .OnSuccess(dsv => RunQuery(
+                dataSetVersion: dsv,
+                query: request,
+                cancellationToken: cancellationToken
+            ));
+    }
+
     private async Task<Either<ActionResult, DataSetVersion>> FindDataSetVersion(
         Guid dataSetId,
         string? dataSetVersion,

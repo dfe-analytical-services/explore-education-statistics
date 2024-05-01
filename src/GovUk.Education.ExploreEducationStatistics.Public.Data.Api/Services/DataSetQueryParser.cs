@@ -47,15 +47,29 @@ internal class DataSetQueryParser(
         return ParseCriteriaFragment(criteria, parsers);
     }
 
-    private static Facets ExtractFacets(DataSetQueryCriteria criteria)
+    private static Facets ExtractFacets(DataSetQueryCriteria criteria, Facets? facets = null)
     {
-        var facets = new Facets();
+        facets ??= new Facets();
 
-        if (criteria is DataSetQueryCriteriaFacets criteriaFacets)
+        switch (criteria)
         {
-            facets.Filters.AddRange(criteriaFacets.Filters?.GetOptions() ?? []);
-            facets.Locations.AddRange(criteriaFacets.Locations?.GetOptions() ?? []);
-            facets.TimePeriods.AddRange(criteriaFacets.TimePeriods?.GetOptions() ?? []);
+            case DataSetQueryCriteriaFacets criteriaFacets:
+                facets.Filters.AddRange(criteriaFacets.Filters?.GetOptions() ?? []);
+                facets.Locations.AddRange(criteriaFacets.Locations?.GetOptions() ?? []);
+                facets.TimePeriods.AddRange(criteriaFacets.TimePeriods?.GetOptions() ?? []);
+                break;
+
+            case DataSetQueryCriteriaAnd andCriteria:
+                andCriteria.And.ForEach(subCriteria => ExtractFacets(subCriteria, facets));
+                break;
+
+            case DataSetQueryCriteriaOr orCriteria:
+                orCriteria.Or.ForEach(subCriteria => ExtractFacets(subCriteria, facets));
+                break;
+
+            case DataSetQueryCriteriaNot notCriteria:
+                ExtractFacets(notCriteria.Not, facets);
+                break;
         }
 
         return facets;
@@ -63,18 +77,42 @@ internal class DataSetQueryParser(
 
     private static IInterpolatedSql ParseCriteriaFragment(
         DataSetQueryCriteria criteria,
-        IEnumerable<IFacetsParser> facetParsers)
+        IEnumerable<IFacetsParser> facetParsers,
+        string path = "")
     {
-        var path = "";
         var builder = new DuckDbSqlBuilder();
 
-        if (criteria is DataSetQueryCriteriaFacets criteriaFacets)
+        switch (criteria)
         {
-            var fragments = facetParsers
-                .Select(parser => parser.Parse(criteriaFacets, path))
-                .Where(fragment => !fragment.IsEmpty());
+            case DataSetQueryCriteriaFacets facetCriteria:
+                var facetFragments = facetParsers
+                    .Select(parser => parser.Parse(facetCriteria, path))
+                    .Where(fragment => !fragment.IsEmpty());
 
-            builder.AppendRange(fragments, joinString: "\nAND ");
+                builder.AppendRange(facetFragments, joinString: "\nAND ");
+                break;
+
+            case DataSetQueryCriteriaAnd andCriteria:
+
+
+                var andFragments = andCriteria.And
+                    .Select(c => ParseCriteriaFragment(c, facetParsers, path: $"{path}.And"));
+
+                builder.AppendRange(andFragments, joinString: "\nAND ");
+                break;
+
+            case DataSetQueryCriteriaOr orCriteria:
+                var orFragments = orCriteria.Or
+                    .Select(c => ParseCriteriaFragment(c, facetParsers, path: $"{path}.Or"));
+
+                builder.AppendRange(orFragments, joinString: "\nOR ");
+                break;
+
+            case DataSetQueryCriteriaNot notCriteria:
+                builder.AppendLiteral("NOT (");
+                builder.Append(ParseCriteriaFragment(notCriteria.Not, facetParsers, path: $"{path}.Not"));
+                builder.AppendLiteral(") ");
+                break;
         }
 
         return builder.Build();
