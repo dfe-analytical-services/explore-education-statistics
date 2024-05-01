@@ -232,6 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
+            app.UseMiddleware(typeof(SeoSecurityHeaderMiddleware));
             app.UseMvc();
             app.UseHealthChecks("/api/health");
 
