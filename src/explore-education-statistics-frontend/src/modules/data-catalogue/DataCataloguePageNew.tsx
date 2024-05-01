@@ -473,24 +473,21 @@ export default function DataCataloguePageNew() {
                           <h3>{`${selectedPublication.title} - ${selectedRelease?.title} downloads`}</h3>
                           {selectedRelease && (
                             <>
-                              <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap govuk-!-margin-bottom-6">
-                                <TagGroup className="govuk-!-margin-right-2">
-                                  <Tag>
-                                    {releaseTypes[selectedRelease.type]}
-                                  </Tag>
-                                  <Tag
-                                    colour={
-                                      selectedRelease.latestRelease
-                                        ? undefined
-                                        : 'orange'
-                                    }
-                                  >
-                                    {selectedRelease.latestRelease
-                                      ? 'This is the latest data'
-                                      : 'This is not the latest data'}
-                                  </Tag>
-                                </TagGroup>
-
+                              <TagGroup>
+                                <Tag>{releaseTypes[selectedRelease.type]}</Tag>
+                                <Tag
+                                  colour={
+                                    selectedRelease.latestRelease
+                                      ? undefined
+                                      : 'orange'
+                                  }
+                                >
+                                  {selectedRelease.latestRelease
+                                    ? 'This is the latest data'
+                                    : 'This is not the latest data'}
+                                </Tag>
+                              </TagGroup>
+                              <div className="govuk-!-margin-bottom-5 govuk-!-margin-top-3">
                                 <Link
                                   to={`/find-statistics/${selectedPublication.slug}/${selectedRelease.slug}`}
                                 >
