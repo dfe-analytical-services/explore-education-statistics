@@ -9,6 +9,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import Button from '@common/components/Button';
+import NotificationBanner from '@common/components/NotificationBanner';
 import { releaseTypes } from '@common/services/types/releaseType';
 import downloadService from '@common/services/downloadService';
 import { Theme } from '@common/services/publicationService';
@@ -261,6 +262,19 @@ export default function DataCataloguePageNew() {
           : undefined
       }
     >
+      <NotificationBanner title="This page has changed">
+        Following user feedback we've made some changes to this page to make our
+        publications easier to find, if you have any comments on the new design
+        please let us know via the{' '}
+        <a
+          href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          feedback survey
+        </a>
+        .
+      </NotificationBanner>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">
