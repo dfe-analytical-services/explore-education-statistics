@@ -10,6 +10,8 @@ const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const referrerPolicy = require('referrer-policy');
 
+const seoRedirects = require('./redirects');
+
 loadEnvConfig(__dirname);
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
@@ -99,6 +101,11 @@ async function startServer() {
     // but it seems current advice is actually to ignore these:
     // https://support.google.com/webmasters/thread/253569816/google-crawler-adding-a-1000-to-the-end-of-a-ton-of-urls?hl=en
     // newUri = replaceLastOccurance(newUri, '/1000', '');
+
+    const urlMatch = seoRedirects.find(source => source.from === req.url);
+    if (urlMatch !== undefined) {
+      newUri = urlMatch.to;
+    }
 
     if (newUri !== req.url) {
       return res.redirect(301, newUri);
