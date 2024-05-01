@@ -17,15 +17,15 @@ using Microsoft.Extensions.Primitives;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
-public abstract class DataSetsControllerQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
+public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory testApp) : IntegrationTestFixture(testApp)
 {
     private const string BaseUrl = "api/v1/data-sets";
 
     private readonly TestParquetPathResolver _parquetPathResolver = new();
 
-    public class QueryDataSetsGetTests : DataSetsControllerQueryTests
+    public class GetQueryDataSetsGetTests : DataSetsControllerGetQueryTests
     {
-        public QueryDataSetsGetTests(TestApplicationFactory testApp) : base(testApp)
+        public GetQueryDataSetsGetTests(TestApplicationFactory testApp) : base(testApp)
         {
             _parquetPathResolver.Directory = "AbsenceSchool";
         }
