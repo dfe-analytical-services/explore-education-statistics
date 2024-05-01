@@ -35,7 +35,7 @@
     "react-dom": "18.2.0",
     "react-highlight-words": "^0.20.0",
     "react-hook-form": "7.43.9",
-    "react-lazyload": "github:twobin/react-lazyload#f1faffda816180f39d3ff8cf3d9c2060f8d9d623",
+    "react-lazyload": "3.2.1",
     "react-leaflet": "^4.2.1",
     "react-markdown": "^8.0.0",
     "recharts": "^2.7.2",
