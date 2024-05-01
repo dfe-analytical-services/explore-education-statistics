@@ -268,4 +268,34 @@ public class DataSetsController(
             .Query(dataSetId, request, dataSetVersion, cancellationToken)
             .HandleFailuresOrOk();
     }
+
+    /// <summary>
+    /// Query a data set (POST)
+    /// </summary>
+    /// <remarks>
+    /// Query a data set using a `POST` request, returning the filtered results.
+    ///
+    /// Note that for simpler queries or exploratory testing, there is also GET variant of this endpoint
+    /// only handles a smaller subset of querying functionality. However, for most use-cases,
+    /// this endpoint is recommended as it provides the complete set of functionality.
+    ///
+    /// Unlike the `GET` endpoint, the `POST` endpoint allows condition criteria (`and`, `or`, `not`)
+    /// and consequently can express more complex queries.
+    /// </remarks>
+    [HttpPost("{dataSetId:guid}/query")]
+    [Produces("application/json")]
+    [SwaggerResponse(200, "The paginated list of query results", type: typeof(DataSetQueryPaginatedResultsViewModel))]
+    [SwaggerResponse(400, type: typeof(ValidationProblemViewModel))]
+    [SwaggerResponse(403, type: typeof(ProblemDetailsViewModel))]
+    [SwaggerResponse(404, type: typeof(ProblemDetailsViewModel))]
+    public async Task<ActionResult<DataSetQueryPaginatedResultsViewModel>> QueryDataSetPost(
+        [SwaggerParameter("The ID of the data set.")] Guid dataSetId,
+        [SwaggerParameter("The version of the data set to use e.g. 2.0, 1.1, etc.")][FromQuery] string? dataSetVersion,
+        [FromBody] DataSetQueryRequest request,
+        CancellationToken cancellationToken)
+    {
+        return await dataSetQueryService
+            .Query(dataSetId, request, dataSetVersion, cancellationToken)
+            .HandleFailuresOrOk();
+    }
 }

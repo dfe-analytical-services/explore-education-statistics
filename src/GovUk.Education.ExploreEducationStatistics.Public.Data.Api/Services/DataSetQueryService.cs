@@ -97,6 +97,22 @@ internal class DataSetQueryService(
             );
     }
 
+    public async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> Query(
+        Guid dataSetId,
+        DataSetQueryRequest request,
+        string? dataSetVersion,
+        CancellationToken cancellationToken = default)
+    {
+        return await FindDataSetVersion(dataSetId, dataSetVersion, cancellationToken)
+            .OnSuccessDo(userService.CheckCanQueryDataSetVersion)
+            .OnSuccess(dsv => RunQuery(
+                dataSetVersion: dsv,
+                query: request,
+                cancellationToken: cancellationToken,
+                baseCriteriaPath: "criteria"
+            ));
+    }
+
     private async Task<Either<ActionResult, DataSetVersion>> FindDataSetVersion(
         Guid dataSetId,
         string? dataSetVersion,
@@ -131,7 +147,8 @@ internal class DataSetQueryService(
     private async Task<Either<ActionResult, DataSetQueryPaginatedResultsViewModel>> RunQuery(
         DataSetVersion dataSetVersion,
         DataSetQueryRequest query,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string baseCriteriaPath = "")
     {
         using var _ = MiniProfiler.Current
             .Step($"{nameof(DataSetQueryService)}.{nameof(RunQuery)}");
@@ -143,10 +160,11 @@ internal class DataSetQueryService(
         if (query.Criteria is not null)
         {
             whereBuilder += await dataSetQueryParser.ParseCriteria(
-                query.Criteria,
-                dataSetVersion,
-                queryState,
-                cancellationToken
+                criteria: query.Criteria,
+                dataSetVersion: dataSetVersion,
+                queryState: queryState,
+                basePath: baseCriteriaPath,
+                cancellationToken: cancellationToken
             );
         }
 

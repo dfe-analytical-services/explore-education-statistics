@@ -16,7 +16,7 @@ public record DataSetQueryRequest
     /// <summary>
     /// The IDs of indicators in the data set to return values for.
     /// </summary>
-    public required IReadOnlyList<string> Indicators { get; init; }
+    public IReadOnlyList<string> Indicators { get; init; } = [];
 
     /// <summary>
     /// The sorts to sort the results by. Sorts at the start of the
