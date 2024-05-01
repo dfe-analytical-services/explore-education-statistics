@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -47,6 +48,13 @@ public static class HttpResponseMessageTestExtensions
         Assert.Equal(Created, message.StatusCode);
         Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
         return message.AssertBodyEqualTo(expectedBody, useSystemJson);
+    }
+
+    public static void AssertHasHeader(this HttpResponseMessage message, string headerKey, string expectedHeaderValue)
+    {
+        message.Headers.TryGetValues(headerKey, out var headerValue);
+        Assert.NotNull(headerValue);
+        Assert.Equal(headerValue.FirstOrDefault(), expectedHeaderValue);
     }
 
     public static void AssertNoContent(this HttpResponseMessage message)
