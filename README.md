@@ -201,12 +201,13 @@ The service can be started against a set of non-existent database. If no pre-exi
    connect to these new databases and run:
    ```sql
    -- Against the `master` database
-   CREATE Login [adminapp] WITH PASSWORD = 'Your_Password123';
-   CREATE Login [importer] WITH PASSWORD = 'Your_Password123';
-   CREATE Login [publisher] WITH PASSWORD = 'Your_Password123';
-   CREATE Login [content] WITH PASSWORD = 'Your_Password123';
-   CREATE Login [data] WITH PASSWORD = 'Your_Password123';
-   
+   CREATE LOGIN [adminapp] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [importer] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [publisher] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [content] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [data] WITH PASSWORD = 'Your_Password123';
+   CREATE LOGIN [public_data_processor] WITH PASSWORD = 'Your_Password123';
+
    -- Against the `content` database
    CREATE USER [adminapp] FROM LOGIN [adminapp];
    ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
@@ -214,7 +215,7 @@ The service can be started against a set of non-existent database. If no pre-exi
    ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
    ALTER ROLE [db_securityadmin] add member [adminapp];
    GRANT ALTER ANY USER TO [adminapp];
-   
+
    -- Against the `statistics` database
    CREATE USER [adminapp] FROM LOGIN [adminapp];
    ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];

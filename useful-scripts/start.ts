@@ -159,7 +159,7 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     colour: chalk.blue,
     port: 7074,
     type: 'func',
-    dockerServices: ['data-storage'],
+    dockerServices: ['db', 'public-api-db', 'data-storage'],
   },
   idp: {
     service: 'idp',
