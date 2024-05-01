@@ -100,15 +100,6 @@ async function startServer() {
     // https://support.google.com/webmasters/thread/253569816/google-crawler-adding-a-1000-to-the-end-of-a-ton-of-urls?hl=en
     // newUri = replaceLastOccurance(newUri, '/1000', '');
 
-    // TODO: Remove these redirects after Google's index is updated (will happen within 6 months)
-    // https://dfedigital.atlassian.net/browse/EES-4979
-    newUri = replaceLastOccurance(newUri, '/meta-guidance', '/data-guidance');
-    newUri = replaceLastOccurance(
-      newUri,
-      '/download-latest-data',
-      '/data-catalogue',
-    );
-
     if (newUri !== req.url) {
       return res.redirect(301, newUri);
     }
