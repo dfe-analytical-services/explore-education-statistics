@@ -21,19 +21,35 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 {
     private const string BaseUrl = "api/v1/data-sets";
 
-    private readonly TestParquetPathResolver _parquetPathResolver = new();
-
-    public class GetQueryDataSetsGetTests : DataSetsControllerGetQueryTests
+    private readonly TestParquetPathResolver _parquetPathResolver = new()
     {
-        public GetQueryDataSetsGetTests(TestApplicationFactory testApp) : base(testApp)
+        Directory = "AbsenceSchool"
+    };
+
+    public class AccessTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData(DataSetVersionStatus.Processing)]
+        [InlineData(DataSetVersionStatus.Failed)]
+        [InlineData(DataSetVersionStatus.Draft)]
+        [InlineData(DataSetVersionStatus.Mapping)]
+        [InlineData(DataSetVersionStatus.Withdrawn)]
+        public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
         {
-            _parquetPathResolver.Directory = "AbsenceSchool";
+            var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"]
+            );
+
+            response.AssertForbidden();
         }
 
         [Theory]
         [InlineData(DataSetVersionStatus.Published)]
         [InlineData(DataSetVersionStatus.Deprecated)]
-        public async Task VersionAvailable_Returns200_CorrectViewModel(DataSetVersionStatus versionStatus)
+        public async Task VersionAvailable_Returns200(DataSetVersionStatus versionStatus)
         {
             var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
 
@@ -51,25 +67,865 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Empty(viewModel.Warnings);
 
             Assert.Equal(216, viewModel.Results.Count);
+        }
 
-            var result = viewModel.Results[0];
+        [Fact]
+        public async Task DataSetDoesNotExist_Returns404()
+        {
+            var response = await QueryDataSet(
+                dataSetId: Guid.NewGuid(),
+                indicators: ["sess_authorised"]
+            );
 
-            Assert.Equal(2, result.Filters.Count);
-            Assert.Equal("pTSoj", result.Filters["ncyear"]);
-            Assert.Equal("0kT5D", result.Filters["school_type"]);
+            response.AssertNotFound();
+        }
 
-            Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
+        [Fact]
+        public async Task VersionDoesNotExist_Returns404()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
 
-            Assert.Equal(3, result.Locations.Count);
-            Assert.Equal("dP0Zw", result.Locations[GeographicLevel.LocalAuthority.GetEnumValue()]);
-            Assert.Equal("pTSoj", result.Locations[GeographicLevel.Country.GetEnumValue()]);
-            Assert.Equal("it6Xr", result.Locations[GeographicLevel.Region.GetEnumValue()]);
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                dataSetVersion: "2.0",
+                indicators: ["sess_authorised"]
+            );
 
-            Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriod.Code);
-            Assert.Equal("2022/2023", result.TimePeriod.Period);
+            response.AssertNotFound();
+        }
+    }
 
-            Assert.Single(result.Values);
-            Assert.Equal("4064499", result.Values["sess_authorised"]);
+    public class FiltersValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData("filters.in")]
+        [InlineData("filters.notIn")]
+        public async Task Empty_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        $"{path}[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasNotEmptyError(path);
+        }
+
+        [Theory]
+        [InlineData("filters.in")]
+        [InlineData("filters.notIn")]
+        public async Task InvalidMix_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidFilters =
+            [
+                "",
+                " ",
+                "  ",
+                new string('a', 11),
+                new string('a', 12),
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, invalidFilters }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(5, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasNotEmptyError($"{path}[0]");
+            validationProblem.AssertHasNotEmptyError($"{path}[1]");
+            validationProblem.AssertHasNotEmptyError($"{path}[2]");
+            validationProblem.AssertHasMaximumLengthError($"{path}[3]", maxLength: 10);
+            validationProblem.AssertHasMaximumLengthError($"{path}[4]", maxLength: 10);
+        }
+
+        [Fact]
+        public async Task AllComparatorsInvalid_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidFilters =
+            [
+                new string('a', 11),
+                ""
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "filters.eq", new string('a', 11)
+                    },
+                    {
+                        "filters.notEq", new string('a', 12)
+                    },
+                    {
+                        "filters.in[]", ""
+                    },
+                    {
+                        "filters.notIn", invalidFilters
+                    },
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(5, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasMaximumLengthError("filters.eq", maxLength: 10);
+            validationProblem.AssertHasMaximumLengthError("filters.notEq", maxLength: 10);
+            validationProblem.AssertHasNotEmptyError("filters.in");
+            validationProblem.AssertHasMaximumLengthError("filters.notIn[0]", maxLength: 10);
+            validationProblem.AssertHasNotEmptyError("filters.notIn[1]");
+        }
+
+        [Theory]
+        [InlineData("filters.in")]
+        [InlineData("filters.notIn")]
+        public async Task NotFound_Returns200_HasWarning(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] notFoundFilters =
+            [
+                "invalid",
+                "9999999"
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(["IzBzg", ..notFoundFilters])
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Single(viewModel.Warnings);
+
+            viewModel.AssertHasFiltersNotFoundWarning(path, notFoundFilters);
+        }
+    }
+
+    public class GeographicLevelsValidationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData("geographicLevels.in")]
+        [InlineData("geographicLevels.notIn")]
+        public async Task Empty_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        $"{path}[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasNotEmptyError(path);
+        }
+
+        [Theory]
+        [InlineData("geographicLevels.in")]
+        [InlineData("geographicLevels.notIn")]
+        public async Task InvalidMix_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidLevels =
+            [
+                "",
+                " ",
+                "LADD",
+                "NATT",
+                "National",
+                "Local authority",
+                "LocalAuthority"
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, invalidLevels
+                    }
+                }
+            );
+
+            var allowed = GeographicLevelUtils.OrderedCodes;
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(7, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[0]", value: null, allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[1]", value: null, allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[2]", value: invalidLevels[2], allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[3]", value: invalidLevels[3], allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[4]", value: invalidLevels[4], allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[5]", value: invalidLevels[5], allowed);
+            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[6]", value: invalidLevels[6], allowed);
+        }
+
+        [Theory]
+        [InlineData("geographicLevels.in")]
+        [InlineData("geographicLevels.notIn")]
+        public async Task NotFound_Returns200_HasWarning(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] notFoundGeographicLevels =
+            [
+                GeographicLevel.Ward.GetEnumValue(),
+                GeographicLevel.OpportunityArea.GetEnumValue(),
+                GeographicLevel.PlanningArea.GetEnumValue(),
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(
+                            [
+                                GeographicLevel.LocalAuthority.GetEnumValue(),
+                                ..notFoundGeographicLevels
+                            ]
+                        )
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Single(viewModel.Warnings);
+
+            viewModel.AssertHasGeographicLevelsNotFoundWarning(path, notFoundGeographicLevels);
+        }
+
+        [Fact]
+        public async Task AllComparatorsInvalid_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidLevels =
+            [
+                "  ",
+                "National",
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "geographicLevels.eq", "NATT"
+                    },
+                    {
+                        "geographicLevels.notEq", "LADD"
+                    },
+                    {
+                        "geographicLevels.in", invalidLevels
+                    },
+                    {
+                        "geographicLevels.notIn[]", ""
+                    },
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            var allowed = GeographicLevelUtils.OrderedCodes;
+
+            Assert.Equal(5, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "geographicLevels.eq",
+                value: "NATT",
+                allowed: allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "geographicLevels.notEq",
+                value: "LADD",
+                allowed: allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "geographicLevels.in[0]",
+                value: null,
+                allowed: allowed
+            );
+            validationProblem.AssertHasAllowedValueError(
+                expectedPath: "geographicLevels.in[1]",
+                value: invalidLevels[1],
+                allowed: allowed
+            );
+            validationProblem.AssertHasNotEmptyError("geographicLevels.notIn");
+        }
+    }
+
+    public class LocationsValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData("locations.in")]
+        [InlineData("locations.notIn")]
+        public async Task Empty_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        $"{path}[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasNotEmptyError(path);
+        }
+
+        [Theory]
+        [InlineData("locations.in")]
+        [InlineData("locations.notIn")]
+        public async Task InvalidMix_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(
+                            [
+                                "",
+                                "invalid",
+                                "||",
+                                "LADD|code|12345",
+                                "NATT|code|12345",
+                                "NAT|invalid|12345",
+                                "LA|urn|12345",
+                                "SCH|code|12345",
+                                "PROV|oldCode|12345",
+                                "RSC|code|12345",
+                                "NAT|id| ",
+                                "LA|code| ",
+                                $"NAT|id|{new string('a', 11)}",
+                                $"LA|code|{new string('a', 26)}",
+                                $"SCH|urn|{new string('a', 7)}",
+                                $"PROV|ukprn|{new string('a', 9)}",
+                                $"RSC|id|{new string('a', 11)}",
+                            ]
+                        )
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(17, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasNotEmptyError(expectedPath: $"{path}[0]");
+            validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[1]", value: "invalid");
+            validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[2]", value: "||");
+
+            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[3]", level: "LADD");
+            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[4]", level: "NATT");
+
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: $"{path}[5]",
+                property: "invalid",
+                allowedProperties: ["id", "code"]
+            );
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: $"{path}[6]",
+                property: "urn",
+                allowedProperties: ["id", "code", "oldCode"]
+            );
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: $"{path}[7]",
+                property: "code",
+                allowedProperties: ["id", "urn", "laEstab"]
+            );
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: $"{path}[8]",
+                property: "oldCode",
+                allowedProperties: ["id", "ukprn"]
+            );
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: $"{path}[9]",
+                property: "code",
+                allowedProperties: ["id"]
+            );
+            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[10]", property: "id");
+            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[11]", property: "code");
+
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[12]",
+                property: "id",
+                maxLength: 10
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[13]",
+                property: "code",
+                maxLength: 25
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[14]",
+                property: "urn",
+                maxLength: 6
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[15]",
+                property: "ukprn",
+                maxLength: 8
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: $"{path}[16]",
+                property: "id",
+                maxLength: 10
+            );
+        }
+
+        [Fact]
+        public async Task AllComparatorsInvalid_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidLocations =
+            [
+                "",
+                "||",
+                "NAT|id| ",
+                $"NAT|id|{new string('a', 11)}",
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "locations.eq", "LADD|code|12345"
+                    },
+                    {
+                        "locations.notEq", "LA|urn|12345"
+                    },
+                    {
+                        "locations.in", invalidLocations
+                    },
+                    {
+                        "locations.notIn[]", ""
+                    },
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(7, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: "locations.eq", level: "LADD");
+            validationProblem.AssertHasLocationAllowedPropertyError(
+                expectedPath: "locations.notEq",
+                property: "urn",
+                allowedProperties: ["id", "code", "oldCode"]
+            );
+            validationProblem.AssertHasNotEmptyError(expectedPath: "locations.in[0]");
+            validationProblem.AssertHasLocationFormatError(expectedPath: "locations.in[1]", value: "||");
+            validationProblem.AssertHasLocationValueNotEmptyError(
+                expectedPath: "locations.in[2]",
+                property: "id"
+            );
+            validationProblem.AssertHasLocationValueMaxLengthError(
+                expectedPath: "locations.in[3]",
+                property: "id",
+                maxLength: 10
+            );
+            validationProblem.AssertHasNotEmptyError("locations.notIn");
+        }
+
+        [Theory]
+        [InlineData("locations.in")]
+        [InlineData("locations.notIn")]
+        public async Task NotFound_Returns200_HasWarning(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] notFoundLocations =
+            [
+                "NAT|id|11111111",
+                "NAT|code|11111111",
+                "REG|id|22222222",
+                "LA|id|33333333",
+                "LA|code|4444444",
+                "LA|oldCode|999",
+                "SCH|id|55555555",
+                "SCH|urn|666666",
+                "SCH|laEstab|7777777",
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(["LA|code|E08000016", ..notFoundLocations])
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Single(viewModel.Warnings);
+
+            viewModel.AssertHasLocationsNotFoundWarning(path, notFoundLocations);
+        }
+    }
+
+    public class TimePeriodsValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
+    {
+ [Fact]
+        public async Task Empty_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "timePeriods.in[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasNotEmptyError("timePeriods.in");
+        }
+
+        [Theory]
+        [InlineData("timePeriods.in")]
+        [InlineData("timePeriods.notIn")]
+        public async Task InvalidMix_Returns400(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(
+                            [
+                                "",
+                                "invalid",
+                                "|",
+                                "2020/2019|AY",
+                                "2020/2022|AY",
+                                "2020|INVALID",
+                                "2020/2021|CY",
+                                "2020/2021|CYQ2",
+                                "2020/2021|RY",
+                                "2020/2021|W10",
+                                "2020/2021|M5",
+                            ]
+                        )
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(11, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasNotEmptyError($"{path}[0]");
+            validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[1]", value: "invalid");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[2]", code: "");
+
+            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[3]", period: "2020/2019");
+            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[4]", period: "2020/2022");
+
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[5]", code: "INVALID");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[6]", code: "CY");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[7]", code: "CYQ2");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[8]", code: "RY");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[9]", code: "W10");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[10]", code: "M5");
+        }
+
+        [Fact]
+        public async Task AllComparatorsInvalid_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] invalidTimePeriods =
+            [
+                "",
+                "invalid",
+                "|"
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "timePeriods.eq", "2020/2019|AY"
+                    },
+                    {
+                        "timePeriods.notEq", "2020/2021|W10"
+                    },
+                    {
+                        "timePeriods.in", invalidTimePeriods
+                    },
+                    {
+                        "timePeriods.notIn[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(6, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasTimePeriodYearRangeError("timePeriods.eq", period: "2020/2019");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.notEq", code: "W10");
+            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
+            validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
+            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
+            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn");
+        }
+
+        [Theory]
+        [InlineData("timePeriods.in")]
+        [InlineData("timePeriods.notIn")]
+        public async Task NotFound_Returns200_HasWarning(string path)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] notFoundTimePeriods =
+            [
+                "2021|CY",
+                "2022|CY",
+                "2030|CY",
+                "2023/2024|AY",
+                "2018/2019|AY",
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        path, new StringValues(["2020/2021|AY", ..notFoundTimePeriods])
+                    }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Single(viewModel.Warnings);
+
+            viewModel.AssertHasTimePeriodsNotFoundWarning(path, notFoundTimePeriods);
+        }
+    }
+
+    public class SortsValidationTests(TestApplicationFactory testApp)
+        : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Fact]
+        public async Task Empty_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    {
+                        "sorts[]", ""
+                    }
+                }
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasNotEmptyError("sorts");
+        }
+
+        [Fact]
+        public async Task InvalidMix_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                sorts:
+                [
+                    "",
+                    "invalid",
+                    "|",
+                    "test|",
+                    "test|invalid",
+                    "test|asc",
+                    "test|desc",
+                    $"{new string('a', 41)}|Asc",
+                    $"{new string('b', 41)}|Desc",
+                    "missing1|Asc",
+                    "missing2|Desc",
+                ]
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Equal(10, validationProblem.Errors.Count);
+
+            validationProblem.AssertHasNotEmptyError(expectedPath: "sorts[0]");
+            validationProblem.AssertHasSortFormatError(expectedPath: "sorts[1]", value: "invalid");
+
+            validationProblem.AssertHasSortFieldNotEmptyError(expectedPath: "sorts[2]");
+
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[2]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "invalid");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "asc");
+            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[6]", direction: "desc");
+
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[7]",
+                field: new string('a', 41)
+            );
+            validationProblem.AssertHasSortFieldMaxLengthError(
+                expectedPath: "sorts[8]",
+                field: new string('b', 41)
+            );
+        }
+
+        [Fact]
+        public async Task FieldsNotFound_Returns400()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] notFoundSorts =
+            [
+                "invalid1|Asc",
+                "invalid2|Desc",
+            ];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                sorts: ["timePeriod|Asc", ..notFoundSorts]
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasSortFieldsNotFoundError("sorts", notFoundSorts);
+        }
+    }
+
+    public class PaginationTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        public async Task PageTooSmall_Returns400(int page)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                page: page
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(10001)]
+        public async Task PageSizeOutOfBounds_Returns400(int pageSize)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"],
+                pageSize: pageSize
+            );
+
+            var validationProblem = response.AssertValidationProblem();
+
+            Assert.Single(validationProblem.Errors);
+
+            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 10000);
         }
 
         [Theory]
@@ -97,7 +953,594 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal(totalPages, viewModel.Paging.TotalPages);
             Assert.Equal(216, viewModel.Paging.TotalResults);
         }
+    }
 
+    public class FiltersQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+        [Theory]
+        [InlineData("filters.eq", 54)]
+        [InlineData("filters.notEq", 162)]
+        [InlineData("filters.in", 54)]
+        [InlineData("filters.notIn", 162)]
+        public async Task SingleOption_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Year 4
+            const string filterOptionId = "IzBzg";
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, filterOptionId }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "filters.eq":
+                case "filters.in":
+                    Assert.Single(meta.Filters["ncyear"]);
+                    Assert.Contains(filterOptionId, meta.Filters["ncyear"]);
+                    break;
+                case "filters.notEq":
+                case "filters.notIn":
+                    Assert.Equal(3, meta.Filters["ncyear"].Count);
+                    Assert.DoesNotContain(filterOptionId, meta.Filters["ncyear"]);
+                    break;
+            }
+        }
+
+        [Theory]
+        [InlineData("filters.in", 108)]
+        [InlineData("filters.notIn", 108)]
+        public async Task MultipleOptionsInSameFilter_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Year 4 and 8
+            string[] filterOptionIds = ["IzBzg", "7zXob"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, filterOptionIds }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            Assert.Equal(2, meta.Indicators.Count);
+            Assert.Contains("enrolments", meta.Indicators);
+            Assert.Contains("sess_authorised", meta.Indicators);
+
+            switch (path)
+            {
+                case "filters.in":
+                    Assert.Equal(2, meta.Filters["ncyear"].Count);
+                    Assert.Contains(filterOptionIds[0], meta.Filters["ncyear"]);
+                    Assert.Contains(filterOptionIds[1], meta.Filters["ncyear"]);
+                    break;
+                case "filters.notIn":
+                    Assert.Equal(2, meta.Filters["ncyear"].Count);
+                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters["ncyear"]);
+                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters["ncyear"]);
+                    break;
+            }
+        }
+
+        [Fact]
+        public async Task CommaSeparatedOptionsInSameFilter_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Year 4 and 8
+            string[] filterOptionIds = ["IzBzg", "7zXob"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "filters.in", filterOptionIds.JoinToString(',') }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(108, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            Assert.Equal(2, meta.Filters["ncyear"].Count);
+            Assert.Contains(filterOptionIds[0], meta.Filters["ncyear"]);
+            Assert.Contains(filterOptionIds[1], meta.Filters["ncyear"]);
+        }
+
+        [Theory]
+        [InlineData("filters.in", 150)]
+        [InlineData("filters.notIn", 66)]
+        public async Task MultipleOptionsInDifferentFilters_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Total and secondary school type
+            // Secondary free school and secondary sponsor led academy types
+            string[] filterOptionIds = ["0kT5D", "6jrfe", "9U4vZ", "O7CLF"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, filterOptionIds }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "filters.in":
+                    Assert.Equal(2, meta.Filters["school_type"].Count);
+                    Assert.Contains(filterOptionIds[0], meta.Filters["school_type"]);
+                    Assert.Contains(filterOptionIds[1], meta.Filters["school_type"]);
+
+                    Assert.Equal(2, meta.Filters["academy_type"].Count);
+                    Assert.Contains(filterOptionIds[2], meta.Filters["academy_type"]);
+                    Assert.Contains(filterOptionIds[3], meta.Filters["academy_type"]);
+                    break;
+                case "filters.notIn":
+                    Assert.Single(meta.Filters["school_type"]);
+                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters["school_type"]);
+                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters["school_type"]);
+
+                    Assert.Single(meta.Filters["academy_type"]);
+                    Assert.DoesNotContain(filterOptionIds[2], meta.Filters["academy_type"]);
+                    Assert.DoesNotContain(filterOptionIds[3], meta.Filters["academy_type"]);
+                    break;
+            }
+        }
+    }
+
+    public class GeographicLevelsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+         [Theory]
+        [InlineData("geographicLevels.eq", 132)]
+        [InlineData("geographicLevels.notEq", 84)]
+        [InlineData("geographicLevels.in", 132)]
+        [InlineData("geographicLevels.notIn", 84)]
+        public async Task SingleOption_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            const GeographicLevel geographicLevel = GeographicLevel.LocalAuthority;
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, geographicLevel.GetEnumValue() }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "geographicLevels.eq":
+                case "geographicLevels.in":
+                    Assert.Single(meta.GeographicLevels);
+                    Assert.Contains(geographicLevel, meta.GeographicLevels);
+                    break;
+                case "geographicLevels.notEq":
+                case "geographicLevels.notIn":
+                    Assert.Equal(3, meta.GeographicLevels.Count);
+                    Assert.DoesNotContain(geographicLevel, meta.GeographicLevels);
+                    break;
+            }
+        }
+
+        [Theory]
+        [InlineData("geographicLevels.in", 180)]
+        [InlineData("geographicLevels.notIn", 36)]
+        public async Task MultipleOptions_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, geographicLevels.Select(l => l.GetEnumValue()).ToArray() }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "geographicLevels.in":
+                    Assert.Equal(2, meta.GeographicLevels.Count);
+                    Assert.Contains(geographicLevels[0], meta.GeographicLevels);
+                    Assert.Contains(geographicLevels[1], meta.GeographicLevels);
+                    break;
+                case "geographicLevels.notIn":
+                    Assert.Equal(2, meta.GeographicLevels.Count);
+                    Assert.DoesNotContain(geographicLevels[0], meta.GeographicLevels);
+                    Assert.DoesNotContain(geographicLevels[1], meta.GeographicLevels);
+                    break;
+            }
+        }
+
+        [Fact]
+        public async Task CommaSeparatedOptions_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "geographicLevels.in", geographicLevels.Select(l => l.GetEnumValue()).JoinToString(',') }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(180, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            Assert.Equal(2, meta.GeographicLevels.Count);
+            Assert.Contains(geographicLevels[0], meta.GeographicLevels);
+            Assert.Contains(geographicLevels[1], meta.GeographicLevels);
+        }
+    }
+
+    public class LocationsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+         [Theory]
+        [InlineData("locations.eq", 36)]
+        [InlineData("locations.notEq", 180)]
+        [InlineData("locations.in", 36)]
+        [InlineData("locations.notIn", 180)]
+        public async Task SingleOption_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Sheffield
+            const string locationStrings = "LA|code|E08000019";
+            const string locationId = "7zXob";
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, locationStrings }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "locations.eq":
+                case "locations.in":
+                    Assert.Single(meta.Locations["LA"]);
+                    Assert.Contains(locationId, meta.Locations["LA"]);
+                    break;
+                case "locations.notEq":
+                case "locations.notIn":
+                    Assert.Equal(3, meta.Locations["LA"].Count);
+                    Assert.DoesNotContain(locationId, meta.Locations["LA"]);
+                    break;
+            }
+        }
+
+        [Theory]
+        [InlineData("locations.in", 72)]
+        [InlineData("locations.notIn", 144)]
+        public async Task MultipleOptionsInSameLevel_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Sheffield and Barnsley
+            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF"];
+            string[] locationIds = ["7zXob", "O7CLF"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, locationStrings }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "locations.in":
+                    Assert.Equal(2, meta.Locations["LA"].Count);
+                    Assert.Contains(locationIds[0], meta.Locations["LA"]);
+                    Assert.Contains(locationIds[1], meta.Locations["LA"]);
+                    break;
+                case "locations.notIn":
+                    Assert.Equal(2, meta.Locations["LA"].Count);
+                    Assert.DoesNotContain(locationIds[0], meta.Locations["LA"]);
+                    Assert.DoesNotContain(locationIds[1], meta.Locations["LA"]);
+                    break;
+            }
+        }
+
+        [Fact]
+        public async Task CommaSeparatedOptionsInSameLevel_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Sheffield and Barnsley
+            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF"];
+            string[] locationIds = ["7zXob", "O7CLF"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "locations.in", locationStrings.JoinToString(',') }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(72, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            Assert.Equal(2, meta.Locations["LA"].Count);
+            Assert.Contains(locationIds[0], meta.Locations["LA"]);
+            Assert.Contains(locationIds[1], meta.Locations["LA"]);
+        }
+
+        [Theory]
+        [InlineData("locations.in", 84)]
+        [InlineData("locations.notIn", 132)]
+        public async Task MultipleOptionsInDifferentLevels_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            // Sheffield and Barnsley
+            // THe Kingston Academy and King Athelstan Primary School
+            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF", "SCH|laEstab|3144001", "SCH|urn|102579"];
+            string[] locationIds = ["7zXob", "O7CLF", "0kT5D", "arLPb"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, locationStrings }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            switch (path)
+            {
+                case "locations.in":
+                    Assert.Equal(3, meta.Locations["LA"].Count);
+                    Assert.Contains(locationIds[0], meta.Locations["LA"]);
+                    Assert.Contains(locationIds[1], meta.Locations["LA"]);
+
+                    Assert.Equal(6, meta.Locations["SCH"].Count);
+                    Assert.Contains(locationIds[2], meta.Locations["SCH"]);
+                    Assert.Contains(locationIds[3], meta.Locations["SCH"]);
+                    break;
+                case "locations.notIn":
+                    Assert.Equal(2, meta.Locations["LA"].Count);
+                    Assert.DoesNotContain(locationIds[0], meta.Locations["LA"]);
+                    Assert.DoesNotContain(locationIds[1], meta.Locations["LA"]);
+
+                    Assert.Equal(2, meta.Locations["SCH"].Count);
+                    Assert.DoesNotContain(locationIds[2], meta.Locations["SCH"]);
+                    Assert.DoesNotContain(locationIds[3], meta.Locations["SCH"]);
+                    break;
+            }
+        }
+    }
+
+    public class TimePeriodsQueryTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
+         [Theory]
+        [InlineData("timePeriods.eq", 72)]
+        [InlineData("timePeriods.notEq", 144)]
+        [InlineData("timePeriods.in", 72)]
+        [InlineData("timePeriods.notIn", 144)]
+        [InlineData("timePeriods.gt", 72)]
+        [InlineData("timePeriods.gte", 144)]
+        [InlineData("timePeriods.lt", 72)]
+        [InlineData("timePeriods.lte", 144)]
+        public async Task SingleOption_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            const string timePeriodString = "2021/2022|AY";
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, timePeriodString }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            var timePeriod = new TimePeriodViewModel
+            {
+                Code = TimeIdentifier.AcademicYear,
+                Period = "2021/2022"
+            };
+
+            switch (path)
+            {
+                case "timePeriods.eq":
+                case "timePeriods.in":
+                    Assert.Single(meta.TimePeriods);
+                    Assert.Contains(timePeriod, meta.TimePeriods);
+                    break;
+                case "timePeriods.notEq":
+                case "timePeriods.notIn":
+                    Assert.Equal(2, meta.TimePeriods.Count);
+                    Assert.DoesNotContain(timePeriod, meta.TimePeriods);
+                    break;
+                case "timePeriods.lt":
+                case "timePeriods.gt":
+                    Assert.Single(meta.TimePeriods);
+                    Assert.DoesNotContain(timePeriod, meta.TimePeriods);
+                    break;
+                case "timePeriods.lte":
+                case "timePeriods.gte":
+                    Assert.Equal(2, meta.TimePeriods.Count);
+                    Assert.Contains(timePeriod, meta.TimePeriods);
+                    break;
+            }
+        }
+
+        [Theory]
+        [InlineData("timePeriods.in", 144)]
+        [InlineData("timePeriods.notIn", 72)]
+        public async Task MultipleOptions_Returns200(string path, int expectedResults)
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] timePeriodStrings = ["2021|AY", "2022/2023|AY"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { path, timePeriodStrings }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(expectedResults, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            TimePeriodViewModel[] timePeriods =
+            [
+                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
+                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
+            ];
+
+            switch (path)
+            {
+                case "timePeriods.in":
+                    Assert.Equal(2, meta.TimePeriods.Count);
+                    Assert.Contains(timePeriods[0], meta.TimePeriods);
+                    Assert.Contains(timePeriods[1], meta.TimePeriods);
+                    break;
+                case "timePeriods.notIn":
+                    Assert.Single(meta.TimePeriods);
+                    Assert.DoesNotContain(timePeriods[0], meta.TimePeriods);
+                    Assert.DoesNotContain(timePeriods[1], meta.TimePeriods);
+                    break;
+            }
+        }
+
+        [Fact]
+        public async Task CommaSeparatedOptions_Returns200()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            string[] timePeriodStrings = ["2021|AY", "2022/2023|AY"];
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["enrolments", "sess_authorised"],
+                queryParameters: new Dictionary<string, StringValues>
+                {
+                    { "timePeriods.in", timePeriodStrings }
+                }
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(144, viewModel.Results.Count);
+
+            var meta = GatherQueryResultsMeta(viewModel);
+
+            TimePeriodViewModel[] timePeriods =
+            [
+                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
+                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
+            ];
+
+            Assert.Equal(2, meta.TimePeriods.Count);
+            Assert.Contains(timePeriods[0], meta.TimePeriods);
+            Assert.Contains(timePeriods[1], meta.TimePeriods);
+        }
+    }
+
+    public class ResultsTests(TestApplicationFactory testApp) : DataSetsControllerGetQueryTests(testApp)
+    {
         [Fact]
         public async Task NoResults_Returns200_HasWarning()
         {
@@ -147,6 +1590,46 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
             Assert.Equal(ValidationMessages.DebugEnabled.Code, warning.Code);
             Assert.Equal(ValidationMessages.DebugEnabled.Message, warning.Message);
+        }
+        
+        [Fact]
+        public async Task SingleIndicator_Returns200_CorrectViewModel()
+        {
+            var dataSetVersion = await SetupDefaultDataSetVersion();
+
+            var response = await QueryDataSet(
+                dataSetId: dataSetVersion.DataSetId,
+                indicators: ["sess_authorised"]
+            );
+
+            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
+
+            Assert.Equal(1, viewModel.Paging.Page);
+            Assert.Equal(1, viewModel.Paging.TotalPages);
+            Assert.Equal(216, viewModel.Paging.TotalResults);
+
+            Assert.Empty(viewModel.Warnings);
+
+            Assert.Equal(216, viewModel.Results.Count);
+
+            var result = viewModel.Results[0];
+
+            Assert.Equal(2, result.Filters.Count);
+            Assert.Equal("pTSoj", result.Filters["ncyear"]);
+            Assert.Equal("0kT5D", result.Filters["school_type"]);
+
+            Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
+
+            Assert.Equal(3, result.Locations.Count);
+            Assert.Equal("dP0Zw", result.Locations[GeographicLevel.LocalAuthority.GetEnumValue()]);
+            Assert.Equal("pTSoj", result.Locations[GeographicLevel.Country.GetEnumValue()]);
+            Assert.Equal("it6Xr", result.Locations[GeographicLevel.Region.GetEnumValue()]);
+
+            Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriod.Code);
+            Assert.Equal("2022/2023", result.TimePeriod.Period);
+
+            Assert.Single(result.Values);
+            Assert.Equal("4064499", result.Values["sess_authorised"]);
         }
 
         [Fact]
@@ -406,578 +1889,6 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Contains("sess_unauthorised_percent", meta.Indicators);
         }
 
-        [Theory]
-        [InlineData("filters.eq", 54)]
-        [InlineData("filters.notEq", 162)]
-        [InlineData("filters.in", 54)]
-        [InlineData("filters.notIn", 162)]
-        public async Task Filters_SingleOption_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Year 4
-            const string filterOptionId = "IzBzg";
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, filterOptionId }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "filters.eq":
-                case "filters.in":
-                    Assert.Single(meta.Filters["ncyear"]);
-                    Assert.Contains(filterOptionId, meta.Filters["ncyear"]);
-                    break;
-                case "filters.notEq":
-                case "filters.notIn":
-                    Assert.Equal(3, meta.Filters["ncyear"].Count);
-                    Assert.DoesNotContain(filterOptionId, meta.Filters["ncyear"]);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("filters.in", 108)]
-        [InlineData("filters.notIn", 108)]
-        public async Task Filters_MultipleOptionsInSameFilter_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Year 4 and 8
-            string[] filterOptionIds = ["IzBzg", "7zXob"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, filterOptionIds }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            Assert.Equal(2, meta.Indicators.Count);
-            Assert.Contains("enrolments", meta.Indicators);
-            Assert.Contains("sess_authorised", meta.Indicators);
-
-            switch (path)
-            {
-                case "filters.in":
-                    Assert.Equal(2, meta.Filters["ncyear"].Count);
-                    Assert.Contains(filterOptionIds[0], meta.Filters["ncyear"]);
-                    Assert.Contains(filterOptionIds[1], meta.Filters["ncyear"]);
-                    break;
-                case "filters.notIn":
-                    Assert.Equal(2, meta.Filters["ncyear"].Count);
-                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters["ncyear"]);
-                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters["ncyear"]);
-                    break;
-            }
-        }
-
-        [Fact]
-        public async Task Filters_CommaSeparatedOptionsInSameFilter_Returns200()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Year 4 and 8
-            string[] filterOptionIds = ["IzBzg", "7zXob"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { "filters.in", filterOptionIds.JoinToString(',') }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(108, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            Assert.Equal(2, meta.Filters["ncyear"].Count);
-            Assert.Contains(filterOptionIds[0], meta.Filters["ncyear"]);
-            Assert.Contains(filterOptionIds[1], meta.Filters["ncyear"]);
-        }
-
-        [Theory]
-        [InlineData("filters.in", 150)]
-        [InlineData("filters.notIn", 66)]
-        public async Task Filters_MultipleOptionsInDifferentFilters_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Total and secondary school type
-            // Secondary free school and secondary sponsor led academy types
-            string[] filterOptionIds = ["0kT5D", "6jrfe", "9U4vZ", "O7CLF"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, filterOptionIds }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "filters.in":
-                    Assert.Equal(2, meta.Filters["school_type"].Count);
-                    Assert.Contains(filterOptionIds[0], meta.Filters["school_type"]);
-                    Assert.Contains(filterOptionIds[1], meta.Filters["school_type"]);
-
-                    Assert.Equal(2, meta.Filters["academy_type"].Count);
-                    Assert.Contains(filterOptionIds[2], meta.Filters["academy_type"]);
-                    Assert.Contains(filterOptionIds[3], meta.Filters["academy_type"]);
-                    break;
-                case "filters.notIn":
-                    Assert.Single(meta.Filters["school_type"]);
-                    Assert.DoesNotContain(filterOptionIds[0], meta.Filters["school_type"]);
-                    Assert.DoesNotContain(filterOptionIds[1], meta.Filters["school_type"]);
-
-                    Assert.Single(meta.Filters["academy_type"]);
-                    Assert.DoesNotContain(filterOptionIds[2], meta.Filters["academy_type"]);
-                    Assert.DoesNotContain(filterOptionIds[3], meta.Filters["academy_type"]);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("geographicLevels.eq", 132)]
-        [InlineData("geographicLevels.notEq", 84)]
-        [InlineData("geographicLevels.in", 132)]
-        [InlineData("geographicLevels.notIn", 84)]
-        public async Task GeographicLevels_SingleOption_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            const GeographicLevel geographicLevel = GeographicLevel.LocalAuthority;
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, geographicLevel.GetEnumValue() }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "geographicLevels.eq":
-                case "geographicLevels.in":
-                    Assert.Single(meta.GeographicLevels);
-                    Assert.Contains(geographicLevel, meta.GeographicLevels);
-                    break;
-                case "geographicLevels.notEq":
-                case "geographicLevels.notIn":
-                    Assert.Equal(3, meta.GeographicLevels.Count);
-                    Assert.DoesNotContain(geographicLevel, meta.GeographicLevels);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("geographicLevels.in", 180)]
-        [InlineData("geographicLevels.notIn", 36)]
-        public async Task GeographicLevels_MultipleOptions_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, geographicLevels.Select(l => l.GetEnumValue()).ToArray() }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "geographicLevels.in":
-                    Assert.Equal(2, meta.GeographicLevels.Count);
-                    Assert.Contains(geographicLevels[0], meta.GeographicLevels);
-                    Assert.Contains(geographicLevels[1], meta.GeographicLevels);
-                    break;
-                case "geographicLevels.notIn":
-                    Assert.Equal(2, meta.GeographicLevels.Count);
-                    Assert.DoesNotContain(geographicLevels[0], meta.GeographicLevels);
-                    Assert.DoesNotContain(geographicLevels[1], meta.GeographicLevels);
-                    break;
-            }
-        }
-
-        [Fact]
-        public async Task GeographicLevels_CommaSeparatedOptions_Returns200()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            GeographicLevel[] geographicLevels = [GeographicLevel.Region, GeographicLevel.LocalAuthority];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { "geographicLevels.in", geographicLevels.Select(l => l.GetEnumValue()).JoinToString(',') }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(180, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            Assert.Equal(2, meta.GeographicLevels.Count);
-            Assert.Contains(geographicLevels[0], meta.GeographicLevels);
-            Assert.Contains(geographicLevels[1], meta.GeographicLevels);
-        }
-
-        [Theory]
-        [InlineData("locations.eq", 36)]
-        [InlineData("locations.notEq", 180)]
-        [InlineData("locations.in", 36)]
-        [InlineData("locations.notIn", 180)]
-        public async Task Locations_SingleOption_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Sheffield
-            const string locationStrings = "LA|code|E08000019";
-            const string locationId = "7zXob";
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "locations.eq":
-                case "locations.in":
-                    Assert.Single(meta.Locations["LA"]);
-                    Assert.Contains(locationId, meta.Locations["LA"]);
-                    break;
-                case "locations.notEq":
-                case "locations.notIn":
-                    Assert.Equal(3, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(locationId, meta.Locations["LA"]);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("locations.in", 72)]
-        [InlineData("locations.notIn", 144)]
-        public async Task Locations_MultipleOptionsInSameLevel_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Sheffield and Barnsley
-            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF"];
-            string[] locationIds = ["7zXob", "O7CLF"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "locations.in":
-                    Assert.Equal(2, meta.Locations["LA"].Count);
-                    Assert.Contains(locationIds[0], meta.Locations["LA"]);
-                    Assert.Contains(locationIds[1], meta.Locations["LA"]);
-                    break;
-                case "locations.notIn":
-                    Assert.Equal(2, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(locationIds[0], meta.Locations["LA"]);
-                    Assert.DoesNotContain(locationIds[1], meta.Locations["LA"]);
-                    break;
-            }
-        }
-
-        [Fact]
-        public async Task Locations_CommaSeparatedOptionsInSameLevel_Returns200()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Sheffield and Barnsley
-            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF"];
-            string[] locationIds = ["7zXob", "O7CLF"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { "locations.in", locationStrings.JoinToString(',') }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(72, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            Assert.Equal(2, meta.Locations["LA"].Count);
-            Assert.Contains(locationIds[0], meta.Locations["LA"]);
-            Assert.Contains(locationIds[1], meta.Locations["LA"]);
-        }
-
-        [Theory]
-        [InlineData("locations.in", 84)]
-        [InlineData("locations.notIn", 132)]
-        public async Task Locations_MultipleOptionsInDifferentLevels_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            // Sheffield and Barnsley
-            // THe Kingston Academy and King Athelstan Primary School
-            string[] locationStrings = ["LA|code|E08000019", "LA|id|O7CLF", "SCH|laEstab|3144001", "SCH|urn|102579"];
-            string[] locationIds = ["7zXob", "O7CLF", "0kT5D", "arLPb"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, locationStrings }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            switch (path)
-            {
-                case "locations.in":
-                    Assert.Equal(3, meta.Locations["LA"].Count);
-                    Assert.Contains(locationIds[0], meta.Locations["LA"]);
-                    Assert.Contains(locationIds[1], meta.Locations["LA"]);
-
-                    Assert.Equal(6, meta.Locations["SCH"].Count);
-                    Assert.Contains(locationIds[2], meta.Locations["SCH"]);
-                    Assert.Contains(locationIds[3], meta.Locations["SCH"]);
-                    break;
-                case "locations.notIn":
-                    Assert.Equal(2, meta.Locations["LA"].Count);
-                    Assert.DoesNotContain(locationIds[0], meta.Locations["LA"]);
-                    Assert.DoesNotContain(locationIds[1], meta.Locations["LA"]);
-
-                    Assert.Equal(2, meta.Locations["SCH"].Count);
-                    Assert.DoesNotContain(locationIds[2], meta.Locations["SCH"]);
-                    Assert.DoesNotContain(locationIds[3], meta.Locations["SCH"]);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("timePeriods.eq", 72)]
-        [InlineData("timePeriods.notEq", 144)]
-        [InlineData("timePeriods.in", 72)]
-        [InlineData("timePeriods.notIn", 144)]
-        [InlineData("timePeriods.gt", 72)]
-        [InlineData("timePeriods.gte", 144)]
-        [InlineData("timePeriods.lt", 72)]
-        [InlineData("timePeriods.lte", 144)]
-        public async Task TimePeriods_SingleOption_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            const string timePeriodString = "2021/2022|AY";
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, timePeriodString }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            var timePeriod = new TimePeriodViewModel
-            {
-                Code = TimeIdentifier.AcademicYear,
-                Period = "2021/2022"
-            };
-
-            switch (path)
-            {
-                case "timePeriods.eq":
-                case "timePeriods.in":
-                    Assert.Single(meta.TimePeriods);
-                    Assert.Contains(timePeriod, meta.TimePeriods);
-                    break;
-                case "timePeriods.notEq":
-                case "timePeriods.notIn":
-                    Assert.Equal(2, meta.TimePeriods.Count);
-                    Assert.DoesNotContain(timePeriod, meta.TimePeriods);
-                    break;
-                case "timePeriods.lt":
-                case "timePeriods.gt":
-                    Assert.Single(meta.TimePeriods);
-                    Assert.DoesNotContain(timePeriod, meta.TimePeriods);
-                    break;
-                case "timePeriods.lte":
-                case "timePeriods.gte":
-                    Assert.Equal(2, meta.TimePeriods.Count);
-                    Assert.Contains(timePeriod, meta.TimePeriods);
-                    break;
-            }
-        }
-
-        [Theory]
-        [InlineData("timePeriods.in", 144)]
-        [InlineData("timePeriods.notIn", 72)]
-        public async Task TimePeriods_MultipleOptions_Returns200(string path, int expectedResults)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] timePeriodStrings = ["2021|AY", "2022/2023|AY"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, timePeriodStrings }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(expectedResults, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            TimePeriodViewModel[] timePeriods =
-            [
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
-            ];
-
-            switch (path)
-            {
-                case "timePeriods.in":
-                    Assert.Equal(2, meta.TimePeriods.Count);
-                    Assert.Contains(timePeriods[0], meta.TimePeriods);
-                    Assert.Contains(timePeriods[1], meta.TimePeriods);
-                    break;
-                case "timePeriods.notIn":
-                    Assert.Single(meta.TimePeriods);
-                    Assert.DoesNotContain(timePeriods[0], meta.TimePeriods);
-                    Assert.DoesNotContain(timePeriods[1], meta.TimePeriods);
-                    break;
-            }
-        }
-
-        [Fact]
-        public async Task TimePeriods_CommaSeparatedOptions_Returns200()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] timePeriodStrings = ["2021|AY", "2022/2023|AY"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["enrolments", "sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { "timePeriods.in", timePeriodStrings }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Equal(144, viewModel.Results.Count);
-
-            var meta = GatherQueryResultsMeta(viewModel);
-
-            TimePeriodViewModel[] timePeriods =
-            [
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2021/2022" },
-                new TimePeriodViewModel { Code = TimeIdentifier.AcademicYear, Period = "2022/2023" }
-            ];
-
-            Assert.Equal(2, meta.TimePeriods.Count);
-            Assert.Contains(timePeriods[0], meta.TimePeriods);
-            Assert.Contains(timePeriods[1], meta.TimePeriods);
-        }
-        
         [Fact]
         public async Task AllFacets_MixOfConditions_Returns200()
         {
@@ -1039,1003 +1950,58 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
             Assert.Equal("752009", result.Values["enrolments"]);
             Assert.Equal("262396", result.Values["sess_authorised"]);
         }
+    }
 
-        [Theory]
-        [InlineData(DataSetVersionStatus.Processing)]
-        [InlineData(DataSetVersionStatus.Failed)]
-        [InlineData(DataSetVersionStatus.Draft)]
-        [InlineData(DataSetVersionStatus.Mapping)]
-        [InlineData(DataSetVersionStatus.Withdrawn)]
-        public async Task VersionNotAvailable_Returns403(DataSetVersionStatus versionStatus)
+    private async Task<HttpResponseMessage> QueryDataSet(
+        Guid dataSetId,
+        IEnumerable<string> indicators,
+        string? dataSetVersion = null,
+        int? page = null,
+        int? pageSize = null,
+        IEnumerable<string>? sorts = null,
+        bool? debug = null,
+        IDictionary<string, StringValues>? queryParameters = null)
+    {
+        var query = new Dictionary<string, StringValues>
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion(versionStatus);
+            { "indicators", indicators.ToArray() }
+        };
 
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"]
-            );
-
-            response.AssertForbidden();
+        if (dataSetVersion is not null)
+        {
+            query["dataSetVersion"] = dataSetVersion;
         }
 
-        [Fact]
-        public async Task DataSetDoesNotExist_Returns404()
+        if (page is not null)
         {
-            var response = await QueryDataSet(
-                dataSetId: Guid.NewGuid(),
-                indicators: ["sess_authorised"]
-            );
-
-            response.AssertNotFound();
+            query["page"] = page.ToString();
         }
 
-        [Fact]
-        public async Task VersionDoesNotExist_Returns404()
+        if (pageSize is not null)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                dataSetVersion: "2.0",
-                indicators: ["sess_authorised"]
-            );
-
-            response.AssertNotFound();
+            query["pageSize"] = pageSize.ToString();
         }
 
-        [Fact]
-        public async Task Indicators_Empty_Returns400()
+        if (sorts is not null)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: []
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
+            query["sorts"] = sorts.ToArray();
         }
 
-        [Fact]
-        public async Task Indicators_Blank_Returns400()
+        if (debug is true)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["", " ", "  "]
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(3, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasNotEmptyError("indicators[0]");
-            validationProblem.AssertHasNotEmptyError("indicators[1]");
-            validationProblem.AssertHasNotEmptyError("indicators[2]");
+            query["debug"] = "true";
         }
 
-        [Fact]
-        public async Task Indicators_TooLong_Returns400()
+        if (queryParameters is not null)
         {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: [new string('a', 41), new string('a', 42)]
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(2, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasMaximumLengthError("indicators[0]", maxLength: 40);
-            validationProblem.AssertHasMaximumLengthError("indicators[1]", maxLength: 40);
+            query.AddRange(queryParameters);
         }
 
-        [Fact]
-        public async Task Indicators_MissingParam_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
+        var client = BuildApp().CreateClient();
 
-            var client = BuildApp().CreateClient();
+        var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
 
-            var response = await client.GetAsync($"{BaseUrl}/{dataSetVersion.DataSetId}/query");
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("indicators");
-        }
-
-        [Fact]
-        public async Task Indicators_NotFound_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundIndicators = ["invalid1", "invalid2", "invalid3"];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: notFoundIndicators
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasIndicatorsNotFoundError("indicators", notFoundIndicators);
-        }
-
-        [Theory]
-        [InlineData("filters.in")]
-        [InlineData("filters.notIn")]
-        public async Task Filters_Empty_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        $"{path}[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError(path);
-        }
-
-        [Theory]
-        [InlineData("filters.in")]
-        [InlineData("filters.notIn")]
-        public async Task Filters_InvalidMix_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidFilters =
-            [
-                "",
-                " ",
-                "  ",
-                new string('a', 11),
-                new string('a', 12),
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    { path, invalidFilters }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(5, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasNotEmptyError($"{path}[0]");
-            validationProblem.AssertHasNotEmptyError($"{path}[1]");
-            validationProblem.AssertHasNotEmptyError($"{path}[2]");
-            validationProblem.AssertHasMaximumLengthError($"{path}[3]", maxLength: 10);
-            validationProblem.AssertHasMaximumLengthError($"{path}[4]", maxLength: 10);
-        }
-
-        [Fact]
-        public async Task Filters_AllCriteriaInvalid_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidFilters =
-            [
-                new string('a', 11),
-                ""
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "filters.eq", new string('a', 11)
-                    },
-                    {
-                        "filters.notEq", new string('a', 12)
-                    },
-                    {
-                        "filters.in[]", ""
-                    },
-                    {
-                        "filters.notIn", invalidFilters
-                    },
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(5, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasMaximumLengthError("filters.eq", maxLength: 10);
-            validationProblem.AssertHasMaximumLengthError("filters.notEq", maxLength: 10);
-            validationProblem.AssertHasNotEmptyError("filters.in");
-            validationProblem.AssertHasMaximumLengthError("filters.notIn[0]", maxLength: 10);
-            validationProblem.AssertHasNotEmptyError("filters.notIn[1]");
-        }
-
-        [Theory]
-        [InlineData("filters.in")]
-        [InlineData("filters.notIn")]
-        public async Task Filters_NotFound_Returns200_HasWarning(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundFilters =
-            [
-                "invalid",
-                "9999999"
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(["IzBzg", ..notFoundFilters])
-                    }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Single(viewModel.Warnings);
-
-            viewModel.AssertHasFiltersNotFoundWarning(path, notFoundFilters);
-        }
-
-        [Theory]
-        [InlineData("geographicLevels.in")]
-        [InlineData("geographicLevels.notIn")]
-        public async Task GeographicLevels_Empty_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        $"{path}[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError(path);
-        }
-
-        [Theory]
-        [InlineData("geographicLevels.in")]
-        [InlineData("geographicLevels.notIn")]
-        public async Task GeographicLevels_InvalidMix_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidLevels =
-            [
-                "",
-                " ",
-                "LADD",
-                "NATT",
-                "National",
-                "Local authority",
-                "LocalAuthority"
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, invalidLevels
-                    }
-                }
-            );
-
-            var allowed = GeographicLevelUtils.OrderedCodes;
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(7, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[0]", value: null, allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[1]", value: null, allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[2]", value: invalidLevels[2], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[3]", value: invalidLevels[3], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[4]", value: invalidLevels[4], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[5]", value: invalidLevels[5], allowed);
-            validationProblem.AssertHasAllowedValueError(expectedPath: $"{path}[6]", value: invalidLevels[6], allowed);
-        }
-
-        [Theory]
-        [InlineData("geographicLevels.in")]
-        [InlineData("geographicLevels.notIn")]
-        public async Task GeographicLevels_NotFound_Returns200_HasWarning(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundGeographicLevels =
-            [
-                GeographicLevel.Ward.GetEnumValue(),
-                GeographicLevel.OpportunityArea.GetEnumValue(),
-                GeographicLevel.PlanningArea.GetEnumValue(),
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(
-                            [
-                                GeographicLevel.LocalAuthority.GetEnumValue(),
-                                ..notFoundGeographicLevels
-                            ]
-                        )
-                    }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Single(viewModel.Warnings);
-
-            viewModel.AssertHasGeographicLevelsNotFoundWarning(path, notFoundGeographicLevels);
-        }
-
-        [Fact]
-        public async Task GeographicLevels_AllCriteriaInvalid_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidLevels =
-            [
-                "  ",
-                "National",
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "geographicLevels.eq", "NATT"
-                    },
-                    {
-                        "geographicLevels.notEq", "LADD"
-                    },
-                    {
-                        "geographicLevels.in", invalidLevels
-                    },
-                    {
-                        "geographicLevels.notIn[]", ""
-                    },
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            var allowed = GeographicLevelUtils.OrderedCodes;
-
-            Assert.Equal(5, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasAllowedValueError(
-                expectedPath: "geographicLevels.eq",
-                value: "NATT",
-                allowed: allowed
-            );
-            validationProblem.AssertHasAllowedValueError(
-                expectedPath: "geographicLevels.notEq",
-                value: "LADD",
-                allowed: allowed
-            );
-            validationProblem.AssertHasAllowedValueError(
-                expectedPath: "geographicLevels.in[0]",
-                value: null,
-                allowed: allowed
-            );
-            validationProblem.AssertHasAllowedValueError(
-                expectedPath: "geographicLevels.in[1]",
-                value: invalidLevels[1],
-                allowed: allowed
-            );
-            validationProblem.AssertHasNotEmptyError("geographicLevels.notIn");
-        }
-
-        [Fact]
-        public async Task Sorts_Empty_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "sorts[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("sorts");
-        }
-
-        [Fact]
-        public async Task Sorts_InvalidMix_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                sorts:
-                [
-                    "",
-                    "invalid",
-                    "|",
-                    "test|",
-                    "test|invalid",
-                    "test|asc",
-                    "test|desc",
-                    $"{new string('a', 41)}|Asc",
-                    $"{new string('b', 41)}|Desc",
-                    "missing1|Asc",
-                    "missing2|Desc",
-                ]
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(10, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasNotEmptyError(expectedPath: "sorts[0]");
-            validationProblem.AssertHasSortFormatError(expectedPath: "sorts[1]", value: "invalid");
-
-            validationProblem.AssertHasSortFieldNotEmptyError(expectedPath: "sorts[2]");
-
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[2]", direction: "");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[3]", direction: "");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[4]", direction: "invalid");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[5]", direction: "asc");
-            validationProblem.AssertHasSortDirectionError(expectedPath: "sorts[6]", direction: "desc");
-
-            validationProblem.AssertHasSortFieldMaxLengthError(
-                expectedPath: "sorts[7]",
-                field: new string('a', 41)
-            );
-            validationProblem.AssertHasSortFieldMaxLengthError(
-                expectedPath: "sorts[8]",
-                field: new string('b', 41)
-            );
-        }
-
-        [Fact]
-        public async Task Sorts_FieldsNotFound_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundSorts =
-            [
-                "invalid1|Asc",
-                "invalid2|Desc",
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                sorts: ["timePeriod|Asc", ..notFoundSorts]
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasSortFieldsNotFoundError("sorts", notFoundSorts);
-        }
-
-        [Theory]
-        [InlineData("locations.in")]
-        [InlineData("locations.notIn")]
-        public async Task Locations_Empty_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        $"{path}[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError(path);
-        }
-
-        [Theory]
-        [InlineData("locations.in")]
-        [InlineData("locations.notIn")]
-        public async Task Locations_InvalidMix_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(
-                            [
-                                "",
-                                "invalid",
-                                "||",
-                                "LADD|code|12345",
-                                "NATT|code|12345",
-                                "NAT|invalid|12345",
-                                "LA|urn|12345",
-                                "SCH|code|12345",
-                                "PROV|oldCode|12345",
-                                "RSC|code|12345",
-                                "NAT|id| ",
-                                "LA|code| ",
-                                $"NAT|id|{new string('a', 11)}",
-                                $"LA|code|{new string('a', 26)}",
-                                $"SCH|urn|{new string('a', 7)}",
-                                $"PROV|ukprn|{new string('a', 9)}",
-                                $"RSC|id|{new string('a', 11)}",
-                            ]
-                        )
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(17, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasNotEmptyError(expectedPath: $"{path}[0]");
-            validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[1]", value: "invalid");
-            validationProblem.AssertHasLocationFormatError(expectedPath: $"{path}[2]", value: "||");
-
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[3]", level: "LADD");
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: $"{path}[4]", level: "NATT");
-
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: $"{path}[5]",
-                property: "invalid",
-                allowedProperties: ["id", "code"]
-            );
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: $"{path}[6]",
-                property: "urn",
-                allowedProperties: ["id", "code", "oldCode"]
-            );
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: $"{path}[7]",
-                property: "code",
-                allowedProperties: ["id", "urn", "laEstab"]
-            );
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: $"{path}[8]",
-                property: "oldCode",
-                allowedProperties: ["id", "ukprn"]
-            );
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: $"{path}[9]",
-                property: "code",
-                allowedProperties: ["id"]
-            );
-            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[10]", property: "id");
-            validationProblem.AssertHasLocationValueNotEmptyError(expectedPath: $"{path}[11]", property: "code");
-
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: $"{path}[12]",
-                property: "id",
-                maxLength: 10
-            );
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: $"{path}[13]",
-                property: "code",
-                maxLength: 25
-            );
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: $"{path}[14]",
-                property: "urn",
-                maxLength: 6
-            );
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: $"{path}[15]",
-                property: "ukprn",
-                maxLength: 8
-            );
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: $"{path}[16]",
-                property: "id",
-                maxLength: 10
-            );
-        }
-
-        [Fact]
-        public async Task Locations_AllCriteriaInvalid_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidLocations =
-            [
-                "",
-                "||",
-                "NAT|id| ",
-                $"NAT|id|{new string('a', 11)}",
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "locations.eq", "LADD|code|12345"
-                    },
-                    {
-                        "locations.notEq", "LA|urn|12345"
-                    },
-                    {
-                        "locations.in", invalidLocations
-                    },
-                    {
-                        "locations.notIn[]", ""
-                    },
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(7, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasLocationAllowedLevelError(expectedPath: "locations.eq", level: "LADD");
-            validationProblem.AssertHasLocationAllowedPropertyError(
-                expectedPath: "locations.notEq",
-                property: "urn",
-                allowedProperties: ["id", "code", "oldCode"]
-            );
-            validationProblem.AssertHasNotEmptyError(expectedPath: "locations.in[0]");
-            validationProblem.AssertHasLocationFormatError(expectedPath: "locations.in[1]", value: "||");
-            validationProblem.AssertHasLocationValueNotEmptyError(
-                expectedPath: "locations.in[2]",
-                property: "id"
-            );
-            validationProblem.AssertHasLocationValueMaxLengthError(
-                expectedPath: "locations.in[3]",
-                property: "id",
-                maxLength: 10
-            );
-            validationProblem.AssertHasNotEmptyError("locations.notIn");
-        }
-
-        [Theory]
-        [InlineData("locations.in")]
-        [InlineData("locations.notIn")]
-        public async Task Locations_NotFound_Returns200_HasWarning(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundLocations =
-            [
-                "NAT|id|11111111",
-                "NAT|code|11111111",
-                "REG|id|22222222",
-                "LA|id|33333333",
-                "LA|code|4444444",
-                "LA|oldCode|999",
-                "SCH|id|55555555",
-                "SCH|urn|666666",
-                "SCH|laEstab|7777777",
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(["LA|code|E08000016", ..notFoundLocations])
-                    }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Single(viewModel.Warnings);
-
-            viewModel.AssertHasLocationsNotFoundWarning(path, notFoundLocations);
-        }
-
-        [Fact]
-        public async Task TimePeriods_Empty_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "timePeriods.in[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasNotEmptyError("timePeriods.in");
-        }
-
-        [Theory]
-        [InlineData("timePeriods.in")]
-        [InlineData("timePeriods.notIn")]
-        public async Task TimePeriods_InvalidMix_Returns400(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(
-                            [
-                                "",
-                                "invalid",
-                                "|",
-                                "2020/2019|AY",
-                                "2020/2022|AY",
-                                "2020|INVALID",
-                                "2020/2021|CY",
-                                "2020/2021|CYQ2",
-                                "2020/2021|RY",
-                                "2020/2021|W10",
-                                "2020/2021|M5",
-                            ]
-                        )
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(11, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasNotEmptyError($"{path}[0]");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: $"{path}[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[2]", code: "");
-
-            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[3]", period: "2020/2019");
-            validationProblem.AssertHasTimePeriodYearRangeError(expectedPath: $"{path}[4]", period: "2020/2022");
-
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[5]", code: "INVALID");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[6]", code: "CY");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[7]", code: "CYQ2");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[8]", code: "RY");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[9]", code: "W10");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: $"{path}[10]", code: "M5");
-        }
-
-        [Fact]
-        public async Task TimePeriods_AllCriteriaInvalid_Returns400()
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] invalidTimePeriods =
-            [
-                "",
-                "invalid",
-                "|"
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        "timePeriods.eq", "2020/2019|AY"
-                    },
-                    {
-                        "timePeriods.notEq", "2020/2021|W10"
-                    },
-                    {
-                        "timePeriods.in", invalidTimePeriods
-                    },
-                    {
-                        "timePeriods.notIn[]", ""
-                    }
-                }
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Equal(6, validationProblem.Errors.Count);
-
-            validationProblem.AssertHasTimePeriodYearRangeError("timePeriods.eq", period: "2020/2019");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.notEq", code: "W10");
-            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.in[0]");
-            validationProblem.AssertHasTimePeriodFormatError(expectedPath: "timePeriods.in[1]", value: "invalid");
-            validationProblem.AssertHasTimePeriodAllowedCodeError(expectedPath: "timePeriods.in[2]", code: "");
-            validationProblem.AssertHasNotEmptyError(expectedPath: "timePeriods.notIn");
-        }
-
-        [Theory]
-        [InlineData("timePeriods.in")]
-        [InlineData("timePeriods.notIn")]
-        public async Task TimePeriods_NotFound_Returns200_HasWarning(string path)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            string[] notFoundTimePeriods =
-            [
-                "2021|CY",
-                "2022|CY",
-                "2030|CY",
-                "2023/2024|AY",
-                "2018/2019|AY",
-            ];
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                queryParameters: new Dictionary<string, StringValues>
-                {
-                    {
-                        path, new StringValues(["2020/2021|AY", ..notFoundTimePeriods])
-                    }
-                }
-            );
-
-            var viewModel = response.AssertOk<DataSetQueryPaginatedResultsViewModel>(useSystemJson: true);
-
-            Assert.Single(viewModel.Warnings);
-
-            viewModel.AssertHasTimePeriodsNotFoundWarning(path, notFoundTimePeriods);
-        }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        public async Task PageTooSmall_Returns400(int page)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                page: page
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasGreaterThanOrEqualError("page", comparisonValue: 1);
-        }
-
-        [Theory]
-        [InlineData(-1)]
-        [InlineData(0)]
-        [InlineData(10001)]
-        public async Task PageSizeOutOfBounds_Returns400(int pageSize)
-        {
-            var dataSetVersion = await SetupDefaultDataSetVersion();
-
-            var response = await QueryDataSet(
-                dataSetId: dataSetVersion.DataSetId,
-                indicators: ["sess_authorised"],
-                pageSize: pageSize
-            );
-
-            var validationProblem = response.AssertValidationProblem();
-
-            Assert.Single(validationProblem.Errors);
-
-            validationProblem.AssertHasInclusiveBetweenError("pageSize", from: 1, to: 10000);
-        }
-
-        private async Task<HttpResponseMessage> QueryDataSet(
-            Guid dataSetId,
-            IEnumerable<string> indicators,
-            string? dataSetVersion = null,
-            int? page = null,
-            int? pageSize = null,
-            IEnumerable<string>? sorts = null,
-            bool? debug = null,
-            IDictionary<string, StringValues>? queryParameters = null)
-        {
-            var query = new Dictionary<string, StringValues>
-            {
-                { "indicators", indicators.ToArray() }
-            };
-
-            if (dataSetVersion is not null)
-            {
-                query["dataSetVersion"] = dataSetVersion;
-            }
-
-            if (page is not null)
-            {
-                query["page"] = page.ToString();
-            }
-
-            if (pageSize is not null)
-            {
-                query["pageSize"] = pageSize.ToString();
-            }
-
-            if (sorts is not null)
-            {
-                query["sorts"] = sorts.ToArray();
-            }
-
-            if (debug is true)
-            {
-                query["debug"] = "true";
-            }
-
-            if (queryParameters is not null)
-            {
-                query.AddRange(queryParameters);
-            }
-
-            var client = BuildApp().CreateClient();
-
-            var uri = QueryHelpers.AddQueryString($"{BaseUrl}/{dataSetId}/query", query);
-
-            return await client.GetAsync(uri);
-        }
+        return await client.GetAsync(uri);
     }
 
     private async Task<DataSetVersion> SetupDefaultDataSetVersion(
@@ -2075,7 +2041,7 @@ public abstract class DataSetsControllerGetQueryTests(TestApplicationFactory tes
 
         return dataSetVersion;
     }
-    
+
     private WebApplicationFactory<Startup> BuildApp()
     {
         return TestApp.ConfigureServices(services =>
