@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -36,6 +36,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
         public bool IsDryRun;
         public int Processed;
         public int LeftToProcess;
+        public List<string> Errors;
     }
 
     private class TimePeriod
@@ -63,6 +64,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
         var files = await filesQueryable.ToListAsync(cancellationToken: cancellationToken);
 
         var numDataSetFileMetaSet = 0;
+        var errors = new List<string>();
 
         foreach (var file in files)
         {
@@ -70,16 +72,23 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 .AsNoTracking()
                 .Where(o => o.SubjectId == file.SubjectId);
 
-            var geographicLevels = await observations
-                .Select(o => o.Location.GeographicLevel)
-                .Distinct()
-                .OrderBy(gl => gl)
-                .ToListAsync(cancellationToken: cancellationToken);
-
             var timePeriods = await observations
                 .Select(o => new TimePeriod{ Year = o.Year, TimeIdentifier = o.TimeIdentifier })
                 .Distinct()
                 .OrderBy(tp => tp.Year)
+                .ToListAsync(cancellationToken: cancellationToken);
+
+            if (timePeriods.Count == 0)
+            {
+                var errorStr = $"SubjectId {file.SubjectId} has no observations!";
+                errors.Add(errorStr);
+                continue;
+            }
+
+            var geographicLevels = await observations
+                .Select(o => o.Location.GeographicLevel)
+                .Distinct()
+                .OrderBy(gl => gl)
                 .ToListAsync(cancellationToken: cancellationToken);
 
             var filters = await _statisticsDbContext.Filter
@@ -131,6 +140,7 @@ public class DataSetFileMetaMigrationController : ControllerBase
                 .Count(f =>
                     f.DataSetFileMeta == null
                     && f.Type == FileType.Data),
+            Errors = errors,
         };
     }
 }
