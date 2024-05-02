@@ -1,11 +1,13 @@
 using Azure.Core;
 using Azure.Identity;
+using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
@@ -91,9 +93,11 @@ public static class ProcessorHostBuilder
                             .UseSqlServer(configuration.GetConnectionString("ContentDb"),
                                 providerOptions => providerOptions.EnableCustomRetryOnFailure())
                             .EnableSensitiveDataLogging(hostEnvironment.IsDevelopment()))
+                    .AddFluentValidation()
                     .AddScoped<IDataSetService, DataSetService>()
                     .AddScoped<IDataSetVersionImportRepository, DataSetVersionImportRepository>()
-                    .AddScoped<IDataSetVersionRepository, DataSetVersionRepository>();
+                    .AddScoped<IDataSetVersionRepository, DataSetVersionRepository>()
+                    .AddScoped<IValidator<ProcessorTriggerRequest>, ProcessorTriggerRequest.Validator>();
             });
     }
 }
