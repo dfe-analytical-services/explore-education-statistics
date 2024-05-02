@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -6,7 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 
 public record FootnoteCreateRequest
 {
-    public string Content { get; init; } = string.Empty;
+    private string _content = string.Empty;
+
+    public string Content
+    {
+        get => _content;
+        init => _content = value.Trim();
+    }
 
     public IReadOnlySet<Guid> Filters { get; init; } = new HashSet<Guid>();
 

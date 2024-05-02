@@ -1,7 +1,3 @@
-import { toolbarConfigSimple } from '@admin/config/ckEditorConfig';
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
-import toHtml from '@admin/utils/markdown/toHtml';
-import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -9,6 +5,7 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import React from 'react';
@@ -42,7 +39,7 @@ export default function EditableKeyStatDataBlockForm({
     onSubmit({
       ...values,
       guidanceTitle: values.guidanceTitle,
-      guidanceText: toMarkdown(values.guidanceText),
+      guidanceText: values.guidanceText,
     });
   };
 
@@ -51,7 +48,7 @@ export default function EditableKeyStatDataBlockForm({
       initialValues={{
         trend: keyStat.trend ?? '',
         guidanceTitle: keyStat.guidanceTitle ?? 'Help',
-        guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
+        guidanceText: keyStat.guidanceText,
       }}
       validationSchema={Yup.object<KeyStatDataBlockFormValues>({
         trend: Yup.string().max(230),
@@ -84,10 +81,10 @@ export default function EditableKeyStatDataBlockForm({
               label="Guidance title"
             />
 
-            <RHFFormFieldEditor<KeyStatDataBlockFormValues>
-              name="guidanceText"
-              toolbarConfig={toolbarConfigSimple}
+            <RHFFormFieldTextArea<KeyStatDataBlockFormValues>
               label="Guidance text"
+              name="guidanceText"
+              rows={3}
             />
 
             <ButtonGroup>
