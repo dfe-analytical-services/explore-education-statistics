@@ -7,11 +7,8 @@ resources:
       trigger: none
 
 parameters:
-  - name: apiContainerAppUserCreatedWithAcrPull
-    displayName: Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?
-    default: true
-  - name: psqlDbUsersAdded
-    displayName: Have database users been added to PSQL yet?
+  - name: deployContainerApp
+    displayName: Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.
     default: true
 
 variables:

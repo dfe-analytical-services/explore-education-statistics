@@ -56,11 +56,8 @@ param dateProvisioned string = utcNow('u')
 @description('The tags of the Docker images to deploy.')
 param dockerImagesTag string = ''
 
-@description('Has the user-assigned Managed Identity for the API Container App been created and been assigned the AcrPull role yet?')
-param apiContainerAppUserCreatedWithAcrPull bool = true
-
-@description('Have database users been added to PSQL yet?')
-param psqlDbUsersAdded bool = true
+@description('Can we deploy the Container App yet?  This is dependent on the user-assigned Managed Identity for the API Container App being created with the AcrPull role, and the database users added to PSQL.')
+param deployContainerApp bool = true
 
 @description('Public URLs of other components in the service.')
 param publicUrls {
@@ -232,12 +229,12 @@ module postgreSqlServerModule 'components/postgresqlDatabase.bicep' = {
   }
 }
 
-resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (apiContainerAppUserCreatedWithAcrPull) {
+resource apiContainerAppManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = if (deployContainerApp) {
   name: apiContainerAppManagedIdentityName
 }
 
 // Deploy main Public API Container App.
-module apiContainerAppModule 'components/containerApp.bicep' = if (apiContainerAppUserCreatedWithAcrPull && psqlDbUsersAdded) {
+module apiContainerAppModule 'components/containerApp.bicep' = if (deployContainerApp) {
   name: 'apiContainerAppDeploy'
   params: {
     resourcePrefix: resourcePrefix

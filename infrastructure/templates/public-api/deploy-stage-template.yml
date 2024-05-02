@@ -65,8 +65,7 @@ stages:
                       postgreSqlAdminPassword='$(postgreSqlAdminPassword)' \
                       postgreSqlFirewallRules='$(maintenanceFirewallRules)' \
                       dockerImagesTag='$(upstreamPipelineBuildNumber)' \
-                      psqlDbUsersAdded=$(psqlDbUsersAdded) \
-                      apiContainerAppUserCreatedWithAcrPull=$(apiContainerAppUserCreatedWithAcrPull)
+                      deployContainerApp=$(deployContainerApp) \
                       dataProcessorFunctionAppExists=$dataProcessorExists
 
           - template: pipeline-variables-from-bicep-outputs-template.yml
