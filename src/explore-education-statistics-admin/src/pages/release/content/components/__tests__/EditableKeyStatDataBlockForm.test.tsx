@@ -41,7 +41,7 @@ describe('EditableKeyStatDataBlockForm', () => {
     expect(screen.getByLabelText('Guidance title')).toHaveValue(
       'DataBlock guidance title',
     );
-    expect(screen.getByLabelText('Guidance text')).toHaveTextContent(
+    expect(screen.getByLabelText('Guidance text')).toHaveValue(
       'DataBlock guidance text',
     );
 

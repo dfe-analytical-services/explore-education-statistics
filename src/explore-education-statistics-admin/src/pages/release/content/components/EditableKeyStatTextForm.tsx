@@ -1,15 +1,9 @@
-import RHFFormFieldEditor from '@admin/components/form/RHFFormFieldEditor';
-import {
-  pluginsConfigSimple,
-  toolbarConfigSimple,
-} from '@admin/config/ckEditorConfig';
-import toHtml from '@admin/utils/markdown/toHtml';
-import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import React from 'react';
@@ -43,7 +37,7 @@ export default function EditableKeyStatTextForm({
     await onSubmit({
       ...values,
       guidanceTitle: values.guidanceTitle,
-      guidanceText: toMarkdown(values.guidanceText),
+      guidanceText: values.guidanceText,
     });
   };
 
@@ -55,9 +49,7 @@ export default function EditableKeyStatTextForm({
           statistic: keyStat?.statistic ?? '',
           trend: keyStat?.trend ?? '',
           guidanceTitle: keyStat?.guidanceTitle ?? 'Help',
-          guidanceText: keyStat?.guidanceText
-            ? toHtml(keyStat.guidanceText)
-            : '',
+          guidanceText: keyStat?.guidanceText,
         }}
         validationSchema={Yup.object<KeyStatTextFormValues>({
           title: Yup.string().required('Enter a title').max(60),
@@ -110,11 +102,10 @@ export default function EditableKeyStatTextForm({
                 label="Guidance title"
               />
 
-              <RHFFormFieldEditor<KeyStatTextFormValues>
-                name="guidanceText"
-                includePlugins={pluginsConfigSimple}
-                toolbarConfig={toolbarConfigSimple}
+              <RHFFormFieldTextArea<KeyStatTextFormValues>
                 label="Guidance text"
+                name="guidanceText"
+                rows={3}
               />
 
               <ButtonGroup>
